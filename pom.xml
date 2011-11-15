@@ -54,7 +54,7 @@
     </dependency>
   </dependencies>  
   <scm>
-    <connection>scm:svn:svn+ssh://dev1.synventis.com:10022/svn/com_celements/tags/celements-core-1.6</connection>
-    <developerConnection>scm:svn:svn+ssh://dev1.synventis.com:10022/svn/com_celements/tags/celements-core-1.6</developerConnection>
+    <connection>scm:git:git://git@github.com:celements/celements-core.git</connection>
+    <developerConnection>scm:git:git://git@github.com:celements/celements-core.git</developerConnection>
   </scm>
 </project>
