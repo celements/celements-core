@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping schema="dbo">
+  <class entity-name="Classes.RTEConfigTypeClass" table="cel_rteconfigtypeclass">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="RCT_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="rteconfig" type="string">
+    <column name="RCT_RTE_CONFIG" length="128" />
+  </property>
+</class>
+</hibernate-mapping>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping schema="dbo">
+  <class entity-name="Classes.RTEConfigTypePropertiesClass" table="cel_rteconfigtypepropertiesclass">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="RCP_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="styles" type="string">
+    <column name="RCP_STYLES" length="255"/>
+  </property>
+  <property name="plugins" type="string">
+    <column name="RCP_PLUGINS" length="255"/>
+  </property>
+  <property name="row_1" type="string">
+    <column name="RCP_ROW_1" length="255"/>
+  </property>
+  <property name="row_2" type="string">
+    <column name="RCP_ROW_2" length="255"/>
+  </property>
+  <property name="row_3" type="string">
+    <column name="RCP_ROW_3" length="255"/>
+  </property>
+  <property name="blockformats" type="string">
+    <column name="RCP_BLOCKFORMATS" length="255"/>
+  </property>
+  <property name="valid_elements" type="text">
+    <column name="RCP_VALID_ELES" />
+  </property>
+  <property name="invalid_elements" type="text">
+    <column name="RCP_INVALID_ELES" />
+  </property>
+</class>
+</hibernate-mapping>

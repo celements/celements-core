@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping schema="dbo">
+  <class entity-name="Classes.MenuItemClass" table="cel_menuitemclass">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="MIC_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="menu_position" type="integer">
+    <column name="MIC_MENU_POS" />
+  </property>
+  <property name="part_name" type="string">
+    <column name="MIC_PART_NAME" />
+  </property>
+  </class>
+
+  <class entity-name="Celements2.MenuName" table="cel_menunames">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="MN_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="menu_name" type="string">
+    <column name="MN_MENU_NAME" length="255"/>
+  </property>
+  <property name="lang" type="string">
+    <column name="MN_LANGUAGE" length="5"/>
+  </property>
+  <property name="tooltip" type="string">
+    <column name="MN_TOOLTIP" length="255"/>
+  </property>
+  <property name="image" type="string">
+    <column name="MN_IMAGE" length="255"/>
+  </property>
+  </class>
+
+  <class entity-name="Celements.CellClass" table="cel_cells">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="CEL_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="idname" type="string">
+    <column name="CEL_IDNAME" />
+  </property>
+  <property name="css_classes" type="string">
+    <column name="CEL_CSS_CLASSES" />
+  </property>
+  <property name="css_styles" type="string">
+    <column name="CEL_CSS_STYLES" />
+  </property>
+  </class>
+
+  <class entity-name="Celements.PageLayoutPropertiesClass" table="cel_pagelayouts">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="CPL_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="prettyname" type="string">
+    <column name="CPL_PRETTYNAME" />
+  </property>
+  <property name="isActive" type="integer">
+    <column name="CPL_ISACTIVE" />
+  </property>
+  <property name="authors" type="string">
+    <column name="CPL_AUTHORS" />
+  </property>
+  <property name="license" type="text">
+    <column name="CPL_LICENSE" />
+  </property>
+  <property name="version" type="string">
+    <column name="CPL_VERSION" />
+  </property>
+  </class>
+
+  <class entity-name="Classes.KeyValueClass" table="cel_keyvalue">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="CKV_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="key" type="string">
+    <column name="CKV_KEY" />
+  </property>
+  <property name="value" type="text">
+    <column name="CKV_VALUE" />
+  </property>
+  </class>
+  
+  <class entity-name="Classes.TokenClass" table="cel_token">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="CTK_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="tokenvalue" type="string">
+    <column name="CTK_TOKEN_VALUE" />
+  </property>
+  <property name="validuntil" type="timestamp">
+    <column name="CTK_VALID_UNTIL" />
+  </property>
+  </class>
+  
+  <class entity-name="Classes.MetaTagClass" table="cel_metatag">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="CMT_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="key" type="string">
+    <column name="CMT_KEY" />
+  </property>
+  <property name="value" type="text">
+    <column name="CMT_VALUE" />
+  </property>
+  <property name="lang" type="string">
+    <column name="CMT_LANGUAGE" />
+  </property>
+  </class>
+  
+  <class entity-name="Classes.ImageMapConfigClass" table="cel_img_map">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="IMC_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="map_id" type="string">
+    <column name="IMC_MAP_ID" />
+  </property>
+  <property name="lang" type="string">
+    <column name="IMC_MAP_LANG" />
+  </property>
+  <property name="map" type="text">
+    <column name="IMC_MAP" />
+  </property>
+  </class>
+
+	<class name="com.celements.migrations.SubSystemDBVersion" table="celsubsysdbversion">
+		<id name="subSystemName" type="string" unsaved-value="undefined">
+			<column name="CSSDBV_SUBSYSTEM_NAME" not-null="true" />
+			<generator class="assigned" />
+		</id>
+		<property name="version" type="integer">
+			<column name="CSSDBV_VERSION" />
+		</property>
+	</class>
+
+</hibernate-mapping>

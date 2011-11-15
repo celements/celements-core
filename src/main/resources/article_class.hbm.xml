@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class entity-name="XWiki.ArticleClass" table="cel_xwikiarticleclass">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="AC_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="article_id" type="integer">
+    <column name="AC_ARTICLE_ID" />
+  </property>
+  <property name="lang" type="string">
+    <column name="AC_LANG" length="2"/>
+  </property>
+  <property name="title" type="string">
+    <column name="AC_TITEL" length="100"/>
+  </property>
+  <property name="extract" type="string">
+    <column name="AC_EXTRACT" />
+  </property>
+  <property name="content" type="string">
+    <column name="AC_CONTENT" />
+  </property>
+  <property name="blogeditor" type="string">
+    <column name="AC_EDITOR" />
+  </property>
+  <property name="publishdate" type="date">
+    <column name="AC_PUBLISH_DATE" />
+  </property>
+  <property name="archivedate" type="date">
+    <column name="AC_ARCHIVE_DATE" />
+  </property>
+  <property name="hasComments" type="integer">
+    <column name="AC_HAS_COMMENTS" />
+  </property>
+  <property name="isSubscribable" type="integer">
+    <column name="AC_IS_SUBSCRIBABLE" />
+  </property>
+</class>
+</hibernate-mapping>
