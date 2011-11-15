@@ -54,7 +54,8 @@
     </dependency>
   </dependencies>  
   <scm>
-    <connection>scm:git:ssh://git@github.com:celements/celements-core.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:celements/celements-core.git</developerConnection>
+    <connection>scm:git:git@github.com:celements/celements-core.git</connection>
+    <developerConnection>scm:git:git@github.com:celements/celements-core.git</developerConnection>
+    <url>https://github.com/celements/celements-core</url>
   </scm>
 </project>
