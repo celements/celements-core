@@ -21,6 +21,8 @@ package com.celements.navigation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.CelementsClassCollection;
 import com.xpn.xwiki.XWiki;
@@ -29,10 +31,15 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+@Component("celements.celNavigationClasses")
 public class NavigationClasses extends CelementsClassCollection {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       NavigationClasses.class);
+
+  public String getConfigName() {
+    return "celNavigationClasses";
+  }
 
   @Override
   protected Log getLogger() {
@@ -49,21 +56,20 @@ public class NavigationClasses extends CelementsClassCollection {
 
   protected BaseClass getMenuNameClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(),
+        "Celements2", "MenuName");
 
     try {
-      doc = xwiki.getDocument("Celements2.MenuName", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements2");
-      doc.setName("MenuName");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements2.MenuName");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("menu_name", "Multilingual MenuName", 30);
     needsUpdate |= bclass.addTextField("lang", "Language", 5);
     needsUpdate |= bclass.addTextField("tooltip", "Tool Tip", 30);
@@ -81,21 +87,20 @@ public class NavigationClasses extends CelementsClassCollection {
   protected BaseClass getNavigationConfigClass(XWikiContext context)
       throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(),
+        "Celements2", "NavigationConfigClass");
 
     try {
-      doc = xwiki.getDocument("Celements2.NavigationConfigClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements2");
-      doc.setName("NavigationConfigClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements2.NavigationConfigClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("menu_element_name", "Menu Element Name", 30);
     needsUpdate |= bclass.addNumberField("from_hierarchy_level", "From Hierarchy Level",
         30, "integer");
@@ -117,21 +122,20 @@ public class NavigationClasses extends CelementsClassCollection {
 
   protected BaseClass getMenuItemClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(),
+        "Celements2", "MenuItem");
 
     try {
-      doc = xwiki.getDocument("Celements2.MenuItem", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements2");
-      doc.setName("MenuItem");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements2.MenuItem");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addNumberField("menu_position", "Position", 30, "integer");
     needsUpdate |= bclass.addTextField("part_name", "Menu Part Name", 30);
 
@@ -143,19 +147,19 @@ public class NavigationClasses extends CelementsClassCollection {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(),
+        "Classes", "MenuItemClass");
 
     try {
-      doc = xwiki.getDocument("Classes.MenuItemClass", context);
+      doc = xwiki.getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Classes");
-      doc.setName("MenuItemClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Classes.MenuItemClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addNumberField("menu_position", "Position", 30, "integer");
     needsUpdate |= bclass.addTextField("part_name", "Menu Part Name", 30);
 
@@ -166,10 +170,6 @@ public class NavigationClasses extends CelementsClassCollection {
 
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
-  }
-
-  public String getConfigName() {
-    return "celNavigationClasses";
   }
 
 }

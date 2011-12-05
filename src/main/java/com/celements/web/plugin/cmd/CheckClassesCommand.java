@@ -55,7 +55,6 @@ public class CheckClassesCommand {
       getExtended_XWikiPreferencesClass(context);
       getExtended_XWikiSkinsClass(context);
       getXWikiUsersClass(context);
-      new NavigationClasses().runUpdate(context);
       getFormMailClass(context);
       getBannerClass(context);
       getFlashBannerClass(context);
@@ -73,18 +72,14 @@ public class CheckClassesCommand {
       getJavaScriptExternalFilesClass(context);
       getContextMenuItemClass(context);
       getPanelConfigClass(context);
-      MenuClasses.getInstance().runUpdate(context);
       getRTEConfigTypeClass(context);
       getRTEConfigTypePropertiesClass(context);
       getMediaLibConfigClass(context);
       getDocLibConfigClass(context);
-      CellsClasses.getInstance().runUpdate(context);
-      RemoteUserValidationClasses.getInstance().runUpdate(context);
       getTagValueClass(context);
       getTokenClass(context);
       getOverlayConfigClass(context);
       getMetaTagClass(context);
-      ImageMapClasses.getInstance().runUpdate(context);
     } catch (XWikiException e) {
       mLogger.fatal(e);
     }
