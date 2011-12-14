@@ -21,29 +21,22 @@ package com.celements.cells;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.CelementsClassCollection;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+@Component("celements.celCellsClasses")
 public class CellsClasses extends CelementsClassCollection {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       CellsClasses.class);
-  private static CellsClasses instance;
 
-  private CellsClasses() {
-  }
-
-  public static CellsClasses getInstance() {
-    if (instance == null) {
-      instance = new CellsClasses();
-    }
-    return instance;
-  }
+  public CellsClasses() {}
 
   @Override
   protected void initClasses(XWikiContext context) throws XWikiException {
@@ -66,21 +59,20 @@ public class CellsClasses extends CelementsClassCollection {
   protected BaseClass getCellClass(XWikiContext context
       ) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
-    
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
+      "CellClass");
+
     try {
-      doc = xwiki.getDocument("Celements.CellClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("CellClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.CellClass");
+
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("idname", "id attribute", 30);
     needsUpdate |= bclass.addTextField("css_classes", "CSS Classes", 30);
     needsUpdate |= bclass.addTextAreaField("css_styles", "CSS Styles", 15, 20);
@@ -97,21 +89,20 @@ public class CellsClasses extends CelementsClassCollection {
   protected BaseClass getPageLayoutPropertiesClass(XWikiContext context
       ) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
+      "PageLayoutPropertiesClass");
     
     try {
-      doc = xwiki.getDocument("Celements.PageLayoutPropertiesClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("PageLayoutPropertiesClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.PageLayoutPropertiesClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("prettyname", "Layout Pretty Name", 30);
     needsUpdate |= bclass.addBooleanField("isActive", "is active", "yesno");
     needsUpdate |= bclass.addTextField("authors", "Authors", 30);
@@ -129,44 +120,43 @@ public class CellsClasses extends CelementsClassCollection {
 
   protected BaseClass getGroupCellClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
+      "GroupCellClass");
     
     try {
-      doc = xwiki.getDocument("Celements.GroupCellClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("GroupCellClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.GroupCellClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("render_layout", "Render Layout", 30);
     
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
   }
 
-  protected BaseClass getPageDepCellConfigClass(XWikiContext context) throws XWikiException {
+  protected BaseClass getPageDepCellConfigClass(XWikiContext context
+      ) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
+      "PageDepCellConfigClass");
 
     try {
-      doc = xwiki.getDocument("Celements.PageDepCellConfigClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("PageDepCellConfigClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.PageDepCellConfigClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("space_name", "Space Name", 30);
     needsUpdate |= bclass.addBooleanField("is_inheritable", "is inheritable", "yesno");
 

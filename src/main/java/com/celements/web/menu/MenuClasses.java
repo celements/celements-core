@@ -21,6 +21,8 @@ package com.celements.web.menu;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.CelementsClassCollection;
 import com.xpn.xwiki.XWiki;
@@ -29,21 +31,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+@Component("celements.celMenuClasses")
 public class MenuClasses extends CelementsClassCollection {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       MenuClasses.class);
-  private static MenuClasses instance;
 
-  private MenuClasses() {
-  }
-
-  public static MenuClasses getInstance() {
-    if (instance == null) {
-      instance = new MenuClasses();
-    }
-    return instance;
-  }
+  public MenuClasses() {}
 
   @Override
   protected void initClasses(XWikiContext context) throws XWikiException {
@@ -63,21 +57,20 @@ public class MenuClasses extends CelementsClassCollection {
   protected BaseClass getMenuBarHeaderItemClass(XWikiContext context
       ) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
+      "MenuBarHeaderItemClass");
     
     try {
-      doc = xwiki.getDocument("Celements.MenuBarHeaderItemClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("MenuBarHeaderItemClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.MenuBarHeaderItemClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("name", "Name (dictionary possible)", 30);
     needsUpdate |= bclass.addNumberField("header_id", "Header Id", 10, "integer");
     needsUpdate |= bclass.addNumberField("pos", "Position", 10, "integer");
@@ -91,19 +84,19 @@ public class MenuClasses extends CelementsClassCollection {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
+      "MenuBarSubItemClass");
     
     try {
-      doc = xwiki.getDocument("Celements.MenuBarSubItemClass", context);
+      doc = xwiki.getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("MenuBarSubItemClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.MenuBarSubItemClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("name", "Name (dictionary possible)", 30);
     needsUpdate |= bclass.addNumberField("header_id", "Header Id", 10, "integer");
     needsUpdate |= bclass.addNumberField("itempos", "Position", 10, "integer");

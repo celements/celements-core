@@ -4,3 +4,8 @@ com.celements.migrations.CelementsSubSystemMigrationComponent
 com.celements.migrator.MenuNameMappingCelements2_8
 com.celements.cells.CellsScriptService
 com.celements.common.classes.CompositorComponent
+com.celements.web.classcollections.RemoteUserValidationClasses
+com.celements.web.classcollections.ImageMapClasses
+com.celements.web.menu.MenuClasses
+com.celements.cells.CellsClasses
+com.celements.navigation.NavigationClasses

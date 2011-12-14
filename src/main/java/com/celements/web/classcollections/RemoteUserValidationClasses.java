@@ -21,52 +21,43 @@ package com.celements.web.classcollections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.CelementsClassCollection;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+@Component("celements.remoteValidator.classes")
 public class RemoteUserValidationClasses extends CelementsClassCollection {
   
   private static Log mLogger = LogFactory.getFactory().getInstance(
       RemoteUserValidationClasses.class);
   
-  private static RemoteUserValidationClasses instance;
-  
   public void initClasses(XWikiContext context) throws XWikiException {
     getRemoteUserValidationClass(context);
   }
   
-  private RemoteUserValidationClasses() {
-  }
-  
-  public static RemoteUserValidationClasses getInstance() {
-    if (instance == null) {
-      instance = new RemoteUserValidationClasses();
-    }
-    return instance;
-  }
+  public RemoteUserValidationClasses() {}
   
   protected BaseClass getRemoteUserValidationClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
+        "RemoteUserValidationClass");
     
     try {
-      doc = xwiki.getDocument("Classes.RemoteUserValidationClass", context);
+      doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
       mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Classes");
-      doc.setName("RemoteUserValidationClass");
+      doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Classes.RemoteUserValidationClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("host", "Allow from host", 30);
     needsUpdate |= bclass.addTextField("secret", "Secret for host", 30);
     
