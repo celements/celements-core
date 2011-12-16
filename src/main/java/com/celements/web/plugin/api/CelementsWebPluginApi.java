@@ -1075,10 +1075,9 @@ public class CelementsWebPluginApi extends Api {
   public String getEditURL(Document doc) {
     if(!context.getWiki().exists(doc.getDocumentReference(), context)
         || !isValidLanguage() || !isTranslationAvailable(doc, context.getLanguage())) {
-      return context.getWiki().getURL(doc.getFullName(), "edit",
-          "language=" + plugin.getDefaultLanguage(context), context);
+      return doc.getURL("edit", "language=" + plugin.getDefaultLanguage(context));
     } else {
-      return doc.getURL("edit");
+      return doc.getURL("edit", "language=" + context.getLanguage());
     }
   }
 
