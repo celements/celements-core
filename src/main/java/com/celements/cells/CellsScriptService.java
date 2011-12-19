@@ -59,6 +59,18 @@ public class CellsScriptService implements ScriptService {
     return currentPageRef;
   }
 
+  public DocumentReference getPageDependentDocRef(DocumentReference currentPageRef,
+      DocumentReference cellDocRef, boolean isInheritable) {
+    try {
+      return getPageDepDocRefCmd().getDocumentReference(getContext().getWiki(
+          ).getDocument(currentPageRef, getContext()), cellDocRef, isInheritable,
+          getContext());
+    } catch (XWikiException exp) {
+      mLogger.error("Failed to get xwiki document for [" + currentPageRef + "].", exp);
+    }
+    return currentPageRef;
+  }
+
   public Document getPageDependentTranslatedDocument(Document currentDoc,
       DocumentReference cellDocRef) {
     try {

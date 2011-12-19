@@ -51,8 +51,15 @@ public class PageDependentDocumentReferenceCommand {
   public DocumentReference getDocumentReference(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) {
     if (!isCurrentDocument(document, cellDocRef, context)) {
-      return getDependentDocumentReference(document, cellDocRef,
-          context);
+      return getDependentDocumentReference(document, cellDocRef, context);
+    }
+    return document.getDocumentReference();
+  }
+
+  public DocumentReference getDocumentReference(XWikiDocument document,
+      DocumentReference cellDocRef, boolean isInheritable, XWikiContext context) {
+    if (!isCurrentDocument(document, cellDocRef, context)) {
+      return getDependentDocumentReference(document, cellDocRef, isInheritable, context);
     }
     return document.getDocumentReference();
   }
@@ -88,8 +95,14 @@ public class PageDependentDocumentReferenceCommand {
 
   DocumentReference getDependentDocumentReference(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) {
+    return getDependentDocumentReference(document, cellDocRef, isInheritable(cellDocRef,
+        context), context);
+  }
+
+  DocumentReference getDependentDocumentReference(XWikiDocument document,
+      DocumentReference cellDocRef, boolean isInheritable, XWikiContext context) {
     String depDocSpace = getDependentDocumentSpace(document, cellDocRef, context);
-    if (isInheritable(cellDocRef, context)) {
+    if (isInheritable) {
       return new InheritorFactory().getContentInheritor(
         getDependentDocList(document.getFullName(), depDocSpace, context), context
         ).getDocument().getDocumentReference();
