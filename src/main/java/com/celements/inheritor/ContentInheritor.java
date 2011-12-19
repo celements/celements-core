@@ -96,7 +96,7 @@ public class ContentInheritor {
       return defaultValue;
   }
   
-  XWikiDocument getDocument(){
+  public XWikiDocument getDocument(){
     return getDoc(null);
   }
   
