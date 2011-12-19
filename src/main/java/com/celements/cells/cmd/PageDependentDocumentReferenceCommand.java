@@ -162,7 +162,7 @@ public class PageDependentDocumentReferenceCommand {
     return "";
   }
 
-  boolean isInheritable(DocumentReference cellDocRef, XWikiContext context) {
+  public boolean isInheritable(DocumentReference cellDocRef, XWikiContext context) {
     try {
       BaseObject cellConfObj = getDepCellXObject(cellDocRef, context);
       if (cellConfObj != null) {

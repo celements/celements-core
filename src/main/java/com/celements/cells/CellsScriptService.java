@@ -72,6 +72,10 @@ public class CellsScriptService implements ScriptService {
     return currentDoc;
   }
 
+  public boolean isInheritable(DocumentReference cellDocRef) {
+    return getPageDepDocRefCmd().isInheritable(cellDocRef, getContext());
+  }
+
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
