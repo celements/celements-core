@@ -38,6 +38,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class PageDependentDocumentReferenceCommand {
 
+  public static final String PDC_DEFAULT_CONTENT_NAME = "PDC-Default_Content";
   public static final String PAGE_DEP_CELL_CONFIG_CLASS_SPACE = "Celements";
   public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
 
@@ -113,11 +114,15 @@ public class PageDependentDocumentReferenceCommand {
       if (pageDepDoc != null) {
         return pageDepDoc.getDocumentReference();
       } else {
-        mLogger.debug("getDependentDocumentReference: inheritable result was null.");
+        mLogger.debug("getDependentDocumentReference: inheritable result was null."
+            + " Fallback to [" + depDocSpace + "." + PDC_DEFAULT_CONTENT_NAME + "]");
+        return new DocumentReference(context.getDatabase(), depDocSpace, 
+            PDC_DEFAULT_CONTENT_NAME);
       }
+    } else {
+      return new DocumentReference(context.getDatabase(), depDocSpace, 
+          document.getDocumentReference().getName());
     }
-    return new DocumentReference(context.getDatabase(), depDocSpace, 
-        document.getDocumentReference().getName());
   }
 
   public String getDependentDocumentSpace(XWikiDocument document,

@@ -127,6 +127,33 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     verifyAll(leftParentDoc);
   }
 
+  @Test
+  public void testGetDependentDocumentReference_defaultContent() throws Exception {
+    setDependentDocSpace("leftColumn", 1);
+    String fullName = "mySpace.MyDoc";
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    String parentFullName = "mySpace.MyParentDoc";
+    List<String> docParentList = Arrays.asList(fullName, parentFullName);
+    expect(webUtilsMock.getDocumentParentsList(eq(fullName), eq(true), same(context))
+        ).andReturn(docParentList);
+    DocumentReference expDepDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace_leftColumn",
+        PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
+    expect(document.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
+    expect(document.getFullName()).andReturn(fullName).atLeastOnce();
+    expect(xwiki.exists(eq("mySpace_leftColumn.MyDoc"), same(context))).andReturn(
+        false).atLeastOnce();
+    String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
+    expect(xwiki.exists(eq(leftParentFullName), same(context))).andReturn(
+        false).atLeastOnce();
+    replayAll();
+    DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(document,
+        cellDocRef, context);
+    assertEquals(expDepDocRef, depDocRef);
+    verifyAll();
+  }
+
 
   private void setDependentDocSpace(String depDocSpace, Integer isInheritable) {
     BaseObject cellConfig = new BaseObject();
