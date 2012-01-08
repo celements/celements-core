@@ -1168,7 +1168,6 @@ public class CelementsWebPluginApi extends Api {
     return (new ParseObjStoreCommand()).getObjStoreOptionsMap(options, context);
   }
 
-
   public boolean useXWikiLoginLayout() {
     return "1".equals(context.getWiki().getWebPreference("xwikiLoginLayout",
         "celements.xwikiLoginLayout", "1", context));
@@ -1263,6 +1262,11 @@ public class CelementsWebPluginApi extends Api {
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
     return emptyCheckCmd.getNextNonEmptyChildren(documentRef, context);
+  }
+
+  public boolean useImageAnimations() {
+    return "1".equals(context.getWiki().getWebPreference("celImageAnimation",
+        "celements.celImageAnimation", "1", context));
   }
 
 }
