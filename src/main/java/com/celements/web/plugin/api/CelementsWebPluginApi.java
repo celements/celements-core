@@ -1266,7 +1266,7 @@ public class CelementsWebPluginApi extends Api {
 
   public boolean useImageAnimations() {
     return "1".equals(context.getWiki().getWebPreference("celImageAnimation",
-        "celements.celImageAnimation", "1", context));
+        "celements.celImageAnimation", "0", context));
   }
 
 }
