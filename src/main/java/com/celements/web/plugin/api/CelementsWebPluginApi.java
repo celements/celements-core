@@ -1269,4 +1269,8 @@ public class CelementsWebPluginApi extends Api {
         "celements.celImageAnimation", "0", context));
   }
 
+  public String getAppScriptURL(String scriptName) {
+    return context.getDoc().getURL("view", "xpage=app&s=" + scriptName, context);
+  }
+
 }
