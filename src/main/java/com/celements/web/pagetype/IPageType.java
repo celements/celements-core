@@ -50,4 +50,6 @@ public interface IPageType {
 
   public String getPrettyName();
 
+  public String getPageTypeClassFullName();
+
 }
