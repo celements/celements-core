@@ -118,4 +118,9 @@ public class PageTypeApi implements IPageType {
   public boolean isVisible() {
     return PageTypeCommand.getInstance().isVisible(doc, context);
   }
+
+  public String getPageTypeClassFullName() {
+    return PageTypeCommand.PAGE_TYPE_CLASSNAME;
+  }
+
 }
