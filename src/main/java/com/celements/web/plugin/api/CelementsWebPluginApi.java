@@ -92,6 +92,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class CelementsWebPluginApi extends Api {
 
+  private static final String APP_SCRIPT_XPAGE = "app";
+
   public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
@@ -1270,7 +1272,25 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public String getAppScriptURL(String scriptName) {
-    return context.getDoc().getURL("view", "xpage=app&s=" + scriptName, context);
+    return getAppScriptURL(scriptName, "");
+  }
+
+  public String getAppScriptURL(String scriptName, String queryString) {
+    if (queryString == null) {
+      queryString = "";
+    }
+    if (!"".equals(queryString)) {
+      queryString = "&" + queryString;
+    }
+    return context.getDoc().getURL("view", "xpage=" + APP_SCRIPT_XPAGE + "&s="
+        + scriptName + queryString, context);
+  }
+
+  public boolean isAppScriptCurrentPage(String scriptName) {
+    String xpageStr = context.getRequest().getParameter("xpage");
+    String scriptStr = context.getRequest().getParameter("s");
+    return (APP_SCRIPT_XPAGE.equals(xpageStr) && (scriptStr != null)
+        && (scriptStr.equals(scriptName)));
   }
 
 }
