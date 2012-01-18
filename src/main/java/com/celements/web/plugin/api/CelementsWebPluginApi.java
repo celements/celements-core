@@ -19,6 +19,9 @@
  */
 package com.celements.web.plugin.api;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,6 +78,7 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
+import com.celements.web.utils.Html2Text;
 import com.celements.web.utils.SuggestBaseClass;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWiki;
@@ -1291,6 +1295,19 @@ public class CelementsWebPluginApi extends Api {
     String scriptStr = context.getRequest().getParameter("s");
     return (APP_SCRIPT_XPAGE.equals(xpageStr) && (scriptStr != null)
         && (scriptStr.equals(scriptName)));
+  }
+
+  public String convertToPlainText(String htmlContent) {
+    try {
+      Reader in = new StringReader(htmlContent);
+      Html2Text parser = new Html2Text();
+      parser.parse(in);
+      in.close();
+      return parser.getText();
+    } catch (IOException ioExp) {
+      mLogger.error("Fail to convertToPlainText: ", ioExp);
+    }
+    return "";
   }
 
 }
