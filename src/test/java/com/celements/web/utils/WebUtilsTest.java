@@ -20,6 +20,8 @@
 package com.celements.web.utils;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
+import com.celements.navigation.filter.INavFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -427,7 +430,35 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     result = "<a href=\"http://" + host + "/download/A/B\" >bla</a>";
     assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
   }
-  
+
+  @Test
+  public void testGetSubNodesForParent() throws Exception {
+    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
+        GetNotMappedMenuItemsForParentCommand.class);
+    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
+    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
+        GetMappedMenuItemsForParentCommand.class);
+    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Content",
+        "MainPage");
+    TreeNode treeNode = new TreeNode(docRef, "Content", 1);
+    List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
+    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:Content."),
+        same(context))).andReturn(mockTreeNodeList);
+    List<TreeNode> emptyList = Collections.emptyList();
+    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:Content."),
+        same(context))).andReturn(emptyList);
+    XWikiRightService mockRightService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(mockRightService).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.MainPage"), same(context))).andReturn(true);
+    replayAll(testGetNotMenuItemCommand, testGetMenuItemCommand, mockRightService);
+    List<TreeNode> resultList = celUtils.getSubNodesForParent("", "Content", "", context);
+    assertEquals(1, resultList.size());
+    assertTrue(mockTreeNodeList.contains(treeNode));
+    verifyAll(testGetNotMenuItemCommand, testGetMenuItemCommand, mockRightService);
+  }
+
   @Test
   public void getSiblingMenuItem_previous() throws XWikiException {
     context.setDatabase("siblingPrevious");
@@ -1108,4 +1139,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     
   }
 
+  private void replayAll(Object ... mocks) {
+    replay(mockStore, wiki, mockXStore);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(mockStore, wiki, mockXStore);
+    verify(mocks);
+  }
 }

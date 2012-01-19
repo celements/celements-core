@@ -355,7 +355,7 @@ public class WebUtils implements IWebUtils {
     String parentKey = getParentKey(parent, menuSpace, context);
     ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
     for (TreeNode node : fetchNodesForParentKey(parentKey, context)) {
-      if(filter.includeTreeNode(node, context)) {
+      if((node != null) && filter.includeTreeNode(node, context)) {
         // show only Menuitems of pages accessible to the current user
         menuArray.add(node);
       }
