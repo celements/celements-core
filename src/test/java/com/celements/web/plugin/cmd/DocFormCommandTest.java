@@ -23,6 +23,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -232,6 +233,15 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
         docFormCmd.getFindObjectFieldInRequestRegex()));
     assertTrue("Space.Doc_Class.Name_3_field".matches(
         docFormCmd.getFindObjectFieldInRequestRegex()));
+  }
+  
+  @Test
+  public void testApplyCreationDateFix() {
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
+        ).getDatabase(), "Test", "Doc"));
+    doc.setCreationDate(new Date(0));
+    docFormCmd.applyCreationDateFix(doc);
+    assertFalse(doc.getCreationDate().getTime() == 0);
   }
 
   @Test

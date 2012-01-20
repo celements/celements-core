@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -169,6 +170,7 @@ public class DocFormCommand {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     if(!changedDocs.containsKey(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage()
         )) {
+      applyCreationDateFix(doc);
       changedDocs.put(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage(), doc);
     } else {
       doc = changedDocs.get(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage());
@@ -192,11 +194,20 @@ public class DocFormCommand {
         tdoc.setStore(doc.getStore());
         tdoc.setTranslation(1);
       }
+      applyCreationDateFix(tdoc);
       changedDocs.put(getFullNameForRef(docRef) + ";" + context.getLanguage(), tdoc);
     } else {
       tdoc = changedDocs.get(getFullNameForRef(docRef) + ";" + context.getLanguage());
     }
     return tdoc;
+  }
+
+  void applyCreationDateFix(XWikiDocument doc) {
+    //FIXME Should be done when xwiki saves a new document. Unfortunately it is done
+    //      when you first get a document and than cached.
+    if(doc.isNew()) {
+      doc.setCreationDate(new Date());
+    }
   }
 
   private String getFullNameForRef(DocumentReference docRef) {
