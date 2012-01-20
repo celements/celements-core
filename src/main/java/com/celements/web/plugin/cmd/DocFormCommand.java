@@ -170,7 +170,7 @@ public class DocFormCommand {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     if(!changedDocs.containsKey(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage()
         )) {
-      applyCreationDateFix(doc);
+      applyCreationDateFix(doc, context);
       changedDocs.put(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage(), doc);
     } else {
       doc = changedDocs.get(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage());
@@ -194,7 +194,7 @@ public class DocFormCommand {
         tdoc.setStore(doc.getStore());
         tdoc.setTranslation(1);
       }
-      applyCreationDateFix(tdoc);
+      applyCreationDateFix(tdoc, context);
       changedDocs.put(getFullNameForRef(docRef) + ";" + context.getLanguage(), tdoc);
     } else {
       tdoc = changedDocs.get(getFullNameForRef(docRef) + ";" + context.getLanguage());
@@ -202,11 +202,12 @@ public class DocFormCommand {
     return tdoc;
   }
 
-  void applyCreationDateFix(XWikiDocument doc) {
+  void applyCreationDateFix(XWikiDocument doc, XWikiContext context) {
     //FIXME Should be done when xwiki saves a new document. Unfortunately it is done
     //      when you first get a document and than cached.
     if(doc.isNew()) {
       doc.setCreationDate(new Date());
+      doc.setCreator(context.getUser());
     }
   }
 

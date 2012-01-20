@@ -240,8 +240,11 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
         ).getDatabase(), "Test", "Doc"));
     doc.setCreationDate(new Date(0));
-    docFormCmd.applyCreationDateFix(doc);
-    assertFalse(doc.getCreationDate().getTime() == 0);
+    doc.setCreator("");
+    getContext().setUser("Hans.Wurscht");
+    docFormCmd.applyCreationDateFix(doc, getContext());
+    assertTrue(doc.getCreationDate().getTime() > 0);
+    assertEquals("Hans.Wurscht", doc.getCreator());
   }
 
   @Test
