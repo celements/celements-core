@@ -467,10 +467,14 @@ public class Navigation implements INavigation {
             fullName);
   }
 
-  private String getMenuLink(String fullName, XWikiContext context
+  String getMenuLink(String fullName, XWikiContext context
       ) throws XWikiException {
-    return context.getWiki().getURL(fullName, "view", context).replace(
-        "/xwiki/bin/view/", "/");
+    String docURL = context.getWiki().getURL(fullName, "view", context).replace(
+            "/xwiki/bin/view/", "/");
+    if ("".equals(docURL)) {
+      docURL = "/";
+    }
+    return docURL;
   }
 
   public static INavigation createNavigation(XWikiContext context) {

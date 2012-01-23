@@ -20,6 +20,8 @@
 package com.celements.navigation;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -110,12 +112,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(pageTypeApi.getPageType()).andStubReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setName(fullNameMenuItem);
-    replay(xwiki, navFilterMock, utils, pageTypeApi);
+    replayAll(pageTypeApi);
     StringBuilder outStream = new StringBuilder();
     nav.openMenuItemOut(outStream, menuItem.getName(), false, false, false, context);
     assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType\">",
         outStream.toString());
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -131,12 +133,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(pageTypeApi.getPageType()).andStubReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setName(fullNameMenuItem);
-    replay(xwiki, navFilterMock, utils, pageTypeApi);
+    replayAll(pageTypeApi);
     StringBuilder outStream = new StringBuilder();
     nav.openMenuItemOut(outStream, menuItem.getName(), false, false, false, context);
     assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType active\">",
         outStream.toString());
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -209,10 +211,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(pageTypeApi.getPageType()).andStubReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setName(fullNameMenuItem);
-    replay(xwiki, navFilterMock, utils, pageTypeApi);
+    replayAll(pageTypeApi);
     String cssClasses = nav.getCssClasses(menuItem.getName(), false, false, false, false,
         context);
-    verify(xwiki, navFilterMock, utils, pageTypeApi);
+    verifyAll(pageTypeApi);
     assertFalse("Expected to NOT find the cmCSSclass. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" cel_cm_navigation_menuitem "));
@@ -228,10 +230,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     expect(pageTypeApi.getPageType()).andStubReturn(pageType);
-    replay(xwiki, navFilterMock, utils, pageTypeApi);
+    replayAll(pageTypeApi);
     String cssClasses = nav.getCssClasses(fullNameMenuItem, true, false, false, false,
         context);
-    verify(xwiki, navFilterMock, utils, pageTypeApi);
+    verifyAll(pageTypeApi);
     assertTrue("Expected to found pageType in css classes. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" " + pageType + " "));
@@ -244,7 +246,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
     String cssClasses = nav.getCssClasses(null, true, false, false, false, context);
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
     assertFalse("Expected to not find pageType (because fullName is null) in css classes."
       + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" " + pageType + " "));
   }
@@ -255,7 +257,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
     String cssClasses = nav.getCssClasses(null, true, false, false, false, context);
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
     assertTrue("Expected to find 'cel_nav_hasChildren' (because not a leaf) in css"
         + " classes. [" + cssClasses + "]", (" " + cssClasses + " ").contains(
             " cel_nav_hasChildren "));
@@ -267,7 +269,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
     String cssClasses = nav.getCssClasses(null, true, false, false, true, context);
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
     assertTrue("Expected to find 'cel_nav_isLeaf' (because no children) in css classes."
       + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_isLeaf "));
   }
@@ -286,7 +288,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expectLastCall().once();
     replay(xwiki, navFilterMock, utils);
     String menuSpace = nav.getMenuSpace(context);
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
     assertEquals("Expected to receive parentSpace ["
         + parentSpaceName + "]", parentSpaceName, menuSpace);
   }
@@ -300,7 +302,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
             currentDoc.getFullName()));
     replay(xwiki, navFilterMock, utils);
     assertTrue(nav.isActiveMenuItem(menuItem.getName(), context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -311,7 +313,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
     assertFalse(nav.isActiveMenuItem(menuItem.getName(), context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -320,7 +322,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu", null));
     replay(xwiki, navFilterMock, utils);
     assertFalse(nav.isActiveMenuItem(null, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -332,7 +334,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
             currentDoc.getFullName()));
     replay(xwiki, navFilterMock, utils);
     assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 1, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -343,7 +345,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
     assertFalse(nav.showSubmenuForMenuItem(menuItem.getName(), 1, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -355,7 +357,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setShowAll(true);
     replay(xwiki, navFilterMock, utils);
     assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 1, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -368,7 +370,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setShowInactiveToLevel(3);
     replay(xwiki, navFilterMock, utils);
     assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 2, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -381,7 +383,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setShowInactiveToLevel(3);
     replay(xwiki, navFilterMock, utils);
     assertFalse(nav.showSubmenuForMenuItem(menuItem.getName(), 3, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -395,7 +397,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setShowInactiveToLevel(3);
     replay(xwiki, navFilterMock, utils);
     assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 5, context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -426,14 +428,14 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn(menuName).atLeastOnce();
     expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
         ))).andReturn("").atLeastOnce();
-    replay(xwiki, navFilterMock, utils, pageTypeApi, menuNameCmdMock);
+    replayAll(pageTypeApi, menuNameCmdMock);
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
         context);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
         + " myUltimativePageType\" id=\"N1:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verify(xwiki, navFilterMock, utils, pageTypeApi, menuNameCmdMock);
+    verifyAll(pageTypeApi, menuNameCmdMock);
   }
 
   @Test
@@ -467,7 +469,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("style=\"background-image:url(abc);\"").atLeastOnce();
     expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
         ))).andReturn("").atLeastOnce();
-    replay(xwiki, navFilterMock, utils, pageTypeApi, menuNameCmdMock);
+    replayAll(pageTypeApi, menuNameCmdMock);
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
         context);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
@@ -475,7 +477,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
         + " myUltimativePageType\" id=\"N1:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verify(xwiki, navFilterMock, utils, pageTypeApi, menuNameCmdMock);
+    verifyAll(pageTypeApi, menuNameCmdMock);
   }
 
   @Test
@@ -505,13 +507,13 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("My Current Doc").atLeastOnce();
     expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
         ))).andReturn("").atLeastOnce();
-    replay(xwiki, navFilterMock, utils, pageTypeApi, menuNameCmdMock);
+    replayAll(pageTypeApi, menuNameCmdMock);
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), true,
         context);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
         + " currentPage myUltimativePageType\" id=\"N1:MySpace.MyCurrentDoc\""
         + ">My Current Doc</span>", outStream.toString());
-    verify(xwiki, navFilterMock, utils, pageTypeApi, menuNameCmdMock);
+    verifyAll(pageTypeApi, menuNameCmdMock);
   }
 
   @Test
@@ -519,10 +521,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.addUlCSSClass("mainCss");
     nav.addUlCSSClass("firstCss");
     nav.addUlCSSClass("secondCss");
-    replay(xwiki, navFilterMock, utils);
+    replayAll();
     assertEquals("class=\"mainCss firstCss secondCss\"",
         nav.getMainUlCSSClasses().trim());
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
@@ -531,27 +533,47 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.addUlCSSClass("firstCss");
     nav.addUlCSSClass("secondCss");
     nav.addUlCSSClass("mainCss"); //double add existing class
-    replay(xwiki, navFilterMock, utils);
+    replayAll();
     assertEquals("class=\"mainCss firstCss secondCss\"",
         nav.getMainUlCSSClasses().trim());
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
   public void testGetNavLanguage_contextLanguage() {
     context.setLanguage("de");
-    replay(xwiki, navFilterMock, utils);
+    replayAll();
     assertEquals("de", nav.getNavLanguage(context));
-    verify(xwiki, navFilterMock, utils);
+    verifyAll();
   }
 
   @Test
   public void testGetNavLanguage_navLanguage() {
     context.setLanguage("de");
     nav.setLanguage("fr");
-    replay(xwiki, navFilterMock, utils);
+    replayAll();
     assertEquals("fr", nav.getNavLanguage(context));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetMenuLink_Content_WebHome() throws Exception {
+    expect(xwiki.getURL(eq("Content.WebHome"), eq("view"), same(context))
+        ).andReturn(""); // BUG IN XWIKI !!!
+    replayAll();
+    assertEquals("/", nav.getMenuLink("Content.WebHome", context));
+    verifyAll();
+  }
+
+  
+  private void replayAll(Object ... mocks) {
+    replay(xwiki, navFilterMock, utils);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
     verify(xwiki, navFilterMock, utils);
+    verify(mocks);
   }
 
 }
