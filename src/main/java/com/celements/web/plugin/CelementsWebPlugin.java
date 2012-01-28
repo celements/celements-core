@@ -269,7 +269,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       XWikiContext context) throws XWikiException{
     Map<String, String> userAccount = new HashMap<String, String>();
     String hashedCode = encryptString("hash:SHA-512:", activationCode);
-    String username = getUsernameForUserData(hashedCode, "validkey", context);
+    String username = new UserNameForUserDataCommand().getUsernameForUserData(hashedCode,
+        "validkey", context);
     
     if((username != null) && !username.equals("")){
       String password = context.getWiki().generateRandomString(24);
