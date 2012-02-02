@@ -77,14 +77,10 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   public void testFetchNodesForParentKey_mergeCombinedResult() {
     context.setDatabase("myWiki");
     String parentKey = "myWiki:mySpace.myDoc";
-    TreeNode menuItem2 = new TreeNode("mySpace.myDoc2", "mySpace.myDoc", 2,
-        context.getDatabase());
-    TreeNode menuItem3 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 3,
-        context.getDatabase());
-    TreeNode menuItem1 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 1,
-        context.getDatabase());
-    TreeNode menuItem5 = new TreeNode("mySpace.myDoc5", "mySpace.myDoc", 5,
-        context.getDatabase());
+    TreeNode menuItem2 = createTreeNode("mySpace", "myDoc2", "mySpace", "myDoc", 2);
+    TreeNode menuItem3 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 3);
+    TreeNode menuItem1 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 1);
+    TreeNode menuItem5 = createTreeNode("mySpace", "myDoc5", "mySpace", "myDoc", 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
         ).andReturn(mappedList);
@@ -105,15 +101,13 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     }
     verifyAll();
   }
-  
+
   @Test
   public void testFetchNodesForParentKey_onlyOldArray() {
     context.setDatabase("myWiki");
     String parentKey = "myWiki:mySpace.myDoc";
-    TreeNode menuItem2 = new TreeNode("mySpace.myDoc2", "mySpace.myDoc", 2,
-        context.getDatabase());
-    TreeNode menuItem3 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 3,
-        context.getDatabase());
+    TreeNode menuItem2 = createTreeNode("mySpace", "myDoc2", "mySpace", "myDoc", 2);
+    TreeNode menuItem3 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 3);
     List<TreeNode> oldNotMappedList = Arrays.asList(menuItem2, menuItem3);
     List<TreeNode> mappedList = Collections.emptyList();
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
@@ -131,10 +125,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     context.setDatabase("myWiki");
     String parentKey = "myWiki:mySpace.myDoc";
     List<TreeNode> oldMenuItems = Collections.emptyList();
-    TreeNode menuItem1 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 1,
-        context.getDatabase());
-    TreeNode menuItem5 = new TreeNode("mySpace.myDoc5", "mySpace.myDoc", 5,
-        context.getDatabase());
+    TreeNode menuItem1 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 1);
+    TreeNode menuItem5 = createTreeNode("mySpace", "myDoc5", "mySpace", "myDoc", 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
         ).andReturn(mappedList);
@@ -163,6 +155,12 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
 
 
+  private TreeNode createTreeNode(String docSpace, String docName, String parentDocSpace,
+      String parentDocName, int pos) {
+    return new TreeNode(new DocumentReference(context.getDatabase(), docSpace, docName),
+        parentDocSpace + "." + parentDocName, pos);
+  }
+  
   private void replayAll(Object ... mocks) {
     replay(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
         testGetMenuItemCommand);
