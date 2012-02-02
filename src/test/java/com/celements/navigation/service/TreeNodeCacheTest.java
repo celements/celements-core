@@ -1,6 +1,8 @@
 package com.celements.navigation.service;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -87,12 +89,35 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testQueryCount() {
-    fail("Not yet implemented");
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
+      createMock(GetNotMappedMenuItemsForParentCommand.class);
+    treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
+    expect(testGetMenuItemCommand.queryCount()).andReturn(15);
+    replayAll(testGetMenuItemCommand);
+    assertEquals(15, treeNodeCache.queryCount());
+    verifyAll(testGetMenuItemCommand);
   }
 
   @Test
   public void testFlushMenuItemCache() {
-    fail("Not yet implemented");
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
+      createMock(GetNotMappedMenuItemsForParentCommand.class);
+    treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
+    testGetMenuItemCommand.flushMenuItemCache(same(context));
+    expectLastCall().once();
+    replayAll(testGetMenuItemCommand);
+    treeNodeCache.flushMenuItemCache();
+    verifyAll(testGetMenuItemCommand);
   }
 
+
+  private void replayAll(Object ... mocks) {
+    replay(mockStore, wiki);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(mockStore, wiki);
+    verify(mocks);
+  }
 }
