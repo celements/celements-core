@@ -107,7 +107,10 @@ public interface IWebUtils {
    * @param menuSpace (default: $doc.space)
    * @param menuPart 
    * @return (array of tree nodes)
+   * 
+   * @deprecated instead use TreeNodeService directly
    */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart, XWikiContext context);
 
@@ -119,6 +122,18 @@ public interface IWebUtils {
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context);
 
+  /**
+   * 
+   * @param <T>
+   * @param parent
+   * @param menuSpace
+   * @param filter
+   * @param context
+   * @return
+   * 
+   * @deprecated instead use TreeNodeService directly
+   */
+  @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context);
 

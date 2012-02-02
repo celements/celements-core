@@ -33,7 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -43,12 +42,12 @@ import org.apache.commons.logging.LogFactory;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
-import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
-import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.ExternalUsageFilter;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.service.ITreeNodeCache;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -61,23 +60,22 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class WebUtils implements IWebUtils {
   
   private static Log mLogger = LogFactory.getFactory().getInstance(WebUtils.class);
 
-  private GetMappedMenuItemsForParentCommand injected_GetMappedMenuItemCommand;
-
   private static IWebUtils instance;
 
   private static Random rand = new Random();
 
-  private GetNotMappedMenuItemsForParentCommand notMappedMenuItemCommand;
-
   private InheritorFactory injectedInheritorFactory;
 
   private AttachmentURLCommand attachmentUrlCmd;
+
+  ITreeNodeService injected_TreeNodeService;
   
   /**
    * FOR TEST ONLY!!!
@@ -92,18 +90,31 @@ public class WebUtils implements IWebUtils {
     return instance;
   }
 
+  private ITreeNodeService getTreeNodeService() {
+    if (injected_TreeNodeService != null) {
+      return injected_TreeNodeService;
+    }
+    return Utils.getComponent(ITreeNodeService.class);
+  }
+
+  private ITreeNodeCache getTreeNodeCache() {
+    return Utils.getComponent(ITreeNodeCache.class);
+  }
+
   /* (non-Javadoc)
    * @see com.celements.web.utils.IWebUtils#queryCount()
    */
+  @Deprecated
   public int queryCount() {
-    return getNotMappedMenuItemsForParentCmd().queryCount();
+    return getTreeNodeCache().queryCount();
   }
 
   /* (non-Javadoc)
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
+  @Deprecated
   public void flushMenuItemCache(XWikiContext context) {
-    getNotMappedMenuItemsForParentCmd().flushMenuItemCache(context);
+    getTreeNodeCache().flushMenuItemCache();
   }
 
   /* (non-Javadoc)
@@ -145,118 +156,6 @@ public class WebUtils implements IWebUtils {
   @Deprecated
   public boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
-  }
-
-  /**
-   * 
-   * @param parentKey
-   * @param context
-   * @return Collection keeps ordering of menuItems according to posId
-   * 
-   * @deprecated use new fetchNodesForParentKey instead
-   */
-  @Deprecated
-  List<BaseObject> fetchMenuItemsForXWiki(String parentKey, XWikiContext context) {
-    long starttotal = System.currentTimeMillis();
-    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
-    for (TreeNode node : fetchNodesForParentKey(parentKey, context)) {
-      try {
-        XWikiDocument itemdoc = context.getWiki().getDocument(node.getFullName(), context);
-        BaseObject cobj = itemdoc.getObject("Celements2.MenuItem");
-        if(cobj != null) {
-          menuItemList.add(cobj);
-        }
-      } catch (XWikiException exp) {
-        mLogger.error("failed to get doc for menuItem", exp);
-      }
-    }
-    long end = System.currentTimeMillis();
-    mLogger.info("fetchMenuItemsForXWiki: [" + parentKey + "] totaltime for list of ["
-        + menuItemList.size() + "]: " + (end-starttotal));
-    return menuItemList;
-  }
-
-  /**
-   * fetchNodesForParentKey
-   * @param parentKey
-   * @param context
-   * @return Collection keeps ordering of TreeNodes according to posId
-   */
-  public List<TreeNode> fetchNodesForParentKey(String parentKey,
-      XWikiContext context) {
-    long starttotal = System.currentTimeMillis();
-    long start = System.currentTimeMillis();
-    List<TreeNode> notMappedmenuItems = getNotMappedMenuItemsForParentCmd(
-        ).getTreeNodesForParentKey(parentKey, context);
-    long end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey: time for getNotMappedMenuItemsFromDatabase: "
-        + (end-start));
-    start = System.currentTimeMillis();
-    List<TreeNode> mappedTreeNodes = getMappedMenuItemsForParentCmd(context
-        ).getTreeNodesForParentKey(parentKey, context);
-    end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey: time for getMappedMenuItemsForParentCmd: "
-        + (end-start));
-    start = System.currentTimeMillis();
-    TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
-    if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
-      end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey  + "] totaltime for list of ["
-          + mappedTreeNodes.size() + "]: " + (end-starttotal));
-      return mappedTreeNodes;
-    } else if (mappedTreeNodes.size() == 0) {
-      end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
-          + notMappedmenuItems.size() + "]: " + (end-starttotal));
-      return notMappedmenuItems;
-    } else {
-      menuItemsMergedMap = new TreeMap<Integer, TreeNode>();
-      for (TreeNode node : notMappedmenuItems) {
-        menuItemsMergedMap.put(new Integer(node.getPosition()), node);
-      }
-      for (TreeNode node : mappedTreeNodes) {
-        menuItemsMergedMap.put(new Integer(node.getPosition()), node);
-      }
-      end = System.currentTimeMillis();
-      mLogger.debug("fetchNodesForParentKey: time for merging menu items: "
-          + (end-start));
-      ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
-          + menuItems.size() + "]: " + (end-starttotal));
-      return menuItems;
-    }
-  }
-
-  void inject_GetMappedMenuItemsForParentCmd(
-      GetMappedMenuItemsForParentCommand testGetMenuItemCommand) {
-    injected_GetMappedMenuItemCommand = testGetMenuItemCommand;
-  }
-
-  GetMappedMenuItemsForParentCommand getMappedMenuItemsForParentCmd(XWikiContext context) {
-    if (injected_GetMappedMenuItemCommand != null) {
-      return injected_GetMappedMenuItemCommand;
-    }
-    if (context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) 
-        != null && context.get(GetMappedMenuItemsForParentCommand.
-            CELEMENTS_MAPPED_MENU_ITEMS_KEY) instanceof GetMappedMenuItemsForParentCommand) {
-      return (GetMappedMenuItemsForParentCommand)context.get(
-          GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY);
-    }
-    GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
-    cmd.set_isActive(false);
-    return cmd;
-  }
-
-  void inject_GetNotMappedMenuItemsForParentCmd(
-      GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand) {
-    notMappedMenuItemCommand = testGetMenuItemCommand;
-  }
-
-  GetNotMappedMenuItemsForParentCommand getNotMappedMenuItemsForParentCmd() {
-    if (notMappedMenuItemCommand == null) {
-      notMappedMenuItemCommand = new GetNotMappedMenuItemsForParentCommand();
-    }
-    return notMappedMenuItemCommand;
   }
 
   /* (non-Javadoc)
@@ -316,14 +215,13 @@ public class WebUtils implements IWebUtils {
     return getSubMenuItemsForParent(parent, menuSpace, filter, context);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getSubMenuItemsForParent_internal(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService directly
    */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart, XWikiContext context) {
-    InternalRightsFilter filter = new InternalRightsFilter();
-    filter.setMenuPart(menuPart);
-    return getSubNodesForParent(parent, menuSpace, filter, context);
+    return getTreeNodeService().getSubNodesForParent(parent, menuSpace, menuPart);
   }
 
   /**
@@ -333,34 +231,16 @@ public class WebUtils implements IWebUtils {
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context) {
-    if("".equals(menuSpace)) {
-      menuSpace = context.getDoc().getSpace();
-    }
-    String parentKey = getParentKey(parent, menuSpace, context);
-    ArrayList<T> menuArray = new ArrayList<T>();
-    for (BaseObject baseObj : fetchMenuItemsForXWiki(parentKey, context)) {
-      if(filter.includeMenuItem(baseObj, context)) {
-        // show only Menuitems of pages accessible to the current user
-        menuArray.add(filter.convertObject(baseObj, context));
-      }
-    }
-    return menuArray;
+    return getTreeNodeService().getSubMenuItemsForParent(parent, menuSpace, filter);
   }
 
+  /**
+   * @deprecated instead use TreeNodeService directly
+   */
+  @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context) {
-    if("".equals(menuSpace)) {
-      menuSpace = context.getDoc().getSpace();
-    }
-    String parentKey = getParentKey(parent, menuSpace, context);
-    ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
-    for (TreeNode node : fetchNodesForParentKey(parentKey, context)) {
-      if((node != null) && filter.includeTreeNode(node, context)) {
-        // show only Menuitems of pages accessible to the current user
-        menuArray.add(node);
-      }
-    }
-    return menuArray;
+    return getTreeNodeService().getSubNodesForParent(parent, menuSpace, filter);
   }
 
   /* (non-Javadoc)
@@ -396,20 +276,6 @@ public class WebUtils implements IWebUtils {
       }
     }
     return parent;
-  }
-
-  String getParentKey(String parent, String menuSpace, XWikiContext context) {
-    String parentKey = "";
-    if (parent != null) {
-      parentKey = parent;
-    }
-    if(parentKey.indexOf('.') < 0) {
-      parentKey = menuSpace + "." + parentKey;
-    }
-    if(parentKey.indexOf(':') < 0) {
-      parentKey = context.getDatabase() + ":" + parentKey;
-    }
-    return parentKey;
   }
 
   /* (non-Javadoc)

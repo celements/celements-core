@@ -9,3 +9,5 @@ com.celements.web.classcollections.ImageMapClasses
 com.celements.web.menu.MenuClasses
 com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
+com.celements.navigation.service.TreeNodeCache
+com.celements.navigation.service.TreeNodeService

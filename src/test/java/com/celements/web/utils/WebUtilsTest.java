@@ -20,13 +20,10 @@
 package com.celements.web.utils;
 
 import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -38,10 +35,8 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
-import com.celements.navigation.TreeNode;
-import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
-import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
-import com.celements.navigation.filter.INavFilter;
+import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -64,6 +59,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   private XWikiURLFactory mockURLFactory;
   private XWiki wiki;
   private XWikiStoreInterface mockXStore;
+  private ITreeNodeService injected_TreeNodeService;
   
   @Before
   public void setUp_WebUtilsTest() {
@@ -76,6 +72,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     mockXStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockXStore).anyTimes();
     context.setURLFactory(mockURLFactory);
+    injected_TreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injected_TreeNodeService = injected_TreeNodeService;
   }
 
   @Test
@@ -432,41 +430,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetSubNodesForParent() throws Exception {
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
-        GetMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Content",
-        "MainPage");
-    TreeNode treeNode = new TreeNode(docRef, "Content", 1);
-    List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:Content."),
-        same(context))).andReturn(mockTreeNodeList);
-    List<TreeNode> emptyList = Collections.emptyList();
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:Content."),
-        same(context))).andReturn(emptyList);
-    XWikiRightService mockRightService = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(mockRightService).anyTimes();
-    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-        eq("Content.MainPage"), same(context))).andReturn(true);
-    replayAll(testGetNotMenuItemCommand, testGetMenuItemCommand, mockRightService);
-    List<TreeNode> resultList = celUtils.getSubNodesForParent("", "Content", "", context);
-    assertEquals(1, resultList.size());
-    assertTrue(mockTreeNodeList.contains(treeNode));
-    verifyAll(testGetNotMenuItemCommand, testGetMenuItemCommand, mockRightService);
-  }
-
-  @Test
   public void getSiblingMenuItem_previous() throws XWikiException {
     context.setDatabase("siblingPrevious");
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
     context.setDoc(doc);
-    String parentKey = ((WebUtils) celUtils).getParentKey("", "mySpace", context);
     BaseObject menuItem1 = new BaseObject();
     String prevFullName = "mySpace.Doc1";
     menuItem1.setName(prevFullName);
@@ -485,9 +454,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument nextDoc = new XWikiDocument();
     nextDoc.setFullName(nextFullName);
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
     expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc).anyTimes();
     expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc
       ).anyTimes();
@@ -502,17 +468,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(mockXStore.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
         (List<?>)anyObject(), same(context))).andReturn(new ArrayList<String>()
             ).anyTimes();
-    List<TreeNode> menuItemList = new ArrayList<TreeNode>();
-    menuItemList.add(new TreeNode(prevFullName, "", 1, context.getDatabase()));
-    menuItemList.add(new TreeNode(mItemFullName, "", 2, context.getDatabase()));
-    menuItemList.add(new TreeNode("mySpace.Doc2", "", 3, context.getDatabase()));
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(menuItemList).atLeastOnce();
-    replay(rightServiceMock, wiki, mockXStore, testGetNotMenuItemCommand);
+    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
+    menuItemList.add(menuItem1);
+    menuItemList.add(menuItemItemDoc);
+    menuItemList.add(menuItem2);
+    expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
+        isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
+    replayAll(rightServiceMock);
     BaseObject prevMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         true, context);
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem1, prevMenuItem);
-    verify(rightServiceMock, wiki, mockXStore, testGetNotMenuItemCommand);
+    verifyAll(rightServiceMock);
   }
 
   @Test
@@ -522,7 +488,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
     context.setDoc(doc);
-    String parentKey = ((WebUtils) celUtils).getParentKey("", "mySpace", context);
     BaseObject menuItem1 = new BaseObject();
     String prevFullName = "mySpace.Doc1";
     menuItem1.setName(prevFullName);
@@ -541,9 +506,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument nextDoc = new XWikiDocument();
     nextDoc.setFullName(nextFullName);
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
     expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc).anyTimes();
     expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc
       ).anyTimes();
@@ -558,17 +520,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(mockXStore.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
         (List<?>)anyObject(), same(context))).andReturn(new ArrayList<String>()
             ).anyTimes();
-    List<TreeNode> menuItemList = new ArrayList<TreeNode>();
-    menuItemList.add(new TreeNode("mySpace.Doc1", "", 1, context.getDatabase()));
-    menuItemList.add(new TreeNode(mItemFullName, "", 2, context.getDatabase()));
-    menuItemList.add(new TreeNode(nextFullName, "", 3, context.getDatabase()));
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(menuItemList).atLeastOnce();
-    replay(rightServiceMock, wiki, mockXStore, testGetNotMenuItemCommand);
+    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
+    menuItemList.add(menuItem1);
+    menuItemList.add(menuItemItemDoc);
+    menuItemList.add(menuItem2);
+    expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
+        isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
+    replayAll(rightServiceMock);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         false, context);
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
-    verify(rightServiceMock, wiki, mockXStore, testGetNotMenuItemCommand);
+    verifyAll(rightServiceMock);
   }
   
   @Test
@@ -578,7 +540,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
     context.setDoc(new XWikiDocument("otherSpace", "otherDoc"));
-    String parentKey = ((WebUtils) celUtils).getParentKey("", "mySpace", context);
     BaseObject menuItem1 = new BaseObject();
     String prevFullName = "mySpace.Doc1";
     menuItem1.setName(prevFullName);
@@ -597,9 +558,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument nextDoc = new XWikiDocument();
     nextDoc.setFullName(nextFullName);
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
     expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc).anyTimes();
     expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc
       ).anyTimes();
@@ -614,17 +572,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(mockXStore.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
         (List<?>)anyObject(), same(context))).andReturn(new ArrayList<String>()
             ).anyTimes();
-    List<TreeNode> menuItemList = new ArrayList<TreeNode>();
-    menuItemList.add(new TreeNode("mySpace.Doc1", "", 1, context.getDatabase()));
-    menuItemList.add(new TreeNode(mItemFullName, "", 2, context.getDatabase()));
-    menuItemList.add(new TreeNode(nextFullName, "", 3, context.getDatabase()));
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(menuItemList).atLeastOnce();
-    replay(rightServiceMock, wiki, mockXStore, testGetNotMenuItemCommand);
+    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
+    menuItemList.add(menuItem1);
+    menuItemList.add(menuItemItemDoc);
+    menuItemList.add(menuItem2);
+    expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
+        isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
+    replayAll(rightServiceMock);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         false, context);
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
-    verify(rightServiceMock, wiki, mockXStore, testGetNotMenuItemCommand);
+    verifyAll(rightServiceMock);
   }
 
   @Test
@@ -928,183 +886,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertTrue(celUtils.isAttachmentLink("db:Space.Page;attachment.jpg"));
   }
 
-  @Test
-  public void testFetchNodesForParentKey_mergeCombinedResult() {
-    context.setDatabase("myWiki");
-    String parentKey = "myWiki:mySpace.myDoc";
-    TreeNode menuItem2 = new TreeNode("mySpace.myDoc2", "mySpace.myDoc", 2,
-        context.getDatabase());
-    TreeNode menuItem3 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 3,
-        context.getDatabase());
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
-    TreeNode menuItem1 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 1,
-        context.getDatabase());
-    TreeNode menuItem5 = new TreeNode("mySpace.myDoc5", "mySpace.myDoc", 5,
-        context.getDatabase());
-    List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
-        GetMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(Arrays.asList(menuItem2, menuItem3)).atLeastOnce();
-    replay(mockStore, wiki, testGetMenuItemCommand,
-        testGetNotMenuItemCommand);
-    List<TreeNode> menuItemsMerged = celUtils.fetchNodesForParentKey(parentKey, context);
-    List<TreeNode> expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
-        menuItem5);
-    assertEquals("result array does not match expected size.", expectedList.size(),
-        menuItemsMerged.size());
-    int pos = 0;
-    for (TreeNode menuItem : menuItemsMerged) {
-      TreeNode expectedMenuitem = expectedList.get(pos++);
-      assertEquals("Array compare failed on item " + pos, expectedMenuitem.getPosition(),
-          menuItem.getPosition());
-      assertSame("Array compare failed on item " + pos, expectedMenuitem, menuItem);
-    }
-    verify(mockStore, wiki, testGetMenuItemCommand,
-        testGetNotMenuItemCommand);
-  }
-  
-  @Test
-  public void testFetchNodesForParentKey_onlyOldArray() {
-    context.setDatabase("myWiki");
-    String parentKey = "myWiki:mySpace.myDoc";
-    TreeNode menuItem2 = new TreeNode("mySpace.myDoc2", "mySpace.myDoc", 2,
-        context.getDatabase());
-    TreeNode menuItem3 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 3,
-        context.getDatabase());
-    List<TreeNode> oldNotMappedList = Arrays.asList(menuItem2, menuItem3);
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
-    List<TreeNode> mappedList = Collections.emptyList();
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
-        GetMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
-        )).andReturn(oldNotMappedList).atLeastOnce();
-    replay(mockStore, wiki, testGetMenuItemCommand,
-        testGetNotMenuItemCommand);
-    List<TreeNode> menuItemsMerged = celUtils.fetchNodesForParentKey(parentKey,
-        context);
-    assertSame("expecting old notMapped list.", oldNotMappedList, menuItemsMerged);
-    verify(mockStore, wiki, testGetMenuItemCommand,
-        testGetNotMenuItemCommand);
-  }
-
-  @Test
-  public void testFetchNodesForParentKey_onlyNewMappedList() {
-    context.setDatabase("myWiki");
-    String parentKey = "myWiki:mySpace.myDoc";
-    List<TreeNode> oldMenuItems = Collections.emptyList();
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
-    TreeNode menuItem1 = new TreeNode("mySpace.myDoc1", "mySpace.myDoc", 1,
-        context.getDatabase());
-    TreeNode menuItem5 = new TreeNode("mySpace.myDoc5", "mySpace.myDoc", 5,
-        context.getDatabase());
-    List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
-        GetMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(oldMenuItems).atLeastOnce();
-    replay(mockStore, wiki, testGetMenuItemCommand,
-        testGetNotMenuItemCommand);
-    List<TreeNode> menuItemsMerged = celUtils.fetchNodesForParentKey(parentKey,
-        context);
-    assertSame("expecting old notMapped list.", mappedList, menuItemsMerged);
-    verify(mockStore, wiki, testGetMenuItemCommand,
-        testGetNotMenuItemCommand);
-  }
-  
-  @Test
-  public void testFetchNodesForParentKey_noMenuItems_NPE() {
-    context.setDatabase("myWiki");
-    String parentKey = "myWiki:mySpace.myDoc";
-    GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand = createMock(
-        GetNotMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetNotMenuItemCommand);
-    List<TreeNode> mappedList = Collections.emptyList();
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
-        GetMappedMenuItemsForParentCommand.class);
-    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
-        )).andReturn(null).atLeastOnce();
-    replay(mockStore, wiki, testGetNotMenuItemCommand,
-        testGetMenuItemCommand);
-    List<TreeNode> menuItemsMerged = celUtils.fetchNodesForParentKey(parentKey,
-        context);
-    assertNotNull("expecting not null.", menuItemsMerged);
-    assertEquals("expecting empty list.", 0, menuItemsMerged.size());
-    verify(mockStore, wiki, testGetNotMenuItemCommand,
-        testGetMenuItemCommand);
-  }
-  
-  @Test
-  public void testGetMappedMenuItemsForParentCmd() {
-    assertFalse(celUtils.getMappedMenuItemsForParentCmd(context).is_isActive());
-  }
-  
-  @Test
-  public void testGetMappedMenuItemsForParentCmd_injected() {
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      new GetMappedMenuItemsForParentCommand();
-    testGetMenuItemCommand.set_isActive(true);
-    celUtils.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    assertEquals(testGetMenuItemCommand, celUtils.getMappedMenuItemsForParentCmd(context));
-    assertTrue(celUtils.getMappedMenuItemsForParentCmd(context).is_isActive());
-  }
-  
-  @Test
-  public void testGetNotMappedMenuItemsForParentCmd() {
-    assertNotNull(celUtils.getNotMappedMenuItemsForParentCmd());
-  }
-  
-  @Test
-  public void testGetNotMappedMenuItemsForParentCmd_injected() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      new GetNotMappedMenuItemsForParentCommand();
-    celUtils.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
-    assertNotNull(celUtils.getNotMappedMenuItemsForParentCmd());
-    assertSame("Expecting injected cmd object", testGetMenuItemCommand,
-        celUtils.getNotMappedMenuItemsForParentCmd());
-  }
-  
-  @Test
-  public void testGetNotMappedMenuItemsForParentCmd_singleton() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      celUtils.getNotMappedMenuItemsForParentCmd();
-    assertNotNull(testGetMenuItemCommand);
-    assertSame("Expecting injected cmd object", testGetMenuItemCommand,
-        celUtils.getNotMappedMenuItemsForParentCmd());
-  }
-  
-  @Test
-  public void testGetMappedMenuItemsForParentCmd_injectedByContext() {
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = new GetMappedMenuItemsForParentCommand();
-    testGetMenuItemCommand.set_isActive(true);
-    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, 
-        testGetMenuItemCommand);
-    assertTrue(celUtils.getMappedMenuItemsForParentCmd(context).is_isActive());
-    
-    testGetMenuItemCommand.set_isActive(false);
-    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, 
-        testGetMenuItemCommand);
-    assertFalse(celUtils.getMappedMenuItemsForParentCmd(context).is_isActive());
-  }
-  
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
@@ -1140,12 +921,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
 
   private void replayAll(Object ... mocks) {
-    replay(mockStore, wiki, mockXStore);
+    replay(mockStore, wiki, mockXStore, injected_TreeNodeService);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(mockStore, wiki, mockXStore);
+    verify(mockStore, wiki, mockXStore, injected_TreeNodeService);
     verify(mocks);
   }
 }
