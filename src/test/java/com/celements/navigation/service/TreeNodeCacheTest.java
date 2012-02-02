@@ -1,8 +1,6 @@
 package com.celements.navigation.service;
 
 import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
