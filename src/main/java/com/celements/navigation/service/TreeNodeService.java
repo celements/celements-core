@@ -29,7 +29,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class TreeNodeService implements ITreeNodeService {
 
-
   private static Log mLogger = LogFactory.getFactory().getInstance(TreeNodeService.class);
 
   @Requirement
