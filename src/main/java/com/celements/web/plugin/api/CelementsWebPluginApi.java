@@ -76,6 +76,7 @@ import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.sajson.Builder;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.Html2Text;
@@ -1317,6 +1318,10 @@ public class CelementsWebPluginApi extends Api {
       mLogger.error("Fail to convertToPlainText: ", ioExp);
     }
     return "";
+  }
+
+  public Builder getNewJSONBuilder() {
+    return new Builder();
   }
 
 }
