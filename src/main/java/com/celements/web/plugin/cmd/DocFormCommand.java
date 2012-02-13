@@ -168,6 +168,9 @@ public class DocFormCommand {
   XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context
       ) throws XWikiException {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
+    if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
+      doc.setDefaultLanguage(context.getLanguage());
+    }
     if(!changedDocs.containsKey(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage()
         )) {
       LOGGER.debug("getUpdateDoc: [" + getFullNameForRef(docRef) + ";"

@@ -305,6 +305,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testUpdateDocFromMap_newFromTemplate_titleAndContent() 
       throws XWikiException {
+    context.setLanguage("de");
     Map<String, String[]> data = new HashMap<String, String[]>();
     data.put("Oh.Noes_title", new String[]{"Blabla Value"});
     data.put("content", new String[]{"Another Blabla Value"});
@@ -328,10 +329,10 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument templDoc = new XWikiDocument(templRef);
     expect(wiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
-    //TODO is there a better method to match the parameter? -> eq and same do not work
-    //     since loadXWikiDoc create a new XWikiDocument
-    expect(store.loadXWikiDoc(isA(XWikiDocument.class), same(context))).andReturn(defaultDoc);
-    expect(store.loadXWikiDoc(isA(XWikiDocument.class), same(context))).andReturn(specificDoc);
+//    //TODO is there a better method to match the parameter? -> eq and same do not work
+//    //     since loadXWikiDoc create a new XWikiDocument
+//    expect(store.loadXWikiDoc(isA(XWikiDocument.class), same(context))).andReturn(defaultDoc);
+//    expect(store.loadXWikiDoc(isA(XWikiDocument.class), same(context))).andReturn(specificDoc);
     expect(wiki.getStore()).andReturn(store).anyTimes();
     replay(wiki, store, request);
     Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", 
@@ -340,7 +341,9 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     //TODO Check how it works - getTranslatedDoc seems to create a new object which leads
     //     to getContent() and getTitle() to be empty -> does it work correctly anyways?
     assertTrue(changedDocs.contains(defaultDoc));
+    assertEquals("de", defaultDoc.getDefaultLanguage());
     assertTrue(changedDocs.contains(specificDoc));
+    assertEquals("de", specificDoc.getDefaultLanguage());
   }
 
   @Test
