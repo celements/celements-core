@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 public class DocFormCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocFormCommand.class);
   private Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
   private Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
@@ -78,7 +78,7 @@ public class DocFormCommand {
         if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
             context.put("exception", e);
         }
-        mLogger.error("Exception reading doc " + docRef + " from template " + templRef, e);
+        LOGGER.error("Exception reading doc " + docRef + " from template " + templRef, e);
       }
     }
     for (String key : data.keySet()) {
@@ -86,7 +86,7 @@ public class DocFormCommand {
         String[] parts = getDocFullname(key, docSpace, docName);
         DocumentReference saveDocRef = new DocumentReference(context.getDatabase(
             ), parts[0], parts[1]);
-        mLogger.debug("request key:'" + key + "'=value:" + data.get(key).length);
+        LOGGER.debug("request key:'" + key + "'=value:" + data.get(key).length);
         if(key.matches("([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_)?content")) {
           XWikiDocument tdoc = getTranslatedDoc(saveDocRef, context);
           tdoc.setContent(collapse(data.get(key)));
@@ -129,12 +129,12 @@ public class DocFormCommand {
   XWikiDocument setObjValue(XWikiDocument doc, String key,
       String[] value, XWikiContext context) throws XWikiException {
     String className = key.substring(0, key.indexOf("_"));
-    mLogger.debug("key complete: " + key);
+    LOGGER.debug("key complete: " + key);
     key = key.substring(key.indexOf("_") + 1);
     Integer objNr = Integer.parseInt(key.substring(0, key.indexOf("_")));
-    mLogger.debug("key -1 part: " + key);
+    LOGGER.debug("key -1 part: " + key);
     key = key.substring(key.indexOf("_") + 1);
-    mLogger.debug("key -2 parts: " + key);
+    LOGGER.debug("key -2 parts: " + key);
     BaseObject obj = null;
     if(changedObjects.containsKey(getObjCacheMapKey(doc, className, objNr))) {
       obj = changedObjects.get(getObjCacheMapKey(doc, className, objNr));
@@ -142,11 +142,11 @@ public class DocFormCommand {
       obj = doc.getObject(className, objNr);
       if((obj == null) || (objNr < 0)) {
         obj = doc.newObject(className, context);
-        mLogger.debug("newObject for classname " + className + " on doc " + doc
+        LOGGER.debug("newObject for classname " + className + " on doc " + doc
             + " <-> " + obj.getNumber() + " <-> " + objNr);
       }
       changedObjects.put(getObjCacheMapKey(doc, className, objNr), obj);
-      mLogger.debug("got object for classname " + className + " on doc " + doc
+      LOGGER.debug("got object for classname " + className + " on doc " + doc
           + " <-> " + obj.getNumber() + " <-> " + objNr);
     }
     obj.set(key, collapse(value), context);
@@ -170,6 +170,9 @@ public class DocFormCommand {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     if(!changedDocs.containsKey(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage()
         )) {
+      LOGGER.debug("getUpdateDoc: [" + getFullNameForRef(docRef) + ";"
+          + doc.getDefaultLanguage() + "] with doc language [" + doc.getLanguage()
+          + "].");
       applyCreationDateFix(doc, context);
       changedDocs.put(getFullNameForRef(docRef) + ";" + doc.getDefaultLanguage(), doc);
     } else {
@@ -186,7 +189,7 @@ public class DocFormCommand {
       XWikiDocument doc = getUpdateDoc(docRef, context);
       tdoc = doc.getTranslatedDocument(context.getLanguage(), context);
       if ((tdoc == doc) && !context.getLanguage().equals(doc.getDefaultLanguage())) {
-        mLogger.info("creating new " + context.getLanguage() + " Translation for "
+        LOGGER.info("creating new " + context.getLanguage() + " Translation for "
             + getFullNameForRef(docRef) + " (defult " + doc.getDefaultLanguage() + ")");
         //TODO use celements addTranslation
         tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
@@ -262,7 +265,7 @@ public class DocFormCommand {
             isValidResult = validationMsg;
           }
         } catch (MalformedPerl5PatternException e) {
-          mLogger.error(e);
+          LOGGER.error(e);
           isValidResult = validationMsg;
         }
       }
@@ -284,7 +287,7 @@ public class DocFormCommand {
     try {
       bclass = context.getWiki().getDocument(className, context).getxWikiClass();
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     return bclass;
   }
