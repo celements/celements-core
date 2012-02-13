@@ -662,7 +662,8 @@ public class CelementsWebPluginApi extends Api {
     return new MenuApi(context);
   }
 
-    public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map) throws XWikiException {
+  public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map
+      ) throws XWikiException {
     Map<String, String[]> recompMap = new HashMap<String, String[]>();
     for (String key : map.keySet()) {
       if(map.get(key) instanceof String[]) {
