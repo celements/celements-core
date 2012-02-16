@@ -1332,4 +1332,12 @@ public class CelementsWebPluginApi extends Api {
     return new Builder();
   }
 
+  public String getCurrentPageURL(String queryString) {
+    if(isAppScriptRequest()) {
+      return getAppScriptURL(getScriptNameFromURL(), queryString);
+    } else {
+      return "?" + queryString;
+    }
+  }
+
 }
