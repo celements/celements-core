@@ -1298,14 +1298,21 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public String getScriptNameFromURL() {
-    String xpageStr = context.getRequest().getParameter("xpage");
-    String scriptStrInURL = context.getRequest().getParameter("s");
-    boolean isAppScriptURL = APP_SCRIPT_XPAGE.equals(xpageStr) && (scriptStrInURL != null);
     String scriptStr = "";
-    if (isAppScriptURL) {
-      scriptStr = scriptStrInURL;
+    if (isAppScriptRequest()) {
+      scriptStr = getAppScriptNameFromRequestURL();
     }
     return scriptStr;
+  }
+
+  public boolean isAppScriptRequest() {
+    String xpageStr = context.getRequest().getParameter("xpage");
+    return APP_SCRIPT_XPAGE.equals(xpageStr)
+        && (getAppScriptNameFromRequestURL() != null);
+  }
+
+  private String getAppScriptNameFromRequestURL() {
+    return context.getRequest().getParameter("s");
   }
 
   public String convertToPlainText(String htmlContent) {
