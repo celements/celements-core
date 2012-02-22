@@ -326,7 +326,8 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public void sendNewValidation(String user, String possibleFields) throws XWikiException{
-    if(hasProgrammingRights() && (user != null) && (user.trim().length() > 0)) {
+    if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
+      mLogger.debug("sendNewValidation for user [" + user + "].");
       new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
           possibleFields, context);
     }
