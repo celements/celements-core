@@ -616,8 +616,12 @@ public class Navigation implements INavigation {
 
   private String getLanguageName(String lang, XWikiContext context) {
     XWikiMessageTool msg = context.getMessageTool();
-    //XXX Space specific definitions must be included!!!
-    if(!msg.get("nav_cel_" + lang + "_" + lang).equals("nav_cel_" + lang + "_" + lang)) {
+    String space = context.getDoc().getDocumentReference().getLastSpaceReference().getName();    
+    if(!msg.get("nav_cel_" + space + "_" + lang + "_" + lang).equals(
+          "nav_cel_" + space + "_" + lang + "_" + lang)) {
+      return msg.get("nav_cel_" + space + "_" + lang + "_" + lang);
+    } else if(!msg.get("nav_cel_" + lang + "_" + lang).equals(
+    	  "nav_cel_" + lang + "_" + lang)) {
       return msg.get("nav_cel_" + lang + "_" + lang);
     } else {
       return msg.get("cel_" + lang + "_" + lang);
