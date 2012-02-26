@@ -37,11 +37,14 @@ import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 
 public class CelSendMail {
-  private static Log mLogger = LogFactory.getFactory().getInstance(CelSendMail.class);
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CelSendMail.class);
   
   private Mail mail;
   private XWikiContext context;
-  
+
+  private PlainTextCommand plainTextCmd = new PlainTextCommand();
+
   public CelSendMail(XWikiContext context) {
     this.context = context;
   }
@@ -84,16 +87,8 @@ public class CelSendMail {
     if((getMailObject().getTextPart() == null)
         || "".equals(getMailObject().getTextPart().trim())) {
       String textContent = context.getMessageTool().get("cel_plain_text_mail") + "\r\n\r\n";
-      try {
-        Reader in = new StringReader(htmlContent);
-        Html2Text parser = new Html2Text();
-        parser.parse(in);
-        in.close();
-        textContent += parser.getText();
-        getMailObject().setTextPart(textContent);
-      } catch (Exception exp) {
-        mLogger.error("Error in computing plaintext! ", exp);
-      }
+      textContent += plainTextCmd.convertToPlainText(htmlContent);
+      getMailObject().setTextPart(textContent);
     }
   }
   
@@ -122,16 +117,16 @@ public class CelSendMail {
   public int sendMail(){
     int sendResult = -999;
     if(mail != null) {
-      mLogger.trace("Sending Mail: \nfrom = '" + mail.getFrom() + "'\n" +
+      LOGGER.trace("Sending Mail: \nfrom = '" + mail.getFrom() + "'\n" +
           "replyTo='" + mail.getTo() + "'\n" + "\n" + mail);
       MailSenderPluginApi mailPlugin = (MailSenderPluginApi)context.getWiki(
           ).getPluginApi("mailsender", context);
       sendResult = mailPlugin.sendMail(mail);
-      mLogger.info("Sent Mail from '" + mail.getFrom() + "' to '" + mail.getTo() + 
+      LOGGER.info("Sent Mail from '" + mail.getFrom() + "' to '" + mail.getTo() + 
           "'. Result was '" + sendResult + "'. Time: " + 
           Calendar.getInstance().getTimeInMillis());
     } else {
-      mLogger.info("Mail Object is null. Send result was '" + sendResult + "'. Time: " + 
+      LOGGER.info("Mail Object is null. Send result was '" + sendResult + "'. Time: " + 
           Calendar.getInstance().getTimeInMillis());
     }
     return sendResult;
