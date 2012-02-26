@@ -34,6 +34,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celNavigationClasses")
 public class NavigationClasses extends CelementsClassCollection {
 
+  public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
+  public static final String MENU_ITEM_CLASS_SPACE = "Celements2";
+
   private static Log mLogger = LogFactory.getFactory().getInstance(
       NavigationClasses.class);
 
@@ -124,7 +127,7 @@ public class NavigationClasses extends CelementsClassCollection {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference classRef = new DocumentReference(context.getDatabase(),
-        "Celements2", "MenuItem");
+        MENU_ITEM_CLASS_SPACE, MENU_ITEM_CLASS_DOC);
 
     try {
       doc = context.getWiki().getDocument(classRef, context);
