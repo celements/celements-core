@@ -11,3 +11,4 @@ com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
 com.celements.navigation.service.TreeNodeCache
 com.celements.navigation.service.TreeNodeService
+com.celements.web.service.CelementsWebScriptService

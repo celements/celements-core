@@ -68,13 +68,13 @@ import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
-import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.RemoteUserValidator;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.sajson.Builder;
+import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
@@ -93,8 +93,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class CelementsWebPluginApi extends Api {
-
-  private static final String APP_SCRIPT_XPAGE = "app";
 
   public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
@@ -1275,58 +1273,73 @@ public class CelementsWebPluginApi extends Api {
         "celements.celImageAnimation", "0", context));
   }
 
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
   public String getAppScriptURL(String scriptName) {
-    return getAppScriptURL(scriptName, "");
+    return getService().getAppScriptURL(scriptName);
   }
 
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
   public String getAppScriptURL(String scriptName, String queryString) {
-    if (queryString == null) {
-      queryString = "";
-    }
-    if (!"".equals(queryString)) {
-      queryString = "&" + queryString;
-    }
-    return context.getDoc().getURL("view", "xpage=" + APP_SCRIPT_XPAGE + "&s="
-        + scriptName + queryString, context);
+    return getService().getAppScriptURL(scriptName, queryString);
   }
 
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
   public boolean isAppScriptCurrentPage(String scriptName) {
-    String scriptStr = getScriptNameFromURL();
-    return (!"".equals(scriptStr) && (scriptStr.equals(scriptName)));
+    return getService().isAppScriptCurrentPage(scriptName);
   }
 
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
   public String getScriptNameFromURL() {
-    String scriptStr = "";
-    if (isAppScriptRequest()) {
-      scriptStr = getAppScriptNameFromRequestURL();
-    }
-    return scriptStr;
+    return getService().getScriptNameFromURL();
   }
 
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
   public boolean isAppScriptRequest() {
-    String xpageStr = context.getRequest().getParameter("xpage");
-    return APP_SCRIPT_XPAGE.equals(xpageStr)
-        && (getAppScriptNameFromRequestURL() != null);
+    return getService().isAppScriptRequest();
   }
 
-  private String getAppScriptNameFromRequestURL() {
-    return context.getRequest().getParameter("s");
-  }
-
-  public String convertToPlainText(String htmlContent) {
-    return new PlainTextCommand().convertToPlainText(htmlContent);
-  }
-
-  public Builder getNewJSONBuilder() {
-    return new Builder();
-  }
-
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
   public String getCurrentPageURL(String queryString) {
-    if(isAppScriptRequest()) {
-      return getAppScriptURL(getScriptNameFromURL(), queryString);
-    } else {
-      return "?" + queryString;
-    }
+    return getService().getCurrentPageURL(queryString);
+  }
+
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
+  public String convertToPlainText(String htmlContent) {
+    return getService().convertToPlainText(htmlContent);
+  }
+
+  /**
+   * @deprecated instead use celementsweb script service
+   */
+  @Deprecated
+  public Builder getNewJSONBuilder() {
+    return getService().getNewJSONBuilder();
+  }
+
+  private CelementsWebScriptService getService() {
+    return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
+        "celementsweb");
   }
 
 }
