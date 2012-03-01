@@ -5,8 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.sajson.Builder;
@@ -81,6 +83,10 @@ public class CelementsWebScriptService implements ScriptService {
 
   public Builder getNewJSONBuilder() {
     return new Builder();
+  }
+
+  public boolean deleteMenuItem(DocumentReference docRef) {
+    return new DeleteMenuItemCommand().deleteMenuItem(docRef);
   }
 
 }
