@@ -5,8 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.model.internal.scripting.ModelScriptService;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
@@ -27,8 +27,8 @@ public class CelementsWebScriptService implements ScriptService {
   @Requirement
   Execution execution;
 
-  @Requirement
-  ModelScriptService modelService;
+  @Requirement("local")
+  EntityReferenceSerializer<String> modelSerializer;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -91,7 +91,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean deleteMenuItem(DocumentReference docRef) {
-    String docFN = modelService.serialize(docRef, "local");
+    String docFN = modelSerializer.serialize(docRef);
     try {
       if (getContext().getWiki().getRightService().hasAccessLevel("edit",
           getContext().getUser(), docFN, getContext())) {
