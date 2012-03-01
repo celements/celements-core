@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.internal.scripting.ModelScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -13,6 +14,7 @@ import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -24,6 +26,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   Execution execution;
+
+  @Requirement
+  ModelScriptService modelService;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -86,7 +91,17 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean deleteMenuItem(DocumentReference docRef) {
-    return new DeleteMenuItemCommand().deleteMenuItem(docRef);
+    String docFN = modelService.serialize(docRef, "local");
+    try {
+      if (getContext().getWiki().getRightService().hasAccessLevel("edit",
+          getContext().getUser(), docFN, getContext())) {
+        return new DeleteMenuItemCommand().deleteMenuItem(docRef);
+      }
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to check 'edit' access rights for user ["
+          + getContext().getUser() + "] on document [" + docFN + "]");
+    }
+    return false;
   }
 
 }
