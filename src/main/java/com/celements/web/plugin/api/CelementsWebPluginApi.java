@@ -403,7 +403,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.9.4 use instead isEmptyRTEDocument(DocumentReference, XWikiContext)
+   * @deprecated since 2.9.4 use instead isEmptyRTEDocument(DocumentReference)
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
