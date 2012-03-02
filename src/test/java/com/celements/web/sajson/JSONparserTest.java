@@ -19,9 +19,7 @@
  */
 package com.celements.web.sajson;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +34,7 @@ public class JSONparserTest {
   @SuppressWarnings("unchecked")
   @Before
   public void setUp() throws Exception {
-    jsonEventHandlerMock = createMock(ILexicalParser.class);
+    jsonEventHandlerMock = createStrictMock(ILexicalParser.class);
     jsonParser = new Parser(null, jsonEventHandlerMock);
   }
 
@@ -72,6 +70,61 @@ public class JSONparserTest {
     jsonParser.parse("{\"elemId\" : \"Content.Agenda\","
         + " \"cmClassNames\" : [ \"cel_cm_agenda\","
         + "\"cel_cm_navigation_menuitem\"]}");
+    verify(jsonEventHandlerMock);
+  }
+  
+  @Test
+  public void testParse_dictionaryInArray() throws Exception {
+    jsonEventHandlerMock.initEvent();
+    jsonEventHandlerMock.openArrayEvent();
+    //rule
+    jsonEventHandlerMock.openDictionaryEvent();
+    //actions
+    jsonEventHandlerMock.openPropertyEvent("actions");
+    jsonEventHandlerMock.openArrayEvent();
+    //action
+    jsonEventHandlerMock.openDictionaryEvent();
+    jsonEventHandlerMock.openPropertyEvent("actionType");
+    jsonEventHandlerMock.stringEvent("addTo");
+    jsonEventHandlerMock.closePropertyEvent();
+    jsonEventHandlerMock.closeDictionaryEvent();
+    //end action
+    jsonEventHandlerMock.closeArrayEvent();
+    //end actions
+    jsonEventHandlerMock.closePropertyEvent();
+    //conditions
+    jsonEventHandlerMock.openPropertyEvent("conditions");
+    jsonEventHandlerMock.openArrayEvent();
+    //condition
+    jsonEventHandlerMock.openDictionaryEvent();
+    jsonEventHandlerMock.openPropertyEvent("conditionType");
+    jsonEventHandlerMock.stringEvent("titleCondition");
+    jsonEventHandlerMock.closePropertyEvent();
+    jsonEventHandlerMock.closeDictionaryEvent();
+    //end condition
+    jsonEventHandlerMock.closeArrayEvent();
+    //end conditions
+    jsonEventHandlerMock.closePropertyEvent();
+    //rulesname
+    jsonEventHandlerMock.openPropertyEvent("rulesname");
+    jsonEventHandlerMock.stringEvent("Rule1");
+    jsonEventHandlerMock.closePropertyEvent();
+    //rule type
+    jsonEventHandlerMock.openPropertyEvent("type");
+    jsonEventHandlerMock.stringEvent("any");
+    jsonEventHandlerMock.closePropertyEvent();
+    jsonEventHandlerMock.closeDictionaryEvent();
+    // end rule
+    jsonEventHandlerMock.closeArrayEvent();
+    // end rules
+    jsonEventHandlerMock.finishEvent();
+    replay(jsonEventHandlerMock);
+    String jsonStr = "[{"
+      + "\"actions\":[{\"actionType\" : \"addTo\"}],"
+      + "\"conditions\":[{\"conditionType\" : \"titleCondition\"}],"
+      + "\"rulesname\":\"Rule1\",\"type\":\"any\""
+      + "}]";
+    jsonParser.parse(jsonStr);
     verify(jsonEventHandlerMock);
   }
   
