@@ -216,7 +216,7 @@ public class LexicalParserTest {
 
   private enum ERulesLiteral implements IGenericLiteral {
     OBJECT_VALUE(ECommand.VALUE_COMMAND),
-    RULE_ATTRIBUTE(OBJECT_VALUE, "name", "type"),
+    RULE_ATTRIBUTE(OBJECT_VALUE, "name", "*"),
     CON_OR_ACT_ATTRIBUTE(OBJECT_VALUE, "type"),
     CONDITION_OR_ACTION_DICT(ECommand.DICTIONARY_COMMAND, CON_OR_ACT_ATTRIBUTE),
     CONDITIONS_OR_ACTIONS_ARRAY(ECommand.ARRAY_COMMAND, CONDITION_OR_ACTION_DICT),
@@ -266,8 +266,12 @@ public class LexicalParserTest {
     public IGenericLiteral getPropertyLiteralForKey(String key,
         IGenericLiteral placeholder) {
       nextLiteral = 1; // properties in dictionary may occur multiple times
-                      //and are optional
-      return getPropertyNameMap().get(key);
+                      // (once for each name) and are optional
+      ERulesLiteral propertyLiteral = getPropertyNameMap().get(key);
+      if (propertyLiteral == null) {
+        propertyLiteral = getPropertyNameMap().get("*");
+      }
+      return propertyLiteral;
     }
 
     private Map<String, ERulesLiteral> getPropertyNameMap() {
