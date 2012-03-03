@@ -52,7 +52,6 @@ public class LexicalParser<T extends IGenericLiteral>
 
   final public void closeArrayEvent() {
     if (workerStack.peek().getCommand() != ECommand.ARRAY_COMMAND) {
-      //XXX probably dirty hack!
       T lastLiteral = workerStack.pop();
       mLogger.debug("close: " + lastLiteral + " ; " + lastLiteral.getCommand());
     }
@@ -121,7 +120,6 @@ public class LexicalParser<T extends IGenericLiteral>
     T nextLiteral = (T) workerStack.peek().getNextLiteral();
     if (nextLiteral != null) {
       workerStack.push(nextLiteral);
-      eventHandler.openEvent(nextLiteral);
       mLogger.debug("advance open: " + workerStack.peek()
           + " ; " + workerStack.peek().getCommand());
     }
