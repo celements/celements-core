@@ -27,4 +27,7 @@ public interface IGenericLiteral {
 
   public IGenericLiteral getFirstLiteral();
 
+  public IGenericLiteral getPropertyLiteralForKey(String key,
+      IGenericLiteral placeholder);
+
 }

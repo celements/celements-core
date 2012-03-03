@@ -65,6 +65,9 @@ public class LexicalParser<T extends IGenericLiteral>
   }
   
   public void closeDictionaryEvent() {
+    if (workerStack.peek().getCommand() == ECommand.PROPERTY_COMMAND) {
+      workerStack.pop(); // remove optional property command
+    }
     checkStackState(ECommand.DICTIONARY_COMMAND);
     closeLiteral();
   }
@@ -79,8 +82,30 @@ public class LexicalParser<T extends IGenericLiteral>
   public void openPropertyEvent(String key) {
     checkStackState(ECommand.PROPERTY_COMMAND);
     mLogger.debug("key: " + key + " ");
+    fixPropertyLiteralOnStack(key);
+    checkStackState(ECommand.PROPERTY_COMMAND);
     openLiteral();
     eventHandler.readPropertyKey(key);
+  }
+
+  /**
+   * important to allow unordered property lists in dictionaries / objects
+   * (see www.json.org : An object is an unordered set of name/value pairs. )
+   * @param key
+   */
+  @SuppressWarnings("unchecked")
+  private void fixPropertyLiteralOnStack(String key) {
+    T placeholder = workerStack.pop(); // remove placeholder property-literal
+    checkStackState(ECommand.DICTIONARY_COMMAND);
+    T nextLiteral = (T) workerStack.peek().getPropertyLiteralForKey(key, placeholder);
+    if (nextLiteral != null) {
+      workerStack.push(nextLiteral);
+      mLogger.debug("fix property literal on stack: " + workerStack.peek()
+          + " ; " + workerStack.peek().getCommand());
+    } else {
+      throw new IllegalStateException("illegal key value [" + key + "] in dictionary ["
+          + workerStack.peek() + "]. Stack: " + workerStack.toString());
+    }
   }
 
   public void stringEvent(String value) {

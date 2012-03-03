@@ -58,4 +58,9 @@ public enum EReorderLiteral implements IGenericLiteral {
     nextLiteral = 1;
     return literals[0];
   }
+
+  public IGenericLiteral getPropertyLiteralForKey(String key,
+      IGenericLiteral placeholder) {
+    return placeholder;
+  }
 }
