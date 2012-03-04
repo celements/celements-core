@@ -284,7 +284,7 @@ public class LexicalParserTest {
 
     public IGenericLiteral getPropertyLiteralForKey(String key,
         IGenericLiteral placeholder) {
-      nextLiteral = 1; // properties in dictionary may occur multiple times
+      nextLiteral = 0; // properties in dictionary may occur multiple times
                       // (once for each name) and are optional
       ERulesLiteral propertyLiteral = getPropertyNameMap().get(key);
       if (propertyLiteral == null) {
