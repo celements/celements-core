@@ -771,14 +771,15 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
     context.setUser(userName);
-    XWikiDocument userDoc = new XWikiDocument();
-    userDoc.setFullName(userName);
-    expect(wiki.getDocument(eq(userName), same(context))).andReturn(userDoc);
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "MyUser");
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     expect(wiki.getWebPreference(eq("admin_language"), eq("de"), same(context))
         ).andReturn("de");
-    replay(wiki);
+    replayAll();
     assertEquals("de", celUtils.getAdminLanguage(context));
-    verify(wiki);
+    verifyAll();
   }
 
   @Test
@@ -786,16 +787,19 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
     context.setUser(userName);
-    XWikiDocument userDoc = new XWikiDocument();
-    userDoc.setFullName(userName);
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "MyUser");
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiUsers");
     BaseObject userObj = new BaseObject();
-    userObj.setClassName("XWiki.XWikiUsers");
+    userObj.setXClassReference(xwikiUserClassRef);
     userObj.setStringValue("admin_language", "fr");
-    userDoc.setObject("XWiki.XWikiUsers", 0, userObj);
-    expect(wiki.getDocument(eq(userName), same(context))).andReturn(userDoc);
-    replay(wiki);
+    userDoc.setXObject(0, userObj);
+    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
+    replayAll();
     assertEquals("fr", celUtils.getAdminLanguage(context));
-    verify(wiki);
+    verifyAll();
   }
 
   @Test
@@ -803,16 +807,19 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
     context.setUser("XWiki.NotMyUser");
-    XWikiDocument userDoc = new XWikiDocument();
-    userDoc.setFullName(userName);
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "MyUser");
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiUsers");
     BaseObject userObj = new BaseObject();
-    userObj.setClassName("XWiki.XWikiUsers");
+    userObj.setXClassReference(xwikiUserClassRef);
     userObj.setStringValue("admin_language", "fr");
-    userDoc.setObject("XWiki.XWikiUsers", 0, userObj);
-    expect(wiki.getDocument(eq(userName), same(context))).andReturn(userDoc);
-    replay(wiki);
+    userDoc.setXObject(0, userObj);
+    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
+    replayAll();
     assertEquals("fr", celUtils.getAdminLanguage(userName, context));
-    verify(wiki);
+    verifyAll();
   }
 
   @Test
@@ -820,18 +827,21 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
     context.setUser("XWiki.NotMyUser");
-    XWikiDocument userDoc = new XWikiDocument();
-    userDoc.setFullName(userName);
-    BaseObject userObj = new BaseObject();
-    userObj.setClassName("XWiki.XWikiUsers");
-    userObj.setStringValue("admin_language", "");
-    userDoc.setObject("XWiki.XWikiUsers", 0, userObj);
-    expect(wiki.getDocument(eq(userName), same(context))).andReturn(userDoc);
     expect(wiki.getWebPreference(eq("admin_language"), isA(String.class), same(context))
         ).andReturn("en");
-    replay(wiki);
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "MyUser");
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiUsers");
+    BaseObject userObj = new BaseObject();
+    userObj.setXClassReference(xwikiUserClassRef);
+    userObj.setStringValue("admin_language", "");
+    userDoc.setXObject(0, userObj);
+    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
+    replayAll();
     assertEquals("en", celUtils.getAdminLanguage(userName, context));
-    verify(wiki);
+    verifyAll();
   }
 
   @Test
@@ -929,4 +939,5 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     verify(mockStore, wiki, mockXStore, injected_TreeNodeService);
     verify(mocks);
   }
+
 }

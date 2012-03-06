@@ -92,8 +92,10 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
       ).andReturn("").anyTimes();
     expect(xwiki.getDocument(eq(""), same(context))).andReturn(new XWikiDocument()
       ).anyTimes();
-    expect(xwiki.getDocument(eq("XWiki.XWikiGuest"), same(context))).andReturn(
-      new XWikiDocument()).anyTimes();
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiGuest");
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
+      new XWikiDocument(userDocRef)).anyTimes();
     expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
     expect(xwiki.getWebPreference(eq("editbox_width"), same(context))).andReturn("123"
       ).anyTimes();

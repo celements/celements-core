@@ -170,13 +170,29 @@ public interface IWebUtils {
 
   public Date parseDate(String date, String format);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage,
       XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public XWikiMessageTool getAdminMessageTool(XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getAdminLanguage(XWikiContext context);
   
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context);
   
   public boolean hasParentSpace(XWikiContext context);
