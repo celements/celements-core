@@ -151,7 +151,17 @@ public class Builder {
     }
     implicitCloseProperty();
   }
-  
+
+  public void addInteger(Integer value) {
+    checkNoDictionary();
+    if (value != null) {
+      addOpeningPart(value.toString());
+    } else {
+      addNull();
+    }
+    implicitCloseProperty();
+  }
+
   public void addNull() {
     checkNoDictionary();
     addOpeningPart(toJSONString(null));

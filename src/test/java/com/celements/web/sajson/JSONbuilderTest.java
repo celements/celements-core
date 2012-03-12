@@ -24,7 +24,8 @@ import static org.junit.Assert.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JSONbuilderTest {
 
@@ -266,6 +267,18 @@ public class JSONbuilderTest {
   }
   
   @Test
+  public void testAddInteger_illegalInDictionary() {
+    builder.openDictionary();
+    try {
+      builder.addInteger(2);
+      fail("Expecting IllegalStateException. Integers cannot" +
+            "be added to a dictionary.");
+    } catch (IllegalStateException e) {
+      // expected
+    }
+  }
+  
+  @Test
   public void testAddNull_illegalInDictionary() {
     builder.openDictionary();
     try {
@@ -497,8 +510,40 @@ public class JSONbuilderTest {
   public void testAddNumber_notFirstElement() {
     builder.setOnFirstElement(false);
     builder.addNumber(new BigDecimal(BigInteger.valueOf(23409876), 5));
-    assertTrue("addNumber must add ', 234.09876' to the json expression.",
+    assertTrue("addNumber must add ', 23409876' to the json expression.",
         builder.internal_getUnfinishedJSON().endsWith(", 234.09876"));
+    assertFalse("After addNull firstElement must be false.",
+        builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddInteger() {
+    builder.addInteger(23409876);
+    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    assertTrue("addInteger must add '23409876' to the json expression. '"
+        + unfinishedJSON + "'", unfinishedJSON.endsWith("23409876"));
+    assertFalse("After addNull firstElement must be false.",
+        builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddIntegerl_implicitOpenPropertyClosing() {
+    builder.openDictionary();
+    builder.openProperty("myKey");
+    builder.addInteger(23409876);
+    assertTrue("addInteger must remove the PROPERTY_COMMAND from stack.",
+        builder.internal_getWorkerStack().peek(
+            ) == ECommand.DICTIONARY_COMMAND);
+    assertFalse("After addNull firstElement must be false.",
+        builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddInteger_notFirstElement() {
+    builder.setOnFirstElement(false);
+    builder.addInteger(23409876);
+    assertTrue("addInteger must add ', 23409876' to the json expression.",
+        builder.internal_getUnfinishedJSON().endsWith(", 23409876"));
     assertFalse("After addNull firstElement must be false.",
         builder.isOnFirstElement());
   }
