@@ -1,5 +1,8 @@
 package com.celements.web.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -7,6 +10,9 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
@@ -29,6 +35,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement("local")
   EntityReferenceSerializer<String> modelSerializer;
+
+  @Requirement
+  QueryManager queryManager;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -102,6 +111,31 @@ public class CelementsWebScriptService implements ScriptService {
           + getContext().getUser() + "] on document [" + docFN + "]");
     }
     return false;
+  }
+
+  public List<String[]> getLastChangedDocuments(int numEntries) {
+    return getLastChangedDocuments(numEntries, "");
+  }
+
+  //TODO write unit tests
+  public List<String[]> getLastChangedDocuments(int numEntries, String space) {
+    String xwql = "select doc.fullName, doc.language from XWikiDocument doc";
+    boolean hasSpaceRestriction = (!"".equals(space));
+    if (hasSpaceRestriction) {
+      xwql = xwql + " where doc.space = :spaceName";
+    }
+    xwql = xwql + " order by doc.date desc";
+    Query query;
+    try {
+      query = queryManager.createQuery(xwql, Query.XWQL);
+      if (hasSpaceRestriction) {
+        query = query.bindValue("spaceName", space);
+      }
+      return query.setLimit(numEntries).execute();
+    } catch (QueryException exp) {
+      LOGGER.error("Failed to create whats-new query for space [" + space + "].", exp);
+    }
+    return Collections.emptyList();
   }
 
 }
