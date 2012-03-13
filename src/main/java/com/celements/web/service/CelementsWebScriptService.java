@@ -141,11 +141,11 @@ public class CelementsWebScriptService implements ScriptService {
     return Collections.emptyList();
   }
 
-  public String getHumanReadableSize(Long bytes, boolean si) {
+  public String getHumanReadableSize(int bytes, boolean si) {
     return getHumanReadableSize(bytes, si, getContext().getLanguage());
   }
 
-  public String getHumanReadableSize(Long bytes, boolean si, String language) {
+  public String getHumanReadableSize(int bytes, boolean si, String language) {
     int unit = si ? 1000 : 1024;
     if (bytes < unit) return bytes + " B";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
