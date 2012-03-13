@@ -152,6 +152,7 @@ public class CelementsWebScriptService implements ScriptService {
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
     NumberFormat decimalFormat = DecimalFormat.getInstance(new Locale(language));
     decimalFormat.setMaximumFractionDigits(1);
+    decimalFormat.setMinimumFractionDigits(1);
     return String.format("%s %sB", decimalFormat.format(bytes / Math.pow(unit, exp)), pre);
   }
 

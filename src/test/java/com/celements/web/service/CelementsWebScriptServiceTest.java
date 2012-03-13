@@ -50,7 +50,14 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetHumanReadableSize_FullSize() {
-    assertEquals("2 MB", celWebService.getHumanReadableSize(2000000L, true));
+    context.setLanguage("de");
+    assertEquals("2,0 MB", celWebService.getHumanReadableSize(2000000L, true));
+  }
+
+  @Test
+  public void testGetHumanReadableSize_PartSize_de() {
+    context.setLanguage("de");
+    assertEquals("25,4 MB", celWebService.getHumanReadableSize(25432100L, true));
   }
 
   @Test
@@ -59,12 +66,6 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     assertEquals("de-ch", "2.6 MB", celWebService.getHumanReadableSize(2563210L, true));
     assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210L, true,
         "fr"));
-  }
-
-  @Test
-  public void testGetHumanReadableSize_PartSize_de() {
-    context.setLanguage("de");
-    assertEquals("25,4 MB", celWebService.getHumanReadableSize(25432100L, true));
   }
 
 
