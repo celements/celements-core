@@ -1,7 +1,10 @@
 package com.celements.web.service;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -139,11 +142,17 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String getHumanReadableSize(Long bytes, boolean si) {
+    return getHumanReadableSize(bytes, si, getContext().getLanguage());
+  }
+
+  public String getHumanReadableSize(Long bytes, boolean si, String language) {
     int unit = si ? 1000 : 1024;
     if (bytes < unit) return bytes + " B";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    NumberFormat decimalFormat = DecimalFormat.getInstance(new Locale(language));
+    decimalFormat.setMaximumFractionDigits(1);
+    return String.format("%s %sB", decimalFormat.format(bytes / Math.pow(unit, exp)), pre);
   }
 
 }
