@@ -34,6 +34,8 @@ public class Parser {
   private JsonParser parser;
   private static JsonFactory factory = new JsonFactory();
   private Stack<ECommand> workerStack = new Stack<ECommand>();
+  private String lastKey = "";
+  private String lastValue = "";
 
   public static <T extends IGenericLiteral> Parser createLexicalParser(
       T initLiteral, IEventHandler<T> eventHandler) {
@@ -57,7 +59,8 @@ public class Parser {
       while (parser.hasCurrentToken()) {
         switch (nextToken) {
         case VALUE_STRING:
-            lexParser.stringEvent(parser.getText());
+          lastValue = parser.getText();
+          lexParser.stringEvent(lastValue);
             impliciteCloseProperty();
           break;
         case START_ARRAY:
@@ -85,7 +88,8 @@ public class Parser {
         case FIELD_NAME:
           checkStackState(ECommand.DICTIONARY_COMMAND);
           workerStack.push(ECommand.PROPERTY_COMMAND);
-          lexParser.openPropertyEvent(parser.getText());
+          lastKey = parser.getText();
+          lexParser.openPropertyEvent(lastKey);
           break;
         default:
           break;
@@ -110,7 +114,8 @@ public class Parser {
     if (workerStack.isEmpty()
         || workerStack.peek() != expectedCommand) {
       throw new IllegalStateException("Expecting " + expectedCommand
-          + " but found " + workerStack.peek());
+          + " but found " + workerStack.peek() + " Last key [" + lastKey
+          + "] last value [" + lastValue + "]");
     }
   }
 
