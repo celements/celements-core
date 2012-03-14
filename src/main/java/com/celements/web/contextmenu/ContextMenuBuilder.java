@@ -30,8 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonParseException;
 
+import com.celements.web.sajson.AbstractEventHandler;
 import com.celements.web.sajson.Builder;
-import com.celements.web.sajson.IEventHandler;
 import com.celements.web.sajson.Parser;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class ContextMenuBuilder {
 
-  public class CMRequestHandler implements IEventHandler<ERequestLiteral> {
+  public class CMRequestHandler extends AbstractEventHandler<ERequestLiteral> {
 
     private String cssClassName;
     private ERequestLiteral currentLiteral;

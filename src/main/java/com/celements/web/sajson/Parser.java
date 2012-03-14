@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Stack;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
@@ -37,6 +39,8 @@ public class Parser {
   private String lastKey = "";
   private String lastValue = "";
 
+  private static Log LOGGER = LogFactory.getFactory().getInstance(Parser.class);
+
   public static <T extends IGenericLiteral> Parser createLexicalParser(
       T initLiteral, IEventHandler<T> eventHandler) {
     return new Parser(initLiteral, new LexicalParser<T>(initLiteral,
@@ -48,8 +52,7 @@ public class Parser {
     this.lexParser = lexParser;
   }
 
-  public void parse(String jsonExpression
-      ) throws JsonParseException, IOException {
+  public void parse(String jsonExpression) throws JsonParseException, IOException {
     StringReader jsonReader = new StringReader(jsonExpression);
     try {
       parser = factory.createJsonParser(jsonReader);
@@ -58,10 +61,17 @@ public class Parser {
       lexParser.initEvent();
       while (parser.hasCurrentToken()) {
         switch (nextToken) {
+        case VALUE_TRUE:
+        case VALUE_FALSE:
+          boolean boolValue = parser.getBooleanValue();
+          lastValue = Boolean.toString(boolValue);
+          lexParser.booleanEvent(boolValue);
+          impliciteCloseProperty();
+          break;
         case VALUE_STRING:
           lastValue = parser.getText();
           lexParser.stringEvent(lastValue);
-            impliciteCloseProperty();
+          impliciteCloseProperty();
           break;
         case START_ARRAY:
           checkIllegalStackState(ECommand.DICTIONARY_COMMAND, nextToken);
@@ -92,6 +102,8 @@ public class Parser {
           lexParser.openPropertyEvent(lastKey);
           break;
         default:
+          LOGGER.warn("unkown token [" + nextToken + "] lastKey [" + lastKey
+              + "] lastValue [" + lastValue + "].");
           break;
         }
         nextToken = parser.nextToken();

@@ -25,13 +25,13 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.web.sajson.IEventHandler;
+import com.celements.web.sajson.AbstractEventHandler;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class ReorderSaveHandler implements IEventHandler<EReorderLiteral>{
+public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       ReorderSaveHandler.class);

@@ -22,9 +22,9 @@
  */
 package com.celements.web.contextmenu;
 
-import com.celements.web.sajson.IEventHandler;
+import com.celements.web.sajson.AbstractEventHandler;
 
-public class TestRequestHandler implements IEventHandler<ERequestLiteral> {
+public class TestRequestHandler extends AbstractEventHandler<ERequestLiteral> {
 
   /**
    * @param requestLiteralTest

@@ -41,6 +41,64 @@ public class LexicalParserTest {
   }
 
   @Test
+  public void testBooleanEvent_true() {
+    mockEventHandler.openEvent(ERulesLiteral.RULES_ARRAY);
+    mockEventHandler.openEvent(ERulesLiteral.RULE_DICT);
+    mockEventHandler.openEvent(ERulesLiteral.RULE_ATTRIBUTE);
+    mockEventHandler.readPropertyKey("isDeleted");
+    mockEventHandler.openEvent(ERulesLiteral.OBJECT_VALUE);
+    mockEventHandler.booleanEvent(true);
+    mockEventHandler.closeEvent(ERulesLiteral.OBJECT_VALUE);
+    mockEventHandler.closeEvent(ERulesLiteral.RULE_ATTRIBUTE);
+    mockEventHandler.closeEvent(ERulesLiteral.RULE_DICT);
+    mockEventHandler.closeEvent(ERulesLiteral.RULES_ARRAY);
+    replayAll();
+    lexicalParser.initEvent();
+    lexicalParser.openArrayEvent();
+    //rule
+    lexicalParser.openDictionaryEvent();
+    //isDeleted
+    lexicalParser.openPropertyEvent("isDeleted");
+    lexicalParser.booleanEvent(true);
+    lexicalParser.closePropertyEvent();
+    // end rule
+    lexicalParser.closeDictionaryEvent();
+    // end rules
+    lexicalParser.closeArrayEvent();
+    lexicalParser.finishEvent();
+    verifyAll();
+  }
+
+  @Test
+  public void testBooleanEvent_false() {
+    mockEventHandler.openEvent(ERulesLiteral.RULES_ARRAY);
+    mockEventHandler.openEvent(ERulesLiteral.RULE_DICT);
+    mockEventHandler.openEvent(ERulesLiteral.RULE_ATTRIBUTE);
+    mockEventHandler.readPropertyKey("isDeleted");
+    mockEventHandler.openEvent(ERulesLiteral.OBJECT_VALUE);
+    mockEventHandler.booleanEvent(false);
+    mockEventHandler.closeEvent(ERulesLiteral.OBJECT_VALUE);
+    mockEventHandler.closeEvent(ERulesLiteral.RULE_ATTRIBUTE);
+    mockEventHandler.closeEvent(ERulesLiteral.RULE_DICT);
+    mockEventHandler.closeEvent(ERulesLiteral.RULES_ARRAY);
+    replayAll();
+    lexicalParser.initEvent();
+    lexicalParser.openArrayEvent();
+    //rule
+    lexicalParser.openDictionaryEvent();
+    //isDeleted
+    lexicalParser.openPropertyEvent("isDeleted");
+    lexicalParser.booleanEvent(false);
+    lexicalParser.closePropertyEvent();
+    // end rule
+    lexicalParser.closeDictionaryEvent();
+    // end rules
+    lexicalParser.closeArrayEvent();
+    lexicalParser.finishEvent();
+    verifyAll();
+  }
+
+  @Test
   public void testComplicatedRulesJSON_firstDictionaryOrder() {
     mockEventHandler.openEvent(ERulesLiteral.RULES_ARRAY);
     mockEventHandler.openEvent(ERulesLiteral.RULE_DICT);

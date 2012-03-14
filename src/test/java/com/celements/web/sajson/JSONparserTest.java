@@ -128,4 +128,32 @@ public class JSONparserTest {
     verify(jsonEventHandlerMock);
   }
   
+  @Test
+  public void testParse_dictionaryWithBoolean_true() throws Exception {
+    jsonEventHandlerMock.initEvent();
+    jsonEventHandlerMock.openDictionaryEvent();
+    jsonEventHandlerMock.openPropertyEvent("isDeleted");
+    jsonEventHandlerMock.booleanEvent(true);
+    jsonEventHandlerMock.closePropertyEvent();
+    jsonEventHandlerMock.closeDictionaryEvent();
+    jsonEventHandlerMock.finishEvent();
+    replay(jsonEventHandlerMock);
+    jsonParser.parse("{\"isDeleted\" : true }");
+    verify(jsonEventHandlerMock);
+  }
+  
+  @Test
+  public void testParse_dictionaryWithBoolean_false() throws Exception {
+    jsonEventHandlerMock.initEvent();
+    jsonEventHandlerMock.openDictionaryEvent();
+    jsonEventHandlerMock.openPropertyEvent("isDeleted");
+    jsonEventHandlerMock.booleanEvent(false);
+    jsonEventHandlerMock.closePropertyEvent();
+    jsonEventHandlerMock.closeDictionaryEvent();
+    jsonEventHandlerMock.finishEvent();
+    replay(jsonEventHandlerMock);
+    jsonParser.parse("{\"isDeleted\" : false }");
+    verify(jsonEventHandlerMock);
+  }
+  
 }

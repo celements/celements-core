@@ -112,10 +112,18 @@ public class LexicalParser<T extends IGenericLiteral>
     checkStackState(ECommand.VALUE_COMMAND);
     eventHandler.openEvent(workerStack.peek());
     eventHandler.stringEvent(value);
-    mLogger.debug("value: " + value + " ");
+    mLogger.debug("string-value: " + value + " ");
     closeLiteral(); // close VALUE_COMMAND
   }
   
+  public void booleanEvent(boolean value) {
+    checkStackState(ECommand.VALUE_COMMAND);
+    eventHandler.openEvent(workerStack.peek());
+    eventHandler.booleanEvent(value);
+    mLogger.debug("boolean-value: " + value + " ");
+    closeLiteral(); // close VALUE_COMMAND
+  }
+
   final public void finishEvent() {
     if (!workerStack.isEmpty()) {
       throw new IllegalStateException("SyntaxError: finishEvent on nonempty"

@@ -25,6 +25,8 @@ public interface ILexicalParser<T extends IGenericLiteral> {
 
   public void stringEvent(String text);
 
+  public void booleanEvent(boolean boolValue);
+
   public void openArrayEvent();
 
   public void closeArrayEvent();
