@@ -22,8 +22,8 @@
  */
 package com.celements.navigation.cmd;
 
-import com.celements.web.sajson.ECommand;
-import com.celements.web.sajson.IGenericLiteral;
+import com.celements.sajson.ECommand;
+import com.celements.sajson.IGenericLiteral;
 
 public enum EReorderLiteral implements IGenericLiteral {
   ELEMENT_ID(ECommand.VALUE_COMMAND),

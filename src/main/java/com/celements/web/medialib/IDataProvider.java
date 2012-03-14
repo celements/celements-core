@@ -21,8 +21,8 @@ package com.celements.web.medialib;
 
 import java.util.Iterator;
 
+import com.celements.sajson.Builder;
 import com.celements.web.medialib.datafields.IDataFieldRow;
-import com.celements.web.sajson.Builder;
 
 public interface IDataProvider extends Iterator<IDataFieldRow> {
 

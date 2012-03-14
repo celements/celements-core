@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.sajson;
+package com.celements.sajson;
 
 import static org.easymock.EasyMock.*;
 
@@ -26,6 +26,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.celements.sajson.ECommand;
+import com.celements.sajson.IEventHandler;
+import com.celements.sajson.IGenericLiteral;
+import com.celements.sajson.LexicalParser;
 
 public class LexicalParserTest {
 

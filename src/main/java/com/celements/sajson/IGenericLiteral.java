@@ -17,8 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.sajson;
+package com.celements.sajson;
 
-public enum ECommand {
-  ARRAY_COMMAND, DICTIONARY_COMMAND, PROPERTY_COMMAND, VALUE_COMMAND;
+public interface IGenericLiteral {
+
+  public ECommand getCommand();
+
+  public IGenericLiteral getNextLiteral();
+
+  public IGenericLiteral getFirstLiteral();
+
+  public IGenericLiteral getPropertyLiteralForKey(String key,
+      IGenericLiteral placeholder);
+
 }

@@ -21,7 +21,7 @@ package com.celements.web.contextmenu;
 
 import org.junit.*;
 
-import com.celements.web.sajson.Parser;
+import com.celements.sajson.Parser;
 
 
 public class ERequestLiteralTest {

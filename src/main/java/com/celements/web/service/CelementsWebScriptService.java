@@ -19,9 +19,9 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
+import com.celements.sajson.Builder;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.PlainTextCommand;
-import com.celements.web.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 

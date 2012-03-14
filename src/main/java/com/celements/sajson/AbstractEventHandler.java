@@ -1,4 +1,4 @@
-package com.celements.web.sajson;
+package com.celements.sajson;
 
 /**
  * AbstractEventHandler defines for all "Value-Events" an default implementation

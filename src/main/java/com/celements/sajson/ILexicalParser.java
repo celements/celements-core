@@ -17,17 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.sajson;
+package com.celements.sajson;
 
-public interface IGenericLiteral {
+public interface ILexicalParser<T extends IGenericLiteral> {
 
-  public ECommand getCommand();
+  public void initEvent();
 
-  public IGenericLiteral getNextLiteral();
+  public void stringEvent(String text);
 
-  public IGenericLiteral getFirstLiteral();
+  public void booleanEvent(boolean boolValue);
 
-  public IGenericLiteral getPropertyLiteralForKey(String key,
-      IGenericLiteral placeholder);
+  public void openArrayEvent();
+
+  public void closeArrayEvent();
+
+  public void openDictionaryEvent();
+
+  public void closeDictionaryEvent();
+
+  public void openPropertyEvent(String text);
+
+  public void finishEvent();
+
+  public void closePropertyEvent();
 
 }

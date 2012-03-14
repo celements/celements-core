@@ -22,7 +22,7 @@
  */
 package com.celements.web.contextmenu;
 
-import com.celements.web.sajson.AbstractEventHandler;
+import com.celements.sajson.AbstractEventHandler;
 
 public class TestRequestHandler extends AbstractEventHandler<ERequestLiteral> {
 

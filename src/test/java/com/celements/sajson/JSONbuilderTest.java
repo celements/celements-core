@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.sajson;
+package com.celements.sajson;
 
 import static org.junit.Assert.*;
 
@@ -26,6 +26,9 @@ import java.math.BigInteger;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.celements.sajson.Builder;
+import com.celements.sajson.ECommand;
 
 public class JSONbuilderTest {
 

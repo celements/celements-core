@@ -21,7 +21,7 @@ package com.celements.web.contextmenu;
 
 import java.util.HashMap;
 
-import com.celements.web.sajson.Builder;
+import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 

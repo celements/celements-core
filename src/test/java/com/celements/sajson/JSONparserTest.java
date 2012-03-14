@@ -17,13 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.sajson;
+package com.celements.sajson;
 
 import static org.easymock.EasyMock.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.celements.sajson.ILexicalParser;
+import com.celements.sajson.Parser;
 import com.celements.web.contextmenu.ERequestLiteral;
 
 public class JSONparserTest {
