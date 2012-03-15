@@ -658,7 +658,7 @@ public class Navigation implements INavigation {
     return this._showAll;
   }
 
-  void setShowInactiveToLevel(int showInactiveToLevel) {
+  public void setShowInactiveToLevel(int showInactiveToLevel) {
     this.showInactiveToLevel = showInactiveToLevel;
   }
 

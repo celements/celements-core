@@ -90,4 +90,6 @@ public interface INavigation {
 
   public void setLanguage(String language);
 
+  public void setShowInactiveToLevel(int showInactiveToLevel);
+
 }

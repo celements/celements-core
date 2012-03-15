@@ -181,4 +181,9 @@ public class NavigationApi extends Api {
   public void setLanguage(String language) {
     navigation.setLanguage(language);
   }
+
+  public void setShowInactiveToLevel(int showInactiveToLevel) {
+    navigation.setShowInactiveToLevel(showInactiveToLevel);
+  }
+
 }
