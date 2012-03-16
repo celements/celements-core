@@ -32,7 +32,7 @@ public class CreateDocumentCommand {
    * @return
    */
   public XWikiDocument createDocument(DocumentReference docRef, String pageType) {
-    if (getContext().getWiki().exists(docRef, getContext())) {
+    if (!getContext().getWiki().exists(docRef, getContext())) {
       try {
         XWikiDocument theNewDoc = getContext().getWiki().getDocument(docRef,
             getContext());
