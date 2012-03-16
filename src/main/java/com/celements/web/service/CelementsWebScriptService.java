@@ -176,9 +176,13 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public Document createDocument(DocumentReference newDocRef, String pageType) {
+    LOGGER.trace("create new document for [" + newDocRef + "] and pageType [" + pageType
+        + "].");
     XWikiDocument theNewDoc = new CreateDocumentCommand().createDocument(newDocRef,
         pageType);
     if (theNewDoc != null) {
+      LOGGER.debug("created new document for [" + newDocRef + "] and pageType ["
+          + pageType + "].");
       return theNewDoc.newDocument(getContext());
     }
     return null;
