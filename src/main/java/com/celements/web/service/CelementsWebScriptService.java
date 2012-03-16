@@ -150,10 +150,14 @@ public class CelementsWebScriptService implements ScriptService {
     if (bytes < unit) return bytes + " B";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-    NumberFormat decimalFormat = DecimalFormat.getInstance(new Locale(language));
+    NumberFormat decimalFormat = DecimalFormat.getInstance(getLocal(language));
     decimalFormat.setMaximumFractionDigits(1);
     decimalFormat.setMinimumFractionDigits(1);
     return String.format("%s %sB", decimalFormat.format(bytes / Math.pow(unit, exp)), pre);
+  }
+
+  public Locale getLocal(String language) {
+    return new Locale(language);
   }
 
 }
