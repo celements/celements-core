@@ -52,6 +52,9 @@ public class CreateDocumentCommand {
       } catch (XWikiException exp) {
         LOGGER.error("Failed to get document [" + docRef + "].", exp);
       }
+    } else {
+      LOGGER.warn("Failed to create new Document [" + docRef
+          + "] because it already exists");
     }
     return null;
   }
