@@ -50,6 +50,7 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -69,6 +70,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
@@ -1080,8 +1082,16 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return (Arrays.binarySearch(array, value) >= 0);
   }
 
+  /**
+   * @deprecated use IWebUtilsService instead
+   */
+  @Deprecated
   public String getDefaultLanguage(XWikiContext context) {
-    return context.getWiki().getWebPreference("default_language", context);
+    return getWebService().getDefaultLanguage();
+  }
+
+  private IWebUtilsService getWebService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   /**

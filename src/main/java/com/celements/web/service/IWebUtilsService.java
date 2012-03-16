@@ -15,4 +15,6 @@ public interface IWebUtilsService {
 
   public String getAdminLanguage(String userFullName);
 
+  public String getDefaultLanguage();
+
 }

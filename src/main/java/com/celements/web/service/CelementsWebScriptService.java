@@ -21,9 +21,12 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
+import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -166,6 +169,19 @@ public class CelementsWebScriptService implements ScriptService {
 
   public Locale getLocal(String language, String country) {
     return new Locale(language, country);
+  }
+
+  public Document createDocument(DocumentReference newDocRef) {
+    return createDocument(newDocRef, null);
+  }
+
+  public Document createDocument(DocumentReference newDocRef, String pageType) {
+    XWikiDocument theNewDoc = new CreateDocumentCommand().createDocument(newDocRef,
+        pageType);
+    if (theNewDoc != null) {
+      return theNewDoc.newDocument(getContext());
+    }
+    return null;
   }
 
 }

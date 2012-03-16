@@ -29,7 +29,11 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class PageTypeCommand {
 
-  public static final String PAGE_TYPE_CLASSNAME = "Celements2.PageType";
+  public static final String PAGE_TYPE_CLASS_DOC = "PageType";
+  public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
+  public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
+       + PAGE_TYPE_CLASS_DOC;
+
   private static PageTypeCommand pageTypeInstance;
   
   private static Log mLogger = LogFactory.getFactory().getInstance(PageTypeCommand.class);

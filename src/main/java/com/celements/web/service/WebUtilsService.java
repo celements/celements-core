@@ -95,4 +95,8 @@ public class WebUtilsService implements IWebUtilsService {
     return eventRef;
   }
 
+  public String getDefaultLanguage() {
+    return getContext().getWiki().getWebPreference("default_language", getContext());
+  }
+
 }
