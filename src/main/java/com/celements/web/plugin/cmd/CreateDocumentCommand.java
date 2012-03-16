@@ -49,6 +49,7 @@ public class CreateDocumentCommand {
         }
         getContext().getWiki().saveDocument(theNewDoc, "init " + pageType +" document",
             false, getContext());
+        return theNewDoc;
       } catch (XWikiException exp) {
         LOGGER.error("Failed to get document [" + docRef + "].", exp);
       }
