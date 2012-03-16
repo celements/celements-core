@@ -93,6 +93,13 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     assertEquals("12'312'312", formater.format(12312312L));
   }
 
+  @Test
+  public void testGetLocal_country_illegal_combination() {
+    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
+        "en", "ch"));
+    assertEquals("12,312,312", formater.format(12312312L));
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, mockRightService);
