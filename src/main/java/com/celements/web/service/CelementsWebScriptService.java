@@ -146,11 +146,15 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String getHumanReadableSize(int bytes, boolean si, String language) {
+    return getHumanReadableSize(bytes, si, getLocal(language));
+  }
+
+  public String getHumanReadableSize(int bytes, boolean si, Locale locale) {
     int unit = si ? 1000 : 1024;
     if (bytes < unit) return bytes + " B";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-    NumberFormat decimalFormat = DecimalFormat.getInstance(getLocal(language));
+    NumberFormat decimalFormat = DecimalFormat.getInstance(locale);
     decimalFormat.setMaximumFractionDigits(1);
     decimalFormat.setMinimumFractionDigits(1);
     return String.format("%s %sB", decimalFormat.format(bytes / Math.pow(unit, exp)), pre);
@@ -158,6 +162,10 @@ public class CelementsWebScriptService implements ScriptService {
 
   public Locale getLocal(String language) {
     return new Locale(language);
+  }
+
+  public Locale getLocal(String language, String country) {
+    return new Locale(language, country);
   }
 
 }

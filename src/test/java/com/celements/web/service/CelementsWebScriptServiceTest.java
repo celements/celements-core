@@ -3,6 +3,8 @@ package com.celements.web.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.text.DecimalFormat;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
@@ -61,11 +63,34 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   }
 
   @Test
-  public void testGetHumanReadableSize_PartSize_chde() {
+  public void testGetHumanReadableSize_PartSize_dech() {
     context.setLanguage("de-ch");
     assertEquals("de-ch", "2.6 MB", celWebService.getHumanReadableSize(2563210, true));
     assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true,
         "fr"));
+  }
+
+  @Test
+  public void testGetHumanReadableSize_PartSize_de_country_CH() {
+    context.setLanguage("de");
+    assertEquals("de-ch", "1'006.7 MiB", celWebService.getHumanReadableSize(1055563210,
+        false, celWebService.getLocal("de", "ch")));
+    assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true,
+        "fr"));
+  }
+
+  @Test
+  public void testGetLocal() {
+    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
+        "de"));
+    assertEquals("12.312.312", formater.format(12312312L));
+  }
+
+  @Test
+  public void testGetLocal_country() {
+    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
+        "de", "ch"));
+    assertEquals("12'312'312", formater.format(12312312L));
   }
 
 
