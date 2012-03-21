@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.celements.web.plugin.cmd;
 
 import java.util.Date;
@@ -17,13 +36,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-//TODO Add unittests!!!
 public class CreateDocumentCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CreateDocumentCommand.class);
 
   IWebUtils webUtils = WebUtils.getInstance();
+
+  IWebUtilsService injected_webService;
 
   /**
    * createDocument creates a new document if it does not exist.
@@ -37,6 +57,7 @@ public class CreateDocumentCommand {
         XWikiDocument theNewDoc = getContext().getWiki().getDocument(docRef,
             getContext());
         initNewXWikiDocument(theNewDoc);
+        String pageTypeStr = "";
         if (pageType != null) {
           DocumentReference pageTypeClassRef = new DocumentReference(
               getContext().getDatabase(), PageTypeCommand.PAGE_TYPE_CLASS_SPACE,
@@ -44,10 +65,9 @@ public class CreateDocumentCommand {
           BaseObject pageTypeObj = theNewDoc.getXObject(pageTypeClassRef, true,
               getContext());
           pageTypeObj.setStringValue("page_type", pageType);
-        } else {
-          pageType = "";
+          pageTypeStr = pageType + "-";
         }
-        getContext().getWiki().saveDocument(theNewDoc, "init " + pageType +" document",
+        getContext().getWiki().saveDocument(theNewDoc, "init " + pageTypeStr + "document",
             false, getContext());
         return theNewDoc;
       } catch (XWikiException exp) {
@@ -60,7 +80,7 @@ public class CreateDocumentCommand {
     return null;
   }
 
-  private void initNewXWikiDocument(XWikiDocument theNewDoc) {
+  void initNewXWikiDocument(XWikiDocument theNewDoc) {
     Date creationDate = new Date();
     theNewDoc.setDefaultLanguage(getWebService().getDefaultLanguage());
     theNewDoc.setLanguage("");
@@ -78,6 +98,9 @@ public class CreateDocumentCommand {
   }
 
   private IWebUtilsService getWebService() {
+    if (injected_webService != null) {
+      return injected_webService;
+    }
     return Utils.getComponent(IWebUtilsService.class);
   }
 
