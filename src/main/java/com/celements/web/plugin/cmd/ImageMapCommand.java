@@ -19,9 +19,12 @@
  */
 package com.celements.web.plugin.cmd;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +41,9 @@ public class ImageMapCommand {
   
   private XWikiContext context;
   private Set<String> imageMapSet;
+
+  private Pattern useMapsPattern = Pattern.compile("<img [^>]*?usemap=\"([^\"]*)\"",
+      Pattern.CASE_INSENSITIVE);
   
   public ImageMapCommand(XWikiContext context) {
     this.context = context;
@@ -80,5 +86,19 @@ public class ImageMapCommand {
       maps += map;
     }
     return maps;
+  }
+
+  public List<String> getImageUseMaps(String rteContent) {
+    List<String> useMaps = new ArrayList<String>();
+    if (rteContent != null) {
+      Matcher theMatcher = useMapsPattern.matcher(rteContent);
+      while (theMatcher.find()) {
+        String useMapStr = theMatcher.group(1);
+        if ((useMapStr != null) && (!"".equals(useMapStr))) {
+          useMaps.add(useMapStr.replace("#", ""));
+        }
+      }
+    }
+    return useMaps;
   }
 }

@@ -63,7 +63,6 @@ import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.GetPageTypesCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
-import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -99,9 +98,6 @@ public class CelementsWebPluginApi extends Api {
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
     "com.celements.web.ExternalJavaScriptFilesCommand";
   
-  public static final String IMAGE_MAP_COMMAND =
-    "com.celements.web.ImageMapCommand";
-
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
     "com.celements.web.PageLayoutCommand";
 
@@ -257,20 +253,20 @@ public class CelementsWebPluginApi extends Api {
     return (ExternalJavaScriptFilesCommand) context.get(JAVA_SCRIPT_FILES_COMMAND_KEY);
   }
   
+  /**
+   * @deprecated since 2.11.3 instead use celementsweb script service
+   */
+  @Deprecated
   public void addImageMapConfig(String configName) {
-    getImageMapCommand().addMapConfig(configName);
+    getService().addImageMapConfig(configName);
   }
   
-  public String displayImageMapConfigs() throws XWikiException {
-    return getImageMapCommand().displayAllImageMapConfigs();
-  }
-
-  private ImageMapCommand getImageMapCommand() {
-    if (context.get(IMAGE_MAP_COMMAND) == null) {
-      context.put(IMAGE_MAP_COMMAND, new ImageMapCommand(
-          context));
-    }
-    return (ImageMapCommand) context.get(IMAGE_MAP_COMMAND);
+  /**
+   * @deprecated since 2.11.3 instead use celementsweb script service
+   */
+  @Deprecated
+  public String displayImageMapConfigs() {
+    return getService().displayImageMapConfigs();
   }
 
   public String addExtJSfileOnce(String jsFile) {
@@ -977,7 +973,7 @@ public class CelementsWebPluginApi extends Api {
    * @param elementFullName
    * @return
    * 
-   * @deprecated please use renderCelementsDocument(DocumentReference) instead
+   * @deprecated since 2.11.2 use renderCelementsDocument(DocumentReference) instead
    */
   @Deprecated
   public String renderCelementsDocument(String elementFullName) {
@@ -990,7 +986,7 @@ public class CelementsWebPluginApi extends Api {
    * @param renderMode
    * @return
    * 
-   * @deprecated please use renderCelementsDocument(DocumentReference, String) instead
+   * @deprecated since 2.11.2 use renderCelementsDocument(DocumentReference, String) instead
    */
   @Deprecated
   public String renderCelementsDocument(String elementFullName, String renderMode) {
@@ -1274,7 +1270,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public String getAppScriptURL(String scriptName) {
@@ -1282,7 +1278,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public String getAppScriptURL(String scriptName, String queryString) {
@@ -1290,7 +1286,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public boolean isAppScriptCurrentPage(String scriptName) {
@@ -1298,7 +1294,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public String getScriptNameFromURL() {
@@ -1306,7 +1302,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public boolean isAppScriptRequest() {
@@ -1314,7 +1310,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public String getCurrentPageURL(String queryString) {
@@ -1322,7 +1318,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public String convertToPlainText(String htmlContent) {
@@ -1330,7 +1326,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use celementsweb script service
    */
   @Deprecated
   public Builder getNewJSONBuilder() {

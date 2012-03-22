@@ -22,6 +22,7 @@ import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
+import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,6 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class CelementsWebScriptService implements ScriptService {
 
   private static final String APP_SCRIPT_XPAGE = "app";
+  public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebPluginApi.class);
@@ -186,6 +188,25 @@ public class CelementsWebScriptService implements ScriptService {
       return theNewDoc.newDocument(getContext());
     }
     return null;
+  }
+
+  public List<String> getImageUseMaps(String rteContent) {
+    return getImageMapCommand().getImageUseMaps(rteContent);
+  }
+
+  private ImageMapCommand getImageMapCommand() {
+    if (getContext().get(IMAGE_MAP_COMMAND) == null) {
+      getContext().put(IMAGE_MAP_COMMAND, new ImageMapCommand(getContext()));
+    }
+    return (ImageMapCommand) getContext().get(IMAGE_MAP_COMMAND);
+  }
+
+  public void addImageMapConfig(String configName) {
+    getImageMapCommand().addMapConfig(configName);
+  }
+  
+  public String displayImageMapConfigs() {
+    return getImageMapCommand().displayAllImageMapConfigs();
   }
 
 }
