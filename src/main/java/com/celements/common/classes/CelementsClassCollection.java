@@ -25,6 +25,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Extend CelementsClassCollection and make the implementor a named component.
+ * Celements then will call your initClasses method on system start once or if it
+ * is explicitly asked for.
+ * 
+ * @author fabian pichler
+ * 
+ * since 2.11.0
+ */
 public abstract class CelementsClassCollection
     implements ICelementsClassCollection {
 
