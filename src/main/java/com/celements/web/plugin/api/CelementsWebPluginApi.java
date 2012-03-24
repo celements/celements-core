@@ -53,7 +53,6 @@ import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CaptchaCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.ContextMenuCSSClassesCommand;
 import com.celements.web.plugin.cmd.CssCommand;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
@@ -74,6 +73,7 @@ import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
+import com.celements.web.service.ContextMenuScriptService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
@@ -141,12 +141,20 @@ public class CelementsWebPluginApi extends Api {
     return new LastStartupTimeStamp().getLastStartupTimeStamp();
   }
 
+  /**
+   * @deprecated since 2.11.4 instead use contextMenu script service
+   */
+  @Deprecated
   public ContextMenuBuilderApi getContextMenuBuilder() {
-    return new ContextMenuBuilderApi(context);
+    return getCMService().getContextMenuBuilder();
   }
 
+  /**
+   * @deprecated since 2.11.4 instead use contextMenu script service
+   */
+  @Deprecated
   public String getAllContextMenuCSSClassesAsJSON() {
-    return new ContextMenuCSSClassesCommand().getAllContextMenuCSSClassesAsJSON(context);
+    return getCMService().getAllContextMenuCSSClassesAsJSON();
   }
 
   public ContextMenuItemApi getWrapper(com.xpn.xwiki.api.Object menuItem,
@@ -1336,6 +1344,11 @@ public class CelementsWebPluginApi extends Api {
   private CelementsWebScriptService getService() {
     return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
         "celementsweb");
+  }
+
+  private ContextMenuScriptService getCMService() {
+    return (ContextMenuScriptService) Utils.getComponent(ScriptService.class,
+        "contextMenu");
   }
 
 }
