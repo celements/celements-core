@@ -42,7 +42,8 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
   
   public RemoteUserValidationClasses() {}
   
-  protected BaseClass getRemoteUserValidationClass(XWikiContext context) throws XWikiException {
+  protected BaseClass getRemoteUserValidationClass(XWikiContext context
+      ) throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
