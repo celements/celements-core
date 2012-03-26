@@ -79,7 +79,6 @@ public class CheckClassesCommand {
       getTagValueClass(context);
       getTokenClass(context);
       getOverlayConfigClass(context);
-      getMetaTagClass(context);
     } catch (XWikiException e) {
       mLogger.fatal(e);
     }
@@ -849,36 +848,6 @@ public class CheckClassesCommand {
     needsUpdate |= bclass.addTextField("documentToLoadInOverlay",
         "Document to load in overlay", 30);
     needsUpdate |= bclass.addTextAreaField("overlayCSS", "Overlay CSS", 80, 3);
-
-    setContentAndSaveClassDocument(doc, needsUpdate, context);
-    return bclass;
-  }
-
-  private BaseClass getMetaTagClass(XWikiContext context) throws XWikiException {
-    XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
-    boolean needsUpdate = false;
-
-    try {
-      doc = xwiki.getDocument("Classes.MetaTagClass", context);
-    } catch (XWikiException e) {
-      mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Classes");
-      doc.setName("MetaTagClass");
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Classes.MetaTagClass");
-    needsUpdate |= bclass.addTextField("key", "Key", 30);
-    needsUpdate |= bclass.addTextAreaField("value", "Value", 80, 7);
-    needsUpdate |= bclass.addTextField("lang", "Language", 30);
-
-    if (!"internal".equals(bclass.getCustomMapping())) {
-      needsUpdate = true;
-      bclass.setCustomMapping("internal");
-    }
 
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
