@@ -491,6 +491,23 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     verify(_xwiki);
   }
 
+//TODO fix XObjectIterator for this test
+//  @Test
+//  public void testIterator_foreach_noElements() throws Exception {
+//    String fullname = "Test.Doc";
+//    _docList.add(fullname);
+//    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc
+//        ).anyTimes();
+//    _iterator.setDocList(_docList);
+//    replay(_xwiki);
+//    int count = 0;
+//    for (BaseObject obj : _iterator) {
+//      count++;
+//    }
+//    assertEquals(0, count);
+//    verify(_xwiki);
+//  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
