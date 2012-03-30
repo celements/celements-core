@@ -25,10 +25,10 @@ import org.xwiki.observation.EventListener;
 
 import com.celements.cells.CellsClasses;
 import com.celements.common.classes.CompositorComponent;
+import com.celements.menu.MenuClasses;
 import com.celements.navigation.NavigationClasses;
 import com.celements.web.classcollections.ImageMapClasses;
 import com.celements.web.classcollections.RemoteUserValidationClasses;
-import com.celements.web.menu.MenuClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

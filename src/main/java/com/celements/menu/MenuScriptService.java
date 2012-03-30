@@ -17,27 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.menu;
+package com.celements.menu;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.RegEx;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+import org.xwiki.script.service.ScriptService;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class MenuApi extends Api {
+@Component("celMenu")
+public class MenuScriptService implements ScriptService {
 
-  public MenuApi(XWikiContext context) {
-    super(context);
+  @Requirement
+  IMenuService menuService;
+
+  @Requirement
+  Execution execution;
+
+  private XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
   public List<com.xpn.xwiki.api.Object> getMenuHeaders() {
     ArrayList<Object> menuHeaders = new ArrayList<com.xpn.xwiki.api.Object>();
-    for (BaseObject bobj : DataProvider.getInstance().getMenuHeaders(context)) {
+    for (BaseObject bobj : menuService.getMenuHeaders()) {
       if (bobj != null) {
-        menuHeaders.add(bobj.newObjectApi(bobj, getXWikiContext()));
+        menuHeaders.add(bobj.newObjectApi(bobj, getContext()));
       }
     }
     return menuHeaders;

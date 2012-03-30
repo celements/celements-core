@@ -7,7 +7,6 @@ com.celements.common.classes.CompositorComponent
 com.celements.web.classcollections.RemoteUserValidationClasses
 com.celements.web.classcollections.ImageMapClasses
 com.celements.web.classcollections.MetaTagClasses
-com.celements.web.menu.MenuClasses
 com.celements.cells.CellsClasses
 com.celements.navigation.NavigationClasses
 com.celements.navigation.service.TreeNodeCache
@@ -15,3 +14,6 @@ com.celements.navigation.service.TreeNodeService
 com.celements.web.service.CelementsWebScriptService
 com.celements.web.service.WebUtilsService
 com.celements.web.service.ContextMenuScriptService
+com.celements.menu.MenuClasses
+com.celements.menu.MenuService
+com.celements.menu.MenuScriptService

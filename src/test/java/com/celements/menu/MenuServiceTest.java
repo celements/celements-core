@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.menu;
+package com.celements.menu;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -30,34 +30,31 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.menu.IMenuService;
+import com.celements.menu.MenuService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
-public class DataProviderTest extends AbstractBridgedComponentTestCase {
+public class MenuServiceTest extends AbstractBridgedComponentTestCase {
 
-  private DataProvider pdInstance;
+  private MenuService pdInstance;
   private XWikiContext context;
   private XWiki xwiki;
   private XWikiRightService rightsMock;
 
   @Before
   public void setUp_DataProviderTest() throws Exception {
-    pdInstance = DataProvider.getInstance();
+    pdInstance = (MenuService) Utils.getComponent(IMenuService.class);
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     rightsMock = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightsMock).anyTimes();
-  }
-
-  @Test
-  public void testGetInstance_singleton() {
-    assertNotNull(pdInstance);
-    assertSame("ensure singleton", pdInstance, DataProvider.getInstance());
   }
 
   @Test
@@ -69,78 +66,68 @@ public class DataProviderTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHasview_notLocal_central_hasAccess() throws Exception {
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true).once();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(true).once();
 
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(false).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(false).once();
 
     replay(xwiki, rightsMock);
-    assertTrue(pdInstance.hasview("Celements.MenuBar", context));
+    assertTrue(pdInstance.hasview("Celements.MenuBar"));
     verify(xwiki, rightsMock);
   }
   
   @Test
   public void testHasview_local_central_hasAccess() throws Exception {
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true).once();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("Celements.MenuBar"), same(context))).andReturn(true).once();
 
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true).once();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(true).once();
 
     replay(xwiki, rightsMock);
-    assertTrue(pdInstance.hasview("Celements.MenuBar", context));
+    assertTrue(pdInstance.hasview("Celements.MenuBar"));
     verify(xwiki, rightsMock);
   }
   
   @Test
   public void testHasview_local_notCentral_hasAccess() throws Exception {
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(false).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(false).once();
 
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true).once();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(true).once();
 
     replay(xwiki, rightsMock);
-    assertTrue(pdInstance.hasview("Celements.MenuBar", context));
+    assertTrue(pdInstance.hasview("Celements.MenuBar"));
     verify(xwiki, rightsMock);
   }
   
   @Test
   public void testHasview_notLocal_central_noAccess() throws Exception {
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true).once();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(false).once();
 
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(false).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(false).once();
 
     replay(xwiki, rightsMock);
-    assertFalse(pdInstance.hasview("Celements.MenuBar", context));
+    assertFalse(pdInstance.hasview("Celements.MenuBar"));
     verify(xwiki, rightsMock);
   }
   
   @Test
   public void testHasview_local_notCentral_noAccess() throws Exception {
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(false).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(false).once();
 
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).once();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true).once();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("Celements.MenuBar"), same(context))).andReturn(false).once();
 
     replay(xwiki, rightsMock);
-    assertFalse(pdInstance.hasview("Celements.MenuBar", context));
+    assertFalse(pdInstance.hasview("Celements.MenuBar"));
     verify(xwiki, rightsMock);
   }
   
@@ -149,20 +136,19 @@ public class DataProviderTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument("Celements", "MenuBar");
     addMenuHeaderObject("mm_menu_name1", 10, 3, doc);
     addMenuHeaderObject("mm_menu_name2", 20, 2, doc);
-    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))
-        ).andReturn(doc).once();
+    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))).andReturn(doc
+        ).once();
     List<Object> fullNames = new ArrayList<Object>();
     fullNames.add("Celements.MenuBar");
-    expect(xwiki.search(isA(String.class), same(context))
-        ).andReturn(fullNames);
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-        ).andReturn(true).anyTimes();
+    expect(xwiki.search(isA(String.class), same(context))).andReturn(fullNames);
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("Celements.MenuBar"), same(context))).andReturn(true).anyTimes();
     
     replay(xwiki, rightsMock);
     TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
-    pdInstance.addMenuHeaders(menuHeadersMap, context);
+    pdInstance.addMenuHeaders(menuHeadersMap);
     ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
     menuHeaders.addAll(menuHeadersMap.values());
 
@@ -185,27 +171,26 @@ public class DataProviderTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name2", 22, 2, doc);
     addMenuHeaderObject("mm_menu_name1", 42, 1, doc2);
     addMenuHeaderObject("mm_menu_name2", 32, 4, doc2);
-    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))
-    ).andReturn(doc).once();
-    expect(xwiki.getDocument(eq("Celements.MenuBar2"), same(context))
-    ).andReturn(doc2).once();
+    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))).andReturn(doc
+        ).once();
+    expect(xwiki.getDocument(eq("Celements.MenuBar2"), same(context))).andReturn(doc2
+        ).once();
     List<Object> fullNames = new ArrayList<Object>();
     fullNames.add("Celements.MenuBar");
     fullNames.add("Celements.MenuBar2");
-    expect(xwiki.search(isA(String.class), same(context))
-        ).andReturn(fullNames);
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).anyTimes();
+    expect(xwiki.search(isA(String.class), same(context))).andReturn(fullNames);
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(true).anyTimes();
-    expect(xwiki.exists(eq("Celements.MenuBar2"), same(context))
-      ).andReturn(true).anyTimes();
+    expect(xwiki.exists(eq("Celements.MenuBar2"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar2"), same(context))).andReturn(true).anyTimes();
     
     replay(xwiki, rightsMock);
     TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
-    pdInstance.addMenuHeaders(menuHeadersMap, context);
+    pdInstance.addMenuHeaders(menuHeadersMap);
     ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
 
     menuHeaders.addAll(menuHeadersMap.values());
@@ -236,27 +221,26 @@ public class DataProviderTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name2", 22, 2, doc);
     addMenuHeaderObject("mm_menu_name1", 42, 1, doc2);
     addMenuHeaderObject("mm_menu_name2", 32, 4, doc2);
-    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))
-    ).andReturn(doc).anyTimes();
-    expect(xwiki.getDocument(eq("Celements.MenuBar2"), same(context))
-    ).andReturn(doc2).anyTimes();
+    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))).andReturn(doc
+        ).anyTimes();
+    expect(xwiki.getDocument(eq("Celements.MenuBar2"), same(context))).andReturn(doc2
+        ).anyTimes();
     List<Object> fullNames = new ArrayList<Object>();
     fullNames.add("Celements.MenuBar");
     fullNames.add("Celements.MenuBar2");
-    expect(xwiki.search(isA(String.class), same(context))
-        ).andReturn(fullNames);
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).anyTimes();
+    expect(xwiki.search(isA(String.class), same(context))).andReturn(fullNames);
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(true).anyTimes();
-    expect(xwiki.exists(eq("Celements.MenuBar2"), same(context))
-      ).andReturn(true).anyTimes();
+    expect(xwiki.exists(eq("Celements.MenuBar2"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar2"), same(context))).andReturn(false).anyTimes();
     
     replay(xwiki, rightsMock);
     TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
-    pdInstance.addMenuHeaders(menuHeadersMap, context);
+    pdInstance.addMenuHeaders(menuHeadersMap);
     ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
 
     menuHeaders.addAll(menuHeadersMap.values());
@@ -279,30 +263,29 @@ public class DataProviderTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name2", 23, 5, doc);
     addMenuHeaderObject("mm_menu_name1", 43, 1, doc2);
     addMenuHeaderObject("mm_menu_name2", 33, 4, doc2);
-    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))
-      ).andReturn(doc).once();
+    expect(xwiki.getDocument(eq("Celements.MenuBar"), same(context))).andReturn(doc
+        ).once();
     List<Object> fullNames = new ArrayList<Object>();
     fullNames.add("Celements.MenuBar");
-    expect(xwiki.search(isA(String.class), same(context))
-      ).andReturn(fullNames).once();
+    expect(xwiki.search(isA(String.class), same(context))).andReturn(fullNames).once();
     List<Object> fullNamesCentral = new ArrayList<Object>();
     fullNamesCentral.add("Celements.MenuBar2");
-    expect(xwiki.search(isA(String.class), same(context))
-      ).andReturn(fullNamesCentral).once();
-    expect(xwiki.getDocument(eq("Celements.MenuBar2"), same(context))
-      ).andReturn(doc2).once();
+    expect(xwiki.search(isA(String.class), same(context))).andReturn(fullNamesCentral
+        ).once();
+    expect(xwiki.getDocument(eq("Celements.MenuBar2"), same(context))).andReturn(doc2
+        ).once();
 
-    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))
-      ).andReturn(true).anyTimes();
+    expect(xwiki.exists(eq("Celements.MenuBar"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar"), same(context))).andReturn(true).anyTimes();
-    expect(xwiki.exists(eq("Celements.MenuBar2"), same(context))
-      ).andReturn(true).anyTimes();
+    expect(xwiki.exists(eq("Celements.MenuBar2"), same(context))).andReturn(true
+        ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("Celements.MenuBar2"), same(context))).andReturn(true).anyTimes();
     
     replay(xwiki, rightsMock);
-    List<BaseObject> menuHeaders = pdInstance.getMenuHeaders(context);
+    List<BaseObject> menuHeaders = pdInstance.getMenuHeaders();
     assertEquals("Expecting sorted headers", 1,
         menuHeaders.get(0).getIntValue("pos"));
     assertEquals("Expecting sorted headers", 43,

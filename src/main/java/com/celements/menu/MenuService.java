@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.menu;
+package com.celements.menu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,32 +27,32 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class DataProvider {
+@Component
+public class MenuService implements IMenuService {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      MenuClasses.class);
-  private static DataProvider instance;
+  private static Log mLogger = LogFactory.getFactory().getInstance(MenuClasses.class);
 
-  private DataProvider() {}
-  
-  public static DataProvider getInstance() {
-    if (instance == null) {
-      instance = new DataProvider();
-    }
-    return instance;
+  @Requirement
+  Execution execution;
+
+  private XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
-  public List<BaseObject> getMenuHeaders(XWikiContext context) {
+  public List<BaseObject> getMenuHeaders() {
     TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
-    addMenuHeaders(menuHeadersMap, context);
-    context.setDatabase("celements2web");
-    addMenuHeaders(menuHeadersMap, context);
-    context.setDatabase(context.getOriginalDatabase());
+    addMenuHeaders(menuHeadersMap);
+    getContext().setDatabase("celements2web");
+    addMenuHeaders(menuHeadersMap);
+    getContext().setDatabase(getContext().getOriginalDatabase());
     ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
     resultList.addAll(menuHeadersMap.values());
     if (mLogger.isDebugEnabled()) {
@@ -62,33 +62,31 @@ public class DataProvider {
     return resultList;
   }
 
-  boolean hasview(String menuDocFullName, XWikiContext context
-      ) throws XWikiException {
-    String database = context.getDatabase();
-    context.setDatabase("celements2web");
-    boolean centralView = !context.getWiki().exists(menuDocFullName, context)
-      || context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-        menuDocFullName, context);
-    context.setDatabase(context.getOriginalDatabase());
-    boolean localView = !context.getWiki().exists(menuDocFullName, context)
-      || context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-        menuDocFullName, context);
-    context.setDatabase(database);
+  boolean hasview(String menuDocFullName) throws XWikiException {
+    String database = getContext().getDatabase();
+    getContext().setDatabase("celements2web");
+    boolean centralView = !getContext().getWiki().exists(menuDocFullName, getContext())
+      || getContext().getWiki().getRightService().hasAccessLevel("view",
+          getContext().getUser(), menuDocFullName, getContext());
+    getContext().setDatabase(getContext().getOriginalDatabase());
+    boolean localView = !getContext().getWiki().exists(menuDocFullName, getContext())
+      || getContext().getWiki().getRightService().hasAccessLevel("view",
+          getContext().getUser(), menuDocFullName, getContext());
+    getContext().setDatabase(database);
     return centralView && localView;
   }
 
-  void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap,
-      XWikiContext context) {
+  void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap) {
     try {
-      List<String> result = context.getWiki().search(getHeadersHQL(), context);
+      List<String> result = getContext().getWiki().search(getHeadersHQL(), getContext());
       if (mLogger.isDebugEnabled()) {
-        mLogger.debug("addMenuHeaders reseved for " + context.getDatabase()
+        mLogger.debug("addMenuHeaders reseved for " + getContext().getDatabase()
           + ": " + Arrays.deepToString(result.toArray()));
       }
       for(String fullName : result) {
-        if (hasview(fullName, context)) {
-          for(BaseObject obj : context.getWiki().getDocument(fullName,
-              context).getObjects("Celements.MenuBarHeaderItemClass")) {
+        if (hasview(fullName)) {
+          for(BaseObject obj : getContext().getWiki().getDocument(fullName, getContext()
+              ).getObjects("Celements.MenuBarHeaderItemClass")) {
             menuHeadersMap.put(obj.getIntValue("pos"), obj);
           }
         }

@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
@@ -42,7 +43,6 @@ import com.celements.sajson.Builder;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
-import com.celements.web.menu.MenuApi;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.pagetype.RenderCommand;
@@ -658,8 +658,12 @@ public class CelementsWebPluginApi extends Api {
     return WebUtils.getInstance().getMajorVersion(doc.getDocument());
   }
 
-  public MenuApi getMenuBar() {
-    return new MenuApi(context);
+  /**
+   * @deprecated since 2.11.5 use $services.celMenu.getMenuBar() instead
+   */
+  @Deprecated
+  public MenuScriptService getMenuBar() {
+    return (MenuScriptService) Utils.getComponent(ScriptService.class, "celMenu");
   }
 
   public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map
