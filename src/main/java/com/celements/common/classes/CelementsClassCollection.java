@@ -44,7 +44,7 @@ public abstract class CelementsClassCollection
     }
   }
 
-  private boolean isActivated(XWikiContext context) {
+  public boolean isActivated(XWikiContext context) {
     return ("," + context.getWiki().getXWikiPreference("activated_classcollections",
         context) + "," + context.getWiki().Param("celements.classcollections", "") + ","
         ).contains("," + getConfigName() + ",");

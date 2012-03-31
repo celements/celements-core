@@ -2,6 +2,7 @@ com.celements.migrations.CelSubSystemMigrationCoordinator
 com.celements.migrations.XWikiSubSystemMigrationComponent
 com.celements.migrations.CelementsSubSystemMigrationComponent
 com.celements.migrator.MenuNameMappingCelements2_8
+com.celements.migrator.MenuBar_SubMenuItemsClassMigrator
 com.celements.cells.CellsScriptService
 com.celements.common.classes.CompositorComponent
 com.celements.web.classcollections.RemoteUserValidationClasses

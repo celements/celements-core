@@ -22,8 +22,6 @@ package com.celements.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.RegEx;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -54,6 +52,16 @@ public class MenuScriptService implements ScriptService {
       }
     }
     return menuHeaders;
+  }
+
+  public List<com.xpn.xwiki.api.Object> getSubMenuItems(Integer headerId) {
+    ArrayList<Object> menuItems = new ArrayList<com.xpn.xwiki.api.Object>();
+    for (BaseObject bobj : menuService.getSubMenuItems(headerId)) {
+      if (bobj != null) {
+        menuItems.add(bobj.newObjectApi(bobj, getContext()));
+      }
+    }
+    return menuItems;
   }
 
 }

@@ -3,6 +3,7 @@ package com.celements.menu;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -10,5 +11,11 @@ import com.xpn.xwiki.objects.BaseObject;
 public interface IMenuService {
 
   public List<BaseObject> getMenuHeaders();
+
+  public List<BaseObject> getSubMenuItems(Integer headerId);
+
+  public DocumentReference getMenuBarHeaderClassRef();
+
+  public DocumentReference getMenuBarSubItemClassRef();
 
 }

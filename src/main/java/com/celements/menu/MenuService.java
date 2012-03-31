@@ -30,6 +30,14 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,7 +46,16 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class MenuService implements IMenuService {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(MenuClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(MenuService.class);
+
+  @Requirement("default")
+  EntityReferenceSerializer<String> modelSerializer;
+
+  @Requirement
+  EntityReferenceResolver<String> referenceResolver;
+
+  @Requirement
+  QueryManager queryManager;
 
   @Requirement
   Execution execution;
@@ -48,6 +65,7 @@ public class MenuService implements IMenuService {
   }
 
   public List<BaseObject> getMenuHeaders() {
+    LOGGER.trace("getMenuHeaders start");
     TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
     addMenuHeaders(menuHeadersMap);
     getContext().setDatabase("celements2web");
@@ -55,51 +73,129 @@ public class MenuService implements IMenuService {
     getContext().setDatabase(getContext().getOriginalDatabase());
     ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
     resultList.addAll(menuHeadersMap.values());
-    if (mLogger.isDebugEnabled()) {
-      mLogger.debug("getMenuHeaders returning: "
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("getMenuHeaders returning: "
         + Arrays.deepToString(resultList.toArray()));
     }
+    LOGGER.trace("getMenuHeaders end");
     return resultList;
   }
 
-  boolean hasview(String menuDocFullName) throws XWikiException {
-    String database = getContext().getDatabase();
-    getContext().setDatabase("celements2web");
-    boolean centralView = !getContext().getWiki().exists(menuDocFullName, getContext())
+  boolean hasview(DocumentReference menuBarDocRef) throws XWikiException {
+//    String database = getContext().getDatabase();
+//    getContext().setDatabase("celements2web");
+    LOGGER.debug("hasview: " + menuBarDocRef);
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
+        menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
+    String menuBar2webFullName = modelSerializer.serialize(menuBar2webDocRef);
+    boolean centralView = !getContext().getWiki().exists(menuBar2webDocRef, getContext())
       || getContext().getWiki().getRightService().hasAccessLevel("view",
-          getContext().getUser(), menuDocFullName, getContext());
-    getContext().setDatabase(getContext().getOriginalDatabase());
-    boolean localView = !getContext().getWiki().exists(menuDocFullName, getContext())
+          getContext().getUser(), menuBar2webFullName, getContext());
+    LOGGER.debug("hasview: centralView " + menuBar2webFullName + " " + centralView);
+//    getContext().setDatabase(getContext().getOriginalDatabase());
+    String menuBarFullName = modelSerializer.serialize(menuBarDocRef);
+    boolean localView = !getContext().getWiki().exists(menuBarDocRef, getContext())
       || getContext().getWiki().getRightService().hasAccessLevel("view",
-          getContext().getUser(), menuDocFullName, getContext());
-    getContext().setDatabase(database);
+          getContext().getUser(), menuBarFullName, getContext());
+    LOGGER.debug("hasview: localView " + menuBarFullName + " " + localView);
+//    getContext().setDatabase(database);
     return centralView && localView;
   }
 
   void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap) {
     try {
-      List<String> result = getContext().getWiki().search(getHeadersHQL(), getContext());
-      if (mLogger.isDebugEnabled()) {
-        mLogger.debug("addMenuHeaders reseved for " + getContext().getDatabase()
+      List<String> result = queryManager.createQuery(getHeadersXWQL(), Query.XWQL
+          ).execute();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("addMenuHeaders received for " + getContext().getDatabase()
           + ": " + Arrays.deepToString(result.toArray()));
       }
       for(String fullName : result) {
-        if (hasview(fullName)) {
-          for(BaseObject obj : getContext().getWiki().getDocument(fullName, getContext()
-              ).getObjects("Celements.MenuBarHeaderItemClass")) {
-            menuHeadersMap.put(obj.getIntValue("pos"), obj);
+        DocumentReference menuBarDocRef = resolveDocument(fullName);
+        if (hasview(menuBarDocRef)) {
+          List<BaseObject> headerObjList = getContext().getWiki().getDocument(
+              menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef());
+          if (headerObjList != null) {
+            for (BaseObject obj : headerObjList) {
+              menuHeadersMap.put(obj.getIntValue("pos"), obj);
+            }
           }
         }
       }
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
+    } catch (QueryException e) {
+      LOGGER.error(e);
     }
   }
 
-  String getHeadersHQL() {
-    return "select obj.name"
-        + " from BaseObject obj"
-        + " where obj.className = 'Celements.MenuBarHeaderItemClass'";
+  public DocumentReference getMenuBarHeaderClassRef() {
+    return new DocumentReference(getContext().getDatabase(), "Celements",
+        "MenuBarHeaderItemClass");
+  }
+
+
+  public DocumentReference getMenuBarSubItemClassRef() {
+    return new DocumentReference(getContext().getDatabase(), "Celements",
+        "MenuBarSubItemClass");
+  }
+
+  String getHeadersXWQL() {
+    return "from doc.object(Celements.MenuBarHeaderItemClass) as mHeader";
+  }
+
+  private DocumentReference resolveDocument(String docFullName) {
+    DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
+        docFullName, EntityType.DOCUMENT));
+    eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
+    LOGGER.debug("getDocRefFromFullName: for [" + docFullName + "] got reference ["
+        + eventRef + "].");
+    return eventRef;
+  }
+
+  public List<BaseObject> getSubMenuItems(Integer headerId) {
+    TreeMap<Integer, BaseObject> menuItemsMap = new TreeMap<Integer, BaseObject>();
+    addMenuItems(menuItemsMap, headerId);
+    getContext().setDatabase("celements2web");
+    addMenuItems(menuItemsMap, headerId);
+    getContext().setDatabase(getContext().getOriginalDatabase());
+    ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
+    resultList.addAll(menuItemsMap.values());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("getMenuHeaders returning: "
+        + Arrays.deepToString(resultList.toArray()));
+    }
+    LOGGER.trace("getMenuHeaders end");
+    return resultList;
+  }
+
+  private void addMenuItems(TreeMap<Integer, BaseObject> menuItemsMap, Integer headerId) {
+    try {
+      List<Object[]> result = queryManager.createQuery(getSubItemsXWQL(), Query.XWQL
+          ).bindValue("headerId", headerId).execute();
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("addMenuItems received for " + getContext().getDatabase()
+          + ": " + Arrays.deepToString(result.toArray()));
+      }
+      for(Object[] resultObj : result) {
+        String fullName = resultObj[0].toString();
+        int objectNr = Integer.parseInt(resultObj[1].toString());
+        DocumentReference menuBarDocRef = resolveDocument(fullName);
+        BaseObject obj = getContext().getWiki().getDocument(menuBarDocRef, getContext()
+            ).getXObject(getMenuBarSubItemClassRef(), objectNr);
+        menuItemsMap.put(obj.getIntValue("itempos"), obj);
+      }
+    } catch (XWikiException e) {
+      LOGGER.error(e);
+    } catch (QueryException e) {
+      LOGGER.error(e);
+    }
+  }
+
+  private String getSubItemsXWQL() {
+    return "select doc.fullName, subItem.number"
+      + " from Document as doc, doc.object(Celements.MenuBarSubItemClass) as subItem"
+      + " where subItem.header_id = :headerId";
   }
 
 }
