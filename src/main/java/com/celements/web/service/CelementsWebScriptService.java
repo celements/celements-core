@@ -40,6 +40,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
@@ -226,6 +227,19 @@ public class CelementsWebScriptService implements ScriptService {
   
   public String displayImageMapConfigs() {
     return getImageMapCommand().displayAllImageMapConfigs();
+  }
+
+  public String getSkinFile(String fileName) {
+    return new AttachmentURLCommand().getAttachmentURL(fileName, getContext());
+  }
+
+  public String getSkinFile(String fileName, String action) {
+    return new AttachmentURLCommand().getAttachmentURL(fileName, action, getContext());
+  }
+
+  public String getSkinFileExternal(String fileName, String action) {
+    return new AttachmentURLCommand().getExternalAttachmentURL(fileName, action,
+        getContext());
   }
 
 }

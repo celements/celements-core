@@ -19,6 +19,8 @@
  */
 package com.celements.web.plugin.cmd;
 
+import java.net.MalformedURLException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class AttachmentURLCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       AttachmentURLCommand.class);
 
   public String getAttachmentURL(String link, XWikiContext context) {
@@ -53,7 +55,7 @@ public class AttachmentURLCommand {
         url += "?version=" + new LastStartupTimeStamp().getLastChangedTimeStamp(
             doc.getAttachment(attName).getDate());
       } catch (XWikiException exp) {
-        mLogger.error("Error getting attachment URL for doc " + getPageFullName(link)
+        LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link)
             + " and file " + attName, exp);
         url = link;
       }
@@ -94,6 +96,17 @@ public class AttachmentURLCommand {
       isAttachmentLink = link.trim().matches(regex);
     }
     return isAttachmentLink;
+  }
+
+  public String getExternalAttachmentURL(String fileName, String action,
+      XWikiContext context) {
+    try {
+      return context.getURLFactory().getServerURL(context).toExternalForm(
+          ) + getAttachmentURL(fileName, action, context);
+    } catch (MalformedURLException exp) {
+      LOGGER.error("Failed to getServerURL.", exp);
+    }
+    return "";
   }
 
 }

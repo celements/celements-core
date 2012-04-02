@@ -49,7 +49,6 @@ import com.celements.web.pagetype.RenderCommand;
 import com.celements.web.plugin.CelementsWebPlugin;
 import com.celements.web.plugin.RTEConfig;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
-import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CaptchaCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
@@ -1239,12 +1238,20 @@ public class CelementsWebPluginApi extends Api {
     }
   }
 
+  /**
+   * @deprecated since 2.11.6 instead use celementsweb script service
+   */
+  @Deprecated
   public String getSkinFile(String fileName) {
-    return new AttachmentURLCommand().getAttachmentURL(fileName, context);
+    return getService().getSkinFile(fileName);
   }
 
+  /**
+   * @deprecated since 2.11.6 instead use celementsweb script service
+   */
+  @Deprecated
   public String getSkinFile(String fileName, String action) {
-    return new AttachmentURLCommand().getAttachmentURL(fileName, action, context);
+    return getService().getSkinFile(fileName, action);
   }
 
   public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference, 
