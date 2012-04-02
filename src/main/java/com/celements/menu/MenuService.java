@@ -90,13 +90,18 @@ public class MenuService implements IMenuService {
     if (modelSerializer.serialize(menuBarDocRef).endsWith("Celements2.AdminMenu")) {
       return webUtilsService.isAdvancedAdmin();
     }
+    String database = getContext().getDatabase();
+    getContext().setDatabase("celements2web");
     DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
         menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
     String menuBar2webFullName = modelSerializer.serialize(menuBar2webDocRef);
     boolean centralView = !getContext().getWiki().exists(menuBar2webDocRef, getContext())
       || getContext().getWiki().getRightService().hasAccessLevel("view",
           getContext().getUser(), menuBar2webFullName, getContext());
-    LOGGER.debug("hasview: centralView " + menuBar2webFullName + " " + centralView);
+    LOGGER.debug("hasview: centralView [" + menuBar2webFullName + "] for ["
+        + getContext().getUser() + "] -> [" + centralView + "] on database ["
+        + getContext().getDatabase() + "].");
+    getContext().setDatabase(getContext().getOriginalDatabase());
     DocumentReference menuBarLocalDocRef = new DocumentReference(getContext(
         ).getOriginalDatabase(), menuBarDocRef.getLastSpaceReference().getName(),
         menuBarDocRef.getName());
@@ -104,7 +109,10 @@ public class MenuService implements IMenuService {
     boolean localView = !getContext().getWiki().exists(menuBarLocalDocRef, getContext())
       || getContext().getWiki().getRightService().hasAccessLevel("view",
           getContext().getUser(), menuBarFullName, getContext());
-    LOGGER.debug("hasview: localView " + menuBarFullName + " " + localView);
+    LOGGER.debug("hasview: localView [" + menuBarFullName + "] for ["
+        + getContext().getUser() + "] -> [" + localView + "] on database ["
+        + getContext().getDatabase() + "].");
+    getContext().setDatabase(database);
     return centralView && localView;
   }
 
