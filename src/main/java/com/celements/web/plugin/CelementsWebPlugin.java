@@ -367,6 +367,11 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return attachments;
   }
 
+  /**
+   * @deprecated since 2.11.7 instead use renderCelementsDocument
+   *             on celementsweb scriptService
+   */
+  @Deprecated
   public String renderCelementsPageType(XWikiDocument doc, IPageType pageType,
       XWikiContext context) throws XWikiException{
     XWikiDocument viewTemplate = context.getWiki().getDocument(

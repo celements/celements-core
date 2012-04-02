@@ -39,6 +39,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
+import com.celements.web.pagetype.RenderCommand;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
@@ -240,6 +241,27 @@ public class CelementsWebScriptService implements ScriptService {
   public String getSkinFileExternal(String fileName, String action) {
     return new AttachmentURLCommand().getExternalAttachmentURL(fileName, action,
         getContext());
+  }
+
+  private RenderCommand getCelementsRenderCmd() {
+    RenderCommand renderCommand = new RenderCommand(getContext());
+    renderCommand.setDefaultPageType("RichText");
+    return renderCommand;
+  }
+
+  public String renderCelementsDocument(DocumentReference elementDocRef) {
+    return renderCelementsDocument(elementDocRef, "view");
+  }
+
+  public String renderCelementsDocument(DocumentReference elementDocRef,
+      String renderMode) {
+    try {
+      return getCelementsRenderCmd().renderCelementsDocument(getContext().getWiki(
+          ).getDocument(elementDocRef, getContext()), renderMode);
+    } catch (XWikiException exp) {
+      LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
+    }
+    return "";
   }
 
 }

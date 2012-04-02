@@ -1010,19 +1010,21 @@ public class CelementsWebPluginApi extends Api {
     return "";
   }
 
+  /**
+   * @deprecated since 2.11.7 instead use celementsweb script service
+   */
+  @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef) {
-    return renderCelementsDocument(elementDocRef, "view");
+    return getService().renderCelementsDocument(elementDocRef);
   }
 
+  /**
+   * @deprecated since 2.11.7 instead use celementsweb script service
+   */
+  @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef,
       String renderMode) {
-    try {
-      return getCelementsRenderCmd().renderCelementsDocument(context.getWiki(
-          ).getDocument(elementDocRef, context), renderMode);
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
-    }
-    return "";
+    return getService().renderCelementsDocument(elementDocRef, renderMode);
   }
 
   public String renderDocument(Document renderDoc) {
