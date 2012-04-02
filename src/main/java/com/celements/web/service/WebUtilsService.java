@@ -35,6 +35,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
@@ -105,17 +106,53 @@ public class WebUtilsService implements IWebUtilsService {
     return adminLanguage;
   }
 
-  private DocumentReference resolveDocumentReference(String collDocName) {
+  public DocumentReference resolveDocumentReference(String fullName) {
     DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
-        collDocName, EntityType.DOCUMENT));
-    eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
-    LOGGER.debug("getDocRefFromFullName: for [" + collDocName + "] got reference ["
+        fullName, EntityType.DOCUMENT));
+    if (!fullName.contains(":")) {
+      eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
+    }
+    LOGGER.debug("getDocRefFromFullName: for [" + fullName + "] got reference ["
         + eventRef + "].");
     return eventRef;
   }
 
   public String getDefaultLanguage() {
     return getContext().getWiki().getWebPreference("default_language", getContext());
+  }
+
+  public boolean isAdminUser() {
+    try {
+      if ((getContext().getXWikiUser() != null)
+          && (getContext().getWiki().getRightService() != null)
+          && (getContext().getDoc() != null)) {
+        return (getContext().getWiki().getRightService().hasAdminRights(getContext())
+          || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup",
+              getContext()));
+      } else {
+        return false;
+      }
+    } catch (XWikiException e) {
+      LOGGER.error("Cannot determin if user has Admin Rights therefore guess"
+        + " no (false).", e);
+      return false;
+    }
+  }
+
+  public boolean isAdvancedAdmin() {
+    String user = getContext().getUser();
+    try {
+      XWikiDocument userDoc = getContext().getWiki().getDocument(resolveDocumentReference(
+          user), getContext());
+      BaseObject userObj = userDoc.getXObject(new DocumentReference(getContext(
+          ).getOriginalDatabase(), "XWiki", "XWikiUsers"));
+      return (isAdminUser() && (user.startsWith("xwiki:")
+          || ((userObj != null) && "Advanced".equals(userObj.getStringValue("usertype"
+              )))));
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get user document for [" + user + "].", exp);
+    }
+    return false;
   }
 
 }

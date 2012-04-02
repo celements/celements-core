@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -48,7 +47,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class WebUtilsTest extends AbstractBridgedComponentTestCase {
@@ -254,86 +252,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     verify(mockStore, wiki);
   }
 
-  @Test
-  public void testIsAdminUser_noAdminRights_noRightsService() {
-    XWikiContext context = createMock(XWikiContext.class);
-    expect(context.getWiki()).andReturn(wiki).atLeastOnce();
-    expect(wiki.getRightService()).andReturn(null).anyTimes();
-    TestMockUser xwikiUser = new TestMockUser("XWiki.TestUser");
-    expect(context.getXWikiUser()).andReturn(xwikiUser).anyTimes();
-
-    replay(context, mockStore, wiki);
-    assertFalse(celUtils.isAdminUser(context));
-    verify(context, mockStore, wiki);
-  }
-  
-  @Test
-  public void testIsAdminUser_noContextDoc() {
-    XWikiContext context = createMock(XWikiContext.class);
-    expect(context.getDoc()).andReturn(null).atLeastOnce();
-    expect(context.getWiki()).andReturn(wiki).atLeastOnce();
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    TestMockUser xwikiUser = new TestMockUser("XWiki.TestUser");
-    expect(context.getXWikiUser()).andReturn(xwikiUser).anyTimes();
-    //hasAdminRights must not be called it will fail with an NPE
-
-    replay(context, mockStore, wiki, mockRightsService);
-    assertFalse(celUtils.isAdminUser(context));
-    verify(context, mockStore, wiki, mockRightsService);
-  }
-  
-  @Test
-  public void testIsAdminUser_noAdminRights_notInAdminGroup() {
-    XWikiContext context = createMock(XWikiContext.class);
-    expect(context.getDoc()).andReturn(new XWikiDocument()).atLeastOnce();
-    expect(context.getWiki()).andReturn(wiki).atLeastOnce();
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(false).anyTimes();
-    TestMockUser xwikiUser = new TestMockUser("XWiki.TestUser");
-    expect(context.getXWikiUser()).andReturn(xwikiUser).anyTimes();
-
-    replay(context, mockStore, wiki, mockRightsService);
-    assertFalse(celUtils.isAdminUser(context));
-    verify(context, mockStore, wiki, mockRightsService);
-  }
-  
-  @Test
-  public void testIsAdminUser_noAdminRights_isInAdminGroup() {
-    XWikiContext context = createMock(XWikiContext.class);
-    expect(context.getDoc()).andReturn(new XWikiDocument()).atLeastOnce();
-    expect(context.getWiki()).andReturn(wiki).atLeastOnce();
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(false).anyTimes();
-    TestMockUser xwikiUser = new TestMockUser("XWiki.TestUser");
-    HashSet<String> groups = new HashSet<String>();
-    groups.add("XWiki.XWikiAdminGroup");
-    xwikiUser.setTestGroups(groups );
-    expect(context.getXWikiUser()).andReturn(xwikiUser ).anyTimes();
-
-    replay(context, mockStore, wiki, mockRightsService);
-    assertTrue(celUtils.isAdminUser(context));
-    verify(context, mockStore, wiki, mockRightsService);
-  }
-  
-  @Test
-  public void testIsAdminUser_adminRights_notInAdminGroup() {
-    XWikiContext context = createMock(XWikiContext.class);
-    expect(context.getDoc()).andReturn(new XWikiDocument()).atLeastOnce();
-    expect(context.getWiki()).andReturn(wiki).atLeastOnce();
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
-    TestMockUser xwikiUser = new TestMockUser("XWiki.TestUser");
-    expect(context.getXWikiUser()).andReturn(xwikiUser).anyTimes();
-
-    replay(context, mockStore, wiki, mockRightsService);
-    assertTrue(celUtils.isAdminUser(context));
-    verify(context, mockStore, wiki, mockRightsService);
-  }
-  
   @Test
   public void testGetMajorVersion_nullDoc() {
     assertEquals("1", ((WebUtils)celUtils).getMajorVersion(null));
@@ -908,26 +826,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     navObj.setName(doc.getFullName());
     navObj.setDocumentReference(doc.getDocumentReference());
     return navObj;
-  }
-
-  final private class TestMockUser extends XWikiUser {
-    
-    private HashSet<String> groups = new HashSet<String>();
-
-    public TestMockUser(String user) {
-      super(user);
-    }
-
-    final void setTestGroups(HashSet<String> groups) {
-      this.groups = groups;
-    }
-
-    @Override
-    public boolean isUserInGroup(String groupName, XWikiContext context)
-        throws XWikiException {
-      return groups.contains(groupName);
-    }
-    
   }
 
   private void replayAll(Object ... mocks) {

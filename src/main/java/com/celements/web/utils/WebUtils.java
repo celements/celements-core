@@ -621,22 +621,12 @@ public class WebUtils implements IWebUtils {
     return preSetImgList;
   }
 
+  /**
+   * @deprecated since 2.11.6 instead use WebUtilsService directly
+   */
+  @Deprecated
   public boolean isAdminUser(XWikiContext context) {
-    try {
-      if ((context.getXWikiUser() != null)
-          && (context.getWiki().getRightService() != null)
-          && (context.getDoc() != null)) {
-        return (context.getWiki().getRightService().hasAdminRights(context)
-          || context.getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup",
-              context));
-      } else {
-        return false;
-      }
-    } catch (XWikiException e) {
-      LOGGER.error("Cannot determin if user has Admin Rights therefore guess"
-        + " no (false).", e);
-      return false;
-    }
+    return getWebUtilsService().isAdminUser();
   }
 
   public Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,

@@ -20,6 +20,7 @@
 package com.celements.web.service;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.web.XWikiMessageTool;
 
@@ -35,5 +36,11 @@ public interface IWebUtilsService {
   public String getAdminLanguage(String userFullName);
 
   public String getDefaultLanguage();
+
+  public DocumentReference resolveDocumentReference(String fullName);
+
+  public boolean isAdminUser();
+
+  public boolean isAdvancedAdmin();
 
 }

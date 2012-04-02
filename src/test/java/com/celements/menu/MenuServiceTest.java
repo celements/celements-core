@@ -68,19 +68,42 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHasview_notLocal_central_hasAccess() throws Exception {
-    DocumentReference menuBarDocRef = new DocumentReference("celements2web",
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
         "Celements", "MenuBar");
-    expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-      eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
-
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
+
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
+        "Celements", "MenuBar");
+    expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
+    expect(
+        rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+            eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
 
     replayAll();
     assertTrue(menuService.hasview(menuBarDocRef));
     verifyAll();
   }
-  
+
+  @Test
+  public void testHasview_Local_central_noAccess() throws Exception {
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
+        "Celements", "MenuBar");
+    expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Celements.MenuBar"), same(context))).andReturn(false).once();
+
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
+        "Celements", "MenuBar");
+    expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
+    expect(
+        rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+            eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
+
+    replayAll();
+    assertFalse(menuService.hasview(menuBarDocRef));
+    verifyAll();
+  }
+
   @Test
   public void testHasview_local_central_hasAccess() throws Exception {
     DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),

@@ -3,6 +3,10 @@ package com.celements.web.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -13,6 +17,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
@@ -106,6 +112,114 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals("en", webUtilsService.getAdminLanguage(userName));
     verifyAll();
   }
+
+  @Test
+  public void testIsAdminUser_noAdminRights_noRightsService() {
+    context.setUser("XWiki.TestUser");
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDocument");
+    context.setDoc(new XWikiDocument(currentDocRef));
+    expect(xwiki.getRightService()).andReturn(null).anyTimes();
+
+    replayAll();
+    assertFalse(webUtilsService.isAdminUser());
+    verifyAll();
+  }
+  
+  @Test
+  public void testIsAdminUser_noContextDoc() {
+    context.setUser("XWiki.TestUser");
+    context.setDoc(null);
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    //hasAdminRights must not be called it will fail with an NPE
+
+    replayAll(mockRightsService);
+    assertFalse(webUtilsService.isAdminUser());
+    verifyAll(mockRightsService);
+  }
+  
+  @Test
+  public void testIsAdminUser_noAdminRights_notInAdminGroup() throws Exception {
+    context.setUser("XWiki.TestUser");
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "TestUser");
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDocument");
+    context.setDoc(new XWikiDocument(currentDocRef));
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAdminRights(same(context))).andReturn(false).anyTimes();
+    XWikiGroupService groupServiceMock = createMock(XWikiGroupService.class);
+    expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock);
+    List<DocumentReference> emptyGroupList = Collections.emptyList();
+    expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
+        same(context))).andReturn(emptyGroupList).atLeastOnce();
+    replayAll(mockRightsService, groupServiceMock);
+    assertFalse(webUtilsService.isAdminUser());
+    verifyAll(mockRightsService, groupServiceMock);
+  }
+  
+  @Test
+  public void testIsAdminUser_noAdminRights_isInAdminGroup() throws Exception {
+    context.setUser("XWiki.TestUser");
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "TestUser");
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDocument");
+    context.setDoc(new XWikiDocument(currentDocRef));
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAdminRights(same(context))).andReturn(false).anyTimes();
+    XWikiGroupService groupServiceMock = createMock(XWikiGroupService.class);
+    expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock);
+    DocumentReference adminGroupDocRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiAdminGroup");
+    expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
+        same(context))).andReturn(Arrays.asList(adminGroupDocRef)).atLeastOnce();
+    replayAll(mockRightsService, groupServiceMock);
+    assertTrue(webUtilsService.isAdminUser());
+    verifyAll(mockRightsService, groupServiceMock);
+  }
+  
+  @Test
+  public void testIsAdminUser_adminRights_notInAdminGroup() {
+    context.setUser("XWiki.TestUser");
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDocument");
+    context.setDoc(new XWikiDocument(currentDocRef));
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
+
+    replayAll(mockRightsService);
+    assertNotNull(context.getXWikiUser());
+    assertNotNull(context.getDoc());
+    assertTrue(webUtilsService.isAdminUser());
+    verifyAll(mockRightsService);
+  }
+
+  @Test
+  public void testIsAdvancedAdmin_NPE_noUserObj() throws Exception {
+    context.setUser("XWiki.XWikiGuest");
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiGuest");
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDocument");
+    context.setDoc(new XWikiDocument(currentDocRef));
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
+    XWikiDocument guestUserDoc = new XWikiDocument(userDocRef);
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(guestUserDoc
+        ).anyTimes();
+    replayAll(mockRightsService);
+    assertNotNull(context.getXWikiUser());
+    assertNotNull(context.getDoc());
+    assertFalse(webUtilsService.isAdvancedAdmin());
+    verifyAll(mockRightsService);
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);
