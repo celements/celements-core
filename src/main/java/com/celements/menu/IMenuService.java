@@ -16,6 +16,8 @@ public interface IMenuService {
 
   public DocumentReference getMenuBarHeaderClassRef();
 
+  public DocumentReference getMenuBarHeaderClassRef(String database);
+
   public DocumentReference getMenuBarSubItemClassRef();
 
 }

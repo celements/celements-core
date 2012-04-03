@@ -87,12 +87,13 @@ public class MenuService implements IMenuService {
   }
 
   boolean hasview(DocumentReference menuBarDocRef) throws XWikiException {
+    String database = getContext().getDatabase();
+    getContext().setDatabase(getContext().getOriginalDatabase());
     if (modelSerializer.serialize(menuBarDocRef).endsWith("Celements2.AdminMenu")) {
       LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
           + webUtilsService.isAdvancedAdmin() + "].");
       return webUtilsService.isAdvancedAdmin();
     }
-    String database = getContext().getDatabase();
     getContext().setDatabase("celements2web");
     DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
         menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
@@ -129,10 +130,12 @@ public class MenuService implements IMenuService {
       for(String fullName : new HashSet<String>(result)) {
         DocumentReference menuBarDocRef = resolveDocument(fullName);
         if (hasview(menuBarDocRef)) {
-          LOGGER.trace("addMenuHeaders: hasview for [" + modelSerializer.serialize(
-              menuBarDocRef) + "].");
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(
-              menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef());
+              menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef(
+                  menuBarDocRef.getWikiReference().getName()));
+          LOGGER.trace("addMenuHeaders: hasview for [" + modelSerializer.serialize(
+              menuBarDocRef) + "] adding items [" + ((headerObjList != null) ?
+                  headerObjList.size() : "null") + ".");
           if (headerObjList != null) {
             for (BaseObject obj : headerObjList) {
               menuHeadersMap.put(obj.getIntValue("pos"), obj);
@@ -151,8 +154,11 @@ public class MenuService implements IMenuService {
   }
 
   public DocumentReference getMenuBarHeaderClassRef() {
-    return new DocumentReference(getContext().getDatabase(), "Celements",
-        "MenuBarHeaderItemClass");
+    return getMenuBarHeaderClassRef(getContext().getDatabase());
+  }
+
+  public DocumentReference getMenuBarHeaderClassRef(String database) {
+    return new DocumentReference(database, "Celements", "MenuBarHeaderItemClass");
   }
 
 
