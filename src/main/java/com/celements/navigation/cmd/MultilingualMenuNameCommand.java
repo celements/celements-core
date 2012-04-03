@@ -21,6 +21,8 @@ package com.celements.navigation.cmd;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -28,10 +30,18 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class MultilingualMenuNameCommand {
 
   public static final String CELEMENTS_MENU_NAME = "Celements2.MenuName";
+  public static final String MENU_NAME_CLASS_SPACE = "Celements2";
+  public static final String MENU_NAME_CLASS_DOC = "MenuName";
+
+  public DocumentReference getMenuNameClassRef() {
+    return new DocumentReference(getContext().getDatabase(), MENU_NAME_CLASS_SPACE,
+        MENU_NAME_CLASS_DOC);
+  }
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       MultilingualMenuNameCommand.class);
@@ -171,6 +181,11 @@ public class MultilingualMenuNameCommand {
 
   void inject_webUtils(IWebUtils webUtils) {
     this.webUtils = webUtils;
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
   }
 
 }
