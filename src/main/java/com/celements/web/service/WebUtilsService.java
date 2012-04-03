@@ -32,7 +32,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -42,7 +41,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @Component
 public class WebUtilsService implements IWebUtilsService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtils.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtilsService.class);
 
   @Requirement
   Execution execution;
@@ -141,14 +140,21 @@ public class WebUtilsService implements IWebUtilsService {
 
   public boolean isAdvancedAdmin() {
     String user = getContext().getUser();
+    LOGGER.trace("isAdvancedAdmin: user [" + user + "] db [" + getContext().getDatabase()
+        + "].");
     try {
       XWikiDocument userDoc = getContext().getWiki().getDocument(resolveDocumentReference(
           user), getContext());
-      BaseObject userObj = userDoc.getXObject(new DocumentReference(getContext(
-          ).getOriginalDatabase(), "XWiki", "XWikiUsers"));
-      return (isAdminUser() && (user.startsWith("xwiki:")
+      BaseObject userObj = userDoc.getXObject(resolveDocumentReference(
+          "XWiki.XWikiUsers"));
+      boolean isAdvancedAdmin = isAdminUser() && (user.startsWith("xwiki:")
           || ((userObj != null) && "Advanced".equals(userObj.getStringValue("usertype"
-              )))));
+              ))));
+      LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user ["
+          + user.startsWith("xwiki:") + "] usertype [" + ((userObj != null
+          ) ? userObj.getStringValue("usertype") : "null") + "] returning ["
+          + isAdvancedAdmin + "] db [" + getContext().getDatabase() + "].");
+      return isAdvancedAdmin;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
     }
