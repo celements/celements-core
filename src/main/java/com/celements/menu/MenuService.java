@@ -88,6 +88,8 @@ public class MenuService implements IMenuService {
 
   boolean hasview(DocumentReference menuBarDocRef) throws XWikiException {
     if (modelSerializer.serialize(menuBarDocRef).endsWith("Celements2.AdminMenu")) {
+      LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
+          + webUtilsService.isAdvancedAdmin() + "].");
       return webUtilsService.isAdvancedAdmin();
     }
     String database = getContext().getDatabase();
