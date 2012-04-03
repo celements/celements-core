@@ -163,8 +163,11 @@ public class MenuService implements IMenuService {
 
 
   public DocumentReference getMenuBarSubItemClassRef() {
-    return new DocumentReference(getContext().getDatabase(), "Celements",
-        "MenuBarSubItemClass");
+    return getMenuBarSubItemClassRef(getContext().getDatabase());
+  }
+
+  public DocumentReference getMenuBarSubItemClassRef(String database) {
+    return new DocumentReference(database, "Celements", "MenuBarSubItemClass");
   }
 
   String getHeadersXWQL() {
@@ -209,7 +212,8 @@ public class MenuService implements IMenuService {
         int objectNr = Integer.parseInt(resultObj[1].toString());
         DocumentReference menuBarDocRef = resolveDocument(fullName);
         BaseObject obj = getContext().getWiki().getDocument(menuBarDocRef, getContext()
-            ).getXObject(getMenuBarSubItemClassRef(), objectNr);
+            ).getXObject(getMenuBarSubItemClassRef(menuBarDocRef.getWikiReference(
+                ).getName()), objectNr);
         menuItemsMap.put(obj.getIntValue("itempos"), obj);
       }
     } catch (XWikiException e) {

@@ -20,4 +20,6 @@ public interface IMenuService {
 
   public DocumentReference getMenuBarSubItemClassRef();
 
+  public DocumentReference getMenuBarSubItemClassRef(String database);
+
 }
