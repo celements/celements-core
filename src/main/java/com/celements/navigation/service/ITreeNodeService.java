@@ -1,11 +1,18 @@
 package com.celements.navigation.service;
 
 import java.util.List;
+import java.util.Vector;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
 
 @ComponentRole
 public interface ITreeNodeService {
@@ -32,5 +39,7 @@ public interface ITreeNodeService {
    */
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart);
+  
+  public Integer getMaxConfiguredNavigationLevel(XWikiContext context);
 
 }
