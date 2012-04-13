@@ -53,7 +53,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
-  private static final String APP_SCRIPT_XPAGE = "app";
+  public static final String APP_SCRIPT_XPAGE = "app";
   public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
