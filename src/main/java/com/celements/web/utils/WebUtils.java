@@ -37,8 +37,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.inheritor.InheritorFactory;
-import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.ExternalUsageFilter;
@@ -70,8 +68,6 @@ public class WebUtils implements IWebUtils {
 
   private static Random rand = new Random();
 
-  private InheritorFactory injectedInheritorFactory;
-
   private AttachmentURLCommand attachmentUrlCmd;
 
   ITreeNodeService injected_TreeNodeService;
@@ -89,6 +85,7 @@ public class WebUtils implements IWebUtils {
     return instance;
   }
 
+  
   private ITreeNodeService getTreeNodeService() {
     if (injected_TreeNodeService != null) {
       return injected_TreeNodeService;
@@ -481,108 +478,29 @@ public class WebUtils implements IWebUtils {
     return context.getWiki().getWebPreference("parent", context);
   }
 
+  /**
+   * @deprecated instead use TreeNodeService directly
+   */
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
-    try {
-      BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
-          Navigation.NAVIGATION_CONFIG_CLASS, context.getDoc().getFullName(), context
-          ).getObject("menu_element_name");
-      if (navConfigObj != null) {
-        XWikiDocument navConfigDoc = navConfigObj.getDocument(context);
-        Vector<BaseObject> navConfigObjects = navConfigDoc.getObjects(
-            Navigation.NAVIGATION_CONFIG_CLASS);
-        int maxLevel = 0;
-        if (navConfigObj != null) {
-          for (BaseObject navObj : navConfigObjects) {
-            if (navObj != null) {
-              maxLevel = Math.max(maxLevel, navObj.getIntValue("to_hierarchy_level"));
-            }
-          }
-        }
-        return maxLevel;
-      }
-    } catch (XWikiException e) {
-      LOGGER.error("unable to get configDoc.", e);
-    }
-    return Navigation.DEFAULT_MAX_LEVEL;
+    return getTreeNodeService().getMaxConfiguredNavigationLevel(context);
   }
-
-  void injectInheritorFactory(InheritorFactory injectedInheritorFactory) {
-    this.injectedInheritorFactory = injectedInheritorFactory;
-  }
-
-  private InheritorFactory getInheritorFactory() {
-    if (injectedInheritorFactory != null) {
-      return injectedInheritorFactory;
-    }
-    return new InheritorFactory();
-  }
-
+  
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
   @SuppressWarnings("unchecked")
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException {
-    List<Attachment> attachments = doc.getAttachmentList();
-    
-      try {
-        Comparator<Attachment> comparatorClass = 
-          (Comparator<Attachment>) Class.forName(
-              "com.celements.web.comparators." + comparator).newInstance();
-      Collections.sort(attachments, comparatorClass);
-    } catch (InstantiationException e) {
-      LOGGER.error(e);
-    } catch (IllegalAccessException e) {
-      LOGGER.error(e);
-    } catch (ClassNotFoundException e) {
-      throw e;
-    }
-    
-    return attachments;
+    return this.getWebUtilsService().getAttachmentListSorted(doc, comparator);
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator, boolean imagesOnly) {
-    try {
-      List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
-      if (imagesOnly) {
-        for (Attachment att : new ArrayList<Attachment>(attachments)) {
-          if (!att.isImage()) {
-            attachments.remove(att);
-          }
-        }
-      }
-      return attachments;
-    } catch (ClassNotFoundException exp) {
-      LOGGER.error(exp);
-    }
-    return Collections.emptyList();
-  }
-
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
   public String getAttachmentListSortedAsJSON(Document doc,
       String comparator, boolean imagesOnly) {
-    SimpleDateFormat dateFormater = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    Builder jsonBuilder = new Builder();
-    jsonBuilder.openArray();
-    for (Attachment att : getAttachmentListSorted(doc, comparator, imagesOnly)) {
-      jsonBuilder.openDictionary();
-      jsonBuilder.addStringProperty("filename", att.getFilename());
-      jsonBuilder.addStringProperty("version", att.getVersion());
-      jsonBuilder.addStringProperty("author", att.getAuthor());
-      jsonBuilder.addStringProperty("mimeType", att.getMimeType());
-      jsonBuilder.addStringProperty("lastChanged",
-          dateFormater.format(att.getDate()));
-      jsonBuilder.addStringProperty("url",
-          doc.getAttachmentURL(att.getFilename()));
-      jsonBuilder.closeDictionary();
-    }
-    jsonBuilder.closeArray();
-    return jsonBuilder.getJSON();
-  }
-
-  int coveredQuotient(int divisor, int dividend) {
-    if (dividend >= 0) {
-      return ( (dividend + divisor - 1) / divisor);
-    } else {
-      return (dividend / divisor);
-    }
+    return this.getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
+        imagesOnly);
   }
   
   /**
@@ -595,7 +513,7 @@ public class WebUtils implements IWebUtils {
     try {
       Document imgDoc = context.getWiki().getDocument(fullName,
           context).newDocument(context);
-      List<Attachment> allImagesList = getAttachmentListSorted(imgDoc,
+      List<Attachment> allImagesList = getWebUtilsService().getAttachmentListSorted(imgDoc,
           "AttachmentAscendingNameComparator", true);
       if (allImagesList.size() > 0) {
         List<Attachment> preSetImgList = prepareMaxCoverSet(num, allImagesList);
@@ -619,6 +537,14 @@ public class WebUtils implements IWebUtils {
       preSetImgList.addAll(allImagesList);
     }
     return preSetImgList;
+  }
+  
+  int coveredQuotient(int divisor, int dividend) {
+    if (dividend >= 0) {
+      return ( (dividend + divisor - 1) / divisor);
+    } else {
+      return (dividend / divisor);
+    }
   }
 
   /**

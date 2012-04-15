@@ -199,11 +199,20 @@ public interface IWebUtils {
 
   public String getParentSpace(XWikiContext context);
 
+  /**
+   * @deprecated instead use TreeNodeService directly
+   */
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException;
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
 
