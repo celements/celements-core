@@ -19,13 +19,9 @@
  */
 package com.celements.web.service;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
@@ -46,13 +42,5 @@ public interface IWebUtilsService {
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
-  
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
-      throws ClassNotFoundException;
-  
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator, boolean imagesOnly);
 
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly);
 }

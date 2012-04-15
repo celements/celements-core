@@ -82,6 +82,131 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertNotNull(celUtils.getParentForLevel(1, context));
     assertEquals("", celUtils.getParentForLevel(1, context));
   }
+
+  @Test
+  public void testGetMaxConfiguredNavigationLevel_twoParents() throws Exception {
+    InheritorFactory inheritorFact = new InheritorFactory();
+    PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
+    inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
+    celUtils.injectInheritorFactory(inheritorFact);
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName("MySpace.MyDocument");
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
+        ).andReturn(null).atLeastOnce();
+    context.setDoc(doc);
+    XWikiDocument webPrefDoc = new XWikiDocument();
+    webPrefDoc.setFullName("MySpace.WebPreferences");
+    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))).andReturn(
+        webPrefDoc).atLeastOnce();
+    Vector<BaseObject> navObjects = new Vector<BaseObject>();
+    navObjects.add(createNavObj(5, webPrefDoc));
+    navObjects.add(createNavObj(4, webPrefDoc));
+    navObjects.add(createNavObj(8, webPrefDoc));
+    navObjects.add(createNavObj(3, webPrefDoc));
+    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
+        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
+    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+        ).atLeastOnce();
+    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    int maxLevel = celUtils.getMaxConfiguredNavigationLevel(context);
+    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    assertEquals("Max to Level in navConfigs is 8.", 8, maxLevel);
+  }
+
+  @Test
+  public void testGetMaxConfiguredNavigationLevel_deletedObject_NPE() throws Exception {
+    InheritorFactory inheritorFact = new InheritorFactory();
+    PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
+    inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
+    celUtils.injectInheritorFactory(inheritorFact);
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName("MySpace.MyDocument");
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
+        ).andReturn(null).atLeastOnce();
+    context.setDoc(doc);
+    XWikiDocument webPrefDoc = new XWikiDocument();
+    webPrefDoc.setFullName("MySpace.WebPreferences");
+    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
+        ).andReturn(webPrefDoc).atLeastOnce();
+    Vector<BaseObject> navObjects = new Vector<BaseObject>();
+    navObjects.add(createNavObj(5, webPrefDoc));
+    navObjects.add(null); // deleting an object can lead to a null pointer
+                          // in the object list
+    navObjects.add(createNavObj(8, webPrefDoc));
+    navObjects.add(createNavObj(3, webPrefDoc));
+    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
+        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
+    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+      ).atLeastOnce();
+    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    int maxLevel = celUtils.getMaxConfiguredNavigationLevel(context);
+    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    assertEquals("Max to Level in navConfigs is 8.", 8, maxLevel);
+  }
+
+  @Test
+  public void testGetMaxConfiguredNavigationLevel_noObjectFound_NPE() throws Exception {
+    InheritorFactory inheritorFact = new InheritorFactory();
+    PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
+    inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
+    celUtils.injectInheritorFactory(inheritorFact);
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName("MySpace.MyDocument");
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
+        ).andReturn(null).atLeastOnce();
+    context.setDoc(doc);
+    XWikiDocument webPrefDoc = new XWikiDocument();
+    webPrefDoc.setFullName("MySpace.WebPreferences");
+    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
+      ).andReturn(webPrefDoc).atLeastOnce();
+    XWikiDocument xwikiPrefDoc = new XWikiDocument();
+    webPrefDoc.setFullName("XWiki.XWikiPreferences");
+    expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), eq(context))
+      ).andReturn(xwikiPrefDoc).atLeastOnce();
+    XWikiDocument skinDoc = new XWikiDocument();
+    skinDoc.setFullName("Skins.MySkin");
+    expect(wiki.getDocument(eq("Skins.MySkin"), eq(context))
+      ).andReturn(skinDoc).atLeastOnce();
+    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+      ).atLeastOnce();
+    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    int maxLevel = celUtils.getMaxConfiguredNavigationLevel(context);
+    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    assertEquals("Expecting default max level.", Navigation.DEFAULT_MAX_LEVEL, maxLevel);
+  }
+
+  @Test
+  public void testGetMaxConfiguredNavigationLevel_threeParents() throws Exception {
+    InheritorFactory inheritorFact = new InheritorFactory();
+    PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
+    inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
+    celUtils.injectInheritorFactory(inheritorFact);
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName("MySpace.MyDocument");
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
+        ).andReturn(null).atLeastOnce();
+    context.setDoc(doc);
+    XWikiDocument webPrefDoc = new XWikiDocument();
+    webPrefDoc.setFullName("MySpace.WebPreferences");
+    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
+        ).andReturn(webPrefDoc).atLeastOnce();
+    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+      ).atLeastOnce();
+    Vector<BaseObject> navObjects = new Vector<BaseObject>();
+    navObjects.add(createNavObj(5, webPrefDoc));
+    navObjects.add(createNavObj(4, webPrefDoc));
+    navObjects.add(createNavObj(3, webPrefDoc));
+    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
+        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
+    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    int maxLevel = celUtils.getMaxConfiguredNavigationLevel(context);
+    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    assertEquals("Parents are a.b, b.c and c.d therefor maxlevel must be 5.",
+        5, maxLevel);
+  }
   
   @Test
   public void testCoveredQuotient() {
@@ -692,6 +817,16 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
+
+  private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
+    BaseObject navObj = new BaseObject();
+    navObj.setClassName(Navigation.NAVIGATION_CONFIG_CLASS);
+    navObj.setStringValue("menu_element_name", "mainMenu");
+    navObj.setIntValue("to_hierarchy_level", toLevel);
+    navObj.setName(doc.getFullName());
+    navObj.setDocumentReference(doc.getDocumentReference());
+    return navObj;
+  }
 
   private void replayAll(Object ... mocks) {
     replay(mockStore, wiki, mockXStore, injected_TreeNodeService);

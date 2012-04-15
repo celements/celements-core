@@ -3,7 +3,6 @@ package com.celements.navigation.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,15 +10,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
-import com.celements.inheritor.InheritorFactory;
-import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -40,8 +36,6 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
-  
-  private InheritorFactory injectedInheritorFactory;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -187,42 +181,6 @@ public class TreeNodeService implements ITreeNodeService {
     InternalRightsFilter filter = new InternalRightsFilter();
     filter.setMenuPart(menuPart);
     return getSubNodesForParent(parent, menuSpace, filter);
-  }
-
-  public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
-    try {
-      BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
-          Navigation.NAVIGATION_CONFIG_CLASS, context.getDoc().getFullName(), context
-          ).getObject("menu_element_name");
-      if (navConfigObj != null) {
-        XWikiDocument navConfigDoc = navConfigObj.getDocument(context);
-        Vector<BaseObject> navConfigObjects = navConfigDoc.getObjects(
-            Navigation.NAVIGATION_CONFIG_CLASS);
-        int maxLevel = 0;
-        if (navConfigObj != null) {
-          for (BaseObject navObj : navConfigObjects) {
-            if (navObj != null) {
-              maxLevel = Math.max(maxLevel, navObj.getIntValue("to_hierarchy_level"));
-            }
-          }
-        }
-        return maxLevel;
-      }
-    } catch (XWikiException e) {
-      mLogger.error("unable to get configDoc.", e);
-    }
-    return Navigation.DEFAULT_MAX_LEVEL;
-  }
-  
-  void injectInheritorFactory(InheritorFactory injectedInheritorFactory) {
-    this.injectedInheritorFactory = injectedInheritorFactory;
-  }
-
-  private InheritorFactory getInheritorFactory() {
-    if (injectedInheritorFactory != null) {
-      return injectedInheritorFactory;
-    }
-    return new InheritorFactory();
   }
 
 }

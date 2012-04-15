@@ -19,11 +19,6 @@
  */
 package com.celements.web.service;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -37,11 +32,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -52,10 +44,10 @@ public class WebUtilsService implements IWebUtilsService {
   private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtilsService.class);
 
   @Requirement
-  EntityReferenceResolver<String> referenceResolver;
+  Execution execution;
 
   @Requirement
-  Execution execution;
+  EntityReferenceResolver<String> referenceResolver;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -167,66 +159,6 @@ public class WebUtilsService implements IWebUtilsService {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
     }
     return false;
-  }
-
-  @SuppressWarnings("unchecked")
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException {
-    List<Attachment> attachments = doc.getAttachmentList();
-    
-      try {
-        Comparator<Attachment> comparatorClass = 
-          (Comparator<Attachment>) Class.forName(
-              "com.celements.web.comparators." + comparator).newInstance();
-      Collections.sort(attachments, comparatorClass);
-    } catch (InstantiationException e) {
-      LOGGER.error(e);
-    } catch (IllegalAccessException e) {
-      LOGGER.error(e);
-    } catch (ClassNotFoundException e) {
-      throw e;
-    }
-    
-    return attachments;
-  }
-  
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator, boolean imagesOnly) {
-    try {
-      List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
-      if (imagesOnly) {
-        for (Attachment att : new ArrayList<Attachment>(attachments)) {
-          if (!att.isImage()) {
-            attachments.remove(att);
-          }
-        }
-      }
-      return attachments;
-    } catch (ClassNotFoundException exp) {
-      LOGGER.error(exp);
-    }
-    return Collections.emptyList();
-  }
-  
-  public String getAttachmentListSortedAsJSON(Document doc,
-      String comparator, boolean imagesOnly) {
-    SimpleDateFormat dateFormater = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    Builder jsonBuilder = new Builder();
-    jsonBuilder.openArray();
-    for (Attachment att : getAttachmentListSorted(doc, comparator, imagesOnly)) {
-      jsonBuilder.openDictionary();
-      jsonBuilder.addStringProperty("filename", att.getFilename());
-      jsonBuilder.addStringProperty("version", att.getVersion());
-      jsonBuilder.addStringProperty("author", att.getAuthor());
-      jsonBuilder.addStringProperty("mimeType", att.getMimeType());
-      jsonBuilder.addStringProperty("lastChanged",
-          dateFormater.format(att.getDate()));
-      jsonBuilder.addStringProperty("url",
-          doc.getAttachmentURL(att.getFilename()));
-      jsonBuilder.closeDictionary();
-    }
-    jsonBuilder.closeArray();
-    return jsonBuilder.getJSON();
   }
 
 }
