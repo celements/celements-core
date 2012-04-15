@@ -19,6 +19,7 @@
  */
 package com.celements.web.service;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -40,9 +41,9 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.pagetype.RenderCommand;
-import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
+import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -57,10 +58,9 @@ public class CelementsWebScriptService implements ScriptService {
   public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CelementsWebPluginApi.class);
+      CelementsWebScriptService.class);
 
-  @Requirement
-  Execution execution;
+  private EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
 
   @Requirement("local")
   EntityReferenceSerializer<String> modelSerializer;
@@ -68,8 +68,63 @@ public class CelementsWebScriptService implements ScriptService {
   @Requirement
   QueryManager queryManager;
 
+  @Requirement
+  Execution execution;
+  
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
+  public boolean hasDocAppScript(String scriptName) {
+    return hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
+  }
+
+  public boolean hasLocalAppScript(String scriptName) {
+    return docAppScriptExists(getLocalAppScriptDocRef(scriptName));
+  }
+
+  private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
+    return (getContext().getWiki().exists(appScriptDocRef, getContext())
+        && !emptyCheckCmd.isEmptyRTEDocument(appScriptDocRef, getContext()));
+  }
+
+  public boolean hasCentralAppScript(String scriptName) {
+    return docAppScriptExists(getCentralAppScriptDocRef(scriptName));
+  }
+
+  public DocumentReference getAppScriptDocRef(String scriptName) {
+    if (hasLocalAppScript(scriptName)) {
+      return getCentralAppScriptDocRef(scriptName);
+    } else {
+      return getCentralAppScriptDocRef(scriptName);
+    }
+  }
+
+  public DocumentReference getLocalAppScriptDocRef(String scriptName) {
+    return new DocumentReference(getContext().getDatabase(), "AppScripts", scriptName);
+  }
+
+  public DocumentReference getCentralAppScriptDocRef(String scriptName) {
+    return new DocumentReference("celements2web", "AppScripts", scriptName);
+  }
+
+  public String getAppScriptTemplatePath(String scriptName) {
+    return "celAppScripts/" + scriptName + ".vm";
+  }
+
+  public boolean isAppScriptAvailable(String scriptName) {
+    try {
+      String path = "/templates/" + getAppScriptTemplatePath(scriptName);
+      LOGGER.debug("isAppScriptAvailable: check on [" + path + "].");
+      getContext().getWiki().getResourceContentAsBytes(path);
+      LOGGER.trace("isAppScriptAvailable: Successful got app script [" + scriptName
+          + "].");
+      return true;
+    } catch (IOException exp) {
+      LOGGER.debug("isAppScriptAvailable: Failed to get app script [" + scriptName + "].",
+          exp);
+      return false;
+    }
   }
 
   public String getAppScriptURL(String scriptName) {

@@ -19,8 +19,6 @@
  */
 package com.celements.web;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -28,6 +26,7 @@ import org.apache.velocity.VelocityContext;
 import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiAction;
 
 /**
@@ -38,6 +37,8 @@ import com.xpn.xwiki.web.XWikiAction;
  * @version $Id$
  */
 public class AppScriptAction extends XWikiAction {
+
+  private static final String APP_SCRIPT_ACTION_NAME_CONF_PROPERTY = "celements.appScript.actionName";
 
   private static final String CEL_APPSCRIPT_CONTEXT_PROPERTY = "celAppScript";
 
@@ -60,11 +61,24 @@ public class AppScriptAction extends XWikiAction {
     boolean shouldRender = true;
     context.put("action", VIEW_ACTION);
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-    String celAppScript = context.getRequest().getPathInfo();
-    LOGGER.debug("action: found script path [" + celAppScript + "].");
-    context.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
-    vcontext.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
+    String path = context.getRequest().getPathInfo();
+    if (getStartIndex(path, context) > 0) {
+      String celAppScript = path.substring(getStartIndex(path, context));
+      LOGGER.debug("action: found script path [" + celAppScript + "].");
+      context.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
+      vcontext.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
+    }
     return shouldRender;
+  }
+
+  private int getStartIndex(String path, XWikiContext context) {
+    String actionName = getAppActionName(context);
+    return path.indexOf("/" + actionName + "/") + actionName.length() + 2;
+  }
+
+  private String getAppActionName(XWikiContext context) {
+    return context.getWiki().Param(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
+        CelementsWebScriptService.APP_SCRIPT_XPAGE);
   }
 
   /**
@@ -73,19 +87,10 @@ public class AppScriptAction extends XWikiAction {
    * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
    */
   public String render(XWikiContext context) throws XWikiException {
-    String celAppScript = (String) context.get(CEL_APPSCRIPT_CONTEXT_PROPERTY);
-    try {
-      checkScriptAvailable(context, celAppScript);
-      return CelementsWebScriptService.APP_SCRIPT_XPAGE;
-    } catch (IOException e) {
-        context.getResponse().setStatus(404);
-        return "docdoesnotexist";
-    }
-  }
-
-  private byte[] checkScriptAvailable(XWikiContext context, String path
-      ) throws IOException {
-    return context.getWiki().getResourceContentAsBytes(path);
+    String page = Utils.getPage(context.getRequest(),
+        CelementsWebScriptService.APP_SCRIPT_XPAGE);
+    Utils.parseTemplate(page, !page.equals("direct"), context);
+    return null;
   }
 
 }
