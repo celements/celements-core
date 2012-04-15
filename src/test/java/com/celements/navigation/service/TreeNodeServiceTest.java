@@ -44,7 +44,6 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     wiki = createMock(XWiki.class);
     context.setWiki(wiki);
     mockStore = createMock(XWikiStoreInterface.class);
-    expect(wiki.getStore()).andReturn(mockStore).anyTimes();
     treeNodeService = new TreeNodeService();
     mockXStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockXStore).anyTimes();
