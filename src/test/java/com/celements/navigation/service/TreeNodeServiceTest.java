@@ -32,7 +32,6 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private XWiki wiki;
   private XWikiStoreInterface mockStore;
-  private XWikiStoreInterface mockXStore;
   private TreeNodeService treeNodeService;
   private ITreeNodeCache mockTreeNodeCache;
   private GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand;
@@ -45,8 +44,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     context.setWiki(wiki);
     mockStore = createMock(XWikiStoreInterface.class);
     treeNodeService = new TreeNodeService();
-    mockXStore = createMock(XWikiStoreInterface.class);
-    expect(wiki.getStore()).andReturn(mockXStore).anyTimes();
+    expect(wiki.getStore()).andReturn(mockStore).anyTimes();
     mockTreeNodeCache = createMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
     treeNodeService.execution = getComponentManager().lookup(Execution.class);
@@ -169,18 +167,6 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         parentDocSpace + "." + parentDocName, pos);
   }
   
-  private void replayAll(Object ... mocks) {
-    replay(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
-        testGetMenuItemCommand);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object ... mocks) {
-    verify(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
-        testGetMenuItemCommand);
-    verify(mocks);
-  }
-  
   @Test
   public void testGetMaxConfiguredNavigationLevel_twoParents() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
@@ -206,9 +192,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
     expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
-    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel(context);
-    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    verifyAll(mockPageLayoutCmd);
     assertEquals("Max to Level in navConfigs is 8.", 8, maxLevel);
   }
 
@@ -238,9 +224,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
-    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel(context);
-    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    verifyAll(mockPageLayoutCmd);
     assertEquals("Max to Level in navConfigs is 8.", 8, maxLevel);
   }
 
@@ -269,9 +255,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       ).andReturn(skinDoc).atLeastOnce();
     expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
-    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel(context);
-    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    verifyAll(mockPageLayoutCmd);
     assertEquals("Expecting default max level.", Navigation.DEFAULT_MAX_LEVEL, maxLevel);
   }
 
@@ -299,9 +285,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
     expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
-    replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel(context);
-    verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
+    verifyAll(mockPageLayoutCmd);
     assertEquals("Parents are a.b, b.c and c.d therefor maxlevel must be 5.",
         5, maxLevel);
   }
@@ -314,6 +300,18 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     navObj.setName(doc.getFullName());
     navObj.setDocumentReference(doc.getDocumentReference());
     return navObj;
+  }
+  
+  private void replayAll(Object ... mocks) {
+    replay(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
+        testGetMenuItemCommand);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
+        testGetMenuItemCommand);
+    verify(mocks);
   }
 
 }
