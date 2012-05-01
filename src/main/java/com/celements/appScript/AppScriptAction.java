@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web;
+package com.celements.appScript;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
-import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
@@ -37,8 +36,6 @@ import com.xpn.xwiki.web.XWikiAction;
  * @version $Id$
  */
 public class AppScriptAction extends XWikiAction {
-
-  private static final String APP_SCRIPT_ACTION_NAME_CONF_PROPERTY = "celements.appScript.actionName";
 
   private static final String CEL_APPSCRIPT_CONTEXT_PROPERTY = "celAppScript";
 
@@ -60,25 +57,15 @@ public class AppScriptAction extends XWikiAction {
   public boolean action(XWikiContext context) throws XWikiException {
     boolean shouldRender = true;
     context.put("action", VIEW_ACTION);
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     String path = context.getRequest().getPathInfo();
-    if (getStartIndex(path, context) > 0) {
-      String celAppScript = path.substring(getStartIndex(path, context));
+    if (getAppScriptService().getStartIndex(path) > 0) {
+      String celAppScript = getAppScriptService().getScriptNameFromURL();
       LOGGER.debug("action: found script path [" + celAppScript + "].");
       context.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
+      VelocityContext vcontext = (VelocityContext) context.get("vcontext");
       vcontext.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
     }
     return shouldRender;
-  }
-
-  private int getStartIndex(String path, XWikiContext context) {
-    String actionName = getAppActionName(context);
-    return path.indexOf("/" + actionName + "/") + actionName.length() + 2;
-  }
-
-  private String getAppActionName(XWikiContext context) {
-    return context.getWiki().Param(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
-        CelementsWebScriptService.APP_SCRIPT_XPAGE);
   }
 
   /**
@@ -87,10 +74,13 @@ public class AppScriptAction extends XWikiAction {
    * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
    */
   public String render(XWikiContext context) throws XWikiException {
-    String page = Utils.getPage(context.getRequest(),
-        CelementsWebScriptService.APP_SCRIPT_XPAGE);
+    String page = Utils.getPage(context.getRequest(), IAppScriptService.APP_SCRIPT_XPAGE);
     Utils.parseTemplate(page, !page.equals("direct"), context);
     return null;
+  }
+
+  private IAppScriptService getAppScriptService() {
+    return Utils.getComponent(IAppScriptService.class);
   }
 
 }

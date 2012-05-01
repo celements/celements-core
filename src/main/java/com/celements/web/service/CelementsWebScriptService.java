@@ -19,7 +19,6 @@
  */
 package com.celements.web.service;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -38,12 +37,12 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.pagetype.RenderCommand;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
-import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -54,19 +53,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
-  public static final String APP_SCRIPT_XPAGE = "app";
   public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebScriptService.class);
-
-  private EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
 
   @Requirement("local")
   EntityReferenceSerializer<String> modelSerializer;
 
   @Requirement
   QueryManager queryManager;
+
+  @Requirement
+  IAppScriptService appScriptService;
 
   @Requirement
   Execution execution;
@@ -76,93 +75,55 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean hasDocAppScript(String scriptName) {
-    return hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
+    return appScriptService.hasDocAppScript(scriptName);
   }
 
   public boolean hasLocalAppScript(String scriptName) {
-    return docAppScriptExists(getLocalAppScriptDocRef(scriptName));
-  }
-
-  private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
-    return (getContext().getWiki().exists(appScriptDocRef, getContext())
-        && !emptyCheckCmd.isEmptyRTEDocument(appScriptDocRef, getContext()));
+    return appScriptService.hasLocalAppScript(scriptName);
   }
 
   public boolean hasCentralAppScript(String scriptName) {
-    return docAppScriptExists(getCentralAppScriptDocRef(scriptName));
+    return appScriptService.hasCentralAppScript(scriptName);
   }
 
   public DocumentReference getAppScriptDocRef(String scriptName) {
-    if (hasLocalAppScript(scriptName)) {
-      return getCentralAppScriptDocRef(scriptName);
-    } else {
-      return getCentralAppScriptDocRef(scriptName);
-    }
+    return appScriptService.getAppScriptDocRef(scriptName);
   }
 
   public DocumentReference getLocalAppScriptDocRef(String scriptName) {
-    return new DocumentReference(getContext().getDatabase(), "AppScripts", scriptName);
+    return appScriptService.getLocalAppScriptDocRef(scriptName);
   }
 
   public DocumentReference getCentralAppScriptDocRef(String scriptName) {
-    return new DocumentReference("celements2web", "AppScripts", scriptName);
+    return appScriptService.getCentralAppScriptDocRef(scriptName);
   }
 
   public String getAppScriptTemplatePath(String scriptName) {
-    return "celAppScripts/" + scriptName + ".vm";
+    return appScriptService.getAppScriptTemplatePath(scriptName);
   }
 
   public boolean isAppScriptAvailable(String scriptName) {
-    try {
-      String path = "/templates/" + getAppScriptTemplatePath(scriptName);
-      LOGGER.debug("isAppScriptAvailable: check on [" + path + "].");
-      getContext().getWiki().getResourceContentAsBytes(path);
-      LOGGER.trace("isAppScriptAvailable: Successful got app script [" + scriptName
-          + "].");
-      return true;
-    } catch (IOException exp) {
-      LOGGER.debug("isAppScriptAvailable: Failed to get app script [" + scriptName + "].",
-          exp);
-      return false;
-    }
+    return appScriptService.isAppScriptAvailable(scriptName);
   }
 
   public String getAppScriptURL(String scriptName) {
-    return getAppScriptURL(scriptName, "");
+    return appScriptService.getAppScriptURL(scriptName);
   }
 
   public String getAppScriptURL(String scriptName, String queryString) {
-    if (queryString == null) {
-      queryString = "";
-    }
-    if (!"".equals(queryString)) {
-      queryString = "&" + queryString;
-    }
-    return getContext().getDoc().getURL("view", "xpage=" + APP_SCRIPT_XPAGE + "&s="
-        + scriptName + queryString, getContext());
+    return appScriptService.getAppScriptURL(scriptName, queryString);
   }
 
   public boolean isAppScriptCurrentPage(String scriptName) {
-    String scriptStr = getScriptNameFromURL();
-    return (!"".equals(scriptStr) && (scriptStr.equals(scriptName)));
+    return appScriptService.isAppScriptCurrentPage(scriptName);
   }
 
   public String getScriptNameFromURL() {
-    String scriptStr = "";
-    if (isAppScriptRequest()) {
-      scriptStr = getAppScriptNameFromRequestURL();
-    }
-    return scriptStr;
+    return appScriptService.getScriptNameFromURL();
   }
 
   public boolean isAppScriptRequest() {
-    String xpageStr = getContext().getRequest().getParameter("xpage");
-    return APP_SCRIPT_XPAGE.equals(xpageStr)
-        && (getAppScriptNameFromRequestURL() != null);
-  }
-
-  private String getAppScriptNameFromRequestURL() {
-    return getContext().getRequest().getParameter("s");
+    return appScriptService.isAppScriptRequest();
   }
 
   public String getCurrentPageURL(String queryString) {
