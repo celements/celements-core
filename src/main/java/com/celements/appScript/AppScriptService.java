@@ -39,11 +39,13 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public boolean hasDocAppScript(String scriptName) {
+    LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "]");
     return hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
   }
 
   public boolean hasLocalAppScript(String scriptName) {
-    return docAppScriptExists(getLocalAppScriptDocRef(scriptName));
+    return !"".equals(scriptName) && docAppScriptExists(getLocalAppScriptDocRef(
+        scriptName));
   }
 
   private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
@@ -52,7 +54,8 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public boolean hasCentralAppScript(String scriptName) {
-    return docAppScriptExists(getCentralAppScriptDocRef(scriptName));
+    return !"".equals(scriptName) && docAppScriptExists(getCentralAppScriptDocRef(
+        scriptName));
   }
 
   public DocumentReference getAppScriptDocRef(String scriptName) {

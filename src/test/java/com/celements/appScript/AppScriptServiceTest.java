@@ -184,6 +184,46 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockRequest);
   }
 
+  @Test
+  public void testHasDocAppScript_appAction() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "sub", "testScript");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
+        eq("app"))).andReturn("app").anyTimes();
+    DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
+        "AppScripts", "sub/testScript");
+    expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false);
+    DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
+        "AppScripts", "sub/testScript");
+    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false);
+    replayAll(mockRequest);
+    assertFalse(appScriptService.hasDocAppScript("sub/testScript"));
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testHasDocAppScript_appAction_emptyString() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "sub", "testScript");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    replayAll(mockRequest);
+    assertFalse(appScriptService.hasDocAppScript(""));
+    verifyAll(mockRequest);
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);
