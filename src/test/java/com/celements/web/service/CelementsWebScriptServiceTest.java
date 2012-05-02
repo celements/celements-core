@@ -121,47 +121,6 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     verifyAll(mockRequest);
   }
 
-  @Test
-  public void testIsAppScriptRequest_appAction() {
-    XWikiRequest mockRequest = createMock(XWikiRequest.class);
-    context.setRequest(mockRequest);
-    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
-    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    replayAll(mockRequest);
-    assertTrue(celWebService.isAppScriptRequest());
-    verifyAll(mockRequest);
-  }
-
-  @Test
-  public void testIsAppScriptRequest_view_appSpace() {
-    XWikiRequest mockRequest = createMock(XWikiRequest.class);
-    context.setRequest(mockRequest);
-    context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        IAppScriptService.APP_SCRIPT_XPAGE, "myScript");
-    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
-    context.setDoc(contextDoc);
-    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    replayAll(mockRequest);
-    assertTrue(celWebService.isAppScriptRequest());
-    verifyAll(mockRequest);
-  }
-
-  @Test
-  public void testIsAppScriptRequest_view_noAppSpace() {
-    XWikiRequest mockRequest = createMock(XWikiRequest.class);
-    context.setRequest(mockRequest);
-    context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "noScript");
-    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
-    context.setDoc(contextDoc);
-    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    replayAll(mockRequest);
-    assertFalse(celWebService.isAppScriptRequest());
-    verifyAll(mockRequest);
-  }
-
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, mockRightService);

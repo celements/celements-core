@@ -130,7 +130,8 @@ public class AppScriptService implements IAppScriptService {
   }
 
   private boolean isAppScriptActionRequest() {
-    return APP_SCRIPT_XPAGE.equals(getContext().getAction());
+    Object appAction = getContext().get("appAction");
+    return (appAction != null) && ((Boolean)appAction);
   }
 
   private boolean isAppScriptSpaceRequest() {

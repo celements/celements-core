@@ -57,6 +57,7 @@ public class AppScriptAction extends XWikiAction {
   public boolean action(XWikiContext context) throws XWikiException {
     boolean shouldRender = true;
     context.put("action", VIEW_ACTION);
+    context.put("appAction", true);
     String path = context.getRequest().getPathInfo();
     if (getAppScriptService().getStartIndex(path) > 0) {
       String celAppScript = getAppScriptService().getScriptNameFromURL();

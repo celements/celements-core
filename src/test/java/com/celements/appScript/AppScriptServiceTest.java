@@ -50,7 +50,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testIsAppScriptRequest_appAction() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
-    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    context.setAction("view");
+    context.put("appAction", true);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     replayAll(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
@@ -108,7 +109,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetAppScriptNameFromRequestURL_appAction() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
-    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    context.setAction("view");
+    context.put("appAction", true);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
         "pathTo", "myScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -128,7 +130,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetAppScriptNameFromRequestURL_appAction2() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
-    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    context.setAction("view");
+    context.put("appAction", true);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
         "pathTo", "pathTo2");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -188,7 +191,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testHasDocAppScript_appAction() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
-    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    context.setAction("view");
+    context.put("appAction", true);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
         "sub", "testScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -212,7 +216,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testHasDocAppScript_appAction_emptyString() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
-    context.setAction(IAppScriptService.APP_SCRIPT_XPAGE);
+    context.setAction("view");
+    context.put("appAction", true);
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
         "sub", "testScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
