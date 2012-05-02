@@ -118,6 +118,8 @@ public class AppScriptService implements IAppScriptService {
     String scriptStr = "";
     if (isAppScriptRequest()) {
       scriptStr = getAppScriptNameFromRequestURL();
+    } else {
+      LOGGER.debug("getScriptNameFromURL: no AppScriptRequest thus returning ''.");
     }
     return scriptStr;
   }
