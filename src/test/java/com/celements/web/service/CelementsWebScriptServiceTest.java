@@ -116,6 +116,9 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.login").anyTimes();
     replayAll(mockRequest);
     assertTrue(celWebService.isAppScriptRequest());
     verifyAll(mockRequest);

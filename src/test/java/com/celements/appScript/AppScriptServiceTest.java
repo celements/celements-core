@@ -41,6 +41,9 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.login").anyTimes();
     replayAll(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyAll(mockRequest);
@@ -157,6 +160,9 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.login").anyTimes();
     replayAll(mockRequest);
     assertEquals("myScript", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
@@ -239,8 +245,33 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
         eq("app"))).andReturn("app").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.login").anyTimes();
     replayAll(mockRequest);
     assertEquals("", appScriptService.getAppScriptNameFromRequestURL());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetAppScriptNameFromRequestURL_view_overwriteAppDoc() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "login");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("login").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
+        eq("app"))).andReturn("app").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.WhatsNew Content.login").anyTimes();
+    replayAll(mockRequest);
+    assertEquals("login", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
   }
 

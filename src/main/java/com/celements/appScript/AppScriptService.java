@@ -179,6 +179,8 @@ public class AppScriptService implements IAppScriptService {
     if (isAppScriptActionRequest() || isAppScriptSpaceRequest()) {
       String path = getContext().getRequest().getPathInfo();
       return path.substring(getStartIndex(path));
+    } else if (isAppScriptOverwriteDocRequest()) {
+      return getContext().getRequest().getPathInfo();
     }
     return getContext().getRequest().getParameter("s");
   }
