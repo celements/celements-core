@@ -441,6 +441,13 @@ public class CelementsWebPluginApi extends Api {
     return result;
   }
   
+  /**
+   * Returns a list of all parent for a specified doc
+   * 
+   * @param fullName
+   * @param includeDoc
+   * @return List of all parents, starting at the specified doc (bottom up)
+   */
   public List<String> getDocumentParentsList(String fullName,
       boolean includeDoc) {
     return WebUtils.getInstance().getDocumentParentsList(fullName, includeDoc,
