@@ -74,6 +74,60 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testIsAppScriptRequest_view_overwriteAppDoc_comma() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "login");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.login,Content.WhatsNew").anyTimes();
+    replayAll(mockRequest);
+    assertTrue(appScriptService.isAppScriptRequest());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testIsAppScriptRequest_view_overwriteAppDoc_space() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "login");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.WhatsNew Content.login").anyTimes();
+    replayAll(mockRequest);
+    assertTrue(appScriptService.isAppScriptRequest());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testIsAppScriptRequest_view_overwriteAppDoc_noConfig() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "login");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"),
+        eq("com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
+            "-").anyTimes();
+    replayAll(mockRequest);
+    assertFalse(appScriptService.isAppScriptRequest());
+    verifyAll(mockRequest);
+  }
+
+  @Test
   public void testIsAppScriptRequest_view_noAppSpace() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
@@ -83,6 +137,9 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"),
+        eq("com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
+            "-").anyTimes();
     replayAll(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
     verifyAll(mockRequest);

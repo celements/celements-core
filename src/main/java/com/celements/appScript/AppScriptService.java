@@ -1,6 +1,8 @@
 package com.celements.appScript;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,6 +14,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
 @Component
@@ -20,6 +23,9 @@ public class AppScriptService implements IAppScriptService {
   private static Log LOGGER = LogFactory.getFactory().getInstance(AppScriptService.class);
 
   private EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
+
+  @Requirement
+  IWebUtilsService webUtils;
 
   @Requirement
   Execution execution;
@@ -126,7 +132,26 @@ public class AppScriptService implements IAppScriptService {
 
   public boolean isAppScriptRequest() {
     return isAppScriptXpageRequest() || isAppScriptActionRequest()
-        || isAppScriptSpaceRequest();
+        || isAppScriptSpaceRequest() || isAppScriptOverwriteDocRequest();
+  }
+
+  private boolean isAppScriptOverwriteDocRequest() {
+    String overwriteAppDocs = getContext().getWiki().getXWikiPreference(
+        APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
+    List<DocumentReference> overwAppDocList = new Vector<DocumentReference>();
+    if (!"-".equals(overwriteAppDocs)) {
+      for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
+        try {
+          DocumentReference overwAppDocRef = webUtils.resolveDocumentReference(
+              overwAppDocFN);
+          overwAppDocList.add(overwAppDocRef);
+        } catch (Exception exp) {
+          LOGGER.warn("Failed to parse appScript overwrite docs config part ["
+              + overwAppDocFN+ "] of complete config [" + overwriteAppDocs + "].");
+        }
+      }
+    }
+    return overwAppDocList.contains(getContext().getDoc().getDocumentReference());
   }
 
   private boolean isAppScriptActionRequest() {

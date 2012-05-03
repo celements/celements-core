@@ -9,6 +9,9 @@ public interface IAppScriptService {
   public static final String APP_SCRIPT_ACTION_NAME_CONF_PROPERTY
       = "celements.appScript.actionName";
   public static final String APP_SCRIPT_XPAGE = "app";
+  public static final String APP_SCRIPT_XWPREF_OVERW_DOCS = "appScriptOverwriteDocs";
+  public static final String APP_SCRIPT_CONF_OVERW_DOCS =
+    "com.celements.appScript.overwriteDocs";
 
   public int getStartIndex(String path);
 
