@@ -180,7 +180,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn(
+    expect(mockRequest.getPathInfo()).andReturn("/" +
         IAppScriptService.APP_SCRIPT_XPAGE + "/pathTo/myScript").anyTimes();
     expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
         eq("app"))).andReturn("app").anyTimes();
@@ -201,7 +201,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn(
+    expect(mockRequest.getPathInfo()).andReturn("/" +
         IAppScriptService.APP_SCRIPT_XPAGE + "/pathTo/pathTo2/myScript"
         ).anyTimes();
     expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
@@ -223,8 +223,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn(IAppScriptService.APP_SCRIPT_XPAGE
-        + "/myScript").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/" +
+        IAppScriptService.APP_SCRIPT_XPAGE + "/myScript").anyTimes();
     expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
         eq("app"))).andReturn("app").anyTimes();
     replayAll(mockRequest);
@@ -264,7 +264,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn("login").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/login").anyTimes();
     expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
         eq("app"))).andReturn("app").anyTimes();
     expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
