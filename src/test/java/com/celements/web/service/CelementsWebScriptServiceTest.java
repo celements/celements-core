@@ -11,11 +11,14 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.celements.appScript.IAppScriptService;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -36,6 +39,7 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     celWebService.execution = Utils.getComponent(Execution.class);
     celWebService.modelSerializer = Utils.getComponent(EntityReferenceSerializer.class,
         "local");
+    celWebService.appScriptService = Utils.getComponent(IAppScriptService.class);
   }
 
   @Test
@@ -98,6 +102,26 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
         "en", "ch"));
     assertEquals("12,312,312", formater.format(12312312L));
+  }
+
+  @Test
+  public void testIsAppScriptRequest_appXpage() {
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "noScript");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn(
+        IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Content.login").anyTimes();
+    replayAll(mockRequest);
+    assertTrue(celWebService.isAppScriptRequest());
+    verifyAll(mockRequest);
   }
 
 

@@ -37,10 +37,10 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.pagetype.RenderCommand;
-import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
@@ -53,14 +53,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
-  private static final String APP_SCRIPT_XPAGE = "app";
   public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CelementsWebPluginApi.class);
-
-  @Requirement
-  Execution execution;
+      CelementsWebScriptService.class);
 
   @Requirement("local")
   EntityReferenceSerializer<String> modelSerializer;
@@ -68,46 +64,66 @@ public class CelementsWebScriptService implements ScriptService {
   @Requirement
   QueryManager queryManager;
 
+  @Requirement
+  IAppScriptService appScriptService;
+
+  @Requirement
+  Execution execution;
+  
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
+  public boolean hasDocAppScript(String scriptName) {
+    return appScriptService.hasDocAppScript(scriptName);
+  }
+
+  public boolean hasLocalAppScript(String scriptName) {
+    return appScriptService.hasLocalAppScript(scriptName);
+  }
+
+  public boolean hasCentralAppScript(String scriptName) {
+    return appScriptService.hasCentralAppScript(scriptName);
+  }
+
+  public DocumentReference getAppScriptDocRef(String scriptName) {
+    return appScriptService.getAppScriptDocRef(scriptName);
+  }
+
+  public DocumentReference getLocalAppScriptDocRef(String scriptName) {
+    return appScriptService.getLocalAppScriptDocRef(scriptName);
+  }
+
+  public DocumentReference getCentralAppScriptDocRef(String scriptName) {
+    return appScriptService.getCentralAppScriptDocRef(scriptName);
+  }
+
+  public String getAppScriptTemplatePath(String scriptName) {
+    return appScriptService.getAppScriptTemplatePath(scriptName);
+  }
+
+  public boolean isAppScriptAvailable(String scriptName) {
+    return appScriptService.isAppScriptAvailable(scriptName);
+  }
+
   public String getAppScriptURL(String scriptName) {
-    return getAppScriptURL(scriptName, "");
+    return appScriptService.getAppScriptURL(scriptName);
   }
 
   public String getAppScriptURL(String scriptName, String queryString) {
-    if (queryString == null) {
-      queryString = "";
-    }
-    if (!"".equals(queryString)) {
-      queryString = "&" + queryString;
-    }
-    return getContext().getDoc().getURL("view", "xpage=" + APP_SCRIPT_XPAGE + "&s="
-        + scriptName + queryString, getContext());
+    return appScriptService.getAppScriptURL(scriptName, queryString);
   }
 
   public boolean isAppScriptCurrentPage(String scriptName) {
-    String scriptStr = getScriptNameFromURL();
-    return (!"".equals(scriptStr) && (scriptStr.equals(scriptName)));
+    return appScriptService.isAppScriptCurrentPage(scriptName);
   }
 
   public String getScriptNameFromURL() {
-    String scriptStr = "";
-    if (isAppScriptRequest()) {
-      scriptStr = getAppScriptNameFromRequestURL();
-    }
-    return scriptStr;
+    return appScriptService.getScriptNameFromURL();
   }
 
   public boolean isAppScriptRequest() {
-    String xpageStr = getContext().getRequest().getParameter("xpage");
-    return APP_SCRIPT_XPAGE.equals(xpageStr)
-        && (getAppScriptNameFromRequestURL() != null);
-  }
-
-  private String getAppScriptNameFromRequestURL() {
-    return getContext().getRequest().getParameter("s");
+    return appScriptService.isAppScriptRequest();
   }
 
   public String getCurrentPageURL(String queryString) {
