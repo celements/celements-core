@@ -18,3 +18,4 @@ com.celements.web.service.ContextMenuScriptService
 com.celements.menu.MenuClasses
 com.celements.menu.MenuService
 com.celements.menu.MenuScriptService
+com.celements.appScript.AppScriptService
