@@ -1,33 +1,32 @@
 package com.celements.navigation.service;
 
 import java.util.List;
-import java.util.Vector;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
 
 @ComponentRole
 public interface ITreeNodeService {
+    
+  public int getActiveMenuItemPos(int menuLevel, String menuPart);
 
-  public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
-      INavFilter<T> filter);
+  public int getMenuItemPos(DocumentReference docRef, String menuPart);
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated use getSubNodesForParent with DocumentReference instead
    */
   @Deprecated
-  public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
+  public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter);
-
+  
+  public <T> List<TreeNode> getSubNodesForParent(DocumentReference docRef,
+      INavFilter<T> filter);
+  
   /**
    * getSubNodesForParent
    * get all subnodes of a given parent document (by fullname).
@@ -36,10 +35,28 @@ public interface ITreeNodeService {
    * @param menuSpace (default: $doc.space)
    * @param menuPart 
    * @return (array of tree nodes)
+   * 
+   * @deprecated use getSubNodesForParent with DocumentReference instead
    */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart);
   
-  public Integer getMaxConfiguredNavigationLevel(XWikiContext context);
+  public List<TreeNode> getSubNodesForParent(DocumentReference docRef,
+      String menuPart);
+
+  /**
+   * 
+   * @deprecated use getSubNodesForParent instead
+   */
+  @Deprecated
+  public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
+      INavFilter<T> filter);
+  
+  public Integer getMaxConfiguredNavigationLevel();
+  
+  public TreeNode getPrevMenuItem(DocumentReference docRef) throws XWikiException;
+  
+  public TreeNode getNextMenuItem(DocumentReference docRef) throws XWikiException;
 
 }

@@ -25,18 +25,14 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.inheritor.InheritorFactory;
-import com.celements.navigation.Navigation;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -267,6 +263,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem2);
     expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
+    expect(injected_TreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
+        eq(""))).andReturn(1);
     replayAll(rightServiceMock);
     BaseObject prevMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         true, context);
@@ -319,6 +317,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem2);
     expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
+    expect(injected_TreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
+        eq(""))).andReturn(1);
     replayAll(rightServiceMock);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         false, context);
@@ -371,6 +371,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem2);
     expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
+    expect(injected_TreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
+        eq(""))).andReturn(1);
     replayAll(rightServiceMock);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         false, context);

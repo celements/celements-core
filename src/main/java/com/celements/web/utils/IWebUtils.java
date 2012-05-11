@@ -40,6 +40,10 @@ public interface IWebUtils {
 
   public void flushMenuItemCache(XWikiContext context);
 
+  /**
+   * @deprecated use WebUtilsService instead
+   */
+  @Deprecated
   public List<String> getDocumentParentsList(String fullName,
       boolean includeDoc, XWikiContext context);
 
@@ -55,9 +59,17 @@ public interface IWebUtils {
   @Deprecated
   public boolean isEmptyRTEString(String rteContent);
 
+  /**
+   * @deprecated instead use TreeNodeService
+   */
+  @Deprecated
   public int getActiveMenuItemPos(int menuLevel, String menuPart,
       XWikiContext context);
 
+  /**
+   * @deprecated instead use TreeNodeService
+   */
+  @Deprecated
   public int getMenuItemPos(String fullName, String menuPart,
       XWikiContext context);
 
@@ -137,7 +149,19 @@ public interface IWebUtils {
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context);
 
-    public BaseObject getPrevMenuItem(String fullName,
+
+  /**
+   * @deprecated instead use TreeNodeService
+   */
+  @Deprecated
+  public BaseObject getPrevMenuItem(String fullName,
+      XWikiContext context) throws XWikiException;
+  
+  /**
+   * @deprecated instead use TreeNodeService
+   */
+  @Deprecated
+  public BaseObject getNextMenuItem(String fullName,
       XWikiContext context) throws XWikiException;
 
   /**
@@ -251,8 +275,5 @@ public interface IWebUtils {
    */
   @Deprecated
   public boolean isAttachmentLink(String link);
-  
-  public BaseObject getNextMenuItem(String fullName, XWikiContext context
-      ) throws XWikiException;
 
 }

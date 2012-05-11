@@ -60,6 +60,32 @@ public class WebUtilsService implements IWebUtilsService {
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
+  
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
+      boolean includeDoc) {
+    ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
+    try {
+      DocumentReference nextParent;
+      if(includeDoc){
+        nextParent = docRef;
+      } else {
+        nextParent = getParentRef(docRef);
+      }
+      while (nextParent!=null
+          && (getContext().getWiki().exists(nextParent, getContext()))
+          && !docParents.contains(nextParent)) {
+        docParents.add(nextParent);
+        nextParent = getParentRef(nextParent);
+      }
+    } catch (XWikiException e) {
+      LOGGER.error(e);
+    }
+    return docParents;
+  }
+  
+  private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
+    return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
+  }
 
   public XWikiMessageTool getMessageTool(String adminLanguage) {
     if(adminLanguage != null) {

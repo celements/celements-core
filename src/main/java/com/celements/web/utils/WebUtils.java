@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,6 +35,7 @@ import java.util.Vector;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -55,7 +55,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -113,9 +112,10 @@ public class WebUtils implements IWebUtils {
     getTreeNodeCache().flushMenuItemCache();
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getDocumentParentsList(java.lang.String, boolean, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use WebUtilsService
    */
+  @Deprecated
   public List<String> getDocumentParentsList(String fullName,
       boolean includeDoc, XWikiContext context) {
     ArrayList<String> docParents = new ArrayList<String>();
@@ -138,6 +138,7 @@ public class WebUtils implements IWebUtils {
     return docParents;
   }
 
+  @Deprecated
   private String getParentFullName(String fullName, XWikiContext context
       ) throws XWikiException {
     return context.getWiki().getDocument(fullName,
@@ -154,39 +155,22 @@ public class WebUtils implements IWebUtils {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getActiveMenuItemPos(int, java.lang.String, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public int getActiveMenuItemPos(int menuLevel, String menuPart,
       XWikiContext context) {
-    List<String> parents = getDocumentParentsList(
-        context.getDoc().getFullName(), true, context);
-    if (parents.size() >= menuLevel) {
-      return getMenuItemPos(parents.get(parents.size() - menuLevel), menuPart, context);
-    }
-    return -1;
+    return getTreeNodeService().getActiveMenuItemPos(menuLevel, menuPart);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getMenuItemPos(java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public int getMenuItemPos(String fullName, String menuPart,
       XWikiContext context) {
-    try {
-      XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-      String parent = getParentFullName(fullName, context);
-      int pos = -1;
-      for (BaseObject menuItem : getSubMenuItemsForParent_internal(parent, doc.getSpace(),
-          menuPart, context)) {
-        pos = pos + 1;
-        if (fullName.equals(menuItem.getName())) {
-          return pos;
-        }
-      }
-    } catch (XWikiException e) {
-      LOGGER.error(e);
-    }
-    return -1;
+    return getTreeNodeService().getMenuItemPos(getRef(fullName), menuPart);
   }
 
   /* (non-Javadoc)
@@ -212,7 +196,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService directly
+   * @deprecated instead use TreeNodeService
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -231,7 +215,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService directly
+   * @deprecated instead use TreeNodeService
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -274,22 +258,25 @@ public class WebUtils implements IWebUtils {
     return parent;
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getPrevMenuItem(java.lang.String, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public BaseObject getPrevMenuItem(String fullName,
       XWikiContext context) throws XWikiException {
     return getSiblingMenuItem(fullName, true, context);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getNextMenuItem(java.lang.String, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public BaseObject getNextMenuItem(String fullName,
       XWikiContext context) throws XWikiException {
     return getSiblingMenuItem(fullName, false, context);
   }
 
+  @Deprecated
   BaseObject getSiblingMenuItem(String fullName, boolean previous,
       XWikiContext context)
       throws XWikiException {
@@ -482,7 +469,7 @@ public class WebUtils implements IWebUtils {
    * @deprecated instead use TreeNodeService directly
    */
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
-    return getTreeNodeService().getMaxConfiguredNavigationLevel(context);
+    return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
   
   /**
@@ -721,6 +708,10 @@ public class WebUtils implements IWebUtils {
       return authorObj.getStringValue("last_name") + ", " + authorObj.getStringValue("first_name");
     }
     return renderText("$adminMsg.get('cel_ml_unknown_author')", context);
+  }
+  
+  DocumentReference getRef(String s){
+    return getWebUtilsService().resolveDocumentReference(s);
   }
   
   private String renderText(String velocityText, XWikiContext context) {

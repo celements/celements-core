@@ -30,6 +30,9 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
 public interface IWebUtilsService {
+  
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
+      boolean includeDoc);
 
   public XWikiMessageTool getMessageTool(String adminLanguage);
 
@@ -47,8 +50,8 @@ public interface IWebUtilsService {
 
   public boolean isAdvancedAdmin();
   
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
-      throws ClassNotFoundException;
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
+      ) throws ClassNotFoundException;
   
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator, boolean imagesOnly);

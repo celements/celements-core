@@ -41,6 +41,8 @@ public class Navigation implements INavigation {
   public static final int DEFAULT_MAX_LEVEL = 100;
 
   public static final String NAVIGATION_CONFIG_CLASS = "Celements2.NavigationConfigClass";
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
+  public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
 
   private INavigationBuilder navBuilder;
 
