@@ -259,6 +259,18 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return adminLanguage;
   }
+  
+  public String getDefaultLanguage() {
+    return getContext().getWiki().getWebPreference("default_language", getContext());
+  }
+  
+  public boolean hasParentSpace() {
+    return getParentSpace()!=null && !"".equals(getParentSpace());
+  }
+
+  public String getParentSpace() {
+    return getContext().getWiki().getWebPreference("parent", getContext());
+  }
 
   public DocumentReference resolveDocumentReference(String fullName) {
     DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
@@ -274,10 +286,6 @@ public class WebUtilsService implements IWebUtilsService {
   public String resolveFullName(EntityReference reference, boolean withDatabase){
     if(withDatabase) return serializer_default.serialize(reference);
     else return serializer_local.serialize(reference);
-  }
-
-  public String getDefaultLanguage() {
-    return getContext().getWiki().getWebPreference("default_language", getContext());
   }
 
   public boolean isAdminUser() {

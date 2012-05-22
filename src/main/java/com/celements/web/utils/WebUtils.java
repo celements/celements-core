@@ -425,18 +425,26 @@ public class WebUtils implements IWebUtils {
     return getWebUtilsService().getAdminLanguage(userFullName);
   }
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public boolean hasParentSpace(XWikiContext context) {
-    return (getParentSpace(context) != null)
-      && !"".equals(getParentSpace(context));
+    return getWebUtilsService().hasParentSpace();
   }
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getParentSpace(XWikiContext context) {
-    return context.getWiki().getWebPreference("parent", context);
+    return getWebUtilsService().getParentSpace();
   }
 
   /**
    * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
@@ -444,7 +452,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated instead use WebUtilsService
    */
-  @SuppressWarnings("unchecked")
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException {
     return this.getWebUtilsService().getAttachmentListSorted(doc, comparator);
@@ -453,6 +461,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated instead use WebUtilsService
    */
+  @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc,
       String comparator, boolean imagesOnly) {
     return this.getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,

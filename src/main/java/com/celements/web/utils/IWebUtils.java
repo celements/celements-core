@@ -252,8 +252,16 @@ public interface IWebUtils {
   @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context);
   
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public boolean hasParentSpace(XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getParentSpace(XWikiContext context);
 
   /**
@@ -279,6 +287,10 @@ public interface IWebUtils {
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public boolean isAdminUser(XWikiContext context);
 
   public String getJSONContent(XWikiDocument document, XWikiContext context);
