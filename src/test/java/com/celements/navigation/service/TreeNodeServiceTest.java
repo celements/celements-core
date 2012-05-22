@@ -15,7 +15,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.InheritorFactory;
@@ -53,10 +52,6 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     mockTreeNodeCache = createMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
     treeNodeService.execution = getComponentManager().lookup(Execution.class);
-    treeNodeService.serializer_local = getComponentManager(
-        ).lookup(EntityReferenceSerializer.class, "local");
-    treeNodeService.serializer_default = getComponentManager(
-        ).lookup(EntityReferenceSerializer.class);
     testGetNotMenuItemCommand = createMock(GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
         testGetNotMenuItemCommand).anyTimes();

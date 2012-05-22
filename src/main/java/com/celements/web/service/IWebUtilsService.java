@@ -19,14 +19,18 @@
  */
 package com.celements.web.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
+import com.celements.web.pagetype.IPageType;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
@@ -52,6 +56,12 @@ public interface IWebUtilsService {
 
   public int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
+  public IPageType getPageTypeApi(DocumentReference authDocRef) throws XWikiException;
+
+  public List<String> getAllowedLanguages();
+
+  public Date parseDate(String date, String format);
+  
   public XWikiMessageTool getMessageTool(String adminLanguage);
 
   public XWikiMessageTool getAdminMessageTool();
@@ -63,6 +73,8 @@ public interface IWebUtilsService {
   public String getDefaultLanguage();
 
   public DocumentReference resolveDocumentReference(String fullName);
+  
+  public String resolveFullName(EntityReference reference, boolean withDatabase);
 
   public boolean isAdminUser();
 
@@ -76,4 +88,9 @@ public interface IWebUtilsService {
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
+  
+  public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
+  
+  public String getMajorVersion(XWikiDocument doc);
+  
 }

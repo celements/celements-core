@@ -20,10 +20,13 @@
 package com.celements.web.service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -35,10 +38,14 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.sajson.Builder;
+import com.celements.web.pagetype.IPageType;
+import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,6 +60,12 @@ public class WebUtilsService implements IWebUtilsService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtilsService.class);
 
+  @Requirement("default")
+  EntityReferenceSerializer<String> serializer_default;
+  
+  @Requirement("local")
+  EntityReferenceSerializer<String> serializer_local;
+  
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
 
@@ -63,7 +76,7 @@ public class WebUtilsService implements IWebUtilsService {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
-  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException {
+  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException{
     DocumentReference parent = null;
     if(level!=1){
       List<DocumentReference> parentList = getDocumentParentsList(
@@ -176,6 +189,24 @@ public class WebUtilsService implements IWebUtilsService {
   private boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
+  
+  public IPageType getPageTypeApi(DocumentReference docRef) throws XWikiException {
+    return new PageTypeApi(resolveFullName(docRef, true), getContext());
+  }
+
+  public List<String> getAllowedLanguages(){
+    return Arrays.asList(getContext().getWiki(
+        ).getWebPreference("language", getContext()).split("[ ,]"));
+  }
+
+  public Date parseDate(String date, String format){
+    try{
+      return new SimpleDateFormat(format).parse(date);
+    } catch(ParseException e){
+      LOGGER.fatal(e);
+      return null;
+    }
+  }
 
   public XWikiMessageTool getMessageTool(String adminLanguage) {
     if(adminLanguage != null) {
@@ -238,6 +269,11 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.debug("getDocRefFromFullName: for [" + fullName + "] got reference ["
         + eventRef + "].");
     return eventRef;
+  }
+  
+  public String resolveFullName(EntityReference reference, boolean withDatabase){
+    if(withDatabase) return serializer_default.serialize(reference);
+    else return serializer_local.serialize(reference);
   }
 
   public String getDefaultLanguage() {
@@ -343,6 +379,34 @@ public class WebUtilsService implements IWebUtilsService {
     }
     jsonBuilder.closeArray();
     return jsonBuilder.getJSON();
+  }
+  
+  public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException {
+    XWikiDocument authDoc = getContext().getWiki().getDocument(authDocRef, getContext());
+    BaseObject authObj = authDoc.getXObject(getRef("XWiki","XWikiUsers"));
+    if(authObj!=null){
+      return authObj.getStringValue("last_name") + ", " 
+          + authObj.getStringValue("first_name");
+    } else{
+      return getAdminMessageTool().get("cel_ml_unknown_author");
+    }
+  }
+  
+  public String getMajorVersion(XWikiDocument doc) {
+    String revision = "1";
+    if(doc!=null){
+      revision = doc.getVersion();
+      if(revision!=null
+          && revision.trim().length()>0
+          && revision.contains(".")){
+        revision = revision.split("\\.")[0];
+      }
+    }
+    return revision;
+  }
+  
+  private DocumentReference getRef(String spaceName, String pageName){
+    return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
 
 }

@@ -122,24 +122,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals(5, randImgs.size());
     verify(mockStore, wiki);
   }
-
-  @Test
-  public void testGetMajorVersion_nullDoc() {
-    assertEquals("1", ((WebUtils)celUtils).getMajorVersion(null));
-  }
-  
-  @Test
-  public void testGetMajorVersion_noVersionSet() {
-    XWikiDocument doc = new XWikiDocument();
-    assertEquals("1", ((WebUtils)celUtils).getMajorVersion(doc));
-  }
-  
-  @Test
-  public void testGetMajorVersion() {
-    XWikiDocument doc = new XWikiDocument();
-    doc.setVersion("28.82");
-    assertEquals("28", ((WebUtils)celUtils).getMajorVersion(doc));
-  }
   
   @Test
   public void testReplaceInternalWithExternalLinks_nothingToReplace() {

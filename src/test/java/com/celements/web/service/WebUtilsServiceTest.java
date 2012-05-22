@@ -573,6 +573,28 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertFalse(webUtilsService.isAdvancedAdmin());
     verifyAll(mockRightsService);
   }
+  
+  @Test
+  public void testGetMajorVersion_nullDoc() {
+    assertEquals("1", webUtilsService.getMajorVersion(null));
+  }
+  
+  @Test
+  public void testGetMajorVersion_noVersionSet() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(),
+        "Space", "Doc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    assertEquals("1", webUtilsService.getMajorVersion(doc));
+  }
+  
+  @Test
+  public void testGetMajorVersion() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(),
+        "Space", "Doc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setVersion("28.82");
+    assertEquals("28", webUtilsService.getMajorVersion(doc));
+  }
 
 
   private void replayAll(Object ... mocks) {

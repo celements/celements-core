@@ -208,11 +208,23 @@ public interface IWebUtils {
   public int countSections(String regex, String fullName, XWikiContext context)
       throws XWikiException;
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public IPageType getPageTypeApi(String fullName, XWikiContext context
       ) throws XWikiException;
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public List<String> getAllowedLanguages(XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public Date parseDate(String date, String format);
 
   /**
@@ -247,17 +259,20 @@ public interface IWebUtils {
   /**
    * @deprecated instead use TreeNodeService directly
    */
+  @Deprecated
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context);
 
   /**
    * @deprecated instead use WebUtilsService directly
    */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException;
 
   /**
    * @deprecated instead use WebUtilsService directly
    */
+  @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
 
@@ -274,9 +289,17 @@ public interface IWebUtils {
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService.getUserNameForDocRef
+   */
+  @Deprecated
   public String getUserNameForDocName(String authorDocName,
       XWikiContext context) throws XWikiException;
   
+  /**
+   * @deprecated instead use AttachmentURLCommand directly
+   */
+  @Deprecated
   public String getMajorVersion(XWikiDocument doc);
 
   /**

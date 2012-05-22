@@ -11,8 +11,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
@@ -40,12 +38,6 @@ import com.xpn.xwiki.web.Utils;
 public class TreeNodeService implements ITreeNodeService {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(TreeNodeService.class);
-
-  @Requirement("default")
-  EntityReferenceSerializer<String> serializer_default;
-  
-  @Requirement("local")
-  EntityReferenceSerializer<String> serializer_local;
   
   @Requirement
   Execution execution;
@@ -54,7 +46,7 @@ public class TreeNodeService implements ITreeNodeService {
   ITreeNodeCache treeNodeCache;
   
   private InheritorFactory injectedInheritorFactory;
-  private IWebUtilsService webUtils;
+  private IWebUtilsService webUtilsService;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -153,7 +145,7 @@ public class TreeNodeService implements ITreeNodeService {
    * @return Collection keeps ordering of TreeNodes according to posId
    */
   List<TreeNode> fetchNodesForParentKey(DocumentReference docRef) {
-    String parentKey = getFullName(docRef, true);
+    String parentKey = getWebUtilsService().resolveFullName(docRef, true);
     long starttotal = System.currentTimeMillis();
     long start = System.currentTimeMillis();
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd(
@@ -253,7 +245,8 @@ public class TreeNodeService implements ITreeNodeService {
     try {
       BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
           Navigation.NAVIGATION_CONFIG_CLASS,
-          getFullName(getContext().getDoc().getDocumentReference(), false) ,
+          getWebUtilsService().resolveFullName(
+              getContext().getDoc().getDocumentReference(), false) ,
           getContext()).getObject("menu_element_name");
       if(navConfigObj!=null){
         XWikiDocument navConfigDoc = getContext().getWiki().getDocument(
@@ -305,13 +298,13 @@ public class TreeNodeService implements ITreeNodeService {
           return subMenuItems.get(pos + 1);
         }
         mLogger.info("getPrevMenuItem: no previous MenuItem found for "
-            + getFullName(docRef, true));
+            + getWebUtilsService().resolveFullName(docRef, true));
       } catch (XWikiException e) {
         mLogger.error(e);
       }
     } else {
       mLogger.debug("getPrevMenuItem: no MenuItem Object found on doc "
-          + getFullName(docRef, true));
+          + getWebUtilsService().resolveFullName(docRef, true));
     }
     return null;
   }
@@ -335,22 +328,17 @@ public class TreeNodeService implements ITreeNodeService {
     return getWebUtilsService().resolveDocumentReference(s);
   }
   
-  String getFullName(EntityReference reference, boolean withDatabase){
-    if(withDatabase) return serializer_default.serialize(reference);
-    else return serializer_local.serialize(reference);
-  }
-  
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
     return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
   }
   
   void injectIWebUtilsService(IWebUtilsService wu){
-    webUtils = wu;
+    webUtilsService = wu;
   }
   
   private IWebUtilsService getWebUtilsService() {
-    if(webUtils!=null){
-      return webUtils;
+    if(webUtilsService!=null){
+      return webUtilsService;
     } else{
       return Utils.getComponent(IWebUtilsService.class);
     }

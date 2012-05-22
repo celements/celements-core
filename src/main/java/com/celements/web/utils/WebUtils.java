@@ -19,9 +19,6 @@
  */
 package com.celements.web.utils;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,11 +43,9 @@ import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.sajson.Builder;
 import com.celements.web.pagetype.IPageType;
-import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -95,6 +90,17 @@ public class WebUtils implements IWebUtils {
 
   private ITreeNodeCache getTreeNodeCache() {
     return Utils.getComponent(ITreeNodeCache.class);
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private AttachmentURLCommand getAttachmentUrlCmd() {
+    if (attachmentUrlCmd == null) {
+      attachmentUrlCmd = new AttachmentURLCommand();
+    }
+    return attachmentUrlCmd;
   }
 
   /**
@@ -362,28 +368,29 @@ public class WebUtils implements IWebUtils {
     return getWebUtilsService().countSections(regex, getRef(fullName));
   }
   
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public IPageType getPageTypeApi(String fullName, XWikiContext context)
     throws XWikiException {
-    return new PageTypeApi(fullName,
-        context);
+    return getWebUtilsService().getPageTypeApi(getRef(fullName));
   }
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public List<String> getAllowedLanguages(XWikiContext context) {
-    return Arrays.asList(context.getWiki(
-        ).getWebPreference("language", context).split("[ ,]"));
+    return getWebUtilsService().getAllowedLanguages();
   }
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public Date parseDate(String date, String format) {
-    try {
-      return new SimpleDateFormat(format).parse(date);
-    } catch (ParseException e) {
-      LOGGER.fatal(e);
-      return null;
-    }
-  }
-
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
+    return getWebUtilsService().parseDate(date, format);
   }
 
   /**
@@ -497,7 +504,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated since 2.11.6 instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService directly
    */
   @Deprecated
   public boolean isAdminUser(XWikiContext context) {
@@ -631,13 +638,6 @@ public class WebUtils implements IWebUtils {
     return getAttachmentUrlCmd().getAttachmentURL(link, context);
   }
 
-  private AttachmentURLCommand getAttachmentUrlCmd() {
-    if (attachmentUrlCmd == null) {
-      attachmentUrlCmd = new AttachmentURLCommand();
-    }
-    return attachmentUrlCmd;
-  }
-
   /**
    * @deprecated instead use AttachmentURLCommand directly
    */
@@ -662,34 +662,25 @@ public class WebUtils implements IWebUtils {
     return getAttachmentUrlCmd().isAttachmentLink(link);
   }
 
+  /**
+   * @deprecated instead use WebUtilsService.getUserNameForDocRef
+   */
+  @Deprecated
   public String getUserNameForDocName(String authorDocName,
       XWikiContext context) throws XWikiException {
-    XWikiDocument authorDoc = context.getWiki().getDocument(authorDocName, context);
-    BaseObject authorObj = authorDoc.getObject("XWiki.XWikiUsers");
-    if(authorObj != null) {
-      return authorObj.getStringValue("last_name") + ", " + authorObj.getStringValue("first_name");
-    }
-    return renderText("$adminMsg.get('cel_ml_unknown_author')", context);
+    return getWebUtilsService().getUserNameForDocRef(getRef(authorDocName));
+  }
+  
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
+  public String getMajorVersion(XWikiDocument doc) {
+    return getWebUtilsService().getMajorVersion(doc);
   }
   
   DocumentReference getRef(String s){
     return getWebUtilsService().resolveDocumentReference(s);
-  }
-  
-  private String renderText(String velocityText, XWikiContext context) {
-    return context.getWiki().getRenderingEngine().renderText(
-        "{pre}" + velocityText + "{/pre}", context.getDoc(), context);
-  }
-  
-  public String getMajorVersion(XWikiDocument doc) {
-    String revision = "1";
-    if(doc != null){
-      revision = doc.getVersion();
-      if((revision != null) && (revision.trim().length() > 0) && (revision.contains("."))) {
-        revision = revision.split("\\.")[0];
-      }
-    }
-    return revision;
   }
   
 }
