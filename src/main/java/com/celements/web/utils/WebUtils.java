@@ -23,25 +23,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.TreeNode;
-import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.ExternalUsageFilter;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.sajson.Builder;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
@@ -520,122 +516,24 @@ public class WebUtils implements IWebUtils {
     return getWebUtilsService().isAdminUser();
   }
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
       boolean bWithObjects, boolean bWithRendering,
       boolean bWithAttachmentContent, boolean bWithVersions,
       XWikiContext context) throws XWikiException {
-    Map<String,String> docData = new LinkedHashMap<String, String>();
-    docData.put("web", xwikiDoc.getSpace());
-    docData.put("name", xwikiDoc.getName());
-    docData.put("language", xwikiDoc.getLanguage());
-    docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
-    docData.put("translation", "" + xwikiDoc.getTranslation());
-    docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
-    docData.put("parent", xwikiDoc.getParent());
-    docData.put("creator", xwikiDoc.getCreator());
-    docData.put("author", xwikiDoc.getAuthor());
-    docData.put("creator", xwikiDoc.getCreator());
-    docData.put("customClass", xwikiDoc.getCustomClass());
-    docData.put("contentAuthor", xwikiDoc.getContentAuthor());
-    docData.put("creationDate", "" + xwikiDoc.getCreationDate().getTime());
-    docData.put("date", "" + xwikiDoc.getDate().getTime());
-    docData.put("contentUpdateDate", "" + xwikiDoc.getContentUpdateDate().getTime());
-    docData.put("version", xwikiDoc.getVersion());
-    docData.put("title", xwikiDoc.getTitle());
-    docData.put("template", xwikiDoc.getTemplate());
-    docData.put("getDefaultTemplate", xwikiDoc.getDefaultTemplate());
-    docData.put("getValidationScript", xwikiDoc.getValidationScript());
-    docData.put("comment", xwikiDoc.getComment());
-    docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
-    docData.put("syntaxId", xwikiDoc.getSyntaxId());
-    docData.put("menuName", new MultilingualMenuNameCommand().getMultilingualMenuName(
-        xwikiDoc.getObject("Celements2.MenuItem"), xwikiDoc.getLanguage(), context));
-    //docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
-
-    /** TODO add Attachments
-    for (XWikiAttachment attach : xwikiDoc.getAttachmentList()) {
-        docel.add(attach.toXML(bWithAttachmentContent, bWithVersions, context));
-    }**/
-
-    if (bWithObjects) {
-//        // Add Class
-//        BaseClass bclass = xwikiDoc.getxWikiClass();
-//        if (bclass.getFieldList().size() > 0) {
-//            // If the class has fields, add class definition and field information to XML
-//            docel.add(bclass.toXML(null));
-//        }
-//
-//        // Add Objects (THEIR ORDER IS MOLDED IN STONE!)
-//        for (Vector<BaseObject> objects : getxWikiObjects().values()) {
-//            for (BaseObject obj : objects) {
-//                if (obj != null) {
-//                    BaseClass objclass = null;
-//                    if (StringUtils.equals(getFullName(), obj.getClassName())) {
-//                        objclass = bclass;
-//                    } else {
-//                        objclass = obj.getxWikiClass(context);
-//                    }
-//                    docel.add(obj.toXML(objclass));
-//                }
-//            }
-//        }
-      throw new NotImplementedException();
-    }
-
-    String host = context.getRequest().getHeader("host");
-    // Add Content
-    docData.put("content", replaceInternalWithExternalLinks(xwikiDoc.getContent(), host));
-    
-    if (bWithRendering) {
-      try {
-        docData.put("renderedcontent", replaceInternalWithExternalLinks(xwikiDoc.getRenderedContent(context), host));
-      } catch (XWikiException e) {
-        LOGGER.error("Exception with rendering content: " + e.getFullMessage());
-      }
-    }
-
-    if (bWithVersions) {
-        try {
-          docData.put("versions", xwikiDoc.getDocumentArchive(context
-              ).getArchive(context));
-        } catch (XWikiException e) {
-            LOGGER.error("Document [" + xwikiDoc.getFullName()
-                + "] has malformed history");
-        }
-    }
-
-    return docData;
+    return getWebUtilsService().xwikiDocToLinkedMap(xwikiDoc.getDocumentReference(),
+        bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions);
   }
 
-  String replaceInternalWithExternalLinks(String content, String host) {
-    String result = content.replaceAll("src=\\\"(\\.\\./)*/?download/", "src=\"http://" + host + "/download/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?download/", "href=\"http://" + host + "/download/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?skin/", "href=\"http://" + host + "/skin/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?view/", "href=\"http://" + host + "/view/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?edit/", "href=\"http://" + host + "/edit/");
-    return result;
-  }
-
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getJSONContent(XWikiDocument cdoc, XWikiContext context) {
-    Map<String, String> data;
-    try {
-      //    data = xwikiDoctoLinkedMap(tdoc, true, true, false,
-//    false, context);
-      data = xwikiDoctoLinkedMap(cdoc.getTranslatedDocument(context),
-          false, true, false, false, context);
-    } catch (XWikiException e) {
-      LOGGER.error(e);
-      data = Collections.emptyMap();
-    }
-
-    Builder jasonBuilder = new Builder();
-    jasonBuilder.openDictionary();
-    for (String key : data.keySet()) {
-      String value = data.get(key);
-      jasonBuilder.addStringProperty(key, value);
-    }
-    jasonBuilder.closeDictionary();
-    return jasonBuilder.getJSON();
+    return getWebUtilsService().getJSONContent(cdoc.getDocumentReference());
   }
 
 

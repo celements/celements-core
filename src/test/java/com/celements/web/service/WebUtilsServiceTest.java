@@ -575,6 +575,83 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
+  public void testReplaceInternalWithExternalLinks_nothingToReplace() {
+    String host = "www.bla.com";
+    String test = "test";
+    assertEquals(test, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
+  public void testReplaceInternalWithExternalLinks_img_nothingToReplace() {
+    String host = "www.bla.com/";
+    String test = "<img src=\"http://www.bla.com/download/A/B/test.img\" />";
+    assertEquals(test, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
+  public void testReplaceInternalWithExternalLinks_img_newInternal() {
+    String host = "www.bla.com";
+    String test = "<img src=\"/download/A/B/test.img\" />";
+    String result = "<img src=\"http://" + host + "/download/A/B/test.img\" />";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
+  public void testReplaceInternalWithExternalLinks_img_dotInternal() {
+    String host = "www.bla.com";
+    String test = "<img src=\"../../download/A/B/test.img\" />";
+    String result = "<img src=\"http://" + host + "/download/A/B/test.img\" />";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
+  public void testReplaceInternalWithExternalLinks_href_nothingToReplace() {
+    String host = "www.bla.com";
+    String test = "<a href=\"http://www.bla.com/download/A/B/test.pdf\" >bla</a>";
+    assertEquals(test, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"http://www.bla.com/skin/A/B/test.css\" >bla</a>";
+    assertEquals(test, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"http://www.bla.com/view/A/B\" >bla</a>";
+    assertEquals(test, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"http://www.bla.com/edit/A/B\" >bla</a>";
+    assertEquals(test, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
+  public void testReplaceInternalWithExternalLinks_href_newInternal() {
+    String host = "www.bla.com";
+    String test = "<a href=\"/download/A/B/test.pdf\" >bla</a>";
+    String result = "<a href=\"http://" + host + "/download/A/B/test.pdf\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"/skin/A/B/test.css\" >bla</a>";
+    result = "<a href=\"http://" + host + "/skin/A/B/test.css\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"/view/A/B\" >bla</a>";
+    result = "<a href=\"http://" + host + "/view/A/B\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"/edit/A/B\" >bla</a>";
+    result = "<a href=\"http://" + host + "/edit/A/B\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
+  public void testReplaceInternalWithExternalLinks_href_dotInternal() {
+    String host = "www.bla.com";
+    String test = "<a href=\"../../download/A/B/test.pdf\" >bla</a>";
+    String result = "<a href=\"http://" + host + "/download/A/B/test.pdf\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"../../skin/A/B/test.css\" >bla</a>";
+    result = "<a href=\"http://" + host + "/skin/A/B/test.css\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"../../download/A/B\" >bla</a>";
+    result = "<a href=\"http://" + host + "/download/A/B\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+    test = "<a href=\"../../download/A/B\" >bla</a>";
+    result = "<a href=\"http://" + host + "/download/A/B\" >bla</a>";
+    assertEquals(result, webUtilsService.replaceInternalWithExternalLinks(test, host));
+  }
+  
+  @Test
   public void testGetMajorVersion_nullDoc() {
     assertEquals("1", webUtilsService.getMajorVersion(null));
   }

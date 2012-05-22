@@ -293,6 +293,10 @@ public interface IWebUtils {
   @Deprecated
   public boolean isAdminUser(XWikiContext context);
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getJSONContent(XWikiDocument document, XWikiContext context);
 
   /**
