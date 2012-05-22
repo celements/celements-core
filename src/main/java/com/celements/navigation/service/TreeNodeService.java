@@ -20,6 +20,7 @@ import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -113,6 +114,7 @@ public class TreeNodeService implements ITreeNodeService {
     return parentKey;
   }
 
+  
   public <T> List<TreeNode> getSubNodesForParent(DocumentReference docRef,
       INavFilter<T> filter) {
     ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
@@ -312,6 +314,17 @@ public class TreeNodeService implements ITreeNodeService {
           + getFullName(docRef, true));
     }
     return null;
+  }
+  
+  public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart) {
+    DocumentReference parent = new WebUtilsService().getParentForLevel(menuLevel);
+    if (parent != null) {
+      List<TreeNode> submenuItems = getSubNodesForParent(parent, menuPart);
+      mLogger.debug("submenuItems for parent: " + parent + " ; " + submenuItems);
+      return submenuItems;
+    }
+    mLogger.debug("parent is null");
+    return new ArrayList<TreeNode>();
   }
   
   DocumentReference getRef(String spaceName, String pageName){

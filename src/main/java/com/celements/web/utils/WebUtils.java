@@ -50,6 +50,7 @@ import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -96,16 +97,16 @@ public class WebUtils implements IWebUtils {
     return Utils.getComponent(ITreeNodeCache.class);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#queryCount()
+  /**
+   * @deprecated instead use TreeNodeCache
    */
   @Deprecated
   public int queryCount() {
     return getTreeNodeCache().queryCount();
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeCache
    */
   @Deprecated
   public void flushMenuItemCache(XWikiContext context) {
@@ -173,9 +174,12 @@ public class WebUtils implements IWebUtils {
     return getTreeNodeService().getMenuItemPos(getRef(fullName), menuPart);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getSubMenuItemsForParent(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+  // TODO needed?
+  /**
+   * 
+   * @deprecated instead use TreeNodeService.getSubNodesForParent
    */
+  @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
       String parent, String menuSpace, String menuPart, XWikiContext context) {
     ExternalUsageFilter filter = new ExternalUsageFilter();
@@ -185,7 +189,7 @@ public class WebUtils implements IWebUtils {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated instead use TreeNodeService.getSubNodesForParent
    */
   @Deprecated
   public List<BaseObject> getSubMenuItemsForParent_internal(String parent,
@@ -206,7 +210,7 @@ public class WebUtils implements IWebUtils {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated instead use TreeNodeService
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
@@ -223,9 +227,10 @@ public class WebUtils implements IWebUtils {
     return getTreeNodeService().getSubNodesForParent(parent, menuSpace, filter);
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getMenuItemsForHierarchyLevel(int, java.lang.String, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(
       int menuLevel, String menuPart, XWikiContext context) {
     String parent = getParentForLevel(menuLevel, context);
@@ -240,9 +245,10 @@ public class WebUtils implements IWebUtils {
     return new ArrayList<com.xpn.xwiki.api.Object>();
   }
 
-  /* (non-Javadoc)
-   * @see com.celements.web.utils.IWebUtils#getParentForLevel(int, com.xpn.xwiki.XWikiContext)
+  /**
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public String getParentForLevel(int menuLevel, XWikiContext context) {
     String parent = null;
     if (menuLevel == 1) {
@@ -329,75 +335,31 @@ public class WebUtils implements IWebUtils {
     return preferenceDoc;
   }
   
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public String getDocSectionAsJSON(String regex, String fullName, int section,
       XWikiContext context) throws XWikiException {
-    Builder jsonBuilder = new Builder();
-    jsonBuilder.openArray();
-    
-    jsonBuilder.openDictionary();
-    jsonBuilder.addStringProperty("content", getDocSection(regex, fullName,
-        section, context));
-    int sectionNr = countSections(regex, fullName, context);
-    jsonBuilder.openProperty("section");
-    jsonBuilder.addNumber(new BigDecimal(getSectionNr(section, sectionNr)));
-    jsonBuilder.openProperty("sectionNr");
-    jsonBuilder.addNumber(new BigDecimal(sectionNr));
-    jsonBuilder.closeDictionary();
-    jsonBuilder.closeArray();
-    return jsonBuilder.getJSON();
+    return getWebUtilsService().getDocSectionAsJSON(regex, getRef(fullName), section);
   }
   
-  int getSectionNr(int section, int sectionNr) {
-    if(section <= 0){ section = 1; }
-    if(section > sectionNr){ section = sectionNr; }
-    return section;
-  }
-
-  public String getDocSection(String regex, String fullName, int part,
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
+  public String getDocSection(String regex, String fullName, int section,
       XWikiContext context) throws XWikiException {
-    LOGGER.debug("use regex '" + regex + "' on '" + fullName
-        + "' and get section " + part);
-    XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-    String content = doc.getTranslatedDocument(context).getContent();
-    LOGGER.debug("content of'" + doc.getFullName() + "' is: '" + content + "'");
-    String section = null;
-    if((content != null) && (!isEmptyRTEString(content))){
-      part = getSectionNr(part, countSections(regex, fullName, context));
-      for (String partStr : content.split(regex)) {
-        if(!isEmptyRTEString(partStr)) {
-          part--;
-          if(part == 0) {
-            section = partStr;
-            break;
-          }
-        }
-      }
-    } else {
-      LOGGER.debug("content ist empty");
-    }
-    if(section != null) {
-      section = renderText(section, context);
-    }
-    return section;
+    return getWebUtilsService().getDocSection(regex, getRef(fullName), section);
   }
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public int countSections(String regex, String fullName, XWikiContext context
       ) throws XWikiException {
-    LOGGER.debug("use regex '" + regex + "' on '" + fullName + "'");
-    XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-    String content = doc.getTranslatedDocument(context).getContent();
-    LOGGER.debug("content of'" + doc.getFullName() + "' is: '" + content + "'");
-    int parts = 0;
-    if((content != null) && (!isEmptyRTEString(content))){
-      for (String part : content.split(regex)) {
-        if(!isEmptyRTEString(part)) {
-          parts++;
-        }
-      }
-    } else {
-      LOGGER.debug("content ist empty");
-    }
-    return parts;
+    return getWebUtilsService().countSections(regex, getRef(fullName));
   }
   
   public IPageType getPageTypeApi(String fullName, XWikiContext context)
@@ -425,7 +387,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage, XWikiContext context) {
@@ -433,7 +395,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public XWikiMessageTool getAdminMessageTool(XWikiContext context) {
@@ -441,7 +403,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public String getAdminLanguage(XWikiContext context) {
@@ -449,7 +411,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context) {
@@ -466,14 +428,14 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService directly
+   * @deprecated instead use TreeNodeService
    */
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
   
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @SuppressWarnings("unchecked")
   public List<Attachment> getAttachmentListSorted(Document doc,
@@ -482,7 +444,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   public String getAttachmentListSortedAsJSON(Document doc,
       String comparator, boolean imagesOnly) {

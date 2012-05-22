@@ -24,6 +24,7 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -31,8 +32,25 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @ComponentRole
 public interface IWebUtilsService {
   
+  /**
+   * Returns level of hierarchy with level=1 returning root which is null, else
+   * corresponding DocumentReference or throws IndexOutOfBoundsException
+   * @param level
+   * @return DocumentReference of level
+   * @throws IndexOutOfBoundsException - if level above root or below lowest
+   */
+  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
+  
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc);
+  
+  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section 
+      ) throws XWikiException;
+  
+  public String getDocSection(String regex, DocumentReference docRef, int section 
+      ) throws XWikiException;
+
+  public int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
   public XWikiMessageTool getMessageTool(String adminLanguage);
 

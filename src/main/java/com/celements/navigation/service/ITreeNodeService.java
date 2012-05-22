@@ -58,5 +58,7 @@ public interface ITreeNodeService {
   public TreeNode getPrevMenuItem(DocumentReference docRef) throws XWikiException;
   
   public TreeNode getNextMenuItem(DocumentReference docRef) throws XWikiException;
+  
+  public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart); 
 
 }

@@ -36,8 +36,16 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public interface IWebUtils {
 
+  /**
+   * @deprecated instead use TreeNodeCache
+   */
+  @Deprecated
   public int queryCount();
 
+  /**
+   * @deprecated instead use TreeNodeCache
+   */
+  @Deprecated
   public void flushMenuItemCache(XWikiContext context);
 
   /**
@@ -74,18 +82,24 @@ public interface IWebUtils {
       XWikiContext context);
 
   /**
-   * getSubMenuItemsForParent
+   * @deprecated instead use TreeNodeService.getSubNodesForParent
+   * 
    * get all submenu items of given parent document (by fullname).
    * 
    * @param parent
    * @param menuSpace (default: $doc.space)
    * @param menuPart 
    * @return (array of menuitems)
+   * 
    */
+  @Deprecated
   public List<Object> getSubMenuItemsForParent(
       String parent, String menuSpace, String menuPart, XWikiContext context);
 
+  
   /**
+   * @deprecated instead use TreeNodeService
+   * 
    * getMenuItemsForHierarchyLevel
    * get all submenu items of given parent document (by fullname).
    * 
@@ -93,19 +107,19 @@ public interface IWebUtils {
    * @param menuPart 
    * @return (array of menuitems)
    */
+  @Deprecated
   public List<Object> getMenuItemsForHierarchyLevel(
       int menuLevel, String menuPart, XWikiContext context);
 
   /**
-   * @param menuLevel
-   * @param context
-   * @return
+   * @deprecated instead use TreeNodeService
    */
+  @Deprecated
   public String getParentForLevel(int menuLevel, XWikiContext context);
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated use TreeNodeService.getSubNodesForParent instead
    */
   @Deprecated
   public List<BaseObject> getSubMenuItemsForParent_internal(
@@ -180,10 +194,17 @@ public interface IWebUtils {
   public XWikiDocument getConfigDocByInheritance(XWikiDocument doc,
       String className, XWikiContext context) throws XWikiException;
   
-
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public String getDocSectionAsJSON(String regex, String fullName, int part, 
       XWikiContext context) throws XWikiException;
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public int countSections(String regex, String fullName, XWikiContext context)
       throws XWikiException;
 
@@ -195,7 +216,7 @@ public interface IWebUtils {
   public Date parseDate(String date, String format);
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage,

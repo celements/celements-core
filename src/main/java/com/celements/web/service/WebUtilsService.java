@@ -19,6 +19,7 @@
  */
 package com.celements.web.service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.sajson.Builder;
+import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -59,6 +61,17 @@ public class WebUtilsService implements IWebUtilsService {
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+  
+  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException {
+    DocumentReference parent = null;
+    if(level!=1){
+      List<DocumentReference> parentList = getDocumentParentsList(
+          getContext().getDoc().getDocumentReference(), true);
+      int startAtItem = parentList.size()-level+1;
+      parent = parentList.get(startAtItem);
+    }
+    return parent;
   }
   
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
@@ -85,6 +98,83 @@ public class WebUtilsService implements IWebUtilsService {
   
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
     return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
+  }
+  
+  public String getDocSectionAsJSON(String regex, DocumentReference docRef,
+      int section) throws XWikiException {
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openArray();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addStringProperty("content", getDocSection(regex, docRef, section));
+    int sectionNr = countSections(regex, docRef);
+    jsonBuilder.openProperty("section");
+    jsonBuilder.addNumber(new BigDecimal(getSectionNr(section, sectionNr)));
+    jsonBuilder.openProperty("sectionNr");
+    jsonBuilder.addNumber(new BigDecimal(sectionNr));
+    jsonBuilder.closeDictionary();
+    jsonBuilder.closeArray();
+    return jsonBuilder.getJSON();
+  }
+
+  public String getDocSection(String regex, DocumentReference docRef, int section
+      ) throws XWikiException {
+    LOGGER.debug("use regex '" + regex + "' on '" + docRef
+        + "' and get section " + section);
+    XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+    String content = doc.getTranslatedDocument(getContext()).getContent();
+    LOGGER.debug("content of'" + docRef + "' is: '" + content + "'");
+    String section_str = null;
+    if((content != null) && (!isEmptyRTEString(content))){
+      section = getSectionNr(section, countSections(regex, docRef));
+      for (String partStr : content.split(regex)) {
+        if(!isEmptyRTEString(partStr)) {
+          section--;
+          if(section == 0) {
+            section_str = partStr;
+            break;
+          }
+        }
+      }
+    } else {
+      LOGGER.debug("content ist empty");
+    }
+    if(section_str != null) {
+      section_str = renderText(section_str);
+    }
+    return section_str;
+  }
+
+  public int countSections(String regex, DocumentReference docRef) throws XWikiException {
+    LOGGER.debug("use regex '" + regex + "' on '" + docRef + "'");
+    XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+    String content = doc.getTranslatedDocument(getContext()).getContent();
+    LOGGER.debug("content of'" + docRef + "' is: '" + content + "'");
+    int parts = 0;
+    if((content != null) && (!isEmptyRTEString(content))){
+      for (String part : content.split(regex)) {
+        if(!isEmptyRTEString(part)) {
+          parts++;
+        }
+      }
+    } else {
+      LOGGER.debug("content ist empty");
+    }
+    return parts;
+  }
+  
+  int getSectionNr(int section, int sectionNr) {
+    if(section <= 0){ section = 1; }
+    if(section > sectionNr){ section = sectionNr; }
+    return section;
+  }
+  
+  private String renderText(String velocityText) {
+    return getContext().getWiki().getRenderingEngine().renderText(
+        "{pre}" + velocityText + "{/pre}", getContext().getDoc(), getContext());
+  }
+  
+  private boolean isEmptyRTEString(String rteContent) {
+    return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
 
   public XWikiMessageTool getMessageTool(String adminLanguage) {

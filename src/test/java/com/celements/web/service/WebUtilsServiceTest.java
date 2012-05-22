@@ -18,6 +18,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
@@ -34,6 +35,97 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  @Test
+  public void testGetParentForLevel_1() {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc");
+
+    XWikiDocument doc = new XWikiDocument(docRef);
+  
+    context.setDoc(doc);
+    assertNull(webUtilsService.getParentForLevel(1)); //root
+  }
+  
+  @Test
+  public void testGetParentForLevel_2() throws XWikiException {    
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
+      parentRef = new DocumentReference(context.getDatabase(),"mySpace","parent1");
+  
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiDocument docP = new XWikiDocument(parentRef);
+    doc.setParentReference(parentRef.extractReference(EntityType.DOCUMENT));
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
+    expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).once();
+    expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).once();
+    
+    context.setDoc(doc);
+    replayAll();
+    assertEquals(parentRef,webUtilsService.getParentForLevel(2));
+    verifyAll();
+  }
+  
+  @Test
+  public void testGetParentForLevel_3() throws XWikiException {    
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
+      parentRef = new DocumentReference(context.getDatabase(),"mySpace","parent1");
+  
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiDocument docP = new XWikiDocument(parentRef);
+    doc.setParentReference(parentRef.extractReference(EntityType.DOCUMENT));
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
+    expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).once();
+    expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).once();
+    
+    context.setDoc(doc);
+    replayAll();
+    assertEquals(docRef,webUtilsService.getParentForLevel(3));
+    verifyAll();
+  }
+  
+  @Test
+  public void testGetParentForLevel_IndexOutOfBounds() throws XWikiException {    
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
+      parentRef = new DocumentReference(context.getDatabase(),"mySpace","parent1");
+  
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiDocument docP = new XWikiDocument(parentRef);
+    doc.setParentReference(parentRef.extractReference(EntityType.DOCUMENT));
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).times(3);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).times(3);
+    expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).times(3);
+    expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).times(3);
+    
+    context.setDoc(doc);
+    replayAll();
+    try{
+      webUtilsService.getParentForLevel(4);
+      assertFalse(true);
+    } catch(IndexOutOfBoundsException e){
+      assertEquals("-1", e.getMessage());
+    }    
+    try{
+      webUtilsService.getParentForLevel(0);
+      assertFalse(true);
+    } catch(IndexOutOfBoundsException e){
+      assertEquals("Index: 3, Size: 2", e.getMessage());
+    }
+    try{
+      webUtilsService.getParentForLevel(-1);
+      assertFalse(true);
+    } catch(IndexOutOfBoundsException e){
+      assertEquals("Index: 4, Size: 2", e.getMessage());
+    }
+    verifyAll();
   }
   
   @Test
@@ -85,6 +177,216 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     replayAll();
     assertEquals(docParentsList, webUtilsService.getDocumentParentsList(docRef, true));
     verifyAll();
+  }
+  
+  @Test
+  public void testGetDocSectionAsJSON() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    transDoc.setContent("abc<table>blabla</table><table>abc</table>");
+  
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"),
+        eq(context.getDoc()), same(context))).andReturn("<table>blabla</table>"
+        ).atLeastOnce();
+    
+    replayAll(doc, renderer);
+    String json ="[{\"content\" : \"<table>blabla</table>\", \"section\" : 2," +
+        " \"sectionNr\" : 3}]";
+    assertEquals(json, webUtilsService.getDocSectionAsJSON("(?=<table)", docRef, 2));
+    verifyAll(doc, renderer);
+  }
+  
+  @Test
+  public void testGetDocSection_empty() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(doc.getTranslatedDocument(same(context))
+        ).andReturn(new XWikiDocument(transDocRef)).once();
+    
+    replayAll(doc);
+    assertNull(webUtilsService.getDocSection("(?=<table)", docRef, 1));
+    verifyAll(doc);
+  }
+  
+  @Test
+  public void testGetDocSection_first() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    transDoc.setContent("abc<table>blabla</table><table>abc</table>");
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
+    expect(renderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(context))
+        ).andReturn("abc").atLeastOnce();
+    
+    replayAll(doc, renderer);
+    assertEquals("abc", webUtilsService.getDocSection("(?=<table)", docRef, 1));
+    verifyAll(doc, renderer);
+  }
+  
+  @Test
+  public void testGetDocSection_firstEmptyRTE() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    transDoc.setContent("<p></p>  <br /> \n<table>blabla</table><table>abc</table>");
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()), 
+        same(context))).andReturn("<table>blabla</table>").atLeastOnce();
+    
+    replayAll(doc, renderer);
+    assertEquals("<table>blabla</table>", 
+        webUtilsService.getDocSection("(?=<table)", docRef, 1));
+    verifyAll(doc, renderer);
+  }
+  
+  @Test
+  public void testGetDocSection_middle() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    transDoc.setContent("abc<table>blabla</table><table>abc</table>");
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()),
+        same(context))).andReturn("<table>blabla</table>").atLeastOnce();
+    
+    replayAll(doc, renderer);
+    assertEquals("<table>blabla</table>", webUtilsService.getDocSection("(?=<table)",
+        docRef, 2));
+    verifyAll(doc, renderer);
+  }
+  
+  @Test
+  public void testGetDocSection_last() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    transDoc.setContent("abc<table>blabla</table><table>abc</table>");
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(context.getDoc()),
+        same(context))).andReturn("<table>abc</table>").atLeastOnce();
+    
+    replayAll(doc, renderer);
+    assertEquals("<table>abc</table>", webUtilsService.getDocSection("(?=<table)",
+        docRef, 3));
+    verifyAll(doc, renderer);
+  }
+
+  @Test
+  public void testCountSections_empty() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).once();
+    
+    replayAll(doc);
+    assertEquals(0, webUtilsService.countSections("", docRef));
+    verifyAll(doc);
+  }
+
+  @Test
+  public void testCountSections_one() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    transDoc.setContent("<table>blabla</table>");
+    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    replayAll(doc);
+    assertEquals(1, webUtilsService.countSections("(?=<table)", docRef));
+    verifyAll(doc);
+  }
+  
+  @Test
+  public void testCountSections_emptyRTEStart() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    transDoc.setContent("<table>blabla</table>");
+  
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    replayAll(doc);
+    assertEquals(1, webUtilsService.countSections("(?=<table)", docRef));
+    verifyAll(doc);
+  }
+  
+  @Test
+  public void testCountSections_several() throws XWikiException {
+    DocumentReference
+      docRef = new DocumentReference(context.getDatabase(), "Space", "DocName"),
+      transDocRef = new DocumentReference(context.getDatabase(), "Space", "TransDocName");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument transDoc = new XWikiDocument(transDocRef);
+    transDoc.setContent("abc<table>blabla</table><table>abc</table>");
+  
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
+    replayAll(doc);
+    assertEquals(3, webUtilsService.countSections("(?=<table)", docRef));
+    verifyAll(doc);
+  }
+
+  @Test
+  public void testGetSectionNr_negative() {
+    assertEquals(1, webUtilsService.getSectionNr(-3, 5));
+  }
+  
+  @Test
+  public void testGetSectionNr_zero() {
+    assertEquals(1, webUtilsService.getSectionNr(0, 5));
+  }
+  
+  @Test
+  public void testGetSectionNr_validNr() {
+    assertEquals(3, webUtilsService.getSectionNr(3, 5));
+  }
+
+  @Test
+  public void testGetSectionNr_toHighNr() {
+    assertEquals(5, webUtilsService.getSectionNr(8, 5));
   }
 
   @Test
