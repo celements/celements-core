@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
 import com.celements.web.token.NewCelementsTokenForUserCommand;
+import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -213,8 +214,22 @@ public class PasswordRecoveryAndEmailValidationCommand {
     
     XWikiDocument doc = context.getWiki().getDocument(accountName, context);
     BaseObject obj = doc.getObject("XWiki.XWikiUsers");
+    String oldLanguage = context.getLanguage();
+    String newAdminLanguage = obj.getStringValue("admin_language");
+    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    Object oldAdminLanguage = vcontext.get("admin_language"); 
+    if ((newAdminLanguage != null) && !"".equals(newAdminLanguage)) {
+      context.setLanguage(newAdminLanguage);
+      vcontext.put("admin_language", newAdminLanguage);
+      vcontext.put("adminMsg", WebUtils.getInstance().getAdminMessageTool(
+          context));
+    }
     sendValidationMessage(obj.getStringValue("email"), validkey,
         "Tools.AccountActivationMail", context);
+    context.setLanguage(oldLanguage);
+    vcontext.put("admin_language", oldAdminLanguage); 
+    vcontext.put("adminMsg", WebUtils.getInstance().getAdminMessageTool(
+        context));
   }
 
   public String getNewValidationTokenForUser(String accountName,
