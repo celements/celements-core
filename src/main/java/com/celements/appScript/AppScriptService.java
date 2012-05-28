@@ -66,18 +66,19 @@ public class AppScriptService implements IAppScriptService {
 
   public DocumentReference getAppScriptDocRef(String scriptName) {
     if (hasLocalAppScript(scriptName)) {
-      return getCentralAppScriptDocRef(scriptName);
+      return getLocalAppScriptDocRef(scriptName);
     } else {
       return getCentralAppScriptDocRef(scriptName);
     }
   }
 
   public DocumentReference getLocalAppScriptDocRef(String scriptName) {
-    return new DocumentReference(getContext().getDatabase(), "AppScripts", scriptName);
+    return new DocumentReference(getContext().getDatabase(), APP_SCRIPT_SPACE_NAME,
+        scriptName);
   }
 
   public DocumentReference getCentralAppScriptDocRef(String scriptName) {
-    return new DocumentReference("celements2web", "AppScripts", scriptName);
+    return new DocumentReference("celements2web", APP_SCRIPT_SPACE_NAME, scriptName);
   }
 
   public String getAppScriptTemplatePath(String scriptName) {
