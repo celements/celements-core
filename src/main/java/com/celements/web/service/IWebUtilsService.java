@@ -19,9 +19,13 @@
  */
 package com.celements.web.service;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
@@ -42,5 +46,10 @@ public interface IWebUtilsService {
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
-
+  
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField, boolean asc);
+  
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField1, boolean asc1, String orderField2, boolean asc2);
 }
