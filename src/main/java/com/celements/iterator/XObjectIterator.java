@@ -179,9 +179,6 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
    * @return current document
    */
   XWikiDocument getCurrentDoc() {
-    if ((_currentDoc == null) && (getDocIterator().hasNext())) {
-      moveToNextDoc();
-    }
     return _currentDoc;
   }
 
