@@ -148,6 +148,9 @@ public class WebUtils implements IWebUtils {
       context).getParent();
   }
 
+  /**
+   * @deprecated instead use EmptyCheckCommand
+   */
   @Deprecated
   public boolean isEmptyRTEDocument(XWikiDocument localdoc) {
     return isEmptyRTEString(localdoc.getContent());
@@ -176,7 +179,6 @@ public class WebUtils implements IWebUtils {
     return getTreeNodeService().getMenuItemPos(getRef(fullName), menuPart);
   }
 
-  // TODO needed?
   /**
    * 
    * @deprecated instead use TreeNodeService.getSubNodesForParent
@@ -422,7 +424,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public boolean hasParentSpace(XWikiContext context) {
@@ -430,7 +432,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public String getParentSpace(XWikiContext context) {
@@ -509,7 +511,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public boolean isAdminUser(XWikiContext context) {
@@ -517,7 +519,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
@@ -529,7 +531,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public String getJSONContent(XWikiDocument cdoc, XWikiContext context) {
@@ -538,7 +540,7 @@ public class WebUtils implements IWebUtils {
 
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated instead use AttachmentURLCommand
    */
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
@@ -546,7 +548,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated instead use AttachmentURLCommand
    */
   @Deprecated
   public String getAttachmentName(String link) {
@@ -554,7 +556,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated instead use AttachmentURLCommand
    */
   @Deprecated
   public String getPageFullName(String link) {
@@ -562,7 +564,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated instead use AttachmentURLCommand
    */
   @Deprecated
   public boolean isAttachmentLink(String link) {
@@ -579,7 +581,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public String getMajorVersion(XWikiDocument doc) {

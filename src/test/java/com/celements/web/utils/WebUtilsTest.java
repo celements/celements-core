@@ -285,84 +285,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetAdminLanguage_defaultToDocLanguage() throws XWikiException {
-    context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    context.setUser(userName);
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    expect(wiki.getWebPreference(eq("admin_language"), eq("de"), same(context))
-        ).andReturn("de");
-    replayAll();
-    assertEquals("de", celUtils.getAdminLanguage(context));
-    verifyAll();
-  }
-
-  @Test
-  public void testGetAdminLanguage_contextUser() throws XWikiException {
-    context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    context.setUser(userName);
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
-        "XWiki", "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "fr");
-    userDoc.setXObject(0, userObj);
-    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayAll();
-    assertEquals("fr", celUtils.getAdminLanguage(context));
-    verifyAll();
-  }
-
-  @Test
-  public void testGetAdminLanguage_notContextUser() throws XWikiException {
-    context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    context.setUser("XWiki.NotMyUser");
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
-        "XWiki", "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "fr");
-    userDoc.setXObject(0, userObj);
-    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayAll();
-    assertEquals("fr", celUtils.getAdminLanguage(userName, context));
-    verifyAll();
-  }
-
-  @Test
-  public void testGetAdminLanguage_defaultToWebPreferences() throws XWikiException {
-    context.setLanguage("de");
-    String userName = "XWiki.MyUser";
-    context.setUser("XWiki.NotMyUser");
-    expect(wiki.getWebPreference(eq("admin_language"), isA(String.class), same(context))
-        ).andReturn("en");
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "MyUser");
-    XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
-        "XWiki", "XWikiUsers");
-    BaseObject userObj = new BaseObject();
-    userObj.setXClassReference(xwikiUserClassRef);
-    userObj.setStringValue("admin_language", "");
-    userDoc.setXObject(0, userObj);
-    expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayAll();
-    assertEquals("en", celUtils.getAdminLanguage(userName, context));
-    verifyAll();
-  }
-
-  @Test
   public void testGetDocumentParentsList() throws XWikiException {
     String fullName = "mySpace.MyDoc";
     String parent1 = "mySpace.Parent1";
@@ -387,31 +309,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals(docParentsList, celUtils.getDocumentParentsList(fullName, true,
         context));
     verify(wiki);
-  }
-  
-  @Test
-  public void isAttachmentLink_null() {
-    assertFalse(celUtils.isAttachmentLink(null));
-  }
-  
-  @Test
-  public void isAttachmentLink_empty() {
-    assertFalse(celUtils.isAttachmentLink(""));
-  }
-  
-  @Test
-  public void isAttachmentLink_url() {
-    assertFalse(celUtils.isAttachmentLink("/download/Space/Page/attachment.jpg"));
-  }
-  
-  @Test
-  public void isAttachmentLink_is() {
-    assertTrue(celUtils.isAttachmentLink("Space.Page;attachment.jpg"));
-  }
-  
-  @Test
-  public void isAttachmentLink_isWithDb() {
-    assertTrue(celUtils.isAttachmentLink("db:Space.Page;attachment.jpg"));
   }
 
   //*****************************************************************

@@ -149,14 +149,6 @@ public interface IWebUtils {
       INavFilter<T> filter, XWikiContext context);
 
   /**
-   * 
-   * @param <T>
-   * @param parent
-   * @param menuSpace
-   * @param filter
-   * @param context
-   * @return
-   * 
    * @deprecated instead use TreeNodeService directly
    */
   @Deprecated
@@ -179,16 +171,7 @@ public interface IWebUtils {
       XWikiContext context) throws XWikiException;
 
   /**
-   * 
-   * @param doc
-   * @param className
-   * @param context
-   * @return
-   * @throws XWikiException
-   * 
-   * {@link Deprecated} please use instead:<br/>
-   *  <code>new InheritorFactory().getConfigDocFieldInheritor(String className,
-   *   String fullName, XWikiContext context)</code>
+   * @deprecated please use instead InheritorFactory().getConfigDocFieldInheritor
    */
   @Deprecated
   public XWikiDocument getConfigDocByInheritance(XWikiDocument doc,
