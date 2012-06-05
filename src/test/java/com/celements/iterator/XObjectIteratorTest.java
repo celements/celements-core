@@ -142,9 +142,14 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(
       new XWikiDocument()).once();
     replay(_xwiki);
+    XWikiDocument nullDoc = _iterator.getCurrentDoc();
+    assertNull(nullDoc);
+    _iterator.moveToNextDoc();
     XWikiDocument firstDoc = _iterator.getCurrentDoc();
+    assertNotNull(firstDoc);
     _iterator.moveToNextDoc();
     XWikiDocument secondDoc = _iterator.getCurrentDoc();
+    assertNotNull(firstDoc);
     assertNotSame("moveToNextDoc must update the currentDoc.",
         firstDoc, secondDoc);
     verify(_xwiki);
@@ -491,22 +496,21 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     verify(_xwiki);
   }
 
-//TODO fix XObjectIterator for this test
-//  @Test
-//  public void testIterator_foreach_noElements() throws Exception {
-//    String fullname = "Test.Doc";
-//    _docList.add(fullname);
-//    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc
-//        ).anyTimes();
-//    _iterator.setDocList(_docList);
-//    replay(_xwiki);
-//    int count = 0;
-//    for (BaseObject obj : _iterator) {
-//      count++;
-//    }
-//    assertEquals(0, count);
-//    verify(_xwiki);
-//  }
+  @Test
+  public void testIterator_foreach_noElements() throws Exception {
+    String fullname = "Test.Doc";
+    _docList.add(fullname);
+    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc
+        ).anyTimes();
+    _iterator.setDocList(_docList);
+    replay(_xwiki);
+    int count = 0;
+    for (BaseObject obj : _iterator) {
+      count++;
+    }
+    assertEquals(0, count);
+    verify(_xwiki);
+  }
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *

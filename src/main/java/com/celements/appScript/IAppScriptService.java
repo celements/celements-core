@@ -12,6 +12,7 @@ public interface IAppScriptService {
   public static final String APP_SCRIPT_XWPREF_OVERW_DOCS = "appScriptOverwriteDocs";
   public static final String APP_SCRIPT_CONF_OVERW_DOCS =
     "com.celements.appScript.overwriteDocs";
+  public static final String APP_SCRIPT_SPACE_NAME = "AppScripts";
 
   public int getStartIndex(String path);
 
