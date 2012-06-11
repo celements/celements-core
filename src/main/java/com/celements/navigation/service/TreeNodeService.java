@@ -2,6 +2,7 @@ package com.celements.navigation.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
@@ -36,6 +37,9 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
+
+  @Requirement(role = ITreeNodeProvider.class)
+  Map<String, ITreeNodeProvider> nodeProviders;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -81,27 +85,53 @@ public class TreeNodeService implements ITreeNodeService {
   List<TreeNode> fetchNodesForParentKey(String parentKey) {
     long starttotal = System.currentTimeMillis();
     long start = System.currentTimeMillis();
+    List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
+    if ((nodeProviders != null) && (nodeProviders.values().size() > 0)) {
+      TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<Integer, TreeNode>();
+      for (TreeNode node : nodes) {
+        treeNodesMergedMap.put(new Integer(node.getPosition()), node);
+      }
+      for (ITreeNodeProvider tnProvider : nodeProviders.values()) {
+        try {
+          for (TreeNode node : tnProvider.getTreeNodesForParent(parentKey)) {
+            treeNodesMergedMap.put(new Integer(node.getPosition()), node);
+          }
+        } catch(Exception exp) {
+          mLogger.warn("Failed on provider [" + tnProvider.getClass()
+              + "] to get nodes for parentKey [" + parentKey + "].", exp);
+        }
+      }
+      nodes = new ArrayList<TreeNode>(treeNodesMergedMap.values());
+      long end = System.currentTimeMillis();
+      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+          + nodes.size() + "]: " + (end-starttotal));
+    }
+    return nodes;
+  }
+
+  private List<TreeNode> fetchNodesForParentKey_internal(String parentKey,
+      long starttotal, long start) {
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     long end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey: time for getNotMappedMenuItemsFromDatabase: "
+    mLogger.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
         + (end-start));
     start = System.currentTimeMillis();
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey: time for getMappedMenuItemsForParentCmd: "
+    mLogger.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
         + (end-start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey  + "] totaltime for list of ["
+      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
           + mappedTreeNodes.size() + "]: " + (end-starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + notMappedmenuItems.size() + "]: " + (end-starttotal));
       return notMappedmenuItems;
     } else {
@@ -113,10 +143,10 @@ public class TreeNodeService implements ITreeNodeService {
         menuItemsMergedMap.put(new Integer(node.getPosition()), node);
       }
       end = System.currentTimeMillis();
-      mLogger.debug("fetchNodesForParentKey: time for merging menu items: "
+      mLogger.debug("fetchNodesForParentKey_internal: time for merging menu items: "
           + (end-start));
       ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + menuItems.size() + "]: " + (end-starttotal));
       return menuItems;
     }
