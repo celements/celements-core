@@ -463,14 +463,15 @@ public class Navigation implements INavigation {
   }
 
   boolean isActiveMenuItem(String fullName, XWikiContext context) {
-      List<String> docParentList = utils.getDocumentParentsList(context.getDoc(
-          ).getFullName(), true, context);
+      String currentDocFN = context.getDoc().getFullName();
+      List<String> docParentList = utils.getDocumentParentsList(currentDocFN, true,
+          context);
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("isActiveMenuItem: for [" + fullName + "] with parents ["
             + Arrays.deepToString(docParentList.toArray(new String[0])) + "].");
       }
-      return (fullName != null) && docParentList.contains(
-            fullName);
+      return (fullName != null) && (docParentList.contains(fullName)
+          || fullName.equals(currentDocFN));
   }
 
   String getMenuLink(String fullName, XWikiContext context
