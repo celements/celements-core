@@ -19,6 +19,7 @@
  */
 package com.celements.navigation;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -53,7 +54,7 @@ public class Navigation implements INavigation {
 
   public static final String MENU_TYPE_MENUITEM = "menuitem";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(Navigation.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(Navigation.class);
 
   private static final String _NAVIGATION_COUNTER_KEY =
     NavigationApi.class.getCanonicalName() + "_NavigationCounter";
@@ -103,7 +104,7 @@ public class Navigation implements INavigation {
     try {
       setLayoutType(LIST_LAYOUT_TYPE);
     } catch (UnknownLayoutTypeException exp) {
-      mLogger.fatal("Native List Layout Type not available!", exp);
+      LOGGER.fatal("Native List Layout Type not available!", exp);
       throw new IllegalStateException("Native List Layout Type not available!",
           exp);
     }
@@ -179,7 +180,7 @@ public class Navigation implements INavigation {
   }
 
   public String includeNavigation(XWikiContext context) {
-    mLogger.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
+    LOGGER.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
     if(navigationEnabled){
       //TODO add registry for dataType providers
       StringBuilder outStream = new StringBuilder();
@@ -195,7 +196,7 @@ public class Navigation implements INavigation {
                 + "] must be greater than zero");
           }
         } catch (XWikiException e) {
-          mLogger.error(e);
+          LOGGER.error(e);
         }
       } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
         navBuilder.useStream(outStream);
@@ -243,7 +244,7 @@ public class Navigation implements INavigation {
   void addNavigationForParent(StringBuilder outStream,
       String parent, int numMoreLevels, XWikiContext context
       ) throws XWikiException {
-    mLogger.trace("addNavigationForParent: parent [" + parent + "] numMoreLevels ["
+    LOGGER.trace("addNavigationForParent: parent [" + parent + "] numMoreLevels ["
         + numMoreLevels + "].");
     if (numMoreLevels > 0) {
       getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
@@ -452,7 +453,7 @@ public class Navigation implements INavigation {
           cssClass += " " + pageType.getPageType();
         }
       } catch (XWikiException exp) {
-        mLogger.error(exp);
+        LOGGER.error(exp);
       }
       if (isActiveMenuItem(fullName, context)) {
         cssClass += " active";
@@ -462,8 +463,13 @@ public class Navigation implements INavigation {
   }
 
   boolean isActiveMenuItem(String fullName, XWikiContext context) {
-      return (fullName != null) && utils.getDocumentParentsList(
-        context.getDoc().getFullName(), true, context).contains(
+      List<String> docParentList = utils.getDocumentParentsList(context.getDoc(
+          ).getFullName(), true, context);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("isActiveMenuItem: for [" + fullName + "] with parents ["
+            + Arrays.deepToString(docParentList.toArray(new String[0])) + "].");
+      }
+      return (fullName != null) && docParentList.contains(
             fullName);
   }
 
@@ -521,7 +527,7 @@ public class Navigation implements INavigation {
     try {
       prevMenuItem = WebUtils.getInstance().getPrevMenuItem(fullName, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     if (prevMenuItem != null) {
       return prevMenuItem.getName();
@@ -536,7 +542,7 @@ public class Navigation implements INavigation {
     try {
       nextMenuItem = WebUtils.getInstance().getNextMenuItem(fullName, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     if (nextMenuItem != null) {
       return nextMenuItem.getName();
@@ -566,14 +572,14 @@ public class Navigation implements INavigation {
               "menu_element_name", configName, false);
       loadConfigFromObject(prefObj);
     } catch(XWikiException e){
-      mLogger.error(e);
+      LOGGER.error(e);
     }
   }
 
   public void loadConfigFromObject(BaseObject prefObj) {
     if (prefObj != null) {
       configName = prefObj.getStringValue("menu_element_name");
-      mLogger.debug("loadConfigFromObject: configName [" + configName + "] from doc ["
+      LOGGER.debug("loadConfigFromObject: configName [" + configName + "] from doc ["
           + prefObj.getName() + "].");
       fromHierarchyLevel = prefObj.getIntValue("from_hierarchy_level", 0);
       toHierarchyLevel = prefObj.getIntValue("to_hierarchy_level", DEFAULT_MAX_LEVEL);
@@ -588,7 +594,7 @@ public class Navigation implements INavigation {
         try {
           setLayoutType(prefObj.getStringValue("layout_type"));
         } catch (UnknownLayoutTypeException exp) {
-          mLogger.error(exp);
+          LOGGER.error(exp);
         }
       }
       setCMcssClass(prefObj.getStringValue("cm_css_class"));
