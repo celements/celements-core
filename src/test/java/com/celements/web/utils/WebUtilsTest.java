@@ -41,6 +41,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -812,6 +813,217 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void isAttachmentLink_isWithDb() {
     assertTrue(celUtils.isAttachmentLink("db:Space.Page;attachment.jpg"));
+  }
+  
+  @Test
+  public void testGetAttachmentListSorted_getAll() throws ClassNotFoundException, 
+      XWikiException {
+    XWikiRightService rightsService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
+    expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
+        "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
+    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("a.jpg").once();
+    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("b.jpg").once();
+    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("c.jpg").once();
+    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("d.jpg").once();
+    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("e.jpg").once();
+    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("f.jpg").once();
+    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("g.jpg").once();
+    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("h.jpg").once();
+    replay(wiki, rightsService);
+    DocumentReference docref = new DocumentReference("a", "b", "c");
+    Document doc = new Document(new XWikiDocument(docref), context);
+    doc.addAttachment("c.jpg", new byte[]{});
+    doc.addAttachment("d.jpg", new byte[]{});
+    doc.addAttachment("h.jpg", new byte[]{});
+    doc.addAttachment("a.jpg", new byte[]{});
+    doc.addAttachment("e.jpg", new byte[]{});
+    doc.addAttachment("b.jpg", new byte[]{});
+    doc.addAttachment("g.jpg", new byte[]{});
+    doc.addAttachment("f.jpg", new byte[]{});
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+        "AttachmentAscendingNameComparator", 0, 0);
+    verify(wiki, rightsService);
+    assertEquals(8, result.size());
+    assertEquals("a.jpg", result.get(0).getFilename());
+    assertEquals("e.jpg", result.get(4).getFilename());
+    assertEquals("h.jpg", result.get(7).getFilename());
+  }
+  
+  @Test
+  public void testGetAttachmentListSorted_getFirstPart() throws XWikiException, 
+      ClassNotFoundException {
+    XWikiRightService rightsService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
+    expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
+        "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
+    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("a.jpg").once();
+    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("b.jpg").once();
+    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("c.jpg").once();
+    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("d.jpg").once();
+    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("e.jpg").once();
+    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("f.jpg").once();
+    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("g.jpg").once();
+    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("h.jpg").once();
+    replay(wiki, rightsService);
+    DocumentReference docref = new DocumentReference("a", "b", "c");
+    Document doc = new Document(new XWikiDocument(docref), context);
+    doc.addAttachment("c.jpg", new byte[]{});
+    doc.addAttachment("d.jpg", new byte[]{});
+    doc.addAttachment("h.jpg", new byte[]{});
+    doc.addAttachment("a.jpg", new byte[]{});
+    doc.addAttachment("e.jpg", new byte[]{});
+    doc.addAttachment("b.jpg", new byte[]{});
+    doc.addAttachment("g.jpg", new byte[]{});
+    doc.addAttachment("f.jpg", new byte[]{});
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+        "AttachmentAscendingNameComparator", -1, 3);
+    verify(wiki, rightsService);
+    assertEquals(3, result.size());
+    assertEquals("a.jpg", result.get(0).getFilename());
+    assertEquals("b.jpg", result.get(1).getFilename());
+    assertEquals("c.jpg", result.get(2).getFilename());
+  }
+  
+  @Test
+  public void testGetAttachmentListSorted_getMiddlePart() throws XWikiException,
+      ClassNotFoundException {
+    XWikiRightService rightsService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
+    expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
+        "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
+    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("a.jpg").once();
+    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("b.jpg").once();
+    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("c.jpg").once();
+    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("d.jpg").once();
+    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("e.jpg").once();
+    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("f.jpg").once();
+    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("g.jpg").once();
+    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("h.jpg").once();
+    replay(wiki, rightsService);
+    DocumentReference docref = new DocumentReference("a", "b", "c");
+    Document doc = new Document(new XWikiDocument(docref), context);
+    doc.addAttachment("c.jpg", new byte[]{});
+    doc.addAttachment("d.jpg", new byte[]{});
+    doc.addAttachment("h.jpg", new byte[]{});
+    doc.addAttachment("a.jpg", new byte[]{});
+    doc.addAttachment("e.jpg", new byte[]{});
+    doc.addAttachment("b.jpg", new byte[]{});
+    doc.addAttachment("g.jpg", new byte[]{});
+    doc.addAttachment("f.jpg", new byte[]{});
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+        "AttachmentAscendingNameComparator", 3, 3);
+    verify(wiki, rightsService);
+    assertEquals(3, result.size());
+    assertEquals("d.jpg", result.get(0).getFilename());
+    assertEquals("e.jpg", result.get(1).getFilename());
+    assertEquals("f.jpg", result.get(2).getFilename());
+  }
+  
+  @Test
+  public void testGetAttachmentListSorted_getLastPart() throws XWikiException,
+      ClassNotFoundException {
+    XWikiRightService rightsService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
+    expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
+        "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
+    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("a.jpg").once();
+    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("b.jpg").once();
+    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("c.jpg").once();
+    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("d.jpg").once();
+    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("e.jpg").once();
+    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("f.jpg").once();
+    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("g.jpg").once();
+    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("h.jpg").once();
+    replay(wiki, rightsService);
+    DocumentReference docref = new DocumentReference("a", "b", "c");
+    Document doc = new Document(new XWikiDocument(docref), context);
+    doc.addAttachment("c.jpg", new byte[]{});
+    doc.addAttachment("d.jpg", new byte[]{});
+    doc.addAttachment("h.jpg", new byte[]{});
+    doc.addAttachment("a.jpg", new byte[]{});
+    doc.addAttachment("e.jpg", new byte[]{});
+    doc.addAttachment("b.jpg", new byte[]{});
+    doc.addAttachment("g.jpg", new byte[]{});
+    doc.addAttachment("f.jpg", new byte[]{});
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+        "AttachmentAscendingNameComparator", 6, 3);
+    verify(wiki, rightsService);
+    assertEquals(2, result.size());
+    assertEquals("g.jpg", result.get(0).getFilename());
+    assertEquals("h.jpg", result.get(1).getFilename());
+  }
+  
+  @Test
+  public void testGetAttachmentListSorted_getEmpty() throws XWikiException,
+      ClassNotFoundException {
+    XWikiRightService rightsService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
+    expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
+        "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
+    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("a.jpg").once();
+    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("b.jpg").once();
+    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("c.jpg").once();
+    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("d.jpg").once();
+    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("e.jpg").once();
+    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("f.jpg").once();
+    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("g.jpg").once();
+    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("h.jpg").once();
+    replay(wiki, rightsService);
+    DocumentReference docref = new DocumentReference("a", "b", "c");
+    Document doc = new Document(new XWikiDocument(docref), context);
+    doc.addAttachment("c.jpg", new byte[]{});
+    doc.addAttachment("d.jpg", new byte[]{});
+    doc.addAttachment("h.jpg", new byte[]{});
+    doc.addAttachment("a.jpg", new byte[]{});
+    doc.addAttachment("e.jpg", new byte[]{});
+    doc.addAttachment("b.jpg", new byte[]{});
+    doc.addAttachment("g.jpg", new byte[]{});
+    doc.addAttachment("f.jpg", new byte[]{});
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+        "AttachmentAscendingNameComparator", 7, 0);
+    verify(wiki, rightsService);
+    assertEquals(0, result.size());
   }
 
   //*****************************************************************

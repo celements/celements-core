@@ -516,16 +516,19 @@ public class WebUtils implements IWebUtils {
     }
     return new InheritorFactory();
   }
+  
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
+      ) throws ClassNotFoundException {
+    return getAttachmentListSorted(doc, comparator, 0, 0);
+  }
 
   @SuppressWarnings("unchecked")
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException {
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      int start, int nb) throws ClassNotFoundException {
     List<Attachment> attachments = doc.getAttachmentList();
-    
-      try {
-        Comparator<Attachment> comparatorClass = 
-          (Comparator<Attachment>) Class.forName(
-              "com.celements.web.comparators." + comparator).newInstance();
+    try {
+      Comparator<Attachment> comparatorClass = (Comparator<Attachment>) Class.forName(
+          "com.celements.web.comparators." + comparator).newInstance();
       Collections.sort(attachments, comparatorClass);
     } catch (InstantiationException e) {
       LOGGER.error(e);
@@ -534,12 +537,23 @@ public class WebUtils implements IWebUtils {
     } catch (ClassNotFoundException e) {
       throw e;
     }
-    
-    return attachments;
+    List<Attachment> countedAtts = new ArrayList<Attachment>();
+    if((start <= 0) && ((nb <= 0) || (nb >= attachments.size()))) {
+      countedAtts = attachments;
+    } else if(start < attachments.size()) {
+      countedAtts = attachments.subList(Math.max(0, start), Math.min(Math.max(0, start) 
+          + Math.max(0, nb), attachments.size()));
+    }
+    return countedAtts;
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator, boolean imagesOnly) {
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly) {
+    return getAttachmentListSorted(doc, comparator, imagesOnly, 0, 0);
+  }
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb) {
     try {
       List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
       if (imagesOnly) {
@@ -556,12 +570,18 @@ public class WebUtils implements IWebUtils {
     return Collections.emptyList();
   }
 
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly) {
+    return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
+  }
+
   public String getAttachmentListSortedAsJSON(Document doc,
-      String comparator, boolean imagesOnly) {
+      String comparator, boolean imagesOnly, int start, int nb) {
     SimpleDateFormat dateFormater = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     Builder jsonBuilder = new Builder();
     jsonBuilder.openArray();
-    for (Attachment att : getAttachmentListSorted(doc, comparator, imagesOnly)) {
+    for (Attachment att : getAttachmentListSorted(doc, comparator, imagesOnly, start, nb)
+        ) {
       jsonBuilder.openDictionary();
       jsonBuilder.addStringProperty("filename", att.getFilename());
       jsonBuilder.addStringProperty("version", att.getVersion());

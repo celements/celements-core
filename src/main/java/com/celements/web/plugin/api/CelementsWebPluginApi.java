@@ -224,15 +224,25 @@ public class CelementsWebPluginApi extends Api {
     return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, context);
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException{
-      return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
+      ) throws ClassNotFoundException{
+    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
   }
 
-  public String getAttachmentListSortedAsJSON(Document doc,
-      String comparator, boolean imagesOnly) throws ClassNotFoundException{
-      return WebUtils.getInstance().getAttachmentListSortedAsJSON(doc,
-          comparator, imagesOnly);
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      int start, int nb) throws ClassNotFoundException{
+    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator, start, nb);
+  }
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly) throws ClassNotFoundException{
+    return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
+  }
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
+    return WebUtils.getInstance().getAttachmentListSortedAsJSON(doc, comparator, 
+        imagesOnly, start, nb);
   }
 
   public List<Attachment> getRandomImages(String fullName,
