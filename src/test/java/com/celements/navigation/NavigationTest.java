@@ -20,9 +20,6 @@
 package com.celements.navigation;
 
 import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -306,9 +303,20 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testIsActiveMenuItem_isNOTActive() {
+  public void testIsActiveMenuItem_isActive_currentDoc() {
     BaseObject menuItem = new BaseObject();
     menuItem.setName(currentDoc.getFullName());
+    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
+        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    replay(xwiki, navFilterMock, utils);
+    assertTrue(nav.isActiveMenuItem(menuItem.getName(), context));
+    verifyAll();
+  }
+
+  @Test
+  public void testIsActiveMenuItem_isNOTActive() {
+    BaseObject menuItem = new BaseObject();
+    menuItem.setName("MySpace.isNotActiveDoc");
     expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
@@ -340,7 +348,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setName("MySpace.isNotActiveDoc");
     expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     replay(xwiki, navFilterMock, utils);
@@ -351,7 +359,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive_ShowAll() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setName("MySpace.isNotActiveDoc");
     expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     nav.setShowAll(true);
@@ -363,7 +371,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive_showHierarchyLevel() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setName("MySpace.isNotActiveDoc");
     expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     nav.setShowAll(false);
@@ -376,7 +384,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive_showHierarchyLevel_Over() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setName("MySpace.isNotActiveDoc");
     expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
         same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
     nav.setShowAll(false);
@@ -433,7 +441,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         context);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
-        + " myUltimativePageType\" id=\"N1:MySpace.MyCurrentDoc\""
+        + " myUltimativePageType active\" id=\"N1:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
     verifyAll(pageTypeApi, menuNameCmdMock);
   }
@@ -475,7 +483,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " style=\"background-image:url(abc);\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
-        + " myUltimativePageType\" id=\"N1:MySpace.MyCurrentDoc\""
+        + " myUltimativePageType active\" id=\"N1:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
     verifyAll(pageTypeApi, menuNameCmdMock);
   }
@@ -511,7 +519,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), true,
         context);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
-        + " currentPage myUltimativePageType\" id=\"N1:MySpace.MyCurrentDoc\""
+        + " currentPage myUltimativePageType active\" id=\"N1:MySpace.MyCurrentDoc\""
         + ">My Current Doc</span>", outStream.toString());
     verifyAll(pageTypeApi, menuNameCmdMock);
   }

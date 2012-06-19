@@ -222,6 +222,22 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockRightsService);
   }
 
+  @Test
+  public void testResolveDocumentReference_mainWiki() {
+    replayAll();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "xwiki:XWiki.test");
+    assertEquals("xwiki", testDocRef.getWikiReference().getName());
+    verifyAll();
+  }
+
+  @Test
+  public void testResolveDocumentReference_localWiki() {
+    replayAll();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference("XWiki.test");
+    assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
+    verifyAll();
+  }
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);
