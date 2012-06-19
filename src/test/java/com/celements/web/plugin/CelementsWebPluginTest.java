@@ -166,7 +166,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams ), same(context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
     assertNull(plugin.checkAuthByToken(userToken, context));
   }

@@ -22,6 +22,7 @@ package com.celements.web.token;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -79,9 +80,31 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams ), same(context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
     assertNull(tokenAuthImpl.checkAuthByToken("abcd", userToken, context));
+  }
+  
+  @Test
+  public void testCheckAuthByToken_admin() throws XWikiException {
+    String userToken = "123456789012345678901234";
+    List<String> userDocs = new Vector<String>();
+    String loginName = "theUserLoginName";
+    String username = "xwiki:XWiki." + loginName;
+    userDocs.add(username);
+    Capture<String> captHQL = new Capture<String>();
+    Capture<List<?>> captParams = new Capture<List<?>>();
+    List<String> emptyList = Collections.emptyList();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
+        capture(captParams ), same(context))).andReturn(emptyList).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
+        capture(captParams ), same(context))).andReturn(userDocs).once();
+    replay(xwiki, store);
+    assertEquals(username, tokenAuthImpl.checkAuthByToken(loginName, userToken, context
+        ).getUser());
+    assertEquals(username, context.getXWikiUser().getUser());
+    assertEquals(username, context.getUser());
+    verify(xwiki, store);
   }
   
   @Test

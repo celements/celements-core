@@ -216,7 +216,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
       mLogger.info("searching token and found " + users.size() + " with parameters " + 
           Arrays.deepToString(parameterList.toArray()));
-      
+      if(users == null || users.size() == 0) {
+        String db = context.getDatabase();
+        context.setDatabase("xwiki");
+        users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
+        context.setDatabase(db);
+      }
       int usersFound = 0;
       for (String tmpUserDoc : users) {
         if(!tmpUserDoc.trim().equals("")) {

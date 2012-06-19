@@ -69,7 +69,8 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
     if ((loginname != null) && !"".equals(loginname)) {
       String usernameByToken = getUsernameForToken(userToken, context);
       if((usernameByToken != null) && !usernameByToken.equals("")
-          && usernameByToken.equals("XWiki." + loginname)){
+          && (usernameByToken.equals("XWiki." + loginname) 
+          || usernameByToken.equals("xwiki:XWiki." + loginname))){
         mLogger.info("checkAuthByToken: user " + usernameByToken
             + " identified by userToken.");
         context.setUser(usernameByToken);
@@ -104,7 +105,12 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
       mLogger.info("searching token and found " + users.size() + " with parameters " + 
           Arrays.deepToString(parameterList.toArray()));
-      
+      if(users == null || users.size() == 0) {
+        String db = context.getDatabase();
+        context.setDatabase("xwiki");
+        users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
+        context.setDatabase(db);
+      }
       int usersFound = 0;
       for (String tmpUserDoc : users) {
         if(!tmpUserDoc.trim().equals("")) {
