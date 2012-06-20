@@ -1,4 +1,4 @@
-package com.celements.collections.services;
+package com.celements.collections.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.collections.ICollectionsService;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -18,7 +19,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class CollectionsScriptService implements ScriptService {
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  ICollectionsService collectionsService;
   
   @Requirement
   Execution execution;
@@ -44,7 +45,7 @@ public class CollectionsScriptService implements ScriptService {
   public List<com.xpn.xwiki.api.Object> getObjectsOrdered(Document doc, 
       DocumentReference classRef, String orderField1, boolean asc1, String orderField2, 
       boolean asc2) {
-    List<BaseObject> bObjs = webUtilsService.getObjectsOrdered(doc.getDocument(), 
+    List<BaseObject> bObjs = collectionsService.getObjectsOrdered(doc.getDocument(), 
         classRef, orderField1, asc1, orderField2, asc2);
     List<com.xpn.xwiki.api.Object> objs = new ArrayList<com.xpn.xwiki.api.Object>();
     for (BaseObject bObj : bObjs) {

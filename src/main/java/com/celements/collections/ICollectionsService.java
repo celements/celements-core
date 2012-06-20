@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.service;
+package com.celements.collections;
 
 import java.util.List;
 
@@ -26,24 +26,12 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
-public interface IWebUtilsService {
-
-  public XWikiMessageTool getMessageTool(String adminLanguage);
-
-  public XWikiMessageTool getAdminMessageTool();
-
-  public String getAdminLanguage();
-
-  public String getAdminLanguage(String userFullName);
-
-  public String getDefaultLanguage();
-
-  public DocumentReference resolveDocumentReference(String fullName);
-
-  public boolean isAdminUser();
-
-  public boolean isAdvancedAdmin();
+public interface ICollectionsService {
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField, boolean asc);
+  
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField1, boolean asc1, String orderField2, boolean asc2);
 }
