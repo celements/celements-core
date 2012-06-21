@@ -37,7 +37,7 @@
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-captcha</artifactId>
+      <artifactId>xwiki-platform-captcha</artifactId>
       <version>4.1.1</version>
       <scope>provided</scope>
     </dependency>
