@@ -229,11 +229,6 @@ public class CelementsWebPluginApi extends Api {
     return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
-      int start, int nb) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator, start, nb);
-  }
-
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly) throws ClassNotFoundException{
     return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);

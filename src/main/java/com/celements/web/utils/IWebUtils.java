@@ -203,9 +203,6 @@ public interface IWebUtils {
 
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException;
-  
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
-      int start, int nb) throws ClassNotFoundException;
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
