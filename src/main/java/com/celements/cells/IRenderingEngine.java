@@ -20,12 +20,11 @@
 package com.celements.cells;
 
 import com.celements.navigation.TreeNode;
-import com.xpn.xwiki.XWikiContext;
 
 public interface IRenderingEngine {
 
-  public void renderCell(TreeNode node, XWikiContext context);
+  public void renderCell(TreeNode node);
 
-  public void renderPageLayout(String parent, XWikiContext context);
+  public void renderPageLayout(String parent);
 
 }

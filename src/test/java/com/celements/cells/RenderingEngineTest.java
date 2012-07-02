@@ -31,23 +31,23 @@ import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.TreeNode;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
+import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
 
   private RenderingEngine renderingEngine;
   private XWikiContext context;
   private IRenderStrategy renderStrategyMock;
-  private IWebUtils webUtilsMock;
+  private ITreeNodeService mockTreeNodeService;
 
   @Before
   public void setUp_RenderingEngineTest() throws Exception {
     renderStrategyMock = createMock(IRenderStrategy.class);
-    webUtilsMock = createMock(IWebUtils.class);
+    mockTreeNodeService = createMock(ITreeNodeService.class);
     renderingEngine = new RenderingEngine().setRenderStrategy(renderStrategyMock);
-    renderingEngine.inject_WebUtils(webUtilsMock);
+    renderingEngine.treeNodeService = mockTreeNodeService;
     context = getContext();
   }
 
@@ -61,7 +61,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderCell(same(node))).andReturn(false).once();
 
     replay(renderStrategyMock);
-    renderingEngine.renderCell(node, context);
+    renderingEngine.renderCell(node);
     verify(renderStrategyMock);
   }
 
@@ -85,7 +85,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
         ).once();
 
     replay(renderStrategyMock);
-    renderingEngine.renderCell(node, context);
+    renderingEngine.renderCell(node);
     verify(renderStrategyMock);
   }
 
@@ -101,7 +101,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(""))).andReturn(false).once();
 
     replay(renderStrategyMock);
-    renderingEngine.renderPageLayout(spaceName, context);
+    renderingEngine.renderPageLayout(spaceName);
     verify(renderStrategyMock);
   }
 
@@ -121,14 +121,14 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.getMenuSpace(eq(""))).andReturn(menuSpace);
     expect(renderStrategyMock.getMenuPart(eq(""))).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
-    expect(webUtilsMock.getSubNodesForParent(eq(""), eq(menuSpace), eq(menuPart),
-        same(context))).andReturn(subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(""), eq(menuSpace), eq(menuPart))
+        ).andReturn(subCellList);
     renderStrategyMock.renderEmptyChildren(eq(""));
     expectLastCall().once();
 
-    replay(renderStrategyMock, webUtilsMock);
-    renderingEngine.renderPageLayout(pageLayName, context);
-    verify(renderStrategyMock, webUtilsMock);
+    replay(renderStrategyMock, mockTreeNodeService);
+    renderingEngine.renderPageLayout(pageLayName);
+    verify(renderStrategyMock, mockTreeNodeService);
   }
 
   @Test
@@ -137,7 +137,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderCell(same(menuItem))).andReturn(false).once();
 
     replay(renderStrategyMock);
-    renderingEngine.internal_renderCell(menuItem, true, false, context);
+    renderingEngine.internal_renderCell(menuItem, true, false);
     verify(renderStrategyMock);
   }
 
@@ -155,7 +155,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(fullName))).andReturn(false).once();
 
     replay(renderStrategyMock);
-    renderingEngine.internal_renderCell(menuItem, isFirstItem, isLastItem, context);
+    renderingEngine.internal_renderCell(menuItem, isFirstItem, isLastItem);
     verify(renderStrategyMock);
   }
 
@@ -165,7 +165,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(fullName))).andReturn(false).once();
 
     replay(renderStrategyMock);
-    renderingEngine.internal_renderSubCells(fullName, context);
+    renderingEngine.internal_renderSubCells(fullName);
     verify(renderStrategyMock);
   }
 
@@ -178,14 +178,14 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.getMenuSpace(eq(fullName))).andReturn(menuSpace);
     expect(renderStrategyMock.getMenuPart(eq(fullName))).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
-    expect(webUtilsMock.getSubNodesForParent(eq(fullName), eq(menuSpace), eq(menuPart),
-        same(context))).andReturn(subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(fullName), eq(menuSpace),
+        eq(menuPart))).andReturn(subCellList);
     renderStrategyMock.renderEmptyChildren(eq(fullName));
     expectLastCall().once();
 
-    replay(renderStrategyMock, webUtilsMock);
-    renderingEngine.internal_renderSubCells(fullName, context);
-    verify(renderStrategyMock, webUtilsMock);
+    replay(renderStrategyMock, mockTreeNodeService);
+    renderingEngine.internal_renderSubCells(fullName);
+    verify(renderStrategyMock, mockTreeNodeService);
   }
 
   @Test
@@ -209,8 +209,8 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     TreeNode subCell4 = new TreeNode(menuSpace + ".subCell4", "", 4,
         context.getDatabase());
     subCellList.add(subCell4);
-    expect(webUtilsMock.getSubNodesForParent(eq(fullName), eq(menuSpace), eq(menuPart),
-        same(context))).andReturn(subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(fullName), eq(menuSpace),
+        eq(menuPart))).andReturn(subCellList);
     renderStrategyMock.startRenderChildren(eq(fullName));
     expectLastCall().once();
     renderStrategyMock.endRenderChildren(eq(fullName));
@@ -242,21 +242,23 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(subCell4.getFullName()))).andReturn(
         false);
 
-    replay(renderStrategyMock, webUtilsMock);
-    renderingEngine.internal_renderSubCells(fullName, context);
-    verify(renderStrategyMock, webUtilsMock);
+    replay(renderStrategyMock, mockTreeNodeService);
+    renderingEngine.internal_renderSubCells(fullName);
+    verify(renderStrategyMock, mockTreeNodeService);
   }
 
   @Test
-  public void testGetWebUtils() {
-    renderingEngine.inject_WebUtils(webUtilsMock);
-    assertSame(webUtilsMock, renderingEngine.getWebUtils());
+  public void testGetTreeNodeService_inject() {
+    assertSame(mockTreeNodeService, renderingEngine.getTreeNodeService());
   }
 
   @Test
-  public void testGetWebUtils_defaultInstancing() {
-    renderingEngine.inject_WebUtils(null);
-    assertSame(WebUtils.getInstance(), renderingEngine.getWebUtils());
+  public void testGetTreeNodeService_defaultInstancing() {
+    renderingEngine.treeNodeService = null;
+    ITreeNodeService treeNodeService = renderingEngine.getTreeNodeService();
+    assertNotNull(treeNodeService);
+    assertSame(Utils.getComponent(ITreeNodeService.class), treeNodeService);
+    assertNotSame(mockTreeNodeService, treeNodeService);
   }
 
 }

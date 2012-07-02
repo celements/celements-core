@@ -180,7 +180,7 @@ public class PageLayoutCommand {
     IRenderStrategy cellRenderer = new CellRenderer(context).setOutputWriter(
         new DivWriter());
    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
-    renderEngine.renderPageLayout(spaceName, context);
+    renderEngine.renderPageLayout(spaceName);
    return cellRenderer.getAsString();
   }
  
