@@ -33,6 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.comparators.BaseObjectComparator;
@@ -118,6 +119,18 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.debug("getDocRefFromFullName: for [" + fullName + "] got reference ["
         + eventRef + "].");
     return eventRef;
+  }
+
+  public SpaceReference resolveSpaceReference(String spaceName) {
+    String wikiName;
+    if (spaceName.contains(":")) {
+      wikiName = spaceName.split(":")[0];
+      spaceName = spaceName.split(":")[1];
+    } else {
+      wikiName = getContext().getDatabase();
+    }
+    SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
+    return spaceRef;
   }
 
   public String getDefaultLanguage() {

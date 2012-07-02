@@ -21,8 +21,11 @@ package com.celements.cells;
 
 import java.util.List;
 
+import org.xwiki.model.reference.SpaceReference;
+
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.web.Utils;
 
 public class RenderingEngine implements IRenderingEngine {
@@ -30,6 +33,7 @@ public class RenderingEngine implements IRenderingEngine {
   private IRenderStrategy renderStrategy;
 
   ITreeNodeService treeNodeService;
+  IWebUtilsService webUtilsService;
 
   public RenderingEngine() {
   }
@@ -49,9 +53,19 @@ public class RenderingEngine implements IRenderingEngine {
   /* (non-Javadoc)
    * @see com.celements.web.cells.IRenderingEngine#renderSubCells(java.lang.String)
    */
+  @Deprecated
   public void renderPageLayout(String spaceName) {
+    SpaceReference spaceRef = getWebUtilsService().resolveSpaceReference(spaceName);
+    renderPageLayout(spaceRef);
+  }
+
+  /* (non-Javadoc)
+   * @see com.celements.web.cells.IRenderingEngine#renderSubCells(
+   *      org.xwiki.model.reference.SpaceReference)
+   */
+  public void renderPageLayout(SpaceReference spaceRef) {
     renderStrategy.startRendering();
-    renderStrategy.setSpaceName(spaceName);
+    renderStrategy.setSpaceReference(spaceRef);
     internal_renderSubCells("");
     renderStrategy.endRendering();
   }
@@ -94,6 +108,13 @@ public class RenderingEngine implements IRenderingEngine {
       return treeNodeService;
     }
     return Utils.getComponent(ITreeNodeService.class);
+  }
+
+  IWebUtilsService getWebUtilsService() {
+    if (webUtilsService != null) {
+      return webUtilsService;
+    }
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

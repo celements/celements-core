@@ -19,12 +19,23 @@
  */
 package com.celements.cells;
 
+import org.xwiki.model.reference.SpaceReference;
+
 import com.celements.navigation.TreeNode;
 
 public interface IRenderingEngine {
 
   public void renderCell(TreeNode node);
 
-  public void renderPageLayout(String parent);
+  /**
+   * 
+   * @param spaceName
+   * 
+   * @deprecated use renderPageLayout(SpaceReference) instead.
+   */
+  @Deprecated
+  public void renderPageLayout(String spaceName);
+
+  public void renderPageLayout(SpaceReference spaceRef);
 
 }

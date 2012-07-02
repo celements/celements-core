@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,6 +43,8 @@ public interface IWebUtilsService {
   public String getDefaultLanguage();
 
   public DocumentReference resolveDocumentReference(String fullName);
+
+  public SpaceReference resolveSpaceReference(String spaceName);
 
   public boolean isAdminUser();
 

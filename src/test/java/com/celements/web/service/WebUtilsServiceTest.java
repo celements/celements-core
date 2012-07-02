@@ -12,6 +12,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -238,6 +241,31 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
     verifyAll();
   }
+
+  @Test
+  public void testResolveSpaceReference_mainWiki() {
+    replayAll();
+    SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference(
+        "myMasterCellWiki:XWiki");
+    EntityReference parent = testSpaceRef.getParent();
+    assertEquals(WikiReference.class, parent.getClass());
+    assertEquals("myMasterCellWiki", parent.getName());
+    assertEquals("XWiki", testSpaceRef.getName());
+    verifyAll();
+  }
+
+  @Test
+  public void testResolveSpaceReference_localWiki() {
+    replayAll();
+    context.setDatabase("myFirstWiki");
+    SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference("mySpace");
+    EntityReference parent = testSpaceRef.getParent();
+    assertEquals(WikiReference.class, parent.getClass());
+    assertEquals(context.getDatabase(), parent.getName());
+    assertEquals("mySpace", testSpaceRef.getName());
+    verifyAll();
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);
