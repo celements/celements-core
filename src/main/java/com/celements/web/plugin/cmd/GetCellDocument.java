@@ -38,8 +38,8 @@ public class GetCellDocument {
 
   public XWikiDocument getCellDoc(String className, String field, String value, 
       XWikiContext context) {
-    PageLayoutCommand layoutCommand= getPageLayoutCommand();
-    return getCellDoc(layoutCommand.getLayoutPropDoc(context).getSpace(), className, 
+    PageLayoutCommand layoutCommand = getPageLayoutCommand();
+    return getCellDoc(layoutCommand.getLayoutPropDoc().getSpace(), className, 
         field, value, context);
   }
   

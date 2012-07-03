@@ -108,7 +108,8 @@ public class CssCommand {
 
   public List<CSS> includeCSSPage(String css, XWikiContext context) {
     List<BaseObject> skins = null;
-    if (!new PageLayoutCommand().layoutExists(context.getDoc().getSpace(), context)) {
+    if (!new PageLayoutCommand().layoutExists(context.getDoc().getDocumentReference(
+        ).getLastSpaceReference())) {
       XWikiDocument doc = context.getDoc();
       skins = doc.getObjects("Skins.UserCSS");
       mLogger.debug("CSS Page: " + doc.getFullName() + " has attached "
@@ -189,7 +190,7 @@ public class CssCommand {
 
   public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context){
     XWikiDocument pageLayoutDoc = null;
-    pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc(context);
+    pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
     

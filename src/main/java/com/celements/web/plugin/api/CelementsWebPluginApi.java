@@ -73,6 +73,7 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
@@ -819,11 +820,13 @@ public class CelementsWebPluginApi extends Api {
  }
 
   public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayout(spaceName, context);
+    return getPageLayoutCmd().renderPageLayout(getWebUtilsService().resolveSpaceReference(
+        spaceName));
   }
 
   public String getPageLayoutForDoc(String fullName) {
-    return getPageLayoutCmd().getPageLayoutForDoc(fullName, context);
+    return getPageLayoutCmd().getPageLayoutForDoc(getWebUtilsService(
+        ).resolveDocumentReference(fullName)).getName();
    }
   
   public String renderPageLayout() {
@@ -960,7 +963,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
-    return new PageLayoutApi(layoutSpaceName, context);
+    return new PageLayoutApi(layoutSpaceRef, context);
   }
 
   public String navReorderSave(String fullName, String structureJSON) {
@@ -972,7 +975,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean layoutEditorAvailable() {
-    return getPageLayoutCmd().layoutEditorAvailable(context);
+    return getPageLayoutCmd().layoutEditorAvailable();
   }
 
   public List<String> getAllPageTypes() {
@@ -1380,6 +1383,10 @@ public class CelementsWebPluginApi extends Api {
   private ContextMenuScriptService getCMService() {
     return (ContextMenuScriptService) Utils.getComponent(ScriptService.class,
         "contextMenu");
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }
