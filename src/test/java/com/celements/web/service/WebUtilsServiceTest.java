@@ -362,7 +362,30 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(1, list.get(3).getIntValue("l"));
     assertEquals(1, list.get(4).getIntValue("i"));
   }
+
+  @Test
+  public void testSplitStringByLength_noEmptyTrailingFields() {
+    String testString = ("Market Leader. Business Grammar and"
+        + " Usage, Band 1").substring(0, 35);
+    String[] splitedStr = webUtilsService.splitStringByLength(testString, 35);
+    assertEquals("Market Leader. Business Grammar and", splitedStr[0]);
+    assertTrue("Expecting one Element but found [" + splitedStr.length
+        + "].", splitedStr.length == 1);
+  }
   
+  @Test
+  public void testSplitStringByLength() {
+    String[] splitedStr = webUtilsService.splitStringByLength(
+        "Market Leader. Business Grammar and Usage, Band 1", 35);
+    assertEquals("Market Leader. Business Grammar and", splitedStr[0]);
+    assertEquals(" Usage, Band 1", splitedStr[1]);
+  }
+
+
+  //*****************************************************************
+  //*                  H E L P E R  - M E T H O D S                 *
+  //*****************************************************************/
+
   private DocumentReference getBOClassRef() {
     return new DocumentReference(context.getDatabase(), "Classes", "TestClass");
   }

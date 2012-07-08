@@ -55,4 +55,7 @@ public interface IWebUtilsService {
   
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2);
+
+  public String[] splitStringByLength(String inStr, int maxLength);
+
 }

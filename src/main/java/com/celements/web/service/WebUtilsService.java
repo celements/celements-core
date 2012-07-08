@@ -211,4 +211,18 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return resultList;
   }
+
+  public String[] splitStringByLength(String inStr, int maxLength) {
+    int numFullStr = (inStr.length() - 1) / maxLength;
+    String[] splitedStr = new String[1 + numFullStr];
+    for(int i = 0 ; i < numFullStr ; i ++) {
+      int startIndex = i * maxLength;
+      splitedStr[i] = inStr.substring(startIndex, startIndex + maxLength);
+    }
+    int lastPiece = splitedStr.length - 1;
+    splitedStr[lastPiece] = inStr.substring(lastPiece * maxLength,
+        inStr.length());
+    return splitedStr;
+  }
+  
 }
