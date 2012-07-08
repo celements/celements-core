@@ -1098,6 +1098,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals("f.jpg", result.get(2).getFilename());
   }
 
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
