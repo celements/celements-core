@@ -207,12 +207,27 @@ public class PageLayoutCommand {
     return getPageLayoutForDoc(getContext().getDoc().getDocumentReference());
   }
   
+  /**
+   * @deprecated instead use getPageLayoutForDoc(DocumentReference)
+   */
+  @Deprecated
+  public String getPageLayoutForDoc(String fullName, XWikiContext context) {
+    DocumentReference docRef = getWebUtilsService().resolveDocumentReference(fullName);
+    SpaceReference spaceRef = getPageLayoutForDoc(docRef);
+    String layoutWikiName = spaceRef.getParent().getName();
+    if (context.getDatabase().equals(layoutWikiName)) {
+      return spaceRef.getName();
+    } else {
+      return layoutWikiName + ":" + spaceRef.getName();
+    }
+  }
+
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
     if (layoutExists(documentReference.getLastSpaceReference())) {
       return getCelLayoutEditorSpaceRef();
     } else {
-      String spaceName = getInheritorFactory().getPageLayoutInheritor(getFullNameForDocRef(
-          documentReference), getContext()
+      String spaceName = getInheritorFactory().getPageLayoutInheritor(
+          getFullNameForDocRef(documentReference), getContext()
         ).getStringValue("page_layout", null);
       if (spaceName != null) {
         return getWebUtilsService().resolveSpaceReference(spaceName);

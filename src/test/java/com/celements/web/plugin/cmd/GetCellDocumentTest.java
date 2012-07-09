@@ -67,7 +67,7 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
     expect(store.searchDocuments((String)anyObject(), eq(paramList),same(context)))
         .andReturn(docList).once();
     XWikiDocument lDoc = new XWikiDocument("Space", "Name");
-    expect(plc.getLayoutPropDoc(same(context))).andReturn(lDoc).once();
+    expect(plc.getLayoutPropDoc()).andReturn(lDoc).once();
     replay(plc, store, xwiki);
     cmd.injectPageLayoutCommand(plc);
     XWikiDocument result = cmd.getCellDoc("Class.Name", "field", "value", 

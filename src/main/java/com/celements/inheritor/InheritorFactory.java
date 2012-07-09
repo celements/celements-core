@@ -76,8 +76,7 @@ public class InheritorFactory {
     List<String> inheritanceList = new ArrayList<String>();
     inheritanceList.add(fullName.split("\\.")[0] + ".WebPreferences");
     inheritanceList.add("XWiki.XWikiPreferences");
-    String pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(fullName,
-        context);
+    String pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(fullName, context);
     if (pageLayoutForDoc != null) {
       inheritanceList.add(pageLayoutForDoc + ".WebHome");
     }

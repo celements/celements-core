@@ -830,7 +830,7 @@ public class CelementsWebPluginApi extends Api {
    }
   
   public String renderPageLayout() {
-    return getPageLayoutCmd().renderPageLayout(context);
+    return getPageLayoutCmd().renderPageLayout();
   }
   
   public boolean addTranslation(String fullName, String language) {
@@ -924,11 +924,11 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public Map<String,String> getActivePageLayouts() {
-    return getPageLayoutCmd().getActivePageLyouts(context);
+    return getPageLayoutCmd().getActivePageLyouts();
   }
 
   public Map<String,String> getAllPageLayouts() {
-    return getPageLayoutCmd().getAllPageLayouts(context);
+    return getPageLayoutCmd().getAllPageLayouts();
   }
   
   @SuppressWarnings("unchecked")
@@ -959,11 +959,13 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public String createNewLayout(String layoutSpaceName) {
-    return getPageLayoutCmd().createNew(layoutSpaceName, context);
+    return getPageLayoutCmd().createNew(getWebUtilsService().resolveSpaceReference(
+        layoutSpaceName));
   }
 
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
-    return new PageLayoutApi(layoutSpaceRef, context);
+    return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
+        context);
   }
 
   public String navReorderSave(String fullName, String structureJSON) {
@@ -971,7 +973,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean layoutExists(String layoutSpaceName) {
-    return getPageLayoutCmd().layoutExists(layoutSpaceName, context);
+    return getPageLayoutCmd().layoutExists(getWebUtilsService().resolveSpaceReference(
+        layoutSpaceName));
   }
 
   public boolean layoutEditorAvailable() {

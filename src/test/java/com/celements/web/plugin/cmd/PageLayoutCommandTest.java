@@ -97,7 +97,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     Map<String, String> expectedPLmap = new HashMap<String, String>();
     expectedPLmap.put("layout1Space","Layout 1 pretty name");
     expectedPLmap.put("layout2Space","Layout 2 pretty name");
-    assertEquals(expectedPLmap , plCmd.getAllPageLayouts(context));
+    assertEquals(expectedPLmap , plCmd.getAllPageLayouts());
     assertFalse("hql must not contain isActiv constrains.", capturedHQL.getValue(
         ).contains("pl.isActive"));
     verify(xwiki);
@@ -114,7 +114,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     Map<String, String> expectedPLmap = new HashMap<String, String>();
     expectedPLmap.put("layout1Space","Layout 1 pretty name");
     expectedPLmap.put("layout2Space","Layout 2 pretty name");
-    assertEquals(expectedPLmap , plCmd.getActivePageLyouts(context));
+    assertEquals(expectedPLmap , plCmd.getActivePageLyouts());
     assertTrue("hql must contain isActiv constrains.", capturedHQL.getValue(
       ).contains("pl.isActive"));
     verify(xwiki);
