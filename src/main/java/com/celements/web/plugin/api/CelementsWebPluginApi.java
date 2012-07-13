@@ -447,9 +447,10 @@ public class CelementsWebPluginApi extends Api {
   
   public Map<String, String> activateAccount(String activationCode) throws XWikiException{
     Map<String, String> result = new HashMap<String, String>();
-    if(hasProgrammingRights()){
-      result = plugin.activateAccount(activationCode, context);
-    }
+    //TODO Why do we need Programming rights here? and do we realy need them?
+//    if(hasProgrammingRights()){
+    result = plugin.activateAccount(activationCode, context);
+//    }
     return result;
   }
   
