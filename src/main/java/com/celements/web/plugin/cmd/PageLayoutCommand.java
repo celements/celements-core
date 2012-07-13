@@ -208,7 +208,7 @@ public class PageLayoutCommand {
   }
   
   /**
-   * @deprecated instead use getPageLayoutForDoc(DocumentReference)
+   * @deprecated since 2.14.0 instead use getPageLayoutForDoc(DocumentReference)
    */
   @Deprecated
   public String getPageLayoutForDoc(String fullName, XWikiContext context) {

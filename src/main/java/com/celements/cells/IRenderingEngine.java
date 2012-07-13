@@ -31,7 +31,7 @@ public interface IRenderingEngine {
    * 
    * @param spaceName
    * 
-   * @deprecated use renderPageLayout(SpaceReference) instead.
+   * @deprecated since 2.14.0 use renderPageLayout(SpaceReference) instead.
    */
   @Deprecated
   public void renderPageLayout(String spaceName);

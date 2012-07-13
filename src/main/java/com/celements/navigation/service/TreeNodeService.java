@@ -177,7 +177,7 @@ public class TreeNodeService implements ITreeNodeService {
    * @param context
    * @return Collection keeps ordering of menuItems according to posId
    * 
-   * @deprecated use new fetchNodesForParentKey instead
+   * @deprecated since 2.14.0  use new fetchNodesForParentKey instead
    */
   @Deprecated
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
@@ -203,7 +203,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated since 2.14.0  use getSubNodesForParent instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,

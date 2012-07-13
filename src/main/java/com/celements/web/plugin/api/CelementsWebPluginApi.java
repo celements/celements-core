@@ -339,7 +339,7 @@ public class CelementsWebPluginApi extends Api {
     if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
       mLogger.debug("sendNewValidation for user [" + user + "].");
       new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
-          possibleFields, context);
+          possibleFields);
     }
   }
   
@@ -430,7 +430,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
-    return emptyCheckCmd.isEmptyRTEDocument(documentRef, context);
+    return emptyCheckCmd.isEmptyRTEDocument(documentRef);
   }
   
   public String getEmailAdressForCurrentUser() {
@@ -594,12 +594,12 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public String recoverPassword() throws XWikiException {
-    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(context);
+    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
   }
   
   public String recoverPassword(String account) throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account,
-        account, context);
+        account);
   }
   
   public Date parseDate(String date, String format) {
@@ -733,7 +733,8 @@ public class CelementsWebPluginApi extends Api {
    * @param fieldName
    * @param userToken
    * @return
-   * @deprecated because upload failes if xwiki guest does not have view rights on document
+   * @deprecated since 2.14.0  because upload failes if xwiki guest does not have
+   *             view rights on document
    */
   @Deprecated
   public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken) {
@@ -1161,7 +1162,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated use syncustom script service direcly instead
+   * @deprecated since 2.14.0 use syncustom script service direcly instead
    */
   @Deprecated
   public boolean congressRegistrationPlausibility() {
@@ -1169,7 +1170,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated use syncustom script service direcly instead
+   * @deprecated since 2.14.0 use syncustom script service direcly instead
    */
   @Deprecated
   public boolean congressRegistrationPlausibility(Document document) {
@@ -1307,7 +1308,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return emptyCheckCmd.getNextNonEmptyChildren(documentRef, context);
+    return emptyCheckCmd.getNextNonEmptyChildren(documentRef);
   }
 
   public boolean useImageAnimations() {

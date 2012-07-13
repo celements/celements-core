@@ -35,7 +35,7 @@ public interface IRenderStrategy {
    * @param fullName
    * @return
    * 
-   * @deprecated use getSpaceReference instead
+   * @deprecated since 2.14.0  use getSpaceReference instead
    */
   @Deprecated
   public String getMenuSpace(String fullName);
@@ -61,7 +61,7 @@ public interface IRenderStrategy {
   /**
    * @param spaceName
    * 
-   * @deprecated use setSpaceReference instead
+   * @deprecated since 2.14.0  use setSpaceReference instead
    */
   @Deprecated
   public void setSpaceName(String spaceName);
