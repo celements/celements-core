@@ -20,6 +20,8 @@
 package com.celements.web.plugin.cmd;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class PasswordRecoveryAndEmailValidationCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       PasswordRecoveryAndEmailValidationCommand.class);
   private CelSendMail injectedCelSendMail;
 
@@ -50,7 +52,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
             "email", context);
         return recoverPassword(account, email, context);
       } catch (XWikiException e) {
-        mLogger.error("Exception getting userdoc for email '" + email + "'", e);
+        LOGGER.error("Exception getting userdoc for email '" + email + "'", e);
       }
     }
     List<String> params = new ArrayList<String>();
@@ -73,7 +75,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
         try {
           userDoc = context.getWiki().getDocument(account, context);
         } catch (XWikiException e) {
-          mLogger.error("Exception getting document '" + account + "'", e);
+          LOGGER.error("Exception getting document '" + account + "'", e);
         }
         userObj = userDoc.getObject("XWiki.XWikiUsers");
       }
@@ -82,7 +84,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
         try {
           sendResult = setForcePwdAndSendMail(account, userObj, userDoc, context);
         } catch (XWikiException e) {
-          mLogger.error("Exception setting ForcePwd or sending mail for user '" + account 
+          LOGGER.error("Exception setting ForcePwd or sending mail for user '" + account 
               + "'", e);
         }
         if(sendResult != null) {
@@ -90,7 +92,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
         }
       }
     }
-    mLogger.debug("recover result msg: '" + resultMsgKey + "' param: '" + params.get(0) + 
+    LOGGER.debug("recover result msg: '" + resultMsgKey + "' param: '" + params.get(0) + 
         "'");
     return context.getMessageTool().get(resultMsgKey, params);
   }
@@ -103,7 +105,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
       result = "cel_password_recovery_success";
     } else {
       String email = userObj.getStringValue("email");
-      mLogger.debug("email: '" + email + "'");
+      LOGGER.debug("email: '" + email + "'");
       if((email != null) && (email.trim().length() > 0)) {
         String validkey = setUserFieldsForPasswordRecovery(userDoc, userObj,context);
         
@@ -112,7 +114,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
         vcontext.put("validkey", validkey);
         
         int sendRecoveryMail = sendRecoveryMail(email, context);
-        mLogger.debug("sendRecoveryMail: '" + sendRecoveryMail + "'");
+        LOGGER.debug("sendRecoveryMail: '" + sendRecoveryMail + "'");
         if(sendRecoveryMail == 0) { // successfully sent == 0
           result = "cel_password_recovery_success";
         }
@@ -161,7 +163,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
       try {
         newContent = context.getWiki().evaluateTemplate("celMails/" + template, context);
       } catch (IOException exp) {
-        mLogger.info("failed to get mail template [" + template + "].", exp);
+        LOGGER.info("failed to get mail template [" + template + "].", exp);
       }
     }
     if (!"".equals(newContent)) {
@@ -272,8 +274,12 @@ public class PasswordRecoveryAndEmailValidationCommand {
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     vcontext.put("email", to);
     vcontext.put("validkey", validkey);
-    vcontext.put("activationLink", context.getWiki().getExternalURL("Tools.Login", "view",
-        "xpage=activateaccount&ac=" + validkey, context));
+    try {
+      vcontext.put("activationLink", context.getWiki().getExternalURL("Content.Login",
+        "view", "email=" + URLEncoder.encode(to, "UTF-8") + "&ac=" + validkey, context));
+    } catch (UnsupportedEncodingException exp) {
+      LOGGER.error("Failed to encode [" + to + "] for activation link.", exp);
+    }
   }
   
   int sendMail(
