@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSEngine;
@@ -41,21 +42,31 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class CssCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  public static final String SKINS_USER_CSS_CLASS_SPACE = "Skins";
+  public static final String SKINS_USER_CSS_CLASS_DOC = "UserCSS";
+  public static final String SKINS_USER_CSS_CLASS = SKINS_USER_CSS_CLASS_SPACE + "."
+    + SKINS_USER_CSS_CLASS_DOC;
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CssCommand.class);
+
+  public DocumentReference getSkinsUserCssClassRef(String wikiName) {
+    return new DocumentReference(wikiName, SKINS_USER_CSS_CLASS_SPACE,
+        SKINS_USER_CSS_CLASS_DOC);
+  }
 
   public List<CSS> getAllCSS(XWikiContext context) throws XWikiException{
     List<CSS> cssResultList = new ArrayList<CSS>();
     List<CSS> cssList = collectAllCSS(context);
     
-    mLogger.debug("List of CSS files built. There are " + cssList.size()
+    LOGGER.debug("List of CSS files built. There are " + cssList.size()
         + " CSS files to include.");
     
     Set<CSS> includedCSS = new HashSet<CSS>();
     for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
       CSS css = (CSS) iterator.next();
       if(!includedCSS.contains(css) && (css != null)){
-        mLogger.debug("CSS to add to result List: " + css.toString());
+        LOGGER.debug("CSS to add to result List: " + css.toString());
         cssResultList.add(css);
         includedCSS.add(css);
       }
@@ -90,14 +101,14 @@ public class CssCommand {
     List<CSS> cssResultList = new ArrayList<CSS>();
     List<CSS> cssList = collectAllCSS(context);
     
-    mLogger.debug("List of CSS files built. There are " + cssList.size()
+    LOGGER.debug("List of CSS files built. There are " + cssList.size()
         + " CSS files to include.");
     
     Set<CSS> includedCSS = new HashSet<CSS>();
     for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
       CSS css = (CSS) iterator.next();
       if((css != null) && !includedCSS.contains(css) && css.isContentCSS()){
-        mLogger.debug("RTE content CSS to add to result List: " + css.toString());
+        LOGGER.debug("RTE content CSS to add to result List: " + css.toString());
         cssResultList.add(css);
         includedCSS.add(css);
       }
@@ -111,8 +122,8 @@ public class CssCommand {
     if (!new PageLayoutCommand().layoutExists(context.getDoc().getDocumentReference(
         ).getLastSpaceReference())) {
       XWikiDocument doc = context.getDoc();
-      skins = doc.getObjects("Skins.UserCSS");
-      mLogger.debug("CSS Page: " + doc.getFullName() + " has attached "
+      skins = doc.getXObjects(getSkinsUserCssClassRef(context.getDatabase()));
+      LOGGER.debug("CSS Page: " + doc.getDocumentReference() + " has attached "
           + ((skins != null)?skins.size():"0") + " Skins.UserCSS objects.");
     }
     return includeCSS(css, "cel_css_list_page", skins, context);
@@ -130,24 +141,26 @@ public class CssCommand {
         space = context.getDoc().getSpace();
       }
 
-      mLogger.debug("WebPreferences space is: '" + space + "'");
+      LOGGER.debug("WebPreferences space is: '" + space + "'");
       String baseCSS = context.getWiki().getWebPreference("stylesheet", space,
           "", context) + " ";
       baseCSS = context.getWiki().getWebPreference("stylesheets", space, "",
           context) + " ";
       
-      mLogger.debug("CSS Prefs: has '" + baseCSS + "' as CSS to add.");
+      LOGGER.debug("CSS Prefs: has '" + baseCSS + "' as CSS to add.");
 
       List<BaseObject> baseList = new ArrayList<BaseObject>();
-      String xwikiPrefFullName = "XWiki.XWikiPreferences";
-      if (context.getWiki().exists(xwikiPrefFullName, context)) {
+      DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
+          "XWiki", "XWikiPreferences");
+      if (context.getWiki().exists(xwikiPrefDocRef, context)) {
         baseList.addAll(addUserSkinCss(context.getWiki().getDocument(
-            xwikiPrefFullName, context)));
+            xwikiPrefDocRef, context)));
       }
-      String webPrefFullName = context.getDoc().getSpace() + ".WebPreferences";
-      if (context.getWiki().exists(webPrefFullName, context)) {
+      DocumentReference webPrefDocRef = new DocumentReference("WebPreferences",
+          context.getDoc().getDocumentReference().getLastSpaceReference());
+      if (context.getWiki().exists(webPrefDocRef, context)) {
         baseList.addAll(addUserSkinCss(context.getWiki().getDocument(
-            webPrefFullName, context)));
+            webPrefDocRef, context)));
       }
       cssList = includeCSS(baseCSS + css, "cel_css_list_pref", baseList, context);
     }
@@ -174,7 +187,7 @@ public class CssCommand {
       pageTypeDoc = PageTypeCommand.getInstance().getPageTypeObj(context.getDoc(),
           context).getTemplateDocument(context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
@@ -212,8 +225,9 @@ public class CssCommand {
 
   private List<BaseObject> addUserSkinCss(XWikiDocument docAPI) {
     if(docAPI != null) {
-      List<BaseObject> objs = docAPI.getObjects("Skins.UserCSS");
-      mLogger.debug("CSS Skin: " + docAPI.getFullName() + " has attached "
+      List<BaseObject> objs = docAPI.getXObjects(getSkinsUserCssClassRef(
+          docAPI.getDocumentReference().getWikiReference().getName()));
+      LOGGER.debug("CSS Skin: " + docAPI.getDocumentReference() + " has attached "
           + ((objs != null)?objs.size():"0") + " Skins.UserCSS objects.");
       if(objs != null){
         return objs;
