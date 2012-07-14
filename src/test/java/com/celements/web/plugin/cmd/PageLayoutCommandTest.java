@@ -125,11 +125,46 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
+  public void testGetPageLayoutForDoc_noPageLayout_defined() throws Exception {
+    InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
+    plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
+    String fullName = "mySpace.MyDocName";
+    FieldInheritor inheritor = createMock(FieldInheritor.class);
+    expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
+        ).andReturn(inheritor);
+    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())
+      ).andReturn(null);
+    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList("mySpace")),
+        same(context))).andReturn(Collections.emptyList()).anyTimes();
+    replayAll(injectedInheritorFactory, inheritor);
+    assertNull(plCmd.getPageLayoutForDoc(fullName, context));
+    verifyAll(injectedInheritorFactory, inheritor);
+  }
+
+  @Test
   public void testGetPageLayoutForDoc_noLayoutSpace() throws Exception {
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
     plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
     String fullName = "mySpace.MyDocName";
     String layoutName = "MyPageLayout";
+    FieldInheritor inheritor = createMock(FieldInheritor.class);
+    expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
+        ).andReturn(inheritor);
+    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())
+      ).andReturn(layoutName);
+    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList("mySpace")),
+        same(context))).andReturn(Collections.emptyList()).anyTimes();
+    replayAll(injectedInheritorFactory, inheritor);
+    assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
+    verifyAll(injectedInheritorFactory, inheritor);
+  }
+
+  @Test
+  public void testGetPageLayoutForDoc_noLayoutSpace_central() throws Exception {
+    InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
+    plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
+    String fullName = "mySpace.MyDocName";
+    String layoutName = "celements2web:MyPageLayout";
     FieldInheritor inheritor = createMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
         ).andReturn(inheritor);

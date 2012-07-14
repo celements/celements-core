@@ -229,12 +229,15 @@ public class PageLayoutCommand {
   public String getPageLayoutForDoc(String fullName, XWikiContext context) {
     DocumentReference docRef = getWebUtilsService().resolveDocumentReference(fullName);
     SpaceReference spaceRef = getPageLayoutForDoc(docRef);
-    String layoutWikiName = spaceRef.getParent().getName();
-    if (context.getDatabase().equals(layoutWikiName)) {
-      return spaceRef.getName();
-    } else {
-      return layoutWikiName + ":" + spaceRef.getName();
+    if (spaceRef != null) {
+      String layoutWikiName = spaceRef.getParent().getName();
+      if (context.getDatabase().equals(layoutWikiName)) {
+        return spaceRef.getName();
+      } else {
+        return layoutWikiName + ":" + spaceRef.getName();
+      }
     }
+    return null;
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
