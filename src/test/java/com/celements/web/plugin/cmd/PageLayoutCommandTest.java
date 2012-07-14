@@ -20,7 +20,6 @@
 package com.celements.web.plugin.cmd;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -33,12 +32,14 @@ import java.util.Map;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
@@ -46,12 +47,15 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
   private XWikiContext context;
   private XWiki xwiki;
   private PageLayoutCommand plCmd;
+  private XWikiStoreInterface storeMock;
 
   @Before
   public void setUp_PageLayoutCommandTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    storeMock = createMock(XWikiStoreInterface.class);
+    expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
     plCmd = new PageLayoutCommand();
   }
 
@@ -93,14 +97,14 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     resultList.add(new Object[]  {"layout2Space","Layout 2 pretty name"});
     Capture<String> capturedHQL = new Capture<String>();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
-    replay(xwiki);
+    replayAll();
     Map<String, String> expectedPLmap = new HashMap<String, String>();
     expectedPLmap.put("layout1Space","Layout 1 pretty name");
     expectedPLmap.put("layout2Space","Layout 2 pretty name");
     assertEquals(expectedPLmap , plCmd.getAllPageLayouts());
     assertFalse("hql must not contain isActiv constrains.", capturedHQL.getValue(
         ).contains("pl.isActive"));
-    verify(xwiki);
+    verifyAll();
   }
 
   @Test
@@ -110,14 +114,14 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     resultList.add(new Object[]  {"layout2Space","Layout 2 pretty name"});
     Capture<String> capturedHQL = new Capture<String>();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
-    replay(xwiki);
+    replayAll();
     Map<String, String> expectedPLmap = new HashMap<String, String>();
     expectedPLmap.put("layout1Space","Layout 1 pretty name");
     expectedPLmap.put("layout2Space","Layout 2 pretty name");
     assertEquals(expectedPLmap , plCmd.getActivePageLyouts());
     assertTrue("hql must contain isActiv constrains.", capturedHQL.getValue(
       ).contains("pl.isActive"));
-    verify(xwiki);
+    verifyAll();
   }
 
   @Test
@@ -131,13 +135,11 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
         ).andReturn(inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())
       ).andReturn(layoutName);
-    XWikiStoreInterface storeMock = createMock(XWikiStoreInterface.class);
-    expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
     expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList("mySpace")),
         same(context))).andReturn(Collections.emptyList()).anyTimes();
-    replay(xwiki, storeMock, injectedInheritorFactory, inheritor);
+    replayAll(injectedInheritorFactory, inheritor);
     assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
-    verify(xwiki, storeMock, injectedInheritorFactory, inheritor);
+    verifyAll(injectedInheritorFactory, inheritor);
   }
 
   @SuppressWarnings("unchecked")
@@ -146,14 +148,48 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
     plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
     String fullName = "MyPageLayout.MyDocName";
-    XWikiStoreInterface storeMock = createMock(XWikiStoreInterface.class);
-    expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
     List layoutPropDoc = Arrays.asList("MyPageLayout.WebHome");
     expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList(
         "MyPageLayout")), same(context))).andReturn(layoutPropDoc).anyTimes();
-    replay(xwiki, storeMock, injectedInheritorFactory);
+    replayAll(injectedInheritorFactory);
     assertEquals("CelLayoutEditor", plCmd.getPageLayoutForDoc(fullName, context));
-    verify(xwiki, storeMock, injectedInheritorFactory);
+    verifyAll(injectedInheritorFactory);
+  }
+
+  @Test
+  public void testGetLayoutPropDoc() throws Exception {
+    DocumentReference currDocRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyPage");
+    XWikiDocument currDoc = new XWikiDocument(currDocRef);
+    context.setDoc(currDoc);
+    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList(
+        "MySpace")), same(context))).andReturn(Collections.emptyList()).anyTimes();
+    expect(xwiki.getDocument(eq("MySpace.MyPage"), same(context))).andReturn(currDoc
+      ).atLeastOnce();
+    DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument mySpacePrefDoc = new XWikiDocument(mySpacePrefDocRef);
+    expect(xwiki.getDocument(eq("MySpace.WebPreferences"), same(context))).andReturn(
+        mySpacePrefDoc).atLeastOnce();
+    DocumentReference xWikiPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument xWikiPrefDoc = new XWikiDocument(xWikiPrefDocRef);
+    expect(xwiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(
+        xWikiPrefDoc).atLeastOnce();
+    replayAll();
+    assertNull(plCmd.getLayoutPropDoc());
+    verifyAll();
+  }
+
+  
+  private void replayAll(Object ... mocks) {
+    replay(xwiki, storeMock);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(xwiki, storeMock);
+    verify(mocks);
   }
 
 }

@@ -159,9 +159,19 @@ public class PageLayoutCommand {
   }
 
   public XWikiDocument getLayoutPropDoc() {
-    return getLayoutPropDoc(getPageLayoutForCurrentDoc());
+    SpaceReference currDocPageLayout = getPageLayoutForCurrentDoc();
+    if (currDocPageLayout != null) {
+      return getLayoutPropDoc(currDocPageLayout);
+    }
+    return null;
   }
-   
+
+  /**
+   * getLayoutPropDoc
+   * 
+   * @param layoutSpaceRef may not be null (NPE if null)
+   * @return property doc for layoutSpaceRef
+   */
   public XWikiDocument getLayoutPropDoc(SpaceReference layoutSpaceRef) {
     XWikiDocument layoutPropDoc = null;
     try {
