@@ -48,7 +48,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class PageLayoutCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageLayoutCommand.class);
 
   IWebUtilsService webUtilsService;
@@ -81,7 +81,7 @@ public class PageLayoutCommand {
         plMap.put(resultRow[0].toString(), resultRow[1].toString());
       }
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get all page layouts", exp);
+      LOGGER.error("Failed to get all page layouts", exp);
     }
     return plMap ;
   }
@@ -119,7 +119,7 @@ public class PageLayoutCommand {
               getContext());
           return "cel_layout_create_successful";
         } catch (XWikiException exp) {
-          mLogger.error("createNew: failed to create new page layout.", exp);
+          LOGGER.error("createNew: failed to create new page layout.", exp);
         }
       }
     }
@@ -135,7 +135,7 @@ public class PageLayoutCommand {
     try {
       return (!getPropDocs(layoutSpaceRef).isEmpty());
     } catch (XWikiException exp) {
-      mLogger.error("layoutExists: failed to get executed search.", exp);
+      LOGGER.error("layoutExists: failed to get executed search.", exp);
     }
     return false;
   }
@@ -161,7 +161,12 @@ public class PageLayoutCommand {
   public XWikiDocument getLayoutPropDoc() {
     SpaceReference currDocPageLayout = getPageLayoutForCurrentDoc();
     if (currDocPageLayout != null) {
+      LOGGER.debug("getLayoutPropDoc: found page layout [" + currDocPageLayout
+          + "] for page [" + getContext().getDoc().getDocumentReference() + "].");
       return getLayoutPropDoc(currDocPageLayout);
+    } else {
+      LOGGER.debug("getLayoutPropDoc: found NO page layout for page ["
+          + getContext().getDoc().getDocumentReference() + "].");
     }
     return null;
   }
@@ -181,7 +186,7 @@ public class PageLayoutCommand {
             layoutSpaceRef), getContext());
       }
     } catch (XWikiException exp) {
-      mLogger.error("getLayoutPropDoc: failed to get layout property obj.", exp);
+      LOGGER.error("getLayoutPropDoc: failed to get layout property obj.", exp);
     }
     return layoutPropDoc;
   }
