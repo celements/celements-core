@@ -21,62 +21,74 @@ package com.celements.cells;
 
 import java.util.List;
 
+import org.xwiki.model.reference.SpaceReference;
+
 import com.celements.navigation.TreeNode;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.navigation.service.ITreeNodeService;
+import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.web.Utils;
 
 public class RenderingEngine implements IRenderingEngine {
 
-  private IWebUtils utils;
   private IRenderStrategy renderStrategy;
+
+  ITreeNodeService treeNodeService;
+  IWebUtilsService webUtilsService;
 
   public RenderingEngine() {
   }
 
   /* (non-Javadoc)
    * @see com.celements.web.cells.IRenderingEngine#renderCell(
-   *   com.xpn.xwiki.objects.BaseObject, com.xpn.xwiki.XWikiContext)
+   *   com.xpn.xwiki.objects.BaseObject)
    */
-  public void renderCell(TreeNode node, XWikiContext context) {
+  public void renderCell(TreeNode node) {
     renderStrategy.startRendering();
     //isFirst AND isLast because only this item and its children is
     //rendered (NO SIBLINGS!)
-    internal_renderCell(node, true, true, context);
+    internal_renderCell(node, true, true);
     renderStrategy.endRendering();
   }
 
   /* (non-Javadoc)
-   * @see com.celements.web.cells.IRenderingEngine#renderSubCells(
-   *   java.lang.String, com.xpn.xwiki.XWikiContext)
+   * @see com.celements.web.cells.IRenderingEngine#renderSubCells(java.lang.String)
    */
-  public void renderPageLayout(String spaceName, XWikiContext context) {
+  @Deprecated
+  public void renderPageLayout(String spaceName) {
+    SpaceReference spaceRef = getWebUtilsService().resolveSpaceReference(spaceName);
+    renderPageLayout(spaceRef);
+  }
+
+  /* (non-Javadoc)
+   * @see com.celements.web.cells.IRenderingEngine#renderSubCells(
+   *      org.xwiki.model.reference.SpaceReference)
+   */
+  public void renderPageLayout(SpaceReference spaceRef) {
     renderStrategy.startRendering();
-    renderStrategy.setSpaceName(spaceName);
-    internal_renderSubCells("", context);
+    renderStrategy.setSpaceReference(spaceRef);
+    internal_renderSubCells("");
     renderStrategy.endRendering();
   }
 
-  void internal_renderCell(TreeNode node, boolean isFirstItem, boolean isLastItem,
-      XWikiContext context) {
+  void internal_renderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     if(renderStrategy.isRenderCell(node)) {
       renderStrategy.startRenderCell(node, isFirstItem, isLastItem);
-      internal_renderSubCells(node.getFullName(), context);
+      internal_renderSubCells(node.getFullName());
       renderStrategy.endRenderCell(node, isFirstItem, isLastItem);
     }
   }
 
-  void internal_renderSubCells(String parent, XWikiContext context) {
+  void internal_renderSubCells(String parent) {
     if(renderStrategy.isRenderSubCells(parent)) {
-      List<TreeNode> children = getWebUtils().getSubNodesForParent(parent,
-          renderStrategy.getMenuSpace(parent), renderStrategy.getMenuPart(parent), context);
+      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(parent,
+          renderStrategy.getMenuSpace(parent), renderStrategy.getMenuPart(parent));
       if (children.size() > 0) {
         renderStrategy.startRenderChildren(parent);
         boolean isFirstItem = true;
         for (TreeNode node : children) {
           boolean isLastItem = (children.lastIndexOf(node)
               == (children.size() - 1));
-            internal_renderCell(node, isFirstItem, isLastItem, context);
+            internal_renderCell(node, isFirstItem, isLastItem);
           isFirstItem = false;
         }
         renderStrategy.endRenderChildren(parent);
@@ -86,24 +98,23 @@ public class RenderingEngine implements IRenderingEngine {
     }
   }
 
-  IWebUtils getWebUtils() {
-    if(utils == null) {
-      utils = WebUtils.getInstance();
-    }
-    return utils;
-  }
-
   public RenderingEngine setRenderStrategy(IRenderStrategy newStrategy) {
     this.renderStrategy = newStrategy;
     return this;
   }
 
-  /**
-   * FOR TEST USE ONLY!!!
-   * @param webUtils
-   */
-  void inject_WebUtils(IWebUtils webUtils) {
-    this.utils= webUtils;
+  ITreeNodeService getTreeNodeService() {
+    if (treeNodeService != null) {
+      return treeNodeService;
+    }
+    return Utils.getComponent(ITreeNodeService.class);
+  }
+
+  IWebUtilsService getWebUtilsService() {
+    if (webUtilsService != null) {
+      return webUtilsService;
+    }
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

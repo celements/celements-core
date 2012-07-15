@@ -55,7 +55,7 @@ public class TreeNode {
    * 
    * @return fullName
    * 
-   * @deprecated use getDocumentReference instead
+   * @deprecated since 2.14.0 use getDocumentReference instead
    */
   @Deprecated
   public String getFullName() {

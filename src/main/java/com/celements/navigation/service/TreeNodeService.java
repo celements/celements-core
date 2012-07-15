@@ -1,7 +1,27 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.celements.navigation.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
@@ -36,6 +56,9 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
+
+  @Requirement(role = ITreeNodeProvider.class)
+  Map<String, ITreeNodeProvider> nodeProviders;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -81,27 +104,53 @@ public class TreeNodeService implements ITreeNodeService {
   List<TreeNode> fetchNodesForParentKey(String parentKey) {
     long starttotal = System.currentTimeMillis();
     long start = System.currentTimeMillis();
+    List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
+    if ((nodeProviders != null) && (nodeProviders.values().size() > 0)) {
+      TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<Integer, TreeNode>();
+      for (TreeNode node : nodes) {
+        treeNodesMergedMap.put(new Integer(node.getPosition()), node);
+      }
+      for (ITreeNodeProvider tnProvider : nodeProviders.values()) {
+        try {
+          for (TreeNode node : tnProvider.getTreeNodesForParent(parentKey)) {
+            treeNodesMergedMap.put(new Integer(node.getPosition()), node);
+          }
+        } catch(Exception exp) {
+          mLogger.warn("Failed on provider [" + tnProvider.getClass()
+              + "] to get nodes for parentKey [" + parentKey + "].", exp);
+        }
+      }
+      nodes = new ArrayList<TreeNode>(treeNodesMergedMap.values());
+      long end = System.currentTimeMillis();
+      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+          + nodes.size() + "]: " + (end-starttotal));
+    }
+    return nodes;
+  }
+
+  private List<TreeNode> fetchNodesForParentKey_internal(String parentKey,
+      long starttotal, long start) {
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     long end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey: time for getNotMappedMenuItemsFromDatabase: "
+    mLogger.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
         + (end-start));
     start = System.currentTimeMillis();
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey: time for getMappedMenuItemsForParentCmd: "
+    mLogger.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
         + (end-start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey  + "] totaltime for list of ["
+      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
           + mappedTreeNodes.size() + "]: " + (end-starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + notMappedmenuItems.size() + "]: " + (end-starttotal));
       return notMappedmenuItems;
     } else {
@@ -113,10 +162,10 @@ public class TreeNodeService implements ITreeNodeService {
         menuItemsMergedMap.put(new Integer(node.getPosition()), node);
       }
       end = System.currentTimeMillis();
-      mLogger.debug("fetchNodesForParentKey: time for merging menu items: "
+      mLogger.debug("fetchNodesForParentKey_internal: time for merging menu items: "
           + (end-start));
       ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + menuItems.size() + "]: " + (end-starttotal));
       return menuItems;
     }
@@ -128,7 +177,7 @@ public class TreeNodeService implements ITreeNodeService {
    * @param context
    * @return Collection keeps ordering of menuItems according to posId
    * 
-   * @deprecated use new fetchNodesForParentKey instead
+   * @deprecated since 2.14.0  use new fetchNodesForParentKey instead
    */
   @Deprecated
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
@@ -154,7 +203,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated since 2.14.0  use getSubNodesForParent instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,

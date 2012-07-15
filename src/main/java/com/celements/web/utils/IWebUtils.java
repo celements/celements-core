@@ -44,13 +44,13 @@ public interface IWebUtils {
       boolean includeDoc, XWikiContext context);
 
   /**
-   * @deprecated use isEmptyRTEDocument in EmptyCheckCommand class instead.
+   * @deprecated since 2.14.0 use isEmptyRTEDocument in EmptyCheckCommand class instead.
    */
   @Deprecated
   public boolean isEmptyRTEDocument(XWikiDocument localdoc);
   
   /**
-   * @deprecated use isEmptyRTEString in EmptyCheckCommand class instead.
+   * @deprecated since 2.14.0 use isEmptyRTEString in EmptyCheckCommand class instead.
    */
   @Deprecated
   public boolean isEmptyRTEString(String rteContent);
@@ -93,7 +93,7 @@ public interface IWebUtils {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
   @Deprecated
   public List<BaseObject> getSubMenuItemsForParent_internal(
@@ -108,7 +108,7 @@ public interface IWebUtils {
    * @param menuPart 
    * @return (array of tree nodes)
    * 
-   * @deprecated instead use TreeNodeService directly
+   * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -116,7 +116,7 @@ public interface IWebUtils {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
@@ -131,7 +131,7 @@ public interface IWebUtils {
    * @param context
    * @return
    * 
-   * @deprecated instead use TreeNodeService directly
+   * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -171,26 +171,26 @@ public interface IWebUtils {
   public Date parseDate(String date, String format);
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage,
       XWikiContext context);
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public XWikiMessageTool getAdminMessageTool(XWikiContext context);
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public String getAdminLanguage(XWikiContext context);
   
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context);
@@ -201,11 +201,17 @@ public interface IWebUtils {
 
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context);
 
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException;
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
+      ) throws ClassNotFoundException;
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException;
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
+  
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb);
 
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context);
@@ -215,7 +221,7 @@ public interface IWebUtils {
   public String getJSONContent(XWikiDocument document, XWikiContext context);
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context);
@@ -226,19 +232,19 @@ public interface IWebUtils {
   public String getMajorVersion(XWikiDocument doc);
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public String getAttachmentName(String link);
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public String getPageFullName(String link);
 
   /**
-   * @deprecated instead use AttachmentURLCommand directly
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public boolean isAttachmentLink(String link);

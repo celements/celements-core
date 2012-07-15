@@ -73,6 +73,7 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
@@ -224,15 +225,26 @@ public class CelementsWebPluginApi extends Api {
     return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, context);
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException{
-      return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
+      ) throws ClassNotFoundException{
+    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
   }
 
-  public String getAttachmentListSortedAsJSON(Document doc,
-      String comparator, boolean imagesOnly) throws ClassNotFoundException{
-      return WebUtils.getInstance().getAttachmentListSortedAsJSON(doc,
-          comparator, imagesOnly);
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
+    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator, imagesOnly,
+        start, nb);
+  }
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly) throws ClassNotFoundException{
+    return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
+  }
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
+    return WebUtils.getInstance().getAttachmentListSortedAsJSON(doc, comparator, 
+        imagesOnly, start, nb);
   }
 
   public List<Attachment> getRandomImages(String fullName,
@@ -327,7 +339,7 @@ public class CelementsWebPluginApi extends Api {
     if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
       mLogger.debug("sendNewValidation for user [" + user + "].");
       new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
-          possibleFields, context);
+          possibleFields);
     }
   }
   
@@ -418,7 +430,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
-    return emptyCheckCmd.isEmptyRTEDocument(documentRef, context);
+    return emptyCheckCmd.isEmptyRTEDocument(documentRef);
   }
   
   public String getEmailAdressForCurrentUser() {
@@ -435,9 +447,10 @@ public class CelementsWebPluginApi extends Api {
   
   public Map<String, String> activateAccount(String activationCode) throws XWikiException{
     Map<String, String> result = new HashMap<String, String>();
-    if(hasProgrammingRights()){
-      result = plugin.activateAccount(activationCode, context);
-    }
+    //TODO Why do we need Programming rights here? and do we realy need them?
+//    if(hasProgrammingRights()){
+    result = plugin.activateAccount(activationCode, context);
+//    }
     return result;
   }
   
@@ -581,12 +594,12 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public String recoverPassword() throws XWikiException {
-    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(context);
+    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
   }
   
   public String recoverPassword(String account) throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account,
-        account, context);
+        account);
   }
   
   public Date parseDate(String date, String format) {
@@ -720,7 +733,8 @@ public class CelementsWebPluginApi extends Api {
    * @param fieldName
    * @param userToken
    * @return
-   * @deprecated because upload failes if xwiki guest does not have view rights on document
+   * @deprecated since 2.14.0  because upload failes if xwiki guest does not have
+   *             view rights on document
    */
   @Deprecated
   public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken) {
@@ -808,15 +822,17 @@ public class CelementsWebPluginApi extends Api {
  }
 
   public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayout(spaceName, context);
+    return getPageLayoutCmd().renderPageLayout(getWebUtilsService().resolveSpaceReference(
+        spaceName));
   }
 
   public String getPageLayoutForDoc(String fullName) {
-    return getPageLayoutCmd().getPageLayoutForDoc(fullName, context);
+    return getPageLayoutCmd().getPageLayoutForDoc(getWebUtilsService(
+        ).resolveDocumentReference(fullName)).getName();
    }
   
   public String renderPageLayout() {
-    return getPageLayoutCmd().renderPageLayout(context);
+    return getPageLayoutCmd().renderPageLayout();
   }
   
   public boolean addTranslation(String fullName, String language) {
@@ -910,11 +926,11 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public Map<String,String> getActivePageLayouts() {
-    return getPageLayoutCmd().getActivePageLyouts(context);
+    return getPageLayoutCmd().getActivePageLyouts();
   }
 
   public Map<String,String> getAllPageLayouts() {
-    return getPageLayoutCmd().getAllPageLayouts(context);
+    return getPageLayoutCmd().getAllPageLayouts();
   }
   
   @SuppressWarnings("unchecked")
@@ -945,11 +961,13 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public String createNewLayout(String layoutSpaceName) {
-    return getPageLayoutCmd().createNew(layoutSpaceName, context);
+    return getPageLayoutCmd().createNew(getWebUtilsService().resolveSpaceReference(
+        layoutSpaceName));
   }
 
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
-    return new PageLayoutApi(layoutSpaceName, context);
+    return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
+        context);
   }
 
   public String navReorderSave(String fullName, String structureJSON) {
@@ -957,11 +975,12 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean layoutExists(String layoutSpaceName) {
-    return getPageLayoutCmd().layoutExists(layoutSpaceName, context);
+    return getPageLayoutCmd().layoutExists(getWebUtilsService().resolveSpaceReference(
+        layoutSpaceName));
   }
 
   public boolean layoutEditorAvailable() {
-    return getPageLayoutCmd().layoutEditorAvailable(context);
+    return getPageLayoutCmd().layoutEditorAvailable();
   }
 
   public List<String> getAllPageTypes() {
@@ -1143,7 +1162,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated use syncustom script service direcly instead
+   * @deprecated since 2.14.0 use syncustom script service direcly instead
    */
   @Deprecated
   public boolean congressRegistrationPlausibility() {
@@ -1151,7 +1170,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated use syncustom script service direcly instead
+   * @deprecated since 2.14.0 use syncustom script service direcly instead
    */
   @Deprecated
   public boolean congressRegistrationPlausibility(Document document) {
@@ -1289,7 +1308,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return emptyCheckCmd.getNextNonEmptyChildren(documentRef, context);
+    return emptyCheckCmd.getNextNonEmptyChildren(documentRef);
   }
 
   public boolean useImageAnimations() {
@@ -1369,6 +1388,10 @@ public class CelementsWebPluginApi extends Api {
   private ContextMenuScriptService getCMService() {
     return (ContextMenuScriptService) Utils.getComponent(ScriptService.class,
         "contextMenu");
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

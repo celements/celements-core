@@ -25,40 +25,40 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.TreeNode;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
+import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class EmptyCheckCommand {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       EmptyCheckCommand.class);
 
-  IWebUtils celUtils = WebUtils.getInstance();
-
   private Set<DocumentReference> visitedDocRefs;
 
-  public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef,
-      XWikiContext context) {
+  ITreeNodeService treeNodeService;
+
+  public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
     visitedDocRefs = new HashSet<DocumentReference>();
-    return getNextNonEmptyChildren_internal(documentRef, context);
+    return getNextNonEmptyChildren_internal(documentRef);
   }
 
   private DocumentReference getNextNonEmptyChildren_internal(
-      DocumentReference documentRef, XWikiContext context) {
-    if (isEmptyRTEDocument(documentRef, context)) {
-      List<TreeNode> children = celUtils.getSubNodesForParent(getFullNameForRef(
-          documentRef), getSpaceName(documentRef), "", context);
+      DocumentReference documentRef) {
+    if (isEmptyRTEDocument(documentRef)) {
+      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(
+          getFullNameForRef(documentRef), getSpaceName(documentRef), "");
       if (children.size() > 0) {
         visitedDocRefs.add(documentRef);
         DocumentReference nextChild = children.get(0).getDocumentReference();
         if (!visitedDocRefs.contains(nextChild)) {
-          return getNextNonEmptyChildren_internal(nextChild, context);
+          return getNextNonEmptyChildren_internal(nextChild);
         } else {
           mLogger.warn("getNextNonEmptyChildren_internal: recursion detected on ["
               + nextChild + "].");
@@ -77,26 +77,25 @@ public class EmptyCheckCommand {
   }
 
   /**
-   * @deprecated since 2.9.4 use instead isEmptyRTEDocument(DocumentReference, XWikiContext)
+   * @deprecated since 2.9.4 use instead isEmptyRTEDocument(DocumentReference)
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullname, XWikiContext context) {
     DocumentReference docRef = new DocumentReference(context.getDatabase(),
         fullname.split("\\.")[0], fullname.split("\\.")[1]);
     return isEmptyRTEDocumentDefault(docRef, context)
-        && isEmptyRTEDocumentTranslated(docRef, context);
+        && isEmptyRTEDocumentTranslated(docRef);
   }
   
-  public boolean isEmptyRTEDocument(DocumentReference docRef, XWikiContext context) {
-    return isEmptyRTEDocumentDefault(docRef, context)
-        && isEmptyRTEDocumentTranslated(docRef, context);
+  public boolean isEmptyRTEDocument(DocumentReference docRef) {
+    return isEmptyRTEDocumentDefault(docRef, getContext())
+        && isEmptyRTEDocumentTranslated(docRef);
   }
   
-  public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef,
-      XWikiContext context) {
+  public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
     try {
-      return isEmptyRTEDocument(context.getWiki(
-          ).getDocument(docRef, context).getTranslatedDocument(context));
+      return isEmptyRTEDocument(getContext().getWiki(
+          ).getDocument(docRef, getContext()).getTranslatedDocument(getContext()));
     } catch (XWikiException e) {
       mLogger.error(e);
     }
@@ -123,4 +122,16 @@ public class EmptyCheckCommand {
         "(<p>)?(<span.*?>)?(\\s*(&nbsp;|<br\\s*/>))*\\s*(</span>)?(</p>)?", "").trim());
   }
 
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
+  }
+
+
+  ITreeNodeService getTreeNodeService() {
+    if (treeNodeService != null) {
+      return treeNodeService;
+    }
+    return Utils.getComponent(ITreeNodeService.class);
+  }
 }

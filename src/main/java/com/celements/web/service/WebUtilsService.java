@@ -30,6 +30,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -116,6 +117,18 @@ public class WebUtilsService implements IWebUtilsService {
     return eventRef;
   }
 
+  public SpaceReference resolveSpaceReference(String spaceName) {
+    String wikiName;
+    if (spaceName.contains(":")) {
+      wikiName = spaceName.split(":")[0];
+      spaceName = spaceName.split(":")[1];
+    } else {
+      wikiName = getContext().getDatabase();
+    }
+    SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
+    return spaceRef;
+  }
+
   public String getDefaultLanguage() {
     return getContext().getWiki().getWebPreference("default_language", getContext());
   }
@@ -160,4 +173,52 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return false;
   }
+
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField, boolean asc) {
+    return getObjectsOrdered(doc, classRef, orderField, asc, null, false);
+  }
+
+  /**
+   * Get a list of Objects for a Document sorted by one or two fields.
+   * 
+   * @param doc The Document where the Objects are attached.
+   * @param classRef The reference to the class of the Objects to return
+   * @param orderField1 Field to order the objects by. First priority.
+   * @param asc1 Order first priority ascending or descending.
+   * @param orderField2 Field to order the objects by. Second priority.
+   * @param asc2 Order second priority ascending or descending.
+   * @return List of objects ordered as specified
+   */
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField1, boolean asc1, String orderField2, boolean asc2) {
+    List<BaseObject> resultList = new ArrayList<BaseObject>();
+    if(doc != null) {
+      List<BaseObject> allObjects = doc.getXObjects(classRef);
+      if(allObjects != null) {
+        for (BaseObject obj : allObjects) {
+          if(obj != null) {
+            resultList.add(obj);
+          }
+        }
+      }
+      Collections.sort(resultList, new BaseObjectComparator(orderField1, asc1, 
+          orderField2, asc2));
+    }
+    return resultList;
+  }
+
+  public String[] splitStringByLength(String inStr, int maxLength) {
+    int numFullStr = (inStr.length() - 1) / maxLength;
+    String[] splitedStr = new String[1 + numFullStr];
+    for(int i = 0 ; i < numFullStr ; i ++) {
+      int startIndex = i * maxLength;
+      splitedStr[i] = inStr.substring(startIndex, startIndex + maxLength);
+    }
+    int lastPiece = splitedStr.length - 1;
+    splitedStr[lastPiece] = inStr.substring(lastPiece * maxLength,
+        inStr.length());
+    return splitedStr;
+  }
+  
 }
