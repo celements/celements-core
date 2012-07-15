@@ -1098,6 +1098,50 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals("f.jpg", result.get(2).getFilename());
   }
 
+  @Test
+  public void testReduceListToSize_all() {
+    Attachment att1 = createMock(Attachment.class);
+    Attachment att2 = createMock(Attachment.class);
+    Attachment att3 = createMock(Attachment.class);
+    List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
+    replayAll(att1, att2, att3);
+    List<Attachment> resultList = celUtils.reduceListToSize(attachments, 0, 5);
+    assertEquals(3, resultList.size());
+    assertTrue(resultList.contains(att1));
+    assertTrue(resultList.contains(att2));
+    assertTrue(resultList.contains(att3));
+    verifyAll(att1, att2, att3);
+  }
+
+  @Test
+  public void testReduceListToSize_first() {
+    Attachment att1 = createMock(Attachment.class);
+    Attachment att2 = createMock(Attachment.class);
+    Attachment att3 = createMock(Attachment.class);
+    List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
+    replayAll(att1, att2, att3);
+    List<Attachment> resultList = celUtils.reduceListToSize(attachments, 0, 2);
+    assertEquals(2, resultList.size());
+    assertTrue(resultList.contains(att1));
+    assertTrue(resultList.contains(att2));
+    assertFalse(resultList.contains(att3));
+    verifyAll(att1, att2, att3);
+  }
+
+  @Test
+  public void testReduceListToSize_last() {
+    Attachment att1 = createMock(Attachment.class);
+    Attachment att2 = createMock(Attachment.class);
+    Attachment att3 = createMock(Attachment.class);
+    List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
+    replayAll(att1, att2, att3);
+    List<Attachment> resultList = celUtils.reduceListToSize(attachments, 1, 5);
+    assertEquals(2, resultList.size());
+    assertFalse(resultList.contains(att1));
+    assertTrue(resultList.contains(att2));
+    assertTrue(resultList.contains(att3));
+    verifyAll(att1, att2, att3);
+  }
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
