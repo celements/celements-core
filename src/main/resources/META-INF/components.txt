@@ -20,3 +20,4 @@ com.celements.menu.MenuService
 com.celements.menu.MenuScriptService
 com.celements.appScript.AppScriptService
 com.celements.collections.CollectionsService
+com.celements.collections.service.CollectionsScriptService

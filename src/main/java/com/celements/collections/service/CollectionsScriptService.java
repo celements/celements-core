@@ -10,7 +10,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.collections.ICollectionsService;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.objects.BaseObject;
@@ -24,7 +23,10 @@ public class CollectionsScriptService implements ScriptService {
   @Requirement
   Execution execution;
   
-  
+  private XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
   public List<com.xpn.xwiki.api.Object> getObjectsOrdered(Document doc, 
       DocumentReference classRef,
       String orderField, boolean asc) {
@@ -57,7 +59,4 @@ public class CollectionsScriptService implements ScriptService {
     return objs;
   }
   
-  private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
 }
