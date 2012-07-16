@@ -37,6 +37,7 @@ import com.celements.iterator.XObjectIterator;
 import com.celements.menu.IMenuService;
 import com.celements.menu.MenuClasses;
 import com.celements.migrations.SubSystemHibernateMigrationManager;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -62,6 +63,9 @@ public class MenuBar_SubMenuItemsClassMigrator
   @Requirement("celements.celMenuClasses")
   ICelementsClassCollection menuClassCollection;
 
+  @Requirement
+  IWebUtilsService webUtilsService;
+
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
@@ -85,8 +89,8 @@ public class MenuBar_SubMenuItemsClassMigrator
     LOGGER.info("found [" + ((result != null) ? result.size() : result)
         + "] documents to migrate.");
     for (Object fullName : result) {
-      XWikiDocument doc = context.getWiki().getDocument(resolveDocument(
-          fullName.toString()), context);
+      XWikiDocument doc = context.getWiki().getDocument(
+          webUtilsService.resolveDocumentReference(fullName.toString()), context);
       XObjectIterator menuBarSubItemIterator = new XObjectIterator(getContext());
       menuBarSubItemIterator.setClassName("Celements2.MenuBarSubItem");
       menuBarSubItemIterator.setDocList(Arrays.asList(fullName.toString()));
@@ -110,15 +114,6 @@ public class MenuBar_SubMenuItemsClassMigrator
     newSubItemObj.setStringValue("link", oldSubItemObj.getStringValue("link"));
     newSubItemObj.setStringValue("css_classes", "");
     LOGGER.trace("migrating [" + oldSubItemObj.getStringValue("name") + "]");
-  }
-
-  private DocumentReference resolveDocument(String docFullName) {
-    DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
-        docFullName, EntityType.DOCUMENT));
-    eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
-    LOGGER.debug("getDocRefFromFullName: for [" + docFullName + "] got reference ["
-        + eventRef + "].");
-    return eventRef;
   }
 
   public String getDescription() {
