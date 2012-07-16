@@ -28,6 +28,7 @@ import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.iterator.IIteratorFactory;
@@ -43,7 +44,7 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
   private IIteratorFactory<XObjectIterator> _iteratorFactory;
   private XWikiContext _context;
   private XWiki _xwiki;
-  private String _testClassName;
+  private DocumentReference _testClassRef;
   private XWikiDocument _testDoc;
   private List<String> _docList;
   
@@ -52,7 +53,8 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     _context = getContext();
     _xwiki = createMock(XWiki.class);
     _context.setWiki(_xwiki);
-    _testClassName = "Celements.TestClass";
+    _testClassRef = new DocumentReference(_context.getDatabase(), "Celements",
+        "TestClass");
     _fieldInheritor = new FieldInheritor();
     _testDoc = new XWikiDocument();
     _docList = new ArrayList<String>();
@@ -78,12 +80,14 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname);
     Vector<BaseObject> testObjs = new Vector<BaseObject>();
     BaseObject firstObj = new BaseObject();
+    firstObj.setXClassReference(_testClassRef);
     firstObj.setStringValue("field1", "value1");
     testObjs.add(firstObj);
     BaseObject secondObj = new BaseObject();
+    secondObj.setXClassReference(_testClassRef);
     secondObj.setStringValue("field2", "value2");
     testObjs.add(secondObj);
-    _testDoc.setObjects(_testClassName, testObjs);
+    _testDoc.setXObjects(_testClassRef, testObjs);
     expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc
         ).anyTimes();
     _fieldInheritor.setIteratorFactory(_iteratorFactory);
@@ -120,7 +124,8 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     return new IIteratorFactory<XObjectIterator>() {
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(_context);
-        iterator.setClassName(_testClassName);
+        iterator.setClassName(_testClassRef.getLastSpaceReference().getName() + "."
+            + _testClassRef.getName());
         iterator.setDocList(docList);
         return iterator;
       }
