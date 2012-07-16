@@ -49,7 +49,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    expect(xwiki.getWebPreference(eq("admin_language"), eq("de"), same(context))
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
         ).andReturn("de");
     replayAll();
     assertEquals("de", webUtilsService.getAdminLanguage());
@@ -101,7 +101,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
     context.setUser("XWiki.NotMyUser");
-    expect(xwiki.getWebPreference(eq("admin_language"), isA(String.class), same(context))
+    expect(xwiki.getSpacePreference(eq("admin_language"), isA(String.class), same(context))
         ).andReturn("en");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");

@@ -51,7 +51,7 @@ public class FileBaseTagsCmd {
   }
 
   public String getCentralFileBaseFullName(XWikiContext context) {
-    return context.getWiki().getWebPreference("cel_centralfilebase", "", context);
+    return context.getWiki().getSpacePreference("cel_centralfilebase", "", context);
   }
 
   public boolean existsTagWithName(String tagName, XWikiContext context) {

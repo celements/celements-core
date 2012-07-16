@@ -147,7 +147,7 @@ public class MultilingualMenuNameCommand {
       menuNameObj = menuItemDoc.getObject(CELEMENTS_MENU_NAME, "lang", language);
       if ((menuNameObj == null) || "".equals(menuNameObj.getStringValue("menu_name"))) {
         menuNameObj = menuItemDoc.getObject(CELEMENTS_MENU_NAME, "lang", context
-            .getWiki().getWebPreference("default_language", context), false);
+            .getWiki().getSpacePreference("default_language", context), false);
       }
     }
     return menuNameObj;

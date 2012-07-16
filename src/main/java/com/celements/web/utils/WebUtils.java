@@ -335,7 +335,7 @@ public class WebUtils implements IWebUtils {
     if(preferenceDoc.getObject(className, false, context) == null){
       preferenceDoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
       if(preferenceDoc.getObject(className, false, context) == null){
-        String skinDocName = context.getWiki().getWebPreference("skin", context);
+        String skinDocName = context.getWiki().getSpacePreference("skin", context);
         if((skinDocName != null)
             && (context.getWiki().exists(skinDocName, context))){
           preferenceDoc = context.getWiki().getDocument(skinDocName, context);
@@ -424,7 +424,7 @@ public class WebUtils implements IWebUtils {
 
   public List<String> getAllowedLanguages(XWikiContext context) {
     return Arrays.asList(context.getWiki(
-        ).getWebPreference("language", context).split("[ ,]"));
+        ).getSpacePreference("language", context).split("[ ,]"));
   }
 
   public Date parseDate(String date, String format) {
@@ -478,7 +478,7 @@ public class WebUtils implements IWebUtils {
   }
 
   public String getParentSpace(XWikiContext context) {
-    return context.getWiki().getWebPreference("parent", context);
+    return context.getWiki().getSpacePreference("parent", context);
   }
 
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {

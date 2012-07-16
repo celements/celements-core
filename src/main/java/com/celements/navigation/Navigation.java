@@ -376,7 +376,7 @@ public class Navigation implements INavigation {
   }
 
   private boolean useImagesForNavigation(XWikiContext context) {
-    return context.getWiki().getWebPreferenceAsInt("use_navigation_images", 0, context
+    return context.getWiki().getSpacePreferenceAsInt("use_navigation_images", 0, context
         ) > 0;
   }
 

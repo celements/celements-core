@@ -68,7 +68,7 @@ public class ImageMapCommand {
           if(context.getLanguage().equals(map[1])) {
             mapValue = (String)map[0];
             break;
-          } else if(context.getWiki().getWebPreference("default_language", context)
+          } else if(context.getWiki().getSpacePreference("default_language", context)
               .equals(map[1])) {
             mapValue = (String)map[0];
           }

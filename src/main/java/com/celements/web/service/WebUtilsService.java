@@ -104,7 +104,7 @@ public class WebUtilsService implements IWebUtilsService {
       LOGGER.error("failed to get UserObject for " + getContext().getUser());
     }
     if ((adminLanguage == null) || ("".equals(adminLanguage))) {
-      adminLanguage = getContext().getWiki().getWebPreference("admin_language",
+      adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
           getContext().getLanguage(), getContext());
     }
     return adminLanguage;
@@ -134,7 +134,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public String getDefaultLanguage() {
-    return getContext().getWiki().getWebPreference("default_language", getContext());
+    return getContext().getWiki().getSpacePreference("default_language", getContext());
   }
 
   public boolean isAdminUser() {

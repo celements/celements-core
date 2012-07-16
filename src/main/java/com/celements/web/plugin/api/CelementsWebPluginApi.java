@@ -1208,13 +1208,13 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean useXWikiLoginLayout() {
-    return "1".equals(context.getWiki().getWebPreference("xwikiLoginLayout",
+    return "1".equals(context.getWiki().getSpacePreference("xwikiLoginLayout",
         "celements.xwikiLoginLayout", "1", context));
   }
 
   public String getLogoutRedirectURL() {
     XWiki xwiki = context.getWiki();
-    String logoutRedirectConf = xwiki.getWebPreference("LogoutRedirect",
+    String logoutRedirectConf = xwiki.getSpacePreference("LogoutRedirect",
         "celements.logoutRedirect", xwiki.getDefaultSpace(context) + ".WebHome", context);
     String logoutRedirectURL = logoutRedirectConf;
     if (!logoutRedirectConf.startsWith("http://")
@@ -1226,7 +1226,7 @@ public class CelementsWebPluginApi extends Api {
 
   public String getLoginRedirectURL() {
     XWiki xwiki = context.getWiki();
-    String loginRedirectConf = xwiki.getWebPreference("LoginRedirect",
+    String loginRedirectConf = xwiki.getSpacePreference("LoginRedirect",
         "celements.loginRedirect", xwiki.getDefaultSpace(context) + ".WebHome", context);
     String loginRedirectURL = loginRedirectConf;
     if (!loginRedirectConf.startsWith("http://")
@@ -1312,7 +1312,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean useImageAnimations() {
-    return "1".equals(context.getWiki().getWebPreference("celImageAnimation",
+    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation",
         "celements.celImageAnimation", "0", context));
   }
 
