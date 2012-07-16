@@ -102,7 +102,7 @@ public class TreeNodeService implements ITreeNodeService {
   
   /**
    * 
-   * @deprecated use getSubNodesForParent with DocumentReference instead
+   * @deprecated use getSubNodesForParent(DocumentReference, String, INavFilter) instead
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
