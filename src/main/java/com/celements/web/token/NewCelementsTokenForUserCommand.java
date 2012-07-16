@@ -47,6 +47,20 @@ public class NewCelementsTokenForUserCommand {
    */
   public String getNewCelementsTokenForUser(String accountName,
       Boolean guestPlus, XWikiContext context) throws XWikiException {
+    return getNewCelementsTokenForUser(accountName, guestPlus, 1440, context);
+  }
+  /**
+   * 
+   * @param accountName
+   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
+   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param minutesValid how long should the token be valid in minutes.
+   * @param context
+   * @return token (or null if token can not be generated)
+   * @throws XWikiException
+   */
+  public String getNewCelementsTokenForUser(String accountName,
+      Boolean guestPlus, int minutesValid, XWikiContext context) throws XWikiException {
     mLogger.debug("getNewCelementsTokenForUser: with guestPlus [" + guestPlus
         + "] for account [" + accountName + "].");
     String validkey = null;
@@ -60,7 +74,7 @@ public class NewCelementsTokenForUserCommand {
       BaseObject obj = doc1.newObject("Classes.TokenClass", context);
       obj.set("tokenvalue", validkey, context);
       Calendar myCal = Calendar.getInstance();
-      myCal.add(Calendar.DAY_OF_YEAR, 1);
+      myCal.add(Calendar.MINUTE, minutesValid);
       obj.set("validuntil", myCal.getTime(), context);
       context.getWiki().saveDocument(doc1, context);
       mLogger.debug("getNewCelementsTokenForUser: sucessfully created token for account ["

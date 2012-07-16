@@ -129,7 +129,7 @@ public class MultilingualMenuNameCommand {
    * @return
    * @throws XWikiException
    * 
-   * @Deprecated use getMenuNameBaseObject instead
+   * @deprecated since 2.14.0 use getMenuNameBaseObject instead
    */
   @Deprecated
   public BaseObject getMultilingualMenuNameOnly(String fullName, String language,

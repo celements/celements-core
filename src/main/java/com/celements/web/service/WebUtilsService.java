@@ -44,10 +44,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.sajson.Builder;
+import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
@@ -286,12 +288,24 @@ public class WebUtilsService implements IWebUtilsService {
         + eventRef + "].");
     return eventRef;
   }
-  
+
   public String resolveFullName(EntityReference reference, boolean withDatabase){
     if(reference!=null){
       if(withDatabase) return serializer_default.serialize(reference);
       else return serializer_local.serialize(reference);
     } else return "";
+  }
+
+  public SpaceReference resolveSpaceReference(String spaceName) {
+    String wikiName;
+    if (spaceName.contains(":")) {
+      wikiName = spaceName.split(":")[0];
+      spaceName = spaceName.split(":")[1];
+    } else {
+      wikiName = getContext().getDatabase();
+    }
+    SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
+    return spaceRef;
   }
 
   public boolean isAdminUser() {
@@ -356,8 +370,24 @@ public class WebUtilsService implements IWebUtilsService {
     return attachments;
   }
   
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator, boolean imagesOnly) {
+  List<Attachment> reduceListToSize(List<Attachment> attachments, int start, int nb) {
+    List<Attachment> countedAtts = new ArrayList<Attachment>();
+    if((start <= 0) && ((nb <= 0) || (nb >= attachments.size()))) {
+      countedAtts = attachments;
+    } else if(start < attachments.size()) {
+      countedAtts = attachments.subList(Math.max(0, start), Math.min(Math.max(0, start) 
+          + Math.max(0, nb), attachments.size()));
+    }
+    return countedAtts;
+  }
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly) {
+    return getAttachmentListSorted(doc, comparator, imagesOnly, 0, 0);
+  }
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb) {
     try {
       List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
       if (imagesOnly) {
@@ -367,19 +397,25 @@ public class WebUtilsService implements IWebUtilsService {
           }
         }
       }
-      return attachments;
+      return reduceListToSize(attachments, start, nb);
     } catch (ClassNotFoundException exp) {
       LOGGER.error(exp);
     }
     return Collections.emptyList();
   }
-  
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly) {
+    return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
+  }
+
   public String getAttachmentListSortedAsJSON(Document doc,
-      String comparator, boolean imagesOnly) {
+      String comparator, boolean imagesOnly, int start, int nb) {
     SimpleDateFormat dateFormater = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     Builder jsonBuilder = new Builder();
     jsonBuilder.openArray();
-    for (Attachment att : getAttachmentListSorted(doc, comparator, imagesOnly)) {
+    for (Attachment att : getAttachmentListSorted(doc, comparator, imagesOnly, start, nb)
+        ) {
       jsonBuilder.openDictionary();
       jsonBuilder.addStringProperty("filename", att.getFilename());
       jsonBuilder.addStringProperty("version", att.getVersion());
@@ -394,7 +430,7 @@ public class WebUtilsService implements IWebUtilsService {
     jsonBuilder.closeArray();
     return jsonBuilder.getJSON();
   }
-  
+
   public Map<String, String> xwikiDocToLinkedMap(DocumentReference docRef,
       boolean bWithObjects, boolean bWithRendering,
       boolean bWithAttachmentContent, boolean bWithVersions) throws XWikiException {
@@ -546,6 +582,53 @@ public class WebUtilsService implements IWebUtilsService {
   
   private DocumentReference getRef(String spaceName, String pageName){
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
+  }
+
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField, boolean asc) {
+    return getObjectsOrdered(doc, classRef, orderField, asc, null, false);
+  }
+
+  /**
+   * Get a list of Objects for a Document sorted by one or two fields.
+   * 
+   * @param doc The Document where the Objects are attached.
+   * @param classRef The reference to the class of the Objects to return
+   * @param orderField1 Field to order the objects by. First priority.
+   * @param asc1 Order first priority ascending or descending.
+   * @param orderField2 Field to order the objects by. Second priority.
+   * @param asc2 Order second priority ascending or descending.
+   * @return List of objects ordered as specified
+   */
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField1, boolean asc1, String orderField2, boolean asc2) {
+    List<BaseObject> resultList = new ArrayList<BaseObject>();
+    if(doc != null) {
+      List<BaseObject> allObjects = doc.getXObjects(classRef);
+      if(allObjects != null) {
+        for (BaseObject obj : allObjects) {
+          if(obj != null) {
+            resultList.add(obj);
+          }
+        }
+      }
+      Collections.sort(resultList, new BaseObjectComparator(orderField1, asc1, 
+          orderField2, asc2));
+    }
+    return resultList;
+  }
+
+  public String[] splitStringByLength(String inStr, int maxLength) {
+    int numFullStr = (inStr.length() - 1) / maxLength;
+    String[] splitedStr = new String[1 + numFullStr];
+    for(int i = 0 ; i < numFullStr ; i ++) {
+      int startIndex = i * maxLength;
+      splitedStr[i] = inStr.substring(startIndex, startIndex + maxLength);
+    }
+    int lastPiece = splitedStr.length - 1;
+    splitedStr[lastPiece] = inStr.substring(lastPiece * maxLength,
+        inStr.length());
+    return splitedStr;
   }
 
 }

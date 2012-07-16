@@ -19,12 +19,12 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.TreeNode;
-import com.celements.web.utils.IWebUtils;
+import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +43,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private XWiki xwiki;
   private EmptyCheckCommand emptyChildCheckCmd;
-  private IWebUtils celUtils;
+  private ITreeNodeService treeNodeService;
 
   @Before
   public void setUp_EmptyCheckCommandTest() throws Exception {
@@ -51,8 +51,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     emptyChildCheckCmd = new EmptyCheckCommand();
-    celUtils = createMock(IWebUtils.class);
-    emptyChildCheckCmd.celUtils = celUtils;
+    treeNodeService = createMock(ITreeNodeService.class);
+    emptyChildCheckCmd.treeNodeService = treeNodeService;
   }
 
   @Test
@@ -131,8 +131,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
     replayAll();
-    assertEquals(documentRef, emptyChildCheckCmd.getNextNonEmptyChildren(documentRef,
-        context));
+    assertEquals(documentRef, emptyChildCheckCmd.getNextNonEmptyChildren(documentRef));
     verifyAll();
   }
 
@@ -142,11 +141,10 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         "mySpace", "MyEmptyDoc");
     XWikiDocument myXdoc = createEmptyDoc(emptyDocRef);
     List<TreeNode> noChildrenList = Collections.emptyList();
-    expect(celUtils.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"), eq(""),
-        same(context))).andReturn(noChildrenList).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"),
+        eq(""))).andReturn(noChildrenList).once();
     replayAll(myXdoc);
-    assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef,
-        context));
+    assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyAll(myXdoc);
   }
 
@@ -159,8 +157,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "mySpace", "myChild"), "mySpace.MyEmptyDoc", 0),
         new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
             "mySpace.MyEmptyDoc", 1));
-    expect(celUtils.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"), eq(""),
-        same(context))).andReturn(childrenList).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"),
+        eq(""))).andReturn(childrenList).once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myChild");
     XWikiDocument childXdoc = new XWikiDocument(expectedChildDocRef);
@@ -169,7 +167,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         ).once();
     replayAll(myXdoc);
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
-        emptyDocRef, context));
+        emptyDocRef));
     verifyAll(myXdoc);
   }
 
@@ -183,8 +181,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "mySpace", "myChild"), "mySpace.MyEmptyDoc", 0),
         new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
             "mySpace.MyEmptyDoc", 1));
-    expect(celUtils.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"), eq(""),
-        same(context))).andReturn(childrenList).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"),
+        eq(""))).andReturn(childrenList).once();
     DocumentReference childDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myChild");
     XWikiDocument childXdoc = createEmptyDoc(childDocRef);
@@ -192,8 +190,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "mySpace", "myChildChild"), "mySpace.MyEmptyDoc", 0),
         new TreeNode(new DocumentReference(context.getDatabase(), "mySpace",
             "myChildChild2"), "mySpace.MyEmptyDoc", 1));
-    expect(celUtils.getSubNodesForParent(eq("mySpace.myChild"), eq("mySpace"), eq(""),
-        same(context))).andReturn(childrenList2).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.myChild"), eq("mySpace"),
+        eq(""))).andReturn(childrenList2).once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myChildChild");
     XWikiDocument childChildXdoc = new XWikiDocument(expectedChildDocRef);
@@ -202,7 +200,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         childChildXdoc).once();
     replayAll(myXdoc, childXdoc);
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
-        emptyDocRef, context));
+        emptyDocRef));
     verifyAll(myXdoc, childXdoc);
   }
 
@@ -217,8 +215,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         new TreeNode(new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
             "mySpace.MyEmptyDoc", 1));
     //if called more than once the recursion detection is very likely broken!
-    expect(celUtils.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"), eq(""),
-        same(context))).andReturn(childrenList).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.MyEmptyDoc"), eq("mySpace"),
+        eq(""))).andReturn(childrenList).once();
     DocumentReference childDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myChild");
     XWikiDocument childXdoc = createEmptyDoc(childDocRef);
@@ -226,18 +224,18 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "mySpace", "myChildChild"), "mySpace.MyEmptyDoc", 0),
         new TreeNode(new DocumentReference(
             context.getDatabase(), "mySpace", "myChildChild2"), "mySpace.MyEmptyDoc", 1));
-    expect(celUtils.getSubNodesForParent(eq("mySpace.myChild"), eq("mySpace"), eq(""),
-        same(context))).andReturn(childrenList2).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.myChild"), eq("mySpace"),
+        eq(""))).andReturn(childrenList2).once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myChildChild");
     XWikiDocument childChildXdoc = createEmptyDoc(expectedChildDocRef);
     List<TreeNode> childrenList3 = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "mySpace", "MyEmptyDoc"), "mySpace.MyEmptyDoc", 0));
-    expect(celUtils.getSubNodesForParent(eq("mySpace.myChildChild"), eq("mySpace"),
-        eq(""), same(context))).andReturn(childrenList3).once();
+    expect(treeNodeService.getSubNodesForParent(eq("mySpace.myChildChild"), eq("mySpace"),
+        eq(""))).andReturn(childrenList3).once();
     replayAll(myXdoc, childXdoc, childChildXdoc);
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
-        emptyDocRef, context));
+        emptyDocRef));
     verifyAll(myXdoc, childXdoc, childChildXdoc);
   }
 
@@ -264,12 +262,12 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki, celUtils);
+    replay(xwiki, treeNodeService);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki, celUtils);
+    verify(xwiki, treeNodeService);
     verify(mocks);
   }
 

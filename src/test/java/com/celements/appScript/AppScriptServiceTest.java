@@ -290,10 +290,10 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
         eq("app"))).andReturn("app").anyTimes();
     DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
-        "AppScripts", "sub/testScript");
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
     expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false);
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
-        "AppScripts", "sub/testScript");
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
     expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false);
     replayAll(mockRequest);
     assertFalse(appScriptService.hasDocAppScript("sub/testScript"));
@@ -317,6 +317,65 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockRequest);
   }
 
+  @Test
+  public void testGetAppScriptDocRef_localOverwritesCentral() throws Exception {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    context.put("appAction", true);
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "testScript");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
+    expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(true).anyTimes();
+    DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
+    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false
+        ).anyTimes();
+    XWikiDocument appScriptDoc = new XWikiDocument(appScriptDocRef);
+    appScriptDoc.setContent("this is no empty script!");
+    expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(appScriptDoc
+        ).anyTimes();
+    replayAll(mockRequest);
+    DocumentReference expectedAppDocRef = new DocumentReference(context.getDatabase(),
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
+    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript"));
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetAppScriptDocRef_noLocalButCentral() throws Exception {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    context.put("appAction", true);
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Content", "testScript");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
+    expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false).anyTimes();
+    DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
+    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(true
+        ).anyTimes();
+    XWikiDocument appScriptDoc = new XWikiDocument(appScriptDocRef);
+    appScriptDoc.setContent("this is no empty script!");
+    expect(xwiki.getDocument(eq(centralAppScriptDocRef), same(context))).andReturn(
+        appScriptDoc).anyTimes();
+    replayAll(mockRequest);
+    DocumentReference expectedAppDocRef = new DocumentReference("celements2web",
+        IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
+    assertEquals(expectedAppDocRef, appScriptService.getAppScriptDocRef("testScript"));
+    verifyAll(mockRequest);
+  }
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);

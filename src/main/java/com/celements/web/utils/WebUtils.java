@@ -192,8 +192,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * 
-   * @deprecated instead use TreeNodeService.getSubNodesForParent
+   * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
   @Deprecated
   public List<BaseObject> getSubMenuItemsForParent_internal(String parent,
@@ -204,7 +203,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -213,8 +212,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * 
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
@@ -223,7 +221,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -392,7 +390,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage, XWikiContext context) {
@@ -400,7 +398,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public XWikiMessageTool getAdminMessageTool(XWikiContext context) {
@@ -408,7 +406,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public String getAdminLanguage(XWikiContext context) {
@@ -416,7 +414,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context) {
@@ -446,14 +444,19 @@ public class WebUtils implements IWebUtils {
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
-  
   /**
    * @deprecated instead use WebUtilsService
    */
   @Deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException {
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
+      ) throws ClassNotFoundException {
     return this.getWebUtilsService().getAttachmentListSorted(doc, comparator);
+  }
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException {
+    return this.getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
+        start, nb);
   }
 
   /**
@@ -465,7 +468,13 @@ public class WebUtils implements IWebUtils {
     return this.getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
         imagesOnly);
   }
-  
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb) {
+    return this.getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
+        imagesOnly, start, nb);
+  }
+
   /**
    * getRandomImages computes a set of <num> randamly chosen images
    * from the given AttachmentList. It chooses the Images without dubilcats if
@@ -511,7 +520,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.11.6 instead use WebUtilsService directly
    */
   @Deprecated
   public boolean isAdminUser(XWikiContext context) {
@@ -540,7 +549,7 @@ public class WebUtils implements IWebUtils {
 
 
   /**
-   * @deprecated instead use AttachmentURLCommand
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
@@ -548,7 +557,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use AttachmentURLCommand
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public String getAttachmentName(String link) {
@@ -556,7 +565,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use AttachmentURLCommand
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public String getPageFullName(String link) {
@@ -564,7 +573,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use AttachmentURLCommand
+   * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
   @Deprecated
   public boolean isAttachmentLink(String link) {

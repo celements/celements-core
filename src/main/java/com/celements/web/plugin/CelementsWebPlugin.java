@@ -174,7 +174,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @return
    * @throws XWikiException
    * 
-   * @Deprecated use UserNameForUserDataCommand instead
+   * @deprecated since 2.14.0 use UserNameForUserDataCommand instead
    */
   @Deprecated
   public String getUsernameForUserData(String login, String possibleLogins,
@@ -190,7 +190,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @return
    * @throws XWikiException
    * 
-   * @Deprecated use TokenLDAPAuthServiceImpl instead
+   * @deprecated since 2.14.0 use TokenLDAPAuthServiceImpl instead
    */
   @Deprecated
   public String getUsernameForToken(String userToken, XWikiContext context
@@ -216,7 +216,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
       mLogger.info("searching token and found " + users.size() + " with parameters " + 
           Arrays.deepToString(parameterList.toArray()));
-      
+      if(users == null || users.size() == 0) {
+        String db = context.getDatabase();
+        context.setDatabase("xwiki");
+        users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
+        context.setDatabase(db);
+      }
       int usersFound = 0;
       for (String tmpUserDoc : users) {
         if(!tmpUserDoc.trim().equals("")) {
@@ -845,7 +850,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @return
    * @throws XWikiException
    * 
-   * @Deprecated use NewCelementsTokenForUserCommand instead
+   * @deprecated since 2.14.0 use NewCelementsTokenForUserCommand instead
    */
   @Deprecated
   public String getUniqueValidationKey(XWikiContext context)
@@ -893,7 +898,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @return
    * @throws XWikiException
    * 
-   * @Deprecated use TokenLDAPAuthServiceImpl instead
+   * @deprecated since 2.14.0 use TokenLDAPAuthServiceImpl instead
    */
   @Deprecated
   public XWikiUser checkAuthByToken(String userToken, XWikiContext context
@@ -1088,7 +1093,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated use IWebUtilsService instead
+   * @deprecated since 2.14.0 use IWebUtilsService instead
    */
   @Deprecated
   public String getDefaultLanguage(XWikiContext context) {
@@ -1106,7 +1111,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @param context
    * @return
    * 
-   * @deprecated please use the AddTranslationCommand directly
+   * @deprecated since 2.14.0 please use the AddTranslationCommand directly
    */
   @Deprecated
   public boolean addTranslation(String fullName, String language, XWikiContext context) {

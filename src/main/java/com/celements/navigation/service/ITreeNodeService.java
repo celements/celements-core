@@ -17,8 +17,7 @@ public interface ITreeNodeService {
   public int getMenuItemPos(DocumentReference docRef, String menuPart);
 
   /**
-   * 
-   * @deprecated use getSubNodesForParent with DocumentReference instead
+   * @deprecated instead use getSubNodesForParent(DocumentReference, String, INavFilter)
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,

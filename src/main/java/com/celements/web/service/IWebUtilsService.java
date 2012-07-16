@@ -26,12 +26,14 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.web.pagetype.IPageType;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
@@ -81,19 +83,35 @@ public interface IWebUtilsService {
   
   public String resolveFullName(EntityReference reference, boolean withDatabase);
 
+  public SpaceReference resolveSpaceReference(String spaceName);
+
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
   
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
-      ) throws ClassNotFoundException;
-  
   public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator, boolean imagesOnly);
+      String comparator) throws ClassNotFoundException;
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      boolean imagesOnly);
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb);
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb);
+
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField, boolean asc);
   
+  public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
+      String orderField1, boolean asc1, String orderField2, boolean asc2);
+
+  public String[] splitStringByLength(String inStr, int maxLength);
+
   public Map<String, String> xwikiDocToLinkedMap(DocumentReference docRef,
       boolean bWithObjects, boolean bWithRendering,
       boolean bWithAttachmentContent, boolean bWithVersions) throws XWikiException;
