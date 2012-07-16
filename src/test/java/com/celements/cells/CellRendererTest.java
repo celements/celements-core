@@ -113,9 +113,10 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsRenderCell() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
+        "MasterCell");
     assertFalse(renderer.isRenderCell(null));
-    assertTrue(renderer.isRenderCell(new TreeNode("mySpace.MyDoc", "", 0,
-        context.getDatabase())));
+    assertTrue(renderer.isRenderCell(new TreeNode(docRef, "", 0)));
   }
 
   @Test
@@ -156,7 +157,7 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
         "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode("Skin.MasterCell", "", 0, context.getDatabase());
+    TreeNode node = new TreeNode(docRef, "", 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject cellObj = new BaseObject();
     String cssClasses = "classes two";
@@ -168,6 +169,34 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     Vector<BaseObject> cellObjList = new Vector<BaseObject>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
+        CellRenderer.CELEMENTS_CELL_CLASS_SPACE, CellRenderer.CELEMENTS_CELL_CLASS_NAME);
+    doc.setXObjects(cellClassRef, cellObjList);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
+
+    replay(xwiki, outWriterMock);
+    renderer.startRenderCell(node, isFirstItem, isLastItem);
+    verify(xwiki, outWriterMock);
+  }
+
+  @Test
+  public void testStartRenderCell_otherDb() throws XWikiException {
+    String masterCellDb = "theMasterCellDB";
+    DocumentReference docRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
+    boolean isLastItem = true;
+    boolean isFirstItem = false;
+    TreeNode node = new TreeNode(docRef, "", 0);
+    XWikiDocument doc = new XWikiDocument(docRef);
+    BaseObject cellObj = new BaseObject();
+    String cssClasses = "classes two";
+    String idname = "myDivId";
+    String cssStyles = "width:100px;\nheight:10px;\n";
+    cellObj.setStringValue("css_classes", cssClasses);
+    cellObj.setStringValue("idname", idname);
+    cellObj.setStringValue("css_styles", cssStyles);
+    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    cellObjList.add(cellObj);
+    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
         CellRenderer.CELEMENTS_CELL_CLASS_SPACE, CellRenderer.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);

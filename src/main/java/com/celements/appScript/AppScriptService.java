@@ -56,7 +56,7 @@ public class AppScriptService implements IAppScriptService {
 
   private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
     return (getContext().getWiki().exists(appScriptDocRef, getContext())
-        && !emptyCheckCmd.isEmptyRTEDocument(appScriptDocRef, getContext()));
+        && !emptyCheckCmd.isEmptyRTEDocument(appScriptDocRef));
   }
 
   public boolean hasCentralAppScript(String scriptName) {

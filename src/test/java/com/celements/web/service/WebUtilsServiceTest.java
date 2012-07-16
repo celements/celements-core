@@ -12,6 +12,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -239,6 +242,31 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
+  @Test
+  public void testResolveSpaceReference_mainWiki() {
+    replayAll();
+    SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference(
+        "myMasterCellWiki:XWiki");
+    EntityReference parent = testSpaceRef.getParent();
+    assertEquals(WikiReference.class, parent.getClass());
+    assertEquals("myMasterCellWiki", parent.getName());
+    assertEquals("XWiki", testSpaceRef.getName());
+    verifyAll();
+  }
+
+  @Test
+  public void testResolveSpaceReference_localWiki() {
+    replayAll();
+    context.setDatabase("myFirstWiki");
+    SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference("mySpace");
+    EntityReference parent = testSpaceRef.getParent();
+    assertEquals(WikiReference.class, parent.getClass());
+    assertEquals(context.getDatabase(), parent.getName());
+    assertEquals("mySpace", testSpaceRef.getName());
+    verifyAll();
+  }
+
+
   private void replayAll(Object ... mocks) {
     replay(xwiki);
     replay(mocks);
@@ -334,7 +362,30 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(1, list.get(3).getIntValue("l"));
     assertEquals(1, list.get(4).getIntValue("i"));
   }
+
+  @Test
+  public void testSplitStringByLength_noEmptyTrailingFields() {
+    String testString = ("Market Leader. Business Grammar and"
+        + " Usage, Band 1").substring(0, 35);
+    String[] splitedStr = webUtilsService.splitStringByLength(testString, 35);
+    assertEquals("Market Leader. Business Grammar and", splitedStr[0]);
+    assertTrue("Expecting one Element but found [" + splitedStr.length
+        + "].", splitedStr.length == 1);
+  }
   
+  @Test
+  public void testSplitStringByLength() {
+    String[] splitedStr = webUtilsService.splitStringByLength(
+        "Market Leader. Business Grammar and Usage, Band 1", 35);
+    assertEquals("Market Leader. Business Grammar and", splitedStr[0]);
+    assertEquals(" Usage, Band 1", splitedStr[1]);
+  }
+
+
+  //*****************************************************************
+  //*                  H E L P E R  - M E T H O D S                 *
+  //*****************************************************************/
+
   private DocumentReference getBOClassRef() {
     return new DocumentReference(context.getDatabase(), "Classes", "TestClass");
   }

@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -36,12 +37,12 @@ public class PageLayoutApi extends Api {
 
 
   private PageLayoutCommand pageLayoutCmd;
-  private String layoutSpaceName;
+  private SpaceReference layoutSpaceRef;
 
-  public PageLayoutApi(String layoutSpaceName, XWikiContext context) {
+  public PageLayoutApi(SpaceReference layoutSpaceRef, XWikiContext context) {
     super(context);
     this.pageLayoutCmd = new PageLayoutCommand();
-    this.layoutSpaceName = layoutSpaceName;
+    this.layoutSpaceRef = layoutSpaceRef;
   }
 
   public PageLayoutCommand getPageLayoutCommand() {
@@ -52,11 +53,11 @@ public class PageLayoutApi extends Api {
   }
 
   public boolean isActive() {
-    return pageLayoutCmd.isActive(layoutSpaceName, context);
+    return pageLayoutCmd.isActive(layoutSpaceRef);
   }
 
   public String getPrettyName() {
-    return pageLayoutCmd.getPrettyName(layoutSpaceName, context);
+    return pageLayoutCmd.getPrettyName(layoutSpaceRef);
   }
 
   /**
@@ -66,12 +67,12 @@ public class PageLayoutApi extends Api {
    */
   public boolean exportLayoutXAR(boolean withDocHistory) {
     try {
-      pageLayoutCmd.exportLayoutXAR(layoutSpaceName, withDocHistory, context);
+      pageLayoutCmd.exportLayoutXAR(layoutSpaceRef, withDocHistory);
       return true;
     } catch (XWikiException exp) {
-      mLogger.error("Failed to export page layout [" + layoutSpaceName + "].", exp);
+      mLogger.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
     } catch (IOException exp) {
-      mLogger.error("Failed to export page layout [" + layoutSpaceName + "].", exp);
+      mLogger.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
     }
     return false;
   }

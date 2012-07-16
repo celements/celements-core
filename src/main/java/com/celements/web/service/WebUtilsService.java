@@ -33,6 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.comparators.BaseObjectComparator;
@@ -120,6 +121,18 @@ public class WebUtilsService implements IWebUtilsService {
     return eventRef;
   }
 
+  public SpaceReference resolveSpaceReference(String spaceName) {
+    String wikiName;
+    if (spaceName.contains(":")) {
+      wikiName = spaceName.split(":")[0];
+      spaceName = spaceName.split(":")[1];
+    } else {
+      wikiName = getContext().getDatabase();
+    }
+    SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
+    return spaceRef;
+  }
+
   public String getDefaultLanguage() {
     return getContext().getWiki().getWebPreference("default_language", getContext());
   }
@@ -198,4 +211,18 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return resultList;
   }
+
+  public String[] splitStringByLength(String inStr, int maxLength) {
+    int numFullStr = (inStr.length() - 1) / maxLength;
+    String[] splitedStr = new String[1 + numFullStr];
+    for(int i = 0 ; i < numFullStr ; i ++) {
+      int startIndex = i * maxLength;
+      splitedStr[i] = inStr.substring(startIndex, startIndex + maxLength);
+    }
+    int lastPiece = splitedStr.length - 1;
+    splitedStr[lastPiece] = inStr.substring(lastPiece * maxLength,
+        inStr.length());
+    return splitedStr;
+  }
+  
 }

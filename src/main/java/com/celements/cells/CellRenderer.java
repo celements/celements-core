@@ -90,8 +90,10 @@ public class CellRenderer implements IRenderStrategy {
     String cssStyles = "";
     String idname = "";
     try {
-      XWikiDocument cellDoc = context.getWiki().getDocument(node.getDocumentReference(), context);
-      BaseObject cellObj = cellDoc.getXObject(new DocumentReference(context.getDatabase(),
+      DocumentReference cellDocRef = node.getDocumentReference();
+      XWikiDocument cellDoc = context.getWiki().getDocument(cellDocRef, context);
+      BaseObject cellObj = cellDoc.getXObject(new DocumentReference(
+          cellDocRef.getWikiReference().getName(),
           CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME));
       if(cellObj != null) {
         cssClasses = cellObj.getStringValue("css_classes");

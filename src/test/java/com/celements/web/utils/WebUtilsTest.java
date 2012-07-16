@@ -22,6 +22,8 @@ package com.celements.web.utils;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +50,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class WebUtilsTest extends AbstractBridgedComponentTestCase {
@@ -817,7 +820,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetAttachmentListSorted_getAll() throws ClassNotFoundException, 
-      XWikiException {
+      XWikiException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
@@ -838,20 +841,24 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
         ).andReturn("g.jpg").once();
     expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
         ).andReturn("h.jpg").once();
-    replay(wiki, rightsService);
+    XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
+    context.setEngineContext(engContext);
+    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    replay(engContext, wiki, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
-    doc.addAttachment("c.jpg", new byte[]{});
-    doc.addAttachment("d.jpg", new byte[]{});
-    doc.addAttachment("h.jpg", new byte[]{});
-    doc.addAttachment("a.jpg", new byte[]{});
-    doc.addAttachment("e.jpg", new byte[]{});
-    doc.addAttachment("b.jpg", new byte[]{});
-    doc.addAttachment("g.jpg", new byte[]{});
-    doc.addAttachment("f.jpg", new byte[]{});
+    InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
+    doc.addAttachment("c.jpg", in);
+    doc.addAttachment("d.jpg", in);
+    doc.addAttachment("h.jpg", in);
+    doc.addAttachment("a.jpg", in);
+    doc.addAttachment("e.jpg", in);
+    doc.addAttachment("b.jpg", in);
+    doc.addAttachment("g.jpg", in);
+    doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
-        "AttachmentAscendingNameComparator", 0, 0);
-    verify(wiki, rightsService);
+        "AttachmentAscendingNameComparator", true, 0, 0);
+    verify(engContext, wiki, rightsService);
     assertEquals(8, result.size());
     assertEquals("a.jpg", result.get(0).getFilename());
     assertEquals("e.jpg", result.get(4).getFilename());
@@ -860,7 +867,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetAttachmentListSorted_getFirstPart() throws XWikiException, 
-      ClassNotFoundException {
+      ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
@@ -881,20 +888,24 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
         ).andReturn("g.jpg").once();
     expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
         ).andReturn("h.jpg").once();
-    replay(wiki, rightsService);
+    XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
+    context.setEngineContext(engContext);
+    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    replay(engContext, wiki, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
-    doc.addAttachment("c.jpg", new byte[]{});
-    doc.addAttachment("d.jpg", new byte[]{});
-    doc.addAttachment("h.jpg", new byte[]{});
-    doc.addAttachment("a.jpg", new byte[]{});
-    doc.addAttachment("e.jpg", new byte[]{});
-    doc.addAttachment("b.jpg", new byte[]{});
-    doc.addAttachment("g.jpg", new byte[]{});
-    doc.addAttachment("f.jpg", new byte[]{});
+    InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
+    doc.addAttachment("c.jpg", in);
+    doc.addAttachment("d.jpg", in);
+    doc.addAttachment("h.jpg", in);
+    doc.addAttachment("a.jpg", in);
+    doc.addAttachment("e.jpg", in);
+    doc.addAttachment("b.jpg", in);
+    doc.addAttachment("g.jpg", in);
+    doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
-        "AttachmentAscendingNameComparator", -1, 3);
-    verify(wiki, rightsService);
+        "AttachmentAscendingNameComparator", true, -1, 3);
+    verify(engContext, wiki, rightsService);
     assertEquals(3, result.size());
     assertEquals("a.jpg", result.get(0).getFilename());
     assertEquals("b.jpg", result.get(1).getFilename());
@@ -903,7 +914,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetAttachmentListSorted_getMiddlePart() throws XWikiException,
-      ClassNotFoundException {
+      ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
@@ -924,20 +935,24 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
         ).andReturn("g.jpg").once();
     expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
         ).andReturn("h.jpg").once();
-    replay(wiki, rightsService);
+    XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
+    context.setEngineContext(engContext);
+    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    replay(engContext, wiki, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
-    doc.addAttachment("c.jpg", new byte[]{});
-    doc.addAttachment("d.jpg", new byte[]{});
-    doc.addAttachment("h.jpg", new byte[]{});
-    doc.addAttachment("a.jpg", new byte[]{});
-    doc.addAttachment("e.jpg", new byte[]{});
-    doc.addAttachment("b.jpg", new byte[]{});
-    doc.addAttachment("g.jpg", new byte[]{});
-    doc.addAttachment("f.jpg", new byte[]{});
+    InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
+    doc.addAttachment("c.jpg", in);
+    doc.addAttachment("d.jpg", in);
+    doc.addAttachment("h.jpg", in);
+    doc.addAttachment("a.jpg", in);
+    doc.addAttachment("e.jpg", in);
+    doc.addAttachment("b.jpg", in);
+    doc.addAttachment("g.jpg", in);
+    doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
-        "AttachmentAscendingNameComparator", 3, 3);
-    verify(wiki, rightsService);
+        "AttachmentAscendingNameComparator", true, 3, 3);
+    verify(engContext, wiki, rightsService);
     assertEquals(3, result.size());
     assertEquals("d.jpg", result.get(0).getFilename());
     assertEquals("e.jpg", result.get(1).getFilename());
@@ -946,7 +961,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetAttachmentListSorted_getLastPart() throws XWikiException,
-      ClassNotFoundException {
+      ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
@@ -967,20 +982,24 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
         ).andReturn("g.jpg").once();
     expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
         ).andReturn("h.jpg").once();
-    replay(wiki, rightsService);
+    XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
+    context.setEngineContext(engContext);
+    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    replay(engContext, wiki, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
-    doc.addAttachment("c.jpg", new byte[]{});
-    doc.addAttachment("d.jpg", new byte[]{});
-    doc.addAttachment("h.jpg", new byte[]{});
-    doc.addAttachment("a.jpg", new byte[]{});
-    doc.addAttachment("e.jpg", new byte[]{});
-    doc.addAttachment("b.jpg", new byte[]{});
-    doc.addAttachment("g.jpg", new byte[]{});
-    doc.addAttachment("f.jpg", new byte[]{});
+    InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
+    doc.addAttachment("c.jpg", in);
+    doc.addAttachment("d.jpg", in);
+    doc.addAttachment("h.jpg", in);
+    doc.addAttachment("a.jpg", in);
+    doc.addAttachment("e.jpg", in);
+    doc.addAttachment("b.jpg", in);
+    doc.addAttachment("g.jpg", in);
+    doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
-        "AttachmentAscendingNameComparator", 6, 3);
-    verify(wiki, rightsService);
+        "AttachmentAscendingNameComparator", true, 6, 3);
+    verify(engContext, wiki, rightsService);
     assertEquals(2, result.size());
     assertEquals("g.jpg", result.get(0).getFilename());
     assertEquals("h.jpg", result.get(1).getFilename());
@@ -988,7 +1007,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetAttachmentListSorted_getEmpty() throws XWikiException,
-      ClassNotFoundException {
+      ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
@@ -1009,21 +1028,119 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
         ).andReturn("g.jpg").once();
     expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
         ).andReturn("h.jpg").once();
-    replay(wiki, rightsService);
+    XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
+    context.setEngineContext(engContext);
+    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    replay(engContext, wiki, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
-    doc.addAttachment("c.jpg", new byte[]{});
-    doc.addAttachment("d.jpg", new byte[]{});
-    doc.addAttachment("h.jpg", new byte[]{});
-    doc.addAttachment("a.jpg", new byte[]{});
-    doc.addAttachment("e.jpg", new byte[]{});
-    doc.addAttachment("b.jpg", new byte[]{});
-    doc.addAttachment("g.jpg", new byte[]{});
-    doc.addAttachment("f.jpg", new byte[]{});
+    InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
+    doc.addAttachment("c.jpg", in);
+    doc.addAttachment("d.jpg", in);
+    doc.addAttachment("h.jpg", in);
+    doc.addAttachment("a.jpg", in);
+    doc.addAttachment("e.jpg", in);
+    doc.addAttachment("b.jpg", in);
+    doc.addAttachment("g.jpg", in);
+    doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
-        "AttachmentAscendingNameComparator", 7, 0);
-    verify(wiki, rightsService);
+        "AttachmentAscendingNameComparator", true, 7, 0);
+    verify(engContext, wiki, rightsService);
     assertEquals(0, result.size());
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_getWithNonImages() throws XWikiException,
+      ClassNotFoundException, IOException {
+    XWikiRightService rightsService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
+    expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
+        "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
+    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("a.jpg").once();
+    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("b.jpg").once();
+    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("c.jpg").once();
+    expect(wiki.clearName(eq("d.txt"), eq(false), eq(true), same(context))
+        ).andReturn("d.txt").once();
+    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("e.jpg").once();
+    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("f.jpg").once();
+    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("g.jpg").once();
+    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+        ).andReturn("h.jpg").once();
+    XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
+    context.setEngineContext(engContext);
+    expect(engContext.getMimeType("d.txt")).andReturn("txt").once();
+    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    replay(engContext, wiki, rightsService);
+    DocumentReference docref = new DocumentReference("a", "b", "c");
+    Document doc = new Document(new XWikiDocument(docref), context);
+    InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
+    InputStream intxt = getClass().getClassLoader().getResourceAsStream("test.txt");
+    doc.addAttachment("c.jpg", in);
+    doc.addAttachment("d.txt", intxt);
+    doc.addAttachment("h.jpg", in);
+    doc.addAttachment("a.jpg", in);
+    doc.addAttachment("e.jpg", in);
+    doc.addAttachment("b.jpg", in);
+    doc.addAttachment("g.jpg", in);
+    doc.addAttachment("f.jpg", in);
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+        "AttachmentAscendingNameComparator", true, 2, 3);
+    verify(engContext, wiki, rightsService);
+    assertEquals(3, result.size());
+    assertEquals("c.jpg", result.get(0).getFilename());
+    assertEquals("e.jpg", result.get(1).getFilename());
+    assertEquals("f.jpg", result.get(2).getFilename());
+  }
+
+  @Test
+  public void testReduceListToSize_all() {
+    Attachment att1 = createMock(Attachment.class);
+    Attachment att2 = createMock(Attachment.class);
+    Attachment att3 = createMock(Attachment.class);
+    List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
+    replayAll(att1, att2, att3);
+    List<Attachment> resultList = celUtils.reduceListToSize(attachments, 0, 5);
+    assertEquals(3, resultList.size());
+    assertTrue(resultList.contains(att1));
+    assertTrue(resultList.contains(att2));
+    assertTrue(resultList.contains(att3));
+    verifyAll(att1, att2, att3);
+  }
+
+  @Test
+  public void testReduceListToSize_first() {
+    Attachment att1 = createMock(Attachment.class);
+    Attachment att2 = createMock(Attachment.class);
+    Attachment att3 = createMock(Attachment.class);
+    List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
+    replayAll(att1, att2, att3);
+    List<Attachment> resultList = celUtils.reduceListToSize(attachments, 0, 2);
+    assertEquals(2, resultList.size());
+    assertTrue(resultList.contains(att1));
+    assertTrue(resultList.contains(att2));
+    assertFalse(resultList.contains(att3));
+    verifyAll(att1, att2, att3);
+  }
+
+  @Test
+  public void testReduceListToSize_last() {
+    Attachment att1 = createMock(Attachment.class);
+    Attachment att2 = createMock(Attachment.class);
+    Attachment att3 = createMock(Attachment.class);
+    List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
+    replayAll(att1, att2, att3);
+    List<Attachment> resultList = celUtils.reduceListToSize(attachments, 1, 5);
+    assertEquals(2, resultList.size());
+    assertFalse(resultList.contains(att1));
+    assertTrue(resultList.contains(att2));
+    assertTrue(resultList.contains(att3));
+    verifyAll(att1, att2, att3);
   }
 
   //*****************************************************************
