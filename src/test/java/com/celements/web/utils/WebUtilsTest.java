@@ -89,6 +89,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMaxConfiguredNavigationLevel_twoParents() throws Exception {
+    DocumentReference navigationConfigClassReference =
+      Navigation.getNavigationConfigClassReference(context.getDatabase());
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
@@ -109,7 +111,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(3, webPrefDoc));
     expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
-    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
     replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
@@ -120,6 +122,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMaxConfiguredNavigationLevel_deletedObject_NPE() throws Exception {
+    DocumentReference navigationConfigClassReference =
+      Navigation.getNavigationConfigClassReference(context.getDatabase());
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
@@ -139,7 +143,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
                           // in the object list
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
     expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
@@ -183,6 +187,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMaxConfiguredNavigationLevel_threeParents() throws Exception {
+    DocumentReference navigationConfigClassReference =
+      Navigation.getNavigationConfigClassReference(context.getDatabase());
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
@@ -202,7 +208,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
     expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
@@ -1148,11 +1154,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   //*****************************************************************/
 
   private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
+    DocumentReference navigationConfigClassReference =
+      Navigation.getNavigationConfigClassReference(context.getDatabase());
     BaseObject navObj = new BaseObject();
-    navObj.setClassName(Navigation.NAVIGATION_CONFIG_CLASS);
+    navObj.setXClassReference(navigationConfigClassReference);
     navObj.setStringValue("menu_element_name", "mainMenu");
     navObj.setIntValue("to_hierarchy_level", toLevel);
-    navObj.setName(doc.getFullName());
     navObj.setDocumentReference(doc.getDocumentReference());
     return navObj;
   }

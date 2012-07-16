@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
@@ -41,7 +42,10 @@ public class Navigation implements INavigation {
 
   public static final int DEFAULT_MAX_LEVEL = 100;
 
-  public static final String NAVIGATION_CONFIG_CLASS = "Celements2.NavigationConfigClass";
+  public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
+  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
+      + "." + NAVIGATION_CONFIG_CLASS_DOC;
 
   private INavigationBuilder navBuilder;
 
@@ -112,6 +116,11 @@ public class Navigation implements INavigation {
     this.mainUlCssClasses = "";
     this.cmCssClass = _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
     utils = WebUtils.getInstance();
+  }
+
+  public static DocumentReference getNavigationConfigClassReference(String wikiName) {
+    return new DocumentReference(wikiName, NAVIGATION_CONFIG_CLASS_SPACE,
+        NAVIGATION_CONFIG_CLASS_DOC);
   }
 
   /**
