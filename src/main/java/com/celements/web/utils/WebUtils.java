@@ -487,7 +487,8 @@ public class WebUtils implements IWebUtils {
           Navigation.NAVIGATION_CONFIG_CLASS, context.getDoc().getFullName(), context
           ).getObject("menu_element_name");
       if (navConfigObj != null) {
-        XWikiDocument navConfigDoc = navConfigObj.getDocument(context);
+        XWikiDocument navConfigDoc = context.getWiki().getDocument(
+            navConfigObj.getDocumentReference(), context);
         Vector<BaseObject> navConfigObjects = navConfigDoc.getObjects(
             Navigation.NAVIGATION_CONFIG_CLASS);
         int maxLevel = 0;
