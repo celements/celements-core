@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +46,8 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
   private DocumentReference _testClassRef;
   private XWikiDocument _testDoc;
   private List<String> _docList;
+  private String _fullname;
+  private DocumentReference _docRef;
   
   @Before
   public void setUp_FieldInheritorTest() throws Exception {
@@ -56,7 +57,9 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     _testClassRef = new DocumentReference(_context.getDatabase(), "Celements",
         "TestClass");
     _fieldInheritor = new FieldInheritor();
-    _testDoc = new XWikiDocument();
+    _fullname = "Test.Doc";
+    _docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
+    _testDoc = new XWikiDocument(_docRef);
     _docList = new ArrayList<String>();
     _iteratorFactory = getTestIteratorFactory(_docList);
   }
@@ -76,19 +79,16 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetObject() throws Exception{
-    String fullname = "Test.Doc";
-    _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    _docList.add(_fullname);
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     firstObj.setStringValue("field1", "value1");
-    testObjs.add(firstObj);
+    _testDoc.addXObject(firstObj);
     BaseObject secondObj = new BaseObject();
     secondObj.setXClassReference(_testClassRef);
     secondObj.setStringValue("field2", "value2");
-    testObjs.add(secondObj);
-    _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc
+    _testDoc.addXObject(secondObj);
+    expect(_xwiki.getDocument(eq(_fullname), same(_context))).andReturn(_testDoc
         ).anyTimes();
     _fieldInheritor.setIteratorFactory(_iteratorFactory);
     replay(_xwiki);      

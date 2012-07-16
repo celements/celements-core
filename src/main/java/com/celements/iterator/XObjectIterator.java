@@ -24,17 +24,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Iterator class
@@ -55,6 +56,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
   private BaseObject _nextObject;
   private String _key;
   private Object _value;
+
+  IWebUtilsService webUtilsService;
 
   /**
    * Constructor
@@ -166,7 +169,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
     if (getCurrentDoc() == null) {
       return Collections.emptyList();
     }
-    Vector<BaseObject> objs = getCurrentDoc().getObjects(_xwikiClassName);
+    List<BaseObject> objs = getCurrentDoc().getXObjects(getWebUtilsService(
+        ).resolveDocumentReference(_xwikiClassName));
     if (objs != null) {
       return objs;
     } else {
@@ -269,4 +273,12 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
   public Iterator<BaseObject> iterator() {
     return this;
   }
+
+  IWebUtilsService getWebUtilsService() {
+    if (webUtilsService != null) {
+      return webUtilsService;
+    }
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
 }
