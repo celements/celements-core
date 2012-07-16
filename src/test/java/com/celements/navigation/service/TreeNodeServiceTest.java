@@ -20,6 +20,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -41,7 +42,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     treeNodeService = new TreeNodeService();
     mockTreeNodeCache = createMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
-    treeNodeService.execution = getComponentManager().lookup(Execution.class);
+    treeNodeService.execution = Utils.getComponent(Execution.class);
     testGetNotMenuItemCommand = createMock(GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
         testGetNotMenuItemCommand).anyTimes();
