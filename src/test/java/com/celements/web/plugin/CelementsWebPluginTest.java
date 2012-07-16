@@ -82,13 +82,13 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     context.put("vcontext", vContext);
     expect(xwiki.getPluginApi(eq(plugin.getName()), same(context))).andReturn(null
       ).anyTimes();
-    expect(xwiki.getWebPreference(eq("default_language"), same(context))).andReturn(""
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn(""
       ).anyTimes();
-    expect(xwiki.getWebPreference(eq("language"), same(context))).andReturn(""
+    expect(xwiki.getSpacePreference(eq("language"), same(context))).andReturn(""
       ).anyTimes();
-    expect(xwiki.getWebPreference(eq("skin"), same(context))).andReturn(""
+    expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(""
       ).anyTimes();
-    expect(xwiki.getWebPreference(eq("admin_language"), eq("de"), same(context))
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
       ).andReturn("").anyTimes();
     expect(xwiki.getDocument(eq(""), same(context))).andReturn(new XWikiDocument()
       ).anyTimes();
@@ -97,7 +97,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
       new XWikiDocument(userDocRef)).anyTimes();
     expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.getWebPreference(eq("editbox_width"), same(context))).andReturn("123"
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123"
       ).anyTimes();
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
       ).anyTimes();
@@ -123,9 +123,9 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInitPanelsVelocity_checkNPEs_forEmptyVContext() {
     context.put("vcontext", new VelocityContext());
-    expect(xwiki.getWebPreference(eq("showRightPanels"), same(context))).andReturn(null
+    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(null
       ).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("showLeftPanels"), same(context))).andReturn(null
+    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(null
       ).atLeastOnce();
     replay(xwiki, skinDoc);
     plugin.initPanelsVelocity(context);
@@ -407,7 +407,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetRTEwidth_default() throws Exception {
-    expect(xwiki.getWebPreference(eq("editbox_width"), same(context))).andReturn("");
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("");
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
       ).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
@@ -419,7 +419,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetRTEwidth_preferences() throws Exception {
-    expect(xwiki.getWebPreference(eq("editbox_width"), same(context))).andReturn("500");
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500");
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
       ).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
@@ -433,7 +433,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   public void testGetRTEwidth_pageType() throws Exception {
     XWikiRequest request = createMock(XWikiRequest.class);
     context.setRequest(request);
-    expect(xwiki.getWebPreference(eq("editbox_width"), same(context))).andReturn("500"
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500"
         ).anyTimes();
     XWikiDocument theDoc = new XWikiDocument(new DocumentReference(context.getDatabase(),
         "MySpace", "myPage"));

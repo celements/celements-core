@@ -90,9 +90,9 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetWebPreferencesFullName() {
+  public void testgetSpacePreferencesFullName() {
     String fullName = "mySpace.myDoc";
-    assertEquals("mySpace.WebPreferences", _factory.getWebPreferencesFullName(fullName));
+    assertEquals("mySpace.WebPreferences", _factory.getSpacePreferencesFullName(fullName));
   }
 
   @Test

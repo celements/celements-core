@@ -426,7 +426,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         ).andReturn("/MySpace/MyCurrentDoc");
     expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
         currentDoc).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
         ).andReturn(0);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
         MultilingualMenuNameCommand.class);
@@ -465,7 +465,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
         ).andReturn(1);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
         MultilingualMenuNameCommand.class);
@@ -506,7 +506,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     nav.setHasLink(false);
-    expect(xwiki.getWebPreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
       ).andReturn(0);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
         MultilingualMenuNameCommand.class);
