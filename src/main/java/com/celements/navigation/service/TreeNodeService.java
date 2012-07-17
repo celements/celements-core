@@ -49,7 +49,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class TreeNodeService implements ITreeNodeService {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(TreeNodeService.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeService.class);
 
   @Requirement
   Execution execution;
@@ -116,13 +116,13 @@ public class TreeNodeService implements ITreeNodeService {
             treeNodesMergedMap.put(new Integer(node.getPosition()), node);
           }
         } catch(Exception exp) {
-          mLogger.warn("Failed on provider [" + tnProvider.getClass()
+          LOGGER.warn("Failed on provider [" + tnProvider.getClass()
               + "] to get nodes for parentKey [" + parentKey + "].", exp);
         }
       }
       nodes = new ArrayList<TreeNode>(treeNodesMergedMap.values());
       long end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
           + nodes.size() + "]: " + (end-starttotal));
     }
     return nodes;
@@ -133,24 +133,24 @@ public class TreeNodeService implements ITreeNodeService {
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     long end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
+    LOGGER.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
         + (end-start));
     start = System.currentTimeMillis();
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
+    LOGGER.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
         + (end-start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
           + mappedTreeNodes.size() + "]: " + (end-starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + notMappedmenuItems.size() + "]: " + (end-starttotal));
       return notMappedmenuItems;
     } else {
@@ -162,10 +162,10 @@ public class TreeNodeService implements ITreeNodeService {
         menuItemsMergedMap.put(new Integer(node.getPosition()), node);
       }
       end = System.currentTimeMillis();
-      mLogger.debug("fetchNodesForParentKey_internal: time for merging menu items: "
+      LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: "
           + (end-start));
       ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
-      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + menuItems.size() + "]: " + (end-starttotal));
       return menuItems;
     }
@@ -192,11 +192,11 @@ public class TreeNodeService implements ITreeNodeService {
           menuItemList.add(cobj);
         }
       } catch (XWikiException exp) {
-        mLogger.error("failed to get doc for menuItem", exp);
+        LOGGER.error("failed to get doc for menuItem", exp);
       }
     }
     long end = System.currentTimeMillis();
-    mLogger.info("fetchMenuItemsForXWiki: [" + parentKey + "] totaltime for list of ["
+    LOGGER.info("fetchMenuItemsForXWiki: [" + parentKey + "] totaltime for list of ["
         + menuItemList.size() + "]: " + (end-starttotal));
     return menuItemList;
   }
