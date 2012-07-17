@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * TreeNodeService
  * 
- * access a tree node structre throught the method of this service.
+ * access a tree node structure through the method of this service.
  * 
  * @author Fabian Pichler
  *
