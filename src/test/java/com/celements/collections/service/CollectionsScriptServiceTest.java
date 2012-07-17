@@ -16,9 +16,11 @@ import com.celements.collections.ICollectionsService;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.render.macro.WikiCodeFilter;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -53,25 +55,21 @@ public class CollectionsScriptServiceTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void testGetObjectsOrdered() {
+  public void testGetObjectsOrdered() throws XWikiException {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyPage");
     XWikiDocument xdoc = new XWikiDocument(docRef);
-    Document document = new Document(xdoc, context);
     DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
         "MyClass");
-    // FIXME !!! doc.getDocument() needs programming rights.
-    // FIXME !!! view-rights look sufficient to me
-    expect(mockRightService.hasProgrammingRights(same(context))).andReturn(true);
+    expect(xwiki.getDocument(same(docRef), same(context))).andReturn(xdoc).once();
     BaseObject expectedBO = new BaseObject();
     expectedBO.setStringValue("myField", "abcd");
     List<BaseObject> expResultList = Arrays.asList(expectedBO);
-    expect(
-        mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"),
-            eq(true), (String) isNull(), eq(false))).andReturn(expResultList);
+    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"),
+        eq(true), (String) isNull(), eq(false))).andReturn(expResultList);
     replayAll();
     List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(
-        document, classRef, "myField", true);
+        docRef, classRef, "myField", true);
     assertNotNull(resultList);
     assertEquals(1, resultList.size());
     assertEquals("abcd", resultList.get(0).getProperty("myField").getValue());
@@ -79,25 +77,21 @@ public class CollectionsScriptServiceTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void testGetObjectsOrdered_orderByTwoFields() {
+  public void testGetObjectsOrdered_orderByTwoFields() throws XWikiException {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyPage");
     XWikiDocument xdoc = new XWikiDocument(docRef);
-    Document document = new Document(xdoc, context);
     DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
         "MyClass");
-    // FIXME !!! doc.getDocument() needs programming rights.
-    // FIXME !!! view-rights look sufficient to me
-    expect(mockRightService.hasProgrammingRights(same(context))).andReturn(true);
+    expect(xwiki.getDocument(same(docRef), same(context))).andReturn(xdoc).once();
     BaseObject expectedBO = new BaseObject();
     expectedBO.setStringValue("myField", "abcd");
     List<BaseObject> expResultList = Arrays.asList(expectedBO);
-    expect(
-        mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"),
-            eq(true), eq("myField2"), eq(false))).andReturn(expResultList);
+    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"),
+        eq(true), eq("myField2"), eq(false))).andReturn(expResultList);
     replayAll();
     List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(
-        document, classRef, "myField", true, "myField2", false);
+        docRef, classRef, "myField", true, "myField2", false);
     assertNotNull(resultList);
     assertEquals(1, resultList.size());
     assertEquals("abcd", resultList.get(0).getProperty("myField").getValue());
