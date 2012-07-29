@@ -27,10 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.ICelementsClassCollection;
 import com.celements.iterator.XObjectIterator;
@@ -53,9 +49,6 @@ public class MenuBar_SubMenuItemsClassMigrator
 
   @Requirement
   IMenuService menuService;
-
-  @Requirement
-  EntityReferenceResolver<String> referenceResolver;
 
   @Requirement
   Execution execution;
