@@ -31,6 +31,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
@@ -64,6 +67,9 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
+  
+  @Requirement("default")
+  EntityReferenceSerializer<String> serializer;
   
   private InheritorFactory injectedInheritorFactory;
   private IWebUtilsService webUtilsService;
@@ -102,7 +108,8 @@ public class TreeNodeService implements ITreeNodeService {
   
   /**
    * 
-   * @deprecated use getSubNodesForParent(DocumentReference, String, INavFilter) instead
+   * @deprecated use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -128,12 +135,32 @@ public class TreeNodeService implements ITreeNodeService {
     }
     return parentKey;
   }
+  
+  String getParentKey(EntityReference reference, boolean withDataBase){
+    String parentKey = "";
+    if(reference==null){
+      return parentKey;
+    }
+    else{
+      parentKey = serializer.serialize(reference);
+      if(!parentKey.contains(":") && !parentKey.endsWith(":")){
+        parentKey += ":";
+      } else if(!parentKey.contains(".") && !parentKey.endsWith(".")){
+        parentKey += ".";
+      }
+      if(withDataBase){
+        return parentKey;
+      } else{
+        return parentKey.substring(parentKey.indexOf(":")+1);        
+      }
+    }
+  }
 
   
-  public <T> List<TreeNode> getSubNodesForParent(DocumentReference docRef,
+  public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
       INavFilter<T> filter) {
     ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
-    for(TreeNode node : fetchNodesForParentKey(docRef)) {
+    for(TreeNode node : fetchNodesForParentKey(entRef)) {
       if((node!=null) && filter.includeTreeNode(node, getContext())) {
         // show only Menuitems of pages accessible to the current user
         menuArray.add(node);
@@ -144,7 +171,8 @@ public class TreeNodeService implements ITreeNodeService {
   
   /**
    * 
-   * @deprecated use getSubNodesForParent with DocumentReference instead
+   * @deprecated use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -154,11 +182,11 @@ public class TreeNodeService implements ITreeNodeService {
     return getSubNodesForParent(parent, menuSpace, filter);
   }
   
-  public List<TreeNode> getSubNodesForParent(DocumentReference docRef,
+  public List<TreeNode> getSubNodesForParent(EntityReference entRef,
       String menuPart) {
     InternalRightsFilter filter = new InternalRightsFilter();
     filter.setMenuPart(menuPart);
-    return getSubNodesForParent(docRef, filter);
+    return getSubNodesForParent(entRef, filter);
   }
 
   /**
@@ -167,8 +195,8 @@ public class TreeNodeService implements ITreeNodeService {
    * @param context
    * @return Collection keeps ordering of TreeNodes according to posId
    */
-  List<TreeNode> fetchNodesForParentKey(DocumentReference docRef) {
-    String parentKey = getWebUtilsService().resolveFullName(docRef, true);
+  List<TreeNode> fetchNodesForParentKey(EntityReference reference) {
+    String parentKey = getParentKey(reference, true);
     long starttotal = System.currentTimeMillis();
     long start = System.currentTimeMillis();
     List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
@@ -250,8 +278,8 @@ public class TreeNodeService implements ITreeNodeService {
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
     long starttotal = System.currentTimeMillis();
     List<BaseObject> menuItemList = new ArrayList<BaseObject>();
-    
-    for (TreeNode node : fetchNodesForParentKey(getRef(parentKey))) {
+    EntityReference refParent = webUtilsService.resolveEntityReference(parentKey);
+    for (TreeNode node : fetchNodesForParentKey(refParent)) {
       try {
         XWikiDocument itemdoc = getContext().getWiki().getDocument(node.getFullName(),
             getContext());
@@ -271,7 +299,8 @@ public class TreeNodeService implements ITreeNodeService {
 
   /**
    * 
-   * @deprecated since 2.14.0  use getSubNodesForParent instead
+   * @deprecated use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
@@ -293,10 +322,9 @@ public class TreeNodeService implements ITreeNodeService {
   public Integer getMaxConfiguredNavigationLevel() {
     try {
       BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
-          Navigation.NAVIGATION_CONFIG_CLASS,
-          getWebUtilsService().resolveFullName(
-              getContext().getDoc().getDocumentReference(), false) ,
-          getContext()).getObject("menu_element_name");
+          Navigation.NAVIGATION_CONFIG_CLASS, getParentKey(
+              getContext().getDoc().getDocumentReference(), false),
+              getContext()).getObject("menu_element_name");
       if(navConfigObj!=null){
         XWikiDocument navConfigDoc = getContext().getWiki().getDocument(
             navConfigObj.getDocumentReference(), getContext());
@@ -347,13 +375,13 @@ public class TreeNodeService implements ITreeNodeService {
           return subMenuItems.get(pos + 1);
         }
         mLogger.info("getPrevMenuItem: no previous MenuItem found for "
-            + getWebUtilsService().resolveFullName(docRef, true));
+            + getParentKey(docRef, true));
       } catch (XWikiException e) {
         mLogger.error(e);
       }
     } else {
       mLogger.debug("getPrevMenuItem: no MenuItem Object found on doc "
-          + getWebUtilsService().resolveFullName(docRef, true));
+          + getParentKey(docRef, true));
     }
     return null;
   }

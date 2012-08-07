@@ -15,6 +15,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.InheritorFactory;
@@ -52,6 +55,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     mockTreeNodeCache = createMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
     treeNodeService.execution = getComponentManager().lookup(Execution.class);
+    treeNodeService.serializer = getComponentManager().lookup(
+        EntityReferenceSerializer.class);
     testGetNotMenuItemCommand = createMock(GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
         testGetNotMenuItemCommand).anyTimes();
@@ -519,6 +524,28 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     TreeNode prevMenuItem = treeNodeService.getSiblingMenuItem(mItemDocRef, false);
     assertEquals("null expected.", null, prevMenuItem);
     verifyAll(rightServiceMock);
+  }
+  
+  @Test
+  public void testGetParentKey() throws XWikiException { 
+    String
+      wikiName = context.getDatabase(),
+      spaceName = "mySpace",
+      docName = "myDoc";
+    
+    WikiReference wikiRef = new WikiReference(context.getDatabase());
+    SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
+    DocumentReference docRef = new DocumentReference(docName, spaceRef);
+    assertEquals(wikiName+":", treeNodeService.getParentKey(wikiRef, true));
+    assertEquals(wikiName+":"+spaceName+".",
+        treeNodeService.getParentKey(spaceRef, true));
+    assertEquals(wikiName+":"+spaceName+"."+docName,
+        treeNodeService.getParentKey(docRef, true));
+    assertEquals("", treeNodeService.getParentKey(wikiRef, false));
+    assertEquals(spaceName+".",
+        treeNodeService.getParentKey(spaceRef, false));
+    assertEquals(spaceName+"."+docName,
+        treeNodeService.getParentKey(docRef, false));
   }
   
   private void replayAll(Object ... mocks) {

@@ -28,7 +28,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.web.pagetype.IPageType;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -59,8 +58,6 @@ public interface IWebUtilsService {
 
   public int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
-  public IPageType getPageTypeApi(DocumentReference authDocRef) throws XWikiException;
-
   public List<String> getAllowedLanguages();
 
   public Date parseDate(String date, String format);
@@ -80,10 +77,10 @@ public interface IWebUtilsService {
   public String getParentSpace();
 
   public DocumentReference resolveDocumentReference(String fullName);
-  
-  public String resolveFullName(EntityReference reference, boolean withDatabase);
 
   public SpaceReference resolveSpaceReference(String spaceName);
+  
+  public EntityReference resolveEntityReference(String name);
 
   public boolean isAdminUser();
 

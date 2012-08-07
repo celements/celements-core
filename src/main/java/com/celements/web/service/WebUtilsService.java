@@ -50,8 +50,6 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
-import com.celements.web.pagetype.IPageType;
-import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -195,10 +193,6 @@ public class WebUtilsService implements IWebUtilsService {
   private boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
-  
-  public IPageType getPageTypeApi(DocumentReference docRef) throws XWikiException {
-    return new PageTypeApi(resolveFullName(docRef, true), getContext());
-  }
 
   public List<String> getAllowedLanguages(){
     return Arrays.asList(getContext().getWiki(
@@ -289,13 +283,6 @@ public class WebUtilsService implements IWebUtilsService {
     return eventRef;
   }
 
-  public String resolveFullName(EntityReference reference, boolean withDatabase){
-    if(reference!=null){
-      if(withDatabase) return serializer_default.serialize(reference);
-      else return serializer_local.serialize(reference);
-    } else return "";
-  }
-
   public SpaceReference resolveSpaceReference(String spaceName) {
     String wikiName;
     if (spaceName.contains(":")) {
@@ -306,6 +293,45 @@ public class WebUtilsService implements IWebUtilsService {
     }
     SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
     return spaceRef;
+  }
+  
+  public EntityReference resolveEntityReference(String name) {
+    String 
+        wikiName = "",
+        spaceName = "",
+        docName = "";
+    
+    String[] name_a = name.split("\\.");
+    String[] name_b = name_a[0].split(":");
+    
+    //wikiName:spaceName
+    if(name_b.length>1){
+      wikiName = name_b[0];
+      spaceName = name_b[1];
+    //wikiName:
+    } else if(name_a[0].endsWith(":")){
+        if(name_b.length>0){
+          wikiName = name_b[0];
+        }
+    //spaceName
+    } else{
+        wikiName = getContext().getDatabase();
+        if(name_b.length>0){
+          spaceName = name_b[0];
+        }
+    }
+    if(name_a.length>1){
+      docName = name_a[1];
+    }
+    
+    EntityReference entRef = new EntityReference(wikiName, EntityType.WIKI);
+    if(spaceName.length()>0){
+      entRef = new EntityReference(spaceName, EntityType.SPACE, entRef);
+      if(docName.length()>0){
+        entRef = new EntityReference(docName, EntityType.DOCUMENT, entRef);
+      }
+    }
+    return entRef;
   }
 
   public boolean isAdminUser() {
@@ -443,7 +469,7 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
     docData.put("translation", "" + xwikiDoc.getTranslation());
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
-    docData.put("parent", resolveFullName(xwikiDoc.getParentReference(), true));
+    docData.put("parent", serializer_default.serialize(xwikiDoc.getParentReference()));
     docData.put("creator", xwikiDoc.getCreator());
     docData.put("author", xwikiDoc.getAuthor());
     docData.put("creator", xwikiDoc.getCreator());
@@ -454,7 +480,8 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("contentUpdateDate", "" + xwikiDoc.getContentUpdateDate().getTime());
     docData.put("version", xwikiDoc.getVersion());
     docData.put("title", xwikiDoc.getTitle());
-    docData.put("template", resolveFullName(xwikiDoc.getTemplateDocumentReference(), false));
+    docData.put("template", serializer_local.serialize(
+        xwikiDoc.getTemplateDocumentReference()));
     docData.put("getDefaultTemplate", xwikiDoc.getDefaultTemplate());
     docData.put("getValidationScript", xwikiDoc.getValidationScript());
     docData.put("comment", xwikiDoc.getComment());

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
@@ -23,7 +24,7 @@ public interface ITreeNodeService {
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter);
   
-  public <T> List<TreeNode> getSubNodesForParent(DocumentReference docRef,
+  public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
       INavFilter<T> filter);
   
   /**
@@ -41,8 +42,7 @@ public interface ITreeNodeService {
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart);
   
-  public List<TreeNode> getSubNodesForParent(DocumentReference docRef,
-      String menuPart);
+  public List<TreeNode> getSubNodesForParent(EntityReference entRef, String menuPart);
 
   /**
    * 

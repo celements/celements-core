@@ -39,6 +39,7 @@ import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.pagetype.IPageType;
+import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -370,7 +371,7 @@ public class WebUtils implements IWebUtils {
   @Deprecated
   public IPageType getPageTypeApi(String fullName, XWikiContext context)
     throws XWikiException {
-    return getWebUtilsService().getPageTypeApi(getRef(fullName));
+    return new PageTypeApi(fullName, context);
   }
 
   /**

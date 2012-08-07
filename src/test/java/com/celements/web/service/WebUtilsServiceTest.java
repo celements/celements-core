@@ -3,9 +3,6 @@ package com.celements.web.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -881,6 +878,30 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertTrue(resultList.contains(att2));
     assertTrue(resultList.contains(att3));
     verifyAll(att1, att2, att3);
+  }
+  
+  @Test
+  public void testResolveEntityReference(){
+    
+    String
+      wikiName = getContext().getDatabase(),
+      spaceName = "mySpace",
+      docName = "myDoc";
+    EntityReference
+      wikiEntRef = new EntityReference(wikiName, EntityType.WIKI),
+      spaceEntRef = new EntityReference(spaceName, EntityType.SPACE, wikiEntRef),
+      docEntRef = new EntityReference(docName, EntityType.DOCUMENT, spaceEntRef);
+    
+    assertEquals(docEntRef, webUtilsService.resolveEntityReference(
+        wikiName+":"+spaceName+"."+docName));
+    assertEquals(spaceEntRef, webUtilsService.resolveEntityReference(
+        wikiName+":"+spaceName+"."));
+    assertEquals(spaceEntRef, webUtilsService.resolveEntityReference(
+        wikiName+":"+spaceName));
+    assertEquals(wikiEntRef, webUtilsService.resolveEntityReference(
+        wikiName+":"));
+    assertEquals(spaceEntRef, webUtilsService.resolveEntityReference(
+        spaceName));
   }
 
   //*****************************************************************
