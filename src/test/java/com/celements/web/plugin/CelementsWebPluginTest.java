@@ -22,6 +22,7 @@ package com.celements.web.plugin;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,6 +151,32 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     assertTrue(captHQL.getValue().contains("token.tokenvalue=?"));
     assertTrue("There seems to be no database independent 'now' in hql.",
         captHQL.getValue().contains("token.validuntil>=?"));
+    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:",
+        userToken)));
+    verify(xwiki, store);
+  }
+  
+  @Test
+  public void testGetUsernameForToken_userFromMainwiki() throws XWikiException {
+    XWiki xwiki = createMock(XWiki.class);
+    context.setWiki(xwiki);
+    XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
+    String userToken = "123456789012345678901234";
+    List<String> userDocs = new Vector<String>();
+    userDocs.add("Doc.Fullname");
+    expect(xwiki.getStore()).andReturn(store).once();
+    Capture<String> captHQL = new Capture<String>();
+    Capture<String> captHQL2 = new Capture<String>();
+    Capture<List<?>> captParams = new Capture<List<?>>();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
+        capture(captParams ), same(context))).andReturn(new ArrayList<String>()).once();
+    expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), 
+        capture(captParams ), same(context))).andReturn(userDocs).once();
+    replay(xwiki, store);
+    assertEquals("xwiki:Doc.Fullname", plugin.getUsernameForToken(userToken, context));
+    assertTrue(captHQL2.getValue().contains("token.tokenvalue=?"));
+    assertTrue("There seems to be no database independent 'now' in hql.",
+        captHQL2.getValue().contains("token.validuntil>=?"));
     assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:",
         userToken)));
     verify(xwiki, store);

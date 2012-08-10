@@ -220,6 +220,9 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         String db = context.getDatabase();
         context.setDatabase("xwiki");
         users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
+        if(users != null && users.size() == 1) {
+          users.add("xwiki:" + users.remove(0));
+        }
         context.setDatabase(db);
       }
       int usersFound = 0;
