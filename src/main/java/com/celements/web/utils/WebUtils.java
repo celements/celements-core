@@ -451,6 +451,10 @@ public class WebUtils implements IWebUtils {
     return this.getWebUtilsService().getAttachmentListSorted(doc, comparator);
   }
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException {
     return this.getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
