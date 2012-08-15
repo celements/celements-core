@@ -284,9 +284,17 @@ public interface IWebUtils {
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
   
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
 
+  /**
+   * @deprecated instead use ImageService directly
+   */
+  @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context);
 

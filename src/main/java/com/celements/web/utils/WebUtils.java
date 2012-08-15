@@ -58,8 +58,6 @@ public class WebUtils implements IWebUtils {
 
   private static IWebUtils instance;
 
-  private static Random rand = new Random();
-
   private AttachmentURLCommand attachmentUrlCmd;
 
   ITreeNodeService injected_TreeNodeService;
@@ -249,7 +247,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated instead use WebUtilsService
    */
   @Deprecated
   public String getParentForLevel(int menuLevel, XWikiContext context) {
@@ -285,7 +283,6 @@ public class WebUtils implements IWebUtils {
     return getSiblingMenuItem(fullName, false, context);
   }
 
-  @Deprecated
   BaseObject getSiblingMenuItem(String fullName, boolean previous,
       XWikiContext context)
       throws XWikiException {
@@ -470,6 +467,10 @@ public class WebUtils implements IWebUtils {
         imagesOnly);
   }
 
+  /**
+   * @deprecated instead use WebUtilsService
+   */
+  @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) {
     return this.getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
@@ -477,9 +478,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * getRandomImages computes a set of <num> randamly chosen images
-   * from the given AttachmentList. It chooses the Images without dubilcats if
-   * possible.
+   * @deprecated instead use ImageService
    */
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context) {
@@ -491,6 +490,7 @@ public class WebUtils implements IWebUtils {
       if (allImagesList.size() > 0) {
         List<Attachment> preSetImgList = prepareMaxCoverSet(num, allImagesList);
         List<Attachment> imgList = new ArrayList<Attachment>(num);
+        Random rand = new Random();
         for (int i=1; i<=num ; i++) {
           int nextimg = rand.nextInt(preSetImgList.size());
           imgList.add(preSetImgList.remove(nextimg));

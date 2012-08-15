@@ -72,15 +72,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     injected_TreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injected_TreeNodeService = injected_TreeNodeService;
   }
-
-  @Test
-  public void testGetParentForLevel_mainLevel() {
-    XWikiDocument activeDoc = new XWikiDocument("Space", "Name");
-    activeDoc.setParent("");
-    context.setDoc(activeDoc);
-    assertNotNull(celUtils.getParentForLevel(1, context));
-    assertEquals("", celUtils.getParentForLevel(1, context));
-  }
   
   @Test
   public void testCoveredQuotient() {
@@ -124,6 +115,15 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertNotNull(randImgs);
     assertEquals(5, randImgs.size());
     verify(mockStore, wiki);
+  }
+
+  @Test
+  public void testGetParentForLevel_mainLevel() {
+    XWikiDocument activeDoc = new XWikiDocument("Space", "Name");
+    activeDoc.setParent("");
+    context.setDoc(activeDoc);
+    assertNotNull(celUtils.getParentForLevel(1, context));
+    assertEquals("", celUtils.getParentForLevel(1, context));
   }
 
   @Test

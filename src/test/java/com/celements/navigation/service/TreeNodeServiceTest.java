@@ -68,47 +68,59 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSubNodesForParent() throws Exception {
-    DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), 
-        "Content", "Page");
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Content",
-        "MainPage");
-    TreeNode treeNode = new TreeNode(docRef, "Content", 1);
+    String
+      wikiName = "myWiki",
+      spaceName = "mySpace",
+      docName = "myDoc",
+      parentKey = wikiName+":"+spaceName+".";    
+    context.setDatabase(wikiName);
+    EntityReference spaceRef = new SpaceReference(spaceName,
+        new WikiReference(context.getDatabase()));
+    TreeNode treeNode = createTreeNode(spaceName, docName, spaceName, "", 1);
     List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:Content.Page"),
+    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(mockTreeNodeList);
     List<TreeNode> emptyList = Collections.emptyList();
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:Content.Page"),
+    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(emptyList);
     XWikiRightService mockRightService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(mockRightService).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-        eq("Content.MainPage"), same(context))).andReturn(true);
+        eq(spaceName+"."+docName), same(context))).andReturn(true);
     replayAll(mockRightService);
-    List<TreeNode> resultList = treeNodeService.getSubNodesForParent(parentDocRef, "");
+    List<TreeNode> resultList = treeNodeService.getSubNodesForParent(spaceRef, "");
     assertEquals(1, resultList.size());
-    assertTrue(mockTreeNodeList.contains(treeNode));
+    assertTrue(resultList.contains(treeNode));
     verifyAll(mockRightService);
   }
 
   @Test
-  public void testFetchNodesForParentKey_mergeCombinedResult() throws Exception {
-    context.setDatabase("myWiki");
-    DocumentReference docRef = 
-        new DocumentReference(context.getDatabase(),"mySpace","myDoc");
-    String parentKey = "myWiki:mySpace.myDoc";
-    TreeNode menuItem2 = createTreeNode("mySpace", "myDoc2", "mySpace", "myDoc", 2);
-    TreeNode menuItem3 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 3);
-    TreeNode menuItem1 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 1);
-    TreeNode menuItem5 = createTreeNode("mySpace", "myDoc5", "mySpace", "myDoc", 5);
-    List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
+  public void testFetchNodesForParentKey_mergeCombinedResult(){
+    String
+      wikiName = "myWiki",
+      spaceName = "mySpace",
+      docName = "myDoc",
+      parentKey = wikiName+":"+spaceName+"."+docName;    
+    context.setDatabase(wikiName);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
+        docName);
+    
+    TreeNode menuItem1 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 1);
+    TreeNode menuItem2 = createTreeNode(spaceName, "myDoc2", spaceName, docName, 2);
+    TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
+    TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
+    List<TreeNode>
+      mappedList = Arrays.asList(menuItem1, menuItem5),
+      notMappedList = Arrays.asList(menuItem2, menuItem3),
+      expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3, menuItem5);
+    
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
+        ).andReturn(mappedList).once();
     expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(Arrays.asList(menuItem2, menuItem3)).atLeastOnce();
+        same(context))).andReturn(notMappedList).once();
+    
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
-    List<TreeNode> expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
-        menuItem5);
     assertEquals("result array does not match expected size.", expectedList.size(),
         menuItemsMerged.size());
     int pos = 0;
@@ -123,18 +135,23 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testFetchNodesForParentKey_onlyOldArray() throws Exception {
-    context.setDatabase("myWiki");
-    DocumentReference docRef = 
-        new DocumentReference(context.getDatabase(),"mySpace","myDoc");
-    String parentKey = "myWiki:mySpace.myDoc";
-    TreeNode menuItem2 = createTreeNode("mySpace", "myDoc2", "mySpace", "myDoc", 2);
-    TreeNode menuItem3 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 3);
+    String
+      wikiName = "myWiki",
+      spaceName = "mySpace",
+      docName = "myDoc",
+      parentKey = wikiName+":"+spaceName+"."+docName;    
+    context.setDatabase(wikiName);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
+        docName);
+  
+    TreeNode menuItem2 = createTreeNode(spaceName, "myDoc2", spaceName, docName, 2);
+    TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
     List<TreeNode> oldNotMappedList = Arrays.asList(menuItem2, menuItem3);
     List<TreeNode> mappedList = Collections.emptyList();
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
+        ).andReturn(mappedList).once();
     expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
-        )).andReturn(oldNotMappedList).atLeastOnce();
+        )).andReturn(oldNotMappedList).once();
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
     assertSame("expecting old notMapped list.", oldNotMappedList, menuItemsMerged);
@@ -143,18 +160,23 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testFetchNodesForParentKey_onlyNewMappedList() {
-    context.setDatabase("myWiki");
-    DocumentReference docRef = 
-        new DocumentReference(context.getDatabase(),"mySpace","myDoc");
-    String parentKey = "myWiki:mySpace.myDoc";
+    String
+      wikiName = "myWiki",
+      spaceName = "mySpace",
+      docName = "myDoc",
+      parentKey = wikiName+":"+spaceName+"."+docName;    
+    context.setDatabase(wikiName);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
+        docName);
+    
     List<TreeNode> oldMenuItems = Collections.emptyList();
-    TreeNode menuItem1 = createTreeNode("mySpace", "myDoc1", "mySpace", "myDoc", 1);
-    TreeNode menuItem5 = createTreeNode("mySpace", "myDoc5", "mySpace", "myDoc", 5);
+    TreeNode menuItem1 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 1);
+    TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
+        ).andReturn(mappedList).once();
     expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(oldMenuItems).atLeastOnce();
+        same(context))).andReturn(oldMenuItems).once();
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
     assertSame("expecting old notMapped list.", mappedList, menuItemsMerged);
@@ -163,14 +185,19 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testFetchNodesForParentKey_noMenuItems_NPE() {
-    context.setDatabase("myWiki");    DocumentReference docRef = 
-        new DocumentReference(context.getDatabase(),"mySpace","myDoc");
-    String parentKey = "myWiki:mySpace.myDoc";
+    String
+      wikiName = "myWiki",
+      spaceName = "mySpace",
+      docName = "myDoc",
+      parentKey = wikiName+":"+spaceName+"."+docName;    
+    context.setDatabase(wikiName);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
+        docName);
     List<TreeNode> mappedList = Collections.emptyList();
     expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
-        ).andReturn(mappedList);
+        ).andReturn(mappedList).once();
     expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
-        )).andReturn(null).atLeastOnce();
+        )).andReturn(null).once();
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
     assertNotNull("expecting not null.", menuItemsMerged);
