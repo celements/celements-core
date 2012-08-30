@@ -1087,10 +1087,11 @@ public class CelementsWebPluginApi extends Api {
 
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
     try {
-      if ("view".equals(context.getAction()) && renderDoc.isNew() ) {
+      //we should not get here for !getService().isAppScriptRequest()
+      if ("view".equals(context.getAction()) && renderDoc.isNew()) {
         mLogger.info("renderCelementsDocument: Failed to get xwiki document for"
             + renderDoc.getFullName() + " no rendering applied.");
-        //TODO add docdoesnotexist handling!!
+        return context.getWiki().renderTemplate("/docdoesnotexist.vm", context);
       } else {
         return getCelementsRenderCmd().renderCelementsDocument(getXWikiDoc(renderDoc),
             renderMode);
