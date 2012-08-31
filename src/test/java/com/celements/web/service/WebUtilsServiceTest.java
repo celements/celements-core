@@ -719,29 +719,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals("mySpace", testSpaceRef.getName());
     verifyAll();
   }
-  
-  @Test
-  public void testResolveEntityReference(){
-    String
-      wikiName = getContext().getDatabase(),
-      spaceName = "mySpace",
-      docName = "myDoc";
-    EntityReference
-      wikiEntRef = new EntityReference(wikiName, EntityType.WIKI),
-      spaceEntRef = new EntityReference(spaceName, EntityType.SPACE, wikiEntRef),
-      docEntRef = new EntityReference(docName, EntityType.DOCUMENT, spaceEntRef);
-    
-    assertEquals(docEntRef, webUtilsService.resolveEntityReference(
-        wikiName+":"+spaceName+"."+docName));
-    assertEquals(spaceEntRef, webUtilsService.resolveEntityReference(
-        wikiName+":"+spaceName+"."));
-    assertEquals(spaceEntRef, webUtilsService.resolveEntityReference(
-        wikiName+":"+spaceName));
-    assertEquals(wikiEntRef, webUtilsService.resolveEntityReference(
-        wikiName+":"));
-    assertEquals(spaceEntRef, webUtilsService.resolveEntityReference(
-        spaceName));
-  }
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);

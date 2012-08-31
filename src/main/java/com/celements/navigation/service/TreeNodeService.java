@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -278,7 +279,7 @@ public class TreeNodeService implements ITreeNodeService {
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
     long starttotal = System.currentTimeMillis();
     List<BaseObject> menuItemList = new ArrayList<BaseObject>();
-    EntityReference refParent = webUtilsService.resolveEntityReference(parentKey);
+    EntityReference refParent = resolveEntityReference(parentKey);
     for (TreeNode node : fetchNodesForParentKey(refParent)) {
       try {
         XWikiDocument itemdoc = getContext().getWiki().getDocument(node.getFullName(),
@@ -295,6 +296,45 @@ public class TreeNodeService implements ITreeNodeService {
     LOGGER.info("fetchMenuItemsForXWiki: [" + parentKey + "] totaltime for list of ["
         + menuItemList.size() + "]: " + (end-starttotal));
     return menuItemList;
+  }
+  
+  EntityReference resolveEntityReference(String name) {
+    String 
+        wikiName = "",
+        spaceName = "",
+        docName = "";
+    
+    String[] name_a = name.split("\\.");
+    String[] name_b = name_a[0].split(":");
+    
+    //wikiName:spaceName
+    if(name_b.length>1){
+      wikiName = name_b[0];
+      spaceName = name_b[1];
+    //wikiName:
+    } else if(name_a[0].endsWith(":")){
+        if(name_b.length>0){
+          wikiName = name_b[0];
+        }
+    //spaceName
+    } else{
+        wikiName = getContext().getDatabase();
+        if(name_b.length>0){
+          spaceName = name_b[0];
+        }
+    }
+    if(name_a.length>1){
+      docName = name_a[1];
+    }
+    
+    EntityReference entRef = new EntityReference(wikiName, EntityType.WIKI);
+    if(spaceName.length()>0){
+      entRef = new EntityReference(spaceName, EntityType.SPACE, entRef);
+      if(docName.length()>0){
+        entRef = new EntityReference(docName, EntityType.DOCUMENT, entRef);
+      }
+    }
+    return entRef;
   }
 
   /**

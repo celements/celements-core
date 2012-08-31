@@ -79,8 +79,6 @@ public interface IWebUtilsService {
   public DocumentReference resolveDocumentReference(String fullName);
 
   public SpaceReference resolveSpaceReference(String spaceName);
-  
-  public EntityReference resolveEntityReference(String name);
 
   public boolean isAdminUser();
 

@@ -294,45 +294,6 @@ public class WebUtilsService implements IWebUtilsService {
     SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
     return spaceRef;
   }
-  
-  public EntityReference resolveEntityReference(String name) {
-    String 
-        wikiName = "",
-        spaceName = "",
-        docName = "";
-    
-    String[] name_a = name.split("\\.");
-    String[] name_b = name_a[0].split(":");
-    
-    //wikiName:spaceName
-    if(name_b.length>1){
-      wikiName = name_b[0];
-      spaceName = name_b[1];
-    //wikiName:
-    } else if(name_a[0].endsWith(":")){
-        if(name_b.length>0){
-          wikiName = name_b[0];
-        }
-    //spaceName
-    } else{
-        wikiName = getContext().getDatabase();
-        if(name_b.length>0){
-          spaceName = name_b[0];
-        }
-    }
-    if(name_a.length>1){
-      docName = name_a[1];
-    }
-    
-    EntityReference entRef = new EntityReference(wikiName, EntityType.WIKI);
-    if(spaceName.length()>0){
-      entRef = new EntityReference(spaceName, EntityType.SPACE, entRef);
-      if(docName.length()>0){
-        entRef = new EntityReference(docName, EntityType.DOCUMENT, entRef);
-      }
-    }
-    return entRef;
-  }
 
   public boolean isAdminUser() {
     try {

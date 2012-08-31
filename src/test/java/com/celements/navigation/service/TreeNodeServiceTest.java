@@ -213,6 +213,29 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
+  public void testResolveEntityReference(){
+    String
+      wikiName = getContext().getDatabase(),
+      spaceName = "mySpace",
+      docName = "myDoc";
+    EntityReference
+      wikiEntRef = new EntityReference(wikiName, EntityType.WIKI),
+      spaceEntRef = new EntityReference(spaceName, EntityType.SPACE, wikiEntRef),
+      docEntRef = new EntityReference(docName, EntityType.DOCUMENT, spaceEntRef);
+    
+    assertEquals(docEntRef, treeNodeService.resolveEntityReference(
+        wikiName+":"+spaceName+"."+docName));
+    assertEquals(spaceEntRef, treeNodeService.resolveEntityReference(
+        wikiName+":"+spaceName+"."));
+    assertEquals(spaceEntRef, treeNodeService.resolveEntityReference(
+        wikiName+":"+spaceName));
+    assertEquals(wikiEntRef, treeNodeService.resolveEntityReference(
+        wikiName+":"));
+    assertEquals(spaceEntRef, treeNodeService.resolveEntityReference(
+        spaceName));
+  }
+  
+  @Test
   public void testGetMaxConfiguredNavigationLevel_twoParents() throws Exception {
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
