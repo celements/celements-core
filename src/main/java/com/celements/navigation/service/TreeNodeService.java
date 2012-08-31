@@ -137,26 +137,23 @@ public class TreeNodeService implements ITreeNodeService {
     return parentKey;
   }
   
-  String getParentKey(EntityReference reference, boolean withDataBase){
+  String getParentKey(EntityReference reference, boolean withDataBase) {
     String parentKey = "";
-    if(reference==null){
-      return parentKey;
-    }
-    else{
+    if (reference != null) {
       parentKey = serializer.serialize(reference);
-      if(!parentKey.contains(":") && !parentKey.endsWith(":")){
+      if (!parentKey.contains(":") && !parentKey.endsWith(":")) {
         parentKey += ":";
-      } else if(!parentKey.contains(".") && !parentKey.endsWith(".")){
+      } else if (!parentKey.contains(".") && !parentKey.endsWith(".")) {
         parentKey += ".";
       }
-      if(withDataBase){
-        return parentKey;
-      } else{
-        return parentKey.substring(parentKey.indexOf(":")+1);        
+      if (!withDataBase) {
+        parentKey = parentKey.substring(parentKey.indexOf(":") + 1);
       }
     }
+    LOGGER.debug("getParentKey: returning [" + parentKey + "] for entityref ["
+        + reference + "].");
+    return parentKey;
   }
-
   
   public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
       INavFilter<T> filter) {
