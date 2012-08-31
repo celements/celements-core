@@ -421,7 +421,10 @@ public class TreeNodeService implements ITreeNodeService {
     }
   }  
   
-  void injectInheritorFactory(InheritorFactory injectedInheritorFactory) {
+  /**
+   * FOR TEST PURPOSES ONLY
+   */
+  public void injectInheritorFactory(InheritorFactory injectedInheritorFactory) {
     this.injectedInheritorFactory = injectedInheritorFactory;
   }
 

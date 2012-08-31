@@ -32,11 +32,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.ExternalUsageFilter;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeCache;
+import com.celements.navigation.service.TreeNodeService;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.pagetype.PageTypeApi;
@@ -60,7 +62,8 @@ public class WebUtils implements IWebUtils {
 
   private AttachmentURLCommand attachmentUrlCmd;
 
-  ITreeNodeService injected_TreeNodeService;
+  private InheritorFactory injectedInheritorFactory;
+  private ITreeNodeService injectedTreeNodeService;
   
   /**
    * FOR TEST ONLY!!!
@@ -75,12 +78,31 @@ public class WebUtils implements IWebUtils {
     return instance;
   }
 
+  void injectInheritorFactory(InheritorFactory injectedInheritorFactory) {
+    this.injectedInheritorFactory = injectedInheritorFactory;
+  }
+  
+  InheritorFactory getInheritorFactory() {
+    if (injectedInheritorFactory != null) {
+      return injectedInheritorFactory;
+    }
+    return new InheritorFactory();
+  }
+  
+  void injectTreeNodeService(ITreeNodeService injectedTreeNodeService) {
+    this.injectedTreeNodeService = injectedTreeNodeService;
+  }
   
   private ITreeNodeService getTreeNodeService() {
-    if (injected_TreeNodeService != null) {
-      return injected_TreeNodeService;
+    if (injectedTreeNodeService != null) {
+      return injectedTreeNodeService;
     }
-    return Utils.getComponent(ITreeNodeService.class);
+    ITreeNodeService ret = Utils.getComponent(ITreeNodeService.class);
+    InheritorFactory inheritorFactory = getInheritorFactory();
+    if(inheritorFactory!=null){
+      ((TreeNodeService)ret).injectInheritorFactory(inheritorFactory);
+    }
+    return ret;
   }
 
   private ITreeNodeCache getTreeNodeCache() {

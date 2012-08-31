@@ -27,14 +27,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.inheritor.InheritorFactory;
+import com.celements.navigation.Navigation;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,8 +47,10 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -56,7 +62,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   private XWikiURLFactory mockURLFactory;
   private XWiki wiki;
   private XWikiStoreInterface mockXStore;
-  private ITreeNodeService mockTreeNodeService;
   
   @Before
   public void setUp_WebUtilsTest() {
@@ -69,8 +74,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     mockXStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockXStore).anyTimes();
     context.setURLFactory(mockURLFactory);
-    mockTreeNodeService = createMock(ITreeNodeService.class);
-    celUtils.injected_TreeNodeService = mockTreeNodeService;
   }
   
   @Test
@@ -268,83 +271,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setVersion("28.82");
     assertEquals("28", ((WebUtils)celUtils).getMajorVersion(doc));
   }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_nothingToReplace() {
-    String host = "www.bla.com";
-    String test = "test";
-    assertEquals(test, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_img_nothingToReplace() {
-    String host = "www.bla.com/";
-    String test = "<img src=\"http://www.bla.com/download/A/B/test.img\" />";
-    assertEquals(test, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_img_newInternal() {
-    String host = "www.bla.com";
-    String test = "<img src=\"/download/A/B/test.img\" />";
-    String result = "<img src=\"http://" + host + "/download/A/B/test.img\" />";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_img_dotInternal() {
-    String host = "www.bla.com";
-    String test = "<img src=\"../../download/A/B/test.img\" />";
-    String result = "<img src=\"http://" + host + "/download/A/B/test.img\" />";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_href_nothingToReplace() {
-    String host = "www.bla.com";
-    String test = "<a href=\"http://www.bla.com/download/A/B/test.pdf\" >bla</a>";
-    assertEquals(test, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"http://www.bla.com/skin/A/B/test.css\" >bla</a>";
-    assertEquals(test, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"http://www.bla.com/view/A/B\" >bla</a>";
-    assertEquals(test, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"http://www.bla.com/edit/A/B\" >bla</a>";
-    assertEquals(test, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_href_newInternal() {
-    String host = "www.bla.com";
-    String test = "<a href=\"/download/A/B/test.pdf\" >bla</a>";
-    String result = "<a href=\"http://" + host + "/download/A/B/test.pdf\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"/skin/A/B/test.css\" >bla</a>";
-    result = "<a href=\"http://" + host + "/skin/A/B/test.css\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"/view/A/B\" >bla</a>";
-    result = "<a href=\"http://" + host + "/view/A/B\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"/edit/A/B\" >bla</a>";
-    result = "<a href=\"http://" + host + "/edit/A/B\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
-  
-  @Test
-  public void testReplaceInternalWithExternalLinks_href_dotInternal() {
-    String host = "www.bla.com";
-    String test = "<a href=\"../../download/A/B/test.pdf\" >bla</a>";
-    String result = "<a href=\"http://" + host + "/download/A/B/test.pdf\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"../../skin/A/B/test.css\" >bla</a>";
-    result = "<a href=\"http://" + host + "/skin/A/B/test.css\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"../../download/A/B\" >bla</a>";
-    result = "<a href=\"http://" + host + "/download/A/B\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-    test = "<a href=\"../../download/A/B\" >bla</a>";
-    result = "<a href=\"http://" + host + "/download/A/B\" >bla</a>";
-    assertEquals(result, ((WebUtils)celUtils).replaceInternalWithExternalLinks(test, host));
-  }
 
   @Test
   public void getSiblingMenuItem_previous() throws XWikiException {
@@ -389,15 +315,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem1);
     menuItemList.add(menuItemItemDoc);
     menuItemList.add(menuItem2);
+    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
     expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
         eq(""))).andReturn(1);
-    replayAll(rightServiceMock);
+    replayAll(rightServiceMock, mockTreeNodeService);
     BaseObject prevMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         true, context);
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem1, prevMenuItem);
-    verifyAll(rightServiceMock);
+    verifyAll(rightServiceMock, mockTreeNodeService);
   }
 
   @Test
@@ -443,15 +371,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem1);
     menuItemList.add(menuItemItemDoc);
     menuItemList.add(menuItem2);
+    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
     expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
         eq(""))).andReturn(1);
-    replayAll(rightServiceMock);
+    replayAll(rightServiceMock, mockTreeNodeService);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         false, context);
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
-    verifyAll(rightServiceMock);
+    verifyAll(rightServiceMock, mockTreeNodeService);
   }
   
   @Test
@@ -497,23 +427,27 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem1);
     menuItemList.add(menuItemItemDoc);
     menuItemList.add(menuItem2);
+    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
     expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
         eq(""))).andReturn(1);
-    replayAll(rightServiceMock);
+    replayAll(rightServiceMock, mockTreeNodeService);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
         false, context);
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
-    verifyAll(rightServiceMock);
+    verifyAll(rightServiceMock, mockTreeNodeService);
   }
   
   @Test
   public void testGetDocSection_empty() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(new XWikiDocument()
       ).atLeastOnce();
     replay(wiki, doc);
@@ -525,9 +459,11 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetDocSection_first() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("abc<table>blabla</table><table>abc</table>");
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
@@ -536,6 +472,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(renderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(context))
         ).andReturn("abc").atLeastOnce();
     replay(wiki, doc, renderer);
+    System.out.println();
     assertEquals("abc", ((WebUtils)WebUtils.getInstance()).getDocSection("(?=<table)",
         fullName, 1, context));
     verify(wiki, doc, renderer);
@@ -544,11 +481,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetDocSection_firstEmptyRTE() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("<p></p>  <br /> \n<table>blabla</table><table>abc</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(wiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
@@ -561,11 +500,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetDocSection_middle() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("abc<table>blabla</table><table>abc</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(wiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
@@ -578,11 +519,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetDocSection_last() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("abc<table>blabla</table><table>abc</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(wiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
@@ -595,9 +538,11 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCountSections_empty() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(new XWikiDocument()
       ).atLeastOnce();
     replay(wiki, doc);
@@ -608,11 +553,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCountSections_one() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("<table>blabla</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     replay(wiki, doc);
     assertEquals(1, WebUtils.getInstance().countSections("(?=<table)", fullName, context));
@@ -622,11 +569,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCountSections_emptyRTEStart() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("<p> </p>\n<table>blabla</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     replay(wiki, doc);
     assertEquals(1, WebUtils.getInstance().countSections("(?=<table)", fullName, context));
@@ -636,11 +585,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCountSections_several() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("abc<table>blabla</table><table>abc</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     replay(wiki, doc);
     assertEquals(3, WebUtils.getInstance().countSections("(?=<table)", fullName, context));
@@ -650,11 +601,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetDocSectionAsJSON() throws XWikiException {
     String fullName = "Space.DocName";
+    DocumentReference docRef = new DocumentReference(
+        context.getDatabase(), "Space", "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
     tdoc.setContent("abc<table>blabla</table><table>abc</table>");
-    expect(wiki.getDocument(eq(fullName), same(context))).andReturn(doc).atLeastOnce();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(wiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
@@ -667,26 +620,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals(json, WebUtils.getInstance().getDocSectionAsJSON("(?=<table)", fullName,
         2, context));
     verify(wiki, doc, renderer);
-  }
-
-  @Test
-  public void testGetSectionNr_negative() {
-    assertEquals(1, ((WebUtils)WebUtils.getInstance()).getSectionNr(-3, 5));
-  }
-  
-  @Test
-  public void testGetSectionNr_zero() {
-    assertEquals(1, ((WebUtils)WebUtils.getInstance()).getSectionNr(0, 5));
-  }
-  
-  @Test
-  public void testGetSectionNr_validNr() {
-    assertEquals(3, ((WebUtils)WebUtils.getInstance()).getSectionNr(3, 5));
-  }
-
-  @Test
-  public void testGetSectionNr_toHighNr() {
-    assertEquals(5, ((WebUtils)WebUtils.getInstance()).getSectionNr(8, 5));
   }
 
   @Test
@@ -1103,13 +1036,23 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
 
+  private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
+    BaseObject navObj = new BaseObject();
+    navObj.setClassName(Navigation.NAVIGATION_CONFIG_CLASS);
+    navObj.setStringValue("menu_element_name", "mainMenu");
+    navObj.setIntValue("to_hierarchy_level", toLevel);
+    navObj.setName(doc.getFullName());
+    navObj.setDocumentReference(doc.getDocumentReference());
+    return navObj;
+  }
+  
   private void replayAll(Object ... mocks) {
-    replay(mockStore, wiki, mockXStore, mockTreeNodeService);
+    replay(mockStore, wiki, mockXStore);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(mockStore, wiki, mockXStore, mockTreeNodeService);
+    verify(mockStore, wiki, mockXStore);
     verify(mocks);
   }
 
