@@ -176,6 +176,31 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     assertTrue(attachmentURL, attachmentURL.matches(expectedURL + "\\?version=\\d{14}"));
     verify(wiki);
   }
+  
+  @Test
+  public void isAttachmentLink_null() {
+    assertFalse(attUrlCmd.isAttachmentLink(null));
+  }
+  
+  @Test
+  public void isAttachmentLink_empty() {
+    assertFalse(attUrlCmd.isAttachmentLink(""));
+  }
+  
+  @Test
+  public void isAttachmentLink_url() {
+    assertFalse(attUrlCmd.isAttachmentLink("/download/Space/Page/attachment.jpg"));
+  }
+  
+  @Test
+  public void isAttachmentLink_is() {
+    assertTrue(attUrlCmd.isAttachmentLink("Space.Page;attachment.jpg"));
+  }
+  
+  @Test
+  public void isAttachmentLink_isWithDb() {
+    assertTrue(attUrlCmd.isAttachmentLink("db:Space.Page;attachment.jpg"));
+  }
 
   @Test
   public void testGetAttachmentURL_Rubish() {

@@ -19,19 +19,49 @@
  */
 package com.celements.web.service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
 public interface IWebUtilsService {
+  
+  /**
+   * Returns level of hierarchy with level=1 returning root which is null, else
+   * corresponding DocumentReference or throws IndexOutOfBoundsException
+   * @param level
+   * @return DocumentReference of level
+   * @throws IndexOutOfBoundsException - if level above root or below lowest
+   */
+  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
+  
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
+      boolean includeDoc);
+  
+  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section 
+      ) throws XWikiException;
+  
+  public String getDocSection(String regex, DocumentReference docRef, int section 
+      ) throws XWikiException;
 
+  public int countSections(String regex, DocumentReference docRef) throws XWikiException;
+
+  public List<String> getAllowedLanguages();
+
+  public Date parseDate(String date, String format);
+  
   public XWikiMessageTool getMessageTool(String adminLanguage);
 
   public XWikiMessageTool getAdminMessageTool();
@@ -41,6 +71,10 @@ public interface IWebUtilsService {
   public String getAdminLanguage(String userFullName);
 
   public String getDefaultLanguage();
+  
+  public boolean hasParentSpace();
+
+  public String getParentSpace();
 
   public DocumentReference resolveDocumentReference(String fullName);
 
@@ -50,6 +84,21 @@ public interface IWebUtilsService {
 
   public boolean isAdvancedAdmin();
   
+  public List<Attachment> getAttachmentListSorted(Document doc,
+      String comparator) throws ClassNotFoundException;
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      boolean imagesOnly);
+
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb);
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly);
+
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb);
+
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
   
@@ -58,4 +107,14 @@ public interface IWebUtilsService {
 
   public String[] splitStringByLength(String inStr, int maxLength);
 
+  public Map<String, String> xwikiDocToLinkedMap(DocumentReference docRef,
+      boolean bWithObjects, boolean bWithRendering,
+      boolean bWithAttachmentContent, boolean bWithVersions) throws XWikiException;
+  
+  public String getJSONContent(DocumentReference cDocRef);
+  
+  public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
+  
+  public String getMajorVersion(XWikiDocument doc);
+  
 }
