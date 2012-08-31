@@ -719,16 +719,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals("mySpace", testSpaceRef.getName());
     verifyAll();
   }
-
-  private void replayAll(Object ... mocks) {
-    replay(xwiki);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object ... mocks) {
-    verify(xwiki);
-    verify(mocks);
-  }
   
   @Test
   public void testGetObjectsOrdered_docNull() {
@@ -930,6 +920,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     obj.setLongValue("l", 3l);
     objs.add(obj);
     return objs;
+  }
+  
+  private void replayAll(Object ... mocks) {
+    replay(xwiki);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(xwiki);
+    verify(mocks);
   }
 
 }
