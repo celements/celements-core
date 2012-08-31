@@ -119,7 +119,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeCache
+   * @deprecated since 2.17.0 instead use TreeNodeCache
    */
   @Deprecated
   public int queryCount() {
@@ -127,7 +127,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeCache
+   * @deprecated since 2.17.0 instead use TreeNodeCache
    */
   @Deprecated
   public void flushMenuItemCache(XWikiContext context) {
@@ -135,7 +135,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated  since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public List<String> getDocumentParentsList(String fullName,
@@ -168,20 +168,23 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use EmptyCheckCommand
+   * @deprecated  since 2.17.0 instead use EmptyCheckCommand
    */
   @Deprecated
   public boolean isEmptyRTEDocument(XWikiDocument localdoc) {
     return isEmptyRTEString(localdoc.getContent());
   }
 
+  /**
+   * @deprecated  since 2.17.0 instead use EmptyCheckCommand
+   */
   @Deprecated
   public boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
   public int getActiveMenuItemPos(int menuLevel, String menuPart,
@@ -190,7 +193,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
   public int getMenuItemPos(String fullName, String menuPart,
@@ -200,7 +203,7 @@ public class WebUtils implements IWebUtils {
 
   /**
    * 
-   * @deprecated instead use TreeNodeService.getSubNodesForParent
+   * @deprecated since 2.17.0 instead use TreeNodeService.getSubNodesForParent
    */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
@@ -249,7 +252,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(
@@ -267,7 +270,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getParentForLevel(int menuLevel, XWikiContext context) {
@@ -286,7 +289,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
   public BaseObject getPrevMenuItem(String fullName,
@@ -298,7 +301,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
   public BaseObject getNextMenuItem(String fullName,
@@ -330,7 +333,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getDocSectionAsJSON(String regex, String fullName, int section,
@@ -339,7 +342,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getDocSection(String regex, String fullName, int section,
@@ -348,7 +351,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public int countSections(String regex, String fullName, XWikiContext context
@@ -357,7 +360,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public IPageType getPageTypeApi(String fullName, XWikiContext context)
@@ -366,7 +369,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public List<String> getAllowedLanguages(XWikiContext context) {
@@ -374,7 +377,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public Date parseDate(String date, String format) {
@@ -414,7 +417,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public boolean hasParentSpace(XWikiContext context) {
@@ -422,7 +425,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getParentSpace(XWikiContext context) {
@@ -430,14 +433,14 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use TreeNodeService
+   * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
@@ -446,7 +449,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService directly
+   * @deprecated since 2.17.0 instead use WebUtilsService directly
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
@@ -456,7 +459,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc,
@@ -466,7 +469,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
@@ -476,7 +479,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use ImageService
+   * @deprecated since 2.17.0 instead use ImageService
    */
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context) {
@@ -527,7 +530,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
@@ -539,7 +542,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getJSONContent(XWikiDocument cdoc, XWikiContext context) {
@@ -580,7 +583,7 @@ public class WebUtils implements IWebUtils {
   }
 
   /**
-   * @deprecated instead use WebUtilsService.getUserNameForDocRef
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getUserNameForDocName(String authorDocName,
@@ -589,7 +592,7 @@ public class WebUtils implements IWebUtils {
   }
   
   /**
-   * @deprecated instead use WebUtilsService
+   * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
   public String getMajorVersion(XWikiDocument doc) {

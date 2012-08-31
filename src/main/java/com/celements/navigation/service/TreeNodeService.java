@@ -108,7 +108,7 @@ public class TreeNodeService implements ITreeNodeService {
   
   /**
    * 
-   * @deprecated use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
    * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
@@ -171,7 +171,7 @@ public class TreeNodeService implements ITreeNodeService {
   
   /**
    * 
-   * @deprecated use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
    * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated

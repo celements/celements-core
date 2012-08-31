@@ -18,7 +18,9 @@ public interface ITreeNodeService {
   public int getMenuItemPos(DocumentReference docRef, String menuPart);
 
   /**
-   * @deprecated instead use getSubNodesForParent(DocumentReference, String, INavFilter)
+   * 
+   * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -28,15 +30,16 @@ public interface ITreeNodeService {
       INavFilter<T> filter);
   
   /**
-   * getSubNodesForParent
+   * 
+   * since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * getSubNodesForParent(EntityReference, String) instead
+   *
    * get all subnodes of a given parent document (by fullname).
    * 
    * @param parent
    * @param menuSpace (default: $doc.space)
    * @param menuPart 
    * @return (array of tree nodes)
-   * 
-   * @deprecated use getSubNodesForParent with DocumentReference instead
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -46,7 +49,8 @@ public interface ITreeNodeService {
 
   /**
    * 
-   * @deprecated use getSubNodesForParent instead
+   * @deprecated since 2.14.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
