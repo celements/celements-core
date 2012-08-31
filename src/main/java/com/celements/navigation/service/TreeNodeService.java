@@ -334,6 +334,8 @@ public class TreeNodeService implements ITreeNodeService {
         entRef = new EntityReference(docName, EntityType.DOCUMENT, entRef);
       }
     }
+    LOGGER.debug("resolveEntityReference: for [" + name + "] returning [" + entRef
+        + "].");
     return entRef;
   }
 
