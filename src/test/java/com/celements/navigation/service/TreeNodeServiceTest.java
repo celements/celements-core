@@ -72,7 +72,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       wikiName = "myWiki",
       spaceName = "mySpace",
       docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+".";    
+      parentKey = spaceName + ".";    
     context.setDatabase(wikiName);
     EntityReference spaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
@@ -100,7 +100,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       wikiName = "myWiki",
       spaceName = "mySpace",
       docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+"."+docName;    
+      parentKey = spaceName + "." + docName;    
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);
@@ -139,7 +139,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       wikiName = "myWiki",
       spaceName = "mySpace",
       docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+"."+docName;    
+      parentKey = spaceName + "." + docName;    
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);
@@ -164,7 +164,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       wikiName = "myWiki",
       spaceName = "mySpace",
       docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+"."+docName;    
+      parentKey = spaceName + "." + docName;    
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);
@@ -189,7 +189,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       wikiName = "myWiki",
       spaceName = "mySpace",
       docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+"."+docName;    
+      parentKey = spaceName + "." + docName;    
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);
@@ -376,7 +376,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       db = "siblingPrevious",
       space = "Celements2",
       celDocName = "MenuItem",
-      fullName = db+":"+space+"."+celDocName;
+      fullName = space + "." + celDocName;
     
     context.setDatabase(db);
     
@@ -445,7 +445,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       db = "siblingPrevious",
       space = "Celements2",
       celDocName = "MenuItem",
-      fullName = db+":"+space+"."+celDocName;
+      fullName = space + "." + celDocName;
     
     context.setDatabase(db);
     
@@ -514,7 +514,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       db = "siblingPrevious",
       space = "Celements2",
       celDocName = "MenuItem",
-      fullName = db+":"+space+"."+celDocName;
+      fullName = space + "." + celDocName;
     
     context.setDatabase(db);
     
