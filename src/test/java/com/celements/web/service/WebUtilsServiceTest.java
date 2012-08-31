@@ -196,17 +196,17 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
-    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"),
+    XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}<table>blabla</table>{/pre}"),
         eq(context.getDoc()), same(context))).andReturn("<table>blabla</table>"
         ).atLeastOnce();
     
-    replayAll(doc, renderer);
+    replayAll(doc, mockRenderer);
     String json ="[{\"content\" : \"<table>blabla</table>\", \"section\" : 2," +
         " \"sectionNr\" : 3}]";
     assertEquals(json, webUtilsService.getDocSectionAsJSON("(?=<table)", docRef, 2));
-    verifyAll(doc, renderer);
+    verifyAll(doc, mockRenderer);
   }
   
   @Test
@@ -236,14 +236,14 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     transDoc.setContent("abc<table>blabla</table><table>abc</table>");
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
-    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(context))
+    XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(context))
         ).andReturn("abc").atLeastOnce();
     
-    replayAll(doc, renderer);
+    replayAll(doc, mockRenderer);
     assertEquals("abc", webUtilsService.getDocSection("(?=<table)", docRef, 1));
-    verifyAll(doc, renderer);
+    verifyAll(doc, mockRenderer);
   }
   
   @Test
@@ -257,15 +257,15 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     transDoc.setContent("<p></p>  <br /> \n<table>blabla</table><table>abc</table>");
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
-    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()), 
+    XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()), 
         same(context))).andReturn("<table>blabla</table>").atLeastOnce();
     
-    replayAll(doc, renderer);
+    replayAll(doc, mockRenderer);
     assertEquals("<table>blabla</table>", 
         webUtilsService.getDocSection("(?=<table)", docRef, 1));
-    verifyAll(doc, renderer);
+    verifyAll(doc, mockRenderer);
   }
   
   @Test
@@ -279,15 +279,15 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     transDoc.setContent("abc<table>blabla</table><table>abc</table>");
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
-    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()),
+    XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()),
         same(context))).andReturn("<table>blabla</table>").atLeastOnce();
     
-    replayAll(doc, renderer);
+    replayAll(doc, mockRenderer);
     assertEquals("<table>blabla</table>", webUtilsService.getDocSection("(?=<table)",
         docRef, 2));
-    verifyAll(doc, renderer);
+    verifyAll(doc, mockRenderer);
   }
   
   @Test
@@ -301,15 +301,15 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     transDoc.setContent("abc<table>blabla</table><table>abc</table>");
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
-    expect(xwiki.getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(context.getDoc()),
+    XWikiRenderingEngine mockRenderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(mockRenderer).atLeastOnce();
+    expect(mockRenderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(context.getDoc()),
         same(context))).andReturn("<table>abc</table>").atLeastOnce();
     
-    replayAll(doc, renderer);
+    replayAll(doc, mockRenderer);
     assertEquals("<table>abc</table>", webUtilsService.getDocSection("(?=<table)",
         docRef, 3));
-    verifyAll(doc, renderer);
+    verifyAll(doc, mockRenderer);
   }
 
   @Test

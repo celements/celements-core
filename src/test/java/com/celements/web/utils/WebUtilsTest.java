@@ -56,7 +56,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   private XWikiURLFactory mockURLFactory;
   private XWiki wiki;
   private XWikiStoreInterface mockXStore;
-  private ITreeNodeService injected_TreeNodeService;
+  private ITreeNodeService mockTreeNodeService;
   
   @Before
   public void setUp_WebUtilsTest() {
@@ -69,8 +69,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     mockXStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockXStore).anyTimes();
     context.setURLFactory(mockURLFactory);
-    injected_TreeNodeService = createMock(ITreeNodeService.class);
-    celUtils.injected_TreeNodeService = injected_TreeNodeService;
+    mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injected_TreeNodeService = mockTreeNodeService;
   }
   
   @Test
@@ -169,9 +169,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem1);
     menuItemList.add(menuItemItemDoc);
     menuItemList.add(menuItem2);
-    expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
+    expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
-    expect(injected_TreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
+    expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
         eq(""))).andReturn(1);
     replayAll(rightServiceMock);
     BaseObject prevMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
@@ -223,9 +223,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem1);
     menuItemList.add(menuItemItemDoc);
     menuItemList.add(menuItem2);
-    expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
+    expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
-    expect(injected_TreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
+    expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
         eq(""))).andReturn(1);
     replayAll(rightServiceMock);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
@@ -277,9 +277,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemList.add(menuItem1);
     menuItemList.add(menuItemItemDoc);
     menuItemList.add(menuItem2);
-    expect(injected_TreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
+    expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
         isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
-    expect(injected_TreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
+    expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
         eq(""))).andReturn(1);
     replayAll(rightServiceMock);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
@@ -625,12 +625,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   //*****************************************************************/
 
   private void replayAll(Object ... mocks) {
-    replay(mockStore, wiki, mockXStore, injected_TreeNodeService);
+    replay(mockStore, wiki, mockXStore, mockTreeNodeService);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(mockStore, wiki, mockXStore, injected_TreeNodeService);
+    verify(mockStore, wiki, mockXStore, mockTreeNodeService);
     verify(mocks);
   }
 

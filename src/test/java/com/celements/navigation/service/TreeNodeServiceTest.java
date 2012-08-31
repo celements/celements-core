@@ -33,6 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -41,8 +42,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   private XWikiStoreInterface mockStore;
   private TreeNodeService treeNodeService;
   private ITreeNodeCache mockTreeNodeCache;
-  private GetNotMappedMenuItemsForParentCommand testGetNotMenuItemCommand;
-  private GetMappedMenuItemsForParentCommand testGetMenuItemCommand;
+  private GetNotMappedMenuItemsForParentCommand mockGetNotMenuItemCommand;
+  private GetMappedMenuItemsForParentCommand mockGetMenuItemCommand;
 
   @Before
   public void setUp_TreeNodeServiceTest() throws Exception {
@@ -50,20 +51,20 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     wiki = createMock(XWiki.class);
     context.setWiki(wiki);
     mockStore = createMock(XWikiStoreInterface.class);
-    treeNodeService = new TreeNodeService();
+    treeNodeService = (TreeNodeService) Utils.getComponent(ITreeNodeService.class);
     expect(wiki.getStore()).andReturn(mockStore).anyTimes();
     mockTreeNodeCache = createMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
     treeNodeService.execution = getComponentManager().lookup(Execution.class);
     treeNodeService.serializer = getComponentManager().lookup(
         EntityReferenceSerializer.class);
-    testGetNotMenuItemCommand = createMock(GetNotMappedMenuItemsForParentCommand.class);
+    mockGetNotMenuItemCommand = createMock(GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
-        testGetNotMenuItemCommand).anyTimes();
-    testGetMenuItemCommand = createMock(
+        mockGetNotMenuItemCommand).anyTimes();
+    mockGetMenuItemCommand = createMock(
         GetMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getMappedMenuItemsForParentCmd()).andReturn(
-        testGetMenuItemCommand).anyTimes();
+        mockGetMenuItemCommand).anyTimes();
   }
 
   @Test
@@ -78,10 +79,10 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         new WikiReference(context.getDatabase()));
     TreeNode treeNode = createTreeNode(spaceName, docName, spaceName, "", 1);
     List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(mockTreeNodeList);
     List<TreeNode> emptyList = Collections.emptyList();
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(emptyList);
     XWikiRightService mockRightService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(mockRightService).anyTimes();
@@ -114,9 +115,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
       notMappedList = Arrays.asList(menuItem2, menuItem3),
       expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3, menuItem5);
     
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
         ).andReturn(mappedList).once();
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(notMappedList).once();
     
     replayAll();
@@ -148,9 +149,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
     List<TreeNode> oldNotMappedList = Arrays.asList(menuItem2, menuItem3);
     List<TreeNode> mappedList = Collections.emptyList();
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
         ).andReturn(mappedList).once();
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
         )).andReturn(oldNotMappedList).once();
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
@@ -173,9 +174,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     TreeNode menuItem1 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 1);
     TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
         ).andReturn(mappedList).once();
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(oldMenuItems).once();
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
@@ -194,9 +195,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);
     List<TreeNode> mappedList = Collections.emptyList();
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
         ).andReturn(mappedList).once();
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context)
         )).andReturn(null).once();
     replayAll();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
@@ -400,9 +401,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev); nodes.add(tnItem); nodes.add(tnNext);
     
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(
         eq(fullName), same(context))).andReturn(nodes).times(2);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(
         eq(fullName), same(context))
         ).andReturn(new ArrayList<TreeNode>()).times(2);
 
@@ -469,9 +470,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev); nodes.add(tnItem); nodes.add(tnNext);
     
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(
         eq(fullName), same(context))).andReturn(nodes).times(2);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(
         eq(fullName), same(context))
         ).andReturn(new ArrayList<TreeNode>()).times(2);
 
@@ -537,9 +538,9 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev); nodes.add(tnItem);
     
-    expect(testGetNotMenuItemCommand.getTreeNodesForParentKey(
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(
         eq(fullName), same(context))).andReturn(nodes).times(2);
-    expect(testGetMenuItemCommand.getTreeNodesForParentKey(
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(
         eq(fullName), same(context))
         ).andReturn(new ArrayList<TreeNode>()).times(2);
   
@@ -576,14 +577,14 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   private void replayAll(Object ... mocks) {
-    replay(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
-        testGetMenuItemCommand);
+    replay(mockStore, wiki, mockTreeNodeCache, mockGetNotMenuItemCommand,
+        mockGetMenuItemCommand);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(mockStore, wiki, mockTreeNodeCache, testGetNotMenuItemCommand,
-        testGetMenuItemCommand);
+    verify(mockStore, wiki, mockTreeNodeCache, mockGetNotMenuItemCommand,
+        mockGetMenuItemCommand);
     verify(mocks);
   }
 
