@@ -36,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
+import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -271,10 +272,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setVersion("28.82");
     assertEquals("28", ((WebUtils)celUtils).getMajorVersion(doc));
   }
-
+  
   @Test
-  public void getSiblingMenuItem_previous() throws XWikiException {
-    context.setDatabase("siblingPrevious");
+  public void testPrevMenuItem() throws XWikiException{
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
@@ -290,114 +290,56 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setName(mItemFullName);
     menuItemItemDoc.setClassName("Celements2.MenuItem");
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
-    BaseObject menuItem2 = new BaseObject();
-    String nextFullName = "mySpace.Doc2";
-    menuItem2.setName(nextFullName);
-    menuItem2.setClassName("Celements2.MenuItem");
-    XWikiDocument nextDoc = new XWikiDocument();
-    nextDoc.setFullName(nextFullName);
-    nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc).anyTimes();
-    expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc
-      ).anyTimes();
-    expect(wiki.getDocument(eq(prevFullName), same(context))).andReturn(prevDoc
-        ).anyTimes();
-    expect(wiki.getDocument(eq(nextFullName), same(context))).andReturn(nextDoc
-      ).anyTimes();
-    XWikiRightService rightServiceMock = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(rightServiceMock).anyTimes();
-    expect(rightServiceMock.hasAccessLevel(eq("view"), isA(String.class),
-        isA(String.class), same(context))).andReturn(true).anyTimes();
-    expect(mockXStore.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
-        (List<?>)anyObject(), same(context))).andReturn(new ArrayList<String>()
-            ).anyTimes();
-    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
-    menuItemList.add(menuItem1);
-    menuItemList.add(menuItemItemDoc);
-    menuItemList.add(menuItem2);
+    expect(wiki.getDocument(eq(prevDoc.getDocumentReference()), same(context))
+        ).andReturn(prevDoc).once();
+    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), "Celements2.MenuItem", 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
-        isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
-    expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
-        eq(""))).andReturn(1);
-    replayAll(rightServiceMock, mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
-        true, context);
+    expect(mockTreeNodeService.getPrevMenuItem(doc.getDocumentReference())
+        ).andReturn(tnPrev).once();
+    replayAll(mockTreeNodeService);
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(mItemFullName,context);
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem1, prevMenuItem);
-    verifyAll(rightServiceMock, mockTreeNodeService);
-  }
-
-  @Test
-  public void getSiblingMenuItem_next() throws XWikiException {
-    context.setDatabase("siblingPrevious");
-    String mItemFullName = "mySpace.myMenuItemDoc";
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName(mItemFullName);
-    context.setDoc(doc);
-    BaseObject menuItem1 = new BaseObject();
-    String prevFullName = "mySpace.Doc1";
-    menuItem1.setName(prevFullName);
-    menuItem1.setClassName("Celements2.MenuItem");
-    XWikiDocument prevDoc = new XWikiDocument();
-    prevDoc.setFullName(prevFullName);
-    prevDoc.setObject("Celements2.MenuItem", 0, menuItem1);
-    BaseObject menuItemItemDoc = new BaseObject();
-    menuItemItemDoc.setName(mItemFullName);
-    menuItemItemDoc.setClassName("Celements2.MenuItem");
-    doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
-    BaseObject menuItem2 = new BaseObject();
-    String nextFullName = "mySpace.Doc2";
-    menuItem2.setName(nextFullName);
-    menuItem2.setClassName("Celements2.MenuItem");
-    XWikiDocument nextDoc = new XWikiDocument();
-    nextDoc.setFullName(nextFullName);
-    nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc).anyTimes();
-    expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc
-      ).anyTimes();
-    expect(wiki.getDocument(eq(prevFullName), same(context))).andReturn(prevDoc
-        ).anyTimes();
-    expect(wiki.getDocument(eq(nextFullName), same(context))).andReturn(nextDoc
-      ).anyTimes();
-    XWikiRightService rightServiceMock = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(rightServiceMock).anyTimes();
-    expect(rightServiceMock.hasAccessLevel(eq("view"), isA(String.class),
-        isA(String.class), same(context))).andReturn(true).anyTimes();
-    expect(mockXStore.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
-        (List<?>)anyObject(), same(context))).andReturn(new ArrayList<String>()
-            ).anyTimes();
-    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
-    menuItemList.add(menuItem1);
-    menuItemList.add(menuItemItemDoc);
-    menuItemList.add(menuItem2);
-    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
-    celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
-        isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
-    expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
-        eq(""))).andReturn(1);
-    replayAll(rightServiceMock, mockTreeNodeService);
-    BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
-        false, context);
-    assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
-    verifyAll(rightServiceMock, mockTreeNodeService);
+    verifyAll(mockTreeNodeService);
   }
   
   @Test
-  public void getSiblingMenuItem_next_docNotInContextSpace() throws XWikiException {
+  public void testNextMenuItem() throws XWikiException{
+    String mItemFullName = "mySpace.myMenuItemDoc";
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName(mItemFullName);
+    context.setDoc(doc);
+    BaseObject menuItem2 = new BaseObject();
+    String nextFullName = "mySpace.Doc2";
+    menuItem2.setName(nextFullName);
+    menuItem2.setClassName("Celements2.MenuItem");
+    XWikiDocument nextDoc = new XWikiDocument();
+    nextDoc.setFullName(nextFullName);
+    nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
+    BaseObject menuItemItemDoc = new BaseObject();
+    menuItemItemDoc.setName(mItemFullName);
+    menuItemItemDoc.setClassName("Celements2.MenuItem");
+    doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
+    expect(wiki.getDocument(eq(nextDoc.getDocumentReference()), same(context))
+        ).andReturn(nextDoc).once();
+    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
+    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injectTreeNodeService(mockTreeNodeService);
+    expect(mockTreeNodeService.getNextMenuItem(doc.getDocumentReference())
+        ).andReturn(tnPrev).once();
+    replayAll(mockTreeNodeService);
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName,context);
+    assertEquals("MySpace.Doc1 MenuItem expected.", menuItem2, prevMenuItem);
+    verifyAll(mockTreeNodeService);
+  }
+  
+  @Test
+  public void getNextMenuItem_next_docNotInContextSpace() throws XWikiException {
     context.setDatabase("siblingPrevious");
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
     context.setDoc(new XWikiDocument("otherSpace", "otherDoc"));
-    BaseObject menuItem1 = new BaseObject();
-    String prevFullName = "mySpace.Doc1";
-    menuItem1.setName(prevFullName);
-    menuItem1.setClassName("Celements2.MenuItem");
-    XWikiDocument prevDoc = new XWikiDocument();
-    prevDoc.setFullName(prevFullName);
-    prevDoc.setObject("Celements2.MenuItem", 0, menuItem1);
     BaseObject menuItemItemDoc = new BaseObject();
     menuItemItemDoc.setName(mItemFullName);
     menuItemItemDoc.setClassName("Celements2.MenuItem");
@@ -409,35 +351,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument nextDoc = new XWikiDocument();
     nextDoc.setFullName(nextFullName);
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc).anyTimes();
-    expect(wiki.getDocument(eq(mItemFullName), same(context))).andReturn(doc
-      ).anyTimes();
-    expect(wiki.getDocument(eq(prevFullName), same(context))).andReturn(prevDoc
-        ).anyTimes();
-    expect(wiki.getDocument(eq(nextFullName), same(context))).andReturn(nextDoc
-      ).anyTimes();
-    XWikiRightService rightServiceMock = createMock(XWikiRightService.class);
-    expect(wiki.getRightService()).andReturn(rightServiceMock).anyTimes();
-    expect(rightServiceMock.hasAccessLevel(eq("view"), isA(String.class),
-        isA(String.class), same(context))).andReturn(true).anyTimes();
-    expect(mockXStore.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
-        (List<?>)anyObject(), same(context))).andReturn(new ArrayList<String>()
-            ).anyTimes();
-    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
-    menuItemList.add(menuItem1);
-    menuItemList.add(menuItemItemDoc);
-    menuItemList.add(menuItem2);
+    expect(wiki.getDocument(eq(nextDoc.getDocumentReference()), same(context))
+        ).andReturn(nextDoc).once();
+    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getSubMenuItemsForParent(eq(""), eq("mySpace"),
-        isA(InternalRightsFilter.class))).andReturn(menuItemList).atLeastOnce();
-    expect(mockTreeNodeService.getMenuItemPos(eq(celUtils.getRef(mItemFullName)), 
-        eq(""))).andReturn(1);
-    replayAll(rightServiceMock, mockTreeNodeService);
-    BaseObject nextMenuItem = ((WebUtils) celUtils).getSiblingMenuItem(mItemFullName,
-        false, context);
+    expect(mockTreeNodeService.getNextMenuItem(doc.getDocumentReference())
+        ).andReturn(tnPrev).once();
+    replayAll(mockTreeNodeService);
+    BaseObject nextMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName,context);
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
-    verifyAll(rightServiceMock, mockTreeNodeService);
+    verifyAll(mockTreeNodeService);
   }
   
   @Test

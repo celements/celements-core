@@ -20,7 +20,6 @@
 package com.celements.web.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -293,7 +292,10 @@ public class WebUtils implements IWebUtils {
   @Deprecated
   public BaseObject getPrevMenuItem(String fullName,
       XWikiContext context) throws XWikiException {
-    return getSiblingMenuItem(fullName, true, context);
+    DocumentReference docRef = getTreeNodeService().getPrevMenuItem(getRef(fullName)
+        ).getDocumentReference();
+    return context.getWiki().getDocument(docRef, context)
+        .getXObject(getRef("Celements2.MenuItem"));
   }
 
   /**
@@ -302,39 +304,10 @@ public class WebUtils implements IWebUtils {
   @Deprecated
   public BaseObject getNextMenuItem(String fullName,
       XWikiContext context) throws XWikiException {
-    return getSiblingMenuItem(fullName, false, context);
-  }
-
-  BaseObject getSiblingMenuItem(String fullName, boolean previous,
-      XWikiContext context)
-      throws XWikiException {
-    XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-    BaseObject menuItem = doc.getObject("Celements2.MenuItem");
-    if (menuItem != null){
-      String parent;
-      try {
-        parent = getParentFullName(fullName, context);
-        List<BaseObject> submenuItems = getSubMenuItemsForParent_internal(
-            parent, doc.getSpace(), menuItem.getStringValue("part_name"), context);
-        LOGGER.debug("getPrevMenuItem: " + submenuItems.size()
-            + " submenuItems found for parent '" + parent + "'. "
-            + Arrays.deepToString(submenuItems.toArray()));
-        int pos = getMenuItemPos(fullName, menuItem.getStringValue("part_name"), context);
-        if (previous && (pos > 0)) {
-          return submenuItems.get(pos - 1);
-        } else if (!previous && (pos < (submenuItems.size() - 1))) {
-          return submenuItems.get(pos + 1);
-        }
-        LOGGER.info("getPrevMenuItem: no previous MenuItem found for "
-            + fullName);
-      } catch (XWikiException e) {
-        LOGGER.error(e);
-      }
-    } else {
-      LOGGER.debug("getPrevMenuItem: no MenuItem Object found on doc "
-          + fullName);
-    }
-    return null;
+    DocumentReference docRef = getTreeNodeService().getNextMenuItem(getRef(fullName)
+        ).getDocumentReference();
+    return context.getWiki().getDocument(docRef, context)
+        .getXObject(getRef("Celements2.MenuItem"));
   }
 
   /* (non-Javadoc)
