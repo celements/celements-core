@@ -97,9 +97,8 @@ public class WebUtils implements IWebUtils {
       return injectedTreeNodeService;
     }
     ITreeNodeService ret = Utils.getComponent(ITreeNodeService.class);
-    InheritorFactory inheritorFactory = getInheritorFactory();
-    if(inheritorFactory!=null){
-      ((TreeNodeService)ret).injectInheritorFactory(inheritorFactory);
+    if(injectedInheritorFactory!=null){
+      ((TreeNodeService)ret).injectInheritorFactory(injectedInheritorFactory);
     }
     return ret;
   }
@@ -320,7 +319,7 @@ public class WebUtils implements IWebUtils {
     if(preferenceDoc.getObject(className, false, context) == null){
       preferenceDoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
       if(preferenceDoc.getObject(className, false, context) == null){
-        String skinDocName = context.getWiki().getWebPreference("skin", context);
+        String skinDocName = context.getWiki().getSpacePreference("skin", context);
         if((skinDocName != null)
             && (context.getWiki().exists(skinDocName, context))){
           preferenceDoc = context.getWiki().getDocument(skinDocName, context);

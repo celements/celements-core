@@ -20,7 +20,6 @@
 package com.celements.web.pagetype;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -31,6 +30,7 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -58,8 +58,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     context.setWiki(xwiki);
     velocityContext = new VelocityContext();
     context.put("vcontext", velocityContext);
-    currentDoc = new XWikiDocument();
-    currentDoc.setFullName("Content.MyPage");
+    currentDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "Content",
+        "MyPage"));
     context.setDoc(currentDoc);
     renderCmd = new RenderCommand(context);
     mockPageTypeCmd = createMock(PageTypeCommand.class);
@@ -72,7 +72,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   public void testPageTypeCmd() {
     renderCmd.inject_PageTypeCmd(null);
     assertNotNull(renderCmd.pageTypeCmd());
-    assertSame("Expecting singleton.", renderCmd.pageTypeCmd(), 
+    assertNotSame("NOT expecting singleton.", renderCmd.pageTypeCmd(), 
         renderCmd.pageTypeCmd());
   }
 

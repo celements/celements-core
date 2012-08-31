@@ -196,7 +196,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   public List<String> getAllowedLanguages(){
     return Arrays.asList(getContext().getWiki(
-        ).getWebPreference("language", getContext()).split("[ ,]"));
+        ).getSpacePreference("language", getContext()).split("[ ,]"));
   }
 
   public Date parseDate(String date, String format){
@@ -254,14 +254,14 @@ public class WebUtilsService implements IWebUtilsService {
       LOGGER.error("failed to get UserObject for " + getContext().getUser());
     }
     if ((adminLanguage == null) || ("".equals(adminLanguage))) {
-      adminLanguage = getContext().getWiki().getWebPreference("admin_language",
+      adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
           getContext().getLanguage(), getContext());
     }
     return adminLanguage;
   }
   
   public String getDefaultLanguage() {
-    return getContext().getWiki().getWebPreference("default_language", getContext());
+    return getContext().getWiki().getSpacePreference("default_language", getContext());
   }
   
   public boolean hasParentSpace() {
@@ -269,7 +269,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public String getParentSpace() {
-    return getContext().getWiki().getWebPreference("parent", getContext());
+    return getContext().getWiki().getSpacePreference("parent", getContext());
   }
 
   public DocumentReference resolveDocumentReference(String fullName) {

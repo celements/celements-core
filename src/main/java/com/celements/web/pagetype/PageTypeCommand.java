@@ -34,12 +34,8 @@ public class PageTypeCommand {
   public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
        + PAGE_TYPE_CLASS_DOC;
 
-  private static PageTypeCommand pageTypeInstance;
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(PageTypeCommand.class);
-  
-  PageTypeCommand() {
-  }
+  private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeCommand.class);
   
   public static IPageType getApiInstance(XWikiContext context) throws XWikiException {
     Object obj = context.get("pageTypeApi");
@@ -49,11 +45,14 @@ public class PageTypeCommand {
     return ((IPageType)context.get("pageTypeApi"));
   }
   
+  /**
+   * @return new PageTypeCommand instance
+   * 
+   * @deprecated instead please use new PageTypeCommand()
+   */
+  @Deprecated
   public static PageTypeCommand getInstance() {
-    if (pageTypeInstance == null) {
-      pageTypeInstance = new PageTypeCommand();
-    }
-    return pageTypeInstance;
+    return new PageTypeCommand();
   }
 
   public BaseObject getPageTypeObject(XWikiDocument doc, XWikiContext context){
@@ -94,7 +93,7 @@ public class PageTypeCommand {
       try {
         doc = context.getWiki().getDocument(templName, context);
       } catch (XWikiException e) {
-        mLogger.error("Exception while getting template doc '" + templName + "'", e);
+        LOGGER.error("Exception while getting template doc '" + templName + "'", e);
       }
     }
     return doc;
@@ -104,7 +103,7 @@ public class PageTypeCommand {
     return completePageTypeDocName(getPageType(doc, context));
   }
 
-  private String completePageTypeDocName(String pageTypeName) {
+  public String completePageTypeDocName(String pageTypeName) {
     if (pageTypeName.indexOf('.') > 0) {
       return pageTypeName;
     } else {

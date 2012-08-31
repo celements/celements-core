@@ -32,7 +32,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.inheritor.InheritorFactory;
@@ -47,12 +46,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * TreeNodeService
  * 
- * access a tree node structre throught the method of this service.
+ * access a tree node structure through the method of this service.
  * 
  * @author Fabian Pichler
  *
@@ -60,8 +58,8 @@ import com.xpn.xwiki.web.Utils;
 @Component
 public class TreeNodeService implements ITreeNodeService {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(TreeNodeService.class);
-  
+  private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeService.class);
+
   @Requirement
   Execution execution;
 
@@ -70,9 +68,11 @@ public class TreeNodeService implements ITreeNodeService {
   
   @Requirement("default")
   EntityReferenceSerializer<String> serializer;
-  
+
+  @Requirement
+  IWebUtilsService webUtilsService;
+
   private InheritorFactory injectedInheritorFactory;
-  private IWebUtilsService webUtilsService;
 
   @Requirement(role = ITreeNodeProvider.class)
   Map<String, ITreeNodeProvider> nodeProviders;
@@ -82,7 +82,7 @@ public class TreeNodeService implements ITreeNodeService {
   }
     
   public int getActiveMenuItemPos(int menuLevel, String menuPart) {
-    List<DocumentReference> parents = getWebUtilsService().getDocumentParentsList(
+    List<DocumentReference> parents = webUtilsService.getDocumentParentsList(
         getContext().getDoc().getDocumentReference(), true);
     if (parents.size() >= menuLevel) {
       return getMenuItemPos(parents.get(parents.size() - menuLevel), menuPart);
@@ -101,7 +101,7 @@ public class TreeNodeService implements ITreeNodeService {
         }
       }
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     return -1;
   }
@@ -121,7 +121,7 @@ public class TreeNodeService implements ITreeNodeService {
     String parentKey = getParentKey(parent, menuSpace);
     return getSubNodesForParent(getRef(parentKey), filter);
   }
-  
+
   String getParentKey(String parent, String menuSpace) {
     String parentKey = "";
     if (parent != null) {
@@ -211,13 +211,13 @@ public class TreeNodeService implements ITreeNodeService {
             treeNodesMergedMap.put(new Integer(node.getPosition()), node);
           }
         } catch(Exception exp) {
-          mLogger.warn("Failed on provider [" + tnProvider.getClass()
+          LOGGER.warn("Failed on provider [" + tnProvider.getClass()
               + "] to get nodes for parentKey [" + parentKey + "].", exp);
         }
       }
       nodes = new ArrayList<TreeNode>(treeNodesMergedMap.values());
       long end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey: [" + parentKey + "] totaltime for list of ["
           + nodes.size() + "]: " + (end-starttotal));
     }
     return nodes;
@@ -228,24 +228,24 @@ public class TreeNodeService implements ITreeNodeService {
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     long end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
+    LOGGER.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
         + (end-start));
     start = System.currentTimeMillis();
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     end = System.currentTimeMillis();
-    mLogger.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
+    LOGGER.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
         + (end-start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
           + mappedTreeNodes.size() + "]: " + (end-starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
       end = System.currentTimeMillis();
-      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + notMappedmenuItems.size() + "]: " + (end-starttotal));
       return notMappedmenuItems;
     } else {
@@ -257,10 +257,10 @@ public class TreeNodeService implements ITreeNodeService {
         menuItemsMergedMap.put(new Integer(node.getPosition()), node);
       }
       end = System.currentTimeMillis();
-      mLogger.debug("fetchNodesForParentKey_internal: time for merging menu items: "
+      LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: "
           + (end-start));
       ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
-      mLogger.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
           + menuItems.size() + "]: " + (end-starttotal));
       return menuItems;
     }
@@ -288,18 +288,18 @@ public class TreeNodeService implements ITreeNodeService {
           menuItemList.add(cobj);
         }
       } catch (XWikiException exp) {
-        mLogger.error("failed to get doc for menuItem", exp);
+        LOGGER.error("failed to get doc for menuItem", exp);
       }
     }
     long end = System.currentTimeMillis();
-    mLogger.info("fetchMenuItemsForXWiki: [" + parentKey + "] totaltime for list of ["
+    LOGGER.info("fetchMenuItemsForXWiki: [" + parentKey + "] totaltime for list of ["
         + menuItemList.size() + "]: " + (end-starttotal));
     return menuItemList;
   }
 
   /**
    * 
-   * @deprecated use getSubNodesForParent(EntityReference, INavFilter)  or 
+   * @deprecated since 2.14.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
    * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
@@ -342,7 +342,7 @@ public class TreeNodeService implements ITreeNodeService {
         return maxLevel;
       }
     } catch (XWikiException e) {
-      mLogger.error("unable to get configDoc.", e);
+      LOGGER.error("unable to get configDoc.", e);
     }
     return Navigation.DEFAULT_MAX_LEVEL;
   }
@@ -365,7 +365,7 @@ public class TreeNodeService implements ITreeNodeService {
         parent = getParentRef(docRef);
         List<TreeNode> subMenuItems = getSubNodesForParent(parent,
             menuItem.getStringValue("part_name"));
-        mLogger.debug("getPrevMenuItem: " + subMenuItems.size()
+        LOGGER.debug("getPrevMenuItem: " + subMenuItems.size()
             + " subMenuItems found for parent '" + parent + "'. "
             + Arrays.deepToString(subMenuItems.toArray()));
         int pos = getMenuItemPos(docRef, menuItem.getStringValue("part_name"));
@@ -374,13 +374,13 @@ public class TreeNodeService implements ITreeNodeService {
         } else if (!previous && (pos < (subMenuItems.size() - 1))) {
           return subMenuItems.get(pos + 1);
         }
-        mLogger.info("getPrevMenuItem: no previous MenuItem found for "
+        LOGGER.info("getPrevMenuItem: no previous MenuItem found for "
             + getParentKey(docRef, true));
       } catch (XWikiException e) {
-        mLogger.error(e);
+        LOGGER.error(e);
       }
     } else {
-      mLogger.debug("getPrevMenuItem: no MenuItem Object found on doc "
+      LOGGER.debug("getPrevMenuItem: no MenuItem Object found on doc "
           + getParentKey(docRef, true));
     }
     return null;
@@ -390,10 +390,10 @@ public class TreeNodeService implements ITreeNodeService {
     DocumentReference parent = new WebUtilsService().getParentForLevel(menuLevel);
     if (parent != null) {
       List<TreeNode> submenuItems = getSubNodesForParent(parent, menuPart);
-      mLogger.debug("submenuItems for parent: " + parent + " ; " + submenuItems);
+      LOGGER.debug("submenuItems for parent: " + parent + " ; " + submenuItems);
       return submenuItems;
     }
-    mLogger.debug("parent is null");
+    LOGGER.debug("parent is null");
     return new ArrayList<TreeNode>();
   }
   
@@ -402,24 +402,12 @@ public class TreeNodeService implements ITreeNodeService {
   }
   
   DocumentReference getRef(String s){
-    return getWebUtilsService().resolveDocumentReference(s);
+    return webUtilsService.resolveDocumentReference(s);
   }
   
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
     return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
   }
-  
-  void injectIWebUtilsService(IWebUtilsService wu){
-    webUtilsService = wu;
-  }
-  
-  private IWebUtilsService getWebUtilsService() {
-    if(webUtilsService!=null){
-      return webUtilsService;
-    } else{
-      return Utils.getComponent(IWebUtilsService.class);
-    }
-  }  
   
   /**
    * FOR TEST PURPOSES ONLY

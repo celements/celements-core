@@ -57,7 +57,7 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagSpaceName() {
     String celFileBaseName = "Content_attachments.FileBaseDoc";
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), eq(""),
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
         same(context))).andReturn(celFileBaseName);
     replay(xwiki, mockUtils);
     assertEquals("Content_attachments", fileBaseTagCmd.getTagSpaceName(context));
@@ -67,7 +67,7 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagSpaceName_onlySpaceName() {
     String celFileBaseName = "Content_attachments";
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), eq(""),
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
         same(context))).andReturn(celFileBaseName);
     replay(xwiki, mockUtils);
     assertEquals("Content_attachments", fileBaseTagCmd.getTagSpaceName(context));
@@ -78,7 +78,7 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagDocument_docExists_without_MenuItem() throws Exception {
     String celFileBaseName = "Content_attachments";
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), eq(""),
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
         same(context))).andReturn(celFileBaseName).anyTimes();
     String tagDocFN = celFileBaseName + ".tag0";
     expect(xwiki.exists(eq(tagDocFN), same(context))).andReturn(true);
@@ -96,7 +96,7 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagDocument_docExists() throws Exception {
     String celFileBaseName = "Content_attachments";
-    expect(xwiki.getWebPreference(eq("cel_centralfilebase"), eq(""),
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
         same(context))).andReturn(celFileBaseName).anyTimes();
     String tagDocFN = celFileBaseName + ".tag0";
     expect(xwiki.exists(eq(tagDocFN), same(context))).andReturn(true);

@@ -13,6 +13,7 @@ import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
 
@@ -29,7 +30,7 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
     mockStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockStore).anyTimes();
     treeNodeCache = new TreeNodeCache();
-    treeNodeCache.execution = getComponentManager().lookup(Execution.class);
+    treeNodeCache.execution = Utils.getComponent(Execution.class);
   }
 
   @Test

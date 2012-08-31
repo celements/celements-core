@@ -142,9 +142,9 @@ public class CssCommand {
       }
 
       LOGGER.debug("WebPreferences space is: '" + space + "'");
-      String baseCSS = context.getWiki().getWebPreference("stylesheet", space,
+      String baseCSS = context.getWiki().getSpacePreference("stylesheet", space,
           "", context) + " ";
-      baseCSS = context.getWiki().getWebPreference("stylesheets", space, "",
+      baseCSS = context.getWiki().getSpacePreference("stylesheets", space, "",
           context) + " ";
       
       LOGGER.debug("CSS Prefs: has '" + baseCSS + "' as CSS to add.");

@@ -72,7 +72,7 @@ public class DocumentCreationWorker extends AbstractXWikiRunnable{
         fifth = true;
       }
       if((docsCreated +1) % 20000 == 0) {
-        context.getWiki().flushCache();
+        context.getWiki().flushCache(context);
       }
       try {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);

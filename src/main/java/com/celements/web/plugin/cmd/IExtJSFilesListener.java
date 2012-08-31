@@ -19,12 +19,12 @@
  */
 package com.celements.web.plugin.cmd;
 
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.component.annotation.ComponentRole;
 
+@ComponentRole
 public interface IExtJSFilesListener {
 
   public void beforeAllExtFinish(
-      ExternalJavaScriptFilesCommand externalJavaScriptFilesCommand,
-      XWikiContext context);
+      ExternalJavaScriptFilesCommand externalJavaScriptFilesCommand);
 
 }

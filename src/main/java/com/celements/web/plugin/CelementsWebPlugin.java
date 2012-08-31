@@ -153,7 +153,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public String getVersionMode(XWikiContext context) {
-    String versionMode = context.getWiki().getWebPreference("celements_version",
+    String versionMode = context.getWiki().getSpacePreference("celements_version",
         context);
     if ("---".equals(versionMode)) {
       versionMode = context.getWiki().getXWikiPreference("celements_version",
@@ -220,6 +220,9 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         String db = context.getDatabase();
         context.setDatabase("xwiki");
         users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
+        if(users != null && users.size() == 1) {
+          users.add("xwiki:" + users.remove(0));
+        }
         context.setDatabase(db);
       }
       int usersFound = 0;
@@ -390,7 +393,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     try {
       XWiki xwiki = context.getWiki();
       XWikiDocument skinDoc = xwiki.getDocument(
-          xwiki.getWebPreference("skin", context), context);
+          xwiki.getSpacePreference("skin", context), context);
       String className = skinDoc.getObject("XWiki.XWikiSkins").getStringValue(
           "skin_config_class_name");
       BaseObject configObj = util.getConfigDocByInheritance(doc, className,
@@ -532,7 +535,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         tinyMCEwidthStr = Integer.toString(tinyMCEwidth);
       }
       if (tinyMCEwidth < 0) {
-        tinyMCEwidthStr = context.getWiki().getWebPreference("editbox_width", context);
+        tinyMCEwidthStr = context.getWiki().getSpacePreference("editbox_width", context);
         if ((tinyMCEwidthStr != null) && !"".equals(tinyMCEwidthStr)) {
           tinyMCEwidth = Integer.parseInt(tinyMCEwidthStr);
         }
@@ -611,7 +614,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       mLogger.debug("using pagetype for panels " + configName + " -> "+ showPanels);
       return showPanels;
     } else if (isSpaceOverwrite(context)) {
-      boolean showPanels = "1".equals(context.getWiki().getWebPreference(configName,
+      boolean showPanels = "1".equals(context.getWiki().getSpacePreference(configName,
           getSpaceOverwrite(context), "0", context));
       mLogger.debug("using spaceover webPrefs for panels " + configName
           + "," + getSpaceOverwrite(context) +" -> "+ showPanels);
@@ -622,7 +625,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       mLogger.debug("using globalPref for panels " + configName + " -> "+ showPanels);
       return showPanels;
     } else if (context.getWiki() != null) {
-      boolean showPanels = ("1".equals(context.getWiki().getWebPreference(configName,
+      boolean showPanels = ("1".equals(context.getWiki().getSpacePreference(configName,
           context)));
       mLogger.debug("using webPrefs for panels " + configName + " -> "+ showPanels);
       return showPanels;
@@ -695,13 +698,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       panelsString = getPagePanelObj(configName, getPageTypeDoc(context)
           ).getStringValue("panels");
     } else if(isSpaceOverwrite(context)) {
-      panelsString = context.getWiki().getWebPreference(configName,
+      panelsString = context.getWiki().getSpacePreference(configName,
            getSpaceOverwrite(context), "", context);
     } else {
       panelsString = context.getWiki().getUserPreference(configName, context);
       mLogger.debug("else with panels in userPreferences: " + panelsString);
       if("".equals(panelsString)) {
-         panelsString = context.getWiki().getWebPreference(configName, context);
+         panelsString = context.getWiki().getSpacePreference(configName, context);
          mLogger.debug("else with panels in webPreferences: " + panelsString);
       }
     }

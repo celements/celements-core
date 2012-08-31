@@ -55,9 +55,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getStore()).andReturn(mockStore).anyTimes();
     mockTreeNodeCache = createMock(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
-    treeNodeService.execution = getComponentManager().lookup(Execution.class);
-    treeNodeService.serializer = getComponentManager().lookup(
-        EntityReferenceSerializer.class);
+    treeNodeService.execution = Utils.getComponent(Execution.class);
+    treeNodeService.serializer = Utils.getComponent(EntityReferenceSerializer.class);
     mockGetNotMenuItemCommand = createMock(GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
         mockGetNotMenuItemCommand).anyTimes();
@@ -236,7 +235,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
-    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
@@ -268,7 +267,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
     expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
         "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
-    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
@@ -299,7 +298,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     skinDoc.setFullName("Skins.MySkin");
     expect(wiki.getDocument(eq("Skins.MySkin"), eq(context))
       ).andReturn(skinDoc).atLeastOnce();
-    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
@@ -322,7 +321,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     webPrefDoc.setFullName("MySpace.WebPreferences");
     expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
         ).andReturn(webPrefDoc).atLeastOnce();
-    expect(wiki.getWebPreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
