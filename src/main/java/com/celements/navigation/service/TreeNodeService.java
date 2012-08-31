@@ -177,11 +177,14 @@ public class TreeNodeService implements ITreeNodeService {
       String menuPart) {
     InternalRightsFilter filter = new InternalRightsFilter();
     filter.setMenuPart(menuPart);
-    return getSubNodesForParent(parent, menuSpace, filter);
+    List<TreeNode> subNodesForParent = getSubNodesForParent(parent, menuSpace, filter);
+    LOGGER.debug("getSubNodesForParent deprecated use: parent [" + parent
+        + "] menuSpace [" + menuSpace + "] menuPart [" + menuPart + "] returning ["
+        + subNodesForParent.size() + "].");
+    return subNodesForParent;
   }
   
-  public List<TreeNode> getSubNodesForParent(EntityReference entRef,
-      String menuPart) {
+  public List<TreeNode> getSubNodesForParent(EntityReference entRef, String menuPart) {
     InternalRightsFilter filter = new InternalRightsFilter();
     filter.setMenuPart(menuPart);
     return getSubNodesForParent(entRef, filter);
