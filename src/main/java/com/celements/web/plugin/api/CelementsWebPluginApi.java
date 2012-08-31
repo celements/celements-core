@@ -73,6 +73,7 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
+import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
@@ -538,19 +539,19 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public int showRightPanels() {
-    return plugin.showRightPanels(context);
+    return getPrepareVelocityContextService().showRightPanels();
   }
 
   public int showLeftPanels() {
-    return plugin.showLeftPanels(context);
+    return getPrepareVelocityContextService().showLeftPanels();
   }
 
   public List<String> getRightPanels() {
-    return plugin.getRightPanels(context);
+    return getPrepareVelocityContextService().getRightPanels();
   }
 
   public List<String> getLeftPanels() {
-    return plugin.getLeftPanels(context);
+    return getPrepareVelocityContextService().getLeftPanels();
   }
 
   public String getDocSectionAsJSON(String regex, String fullName, int part) throws XWikiException {
@@ -1393,6 +1394,10 @@ public class CelementsWebPluginApi extends Api {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private IPrepareVelocityContext getPrepareVelocityContextService() {
+    return Utils.getComponent(IPrepareVelocityContext.class);
   }
 
 }

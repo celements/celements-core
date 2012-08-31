@@ -31,11 +31,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.velocity.VelocityContext;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
@@ -43,18 +41,13 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.web.XWikiRequest;
 
 public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
 
   private CelementsWebPlugin plugin;
   private XWikiContext context;
   private XWiki xwiki;
-  private XWikiDocument skinDoc;
   
   @Before
   public void setUp_CelementsWebPluginTest() throws Exception {
@@ -62,75 +55,6 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     plugin = new CelementsWebPlugin("celementsweb", "CelementsWebPlugin", context);
-    skinDoc = createMock(XWikiDocument.class);
-    expect(skinDoc.getFullName()).andReturn("XWiki.Celements2Skin").anyTimes();
-    expect(skinDoc.newDocument(same(context))).andReturn(new Document(skinDoc, context)
-      ).anyTimes();
-    expect(xwiki.getDocument(eq("celements2web:XWiki.Celements2Skin"), same(context))
-      ).andReturn(skinDoc).anyTimes();
-  }
-  
-  @Test
-  public void testInitCelementsVelocity_checkNPEs_forNullContext() {
-    context.remove("vcontext");
-    plugin.initCelementsVelocity(context);
-  }
-  
-  @Test
-  public void testInitCelementsVelocity_checkNPEs_forEmptyVContext(
-      ) throws XWikiException {
-    VelocityContext vContext = new VelocityContext();
-    context.put("vcontext", vContext);
-    expect(xwiki.getPluginApi(eq(plugin.getName()), same(context))).andReturn(null
-      ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn(""
-      ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), same(context))).andReturn(""
-      ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(""
-      ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
-      ).andReturn("").anyTimes();
-    expect(xwiki.getDocument(eq(""), same(context))).andReturn(new XWikiDocument()
-      ).anyTimes();
-    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiGuest");
-    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
-      new XWikiDocument(userDocRef)).anyTimes();
-    expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123"
-      ).anyTimes();
-    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
-      ).anyTimes();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).anyTimes();
-    expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin"
-        ).anyTimes();
-    expect(xwiki.getDocument(eq("celements2web:Skins.CellSkin"), same(context))
-        ).andReturn(new XWikiDocument()).anyTimes();
-    context.setWiki(xwiki);
-    replay(xwiki, skinDoc);
-    plugin.initCelementsVelocity(context);
-    assertEquals("expecting tinyMCE_width be set.", "123", vContext.get("tinyMCE_width"));
-    verify(xwiki, skinDoc);
-  }
-  
-  @Test
-  public void testInitPanelsVelocity_checkNPEs_forNullContext() {
-    context.remove("vcontext");
-    plugin.initPanelsVelocity(context);
-  }
-  
-  @Test
-  public void testInitPanelsVelocity_checkNPEs_forEmptyVContext() {
-    context.put("vcontext", new VelocityContext());
-    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(null
-      ).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(null
-      ).atLeastOnce();
-    replay(xwiki, skinDoc);
-    plugin.initPanelsVelocity(context);
-    verify(xwiki, skinDoc);
   }
   
   @Test
@@ -433,61 +357,8 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetRTEwidth_default() throws Exception {
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("");
-    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
-      ).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
-    replay(xwiki, skinDoc);
-    assertEquals("453", plugin.getRTEwidth(context));
-    verify(xwiki, skinDoc);
+  public void testGetPrepareVelocityContextService() {
+   assertNotNull(plugin.getPrepareVelocityContextService()); 
   }
-  
-  @Test
-  public void testGetRTEwidth_preferences() throws Exception {
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500");
-    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
-      ).atLeastOnce();
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).atLeastOnce();
-    replay(xwiki, skinDoc);
-    assertEquals("500", plugin.getRTEwidth(context));
-    verify(xwiki, skinDoc);
-  }
-  
-  @Test
-  public void testGetRTEwidth_pageType() throws Exception {
-    XWikiRequest request = createMock(XWikiRequest.class);
-    context.setRequest(request);
-    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500"
-        ).anyTimes();
-    XWikiDocument theDoc = new XWikiDocument(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"));
-    BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setStringValue("page_type", "SpecialRichText");
-    DocumentReference pagTypeClassRef = new DocumentReference(context.getDatabase(), 
-        "Celements2", "PageType");
-    pageTypeObj.setXClassReference(pagTypeClassRef);
-    theDoc.setXObjects(pagTypeClassRef, Arrays.asList(pageTypeObj));
-    context.setDoc(theDoc);
-    expect(request.get(eq("template"))).andReturn(null).anyTimes();
-    DocumentReference specialPTRef = new DocumentReference(context.getDatabase(),
-        "PageTypes", "SpecialRichText");
-    expect(xwiki.exists(eq("PageTypes.SpecialRichText"), same(context))).andReturn(true
-        ).atLeastOnce();
-    XWikiDocument pageTypeDoc = new XWikiDocument(specialPTRef);
-    expect(xwiki.getDocument(eq("PageTypes.SpecialRichText"), same(context))).andReturn(
-        pageTypeDoc).once();
-    BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setIntValue("rte_width", 700);
-    DocumentReference pageTypePropClassRef = new DocumentReference(context.getDatabase(), 
-        "Celements2", "PageTypeProperties");
-    pageTypePropObj.setXClassReference(pageTypePropClassRef);
-    pageTypeDoc.setXObjects(pageTypePropClassRef, Arrays.asList(pageTypePropObj));
-    replay(xwiki, skinDoc, request);
-    assertEquals("700", plugin.getRTEwidth(context));
-    verify(xwiki, skinDoc, request);
-  }
-  
+
 }

@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +40,6 @@ import com.celements.navigation.MenuTypeRepository;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.web.pagetype.IPageType;
-import com.celements.web.pagetype.PageTypeApi;
-import com.celements.web.pagetype.PageTypeCommand;
 import com.celements.web.pagetype.RenderCommand;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
@@ -50,6 +47,7 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
@@ -63,7 +61,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -75,7 +72,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebPlugin.class);
 
   private final static IWebUtils util = WebUtils.getInstance();
@@ -102,13 +99,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public String getName() {
-    mLogger.debug("Entered method getName");
-    return "celementsweb";
+    return getPrepareVelocityContextService().getVelocityName();
   }
 
   public void flushCache() {
     //TODO: check if flushCache is called for changing a page MenuItem.
-    mLogger.debug("Entered method flushCache");
+    LOGGER.debug("Entered method flushCache");
   }
 
   public void flushCache(XWikiContext context) {
@@ -128,7 +124,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   private void addMenuTypeMenuItemToRepository() {
     if (MenuTypeRepository.getInstance().put(Navigation.MENU_TYPE_MENUITEM,
         new MenuItemNavigation())) {
-      mLogger.debug("Added MenuItemNavigation with key '"
+      LOGGER.debug("Added MenuItemNavigation with key '"
           + Navigation.MENU_TYPE_MENUITEM + "' to the "
           + "MenuTypeRepository");
     }
@@ -214,7 +210,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-      mLogger.info("searching token and found " + users.size() + " with parameters " + 
+      LOGGER.info("searching token and found " + users.size() + " with parameters " + 
           Arrays.deepToString(parameterList.toArray()));
       if(users == null || users.size() == 0) {
         String db = context.getDatabase();
@@ -233,11 +229,11 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         }
       }
       if(usersFound > 1){
-        mLogger.warn("Found more than one user for token '" + userToken + "'");
+        LOGGER.warn("Found more than one user for token '" + userToken + "'");
         return null;
       }
     } else {
-      mLogger.warn("No valid token given");
+      LOGGER.warn("No valid token given");
     }    
     return userDoc;
   }
@@ -255,13 +251,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       Boolean guestPlus, XWikiContext context) throws XWikiException {
     if (!"".equals(context.getRequest().getParameter("j_username"))
         && !"".equals(context.getRequest().getParameter("j_password"))) {
-      mLogger.info("getNewCelementsTokenForUser: trying to authenticate  "
+      LOGGER.info("getNewCelementsTokenForUser: trying to authenticate  "
           + context.getRequest().getParameter("j_username"));
       Principal principal = context.getWiki().getAuthService().authenticate(
           context.getRequest().getParameter("j_username"),
           context.getRequest().getParameter("j_password"), context);
       if(principal != null) {
-        mLogger.info("getNewCelementsTokenForUser: successfully autenthicated "
+        LOGGER.info("getNewCelementsTokenForUser: successfully autenthicated "
             + principal.getName());
         context.setUser(principal.getName());
         accountName = principal.getName();
@@ -308,7 +304,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         BaseObject obj = doc.getObject("XWiki.XWikiUsers");
         return obj.getStringValue("email");
       } catch (XWikiException e) {
-        mLogger.error(e);
+        LOGGER.error(e);
       }
     }
     return null;
@@ -360,16 +356,16 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     List<Attachment> attachments = new ArrayList<Attachment>();
     for(String docFN : docsFN) {
       try {
-        mLogger.info("getAttachmentsForDocs: processing doc " + docFN);
+        LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
         for(XWikiAttachment xwikiAttachment : context.getWiki().getDocument(
             docFN, context).getAttachmentList()) {
-          mLogger.info("getAttachmentsForDocs: adding attachment " + 
+          LOGGER.info("getAttachmentsForDocs: adding attachment " + 
               xwikiAttachment.getFilename() + " to list.");
           attachments.add(new Attachment(context.getWiki().getDocument(
               docFN, context).newDocument(context), xwikiAttachment, context));
         }
       } catch (XWikiException e) {
-        mLogger.error(e);
+        LOGGER.error(e);
       }
     }
     return attachments;
@@ -400,7 +396,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
           context).getObject(className);
       return configObj;
     } catch(XWikiException e){
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     return null;
   }
@@ -408,10 +404,9 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   @Override
   public void beginRendering(XWikiContext context) {
     try {
-      initCelementsVelocity(context);
-      initPanelsVelocity(context);
+      getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
-      mLogger.error("beginRendering", exp);
+      LOGGER.error("beginRendering", exp);
       throw exp;
     }
   }
@@ -419,319 +414,15 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   @Override
   public void beginParsing(XWikiContext context) {
     try {
-      initCelementsVelocity(context);
-      initPanelsVelocity(context);
+      getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
-      mLogger.error("beginParsing", exp);
+      LOGGER.error("beginParsing", exp);
       throw exp;
     }
   }
 
-  void initPanelsVelocity(XWikiContext context) {
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-    if (vcontext != null) {
-      if (!vcontext.containsKey("rightPanels")) {
-        mLogger.debug("setting rightPanels in vcontext: " + getRightPanels(context));
-        vcontext.put("rightPanels", getRightPanels(context));
-      }
-      if (!vcontext.containsKey("leftPanels")) {
-        mLogger.debug("setting leftPanels in vcontext: " + getLeftPanels(context));
-        vcontext.put("leftPanels", getLeftPanels(context));
-      }
-      if (!vcontext.containsKey("showRightPanels")) {
-        vcontext.put("showRightPanels", Integer.toString(showRightPanels(context)));
-      }
-      if (!vcontext.containsKey("showLeftPanels")) {
-        vcontext.put("showLeftPanels", Integer.toString(showLeftPanels(context)));
-      }
-      mLogger.debug("leftPanels [" + vcontext.get("leftPanels")
-          + "] and rightPanels [" + vcontext.get("rightPanels")
-          + "] after initPanelsVelocity.");
-    }
-  }
-
-  void initCelementsVelocity(XWikiContext context) {
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-    if ((vcontext != null) && (context.getWiki() != null)) {
-      if (!vcontext.containsKey(getName())) {
-        vcontext.put(getName(), context.getWiki().getPluginApi(getName(), context));
-      }
-      if (!vcontext.containsKey("default_language")) {
-        vcontext.put("default_language", getDefaultLanguage(context));
-      }
-      if (!vcontext.containsKey("langs")) {
-        vcontext.put("langs", WebUtils.getInstance().getAllowedLanguages(context));
-      }
-      if (!vcontext.containsKey("hasedit")) {
-        try {
-          if (context.getDoc() != null) {
-            vcontext.put("hasedit", context.getWiki(
-                ).getRightService().hasAccessLevel("edit", context.getUser(),
-                    context.getDoc().getFullName(), context));
-          } else {
-            vcontext.put("hasedit", new Boolean(false));
-          }
-        } catch (XWikiException exp) {
-          mLogger.error("Failed to check edit Access Rights on "
-              + context.getDoc().getFullName(), exp);
-          vcontext.put("hasedit", new Boolean(false));
-        }
-      }
-      if (!vcontext.containsKey("skin_doc")) {
-        try {
-          String skinDocName = context.getWiki().getSkin(context);
-          Document skinDoc = context.getWiki().getDocument(skinDocName, context
-              ).newDocument(context);
-          vcontext.put("skin_doc", skinDoc);
-        } catch (XWikiException e) {
-          mLogger.error("Failed to get skin_doc");
-        }
-      }
-      if (!vcontext.containsKey("isAdmin")) {
-        vcontext.put("isAdmin", util.isAdminUser(context));
-      }
-      if (!vcontext.containsKey("isSuperAdmin")) {
-        vcontext.put("isSuperAdmin", (util.isAdminUser(context)
-            && context.getUser().startsWith("xwiki:")));
-      }
-      if (!vcontext.containsKey("admin_language")) {
-        vcontext.put("admin_language", util.getAdminLanguage(context));
-        mLogger.debug("added admin_language to vcontext: "
-            + util.getAdminLanguage(context));
-      }
-      if (!vcontext.containsKey("adminMsg")) {
-        vcontext.put("adminMsg", WebUtils.getInstance().getAdminMessageTool(
-            context));
-      }
-      if (!vcontext.containsKey("celements2_skin")) {
-        vcontext.put("celements2_skin", getCelementsSkinDoc(context));
-      }
-      if (!vcontext.containsKey("celements2_baseurl")
-          && (getCelementsSkinDoc(context) != null)) {
-        String celements2_baseurl = getCelementsSkinDoc(context).getURL("view");
-        if (celements2_baseurl.indexOf("/",8) > 0) {
-          vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
-              celements2_baseurl.indexOf("/",8)));
-        }
-      }
-      if (!vcontext.containsKey("page_type")) {
-        vcontext.put("page_type", PageTypeCommand.getInstance().getPageType(context.getDoc(),
-            context));
-      }
-      if (!vcontext.containsKey("tinyMCE_width")) {
-        vcontext.put("tinyMCE_width", getRTEwidth(context));
-      }
-    }
-  }
-
-  String getRTEwidth(XWikiContext context) {
-    int tinyMCEwidth = -1;
-    String tinyMCEwidthStr = "";
-    if (getCelementsSkinDoc(context) != null) {
-      BaseObject pageTypeObj = PageTypeCommand.getInstance().getPageTypeObj(
-          context.getDoc(), context).getPageTypeProperties(context);
-      if (pageTypeObj != null) {
-        tinyMCEwidth = pageTypeObj.getIntValue("rte_width", -1);
-        tinyMCEwidthStr = Integer.toString(tinyMCEwidth);
-      }
-      if (tinyMCEwidth < 0) {
-        tinyMCEwidthStr = context.getWiki().getSpacePreference("editbox_width", context);
-        if ((tinyMCEwidthStr != null) && !"".equals(tinyMCEwidthStr)) {
-          tinyMCEwidth = Integer.parseInt(tinyMCEwidthStr);
-        }
-      }
-    }
-    if (tinyMCEwidth < 0) {
-      tinyMCEwidth = 453;
-      tinyMCEwidthStr = Integer.toString(tinyMCEwidth);
-    }
-    return tinyMCEwidthStr;
-  }
-
-  private Document getCelementsSkinDoc(XWikiContext context) {
-    Document skinDoc = null;
-    try {
-      skinDoc = context.getWiki(
-          ).getDocument("celements2web:XWiki.Celements2Skin", context
-              ).newDocument(context);
-    } catch (XWikiException exp) {
-      mLogger.error("Failed to load celements2_skin"
-          + " (celements2web:XWiki.Celements2Skin) ", exp);
-    }
-    return skinDoc;
-  }
-
-
-  public int showRightPanels(XWikiContext context) {
-    if (showRightPanelsBoolean(context) && !getRightPanels(context).isEmpty()) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-
-  private boolean showRightPanelsBoolean(XWikiContext context) {
-    return showPanelByConfigName(context, "showRightPanels");
-  }
-
-  public int showLeftPanels(XWikiContext context) {
-    if (showLeftPanelsBoolean(context) && !getLeftPanels(context).isEmpty()) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-
-  private boolean showLeftPanelsBoolean(XWikiContext context) {
-    return showPanelByConfigName(context, "showLeftPanels");
-  }
-
-  public List<String> getRightPanels(XWikiContext context) {
-    if (showRightPanelsBoolean(context)) {
-      return Arrays.asList(getPanelString(context, "rightPanels").split(","));
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  public List<String> getLeftPanels(XWikiContext context) {
-    if (showLeftPanelsBoolean(context)) {
-      return Arrays.asList(getPanelString(context, "leftPanels").split(","));
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  private boolean showPanelByConfigName(XWikiContext context,
-      String configName) {
-    if (isPageShowPanelOverwrite(configName, context.getDoc())) {
-      return (1 == getPagePanelObj(configName, context.getDoc()
-          ).getIntValue("show_panels"));
-    } else if ((getPageTypeDoc(context) != null)
-        && isPageShowPanelOverwrite(configName, getPageTypeDoc(context))) {
-      boolean showPanels = (1 == getPagePanelObj(configName, getPageTypeDoc(context)
-          ).getIntValue("show_panels"));
-      mLogger.debug("using pagetype for panels " + configName + " -> "+ showPanels);
-      return showPanels;
-    } else if (isSpaceOverwrite(context)) {
-      boolean showPanels = "1".equals(context.getWiki().getSpacePreference(configName,
-          getSpaceOverwrite(context), "0", context));
-      mLogger.debug("using spaceover webPrefs for panels " + configName
-          + "," + getSpaceOverwrite(context) +" -> "+ showPanels);
-      return showPanels;
-    } else if (isGlobalPref(context)) {
-      boolean showPanels = ("1".equals(context.getWiki().getXWikiPreference(configName,
-          context)));
-      mLogger.debug("using globalPref for panels " + configName + " -> "+ showPanels);
-      return showPanels;
-    } else if (context.getWiki() != null) {
-      boolean showPanels = ("1".equals(context.getWiki().getSpacePreference(configName,
-          context)));
-      mLogger.debug("using webPrefs for panels " + configName + " -> "+ showPanels);
-      return showPanels;
-    }
-    return false;
-  }
-
-  private XWikiDocument getPageTypeDoc(XWikiContext context) {
-    if(context.getDoc() != null) {
-      try {
-        Document templateDocument = new PageTypeApi(
-        context.getDoc().getFullName(), context).getTemplateDocument();
-        XWikiDocument pageTypeDoc = context.getWiki().getDocument(
-            templateDocument.getFullName(), context);
-        mLogger.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc + " , "
-            + templateDocument);
-        return pageTypeDoc;
-      } catch (XWikiException e) {
-        mLogger.error(e);
-      }
-    }
-    return null;
-  }
-
-  private BaseObject getPagePanelObj(String configName, XWikiDocument theDoc) {
-    if (theDoc != null) {
-      return theDoc.getObject(CheckClassesCommand.CLASS_PANEL_CONFIG_CLASS, "config_name",
-        getPanelType(configName), false);
-    } else {
-      return null;
-    }
-  }
-
-  private boolean isPageShowPanelOverwrite(String configName,
-      XWikiDocument theDoc) {
-    try {
-      return ((getPagePanelObj(configName, theDoc) != null)
-         && (((BaseProperty)getPagePanelObj(configName, theDoc
-             ).get("show_panels")).getValue() != null));
-    } catch (XWikiException e) {
-      mLogger.error(e);
-      return false;
-    }
-  }
-
-  private String getPanelType(String configName) {
-    if ("showLeftPanels".equals(configName)) {
-      return "leftPanels";
-    } else if ("showRightPanels".equals(configName)) {
-      return "rightPanels";
-    } else {
-      return configName;
-    }
-  }
-
-  private boolean isSpaceOverwrite(XWikiContext context) {
-    return ((getSpaceOverwrite(context) != null)
-        && !"".equals(getSpaceOverwrite(context)));
-  }
-
-  private String getPanelString(XWikiContext context, String configName) {
-    String panelsString = "";
-    if(isGlobalPref(context)) {
-      panelsString = context.getWiki().getXWikiPreference(configName, context);
-    } else if(isPagePanelsOverwrite(configName, context.getDoc())) {
-      panelsString = getPagePanelObj(configName, context.getDoc()
-          ).getStringValue("panels");
-    } else if((getPageTypeDoc(context) != null)
-        && isPagePanelsOverwrite(configName, getPageTypeDoc(context))) {
-      panelsString = getPagePanelObj(configName, getPageTypeDoc(context)
-          ).getStringValue("panels");
-    } else if(isSpaceOverwrite(context)) {
-      panelsString = context.getWiki().getSpacePreference(configName,
-           getSpaceOverwrite(context), "", context);
-    } else {
-      panelsString = context.getWiki().getUserPreference(configName, context);
-      mLogger.debug("else with panels in userPreferences: " + panelsString);
-      if("".equals(panelsString)) {
-         panelsString = context.getWiki().getSpacePreference(configName, context);
-         mLogger.debug("else with panels in webPreferences: " + panelsString);
-      }
-    }
-    mLogger.debug("panels for config " + configName + " ; " + panelsString);
-    return panelsString;
-  }
-
-  private boolean isPagePanelsOverwrite(String configName,
-      XWikiDocument theDoc) {
-    return ((getPagePanelObj(configName, theDoc) != null)
-        && (!"".equals(getPagePanelObj(configName, theDoc
-            ).getStringValue("panels"))));
-  }
-
-  private String getSpaceOverwrite(XWikiContext context) {
-    if(context.getRequest() != null) {
-      return context.getRequest().get("space");
-    }
-    return "";
-  }
-
-  private boolean isGlobalPref(XWikiContext context) {
-    if ((context.getDoc() != null) && (context.getRequest() != null)) {
-      return "XWiki.XWikiPreferences".equals(context.getDoc().getFullName())
-          || "globaladmin".equals(context.getRequest().get("editor"));
-    }
-    return false;
+  IPrepareVelocityContext getPrepareVelocityContextService() {
+    return Utils.getComponent(IPrepareVelocityContext.class);
   }
 
   @SuppressWarnings("unchecked")
@@ -818,13 +509,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       context.getWiki().saveDocument(doc, context);
       
       if(validate) {
-        mLogger.info("send account validation mail with data: accountname='" + accountName
+        LOGGER.info("send account validation mail with data: accountname='" + accountName
             + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
         try{
           new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(
               userData.get("email"), validkey, "Tools.AccountActivationMail", context);
         } catch(XWikiException e){
-          mLogger.error("Exception while sending validation mail to '" + 
+          LOGGER.error("Exception while sending validation mail to '" + 
               userData.get("email") + "'", e);
         }
       }
@@ -866,11 +557,11 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       XWikiContext context) throws XWikiException {
     String username = getUsernameForToken(userToken, context);
     if((username != null) && !username.equals("")){
-      mLogger.info("tokenBasedUpload: user " + username + " identified by userToken.");
+      LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       context.setUser(username);
       return attachToDoc.addAttachments(fieldName);
     } else {
-      mLogger.warn("tokenBasedUpload: username could not be identified by token");
+      LOGGER.warn("tokenBasedUpload: username could not be identified by token");
     }
     return 0;
   }
@@ -879,17 +570,17 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       Boolean createIfNotExists, XWikiContext context) throws XWikiException {
     String username = getUsernameForToken(userToken, context);
     if((username != null) && !username.equals("")){
-      mLogger.info("tokenBasedUpload: user " + username + " identified by userToken.");
+      LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       context.setUser(username);
       XWikiDocument doc = context.getWiki().getDocument(attachToDocFN, context);
       if (createIfNotExists || context.getWiki().exists(attachToDocFN, context)) {
-        mLogger.info("tokenBasedUpload: add attachment.");
+        LOGGER.info("tokenBasedUpload: add attachment.");
         return doc.newDocument(context).addAttachments(fieldName);
       } else {
-        mLogger.warn("tokenBasedUpload: document " + attachToDocFN + " does not exist.");
+        LOGGER.warn("tokenBasedUpload: document " + attachToDocFN + " does not exist.");
       }
     } else {
-      mLogger.warn("tokenBasedUpload: username could not be identified by token");
+      LOGGER.warn("tokenBasedUpload: username could not be identified by token");
     }
     return 0;
   }
@@ -908,11 +599,11 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       ) throws XWikiException {
     String username = getUsernameForToken(userToken, context);
     if((username != null) && !username.equals("")){
-      mLogger.info("checkAuthByToken: user " + username + " identified by userToken.");
+      LOGGER.info("checkAuthByToken: user " + username + " identified by userToken.");
       context.setUser(username);
       return context.getXWikiUser();
     } else {
-      mLogger.warn("checkAuthByToken: username could not be identified by token");
+      LOGGER.warn("checkAuthByToken: username could not be identified by token");
     }
     return null;
   }
@@ -936,7 +627,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context) {
-    mLogger.info("Executing action on doc '" + actionDoc.getFullName() + "'");
+    LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     vcontext.put("theDoc", actionDoc);
     Boolean debug = (Boolean)vcontext.get("debug");
@@ -950,7 +641,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       execAct = context.getWiki()
           .getDocument("celements2web:Macros.executeActions", context);
     } catch (XWikiException e) {
-      mLogger.error("Could not get action Macro", e);
+      LOGGER.error("Could not get action Macro", e);
     }
     String actionContent = "";
     if(execAct != null) {
@@ -961,8 +652,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     }
     boolean successful = "true".equals(vcontext.get("successful"));
     if(!successful) {
-      mLogger.error("Error executing action. Output:" + vcontext.get("actionScriptOutput"));
-      mLogger.error("Rendered Action Script: " + actionContent);
+      LOGGER.error("Error executing action. Output:" + vcontext.get("actionScriptOutput"));
+      LOGGER.error("Rendered Action Script: " + actionContent);
     }
     vcontext.put("debug", debug);
     vcontext.put("hasedit", hasedit);
@@ -1006,7 +697,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         adjustResponseHeader(filename, context.getResponse(), context);
         setResponseContent(renderDoc, context.getResponse(), context);
       } catch (XWikiException e) {
-        mLogger.error(e);
+        LOGGER.error(e);
       }
       context.setFinished(true);
     }

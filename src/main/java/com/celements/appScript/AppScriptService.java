@@ -132,6 +132,7 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public boolean isAppScriptRequest() {
+    //TODO exclude isOverlayRequest
     return isAppScriptXpageRequest() || isAppScriptActionRequest()
         || isAppScriptSpaceRequest() || isAppScriptOverwriteDocRequest();
   }

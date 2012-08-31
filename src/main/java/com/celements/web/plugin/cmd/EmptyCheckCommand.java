@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class EmptyCheckCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       EmptyCheckCommand.class);
 
   private Set<DocumentReference> visitedDocRefs;
@@ -60,7 +60,7 @@ public class EmptyCheckCommand {
         if (!visitedDocRefs.contains(nextChild)) {
           return getNextNonEmptyChildren_internal(nextChild);
         } else {
-          mLogger.warn("getNextNonEmptyChildren_internal: recursion detected on ["
+          LOGGER.warn("getNextNonEmptyChildren_internal: recursion detected on ["
               + nextChild + "].");
         }
       }
@@ -97,7 +97,7 @@ public class EmptyCheckCommand {
       return isEmptyRTEDocument(getContext().getWiki(
           ).getDocument(docRef, getContext()).getTranslatedDocument(getContext()));
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     return true;
   }
@@ -108,7 +108,7 @@ public class EmptyCheckCommand {
       return isEmptyRTEDocument(context.getWiki(
           ).getDocument(docRef, context));
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     return true;
   }
