@@ -95,6 +95,32 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetSubNodesForParent_deprecated() throws Exception {
+    String
+      wikiName = "myWiki",
+      spaceName = "mySpace",
+      docName = "myDoc",
+      parentKey = spaceName + ".";    
+    context.setDatabase(wikiName);
+    TreeNode treeNode = createTreeNode(spaceName, docName, spaceName, "", 1);
+    List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(mockTreeNodeList);
+    List<TreeNode> emptyList = Collections.emptyList();
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(emptyList);
+    XWikiRightService mockRightService = createMock(XWikiRightService.class);
+    expect(wiki.getRightService()).andReturn(mockRightService).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq(spaceName + "." + docName), same(context))).andReturn(true);
+    replayAll(mockRightService);
+    List<TreeNode> resultList = treeNodeService.getSubNodesForParent("", spaceName, "");
+    assertEquals(1, resultList.size());
+    assertTrue(resultList.contains(treeNode));
+    verifyAll(mockRightService);
+  }
+
+  @Test
   public void testFetchNodesForParentKey_mergeCombinedResult(){
     String
       wikiName = "myWiki",

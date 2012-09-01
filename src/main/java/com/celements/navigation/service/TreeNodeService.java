@@ -120,7 +120,7 @@ public class TreeNodeService implements ITreeNodeService {
           ).getName();
     }
     String parentKey = getParentKey(parent, menuSpace);
-    return getSubNodesForParent(getRef(parentKey), filter);
+    return getSubNodesForParent(resolveEntityReference(parentKey), filter);
   }
 
   String getParentKey(String parent, String menuSpace) {
@@ -229,25 +229,27 @@ public class TreeNodeService implements ITreeNodeService {
     List<TreeNode> notMappedmenuItems = treeNodeCache.getNotMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     long end = System.currentTimeMillis();
-    LOGGER.debug("fetchNodesForParentKey_internal: time for getNotMappedMenuItemsFromDatabase: "
-        + (end-start));
+    LOGGER.debug("fetchNodesForParentKey_internal: time for"
+        + " getNotMappedMenuItemsFromDatabase: " + (end-start));
     start = System.currentTimeMillis();
     List<TreeNode> mappedTreeNodes = treeNodeCache.getMappedMenuItemsForParentCmd(
         ).getTreeNodesForParentKey(parentKey, getContext());
     end = System.currentTimeMillis();
-    LOGGER.debug("fetchNodesForParentKey_internal: time for getMappedMenuItemsForParentCmd: "
-        + (end-start));
+    LOGGER.debug("fetchNodesForParentKey_internal: time for"
+        + " getMappedMenuItemsForParentCmd: " + (end-start));
     start = System.currentTimeMillis();
     TreeMap<Integer, TreeNode> menuItemsMergedMap = null;
     if ((notMappedmenuItems == null) || (notMappedmenuItems.size() == 0)) {
       end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey  + "] totaltime for list of ["
-          + mappedTreeNodes.size() + "]: " + (end-starttotal));
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey
+          + "] totaltime for list of [" + mappedTreeNodes.size() + "]: "
+          + (end - starttotal));
       return mappedTreeNodes;
     } else if (mappedTreeNodes.size() == 0) {
       end = System.currentTimeMillis();
-      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
-          + notMappedmenuItems.size() + "]: " + (end-starttotal));
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey
+          + "] totaltime for list of [" + notMappedmenuItems.size() + "]: "
+          + (end - starttotal));
       return notMappedmenuItems;
     } else {
       menuItemsMergedMap = new TreeMap<Integer, TreeNode>();
@@ -260,9 +262,10 @@ public class TreeNodeService implements ITreeNodeService {
       end = System.currentTimeMillis();
       LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: "
           + (end-start));
-      ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
-      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey + "] totaltime for list of ["
-          + menuItems.size() + "]: " + (end-starttotal));
+      ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values(
+          ));
+      LOGGER.info("fetchNodesForParentKey_internal: [" + parentKey
+          + "] totaltime for list of [" + menuItems.size() + "]: " + (end-starttotal));
       return menuItems;
     }
   }
@@ -441,10 +444,6 @@ public class TreeNodeService implements ITreeNodeService {
   
   DocumentReference getRef(String spaceName, String pageName){
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
-  }
-  
-  DocumentReference getRef(String s){
-    return webUtilsService.resolveDocumentReference(s);
   }
   
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
