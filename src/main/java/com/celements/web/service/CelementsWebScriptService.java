@@ -294,7 +294,7 @@ public class CelementsWebScriptService implements ScriptService {
     if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
       LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
           + renderDoc.getFullName() + " no rendering applied.");
-      return getContext().getWiki().renderTemplate("/docdoesnotexist.vm", getContext());
+      return "";
     } else {
       return renderCelementsDocument(renderDoc.getDocumentReference(),
           renderDoc.getLanguage(), renderMode);
