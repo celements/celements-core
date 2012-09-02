@@ -260,7 +260,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   private RenderCommand getCelementsRenderCmd() {
-    RenderCommand renderCommand = new RenderCommand(getContext());
+    RenderCommand renderCommand = new RenderCommand();
     renderCommand.setDefaultPageType("RichText");
     return renderCommand;
   }
@@ -278,6 +278,45 @@ public class CelementsWebScriptService implements ScriptService {
       LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
     }
     return "";
+  }
+
+  public String renderCelementsDocument(Document renderDoc, String renderMode) {
+    //we must not get here for !getService().isAppScriptRequest()
+    if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
+      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
+          + renderDoc.getFullName() + " no rendering applied.");
+      return getContext().getWiki().renderTemplate("/docdoesnotexist.vm", getContext());
+    } else {
+      return renderCelementsDocument(renderDoc.getDocumentReference(), renderMode);
+    }
+  }
+
+  public String renderDocument(DocumentReference docRef, String lang) {
+    return new RenderCommand().renderDocument(docRef, lang);
+  }
+
+  public String renderDocument(Document renderDoc) {
+    return new RenderCommand().renderDocument(renderDoc.getDocumentReference(),
+        renderDoc.getLanguage());
+  }
+
+  public String renderDocument(DocumentReference docRef, String lang, boolean removePre,
+      List<String> rendererNameList) {
+    try {
+      RenderCommand renderCommand = new RenderCommand();
+      renderCommand.initRenderingEngine(rendererNameList);
+      return renderCommand.renderDocument(docRef, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("renderCelementsDocument: Failed to render ["
+          + docRef + "] lang ["+ lang + "].", exp);
+    }
+    return "";
+  }
+
+  public String renderDocument(Document renderDoc, boolean removePre,
+      List<String> rendererNameList) {
+    return renderDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(),
+        removePre, rendererNameList);
   }
 
 }

@@ -1054,30 +1054,27 @@ public class CelementsWebPluginApi extends Api {
     return getService().renderCelementsDocument(elementDocRef, renderMode);
   }
 
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderDocument in CelementsWebScriptService
+   */
+  @Deprecated
   public String renderDocument(Document renderDoc) {
-    try {
-      return new RenderCommand(context).renderDocument(getXWikiDoc(renderDoc));
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render "
-          + renderDoc.getFullName(), exp);
-    }
-    return "";
+    return getService().renderDocument(renderDoc);
   }
 
-  public String renderDocument(Document renderDoc, boolean removePre, List<String> rendererNameList) {
-    try {
-      RenderCommand renderCommand = new RenderCommand(context);
-      renderCommand.initRenderingEngine(rendererNameList);
-      return renderCommand.renderDocument(getXWikiDoc(renderDoc));
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render "
-          + renderDoc.getFullName(), exp);
-    }
-    return "";
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderDocument in CelementsWebScriptService
+   */
+  @Deprecated
+  public String renderDocument(Document renderDoc, boolean removePre,
+      List<String> rendererNameList) {
+    return getService().renderDocument(renderDoc, removePre, rendererNameList);
   }
 
   private RenderCommand getCelementsRenderCmd() {
-    RenderCommand renderCommand = new RenderCommand(context);
+    RenderCommand renderCommand = new RenderCommand();
     renderCommand.setDefaultPageType("RichText");
     return renderCommand;
   }
@@ -1086,37 +1083,19 @@ public class CelementsWebPluginApi extends Api {
     return renderCelementsDocument(renderDoc, "view");
   }
 
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderCelementsDocument in CelementsWebScriptService
+   */
+  @Deprecated
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
-    try {
-      //we should not get here for !getService().isAppScriptRequest()
-      if ("view".equals(context.getAction()) && renderDoc.isNew()) {
-        mLogger.info("renderCelementsDocument: Failed to get xwiki document for"
-            + renderDoc.getFullName() + " no rendering applied.");
-        return context.getWiki().renderTemplate("/docdoesnotexist.vm", context);
-      } else {
-        return getCelementsRenderCmd().renderCelementsDocument(getXWikiDoc(renderDoc),
-            renderMode);
-      }
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render "
-          + renderDoc.getFullName(), exp);
-    }
-    return "";
-  }
-
-  private XWikiDocument getXWikiDoc(Document renderDoc) throws XWikiException {
-    XWikiDocument renderXdoc = context.getWiki().getDocument(
-        renderDoc.getDocumentReference(), context);
-    if (!"".equals(renderDoc.getLanguage())) {
-      renderXdoc = renderXdoc.getTranslatedDocument(renderDoc.getLanguage(), context);
-    }
-    return renderXdoc;
+    return getService().renderCelementsDocument(renderDoc, renderMode);
   }
 
   public String getEditURL(Document doc) {
     if(!context.getWiki().exists(doc.getDocumentReference(), context)
         || !isValidLanguage() || !isTranslationAvailable(doc, context.getLanguage())) {
-      return doc.getURL("edit", "language=" + plugin.getDefaultLanguage(context));
+      return doc.getURL("edit", "language=" + getWebUtilsService().getDefaultLanguage());
     } else {
       return doc.getURL("edit", "language=" + context.getLanguage());
     }
@@ -1128,8 +1107,8 @@ public class CelementsWebPluginApi extends Api {
     } catch (XWikiException exp) {
       mLogger.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
           exp);
-      return (language.equals(plugin.getDefaultLanguage(context))
-          && context.getWiki().exists(doc.getFullName(), context));
+      return (language.equals(getWebUtilsService().getDefaultLanguage())
+          && context.getWiki().exists(doc.getDocumentReference(), context));
     }
   }
 
