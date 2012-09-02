@@ -61,7 +61,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     currentDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "Content",
         "MyPage"));
     context.setDoc(currentDoc);
-    renderCmd = new RenderCommand(context);
+    renderCmd = new RenderCommand();
     mockPageTypeCmd = createMock(PageTypeCommand.class);
     renderCmd.inject_PageTypeCmd(mockPageTypeCmd);
     renderingEngineMock = createMock(XWikiRenderingEngine.class);
@@ -72,8 +72,10 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   public void testPageTypeCmd() {
     renderCmd.inject_PageTypeCmd(null);
     assertNotNull(renderCmd.pageTypeCmd());
-    assertNotSame("NOT expecting singleton.", renderCmd.pageTypeCmd(), 
+    assertSame("expecting same instance.", renderCmd.pageTypeCmd(), 
         renderCmd.pageTypeCmd());
+    assertNotSame("expecting not same instance.", renderCmd.pageTypeCmd(), 
+        new RenderCommand().pageTypeCmd());
   }
 
   @Test

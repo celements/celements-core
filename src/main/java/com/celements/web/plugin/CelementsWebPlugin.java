@@ -714,7 +714,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   void setResponseContent(XWikiDocument renderDoc, XWikiResponse response,
       XWikiContext context) throws XWikiException {
-    String renderedContent = new RenderCommand(context).renderDocument(renderDoc);
+    String renderedContent = new RenderCommand().renderDocument(renderDoc);
     byte[] data = {};
     try {
       data = renderedContent.getBytes("UTF-8");
