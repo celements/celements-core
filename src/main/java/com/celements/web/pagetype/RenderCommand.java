@@ -95,9 +95,23 @@ public class RenderCommand {
         templateDoc, getContext().getDoc(), getContext());
   }
 
-  public String renderDocument(DocumentReference docRef) throws XWikiException {
-    XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
-    return renderDocument(xwikidoc);
+  public String renderDocument(DocumentReference docRef) {
+    return renderDocument(docRef, null);
+  }
+
+  public String renderDocument(DocumentReference docRef, String lang) {
+    try {
+      XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
+      if ((lang != null) && !"".equals(lang)
+          && !lang.equals(xwikidoc.getDefaultLanguage())) {
+        xwikidoc = xwikidoc.getTranslatedDocument(lang, getContext());
+      }
+      return renderDocument(xwikidoc);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get translated document for [" + docRef + "] in [" + lang
+          + "].", exp);
+    }
+    return "";
   }
 
   public String renderDocument(XWikiDocument document) throws XWikiException {
