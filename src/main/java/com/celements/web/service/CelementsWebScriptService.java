@@ -285,6 +285,10 @@ public class CelementsWebScriptService implements ScriptService {
     return "";
   }
 
+  public String renderCelementsDocument(Document renderDoc) {
+    return renderCelementsDocument(renderDoc, "view");
+  }
+
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
     //we must not get here for !getService().isAppScriptRequest()
     if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
