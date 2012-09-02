@@ -301,6 +301,10 @@ public class CelementsWebScriptService implements ScriptService {
     }
   }
 
+  public String renderDocument(DocumentReference docRef) {
+    return new RenderCommand().renderDocument(docRef);
+  }
+
   public String renderDocument(DocumentReference docRef, String lang) {
     return new RenderCommand().renderDocument(docRef, lang);
   }
