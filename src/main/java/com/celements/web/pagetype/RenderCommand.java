@@ -28,7 +28,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -68,6 +70,16 @@ public class RenderCommand {
     return renderCelementsDocument(cellDoc, "view");
   }
 
+  /**
+   * renderCelementsCell
+   * 
+   * @param elementFullName
+   * @return
+   * @throws XWikiException
+   * 
+   * @Deprecated since 2.17.0 instead use renderCelementsCell(DocumentReference) 
+   */
+  @Deprecated
   public String renderCelementsCell(String elementFullName) throws XWikiException {
     XWikiDocument cellDoc = getTemplateDoc(getWebUtilsService().resolveDocumentReference(
         elementFullName));
@@ -82,12 +94,12 @@ public class RenderCommand {
   public String renderCelementsDocument(DocumentReference elemDocRef, String lang,
       String renderMode) throws XWikiException {
     XWikiDocument cellDoc = getContext().getWiki().getDocument(elemDocRef, getContext());
-    return renderCelementsDocument(cellDoc, renderMode, lang);
+    return renderCelementsDocument(cellDoc, lang, renderMode);
   }
 
   public String renderCelementsDocument(XWikiDocument cellDoc, String renderMode
       ) throws XWikiException {
-    return renderCelementsDocument(cellDoc, renderMode, getContext().getLanguage());
+    return renderCelementsDocument(cellDoc, getContext().getLanguage(), renderMode);
   }
 
   public String renderCelementsDocument(XWikiDocument cellDoc, String lang,
@@ -98,7 +110,8 @@ public class RenderCommand {
     vcontext.put("celldoc", cellDoc.newDocument(getContext()));
     PageType cellType = pageTypeCmd().getPageTypeWithDefaultObj(cellDoc, defaultPageType,
         getContext());
-    String renderTemplatePath = getRenderTemplatePath(cellType, cellDoc.getFullName(),
+    String cellDocFN = getRefSerializer().serialize(cellDoc.getDocumentReference());
+    String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
         renderMode);
     String templateContent;
     XWikiDocument templateDoc = getContext().getDoc();
@@ -224,6 +237,11 @@ public class RenderCommand {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private DefaultStringEntityReferenceSerializer getRefSerializer() {
+    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
+        EntityReferenceSerializer.class);
   }
 
 }
