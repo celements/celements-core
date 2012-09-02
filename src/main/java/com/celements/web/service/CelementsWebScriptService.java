@@ -266,14 +266,14 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String renderCelementsDocument(DocumentReference elementDocRef) {
-    return renderCelementsDocument(elementDocRef, "view");
+    return renderCelementsDocument(elementDocRef, getContext().getLanguage(), "view");
   }
 
-  public String renderCelementsDocument(DocumentReference elementDocRef,
+  public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
       String renderMode) {
     try {
-      return getCelementsRenderCmd().renderCelementsDocument(getContext().getWiki(
-          ).getDocument(elementDocRef, getContext()), renderMode);
+      return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang,
+          renderMode);
     } catch (XWikiException exp) {
       LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
     }
@@ -287,7 +287,8 @@ public class CelementsWebScriptService implements ScriptService {
           + renderDoc.getFullName() + " no rendering applied.");
       return getContext().getWiki().renderTemplate("/docdoesnotexist.vm", getContext());
     } else {
-      return renderCelementsDocument(renderDoc.getDocumentReference(), renderMode);
+      return renderCelementsDocument(renderDoc.getDocumentReference(),
+          renderDoc.getLanguage(), renderMode);
     }
   }
 
