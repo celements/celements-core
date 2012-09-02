@@ -269,6 +269,11 @@ public class CelementsWebScriptService implements ScriptService {
     return renderCelementsDocument(elementDocRef, getContext().getLanguage(), "view");
   }
 
+  public String renderCelementsDocument(DocumentReference elementDocRef,
+      String renderMode) {
+    return renderCelementsDocument(elementDocRef, getContext().getLanguage(), renderMode);
+  }
+
   public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
       String renderMode) {
     try {
