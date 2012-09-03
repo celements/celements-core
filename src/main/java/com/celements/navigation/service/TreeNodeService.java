@@ -75,7 +75,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   private InheritorFactory injectedInheritorFactory;
 
-  @Requirement(role = ITreeNodeProvider.class)
+  @Requirement
   Map<String, ITreeNodeProvider> nodeProviders;
 
   private XWikiContext getContext() {
