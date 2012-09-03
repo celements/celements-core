@@ -288,7 +288,7 @@ public class DocFormCommand {
   private BaseClass getBaseClass(String className, XWikiContext context) {
     BaseClass bclass = null;
     try {
-      bclass = context.getWiki().getDocument(className, context).getxWikiClass();
+      bclass = context.getWiki().getDocument(className, context).getXClass();
     } catch (XWikiException e) {
       LOGGER.error(e);
     }

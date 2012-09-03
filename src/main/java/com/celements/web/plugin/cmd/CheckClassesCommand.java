@@ -106,7 +106,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.ContextMenuItemClass");
     needsUpdate |= bclass.addTextAreaField("cmi_link", "CMItem Link (velocity code)", 80,
         20);
@@ -135,7 +135,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName(CLASS_PANEL_CONFIG_CLASS);
     needsUpdate |= bclass.addStaticListField("config_name", "Panel Config Type", 1,
         false, "leftPanels|rightPanels", "select");
@@ -163,7 +163,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("XWiki.XWikiPreferences");
 
     needsUpdate |= bclass.addTextField("cel_centralfilebase", "Central Filebase", 30);
@@ -210,7 +210,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("XWiki.XWikiSkins");
     needsUpdate |= bclass.addTextField("menu_elements", "Available Menu Elements", 30);
     needsUpdate |= bclass.addTextField("skin_config_class_name",
@@ -235,7 +235,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("XWiki.XWikiUsers");
     needsUpdate |= bclass
         .addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
@@ -264,7 +264,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.FormMailClass");
     needsUpdate |= bclass.addTextField("name", "name", 30);
     needsUpdate |= bclass.addTextField("emailFrom", "emailFrom", 30);
@@ -290,7 +290,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("XWiki.PhotoAlbumClass");
     needsUpdate |= bclass.addTextField("title", "title", 30);
     needsUpdate |= bclass.addTextAreaField("description", "description", 30, 15);
@@ -322,7 +322,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.FilebaseTag");
     needsUpdate |= bclass.addTextField("attachment", "attachment", 30);
 
@@ -345,7 +345,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.ImportClass");
     needsUpdate |= bclass.addTextField("filebaseTagDocName", "filebaseTagDocName", 30);
     needsUpdate |= bclass.addTextField("preimport_link", "preimport_link", 30);
@@ -374,7 +374,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Tools.Banner");
     needsUpdate |= bclass.addTextField("filename", "filename", 30);
     needsUpdate |= bclass.addTextField("id", "id", 30);
@@ -398,7 +398,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Tools.FlashBanner");
     needsUpdate |= bclass.addTextField("filename", "filename", 30);
     needsUpdate |= bclass.addNumberField("height_old", "height_old", 30, "integer");
@@ -425,7 +425,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Skins.UserCSS");
     needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
     needsUpdate |= bclass.addBooleanField("is_rte_content", "is_rte_content", "yesno");
@@ -451,7 +451,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.FormActionClass");
     needsUpdate |= bclass.addTextField("doc_fullName", "doc_fullName", 30);
     needsUpdate |= bclass.addTextAreaField("completeRuleSnippet",
@@ -478,7 +478,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.FormConfigClass");
     needsUpdate |= bclass.addTextField("successfulpage", "successfulpage", 30);
     needsUpdate |= bclass.addTextField("failedpage", "failedpage", 30);
@@ -502,7 +502,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.ActionTypeClass");
     needsUpdate |= bclass.addTextField("action_type", "Action Type", 30);
 
@@ -525,7 +525,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.FormStorageClass");
     needsUpdate |= bclass.addTextField("storageLocation", "Storage Location", 30);
     needsUpdate |= bclass.addTextField("storageClassname", "Storage Classname", 30);
@@ -551,7 +551,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.ReceiverEMail");
     needsUpdate |= bclass.addTextField("email", "email", 30);
 
@@ -575,7 +575,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.PageTypeProperties");
     needsUpdate |= bclass.addTextField("type_name", "Type Pretty Name", 30);
     needsUpdate |= bclass.addTextField("category", "Category", 30);
@@ -610,7 +610,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.PageType");
     needsUpdate |= bclass.addTextField("page_type", "Page Type", 30);
     needsUpdate |= bclass.addTextField("page_layout", "Page Layout", 30);
@@ -635,7 +635,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("JavaScript.ExternalFiles");
     needsUpdate |= bclass.addTextField("filepath", "filepath", 50);
 
@@ -658,7 +658,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.RTEConfigTypeClass");
     needsUpdate |= bclass.addTextField("rteconfig", "RichTextEditor Config Document", 30);
 
@@ -687,7 +687,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.RTEConfigTypePropertiesClass");
     needsUpdate |= bclass.addTextField("styles", "RichTextEditor Styles", 30);
     needsUpdate |= bclass
@@ -726,7 +726,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName(MEDIALIB_CONFIG_CLASS);
     needsUpdate |= bclass.addTextField("configname", "Config Name", 30);
     needsUpdate |= bclass.addTextField("columnconfig", "Column Config", 30);
@@ -753,7 +753,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.DocLibConfigClass");
     needsUpdate |= bclass.addTextField("browser_doc", "Browser document full name", 30);
     needsUpdate |= bclass.addTextField("content_doc",
@@ -778,7 +778,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.KeyValueClass");
     needsUpdate |= bclass.addTextField("key", "Key", 30);
     needsUpdate |= bclass.addTextAreaField("value", "Value", 80, 15);
@@ -807,7 +807,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.TokenClass");
     needsUpdate |= bclass.addPasswordField("tokenvalue", "Token value", 30);
     needsUpdate |= bclass.addDateField("validuntil", "Valid until");
@@ -836,7 +836,7 @@ public class CheckClassesCommand {
       needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
+    BaseClass bclass = doc.getXClass();
     bclass.setName("Classes.OverlayConfigClass");
 
     needsUpdate |= bclass.addBooleanField("loadAdminMenuBar", "Load admin menu bar",
