@@ -35,9 +35,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
-import com.celements.navigation.MenuItemNavigation;
-import com.celements.navigation.MenuTypeRepository;
-import com.celements.navigation.Navigation;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.pagetype.RenderCommand;
@@ -112,7 +109,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   public void init(XWikiContext context) {
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
-    addMenuTypeMenuItemToRepository();
     new CheckClassesCommand().checkClasses(context);
     super.init(context);
   }
@@ -121,15 +117,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
     new CheckClassesCommand().checkClasses(context);
     super.virtualInit(context);
-  }
-
-  private void addMenuTypeMenuItemToRepository() {
-    if (MenuTypeRepository.getInstance().put(Navigation.MENU_TYPE_MENUITEM,
-        new MenuItemNavigation())) {
-      LOGGER.debug("Added MenuItemNavigation with key '"
-          + Navigation.MENU_TYPE_MENUITEM + "' to the "
-          + "MenuTypeRepository");
-    }
   }
 
   public int queryCount() {
