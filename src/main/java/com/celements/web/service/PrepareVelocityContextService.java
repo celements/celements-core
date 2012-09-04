@@ -156,6 +156,12 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         vcontext.put("isContentEditor", context.getWiki().getUser(context.getUser(),
             getContext()).isUserInGroup("XWiki.ContentEditorsGroup"));
       }
+      if (!vcontext.containsKey("q")) {
+        vcontext.put("q", "'");
+      }
+      if (!vcontext.containsKey("Q")) {
+        vcontext.put("Q", "\"");
+      }
       if (!vcontext.containsKey("tinyMCE_width")) {
         vcontext.put("tinyMCE_width", getRTEwidth(context));
       }
