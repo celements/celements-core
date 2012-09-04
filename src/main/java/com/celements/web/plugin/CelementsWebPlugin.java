@@ -91,7 +91,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public CelementsWebPlugin(
       String name, String className, XWikiContext context) {
     super(name, className, context);
-    init(context);
   }
 
   public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
@@ -112,11 +111,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public void init(XWikiContext context) {
+    LOGGER.trace("init called database [" + context.getDatabase() + "]");
     addMenuTypeMenuItemToRepository();
+    new CheckClassesCommand().checkClasses(context);
     super.init(context);
   }
 
   public void virtualInit(XWikiContext context) {
+    LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
     new CheckClassesCommand().checkClasses(context);
     super.virtualInit(context);
   }
@@ -403,24 +405,26 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   @Override
   public void beginRendering(XWikiContext context) {
-    LOGGER.debug("beginRendering: language [" + context.getLanguage() + "].");
+    LOGGER.debug("start beginRendering: language [" + context.getLanguage() + "].");
     try {
       getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
       LOGGER.error("beginRendering", exp);
       throw exp;
     }
+    LOGGER.debug("end beginRendering: language [" + context.getLanguage() + "].");
   }
 
   @Override
   public void beginParsing(XWikiContext context) {
-    LOGGER.debug("beginParsing: language [" + context.getLanguage() + "].");
+    LOGGER.debug("start beginParsing: language [" + context.getLanguage() + "].");
     try {
       getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
       LOGGER.error("beginParsing", exp);
       throw exp;
     }
+    LOGGER.debug("end beginParsing: language [" + context.getLanguage() + "].");
   }
 
   IPrepareVelocityContext getPrepareVelocityContextService() {
