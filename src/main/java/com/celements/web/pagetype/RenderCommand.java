@@ -105,7 +105,7 @@ public class RenderCommand {
   public String renderCelementsDocument(XWikiDocument cellDoc, String lang,
       String renderMode) throws XWikiException {
     LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
-        + "] renderMode [" + renderMode + "].");
+        + "] lang [" + lang + "] renderMode [" + renderMode + "].");
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     vcontext.put("celldoc", cellDoc.newDocument(getContext()));
     PageType cellType = pageTypeCmd().getPageTypeWithDefaultObj(cellDoc, defaultPageType,
