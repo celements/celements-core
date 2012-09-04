@@ -403,6 +403,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   @Override
   public void beginRendering(XWikiContext context) {
+    LOGGER.debug("beginRendering: language [" + context.getLanguage() + "].");
     try {
       getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
@@ -413,6 +414,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   @Override
   public void beginParsing(XWikiContext context) {
+    LOGGER.debug("beginParsing: language [" + context.getLanguage() + "].");
     try {
       getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
