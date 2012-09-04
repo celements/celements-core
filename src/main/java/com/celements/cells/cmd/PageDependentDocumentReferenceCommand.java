@@ -45,7 +45,7 @@ public class PageDependentDocumentReferenceCommand {
   public static final String PROPNAME_SPACE_NAME = "space_name";
   public static final String PROPNAME_IS_INHERITABLE = "is_inheritable";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageDependentDocumentReferenceCommand.class);
 
   IWebUtils webUtils = WebUtils.getInstance();
@@ -107,14 +107,14 @@ public class PageDependentDocumentReferenceCommand {
     if (isInheritable) {
       List<String> depDocList = getDependentDocList(document.getFullName(), depDocSpace,
           context);
-      mLogger.debug("getDependentDocumentReference: inheritable for ["
+      LOGGER.debug("getDependentDocumentReference: inheritable for ["
           + document.getDocumentReference() + "]. ");
       XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(depDocList,
           context).getDocument();
       if (pageDepDoc != null) {
         return pageDepDoc.getDocumentReference();
       } else {
-        mLogger.debug("getDependentDocumentReference: inheritable result was null."
+        LOGGER.debug("getDependentDocumentReference: inheritable result was null."
             + " Fallback to [" + depDocSpace + "." + PDC_DEFAULT_CONTENT_NAME + "]");
         return new DocumentReference(context.getDatabase(), depDocSpace, 
             PDC_DEFAULT_CONTENT_NAME);
@@ -133,14 +133,14 @@ public class PageDependentDocumentReferenceCommand {
         spaceName = getCurrentDocumentSpaceName(document, context) + "_"
           + getDepCellSpace(cellDocRef, context);
       } else {
-        mLogger.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
+        LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
             + " check with isCurrentDocument method before calling"
             + " getDependentDocumentSpace!");
         spaceName = getCurrentDocumentSpaceName(document, context);
       }
     } catch (XWikiException exp) {
       spaceName = getCurrentDocumentSpaceName(document, context);
-      mLogger.error("getDependentDocumentSpace: Failed to get getDepCellSpace from ["
+      LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from ["
           + cellDocRef + "] assuming" + " [" + spaceName + "] for document space.", exp);
     }
     return spaceName;
@@ -148,7 +148,7 @@ public class PageDependentDocumentReferenceCommand {
 
   String getCurrentDocumentSpaceName(XWikiDocument document, XWikiContext context
       ) {
-    mLogger.info("getCurrentDocumentSpaceName for document ["
+    LOGGER.info("getCurrentDocumentSpaceName for document ["
         + document.getDocumentReference() + "].");
     String spaceName;
     List<SpaceReference> currentSpaces = document.getDocumentReference(
@@ -157,7 +157,7 @@ public class PageDependentDocumentReferenceCommand {
       spaceName = currentSpaces.get(0).getName();
     } else {
       spaceName = context.getWiki().getDefaultSpace(context);
-      mLogger.warn("getCurrentDocumentSpaceName: no space reference for current Document"
+      LOGGER.warn("getCurrentDocumentSpaceName: no space reference for current Document"
           + " [" + document.getDocumentReference() + "] found. Fallback to default ["
           + spaceName + "].");
     }
@@ -169,7 +169,7 @@ public class PageDependentDocumentReferenceCommand {
     try {
       return "".equals(getDepCellSpace(cellDocRef, context));
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get PageDepCellConfigClass object from [" + cellDocRef
+      LOGGER.error("Failed to get PageDepCellConfigClass object from [" + cellDocRef
           + "].", exp);
       // return true, because without config we are unable to determine the document
       return true;
@@ -195,7 +195,7 @@ public class PageDependentDocumentReferenceCommand {
         return (cellConfObj.getIntValue(PROPNAME_IS_INHERITABLE, 0) != 0);
       }
     } catch (XWikiException exp) {
-      mLogger.error("Faild to check if isInheritable for ["
+      LOGGER.error("Faild to check if isInheritable for ["
           + cellDocRef.getLastSpaceReference() + "." + cellDocRef.getName() + "].", exp);
     }
     return false;
