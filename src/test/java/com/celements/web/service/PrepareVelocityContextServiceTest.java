@@ -5,6 +5,8 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
@@ -16,8 +18,11 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -27,12 +32,15 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   private XWiki xwiki;
   private PrepareVelocityContextService prepVeloContextService;
   private XWikiDocument skinDoc;
+  private XWikiRightService rightServiceMock;
 
   @Before
   public void setUp_PrepareVelocityContextServiceTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    rightServiceMock = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(rightServiceMock ).anyTimes();
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
     prepVeloContextService = (PrepareVelocityContextService) Utils.getComponent(
@@ -59,6 +67,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   @Test
   public void testInitCelementsVelocity_checkNPEs_forEmptyVContext(
       ) throws XWikiException {
+    context.setUser("XWiki.myTestUser");
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
     expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(context))
@@ -72,28 +81,35 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
       ).anyTimes();
     expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
       ).andReturn("").anyTimes();
-    expect(xwiki.getDocument(eq(""), same(context))).andReturn(new XWikiDocument()
-      ).anyTimes();
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiGuest");
+        "myTestUser");
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
       new XWikiDocument(userDocRef)).anyTimes();
     expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
     expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123"
       ).anyTimes();
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
-      ).anyTimes();
+      ).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
-        new XWikiDocument()).anyTimes();
+        new XWikiDocument()).atLeastOnce();
     expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin"
         ).anyTimes();
-    expect(xwiki.getDocument(eq("celements2web:Skins.CellSkin"), same(context))
-        ).andReturn(new XWikiDocument()).anyTimes();
+    DocumentReference cellSkinDoc = new DocumentReference("celements2web","Skins",
+        "CellSkin");
+    expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
+        cellSkinDoc)).atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))
+      ).andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
+    XWikiGroupService groupServiceMock = createMock(XWikiGroupService.class);
+    expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock).anyTimes();
+    List<DocumentReference> groupRefList = Collections.emptyList();
+    expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
+        same(context))).andReturn(groupRefList).atLeastOnce();
     context.setWiki(xwiki);
-    replayAll();
+    replayAll(groupServiceMock);
     prepVeloContextService.initCelementsVelocity(context);
     assertEquals("expecting tinyMCE_width be set.", "123", vContext.get("tinyMCE_width"));
-    verifyAll();
+    verifyAll(groupServiceMock);
   }
   
   @Test
@@ -174,12 +190,12 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki, skinDoc);
+    replay(xwiki, skinDoc, rightServiceMock);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki, skinDoc);
+    verify(xwiki, skinDoc, rightServiceMock);
     verify(mocks);
   }
 

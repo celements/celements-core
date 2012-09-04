@@ -17,7 +17,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.web.pagetype.PageTypeApi;
 import com.celements.web.pagetype.PageTypeCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -92,7 +91,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         vcontext.put("default_language", webUtilsService.getDefaultLanguage());
       }
       if (!vcontext.containsKey("langs")) {
-        vcontext.put("langs", WebUtils.getInstance().getAllowedLanguages(context));
+        vcontext.put("langs", webUtilsService.getAllowedLanguages());
       }
       if (!vcontext.containsKey("hasedit")) {
         try {
@@ -105,14 +104,15 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
           }
         } catch (XWikiException exp) {
           LOGGER.error("Failed to check edit Access Rights on "
-              + context.getDoc().getFullName(), exp);
+              + context.getDoc().getDocumentReference(), exp);
           vcontext.put("hasedit", new Boolean(false));
         }
       }
       if (!vcontext.containsKey("skin_doc")) {
         try {
           String skinDocName = context.getWiki().getSkin(context);
-          Document skinDoc = context.getWiki().getDocument(skinDocName, context
+          Document skinDoc = context.getWiki().getDocument(
+              webUtilsService.resolveDocumentReference(skinDocName), context
               ).newDocument(context);
           vcontext.put("skin_doc", skinDoc);
         } catch (XWikiException e) {
