@@ -138,6 +138,7 @@ public class RenderCommand {
   }
 
   public String renderDocument(DocumentReference docRef, String lang) {
+    LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef + "].");
     try {
       XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
       return renderDocument(xwikidoc, lang);
@@ -154,6 +155,8 @@ public class RenderCommand {
 
   public String renderDocument(XWikiDocument document, String lang
       ) throws XWikiException {
+    LOGGER.debug("renderDocument for lang  [" + lang + "] and doc ["
+        + document.getDocumentReference() + "].");
     return getRenderingEngine().renderText(getTranslatedContent(document, lang), document,
         getContext());
   }
@@ -201,6 +204,8 @@ public class RenderCommand {
 
   String getTranslatedContent(XWikiDocument templateDoc, String lang
       ) throws XWikiException {
+    LOGGER.debug("getTranslatedContent for lang  [" + lang + "] and templateDoc ["
+        + templateDoc.getDocumentReference() + "].");
     String translatedContent = templateDoc.getTranslatedContent(lang, getContext());
     if (!getRenderingEngine().getRendererNames().contains("xwiki")) {
       return translatedContent.replaceAll("\\{pre\\}|\\{/pre\\}", "");
