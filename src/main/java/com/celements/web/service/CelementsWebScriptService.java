@@ -312,7 +312,8 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String renderDocument(Document renderDoc) {
-    LOGGER.trace("renderDocument: renderDoc [" + renderDoc.getDocumentReference() + "].");
+    LOGGER.trace("renderDocument: renderDocLang [" + renderDoc.getLanguage()
+        + "] renderDoc [" + renderDoc.getDocumentReference() + "].");
     return new RenderCommand().renderDocument(renderDoc.getDocumentReference(),
         renderDoc.getLanguage());
   }
