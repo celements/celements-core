@@ -64,6 +64,18 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testSetReplyTo_null() {
+    sendMail.setReplyTo(null);
+    assertNull(sendMail.getMailObject().getHeaders().get("reply-to"));
+  }
+
+  @Test
+  public void testSetReplyTo_empty() {
+    sendMail.setReplyTo(" \n ");
+    assertNull(sendMail.getMailObject().getHeaders().get("reply-to"));
+  }
+
+  @Test
   public void testSetTo() {
     String to = "test@synventis.com";
     sendMail.setTo(to);

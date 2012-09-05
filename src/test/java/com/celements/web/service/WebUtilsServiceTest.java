@@ -921,7 +921,8 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     objs.add(obj);
     return objs;
   }
-  
+
+
   private void replayAll(Object ... mocks) {
     replay(xwiki);
     replay(mocks);
