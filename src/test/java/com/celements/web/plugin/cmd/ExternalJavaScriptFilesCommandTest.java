@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -105,19 +106,22 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_double() throws Exception {
-    context.setDoc(new XWikiDocument());
+    context.setDoc(new XWikiDocument(new DocumentReference(context.getDatabase(), "Main",
+        "WebHome")));
     String fileNotFound = "celJS/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null
         ).once();
     String file = "celJS/prototype.js?version=20110401120000";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
-    XWikiDocument xwikiPrefDoc = new XWikiDocument();
-    xwikiPrefDoc.setFullName("XWiki.XWikiPreferences");
-    expect(xwiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(
         xwikiPrefDoc).anyTimes();
-    XWikiDocument mainPrefDoc = new XWikiDocument();
-    mainPrefDoc.setFullName("Main.WebPreferences");
-    expect(xwiki.getDocument(eq("Main.WebPreferences"), same(context))).andReturn(
+    DocumentReference mainPrefDocRef = new DocumentReference(context.getDatabase(),
+        "Main", "WebPreferences");
+    XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
+    expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(
         mainPrefDoc).anyTimes();
     replay(xwiki, attUrlCmd);
     assertEquals("", command.addExtJSfileOnce(file));

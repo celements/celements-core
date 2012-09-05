@@ -135,7 +135,7 @@ public class CellRenderer implements IRenderStrategy {
 
   RenderCommand ctRendererCmd() {
     if (ctRendererCmd == null) {
-      ctRendererCmd = new RenderCommand(context);
+      ctRendererCmd = new RenderCommand();
     }
     return ctRendererCmd;
   }

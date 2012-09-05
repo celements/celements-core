@@ -19,5 +19,6 @@ com.celements.menu.MenuClasses
 com.celements.menu.MenuService
 com.celements.menu.MenuScriptService
 com.celements.appScript.AppScriptService
+com.celements.web.service.PrepareVelocityContextService
 com.celements.collections.CollectionsService
 com.celements.collections.service.CollectionsScriptService

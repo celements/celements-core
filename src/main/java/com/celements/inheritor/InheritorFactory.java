@@ -80,7 +80,7 @@ public class InheritorFactory {
     if (pageLayoutForDoc != null) {
       inheritanceList.add(pageLayoutForDoc + ".WebHome");
     }
-    String skinDocName = context.getWiki().getWebPreference("skin", context);
+    String skinDocName = context.getWiki().getSpacePreference("skin", context);
     if (skinDocName != null){
       inheritanceList.add(skinDocName);
     }
@@ -115,10 +115,10 @@ public class InheritorFactory {
 
   public FieldInheritor getPageLayoutInheritor(String fullName, XWikiContext context) {
     return getFieldInheritor("Celements2.PageType", Arrays.asList(fullName,
-        getWebPreferencesFullName(fullName), "XWiki.XWikiPreferences"), context);
+        getSpacePreferencesFullName(fullName), "XWiki.XWikiPreferences"), context);
   }
 
-  String getWebPreferencesFullName(String fullName) {
+  String getSpacePreferencesFullName(String fullName) {
     return fullName.substring(0, fullName.indexOf('.')) + ".WebPreferences";
   }
 

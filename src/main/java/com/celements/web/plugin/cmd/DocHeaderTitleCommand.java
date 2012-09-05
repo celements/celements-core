@@ -52,9 +52,9 @@ public class DocHeaderTitleCommand {
         docHeaderTitle = menuNameCmd.getMultilingualMenuNameOnly(fullName,
             context.getLanguage(), false, context);
       }
-      if (!"".equals(context.getWiki().getWebPreference("title", "", context))) {
+      if (!"".equals(context.getWiki().getSpacePreference("title", "", context))) {
         docHeaderTitle = context.getWiki().parseContent(context.getWiki(
-            ).getWebPreference("title", "", context), context) + docHeaderTitle;
+            ).getSpacePreference("title", "", context), context) + docHeaderTitle;
       }
     } catch (Exception exp) {
       mLogger.error(exp);

@@ -52,8 +52,6 @@ public interface INavigation {
    */
   public void setMenuSpace(String menuSpace);
 
-  public void setMenuTypeByTypeName(String menuTypeName);
-
   public String includeNavigation(XWikiContext context);
 
   public int getMenuItemPos(String fullName, XWikiContext context);

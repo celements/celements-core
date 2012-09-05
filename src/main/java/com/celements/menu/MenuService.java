@@ -31,11 +31,9 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -128,7 +126,8 @@ public class MenuService implements IMenuService {
           + ": " + Arrays.deepToString(result.toArray()));
       }
       for(String fullName : new HashSet<String>(result)) {
-        DocumentReference menuBarDocRef = resolveDocument(fullName);
+        DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(
+            fullName);
         if (hasview(menuBarDocRef)) {
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(
               menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef(
@@ -174,15 +173,6 @@ public class MenuService implements IMenuService {
     return "from doc.object(Celements.MenuBarHeaderItemClass) as mHeader";
   }
 
-  private DocumentReference resolveDocument(String docFullName) {
-    DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
-        docFullName, EntityType.DOCUMENT));
-    eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
-    LOGGER.debug("getDocRefFromFullName: for [" + docFullName + "] got reference ["
-        + eventRef + "].");
-    return eventRef;
-  }
-
   public List<BaseObject> getSubMenuItems(Integer headerId) {
     TreeMap<Integer, BaseObject> menuItemsMap = new TreeMap<Integer, BaseObject>();
     addMenuItems(menuItemsMap, headerId);
@@ -210,7 +200,8 @@ public class MenuService implements IMenuService {
       for(Object[] resultObj : result) {
         String fullName = resultObj[0].toString();
         int objectNr = Integer.parseInt(resultObj[1].toString());
-        DocumentReference menuBarDocRef = resolveDocument(fullName);
+        DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(
+            fullName);
         BaseObject obj = getContext().getWiki().getDocument(menuBarDocRef, getContext()
             ).getXObject(getMenuBarSubItemClassRef(menuBarDocRef.getWikiReference(
                 ).getName()), objectNr);

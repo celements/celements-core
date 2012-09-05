@@ -260,24 +260,81 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   private RenderCommand getCelementsRenderCmd() {
-    RenderCommand renderCommand = new RenderCommand(getContext());
+    RenderCommand renderCommand = new RenderCommand();
     renderCommand.setDefaultPageType("RichText");
     return renderCommand;
   }
 
   public String renderCelementsDocument(DocumentReference elementDocRef) {
-    return renderCelementsDocument(elementDocRef, "view");
+    return renderCelementsDocument(elementDocRef, getContext().getLanguage(), "view");
   }
 
   public String renderCelementsDocument(DocumentReference elementDocRef,
       String renderMode) {
+    return renderCelementsDocument(elementDocRef, getContext().getLanguage(), renderMode);
+  }
+
+  public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
+      String renderMode) {
     try {
-      return getCelementsRenderCmd().renderCelementsDocument(getContext().getWiki(
-          ).getDocument(elementDocRef, getContext()), renderMode);
+      return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang,
+          renderMode);
     } catch (XWikiException exp) {
       LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
     }
     return "";
+  }
+
+  public String renderCelementsDocument(Document renderDoc) {
+    return renderCelementsDocument(renderDoc, "view");
+  }
+
+  public String renderCelementsDocument(Document renderDoc, String renderMode) {
+    //we must not get here for !getService().isAppScriptRequest()
+    if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
+      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
+          + renderDoc.getFullName() + " no rendering applied.");
+      return "";
+    } else {
+      return renderCelementsDocument(renderDoc.getDocumentReference(),
+          renderDoc.getLanguage(), renderMode);
+    }
+  }
+
+  public String renderDocument(DocumentReference docRef) {
+    LOGGER.trace("renderDocument: docRef [" + docRef + "].");
+    return new RenderCommand().renderDocument(docRef);
+  }
+
+  public String renderDocument(DocumentReference docRef, String lang) {
+    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
+    return new RenderCommand().renderDocument(docRef, lang);
+  }
+
+  public String renderDocument(Document renderDoc) {
+    LOGGER.trace("renderDocument: renderDocLang [" + renderDoc.getLanguage()
+        + "] renderDoc [" + renderDoc.getDocumentReference() + "].");
+    return new RenderCommand().renderDocument(renderDoc.getDocumentReference(),
+        renderDoc.getLanguage());
+  }
+
+  public String renderDocument(DocumentReference docRef, String lang, boolean removePre,
+      List<String> rendererNameList) {
+    try {
+      RenderCommand renderCommand = new RenderCommand();
+      renderCommand.initRenderingEngine(rendererNameList);
+      return renderCommand.renderDocument(docRef, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("renderCelementsDocument: Failed to render ["
+          + docRef + "] lang ["+ lang + "].", exp);
+    }
+    return "";
+  }
+
+  public String renderDocument(Document renderDoc, boolean removePre,
+      List<String> rendererNameList) {
+    return renderDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(),
+        removePre, rendererNameList);
   }
 
 }

@@ -73,6 +73,7 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
+import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
@@ -538,19 +539,19 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public int showRightPanels() {
-    return plugin.showRightPanels(context);
+    return getPrepareVelocityContextService().showRightPanels();
   }
 
   public int showLeftPanels() {
-    return plugin.showLeftPanels(context);
+    return getPrepareVelocityContextService().showLeftPanels();
   }
 
   public List<String> getRightPanels() {
-    return plugin.getRightPanels(context);
+    return getPrepareVelocityContextService().getRightPanels();
   }
 
   public List<String> getLeftPanels() {
-    return plugin.getLeftPanels(context);
+    return getPrepareVelocityContextService().getLeftPanels();
   }
 
   public String getDocSectionAsJSON(String regex, String fullName, int part) throws XWikiException {
@@ -1053,30 +1054,27 @@ public class CelementsWebPluginApi extends Api {
     return getService().renderCelementsDocument(elementDocRef, renderMode);
   }
 
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderDocument in CelementsWebScriptService
+   */
+  @Deprecated
   public String renderDocument(Document renderDoc) {
-    try {
-      return new RenderCommand(context).renderDocument(getXWikiDoc(renderDoc));
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render "
-          + renderDoc.getFullName(), exp);
-    }
-    return "";
+    return getService().renderDocument(renderDoc);
   }
 
-  public String renderDocument(Document renderDoc, boolean removePre, List<String> rendererNameList) {
-    try {
-      RenderCommand renderCommand = new RenderCommand(context);
-      renderCommand.initRenderingEngine(rendererNameList);
-      return renderCommand.renderDocument(getXWikiDoc(renderDoc));
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render "
-          + renderDoc.getFullName(), exp);
-    }
-    return "";
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderDocument in CelementsWebScriptService
+   */
+  @Deprecated
+  public String renderDocument(Document renderDoc, boolean removePre,
+      List<String> rendererNameList) {
+    return getService().renderDocument(renderDoc, removePre, rendererNameList);
   }
 
   private RenderCommand getCelementsRenderCmd() {
-    RenderCommand renderCommand = new RenderCommand(context);
+    RenderCommand renderCommand = new RenderCommand();
     renderCommand.setDefaultPageType("RichText");
     return renderCommand;
   }
@@ -1085,36 +1083,19 @@ public class CelementsWebPluginApi extends Api {
     return renderCelementsDocument(renderDoc, "view");
   }
 
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderCelementsDocument in CelementsWebScriptService
+   */
+  @Deprecated
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
-    try {
-      if ("view".equals(context.getAction()) && renderDoc.isNew() ) {
-        mLogger.info("renderCelementsDocument: Failed to get xwiki document for"
-            + renderDoc.getFullName() + " no rendering applied.");
-        //TODO add docdoesnotexist handling!!
-      } else {
-        return getCelementsRenderCmd().renderCelementsDocument(getXWikiDoc(renderDoc),
-            renderMode);
-      }
-    } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render "
-          + renderDoc.getFullName(), exp);
-    }
-    return "";
-  }
-
-  private XWikiDocument getXWikiDoc(Document renderDoc) throws XWikiException {
-    XWikiDocument renderXdoc = context.getWiki().getDocument(
-        renderDoc.getDocumentReference(), context);
-    if (!"".equals(renderDoc.getLanguage())) {
-      renderXdoc = renderXdoc.getTranslatedDocument(renderDoc.getLanguage(), context);
-    }
-    return renderXdoc;
+    return getService().renderCelementsDocument(renderDoc, renderMode);
   }
 
   public String getEditURL(Document doc) {
     if(!context.getWiki().exists(doc.getDocumentReference(), context)
         || !isValidLanguage() || !isTranslationAvailable(doc, context.getLanguage())) {
-      return doc.getURL("edit", "language=" + plugin.getDefaultLanguage(context));
+      return doc.getURL("edit", "language=" + getWebUtilsService().getDefaultLanguage());
     } else {
       return doc.getURL("edit", "language=" + context.getLanguage());
     }
@@ -1126,8 +1107,8 @@ public class CelementsWebPluginApi extends Api {
     } catch (XWikiException exp) {
       mLogger.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
           exp);
-      return (language.equals(plugin.getDefaultLanguage(context))
-          && context.getWiki().exists(doc.getFullName(), context));
+      return (language.equals(getWebUtilsService().getDefaultLanguage())
+          && context.getWiki().exists(doc.getDocumentReference(), context));
     }
   }
 
@@ -1208,13 +1189,13 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean useXWikiLoginLayout() {
-    return "1".equals(context.getWiki().getWebPreference("xwikiLoginLayout",
+    return "1".equals(context.getWiki().getSpacePreference("xwikiLoginLayout",
         "celements.xwikiLoginLayout", "1", context));
   }
 
   public String getLogoutRedirectURL() {
     XWiki xwiki = context.getWiki();
-    String logoutRedirectConf = xwiki.getWebPreference("LogoutRedirect",
+    String logoutRedirectConf = xwiki.getSpacePreference("LogoutRedirect",
         "celements.logoutRedirect", xwiki.getDefaultSpace(context) + ".WebHome", context);
     String logoutRedirectURL = logoutRedirectConf;
     if (!logoutRedirectConf.startsWith("http://")
@@ -1226,7 +1207,7 @@ public class CelementsWebPluginApi extends Api {
 
   public String getLoginRedirectURL() {
     XWiki xwiki = context.getWiki();
-    String loginRedirectConf = xwiki.getWebPreference("LoginRedirect",
+    String loginRedirectConf = xwiki.getSpacePreference("LoginRedirect",
         "celements.loginRedirect", xwiki.getDefaultSpace(context) + ".WebHome", context);
     String loginRedirectURL = loginRedirectConf;
     if (!loginRedirectConf.startsWith("http://")
@@ -1312,7 +1293,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean useImageAnimations() {
-    return "1".equals(context.getWiki().getWebPreference("celImageAnimation",
+    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation",
         "celements.celImageAnimation", "0", context));
   }
 
@@ -1392,6 +1373,10 @@ public class CelementsWebPluginApi extends Api {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private IPrepareVelocityContext getPrepareVelocityContextService() {
+    return Utils.getComponent(IPrepareVelocityContext.class);
   }
 
 }

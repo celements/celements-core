@@ -26,19 +26,24 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.web.Utils;
 
 public class RenderCommand {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(RenderCommand.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(RenderCommand.class);
 
-  private XWikiContext context;
-
-  private PageTypeCommand injected_pageTypeCmd;
+  private PageTypeCommand pageTypeCmd;
 
   private String defaultPageType = null;
 
@@ -46,55 +51,119 @@ public class RenderCommand {
 
   private static XWikiRenderingEngine defaultRenderingEngine;
 
+  public RenderCommand() {}
+
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecutionContext().getProperty("xwikicontext");
+  }
+
+  private ExecutionContext getExecutionContext() {
+    return Utils.getComponent(Execution.class).getContext();
+  }
+
   public void setDefaultPageType(String defaultPageType) {
     this.defaultPageType = defaultPageType;
   }
 
-  public RenderCommand(XWikiContext context) {
-    this.context = context;
+  public String renderCelementsCell(DocumentReference elemDocRef) throws XWikiException {
+    XWikiDocument cellDoc = getTemplateDoc(elemDocRef);
+    return renderCelementsDocument(cellDoc, "view");
   }
 
+  /**
+   * renderCelementsCell
+   * 
+   * @param elementFullName
+   * @return
+   * @throws XWikiException
+   * 
+   * @Deprecated since 2.17.0 instead use renderCelementsCell(DocumentReference) 
+   */
+  @Deprecated
   public String renderCelementsCell(String elementFullName) throws XWikiException {
-    XWikiDocument cellDoc = getTemplateDoc(elementFullName);
+    XWikiDocument cellDoc = getTemplateDoc(getWebUtilsService().resolveDocumentReference(
+        elementFullName));
     return renderCelementsDocument(cellDoc, "view");
+  }
+
+  public String renderCelementsDocument(DocumentReference elemDocRef, String renderMode
+      ) throws XWikiException {
+      return renderCelementsDocument(elemDocRef, renderMode, getContext().getLanguage());
+  }
+
+  public String renderCelementsDocument(DocumentReference elemDocRef, String lang,
+      String renderMode) throws XWikiException {
+    XWikiDocument cellDoc = getContext().getWiki().getDocument(elemDocRef, getContext());
+    return renderCelementsDocument(cellDoc, lang, renderMode);
   }
 
   public String renderCelementsDocument(XWikiDocument cellDoc, String renderMode
       ) throws XWikiException {
-    mLogger.trace("renderCelementsDocument: cellDoc [" + cellDoc.getFullName()
-        + "] renderMode [" + renderMode + "].");
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-    vcontext.put("celldoc", cellDoc.newDocument(context));
+    return renderCelementsDocument(cellDoc, getContext().getLanguage(), renderMode);
+  }
+
+  public String renderCelementsDocument(XWikiDocument cellDoc, String lang,
+      String renderMode) throws XWikiException {
+    LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
+        + "] lang [" + lang + "] renderMode [" + renderMode + "].");
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    vcontext.put("celldoc", cellDoc.newDocument(getContext()));
     PageType cellType = pageTypeCmd().getPageTypeWithDefaultObj(cellDoc, defaultPageType,
-        context);
-    String renderTemplatePath = getRenderTemplatePath(cellType, cellDoc.getFullName(),
+        getContext());
+    String cellDocFN = getRefSerializer().serialize(cellDoc.getDocumentReference());
+    String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
         renderMode);
     String templateContent;
-    XWikiDocument templateDoc = context.getDoc();
+    XWikiDocument templateDoc = getContext().getDoc();
     if (renderTemplatePath.startsWith(":")) {
       String templatePath = getTemplatePathOnDisk(renderTemplatePath);
       try {
-        templateContent = context.getWiki().getResourceContent(templatePath);
+        templateContent = getContext().getWiki().getResourceContent(templatePath);
       } catch (IOException exp) {
-        mLogger.debug("Exception while parsing template [" + templatePath + "].", exp);
+        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
         return "";
       }
     } else {
-      templateDoc = getTemplateDoc(renderTemplatePath);
-      templateContent = getTranslatedContent(templateDoc);
+      DocumentReference renderTemplateDocRef = getWebUtilsService(
+          ).resolveDocumentReference(renderTemplatePath);
+      templateDoc = getTemplateDoc(renderTemplateDocRef);
+      templateContent = getTranslatedContent(templateDoc, lang);
     }
     return getRenderingEngine().renderText(templateContent,
-        templateDoc, context.getDoc(), context);
+        templateDoc, getContext().getDoc(), getContext());
+  }
+
+  public String renderDocument(DocumentReference docRef) {
+    return renderDocument(docRef, getContext().getLanguage());
+  }
+
+  public String renderDocument(DocumentReference docRef, String lang) {
+    LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef + "].");
+    try {
+      XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
+      return renderDocument(xwikidoc, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get translated document for [" + docRef + "] in [" + lang
+          + "].", exp);
+    }
+    return "";
   }
 
   public String renderDocument(XWikiDocument document) throws XWikiException {
-    return getRenderingEngine().renderText(getTranslatedContent(document), document,
-        context);
+    return renderDocument(document, document.getLanguage());
+  }
+
+  public String renderDocument(XWikiDocument document, String lang
+      ) throws XWikiException {
+    LOGGER.debug("renderDocument for lang  [" + lang + "] and doc ["
+        + document.getDocumentReference() + "].");
+    return getRenderingEngine().renderText(getTranslatedContent(document, lang), document,
+        getContext());
   }
 
   XWikiRenderingEngine getRenderingEngine() throws XWikiException {
     if (this.renderingEngine == null) {
-      this.renderingEngine = getDefaultRenderingEngine(context);
+      this.renderingEngine = getDefaultRenderingEngine(getContext());
     }
     return this.renderingEngine;
   }
@@ -115,7 +184,7 @@ public class RenderCommand {
 
   public XWikiRenderingEngine initRenderingEngine(List<String> rendererNames
       ) throws XWikiException {
-    return RenderCommand.initRenderingEngine(rendererNames, context);
+    return RenderCommand.initRenderingEngine(rendererNames, getContext());
   }
 
   public void setRenderingEngine(XWikiRenderingEngine renderingEngine) {
@@ -123,18 +192,21 @@ public class RenderCommand {
   }
 
   PageTypeCommand pageTypeCmd() {
-    if (injected_pageTypeCmd != null) {
-      return injected_pageTypeCmd;
+    if (pageTypeCmd == null) {
+      pageTypeCmd = new PageTypeCommand();
     }
-    return PageTypeCommand.getInstance();
+    return pageTypeCmd;
   }
 
   void inject_PageTypeCmd(PageTypeCommand mockPTcmd) {
-    injected_pageTypeCmd = mockPTcmd;
+    pageTypeCmd = mockPTcmd;
   }
 
-  String getTranslatedContent(XWikiDocument templateDoc) throws XWikiException {
-    String translatedContent = templateDoc.getTranslatedContent(context);
+  String getTranslatedContent(XWikiDocument templateDoc, String lang
+      ) throws XWikiException {
+    LOGGER.debug("getTranslatedContent for lang  [" + lang + "] and templateDoc ["
+        + templateDoc.getDocumentReference() + "].");
+    String translatedContent = templateDoc.getTranslatedContent(lang, getContext());
     if (!getRenderingEngine().getRendererNames().contains("xwiki")) {
       return translatedContent.replaceAll("\\{pre\\}|\\{/pre\\}", "");
     } else {
@@ -142,8 +214,8 @@ public class RenderCommand {
     }
   }
 
-  XWikiDocument getTemplateDoc(String templateFullName) throws XWikiException {
-    return context.getWiki().getDocument(templateFullName, context);
+  XWikiDocument getTemplateDoc(DocumentReference templateDocRef) throws XWikiException {
+    return getContext().getWiki().getDocument(templateDocRef, getContext());
   }
 
   String getTemplatePathOnDisk(String renderTemplatePath) {
@@ -154,17 +226,27 @@ public class RenderCommand {
   String getRenderTemplatePath(PageType cellType, String cellDocFN,
       String renderMode) throws XWikiException {
     if (cellType != null) {
-      String renderTemplateFullName = cellType.getRenderTemplate(renderMode, context);
+      String renderTemplateFullName = cellType.getRenderTemplate(renderMode,
+          getContext());
       if ((renderTemplateFullName != null) && !"".equals(renderTemplateFullName)) {
-        mLogger.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
+        LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
             + cellType.getFullName() + "] and renderTemplate ["
             + renderTemplateFullName + "].");
         return renderTemplateFullName;
       }
-      mLogger.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
+      LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
           + cellType.getFullName() + "] using content of cellDoc [" + cellDocFN + "].");
     }
     return cellDocFN;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private DefaultStringEntityReferenceSerializer getRefSerializer() {
+    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
+        EntityReferenceSerializer.class);
   }
 
 }

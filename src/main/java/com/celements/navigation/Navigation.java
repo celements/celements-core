@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
@@ -41,7 +42,10 @@ public class Navigation implements INavigation {
 
   public static final int DEFAULT_MAX_LEVEL = 100;
 
-  public static final String NAVIGATION_CONFIG_CLASS = "Celements2.NavigationConfigClass";
+  public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
+  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
+      + "." + NAVIGATION_CONFIG_CLASS_DOC;
 
   private INavigationBuilder navBuilder;
 
@@ -114,17 +118,9 @@ public class Navigation implements INavigation {
     utils = WebUtils.getInstance();
   }
 
-  /**
-   * Deprecated: use layoutType and dataType instead
-   * @return
-   */
-  @Deprecated
-  private IMenuTypeRepository getMenuType() {
-    if (menuType == null) {
-      return MenuTypeRepository.getInstance().get(MENU_TYPE_MENUITEM);
-    } else {
-      return menuType;
-    }
+  public static DocumentReference getNavigationConfigClassReference(String wikiName) {
+    return new DocumentReference(wikiName, NAVIGATION_CONFIG_CLASS_SPACE,
+        NAVIGATION_CONFIG_CLASS_DOC);
   }
 
   public String getLayoutType() {
@@ -133,7 +129,7 @@ public class Navigation implements INavigation {
 
   public void setLayoutType(String layoutType
       ) throws UnknownLayoutTypeException {
-    //TODO implement a registry
+    //TODO implement a component role
     if (LIST_LAYOUT_TYPE.equals(layoutType)) {
       this.navBuilder = new ListBuilder(uniqueName);
     } else {
@@ -141,14 +137,6 @@ public class Navigation implements INavigation {
     }
   }
 
-  public void setMenuTypeByTypeName(String menuTypeName) {
-    this.menuType = MenuTypeRepository.getInstance().get(menuTypeName);
-    if (this.menuType == null) {
-      throw new IllegalArgumentException("MenuType " + menuTypeName
-          + " not available!");
-    }
-  }
-  
   /**
    * setFromHierarchyLevel
    * @param fromHierarchyLevel starting (including) at Hierarchy Level
@@ -376,7 +364,7 @@ public class Navigation implements INavigation {
   }
 
   private boolean useImagesForNavigation(XWikiContext context) {
-    return context.getWiki().getWebPreferenceAsInt("use_navigation_images", 0, context
+    return context.getWiki().getSpacePreferenceAsInt("use_navigation_images", 0, context
         ) > 0;
   }
 
