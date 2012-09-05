@@ -19,8 +19,6 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Collections;
@@ -30,7 +28,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.web.utils.Html2Text;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.plugin.mailsender.Mail;
@@ -54,7 +51,9 @@ public class CelSendMail {
   }
   
   public void setReplyTo(String replyTo) {
-    getMailObject().setHeader("reply-to", replyTo);
+    if((replyTo != null) && (replyTo.trim().length() > 0)) {
+      getMailObject().setHeader("reply-to", replyTo);
+    }
   }
   
   public void setTo(String to) {
