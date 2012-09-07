@@ -24,7 +24,7 @@ import java.util.List;
 
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
-import com.celements.web.pagetype.IPageType;
+import com.celements.pagetype.IPageType;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
