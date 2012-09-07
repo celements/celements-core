@@ -29,7 +29,6 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -41,17 +40,25 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("CompositerComponent")
 public class CompositorComponent implements EventListener {
 
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      CompositorComponent.class);
+  
   @Requirement
-  private Map<String, ICelementsClassCollection> classCollectionMap;
+  private Map<String, IClassCollectionRole> classCollectionMap;
+  
+  @Requirement
+  private Map<String, ICelementsClassCollection> classCollectionMap_old;
   
   @Requirement
   private Execution execution;
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      CompositorComponent.class);
-  
+
+  protected XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
   public List<Event> getEvents() {
-    mLogger.info("getEvents: registering for update, save and delete events.");
+    LOGGER.info("getEvents: registering for update, save and delete events.");
     return Arrays.<Event> asList(new DocumentUpdatedEvent());
   }
 
@@ -64,22 +71,36 @@ public class CompositorComponent implements EventListener {
     DocumentReference xwikiPrefDoc = new DocumentReference(document.getDocumentReference(
         ).getWikiReference().getName(), "XWiki", "XWikiPreferences");
     if(document.getDocumentReference().equals(xwikiPrefDoc)) {
-      checkClassCollections();
+      checkAllClassCollections();
     }
   }
 
-  public void checkClassCollections() {
-    ExecutionContext exContext = execution.getContext();
-    XWikiContext context = (XWikiContext)exContext.getProperty("xwikicontext");
-    for (ICelementsClassCollection classCollection : classCollectionMap.values()) {
+  public void checkAllClassCollections() {
+    checkClassCollections();
+    checkOldClassCollections();
+  }
+
+  @Deprecated
+  void checkOldClassCollections() {
+    for (ICelementsClassCollection classCollection : classCollectionMap_old.values()) {
       try {
-        classCollection.runUpdate(context);
+        classCollection.runUpdate(getContext());
       } catch (XWikiException e) {
-        mLogger.error("Exception checking class collection " 
+        LOGGER.error("Exception checking class collection " 
             + classCollection.getConfigName(), e);
       }
     }
-    
+  }
+
+  void checkClassCollections() {
+    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
+      try {
+        classCollection.runUpdate();
+      } catch (XWikiException e) {
+        LOGGER.error("Exception checking class collection " 
+            + classCollection.getConfigName(), e);
+      }
+    }
   }
 
 }

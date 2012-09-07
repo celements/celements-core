@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.pagetype.PageType;
+import com.celements.web.pagetype.PageTypeClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -196,16 +196,16 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
       ).anyTimes();
     XWikiDocument ptRTE = new XWikiDocument();
     BaseObject ptRTEProp = new BaseObject();
-    ptRTEProp.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptRTEProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     ptRTEProp.setStringValue("category", "");
-    ptRTE.addObject(PageType.PAGE_TYPE_PROPERTIES, ptRTEProp);
+    ptRTE.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptRTEProp);
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(ptRTE 
       ).anyTimes();
     XWikiDocument ptCode = new XWikiDocument();
     BaseObject ptCodeProp = new BaseObject();
-    ptCodeProp.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptCodeProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     ptCodeProp.setStringValue("category", "cellType");
-    ptCode.addObject(PageType.PAGE_TYPE_PROPERTIES, ptCodeProp);
+    ptCode.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptCodeProp);
     expect(xwiki.getDocument(eq("PageTypes.Code"), same(context))).andReturn(ptCode
       ).anyTimes();
     replay(xwiki);
@@ -228,16 +228,16 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
       ).anyTimes();
     XWikiDocument ptRTE = new XWikiDocument();
     BaseObject ptRTEProp = new BaseObject();
-    ptRTEProp.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptRTEProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     //ptRTEProp.setStringValue("category", null);
-    ptRTE.addObject(PageType.PAGE_TYPE_PROPERTIES, ptRTEProp);
+    ptRTE.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptRTEProp);
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(ptRTE 
       ).anyTimes();
     XWikiDocument ptCode = new XWikiDocument();
     BaseObject ptCodeProp = new BaseObject();
-    ptCodeProp.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptCodeProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     ptCodeProp.setStringValue("category", "cellType");
-    ptCode.addObject(PageType.PAGE_TYPE_PROPERTIES, ptCodeProp);
+    ptCode.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptCodeProp);
     expect(xwiki.getDocument(eq("PageTypes.Code"), same(context))).andReturn(ptCode
       ).anyTimes();
     replay(xwiki);

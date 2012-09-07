@@ -33,9 +33,14 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class PageType {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(PageType.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
 
-  public static final String PAGE_TYPE_PROPERTIES = "Celements2.PageTypeProperties";
+  /**
+   * @deprecated since 2.18.0 instead use PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS
+   */
+  @Deprecated
+  public static final String PAGE_TYPE_PROPERTIES =
+    PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS;
 
   private String pageTypeFN;
 
@@ -62,7 +67,7 @@ public class PageType {
 
   public BaseObject getPageTypeProperties(XWikiContext context) {
     try {
-      return getTemplateDocument(context).getObject(PAGE_TYPE_PROPERTIES);
+      return getTemplateDocument(context).getObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     } catch (XWikiException e) {
       return null;
     }
