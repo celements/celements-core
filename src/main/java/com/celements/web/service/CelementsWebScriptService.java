@@ -39,8 +39,8 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
+import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
-import com.celements.web.pagetype.RenderCommand;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;

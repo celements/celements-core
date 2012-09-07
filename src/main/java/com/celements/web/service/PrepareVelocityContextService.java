@@ -20,8 +20,8 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.pagetype.PageTypeApi;
-import com.celements.web.pagetype.PageTypeCommand;
+import com.celements.pagetype.PageTypeApi;
+import com.celements.pagetype.PageTypeCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

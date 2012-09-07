@@ -29,7 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
-import com.celements.web.pagetype.IPageType;
+import com.celements.pagetype.IPageType;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;

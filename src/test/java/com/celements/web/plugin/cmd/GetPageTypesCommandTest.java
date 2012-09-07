@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.pagetype.PageTypeClasses;
+import com.celements.pagetype.PageTypeClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

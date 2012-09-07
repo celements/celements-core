@@ -32,7 +32,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.pagetype.PageTypeCommand;
+import com.celements.pagetype.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

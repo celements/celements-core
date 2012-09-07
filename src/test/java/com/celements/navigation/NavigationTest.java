@@ -33,7 +33,7 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
-import com.celements.web.pagetype.IPageType;
+import com.celements.pagetype.IPageType;
 import com.celements.web.utils.IWebUtils;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
