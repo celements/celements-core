@@ -36,8 +36,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
+import com.celements.rendering.RenderCommand;
 import com.celements.web.pagetype.IPageType;
-import com.celements.web.pagetype.RenderCommand;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;

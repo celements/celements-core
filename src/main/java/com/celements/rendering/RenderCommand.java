@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.pagetype;
+package com.celements.rendering;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,6 +32,8 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.celements.web.pagetype.PageType;
+import com.celements.web.pagetype.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
