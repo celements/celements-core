@@ -182,6 +182,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         transContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
         "groovy"));
+    expect(templateDoc.getDocumentReference()).andReturn(new DocumentReference(
+        context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     replay(xwiki, renderingEngineMock, templateDoc);
     assertEquals("expected removing pre-tags", "\n" + expectedContent,
         renderCmd.getTranslatedContent(templateDoc, "de"));
@@ -199,6 +201,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         transContent);
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
         "groovy", "xwiki"));
+    expect(templateDoc.getDocumentReference()).andReturn(new DocumentReference(
+        context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     replay(xwiki, renderingEngineMock, templateDoc);
     assertEquals("expected removing pre-tags", "{pre}\n" + expectedContent + "{/pre}",
         renderCmd.getTranslatedContent(templateDoc, "fr"));
@@ -293,6 +297,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
       "groovy"));
+    expect(templMock.getDocumentReference()).andReturn(new DocumentReference(
+        context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     replay(xwiki, mockPageTypeCmd, renderingEngineMock, ptMock, templMock);
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementFullName));
@@ -333,6 +339,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
       "groovy"));
+    expect(templMock.getDocumentReference()).andReturn(new DocumentReference(
+        context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     replay(xwiki, mockPageTypeCmd, renderingEngineMock, ptMock, templMock);
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementDocRef));
@@ -371,6 +379,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
       "groovy"));
+    expect(templMock.getDocumentReference()).andReturn(new DocumentReference(
+        context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     replay(xwiki, mockPageTypeCmd, renderingEngineMock, ptMock, templMock);
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementFullName));
@@ -408,6 +418,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
     expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
       "groovy"));
+    expect(templMock.getDocumentReference()).andReturn(new DocumentReference(
+        context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     replay(xwiki, mockPageTypeCmd, renderingEngineMock, ptMock, templMock);
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementDocRef));

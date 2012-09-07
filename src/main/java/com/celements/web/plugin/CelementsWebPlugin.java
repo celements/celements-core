@@ -35,9 +35,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
-import com.celements.navigation.MenuItemNavigation;
-import com.celements.navigation.MenuTypeRepository;
-import com.celements.navigation.Navigation;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.web.pagetype.IPageType;
 import com.celements.web.pagetype.RenderCommand;
@@ -91,7 +88,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public CelementsWebPlugin(
       String name, String className, XWikiContext context) {
     super(name, className, context);
-    init(context);
   }
 
   public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
@@ -112,22 +108,15 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public void init(XWikiContext context) {
-    addMenuTypeMenuItemToRepository();
+    LOGGER.trace("init called database [" + context.getDatabase() + "]");
+    new CheckClassesCommand().checkClasses(context);
     super.init(context);
   }
 
   public void virtualInit(XWikiContext context) {
+    LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
     new CheckClassesCommand().checkClasses(context);
     super.virtualInit(context);
-  }
-
-  private void addMenuTypeMenuItemToRepository() {
-    if (MenuTypeRepository.getInstance().put(Navigation.MENU_TYPE_MENUITEM,
-        new MenuItemNavigation())) {
-      LOGGER.debug("Added MenuItemNavigation with key '"
-          + Navigation.MENU_TYPE_MENUITEM + "' to the "
-          + "MenuTypeRepository");
-    }
   }
 
   public int queryCount() {
@@ -403,22 +392,26 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   @Override
   public void beginRendering(XWikiContext context) {
+    LOGGER.debug("start beginRendering: language [" + context.getLanguage() + "].");
     try {
       getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
       LOGGER.error("beginRendering", exp);
       throw exp;
     }
+    LOGGER.debug("end beginRendering: language [" + context.getLanguage() + "].");
   }
 
   @Override
   public void beginParsing(XWikiContext context) {
+    LOGGER.debug("start beginParsing: language [" + context.getLanguage() + "].");
     try {
       getPrepareVelocityContextService().prepareVelocityContext(context);
     } catch(RuntimeException exp) {
       LOGGER.error("beginParsing", exp);
       throw exp;
     }
+    LOGGER.debug("end beginParsing: language [" + context.getLanguage() + "].");
   }
 
   IPrepareVelocityContext getPrepareVelocityContextService() {

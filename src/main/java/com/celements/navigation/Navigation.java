@@ -123,26 +123,13 @@ public class Navigation implements INavigation {
         NAVIGATION_CONFIG_CLASS_DOC);
   }
 
-  /**
-   * Deprecated: use layoutType and dataType instead
-   * @return
-   */
-  @Deprecated
-  private IMenuTypeRepository getMenuType() {
-    if (menuType == null) {
-      return MenuTypeRepository.getInstance().get(MENU_TYPE_MENUITEM);
-    } else {
-      return menuType;
-    }
-  }
-
   public String getLayoutType() {
     return navBuilder.getLayoutTypeName();
   }
 
   public void setLayoutType(String layoutType
       ) throws UnknownLayoutTypeException {
-    //TODO implement a registry
+    //TODO implement a component role
     if (LIST_LAYOUT_TYPE.equals(layoutType)) {
       this.navBuilder = new ListBuilder(uniqueName);
     } else {
@@ -150,14 +137,6 @@ public class Navigation implements INavigation {
     }
   }
 
-  public void setMenuTypeByTypeName(String menuTypeName) {
-    this.menuType = MenuTypeRepository.getInstance().get(menuTypeName);
-    if (this.menuType == null) {
-      throw new IllegalArgumentException("MenuType " + menuTypeName
-          + " not available!");
-    }
-  }
-  
   /**
    * setFromHierarchyLevel
    * @param fromHierarchyLevel starting (including) at Hierarchy Level

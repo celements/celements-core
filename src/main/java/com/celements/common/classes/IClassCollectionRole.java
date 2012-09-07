@@ -21,17 +21,12 @@ package com.celements.common.classes;
 
 import org.xwiki.component.annotation.ComponentRole;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-/**
- * @deprecated since 2.18.0 instead use IClassCollectionRole
- */
-@Deprecated
 @ComponentRole
-public interface ICelementsClassCollection {
+public interface IClassCollectionRole {
 
-  public void runUpdate(XWikiContext context) throws XWikiException;
+  public void runUpdate() throws XWikiException;
   
   public String getConfigName();
 

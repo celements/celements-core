@@ -23,12 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.observation.EventListener;
 
-import com.celements.cells.CellsClasses;
 import com.celements.common.classes.CompositorComponent;
-import com.celements.menu.MenuClasses;
-import com.celements.navigation.NavigationClasses;
-import com.celements.web.classcollections.ImageMapClasses;
-import com.celements.web.classcollections.RemoteUserValidationClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -67,8 +62,6 @@ public class CheckClassesCommand {
       getActionTypeClass(context);
       getFormStorageClass(context);
       getReceiverEMailClass(context);
-      getPageTypePropertiesClass(context);
-      getPageTypeClass(context);
       getJavaScriptExternalFilesClass(context);
       getContextMenuItemClass(context);
       getPanelConfigClass(context);
@@ -86,7 +79,7 @@ public class CheckClassesCommand {
     CompositorComponent compComponent = (CompositorComponent) Utils.getComponent(
         EventListener.class, "CompositerComponent");
     if(compComponent != null) {
-      compComponent.checkClassCollections();
+      compComponent.checkAllClassCollections();
     }
   }
 
@@ -554,66 +547,6 @@ public class CheckClassesCommand {
     BaseClass bclass = doc.getXClass();
     bclass.setName("Celements2.ReceiverEMail");
     needsUpdate |= bclass.addTextField("email", "email", 30);
-
-    setContentAndSaveClassDocument(doc, needsUpdate, context);
-    return bclass;
-  }
-
-  private BaseClass getPageTypePropertiesClass(XWikiContext context)
-      throws XWikiException {
-    XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
-    boolean needsUpdate = false;
-
-    try {
-      doc = xwiki.getDocument("Celements2.PageTypeProperties", context);
-    } catch (XWikiException e) {
-      mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements2");
-      doc.setName("PageTypeProperties");
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setName("Celements2.PageTypeProperties");
-    needsUpdate |= bclass.addTextField("type_name", "Type Pretty Name", 30);
-    needsUpdate |= bclass.addTextField("category", "Category", 30);
-    needsUpdate |= bclass.addTextField("page_edit", "Type Edit Template", 30);
-    needsUpdate |= bclass.addTextField("page_view", "Type View Template", 30);
-    needsUpdate |= bclass.addBooleanField("visible", "Visible", "yesno");
-    needsUpdate |= bclass.addBooleanField("show_frame", "Show Frame", "yesno");
-    needsUpdate |= bclass.addBooleanField("load_richtext", "Load Richtext Editor",
-        "yesno");
-    needsUpdate |= bclass.addNumberField("rte_width", "Richtext Editor Width", 30,
-        "integer");
-    needsUpdate |= bclass.addNumberField("rte_height", "Richtext Editor Height", 30,
-        "integer");
-    needsUpdate |= bclass.addBooleanField("haspagetitle", "Has Page Title", "yesno");
-
-    setContentAndSaveClassDocument(doc, needsUpdate, context);
-    return bclass;
-  }
-
-  private BaseClass getPageTypeClass(XWikiContext context) throws XWikiException {
-    XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
-    boolean needsUpdate = false;
-
-    try {
-      doc = xwiki.getDocument("Celements2.PageType", context);
-    } catch (XWikiException e) {
-      mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements2");
-      doc.setName("PageType");
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setName("Celements2.PageType");
-    needsUpdate |= bclass.addTextField("page_type", "Page Type", 30);
-    needsUpdate |= bclass.addTextField("page_layout", "Page Layout", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;

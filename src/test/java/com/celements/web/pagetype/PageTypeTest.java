@@ -102,10 +102,10 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(true).anyTimes();
     XWikiDocument pageTypeDoc = new XWikiDocument();
     BaseObject ptPropertiesObj = new BaseObject();
-    ptPropertiesObj.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptPropertiesObj.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     String ptViewTemplate = "Templates.TestPageView";
     ptPropertiesObj.setStringValue("page_view", ptViewTemplate);
-    pageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, ptPropertiesObj);
+    pageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, ptPropertiesObj);
     expect(mockWiki.getDocument(eq(ptName), eq(context))
       ).andReturn(pageTypeDoc).anyTimes();
     // missing page_type_properties object may not lead to NPE
@@ -132,10 +132,10 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(true).anyTimes();
     XWikiDocument pageTypeDoc = new XWikiDocument();
     BaseObject ptPropertiesObj = new BaseObject();
-    ptPropertiesObj.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptPropertiesObj.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     String ptViewTemplate = "Templates.TestPageView";
     ptPropertiesObj.setStringValue("page_view", ptViewTemplate);
-    pageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, ptPropertiesObj);
+    pageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, ptPropertiesObj);
     expect(mockWiki.getDocument(eq(ptName), eq(context))
       ).andReturn(pageTypeDoc).anyTimes();
     // missing page_type_properties object may not lead to NPE
@@ -164,10 +164,10 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(true).anyTimes();
     XWikiDocument pageTypeDoc = new XWikiDocument();
     BaseObject ptPropertiesObj = new BaseObject();
-    ptPropertiesObj.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptPropertiesObj.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     String ptViewTemplate = "Templates.TestPageView";
     ptPropertiesObj.setStringValue("page_view", ptViewTemplate);
-    pageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, ptPropertiesObj);
+    pageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, ptPropertiesObj);
     expect(mockWiki.getDocument(eq(ptName), eq(context))
       ).andReturn(pageTypeDoc).anyTimes();
     // missing page_type_properties object may not lead to NPE
@@ -196,10 +196,10 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(true).anyTimes();
     XWikiDocument pageTypeDoc = new XWikiDocument();
     BaseObject ptPropertiesObj = new BaseObject();
-    ptPropertiesObj.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptPropertiesObj.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     String ptViewTemplate = "celements2web:Templates.TestPageView";
     ptPropertiesObj.setStringValue("page_view", ptViewTemplate);
-    pageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, ptPropertiesObj);
+    pageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, ptPropertiesObj);
     expect(mockWiki.getDocument(eq(ptName), eq(context))
       ).andReturn(pageTypeDoc).anyTimes();
     // missing page_type_properties object may not lead to NPE
@@ -226,10 +226,10 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(true).anyTimes();
     XWikiDocument pageTypeDoc = new XWikiDocument();
     BaseObject ptPropertiesObj = new BaseObject();
-    ptPropertiesObj.setClassName(PageType.PAGE_TYPE_PROPERTIES);
+    ptPropertiesObj.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     String ptViewTemplate = "celements2web:Templates.TestPageView";
     ptPropertiesObj.setStringValue("page_view", ptViewTemplate);
-    pageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, ptPropertiesObj);
+    pageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, ptPropertiesObj);
     expect(mockWiki.getDocument(eq(ptName), eq(context))
       ).andReturn(pageTypeDoc).anyTimes();
     // missing page_type_properties object may not lead to NPE
@@ -280,7 +280,7 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(testPageTypeDoc).anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("category", "myCat");
-    testPageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, paeTypePropObj);
+    testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replay(mockWiki, request);
     assertEquals("myCat", pageType.getCategoryString(context));
@@ -320,7 +320,7 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(testPageTypeDoc).anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("category", "myCat");
-    testPageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, paeTypePropObj);
+    testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replay(mockWiki, request);
     assertEquals(Arrays.asList("myCat"), pageType.getCategories(context));
@@ -342,7 +342,7 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(testPageTypeDoc).anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("category", "myCat,secondCat");
-    testPageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, paeTypePropObj);
+    testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replay(mockWiki, request);
     assertEquals(Arrays.asList("myCat", "secondCat"), pageType.getCategories(context));
@@ -364,7 +364,7 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
       ).andReturn(testPageTypeDoc).anyTimes();
     BaseObject paeTypePropObj = new BaseObject();
     paeTypePropObj.setStringValue("type_name", "myPrettyTypeName");
-    testPageTypeDoc.setObject(PageType.PAGE_TYPE_PROPERTIES, 0, paeTypePropObj);
+    testPageTypeDoc.setObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, 0, paeTypePropObj);
     expect(request.get(eq("template"))).andReturn("").anyTimes();
     replay(mockWiki, request);
     assertEquals("myPrettyTypeName", pageType.getPrettyName(context));

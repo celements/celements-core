@@ -20,6 +20,8 @@
 package com.celements.common.classes;
 
 import org.apache.commons.logging.Log;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,28 +34,34 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @author fabian pichler
  * 
- * since 2.11.0
- * @deprecated since 2.18.0 instead use AbstractClassCollection
+ * since 2.18.0
  */
-@Deprecated
-public abstract class CelementsClassCollection
-    implements ICelementsClassCollection {
+public abstract class AbstractClassCollection
+    implements IClassCollectionRole {
 
-  final public void runUpdate(XWikiContext context) throws XWikiException {
-    if (isActivated(context)) {
-      getLogger().debug("calling initClasses for database: " + context.getDatabase());
-      initClasses(context);
+  @Requirement
+  protected Execution execution;
+
+  protected XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
+  final public void runUpdate() throws XWikiException {
+    if (isActivated()) {
+      getLogger().debug("calling initClasses for database: " + getContext().getDatabase()
+          );
+      initClasses();
     }
   }
 
-  public boolean isActivated(XWikiContext context) {
-    return ("," + context.getWiki().getXWikiPreference("activated_classcollections",
-        context) + "," + context.getWiki().Param("celements.classcollections", "") + ","
-        ).contains("," + getConfigName() + ",");
+  public boolean isActivated() {
+    return ("," + getContext().getWiki().getXWikiPreference("activated_classcollections",
+        getContext()) + "," + getContext().getWiki().Param("celements.classcollections",
+            "") + ",").contains("," + getConfigName() + ",");
   }
 
   protected void setContentAndSaveClassDocument(XWikiDocument doc,
-      boolean needsUpdate, XWikiContext context) throws XWikiException {
+      boolean needsUpdate) throws XWikiException {
     String content = doc.getContent();
     if ((content == null) || (content.equals(""))) {
       needsUpdate = true;
@@ -61,11 +69,11 @@ public abstract class CelementsClassCollection
     }
     
     if (needsUpdate){
-      context.getWiki().saveDocument(doc, context);
+      getContext().getWiki().saveDocument(doc, getContext());
     }
   }
 
-  abstract protected void initClasses(XWikiContext context) throws XWikiException;
+  abstract protected void initClasses() throws XWikiException;
 
   abstract protected Log getLogger();
 }
