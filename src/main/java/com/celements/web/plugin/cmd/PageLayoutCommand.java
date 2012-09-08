@@ -20,9 +20,7 @@
 package com.celements.web.plugin.cmd;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -132,20 +130,7 @@ public class PageLayoutCommand {
   }
 
   public boolean layoutExists(SpaceReference layoutSpaceRef){
-    try {
-      return (!getPropDocs(layoutSpaceRef).isEmpty());
-    } catch (XWikiException exp) {
-      LOGGER.error("layoutExists: failed to get executed search.", exp);
-    }
-    return false;
-  }
-
-  private List<String> getPropDocs(SpaceReference layoutSpaceRef)
-      throws XWikiException {
-    List<String> params = Arrays.asList(layoutSpaceRef.getName());
-    List<String> existingPropDocs = getContext().getWiki().getStore().search(
-        getPageLayoutPropertiesHQL(), 0, 0, params, getContext());
-    return existingPropDocs;
+      return (getLayoutPropDoc(layoutSpaceRef) != null);
   }
 
   public BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
@@ -179,14 +164,19 @@ public class PageLayoutCommand {
    */
   public XWikiDocument getLayoutPropDoc(SpaceReference layoutSpaceRef) {
     XWikiDocument layoutPropDoc = null;
-    try {
-      List<String> existingPropDocs = getPropDocs(layoutSpaceRef);
-      if (!existingPropDocs.isEmpty()) {
-        layoutPropDoc = getContext().getWiki().getDocument(standardPropDocRef(
-            layoutSpaceRef), getContext());
+    DocumentReference layoutPropDocRef = standardPropDocRef(layoutSpaceRef);
+    if (getContext().getWiki().exists(layoutPropDocRef, getContext())) {
+      try {
+        XWikiDocument theDoc = getContext().getWiki().getDocument(layoutPropDocRef,
+            getContext());
+        if (theDoc.getXObject(getPageLayoutPropertiesClassRef(theDoc.getDocumentReference(
+            ).getWikiReference().getName())) != null) {
+          layoutPropDoc = theDoc;
+        }
+      } catch (XWikiException exp) {
+        LOGGER.error("getLayoutPropDoc: Failed to get layout property doc for [" 
+            + layoutSpaceRef + "].", exp);
       }
-    } catch (XWikiException exp) {
-      LOGGER.error("getLayoutPropDoc: failed to get layout property obj.", exp);
     }
     return layoutPropDoc;
   }
@@ -195,24 +185,11 @@ public class PageLayoutCommand {
     return new DocumentReference("WebHome", layoutSpaceRef);
   }
 
-  private String getPageLayoutPropertiesHQL() {
-    String hql = "select doc.fullName"
-      + " from XWikiDocument as doc, BaseObject obj,"
-      + " Celements.PageLayoutPropertiesClass as pl"
-      + " where doc.fullName = obj.name"
-      + " and doc.space = ?"
-      + " and obj.className='" + PAGE_LAYOUT_PROPERTIES_CLASS + "'"
-      + " and pl.id.id=obj.id";
-    return hql;
-  }
-
   public String renderPageLayout() {
     return renderPageLayout(getPageLayoutForCurrentDoc());
   }
 
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
-    //TODO check where inheritance of layouts should be implemented on rendering or
-    //TODO on getting layoutSpaceRef (getPageLayoutForDoc or renderPageLayout)
     IRenderStrategy cellRenderer = new CellRenderer(getContext()).setOutputWriter(
         new DivWriter());
    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
@@ -243,20 +220,26 @@ public class PageLayoutCommand {
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
-    //TODO check where inheritance of layouts should be implemented on rendering or
-    //TODO on getting layoutSpaceRef (getPageLayoutForDoc or renderPageLayout)
+    SpaceReference layoutSpaceRef = null;
     if (layoutExists(documentReference.getLastSpaceReference())) {
-      return getCelLayoutEditorSpaceRef();
+      layoutSpaceRef = getCelLayoutEditorSpaceRef();
     } else {
       String spaceName = getInheritorFactory().getPageLayoutInheritor(
           getFullNameForDocRef(documentReference), getContext()
         ).getStringValue("page_layout", null);
       if (spaceName != null) {
-        return getWebUtilsService().resolveSpaceReference(spaceName);
-      } else {
-        return null;
+        layoutSpaceRef =  getWebUtilsService().resolveSpaceReference(spaceName);
       }
     }
+    if (layoutSpaceRef != null) {
+      SpaceReference centralLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
+          new WikiReference("celements2web"));
+      if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && !layoutExists(layoutSpaceRef)
+          && layoutExists(centralLayoutSpaceRef)) {
+        layoutSpaceRef = centralLayoutSpaceRef;
+      }
+    }
+    return layoutSpaceRef;
   }
 
   SpaceReference getCelLayoutEditorSpaceRef() {

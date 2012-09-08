@@ -23,8 +23,6 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +40,7 @@ import com.celements.inheritor.InheritorFactory;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
@@ -135,6 +134,47 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
+  public void testGetPageLayoutForDoc_centralPageLayout() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDocName");
+    InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
+    plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
+    String fullName = "mySpace.MyDocName";
+    FieldInheritor inheritor = createMock(FieldInheritor.class);
+    expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
+        ).andReturn(inheritor);
+    String layoutName = "MyPageLayout";
+    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())).andReturn(
+        layoutName);
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
+        new XWikiDocument(webHomeDocRef));
+    expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), layoutName,
+        "WebHome")), same(context))).andReturn(false);
+    DocumentReference centralLayoutPropDocRef = new DocumentReference("celements2web",
+        layoutName, "WebHome");
+    expect(xwiki.exists(eq(centralLayoutPropDocRef), same(context))).andReturn(true);
+    XWikiDocument centralLayoutPropDoc = new XWikiDocument(centralLayoutPropDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference centralPagePropClassRef = new DocumentReference("celements2web",
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(centralPagePropClassRef);
+    centralLayoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(centralLayoutPropDocRef), same(context))).andReturn(
+        centralLayoutPropDoc);
+    replayAll(injectedInheritorFactory, inheritor);
+    SpaceReference pageLayoutForDoc = plCmd.getPageLayoutForDoc(docRef);
+    assertNotNull(pageLayoutForDoc);
+    SpaceReference centralLayoutRef = new SpaceReference(layoutName, new WikiReference(
+        "celements2web"));
+    assertEquals(centralLayoutRef, pageLayoutForDoc);
+    verifyAll(injectedInheritorFactory, inheritor);
+  }
+
+  @Test
   public void testGetPageLayoutForDoc_noPageLayout_defined() throws Exception {
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
     plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
@@ -142,10 +182,10 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     FieldInheritor inheritor = createMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
         ).andReturn(inheritor);
-    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())
-      ).andReturn(null);
-    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList("mySpace")),
-        same(context))).andReturn(Collections.emptyList()).anyTimes();
+    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())).andReturn(null);
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
     replayAll(injectedInheritorFactory, inheritor);
     assertNull(plCmd.getPageLayoutForDoc(fullName, context));
     verifyAll(injectedInheritorFactory, inheritor);
@@ -160,10 +200,15 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     FieldInheritor inheritor = createMock(FieldInheritor.class);
     expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
         ).andReturn(inheritor);
-    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())
-      ).andReturn(layoutName);
-    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList("mySpace")),
-        same(context))).andReturn(Collections.emptyList()).anyTimes();
+    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())).andReturn(
+        layoutName);
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
+    expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), layoutName,
+        "WebHome")), same(context))).andReturn(false);
+    expect(xwiki.exists(eq(new DocumentReference("celements2web", layoutName, "WebHome")),
+        same(context))).andReturn(false);
     replayAll(injectedInheritorFactory, inheritor);
     assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
     verifyAll(injectedInheritorFactory, inheritor);
@@ -180,24 +225,79 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
         ).andReturn(inheritor);
     expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())
       ).andReturn(layoutName);
-    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList("mySpace")),
-        same(context))).andReturn(Collections.emptyList()).anyTimes();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
     replayAll(injectedInheritorFactory, inheritor);
     assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
     verifyAll(injectedInheritorFactory, inheritor);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetPageLayoutForDoc_layoutSpace() throws Exception {
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
     plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
     String fullName = "MyPageLayout.MyDocName";
-    List layoutPropDoc = Arrays.asList("MyPageLayout.WebHome");
-    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList(
-        "MyPageLayout")), same(context))).andReturn(layoutPropDoc).anyTimes();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "MyPageLayout", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true);
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(layoutPropDoc);
+    DocumentReference layoutEditorPropDocRef = new DocumentReference(
+        context.getDatabase(), "CelLayoutEditor", "WebHome");
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true);
+    XWikiDocument layoutEditorPropDoc = new XWikiDocument(layoutEditorPropDocRef);
+    BaseObject layoutEditorPropObj = new BaseObject();
+    layoutEditorPropObj.setXClassReference(pagePropClassRef);
+    layoutEditorPropDoc.addXObject(layoutEditorPropObj);
+    expect(xwiki.getDocument(eq(layoutEditorPropDocRef), same(context))).andReturn(
+        layoutEditorPropDoc);
     replayAll(injectedInheritorFactory);
     assertEquals("CelLayoutEditor", plCmd.getPageLayoutForDoc(fullName, context));
+    verifyAll(injectedInheritorFactory);
+  }
+
+  @Test
+  public void testGetPageLayoutForDoc_layoutSpace_centralLayoutEditor() throws Exception {
+    InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
+    plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
+    String fullName = "MyPageLayout.MyDocName";
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "MyPageLayout", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true);
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(layoutPropDoc);
+    DocumentReference layoutEditorPropDocRef = new DocumentReference(
+        context.getDatabase(), "CelLayoutEditor", "WebHome");
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(false);
+    DocumentReference centralLayoutEditorPropDocRef = new DocumentReference(
+        "celements2web", "CelLayoutEditor", "WebHome");
+    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(true
+        );
+    XWikiDocument layoutEditorPropDoc = new XWikiDocument(centralLayoutEditorPropDocRef);
+    BaseObject layoutEditorPropObj = new BaseObject();
+    DocumentReference centralPagePropClassRef = new DocumentReference("celements2web",
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutEditorPropObj.setXClassReference(centralPagePropClassRef);
+    layoutEditorPropDoc.addXObject(layoutEditorPropObj);
+    expect(xwiki.getDocument(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
+        layoutEditorPropDoc);
+    replayAll(injectedInheritorFactory);
+    assertEquals("celements2web:CelLayoutEditor", plCmd.getPageLayoutForDoc(fullName,
+        context));
     verifyAll(injectedInheritorFactory);
   }
 
@@ -207,8 +307,9 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
         "MyPage");
     XWikiDocument currDoc = new XWikiDocument(currDocRef);
     context.setDoc(currDoc);
-    expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList(
-        "MySpace")), same(context))).andReturn(Collections.emptyList()).anyTimes();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
     expect(xwiki.getDocument(eq(currDocRef), same(context))).andReturn(currDoc
       ).atLeastOnce();
     DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(),
