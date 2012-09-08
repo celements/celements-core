@@ -199,17 +199,17 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     context.setDoc(currDoc);
     expect(storeMock.search(isA(String.class), eq(0), eq(0), eq(Arrays.asList(
         "MySpace")), same(context))).andReturn(Collections.emptyList()).anyTimes();
-    expect(xwiki.getDocument(eq("MySpace.MyPage"), same(context))).andReturn(currDoc
+    expect(xwiki.getDocument(eq(currDocRef), same(context))).andReturn(currDoc
       ).atLeastOnce();
     DocumentReference mySpacePrefDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "WebPreferences");
     XWikiDocument mySpacePrefDoc = new XWikiDocument(mySpacePrefDocRef);
-    expect(xwiki.getDocument(eq("MySpace.WebPreferences"), same(context))).andReturn(
+    expect(xwiki.getDocument(eq(mySpacePrefDocRef), same(context))).andReturn(
         mySpacePrefDoc).atLeastOnce();
     DocumentReference xWikiPrefDocRef = new DocumentReference(context.getDatabase(),
-        "MySpace", "WebPreferences");
+        "XWiki", "XWikiPreferences");
     XWikiDocument xWikiPrefDoc = new XWikiDocument(xWikiPrefDocRef);
-    expect(xwiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(
+    expect(xwiki.getDocument(eq(xWikiPrefDocRef), same(context))).andReturn(
         xWikiPrefDoc).atLeastOnce();
     replayAll();
     assertNull(plCmd.getLayoutPropDoc());
