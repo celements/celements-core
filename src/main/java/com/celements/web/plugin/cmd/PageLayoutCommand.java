@@ -211,6 +211,8 @@ public class PageLayoutCommand {
   }
 
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    //TODO check where inheritance of layouts should be implemented on rendering or
+    //TODO on getting layoutSpaceRef (getPageLayoutForDoc or renderPageLayout)
     IRenderStrategy cellRenderer = new CellRenderer(getContext()).setOutputWriter(
         new DivWriter());
    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
@@ -241,6 +243,8 @@ public class PageLayoutCommand {
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+    //TODO check where inheritance of layouts should be implemented on rendering or
+    //TODO on getting layoutSpaceRef (getPageLayoutForDoc or renderPageLayout)
     if (layoutExists(documentReference.getLastSpaceReference())) {
       return getCelLayoutEditorSpaceRef();
     } else {
