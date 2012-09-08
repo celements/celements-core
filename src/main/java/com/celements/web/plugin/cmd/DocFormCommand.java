@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.oro.text.perl.MalformedPerl5PatternException;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -41,6 +42,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
@@ -129,6 +131,7 @@ public class DocFormCommand {
   XWikiDocument setObjValue(XWikiDocument doc, String key,
       String[] value, XWikiContext context) throws XWikiException {
     String className = key.substring(0, key.indexOf("_"));
+    DocumentReference classRef = getWebUtilsService().resolveDocumentReference(className);
     LOGGER.debug("key complete: " + key);
     key = key.substring(key.indexOf("_") + 1);
     Integer objNr = Integer.parseInt(key.substring(0, key.indexOf("_")));
@@ -139,15 +142,15 @@ public class DocFormCommand {
     if(changedObjects.containsKey(getObjCacheMapKey(doc, className, objNr))) {
       obj = changedObjects.get(getObjCacheMapKey(doc, className, objNr));
     } else {
-      obj = doc.getObject(className, objNr);
+      obj = doc.getXObject(classRef, objNr);
       if((obj == null) || (objNr < 0)) {
-        obj = doc.newObject(className, context);
-        LOGGER.debug("newObject for classname " + className + " on doc " + doc
-            + " <-> " + obj.getNumber() + " <-> " + objNr);
+        obj = doc.newXObject(classRef, context);
+        LOGGER.debug("newObject for classname [" + className + "] on doc [" + doc
+            + "] <-> [" + obj.getNumber() + "] <-> [" + objNr + "].");
       }
       changedObjects.put(getObjCacheMapKey(doc, className, objNr), obj);
-      LOGGER.debug("got object for classname " + className + " on doc " + doc
-          + " <-> " + obj.getNumber() + " <-> " + objNr);
+      LOGGER.debug("got object for classname [" + className + "] on doc [" + doc
+          + "] <-> [" + obj.getNumber() + "] <-> [" + objNr + "].");
     }
     obj.set(key, collapse(value), context);
     return doc;
@@ -287,8 +290,10 @@ public class DocFormCommand {
 
   private BaseClass getBaseClass(String className, XWikiContext context) {
     BaseClass bclass = null;
+    DocumentReference bclassDocRef = getWebUtilsService().resolveDocumentReference(
+        className);
     try {
-      bclass = context.getWiki().getDocument(className, context).getXClass();
+      bclass = context.getWiki().getDocument(bclassDocRef, context).getXClass();
     } catch (XWikiException e) {
       LOGGER.error(e);
     }
@@ -301,6 +306,10 @@ public class DocFormCommand {
 
   Map<String, XWikiDocument> getChangedDocs() {
     return changedDocs;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

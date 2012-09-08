@@ -198,9 +198,11 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     fields.put("testField", property);
     BaseClass bclass = new BaseClass();
     bclass.setFields(fields);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setxWikiClass(bclass);
-    expect(wiki.getDocument(eq("Test.TestClass"), same(context))).andReturn(doc
+    DocumentReference bclassDocRef = new DocumentReference(context.getDatabase(), "Test",
+        "TestClass");
+    XWikiDocument doc = new XWikiDocument(bclassDocRef);
+    doc.setXClass(bclass);
+    expect(wiki.getDocument(eq(bclassDocRef), same(context))).andReturn(doc
         ).atLeastOnce();
     replay(wiki);
     String result = docFormCmd.validateField("Test.TestClass", "testField", "value",
