@@ -73,6 +73,8 @@ public class CSSEngine implements ICSSEngine {
         if(baseCSSList != null){
           for (BaseObject cssObj : baseCSSList) {
             if(cssObj != null) {
+              LOGGER.debug("includeCSS: adding baseObject [" + cssObj.getStringValue(
+              "cssname") + "].");
               cssList.add(new CSSBaseObject(cssObj, context));
             }
           }
