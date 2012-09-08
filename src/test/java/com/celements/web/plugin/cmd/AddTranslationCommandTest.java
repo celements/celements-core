@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -46,9 +47,25 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testAddTranslation_noDoc() {
-    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
     XWiki xwiki = createMock(XWiki.class);
-    expect(xwiki.exists(eq(fullName), same(context))).andReturn(false);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(false);
+    context.setWiki(xwiki);
+    replay(xwiki);
+    assertFalse("expecting true if translation successfully created",
+        addTransCmd.addTranslation(docRef, "fr"));
+    verify(xwiki);
+  }
+
+  @Test
+  @Deprecated
+  public void testAddTranslation_noDoc_deprecated() {
+    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
+    XWiki xwiki = createMock(XWiki.class);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(false);
     context.setWiki(xwiki);
     replay(xwiki);
     assertFalse("expecting true if translation successfully created",
@@ -58,14 +75,43 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testAddTranslation_already_exists() throws XWikiException {
-    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
     XWiki xwiki = createMock(XWiki.class);
-    expect(xwiki.exists(eq(fullName), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
     XWikiDocument mainDoc = createMock(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(mainDoc);
-    expect(mainDoc.getFullName()).andReturn(fullName).anyTimes();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(mainDoc);
+    expect(mainDoc.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(mainDoc.getDefaultLanguage()).andReturn("de");
-    XWikiDocument transDoc = new XWikiDocument();
+    XWikiDocument transDoc = new XWikiDocument(docRef);
+    transDoc.setLanguage("fr");
+    transDoc.setDefaultLanguage("fr");
+    transDoc.setNew(false);
+    expect(mainDoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(transDoc);
+    xwiki.saveDocument(same(transDoc), same(context));
+    expectLastCall();
+    context.setWiki(xwiki);
+    replay(xwiki, mainDoc);
+    assertFalse("expecting false if no new translation was created",
+        addTransCmd.addTranslation(docRef, "fr"));
+    assertEquals("expecting translation flag to be set to 1.", 1,
+        transDoc.getTranslation());
+    verify(xwiki, mainDoc);
+  }
+
+  @Test
+  @Deprecated
+  public void testAddTranslation_already_exists_deprecated() throws XWikiException {
+    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
+    XWiki xwiki = createMock(XWiki.class);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
+    XWikiDocument mainDoc = createMock(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(mainDoc);
+    expect(mainDoc.getDocumentReference()).andReturn(docRef).anyTimes();
+    expect(mainDoc.getDefaultLanguage()).andReturn("de");
+    XWikiDocument transDoc = new XWikiDocument(docRef);
     transDoc.setLanguage("fr");
     transDoc.setDefaultLanguage("fr");
     transDoc.setNew(false);
@@ -83,16 +129,53 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testAddTranslation_create_translation() throws XWikiException {
-    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
     String mainDocContent = " The content \n of the main document copied into trans.";
     XWiki xwiki = createMock(XWiki.class);
-    expect(xwiki.exists(eq(fullName), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true);
     XWikiDocument mainDoc = createMock(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(mainDoc);
-    expect(mainDoc.getFullName()).andReturn(fullName).anyTimes();
-    expect(mainDoc.getSpace()).andReturn("MyTestSpace").anyTimes();
-    expect(mainDoc.getName()).andReturn("MyTestDoc").anyTimes();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(mainDoc);
+    expect(mainDoc.getDocumentReference()).andReturn(docRef).anyTimes();
+    expect(mainDoc.getContent()).andReturn(mainDocContent).anyTimes();
+    XWikiStoreInterface mockStore = createMock(XWikiStoreInterface.class);
+    expect(mainDoc.getStore()).andReturn(mockStore).anyTimes();
+    expect(mainDoc.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(mainDoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(mainDoc);
+    Capture<XWikiDocument> transDocCapture = new Capture<XWikiDocument>();
+    xwiki.saveDocument(capture(transDocCapture), same(context));
+    expectLastCall();
+    context.setWiki(xwiki);
+    replay(xwiki, mainDoc);
+    assertTrue("expecting true if translation successfully created",
+        addTransCmd.addTranslation(docRef, "fr"));
+    XWikiDocument transDoc = transDocCapture.getValue();
+    assertEquals("expecting document language to be set.", "fr",
+        transDoc.getLanguage());
+    assertEquals("expecting document default language to be set.", "de",
+        transDoc.getDefaultLanguage());
+    assertEquals("expecting translation flag to be set to 1.", 1,
+        transDoc.getTranslation());
+    assertTrue("expecting metadata dirty status set to true.",
+        transDoc.isMetaDataDirty());
+    assertTrue("expecting transdoc to be 'new'.", transDoc.isNew());
+    verify(xwiki, mainDoc);
+  }
+
+  @Test
+  @Deprecated
+  public void testAddTranslation_create_translation_deprecated() throws XWikiException {
+    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
+    String mainDocContent = " The content \n of the main document copied into trans.";
+    XWiki xwiki = createMock(XWiki.class);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(xwiki.isMultiLingual(same(context))).andReturn(true);
+    XWikiDocument mainDoc = createMock(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(mainDoc);
+    expect(mainDoc.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(mainDoc.getContent()).andReturn(mainDocContent).anyTimes();
     XWikiStoreInterface mockStore = createMock(XWikiStoreInterface.class);
     expect(mainDoc.getStore()).andReturn(mockStore).anyTimes();
@@ -120,14 +203,13 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testCreateTranslationDoc_create_translation() throws XWikiException {
-    String fullName = "MyTestSpace.MyTestDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MyTestSpace",
+        "MyTestDoc");
     String mainDocContent = " The Content \n of the main Document.";
     XWiki xwiki = createMock(XWiki.class);
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     XWikiDocument mainDoc = createMock(XWikiDocument.class);
-    expect(mainDoc.getFullName()).andReturn(fullName).anyTimes();
-    expect(mainDoc.getSpace()).andReturn("MyTestSpace").anyTimes();
-    expect(mainDoc.getName()).andReturn("MyTestDoc").anyTimes();
+    expect(mainDoc.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(mainDoc.getContent()).andReturn(mainDocContent).anyTimes();
     XWikiStoreInterface mockStore = createMock(XWikiStoreInterface.class);
     expect(mainDoc.getStore()).andReturn(mockStore).anyTimes();
@@ -135,7 +217,7 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expect(mainDoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(mainDoc);
     context.setWiki(xwiki);
     replay(xwiki, mainDoc);
-    XWikiDocument transDoc = addTransCmd.createTranslationDoc(mainDoc, "fr", context);
+    XWikiDocument transDoc = addTransCmd.createTranslationDoc(mainDoc, "fr");
     assertNotSame("new XWikiDocument being created.", mainDoc, transDoc);
     assertEquals("expecting document language to be set.", "fr", transDoc.getLanguage());
     assertEquals("expecting document default language to be set.", "de",
