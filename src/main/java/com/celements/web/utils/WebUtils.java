@@ -533,18 +533,6 @@ public class WebUtils implements IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
-  public Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
-      boolean bWithObjects, boolean bWithRendering,
-      boolean bWithAttachmentContent, boolean bWithVersions,
-      XWikiContext context) throws XWikiException {
-    return getWebUtilsService().xwikiDocToLinkedMap(xwikiDoc.getDocumentReference(),
-        bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions);
-  }
-
-  /**
-   * @deprecated since 2.17.0 instead use WebUtilsService
-   */
-  @Deprecated
   public String getJSONContent(XWikiDocument cdoc, XWikiContext context) {
     return getWebUtilsService().getJSONContent(cdoc.getDocumentReference());
   }
