@@ -158,7 +158,9 @@ public class DocFormCommand {
 
   private String getObjCacheMapKey(XWikiDocument doc, String className,
       Integer objNr) {
-    return doc.getFullName() + "_" + className + "_" + objNr;
+    DocumentReference docRef = doc.getDocumentReference();
+    return docRef.getLastSpaceReference().getName() + "." + docRef.getName() + "_"
+        + className + "_" + objNr;
   }
 
   String collapse(String[] value) {
@@ -193,17 +195,7 @@ public class DocFormCommand {
     if(!changedDocs.containsKey(getFullNameForRef(docRef) + ";" + context.getLanguage())
         ) {
       XWikiDocument doc = getUpdateDoc(docRef, context);
-      tdoc = doc.getTranslatedDocument(context.getLanguage(), context);
-      if ((tdoc == doc) && !context.getLanguage().equals(doc.getDefaultLanguage())) {
-        LOGGER.info("creating new " + context.getLanguage() + " Translation for "
-            + getFullNameForRef(docRef) + " (defult " + doc.getDefaultLanguage() + ")");
-        //TODO use celements addTranslation
-        tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
-        tdoc.setLanguage(context.getLanguage());
-        tdoc.setStore(doc.getStore());
-        tdoc.setTranslation(1);
-      }
-      applyCreationDateFix(tdoc, context);
+      tdoc = new AddTranslationCommand().getTranslatedDoc(doc, context.getLanguage());
       changedDocs.put(getFullNameForRef(docRef) + ";" + context.getLanguage(), tdoc);
     } else {
       tdoc = changedDocs.get(getFullNameForRef(docRef) + ";" + context.getLanguage());
