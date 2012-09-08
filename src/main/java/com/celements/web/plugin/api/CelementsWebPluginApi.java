@@ -827,9 +827,17 @@ public class CelementsWebPluginApi extends Api {
         spaceName));
   }
 
+  /**
+   * @deprecated since 2.18.0 instead use getPageLayoutForDoc(DocumentReference)
+   */
+  @Deprecated
   public String getPageLayoutForDoc(String fullName) {
     return getPageLayoutCmd().getPageLayoutForDoc(getWebUtilsService(
         ).resolveDocumentReference(fullName)).getName();
+   }
+  
+  public String getPageLayoutForDoc(DocumentReference docRef) {
+    return getPageLayoutCmd().getPageLayoutForDoc(docRef).getName();
    }
   
   public String renderPageLayout() {
