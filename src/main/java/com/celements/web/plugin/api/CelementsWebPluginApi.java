@@ -863,14 +863,14 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getPageLayoutForDoc(String fullName) {
-    return getPageLayoutCmd().getPageLayoutForDoc(getWebUtilsService(
-        ).resolveDocumentReference(fullName)).getName();
-   }
-  
+    return getPageLayoutCmd().getPageLayoutForDoc(
+        getWebUtilsService().resolveDocumentReference(fullName)).getName();
+  }
+
   public String getPageLayoutForDoc(DocumentReference docRef) {
     return getPageLayoutCmd().getPageLayoutForDoc(docRef).getName();
-   }
-  
+  }
+
   public String renderPageLayout() {
     return getPageLayoutCmd().renderPageLayout();
   }
