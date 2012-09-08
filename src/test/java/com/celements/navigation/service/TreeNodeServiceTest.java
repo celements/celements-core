@@ -267,23 +267,24 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))).andReturn(
-        webPrefDoc).atLeastOnce();
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))).andReturn(webPrefDoc
+        ).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
-        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
-    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
+    webPrefDoc.setXObjects(Navigation.getNavigationConfigClassReference(
+        context.getDatabase()), navObjects);
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
@@ -298,14 +299,16 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))
         ).andReturn(webPrefDoc).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
@@ -313,11 +316,10 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
                           // in the object list
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
-    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
-        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
+    webPrefDoc.setXObjects(Navigation.getNavigationConfigClassReference(
+        context.getDatabase()), navObjects);
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
-      ).atLeastOnce();
+        ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
     verifyAll(mockPageLayoutCmd);
@@ -330,23 +332,27 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
-      ).andReturn(webPrefDoc).atLeastOnce();
-    XWikiDocument xwikiPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("XWiki.XWikiPreferences");
-    expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), eq(context))
-      ).andReturn(xwikiPrefDoc).atLeastOnce();
-    XWikiDocument skinDoc = new XWikiDocument();
-    skinDoc.setFullName("Skins.MySkin");
-    expect(wiki.getDocument(eq("Skins.MySkin"), eq(context))
-      ).andReturn(skinDoc).atLeastOnce();
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))
+        ).andReturn(webPrefDoc).atLeastOnce();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(wiki.getDocument(eq(xwikiPrefDocRef), eq(context))).andReturn(xwikiPrefDoc
+        ).atLeastOnce();
+    DocumentReference skinDocRef = new DocumentReference(context.getDatabase(), "Skins",
+        "MySkin");
+    XWikiDocument skinDoc = new XWikiDocument(skinDocRef);
+    expect(wiki.getDocument(eq(skinDocRef), eq(context))).andReturn(skinDoc).atLeastOnce(
+        );
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
@@ -361,14 +367,16 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))
         ).andReturn(webPrefDoc).atLeastOnce();
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
@@ -376,9 +384,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setObjects(Navigation.NAVIGATION_CONFIG_CLASS, navObjects);
-    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
-        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
+    webPrefDoc.setXObjects(Navigation.getNavigationConfigClassReference(
+        context.getDatabase()), navObjects);
     replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
     verifyAll(mockPageLayoutCmd);
@@ -388,10 +395,11 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   
   private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
     BaseObject navObj = new BaseObject();
-    navObj.setClassName(Navigation.NAVIGATION_CONFIG_CLASS);
+    navObj.setXClassReference(Navigation.getNavigationConfigClassReference(
+        context.getDatabase()));
     navObj.setStringValue("menu_element_name", "mainMenu");
     navObj.setIntValue("to_hierarchy_level", toLevel);
-    navObj.setName(doc.getFullName());
+    navObj.setDocumentReference(doc.getDocumentReference());
     navObj.setDocumentReference(doc.getDocumentReference());
     return navObj;
   }

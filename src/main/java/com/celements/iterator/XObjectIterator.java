@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
@@ -123,7 +124,10 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
    */
   void moveToNextDoc() {
     try {
-      _currentDoc = _xwiki.getDocument(getDocIterator().next(), _context);
+      String nextFN = getDocIterator().next();
+      DocumentReference nextDocRef = Utils.getComponent(IWebUtilsService.class
+          ).resolveDocumentReference(nextFN);
+      _currentDoc = _xwiki.getDocument(nextDocRef, _context);
       _objectIterator = null;
     } catch (XWikiException exp) {
       // If getDocument failed, getDocIterator still moved on by one document in list.
