@@ -33,6 +33,8 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.FieldInheritor;
@@ -88,6 +90,14 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
   public void testExtendToFullName() {
     assertEquals("Test.name", plCmd.extendToFullName("Test", "name"));
     assertEquals("Test.name", plCmd.extendToFullName("Test2", "Test.name"));
+  }
+
+  @Test
+  public void testGetCelLayoutEditorSpaceRef() {
+    SpaceReference celLayoutEditorSpaceRef = new SpaceReference(
+        PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, new WikiReference(
+            context.getDatabase()));
+    assertEquals(celLayoutEditorSpaceRef , plCmd.getCelLayoutEditorSpaceRef());
   }
 
   @Test

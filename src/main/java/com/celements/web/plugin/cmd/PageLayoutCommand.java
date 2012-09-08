@@ -255,7 +255,7 @@ public class PageLayoutCommand {
     }
   }
 
-  private SpaceReference getCelLayoutEditorSpaceRef() {
+  SpaceReference getCelLayoutEditorSpaceRef() {
     return new SpaceReference(CEL_LAYOUT_EDITOR_PL_NAME, new WikiReference(
         getContext().getDatabase()));
   }
