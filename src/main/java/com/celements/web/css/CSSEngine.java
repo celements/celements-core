@@ -33,8 +33,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class CSSEngine implements ICSSEngine {
 
   private static final String _CSS_ENGINE_OBJECT_KEY = "com.celements.web.css.CSSEngine";
-  static Log mLogger = LogFactory.getFactory().getInstance(
-      CSSEngine.class);
+  static Log LOGGER = LogFactory.getFactory().getInstance(CSSEngine.class);
 
   private CSSEngine() {
   }
@@ -61,7 +60,7 @@ public class CSSEngine implements ICSSEngine {
   @SuppressWarnings("unchecked")
   public List<CSS> includeCSS(String css, String field,
       List<BaseObject> baseCSSList, XWikiContext context){
-    mLogger.debug("adding '" + css + "' to " + field + ". List contains already "
+    LOGGER.debug("adding '" + css + "' to " + field + ". List contains already "
         + ((baseCSSList != null)?baseCSSList.size():"0") + " items.");
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
