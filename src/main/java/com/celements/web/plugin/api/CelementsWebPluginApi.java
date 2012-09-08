@@ -229,12 +229,12 @@ public class CelementsWebPluginApi extends Api {
 
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
+    return getWebUtilsService().getAttachmentListSorted(doc, comparator);
   }
 
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator, imagesOnly,
+    return getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
         start, nb);
   }
 
@@ -245,7 +245,7 @@ public class CelementsWebPluginApi extends Api {
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator, 
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSortedAsJSON(doc, comparator, 
+    return getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator, 
         imagesOnly, start, nb);
   }
 
@@ -255,7 +255,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public XWikiMessageTool getMessageTool(String adminLanguage) {
-    return WebUtils.getInstance().getMessageTool(adminLanguage, context);
+    return getWebUtilsService().getMessageTool(adminLanguage);
   }
 
   public String getVersionMode() {
@@ -555,7 +555,8 @@ public class CelementsWebPluginApi extends Api {
     return getPrepareVelocityContextService().getLeftPanels();
   }
 
-  public String getDocSectionAsJSON(String regex, String fullName, int part) throws XWikiException {
+  public String getDocSectionAsJSON(String regex, String fullName, int part
+      ) throws XWikiException {
     return WebUtils.getInstance().getDocSectionAsJSON(regex, fullName, part, context);
   }
 
@@ -580,7 +581,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public List<String> getAllowedLanguages() {
-    return WebUtils.getInstance().getAllowedLanguages(context);
+    return getWebUtilsService().getAllowedLanguages();
   }
   
   public int createUser() throws XWikiException {
@@ -604,8 +605,12 @@ public class CelementsWebPluginApi extends Api {
         account);
   }
   
+  /**
+   * @deprecated since 2.18.0 use instead velocity $datetool.format(format, date)
+   */
+  @Deprecated
   public Date parseDate(String date, String format) {
-    return WebUtils.getInstance().parseDate(date, format);
+    return getWebUtilsService().parseDate(date, format);
   }
   
   @Deprecated
@@ -653,7 +658,7 @@ public class CelementsWebPluginApi extends Api {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
   public String getParentSpace() {
-    return WebUtils.getInstance().getParentSpace(context);
+    return getWebUtilsService().getParentSpace();
   }
   
   public String getRTEConfigField(String name) throws XWikiException {
@@ -661,22 +666,37 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public String getJSONContent(Document contentDoc) {
-    return WebUtils.getInstance().getJSONContent(contentDoc.getDocument(),
-        context);
+    return getWebUtilsService().getJSONContent(contentDoc.getDocument());
   }
   
   /**
    * 
    * @param authorDocName
    * @return returns the name of the user in the form "lastname, first name"
-   * @throws XWikiException 
+   * @throws XWikiException
+   * 
+   * @Deprecated since 2.18.0 instead use getUserNameForDocRef(DocumentReference)
    */
+  @Deprecated
   public String getUserNameForDocName(String authorDocName) throws XWikiException{
     return WebUtils.getInstance().getUserNameForDocName(authorDocName, context);
   }
   
+  /**
+   * 
+   * @param authorDocName
+   * @return returns the name of the user in the form "lastname, first name"
+   */
+  public String getUserNameForDocRef(DocumentReference authorDocRef) {
+    try {
+      return getWebUtilsService().getUserNameForDocRef(authorDocRef);
+    } catch (XWikiException e) {
+      LOGGe
+    }
+  }
+  
   public String getMajorVersion(Document doc) {
-    return WebUtils.getInstance().getMajorVersion(doc.getDocument());
+    return getWebUtilsService().getMajorVersion(doc.getDocument());
   }
 
   /**
