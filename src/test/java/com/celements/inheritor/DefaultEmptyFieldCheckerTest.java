@@ -20,9 +20,7 @@
 package com.celements.inheritor;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -99,22 +97,6 @@ public class DefaultEmptyFieldCheckerTest extends AbstractBridgedComponentTestCa
   public void testIsEmpty_DateField_empty(){
     BaseObject bo = new BaseObject();
     bo.setDateValue("myField", null);
-    assertTrue(_emptyFieldChecker.isEmpty(getProperty(bo, "myField")));
-  }
-  
-  @Test
-  public void testIsEmpty_ListField_notEmpty(){
-    BaseObject bo = new BaseObject();
-    List<String> list = new ArrayList<String>();
-    list.add("myListEntry");
-    bo.setListValue("myField", list);
-    assertFalse(_emptyFieldChecker.isEmpty(getProperty(bo, "myField")));
-  }
-  
-  @Test
-  public void testIsEmpty_ListField_empty(){
-    BaseObject bo = new BaseObject();
-    bo.setListValue("myField", null);
     assertTrue(_emptyFieldChecker.isEmpty(getProperty(bo, "myField")));
   }
   
