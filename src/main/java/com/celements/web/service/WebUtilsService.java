@@ -417,13 +417,12 @@ public class WebUtilsService implements IWebUtilsService {
     return jsonBuilder.getJSON();
   }
 
-  public Map<String, String> xwikiDocToLinkedMap(DocumentReference docRef,
+  Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
       boolean bWithObjects, boolean bWithRendering,
       boolean bWithAttachmentContent, boolean bWithVersions) throws XWikiException {
     Map<String,String> docData = new LinkedHashMap<String, String>();
-    docRef.getLastSpaceReference().getName();
-    XWikiDocument xwikiDoc = getContext().getWiki().getDocument(docRef, getContext());
-    docData.put("web", docRef.getLastSpaceReference().getName());
+    DocumentReference docRef = xwikiDoc.getDocumentReference();
+    docData.put("web", docRef .getLastSpaceReference().getName());
     docData.put("name", docRef.getName());
     docData.put("language", xwikiDoc.getLanguage());
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
@@ -522,12 +521,11 @@ public class WebUtilsService implements IWebUtilsService {
     return result;
   }
   
-  public String getJSONContent(DocumentReference cDocRef) {
+  public String getJSONContent(XWikiDocument cdoc) {
     Map<String, String> data;
     try {
-      XWikiDocument cDoc = getContext().getWiki().getDocument(cDocRef, getContext());
-      data = xwikiDocToLinkedMap(cDoc.getTranslatedDocument(getContext()
-          ).getDocumentReference(), false, true, false, false);
+      data = xwikiDoctoLinkedMap(cdoc.getTranslatedDocument(getContext()), false, true,
+          false, false);
     } catch (XWikiException e) {
       LOGGER.error(e);
       data = Collections.emptyMap();
@@ -542,7 +540,7 @@ public class WebUtilsService implements IWebUtilsService {
     jasonBuilder.closeDictionary();
     return jasonBuilder.getJSON();
   }
-  
+
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException {
     XWikiDocument authDoc = getContext().getWiki().getDocument(authDocRef, getContext());
     BaseObject authObj = authDoc.getXObject(getRef("XWiki","XWikiUsers"));

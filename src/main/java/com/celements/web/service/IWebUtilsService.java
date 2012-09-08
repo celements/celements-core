@@ -21,7 +21,6 @@ package com.celements.web.service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
@@ -105,12 +104,8 @@ public interface IWebUtilsService {
       String orderField1, boolean asc1, String orderField2, boolean asc2);
 
   public String[] splitStringByLength(String inStr, int maxLength);
-
-  public Map<String, String> xwikiDocToLinkedMap(DocumentReference docRef,
-      boolean bWithObjects, boolean bWithRendering,
-      boolean bWithAttachmentContent, boolean bWithVersions) throws XWikiException;
   
-  public String getJSONContent(DocumentReference cDocRef);
+  public String getJSONContent(XWikiDocument cdoc);
   
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
   
