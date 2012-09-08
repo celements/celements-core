@@ -88,7 +88,7 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     secondObj.setXClassReference(_testClassRef);
     secondObj.setStringValue("field2", "value2");
     _testDoc.addXObject(secondObj);
-    expect(_xwiki.getDocument(eq(_fullname), same(_context))).andReturn(_testDoc
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc
         ).anyTimes();
     _fieldInheritor.setIteratorFactory(_iteratorFactory);
     replay(_xwiki);      
