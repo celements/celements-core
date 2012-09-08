@@ -40,7 +40,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class SubSystemHibernateMigrationManager extends AbstractXWikiMigrationManager {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       SubSystemHibernateMigrationManager.class);
 
   private String subSystemName;
@@ -114,15 +114,15 @@ public class SubSystemHibernateMigrationManager extends AbstractXWikiMigrationMa
     try {
       result = Utils.getComponentManager().lookupList(subMigratorInterface);
     } catch (ComponentLookupException exp) {
-      mLogger.error("Failed to get Migrator for subsystem [" + getSubSystemName() + "].",
+      LOGGER.error("Failed to get Migrator for subsystem [" + getSubSystemName() + "].",
           exp);
     }
     if (result != null) {
-      mLogger.debug("lookup for [" + subMigratorInterface + "] returned [" + result.size()
+      LOGGER.debug("lookup for [" + subMigratorInterface + "] returned [" + result.size()
           + "] migrator.");
       return result;
     }
-    mLogger.debug("lookup for [" + subMigratorInterface + "] returned empty list.");
+    LOGGER.debug("lookup for [" + subMigratorInterface + "] returned empty list.");
     return Collections.emptyList();
   }
 

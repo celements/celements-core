@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public class MigrationManagerBridge extends AbstractXWikiMigrationManager {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       MigrationManagerBridge.class);
 
   public MigrationManagerBridge(XWikiContext context) throws XWikiException {
@@ -62,7 +62,7 @@ public class MigrationManagerBridge extends AbstractXWikiMigrationManager {
 
   @Override
   public void startMigrations(XWikiContext context) throws XWikiException {
-    mLogger.info("startCoordinater in MigrationManagerBridge");
+    LOGGER.info("startCoordinater in MigrationManagerBridge");
     Utils.getComponent(ISubSystemMigrationCoordinator.class
         ).startSubSystemMigrations(context);
   }
