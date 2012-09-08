@@ -687,12 +687,13 @@ public class CelementsWebPluginApi extends Api {
    * @param authorDocName
    * @return returns the name of the user in the form "lastname, first name"
    */
-  public String getUserNameForDocRef(DocumentReference authorDocRef) {
+  public String getUserNameForDocRef(DocumentReference userDocRef) {
     try {
-      return getWebUtilsService().getUserNameForDocRef(authorDocRef);
-    } catch (XWikiException e) {
-      LOGGe
+      return getWebUtilsService().getUserNameForDocRef(userDocRef);
+    } catch (XWikiException exp) {
+      mLogger.error("Failed to get user document [" + userDocRef + "].", exp);
     }
+    return "N/A";
   }
   
   public String getMajorVersion(Document doc) {
