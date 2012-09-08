@@ -40,41 +40,41 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class CelSubSystemMigrationCoordinator implements ISubSystemMigrationCoordinator {
 
-  @Requirement(role = ISubSystemMigrationManager.class)
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      CelSubSystemMigrationCoordinator.class);
+  
+  @Requirement
   private Map<String, ISubSystemMigrationManager> subSysMigrationManagerMap;
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      CelSubSystemMigrationCoordinator.class);
-
   public CelSubSystemMigrationCoordinator(){}
 
   public void startSubSystemMigrations(XWikiContext context) throws XWikiException {
     if ((subSysMigrationManagerMap != null) && (subSysMigrationManagerMap.size() > 0)) {
-      mLogger.debug("Found [" + subSysMigrationManagerMap.size()
+      LOGGER.debug("Found [" + subSysMigrationManagerMap.size()
           + "] SubSystemMigrationManagers [" + subSysMigrationManagerMap.keySet() + "].");
       String[] subSysMigConfig = context.getWiki().getConfig().getPropertyAsList(
           "celements.subsystems.migration.manager.order");
       if (subSysMigConfig.length == 0) {
         subSysMigConfig = new String[]{"XWikiSubSystem"};
       }
-      mLogger.info("executing following subsystem migration manager in this order: "
+      LOGGER.info("executing following subsystem migration manager in this order: "
           + Arrays.deepToString(subSysMigConfig));
       for (String subSystemHintName : subSysMigConfig) {
         ISubSystemMigrationManager subSystemMigrationManager =
           subSysMigrationManagerMap.get(subSystemHintName);
         if ("1".equals(context.getWiki().Param("celements.subsystems." + subSystemHintName
             + ".migration", "0"))) {
-          mLogger.info("starting migration for ["
+          LOGGER.info("starting migration for ["
               + subSystemMigrationManager.getSubSystemName() + "].");
           subSystemMigrationManager.startMigrations(context);
-          mLogger.info("finished migration for ["
+          LOGGER.info("finished migration for ["
               + subSystemMigrationManager.getSubSystemName() + "].");
         } else {
-          mLogger.info("skipping migration for [" + subSystemHintName + "].");
+          LOGGER.info("skipping migration for [" + subSystemHintName + "].");
         }
       }
     } else {
-      mLogger.fatal("allSubMigrationManagers is empty. Expecting at least the"
+      LOGGER.fatal("allSubMigrationManagers is empty. Expecting at least the"
           + " xwikiSubSystem migration manager. " + subSysMigrationManagerMap);
     }
   }

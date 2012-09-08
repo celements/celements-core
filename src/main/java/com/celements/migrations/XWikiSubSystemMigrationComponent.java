@@ -27,6 +27,16 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager;
 
+/**
+ * TODO MigrationManager in XWiki was improved and "componentized" in 3.4
+ * http://lists.xwiki.org/pipermail/devs/2011-October/048619.html
+ * http://jira.xwiki.org/browse/XWIKI-7006
+ * http://jira.xwiki.org/browse/XWIKI-1859
+ * we need to adapt our version to make it compile on unstable branch
+ * 
+ * @author fabian
+ *
+ */
 @Component("XWikiSubSystem")
 public class XWikiSubSystemMigrationComponent implements ISubSystemMigrationManager {
 

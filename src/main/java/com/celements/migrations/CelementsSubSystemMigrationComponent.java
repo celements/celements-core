@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiException;
 @Component("CelementsSubSystem")
 public class CelementsSubSystemMigrationComponent implements ISubSystemMigrationManager {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsSubSystemMigrationComponent.class);
 
   SubSystemHibernateMigrationManager injected_MigrationManager;
@@ -43,7 +43,7 @@ public class CelementsSubSystemMigrationComponent implements ISubSystemMigration
     try {
       celMigrationManager = getSubSystemHibernateMigrationManager(context);
     } catch (XWikiException exp) {
-      mLogger.error("Failed to instanciate CelementsHibernateMigrationManager!", exp);
+      LOGGER.error("Failed to instanciate CelementsHibernateMigrationManager!", exp);
     }
     if (celMigrationManager != null) {
       celMigrationManager.startMigrations(context);
