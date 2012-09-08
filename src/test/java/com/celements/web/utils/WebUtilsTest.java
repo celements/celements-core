@@ -20,6 +20,18 @@
 package com.celements.web.utils;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -138,22 +150,22 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))).andReturn(
-        webPrefDoc).atLeastOnce();
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))).andReturn(webPrefDoc
+        ).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
-        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
@@ -171,15 +183,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
-        ).andReturn(webPrefDoc).atLeastOnce();
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))).andReturn(webPrefDoc
+        ).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(null); // deleting an object can lead to a null pointer
@@ -187,8 +201,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
     webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
-    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
-        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
@@ -203,23 +215,27 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
-      ).andReturn(webPrefDoc).atLeastOnce();
-    XWikiDocument xwikiPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("XWiki.XWikiPreferences");
-    expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), eq(context))
-      ).andReturn(xwikiPrefDoc).atLeastOnce();
-    XWikiDocument skinDoc = new XWikiDocument();
-    skinDoc.setFullName("Skins.MySkin");
-    expect(wiki.getDocument(eq("Skins.MySkin"), eq(context))
-      ).andReturn(skinDoc).atLeastOnce();
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))).andReturn(webPrefDoc
+        ).atLeastOnce();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(wiki.getDocument(eq(xwikiPrefDocRef), eq(context))).andReturn(xwikiPrefDoc
+        ).atLeastOnce();
+    DocumentReference skinDocRef = new DocumentReference(context.getDatabase(), "Skins",
+        "MySkin");
+    XWikiDocument skinDoc = new XWikiDocument(skinDocRef);
+    expect(wiki.getDocument(eq(skinDocRef), eq(context))).andReturn(skinDoc).atLeastOnce(
+        );
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
@@ -236,15 +252,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("MySpace.MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
+    XWikiDocument doc = new XWikiDocument(docRef);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
     context.setDoc(doc);
-    XWikiDocument webPrefDoc = new XWikiDocument();
-    webPrefDoc.setFullName("MySpace.WebPreferences");
-    expect(wiki.getDocument(eq("MySpace.WebPreferences"), eq(context))
-        ).andReturn(webPrefDoc).atLeastOnce();
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "WebPreferences");
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
+    expect(wiki.getDocument(eq(webPrefDocRef), eq(context))).andReturn(webPrefDoc
+        ).atLeastOnce();
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
       ).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
@@ -252,8 +270,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
     webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
-    expect(wiki.getDocument(eq(new DocumentReference("xwikidb", "MySpace", 
-        "WebPreferences")), same(context))).andReturn(webPrefDoc).atLeastOnce();
     replay(mockStore, wiki, mockXStore, mockPageLayoutCmd);
     int maxLevel = celUtils.getMaxConfiguredNavigationLevel(context);
     verify(mockStore, wiki, mockXStore, mockPageLayoutCmd);
