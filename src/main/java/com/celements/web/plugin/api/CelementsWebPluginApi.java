@@ -835,9 +835,17 @@ public class CelementsWebPluginApi extends Api {
   public String renderPageLayout() {
     return getPageLayoutCmd().renderPageLayout();
   }
-  
+
+  /**
+   * @deprecated since 2.18.0 instead use addTranslation(DocumentReference, String)
+   */
+  @Deprecated
   public boolean addTranslation(String fullName, String language) {
     return new AddTranslationCommand().addTranslation(fullName, language, context);
+  }
+ 
+  public boolean addTranslation(DocumentReference docRef, String language) {
+    return new AddTranslationCommand().addTranslation(docRef, language);
   }
  
   /**
