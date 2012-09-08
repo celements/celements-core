@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.menu.MenuScriptService;
@@ -791,40 +792,49 @@ public class CelementsWebPluginApi extends Api {
   * @return null if failed, non null XWikiUser if sucess
   * @throws XWikiException
   */
- public XWikiUser checkAuth(String logincredential, String password, String rememberme,
-     String possibleLogins) throws XWikiException {
-     return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
-         context);
- }
+  public XWikiUser checkAuth(String logincredential, String password, String rememberme,
+      String possibleLogins) throws XWikiException {
+    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
+        context);
+  }
 
- /**
-  * 
-  * @return null means the validation has been successful. Otherwise the validation 
-  *         message configured in the class is returned.
-  */
- public String validateField(String className, String fieldName, String value) {
-   return getDocFormCommand().validateField(className, fieldName, value, context);
- }
+  /**
+   * 
+   * @return null means the validation has been successful. Otherwise the
+   *         validation message configured in the class is returned.
+   */
+  public String validateField(String className, String fieldName, String value) {
+    return getDocFormCommand().validateField(className, fieldName, value, context);
+  }
  
- /**
-  * 
-  * @return empty map means the validation has been successful. Otherwise the validation 
-  *         message configured in the class is returned for not validating fields.
-  */
- public Map<String, String> validateRequest() {
-   return getDocFormCommand().validateRequest(context);
- }
+  /**
+   * 
+   * @return empty map means the validation has been successful. Otherwise the
+   *         validation message configured in the class is returned for not
+   *         validating fields.
+   */
+  public Map<String, String> validateRequest() {
+    return getDocFormCommand().validateRequest(context);
+  }
 
- private PageLayoutCommand getPageLayoutCmd() {
-   if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-     context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
-   }
-   return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
- }
+  private PageLayoutCommand getPageLayoutCmd() {
+    if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
+    }
+    return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
+  }
 
+  public String renderPageLayout(SpaceReference spaceRef) {
+    return getPageLayoutCmd().renderPageLayout(spaceRef);
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use renderPageLayout(SpaceReference)
+   */
+  @Deprecated
   public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayout(getWebUtilsService().resolveSpaceReference(
-        spaceName));
+    return getPageLayoutCmd().renderPageLayout(
+        getWebUtilsService().resolveSpaceReference(spaceName));
   }
 
   /**
