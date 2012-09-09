@@ -23,6 +23,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.FieldInheritor;
@@ -327,6 +330,39 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     verifyAll();
   }
 
+  @Test
+  public void testDeleteLayout() throws Exception {
+    QueryManager queryManagerMock = createMock(QueryManager.class);
+    plCmd.queryManager = queryManagerMock;
+    String layoutName = "delLayout";
+    SpaceReference layoutSpaceRef = new SpaceReference(layoutName, new WikiReference(
+        context.getDatabase()));
+    Query queryMock = createMock(Query.class);
+    expect(queryManagerMock.createQuery(eq("where doc.space = :space"), eq(Query.XWQL))
+        ).andReturn(queryMock).once();
+    expect(queryMock.bindValue(eq("space"), eq(layoutSpaceRef.getName()))).andReturn(
+        queryMock).once();
+    List<String> resultList = Arrays.asList(layoutName + ".myCell", layoutName
+        + ".WebHome");
+    expect(queryMock.<String>execute()).andReturn(resultList).once();
+    DocumentReference myCellDocRef = new DocumentReference(context.getDatabase(),
+        layoutName, "myCell");
+    XWikiDocument myCellDoc = new XWikiDocument(myCellDocRef);
+    expect(xwiki.getDocument(eq(myCellDocRef), same(context))).andReturn(myCellDoc
+        ).once();
+    xwiki.deleteAllDocuments(same(myCellDoc), same(context));
+    expectLastCall().once();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        layoutName, "WebHome");
+    XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc
+        ).once();
+    xwiki.deleteAllDocuments(same(webHomeDoc), same(context));
+    expectLastCall().once();
+    replayAll(queryManagerMock, queryMock);
+    assertTrue(plCmd.deleteLayout(layoutSpaceRef));
+    verifyAll(queryManagerMock, queryMock);
+  }
   
   private void replayAll(Object ... mocks) {
     replay(xwiki, storeMock);

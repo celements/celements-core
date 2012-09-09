@@ -29,6 +29,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.celements.cells.CellRenderer;
 import com.celements.cells.DivWriter;
@@ -36,6 +39,7 @@ import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -48,6 +52,8 @@ public class PageLayoutCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageLayoutCommand.class);
+
+  QueryManager queryManager = Utils.getComponent(QueryManager.class);
 
   IWebUtilsService webUtilsService;
 
@@ -124,6 +130,29 @@ public class PageLayoutCommand {
     return "cel_layout_empty_name_msg";
   }
 
+  public boolean deleteLayout(SpaceReference layoutSpaceRef) {
+    XWiki xwiki = getContext().getWiki();
+    try {
+      Query spaceDocsQuery = queryManager.createQuery(
+          "where doc.space = :space", Query.XWQL);
+      spaceDocsQuery.bindValue("space", layoutSpaceRef.getName());
+      for (String docName : spaceDocsQuery.<String> execute()) {
+        DocumentReference docReference = getWebUtilsService().resolveDocumentReference(
+            docName);
+        xwiki.deleteAllDocuments(xwiki.getDocument(docReference, getContext()),
+            getContext());
+      }
+      return true;
+    } catch (QueryException exp) {
+      LOGGER.warn("Failed to get the list of documents while trying to delete space ["
+          + layoutSpaceRef + "]", exp);
+    } catch (XWikiException exp) {
+      LOGGER.error("deleteLayout: Failed to delete documents for space [" + layoutSpaceRef
+          + "].", exp);
+    }
+    return false;
+  }
+
   private DocumentReference getPageLayoutPropertiesClassRef(String dbName) {
     return new DocumentReference(dbName, PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
         PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
@@ -181,7 +210,7 @@ public class PageLayoutCommand {
     return layoutPropDoc;
   }
 
-  private DocumentReference standardPropDocRef(SpaceReference layoutSpaceRef) {
+  public DocumentReference standardPropDocRef(SpaceReference layoutSpaceRef) {
     return new DocumentReference("WebHome", layoutSpaceRef);
   }
 

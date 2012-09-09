@@ -31,7 +31,9 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -1013,6 +1015,25 @@ public class CelementsWebPluginApi extends Api {
         layoutSpaceName));
   }
 
+  public boolean deleteLayout(String layoutSpaceName) {
+    SpaceReference layoutSpaceRef = getWebUtilsService().resolveSpaceReference(
+        layoutSpaceName);
+    String layoutPropDocName = getEntitySerializer().serialize(getPageLayoutCmd(
+        ).standardPropDocRef(layoutSpaceRef));
+    try {
+      if (hasAccessLevel("delete", layoutPropDocName)) {
+        return getPageLayoutCmd().deleteLayout(layoutSpaceRef);
+      } else {
+        LOGGER.warn("NO delete rights on [" + layoutPropDocName
+            + "] for user [" + context.getUser() + "].");
+      }
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to check delete rights on [" + layoutSpaceName + "] for user ["
+          + context.getUser() + "].");
+    }
+    return false;
+  }
+
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
     return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
         context);
@@ -1424,6 +1445,11 @@ public class CelementsWebPluginApi extends Api {
 
   private IPrepareVelocityContext getPrepareVelocityContextService() {
     return Utils.getComponent(IPrepareVelocityContext.class);
+  }
+
+  private DefaultStringEntityReferenceSerializer getEntitySerializer() {
+    return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
+        EntityReferenceSerializer.class));
   }
 
 }
