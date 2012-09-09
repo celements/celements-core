@@ -105,7 +105,7 @@ public class CelementsWebPluginApi extends Api {
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebPluginApi.class);
   
   private CelementsWebPlugin plugin;
@@ -302,11 +302,11 @@ public class CelementsWebPluginApi extends Api {
       ) throws XWikiException{
     String account = "";
     if(hasProgrammingRights()){
-      mLogger.debug("executing getUsernameForUserData in plugin");
+      LOGGER.debug("executing getUsernameForUserData in plugin");
       account = new UserNameForUserDataCommand().getUsernameForUserData(login,
           possibleLogins, context);
     } else {
-      mLogger.debug("missing ProgrammingRights for [" + context.get("sdoc")
+      LOGGER.debug("missing ProgrammingRights for [" + context.get("sdoc")
           + "]: getUsernameForUserData cannot be executed!");
     }
     return account;
@@ -339,7 +339,7 @@ public class CelementsWebPluginApi extends Api {
   
   public void sendNewValidation(String user, String possibleFields) throws XWikiException{
     if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
-      mLogger.debug("sendNewValidation for user [" + user + "].");
+      LOGGER.debug("sendNewValidation for user [" + user + "].");
       new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
           possibleFields);
     }
@@ -351,7 +351,7 @@ public class CelementsWebPluginApi extends Api {
         return new PasswordRecoveryAndEmailValidationCommand(
             ).getNewValidationTokenForUser(context.getUser(), context);
       } catch (XWikiException exp) {
-        mLogger.error("Failed to create new validation Token for user: "
+        LOGGER.error("Failed to create new validation Token for user: "
             + context.getUser(), exp);
       }
     }
@@ -367,7 +367,7 @@ public class CelementsWebPluginApi extends Api {
       try {
         return plugin.getNewCelementsTokenForUser(context.getUser(), guestPlus, context);
       } catch (XWikiException exp) {
-        mLogger.error("Failed to create new validation Token for user: "
+        LOGGER.error("Failed to create new validation Token for user: "
             + context.getUser(), exp);
       }
     }
@@ -425,7 +425,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("usage of deprecated isEmptyRTEDocument(String) on ["
+    LOGGER.warn("usage of deprecated isEmptyRTEDocument(String) on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     return emptyCheckCmd.isEmptyRTEDocument(fullName, context);
@@ -503,11 +503,11 @@ public class CelementsWebPluginApi extends Api {
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = Collections.emptyList();
     if (hasProgrammingRights()){
-      mLogger.info("getAttachmentsForDocs: fetching attachments...");
+      LOGGER.info("getAttachmentsForDocs: fetching attachments...");
       attachments = plugin.getAttachmentsForDocs(docsFN, context);      
     }
     else {
-      mLogger.info("getAttachmentsForDocs: no programming rights");
+      LOGGER.info("getAttachmentsForDocs: no programming rights");
     }
     return attachments;
   }
@@ -520,7 +520,7 @@ public class CelementsWebPluginApi extends Api {
       String subject, String htmlContent, String textContent, 
       List<Attachment> attachments, Map<String, String> others){
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("usage of deprecated sendLatin1Mail on ["
+    LOGGER.warn("usage of deprecated sendLatin1Mail on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent,
@@ -624,7 +624,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public void processRegistrationsWithoutCallback(List<String> recipients) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of processRegistrationsWithoutCallback on ["
+    LOGGER.warn("deprecated usage of processRegistrationsWithoutCallback on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     getSynCustom().processRegistrationsWithoutCallback(recipients);
@@ -636,7 +636,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public void paymentCallback() throws XWikiException {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of paymentCallback on [" + docRef.getWikiReference()
+    LOGGER.warn("deprecated usage of paymentCallback on [" + docRef.getWikiReference()
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     getSynCustom().paymentCallback();
   }
@@ -648,7 +648,7 @@ public class CelementsWebPluginApi extends Api {
   public void sendCallbackNotificationMail(Map<String, String[]> data,
       List<String> recipients) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of sendCallbackNotificationMail on ["
+    LOGGER.warn("deprecated usage of sendCallbackNotificationMail on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     getSynCustom().sendCallbackNotificationMail(data, recipients);
@@ -691,7 +691,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return getWebUtilsService().getUserNameForDocRef(userDocRef);
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get user document [" + userDocRef + "].", exp);
+      LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
     }
     return "N/A";
   }
@@ -764,7 +764,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return plugin.tokenBasedUpload(attachToDoc, fieldName, userToken, context);
     } catch (XWikiException exp) {
-      mLogger.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: " + exp);
     }
     return 0;
   }
@@ -779,7 +779,7 @@ public class CelementsWebPluginApi extends Api {
       return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken, 
           createIfNotExists, context);
     } catch (XWikiException exp) {
-      mLogger.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: " + exp);
     }
     return 0;
   }
@@ -794,10 +794,10 @@ public class CelementsWebPluginApi extends Api {
    */
   public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
     if(hasProgrammingRights()){
-      mLogger.debug("checkAuthByToken: executing checkAuthByToken in plugin");
+      LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
       return plugin.checkAuthByToken(userToken, context);
     } else {
-      mLogger.debug("checkAuthByToken: missing ProgrammingRights for ["
+      LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
           + context.get("sdoc") + "]: checkAuthByToken cannot be executed!");
     }
     return null;
@@ -893,7 +893,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public float getBMI() {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of getBMI on [" + docRef.getWikiReference() + ":"
+    LOGGER.warn("deprecated usage of getBMI on [" + docRef.getWikiReference() + ":"
         + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     return getSynCustom().getBMI();
   }
@@ -921,7 +921,7 @@ public class CelementsWebPluginApi extends Api {
   public int countObjsWithField(String fullName, String className, String fieldName, 
       String value, String valueEnd) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of countObjsWithField on [" + docRef.getWikiReference()
+    LOGGER.warn("deprecated usage of countObjsWithField on [" + docRef.getWikiReference()
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     return getSynCustom().countObjsWithField(fullName, className, fieldName, value,
         valueEnd);
@@ -934,7 +934,7 @@ public class CelementsWebPluginApi extends Api {
   public Map<String, Integer> getRegistrationStatistics(Document mappingDoc, 
       String congressName) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of getRegistrationStatistics on ["
+    LOGGER.warn("deprecated usage of getRegistrationStatistics on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     return getSynCustom().getRegistrationStatistics(mappingDoc, congressName);
@@ -946,7 +946,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public Map<String, String> getExportMapping(String mappingStr, String congress) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of getExportMapping on [" + docRef.getWikiReference()
+    LOGGER.warn("deprecated usage of getExportMapping on [" + docRef.getWikiReference()
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     return getSynCustom().getExportMapping(mappingStr, congress);
   }
@@ -964,7 +964,7 @@ public class CelementsWebPluginApi extends Api {
         return appClassObj.getStringValue("appversion");
       }
     } catch (XWikiException exp) {
-      mLogger.warn("Failed to get celementsWeb Application scripts version.", exp);
+      LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
     }
     return "N/A";
   }
@@ -1002,7 +1002,7 @@ public class CelementsWebPluginApi extends Api {
     if (hasAdminRights()) {
       return new ResetProgrammingRightsCommand().resetCelements2webRigths(context);
     } else {
-      mLogger.warn("user [" + context.getUser() + "] tried to reset programming rights,"
+      LOGGER.warn("user [" + context.getUser() + "] tried to reset programming rights,"
           + " but has no admin rights.");
     }
     return false;
@@ -1079,7 +1079,7 @@ public class CelementsWebPluginApi extends Api {
       return getCelementsRenderCmd().renderCelementsDocument(context.getWiki(
           ).getDocument(elementFullName, context), renderMode);
     } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render " + elementFullName, exp);
+      LOGGER.error("renderCelementsDocument: Failed to render " + elementFullName, exp);
     }
     return "";
   }
@@ -1152,7 +1152,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return doc.getTranslationList().contains(language);
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
+      LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
           exp);
       return (language.equals(getWebUtilsService().getDefaultLanguage())
           && context.getWiki().exists(doc.getDocumentReference(), context));
@@ -1176,7 +1176,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public void logDeprecatedVelocityScript(String logMessage) {
-    mLogger.warn("deprecated usage of velocity Script: " + logMessage);
+    LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
   }
 
   public String isValidUserJSON(String username, String password, String memberOfGroup, 
