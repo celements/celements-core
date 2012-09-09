@@ -31,7 +31,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.menu.MenuScriptService;
@@ -104,7 +107,7 @@ public class CelementsWebPluginApi extends Api {
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebPluginApi.class);
   
   private CelementsWebPlugin plugin;
@@ -228,12 +231,12 @@ public class CelementsWebPluginApi extends Api {
 
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator);
+    return getWebUtilsService().getAttachmentListSorted(doc, comparator);
   }
 
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSorted(doc, comparator, imagesOnly,
+    return getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
         start, nb);
   }
 
@@ -244,7 +247,7 @@ public class CelementsWebPluginApi extends Api {
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator, 
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return WebUtils.getInstance().getAttachmentListSortedAsJSON(doc, comparator, 
+    return getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator, 
         imagesOnly, start, nb);
   }
 
@@ -254,7 +257,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public XWikiMessageTool getMessageTool(String adminLanguage) {
-    return WebUtils.getInstance().getMessageTool(adminLanguage, context);
+    return getWebUtilsService().getMessageTool(adminLanguage);
   }
 
   public String getVersionMode() {
@@ -301,11 +304,11 @@ public class CelementsWebPluginApi extends Api {
       ) throws XWikiException{
     String account = "";
     if(hasProgrammingRights()){
-      mLogger.debug("executing getUsernameForUserData in plugin");
+      LOGGER.debug("executing getUsernameForUserData in plugin");
       account = new UserNameForUserDataCommand().getUsernameForUserData(login,
           possibleLogins, context);
     } else {
-      mLogger.debug("missing ProgrammingRights for [" + context.get("sdoc")
+      LOGGER.debug("missing ProgrammingRights for [" + context.get("sdoc")
           + "]: getUsernameForUserData cannot be executed!");
     }
     return account;
@@ -338,7 +341,7 @@ public class CelementsWebPluginApi extends Api {
   
   public void sendNewValidation(String user, String possibleFields) throws XWikiException{
     if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
-      mLogger.debug("sendNewValidation for user [" + user + "].");
+      LOGGER.debug("sendNewValidation for user [" + user + "].");
       new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
           possibleFields);
     }
@@ -350,7 +353,7 @@ public class CelementsWebPluginApi extends Api {
         return new PasswordRecoveryAndEmailValidationCommand(
             ).getNewValidationTokenForUser(context.getUser(), context);
       } catch (XWikiException exp) {
-        mLogger.error("Failed to create new validation Token for user: "
+        LOGGER.error("Failed to create new validation Token for user: "
             + context.getUser(), exp);
       }
     }
@@ -366,7 +369,7 @@ public class CelementsWebPluginApi extends Api {
       try {
         return plugin.getNewCelementsTokenForUser(context.getUser(), guestPlus, context);
       } catch (XWikiException exp) {
-        mLogger.error("Failed to create new validation Token for user: "
+        LOGGER.error("Failed to create new validation Token for user: "
             + context.getUser(), exp);
       }
     }
@@ -424,7 +427,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("usage of deprecated isEmptyRTEDocument(String) on ["
+    LOGGER.warn("usage of deprecated isEmptyRTEDocument(String) on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     return emptyCheckCmd.isEmptyRTEDocument(fullName, context);
@@ -502,11 +505,11 @@ public class CelementsWebPluginApi extends Api {
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = Collections.emptyList();
     if (hasProgrammingRights()){
-      mLogger.info("getAttachmentsForDocs: fetching attachments...");
+      LOGGER.info("getAttachmentsForDocs: fetching attachments...");
       attachments = plugin.getAttachmentsForDocs(docsFN, context);      
     }
     else {
-      mLogger.info("getAttachmentsForDocs: no programming rights");
+      LOGGER.info("getAttachmentsForDocs: no programming rights");
     }
     return attachments;
   }
@@ -519,7 +522,7 @@ public class CelementsWebPluginApi extends Api {
       String subject, String htmlContent, String textContent, 
       List<Attachment> attachments, Map<String, String> others){
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("usage of deprecated sendLatin1Mail on ["
+    LOGGER.warn("usage of deprecated sendLatin1Mail on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent,
@@ -554,7 +557,8 @@ public class CelementsWebPluginApi extends Api {
     return getPrepareVelocityContextService().getLeftPanels();
   }
 
-  public String getDocSectionAsJSON(String regex, String fullName, int part) throws XWikiException {
+  public String getDocSectionAsJSON(String regex, String fullName, int part
+      ) throws XWikiException {
     return WebUtils.getInstance().getDocSectionAsJSON(regex, fullName, part, context);
   }
 
@@ -579,7 +583,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public List<String> getAllowedLanguages() {
-    return WebUtils.getInstance().getAllowedLanguages(context);
+    return getWebUtilsService().getAllowedLanguages();
   }
   
   public int createUser() throws XWikiException {
@@ -603,8 +607,12 @@ public class CelementsWebPluginApi extends Api {
         account);
   }
   
+  /**
+   * @deprecated since 2.18.0 use instead velocity $datetool.format(format, date)
+   */
+  @Deprecated
   public Date parseDate(String date, String format) {
-    return WebUtils.getInstance().parseDate(date, format);
+    return getWebUtilsService().parseDate(date, format);
   }
   
   @Deprecated
@@ -618,7 +626,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public void processRegistrationsWithoutCallback(List<String> recipients) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of processRegistrationsWithoutCallback on ["
+    LOGGER.warn("deprecated usage of processRegistrationsWithoutCallback on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     getSynCustom().processRegistrationsWithoutCallback(recipients);
@@ -630,7 +638,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public void paymentCallback() throws XWikiException {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of paymentCallback on [" + docRef.getWikiReference()
+    LOGGER.warn("deprecated usage of paymentCallback on [" + docRef.getWikiReference()
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     getSynCustom().paymentCallback();
   }
@@ -642,7 +650,7 @@ public class CelementsWebPluginApi extends Api {
   public void sendCallbackNotificationMail(Map<String, String[]> data,
       List<String> recipients) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of sendCallbackNotificationMail on ["
+    LOGGER.warn("deprecated usage of sendCallbackNotificationMail on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     getSynCustom().sendCallbackNotificationMail(data, recipients);
@@ -652,7 +660,7 @@ public class CelementsWebPluginApi extends Api {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
   public String getParentSpace() {
-    return WebUtils.getInstance().getParentSpace(context);
+    return getWebUtilsService().getParentSpace();
   }
   
   public String getRTEConfigField(String name) throws XWikiException {
@@ -660,22 +668,38 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public String getJSONContent(Document contentDoc) {
-    return WebUtils.getInstance().getJSONContent(contentDoc.getDocument(),
-        context);
+    return getWebUtilsService().getJSONContent(contentDoc.getDocument());
   }
   
   /**
    * 
    * @param authorDocName
    * @return returns the name of the user in the form "lastname, first name"
-   * @throws XWikiException 
+   * @throws XWikiException
+   * 
+   * @Deprecated since 2.18.0 instead use getUserNameForDocRef(DocumentReference)
    */
+  @Deprecated
   public String getUserNameForDocName(String authorDocName) throws XWikiException{
     return WebUtils.getInstance().getUserNameForDocName(authorDocName, context);
   }
   
+  /**
+   * 
+   * @param authorDocName
+   * @return returns the name of the user in the form "lastname, first name"
+   */
+  public String getUserNameForDocRef(DocumentReference userDocRef) {
+    try {
+      return getWebUtilsService().getUserNameForDocRef(userDocRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
+    }
+    return "N/A";
+  }
+  
   public String getMajorVersion(Document doc) {
-    return WebUtils.getInstance().getMajorVersion(doc.getDocument());
+    return getWebUtilsService().getMajorVersion(doc.getDocument());
   }
 
   /**
@@ -742,7 +766,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return plugin.tokenBasedUpload(attachToDoc, fieldName, userToken, context);
     } catch (XWikiException exp) {
-      mLogger.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: " + exp);
     }
     return 0;
   }
@@ -757,7 +781,7 @@ public class CelementsWebPluginApi extends Api {
       return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken, 
           createIfNotExists, context);
     } catch (XWikiException exp) {
-      mLogger.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: " + exp);
     }
     return 0;
   }
@@ -772,10 +796,10 @@ public class CelementsWebPluginApi extends Api {
    */
   public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
     if(hasProgrammingRights()){
-      mLogger.debug("checkAuthByToken: executing checkAuthByToken in plugin");
+      LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
       return plugin.checkAuthByToken(userToken, context);
     } else {
-      mLogger.debug("checkAuthByToken: missing ProgrammingRights for ["
+      LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
           + context.get("sdoc") + "]: checkAuthByToken cannot be executed!");
     }
     return null;
@@ -791,53 +815,78 @@ public class CelementsWebPluginApi extends Api {
   * @return null if failed, non null XWikiUser if sucess
   * @throws XWikiException
   */
- public XWikiUser checkAuth(String logincredential, String password, String rememberme,
-     String possibleLogins) throws XWikiException {
-     return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
-         context);
- }
-
- /**
-  * 
-  * @return null means the validation has been successful. Otherwise the validation 
-  *         message configured in the class is returned.
-  */
- public String validateField(String className, String fieldName, String value) {
-   return getDocFormCommand().validateField(className, fieldName, value, context);
- }
- 
- /**
-  * 
-  * @return empty map means the validation has been successful. Otherwise the validation 
-  *         message configured in the class is returned for not validating fields.
-  */
- public Map<String, String> validateRequest() {
-   return getDocFormCommand().validateRequest(context);
- }
-
- private PageLayoutCommand getPageLayoutCmd() {
-   if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-     context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
-   }
-   return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
- }
-
-  public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayout(getWebUtilsService().resolveSpaceReference(
-        spaceName));
+  public XWikiUser checkAuth(String logincredential, String password, String rememberme,
+      String possibleLogins) throws XWikiException {
+    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
+        context);
   }
 
+  /**
+   * 
+   * @return null means the validation has been successful. Otherwise the
+   *         validation message configured in the class is returned.
+   */
+  public String validateField(String className, String fieldName, String value) {
+    return getDocFormCommand().validateField(className, fieldName, value, context);
+  }
+ 
+  /**
+   * 
+   * @return empty map means the validation has been successful. Otherwise the
+   *         validation message configured in the class is returned for not
+   *         validating fields.
+   */
+  public Map<String, String> validateRequest() {
+    return getDocFormCommand().validateRequest(context);
+  }
+
+  private PageLayoutCommand getPageLayoutCmd() {
+    if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
+    }
+    return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
+  }
+
+  public String renderPageLayout(SpaceReference spaceRef) {
+    return getPageLayoutCmd().renderPageLayout(spaceRef);
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use renderPageLayout(SpaceReference)
+   */
+  @Deprecated
+  public String renderPageLayout(String spaceName) {
+    return getPageLayoutCmd().renderPageLayout(
+        getWebUtilsService().resolveSpaceReference(spaceName));
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use getPageLayoutForDoc(DocumentReference)
+   */
+  @Deprecated
   public String getPageLayoutForDoc(String fullName) {
-    return getPageLayoutCmd().getPageLayoutForDoc(getWebUtilsService(
-        ).resolveDocumentReference(fullName)).getName();
-   }
-  
+    return getPageLayoutCmd().getPageLayoutForDoc(
+        getWebUtilsService().resolveDocumentReference(fullName)).getName();
+  }
+
+  public String getPageLayoutForDoc(DocumentReference docRef) {
+    return getPageLayoutCmd().getPageLayoutForDoc(docRef).getName();
+  }
+
   public String renderPageLayout() {
     return getPageLayoutCmd().renderPageLayout();
   }
-  
+
+  /**
+   * @deprecated since 2.18.0 instead use addTranslation(DocumentReference, String)
+   */
+  @Deprecated
   public boolean addTranslation(String fullName, String language) {
     return new AddTranslationCommand().addTranslation(fullName, language, context);
+  }
+ 
+  public boolean addTranslation(DocumentReference docRef, String language) {
+    return new AddTranslationCommand().addTranslation(docRef, language);
   }
  
   /**
@@ -846,7 +895,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public float getBMI() {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of getBMI on [" + docRef.getWikiReference() + ":"
+    LOGGER.warn("deprecated usage of getBMI on [" + docRef.getWikiReference() + ":"
         + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     return getSynCustom().getBMI();
   }
@@ -874,7 +923,7 @@ public class CelementsWebPluginApi extends Api {
   public int countObjsWithField(String fullName, String className, String fieldName, 
       String value, String valueEnd) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of countObjsWithField on [" + docRef.getWikiReference()
+    LOGGER.warn("deprecated usage of countObjsWithField on [" + docRef.getWikiReference()
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     return getSynCustom().countObjsWithField(fullName, className, fieldName, value,
         valueEnd);
@@ -887,7 +936,7 @@ public class CelementsWebPluginApi extends Api {
   public Map<String, Integer> getRegistrationStatistics(Document mappingDoc, 
       String congressName) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of getRegistrationStatistics on ["
+    LOGGER.warn("deprecated usage of getRegistrationStatistics on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
     return getSynCustom().getRegistrationStatistics(mappingDoc, congressName);
@@ -899,7 +948,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public Map<String, String> getExportMapping(String mappingStr, String congress) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    mLogger.warn("deprecated usage of getExportMapping on [" + docRef.getWikiReference()
+    LOGGER.warn("deprecated usage of getExportMapping on [" + docRef.getWikiReference()
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     return getSynCustom().getExportMapping(mappingStr, congress);
   }
@@ -917,7 +966,7 @@ public class CelementsWebPluginApi extends Api {
         return appClassObj.getStringValue("appversion");
       }
     } catch (XWikiException exp) {
-      mLogger.warn("Failed to get celementsWeb Application scripts version.", exp);
+      LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
     }
     return "N/A";
   }
@@ -955,7 +1004,7 @@ public class CelementsWebPluginApi extends Api {
     if (hasAdminRights()) {
       return new ResetProgrammingRightsCommand().resetCelements2webRigths(context);
     } else {
-      mLogger.warn("user [" + context.getUser() + "] tried to reset programming rights,"
+      LOGGER.warn("user [" + context.getUser() + "] tried to reset programming rights,"
           + " but has no admin rights.");
     }
     return false;
@@ -964,6 +1013,25 @@ public class CelementsWebPluginApi extends Api {
   public String createNewLayout(String layoutSpaceName) {
     return getPageLayoutCmd().createNew(getWebUtilsService().resolveSpaceReference(
         layoutSpaceName));
+  }
+
+  public boolean deleteLayout(String layoutSpaceName) {
+    SpaceReference layoutSpaceRef = getWebUtilsService().resolveSpaceReference(
+        layoutSpaceName);
+    String layoutPropDocName = getEntitySerializer().serialize(getPageLayoutCmd(
+        ).standardPropDocRef(layoutSpaceRef));
+    try {
+      if (hasAccessLevel("delete", layoutPropDocName)) {
+        return getPageLayoutCmd().deleteLayout(layoutSpaceRef);
+      } else {
+        LOGGER.warn("NO delete rights on [" + layoutPropDocName
+            + "] for user [" + context.getUser() + "].");
+      }
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to check delete rights on [" + layoutSpaceName + "] for user ["
+          + context.getUser() + "].");
+    }
+    return false;
   }
 
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
@@ -1032,7 +1100,7 @@ public class CelementsWebPluginApi extends Api {
       return getCelementsRenderCmd().renderCelementsDocument(context.getWiki(
           ).getDocument(elementFullName, context), renderMode);
     } catch (XWikiException exp) {
-      mLogger.error("renderCelementsDocument: Failed to render " + elementFullName, exp);
+      LOGGER.error("renderCelementsDocument: Failed to render " + elementFullName, exp);
     }
     return "";
   }
@@ -1105,7 +1173,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return doc.getTranslationList().contains(language);
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
+      LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
           exp);
       return (language.equals(getWebUtilsService().getDefaultLanguage())
           && context.getWiki().exists(doc.getDocumentReference(), context));
@@ -1129,7 +1197,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public void logDeprecatedVelocityScript(String logMessage) {
-    mLogger.warn("deprecated usage of velocity Script: " + logMessage);
+    LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
   }
 
   public String isValidUserJSON(String username, String password, String memberOfGroup, 
@@ -1377,6 +1445,11 @@ public class CelementsWebPluginApi extends Api {
 
   private IPrepareVelocityContext getPrepareVelocityContextService() {
     return Utils.getComponent(IPrepareVelocityContext.class);
+  }
+
+  private DefaultStringEntityReferenceSerializer getEntitySerializer() {
+    return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
+        EntityReferenceSerializer.class));
   }
 
 }

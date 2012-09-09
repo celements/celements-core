@@ -19,11 +19,13 @@
  */
 package com.celements.web.css;
 
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * TODO make an API class but which is given back to velocity calls.
@@ -83,6 +85,10 @@ public abstract class CSS extends Api {
       utils = WebUtils.getInstance();
     }
     return utils;
+  }
+
+  protected IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
@@ -37,8 +36,8 @@ import com.celements.navigation.filter.ExternalUsageFilter;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeCache;
-import com.celements.navigation.service.TreeNodeService;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.navigation.service.TreeNodeService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -533,20 +532,8 @@ public class WebUtils implements IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
-  public Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
-      boolean bWithObjects, boolean bWithRendering,
-      boolean bWithAttachmentContent, boolean bWithVersions,
-      XWikiContext context) throws XWikiException {
-    return getWebUtilsService().xwikiDocToLinkedMap(xwikiDoc.getDocumentReference(),
-        bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions);
-  }
-
-  /**
-   * @deprecated since 2.17.0 instead use WebUtilsService
-   */
-  @Deprecated
   public String getJSONContent(XWikiDocument cdoc, XWikiContext context) {
-    return getWebUtilsService().getJSONContent(cdoc.getDocumentReference());
+    return getWebUtilsService().getJSONContent(cdoc);
   }
 
 

@@ -89,8 +89,8 @@ public class CssCommand {
     String CSS = "";
     
     List<CSS> cssList = getAllCSS(context);
-    for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
-      CSS css = (CSS) iterator.next();
+    for (CSS css : cssList) {
+      LOGGER.debug("displayAllCSS: displayInclude for [" + css.getCSS() + "]." );
       CSS += css.displayInclude(context);
     }
     

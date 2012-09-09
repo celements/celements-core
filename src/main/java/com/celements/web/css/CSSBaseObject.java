@@ -21,8 +21,9 @@ package com.celements.web.css;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.utils.WebUtils;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -33,10 +34,12 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class CSSBaseObject extends CSS {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(CSSBaseObject.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CSSBaseObject.class);
 
   private BaseObject obj;
-  
+
+  private AttachmentURLCommand attURLcmd = new AttachmentURLCommand();
+
   public CSSBaseObject(BaseObject obj, XWikiContext context) {
     super(context);
     this.obj = obj;
@@ -69,16 +72,18 @@ public class CSSBaseObject extends CSS {
   public Attachment getAttachment() {
     if (isAttachment()) {
       try {
-        XWikiDocument attDoc = context.getWiki().getDocument(getWebUtils(
-            ).getPageFullName(obj.getStringValue("cssname")),
-          context);
-        XWikiAttachment att = attDoc.getAttachment(utils.getAttachmentName(
+        String cssName = getCssBasePath();
+        LOGGER.debug("getAttachment for [" + cssName + "].");
+        DocumentReference addDocRef = getWebUtilsService(
+            ).resolveDocumentReference(attURLcmd.getPageFullName(cssName));
+        XWikiDocument attDoc = context.getWiki().getDocument(addDocRef, context);
+        XWikiAttachment att = attDoc.getAttachment(attURLcmd.getAttachmentName(
             obj.getStringValue("cssname")));
         if (att != null) {
           return new Attachment(new Document(attDoc, context), att, context);
         }
       } catch (XWikiException e) {
-        mLogger.error(e);
+        LOGGER.error(e);
       }
     }
     return null;
@@ -86,7 +91,7 @@ public class CSSBaseObject extends CSS {
 
   @Override
   public boolean isAttachment() {
-    return WebUtils.getInstance().isAttachmentLink(obj.getStringValue("cssname"));
+    return attURLcmd.isAttachmentLink(obj.getStringValue("cssname"));
   }
 
   BaseObject getObject() {
@@ -98,6 +103,9 @@ public class CSSBaseObject extends CSS {
     String str = "";
     if(obj != null) {
       str = obj.getStringValue("cssname");
+      if ((str != null) && !"".equals(str) && !str.contains(":")) {
+        str = obj.getDocumentReference().getWikiReference().getName() + ":" + str;
+      }
     }
     return str;
   }
