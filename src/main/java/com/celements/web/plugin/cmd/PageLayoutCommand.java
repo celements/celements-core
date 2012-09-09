@@ -257,15 +257,31 @@ public class PageLayoutCommand {
           getFullNameForDocRef(documentReference), getContext()
         ).getStringValue("page_layout", null);
       if (spaceName != null) {
-        layoutSpaceRef =  getWebUtilsService().resolveSpaceReference(spaceName);
+        layoutSpaceRef = getWebUtilsService().resolveSpaceReference(spaceName);
       }
     }
-    if (layoutSpaceRef != null) {
+    layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    if (layoutSpaceRef == null) {
+      layoutSpaceRef = new SpaceReference(getDefaultLayout(), new WikiReference(
+          getContext().getDatabase()));
+      layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    }
+    return layoutSpaceRef;
+  }
+
+  private String getDefaultLayout() {
+    return getContext().getWiki().Param("celements.layout.default", "SimpleLayout");
+  }
+
+  private SpaceReference decideLocalOrCentral(SpaceReference layoutSpaceRef) {
+    if ((layoutSpaceRef != null) && !layoutExists(layoutSpaceRef)) {
       SpaceReference centralLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
           new WikiReference("celements2web"));
-      if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && !layoutExists(layoutSpaceRef)
+      if (!layoutSpaceRef.equals(centralLayoutSpaceRef)
           && layoutExists(centralLayoutSpaceRef)) {
         layoutSpaceRef = centralLayoutSpaceRef;
+      } else {
+        layoutSpaceRef = null;
       }
     }
     return layoutSpaceRef;

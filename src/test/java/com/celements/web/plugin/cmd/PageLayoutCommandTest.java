@@ -189,8 +189,51 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "WebHome");
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
+    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout"))).andReturn(
+        "SimpleLayout").once();
+    expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), "SimpleLayout",
+        "WebHome")), same(context))).andReturn(false);
+    expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout",
+        "WebHome")), same(context))).andReturn(false);
     replayAll(injectedInheritorFactory, inheritor);
     assertNull(plCmd.getPageLayoutForDoc(fullName, context));
+    verifyAll(injectedInheritorFactory, inheritor);
+  }
+
+  @Test
+  public void testGetPageLayoutForDoc_noPageLayout_defaultAvailable() throws Exception {
+    InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
+    plCmd.inject_TEST_InheritorFactory(injectedInheritorFactory);
+    String fullName = "mySpace.MyDocName";
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDocName");
+    FieldInheritor inheritor = createMock(FieldInheritor.class);
+    expect(injectedInheritorFactory.getPageLayoutInheritor(eq(fullName), same(context))
+        ).andReturn(inheritor);
+    expect(inheritor.getStringValue(eq("page_layout"), (String)isNull())).andReturn(null);
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "WebHome");
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
+    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout"))).andReturn(
+        "SimpleLayout").once();
+    expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), "SimpleLayout",
+        "WebHome")), same(context))).andReturn(false);
+    DocumentReference centralSimpleLayoutDocRef = new DocumentReference("celements2web",
+        "SimpleLayout", "WebHome");
+    expect(xwiki.exists(eq(centralSimpleLayoutDocRef), same(context))).andReturn(true);
+    XWikiDocument layoutPropDoc = new XWikiDocument(centralSimpleLayoutDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference("celements2web",
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(centralSimpleLayoutDocRef), same(context))).andReturn(
+        layoutPropDoc).once();
+    replayAll(injectedInheritorFactory, inheritor);
+    SpaceReference simpleLayoutSpaceRef = new SpaceReference("SimpleLayout",
+        new WikiReference("celements2web"));
+    assertEquals(simpleLayoutSpaceRef, plCmd.getPageLayoutForDoc(myDocRef));
     verifyAll(injectedInheritorFactory, inheritor);
   }
 
@@ -212,8 +255,14 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
         "WebHome")), same(context))).andReturn(false);
     expect(xwiki.exists(eq(new DocumentReference("celements2web", layoutName, "WebHome")),
         same(context))).andReturn(false);
+    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout"))).andReturn(
+        "SimpleLayout").once();
+    expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), "SimpleLayout",
+        "WebHome")), same(context))).andReturn(false);
+    expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout",
+        "WebHome")), same(context))).andReturn(false);
     replayAll(injectedInheritorFactory, inheritor);
-    assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
+    assertNull(plCmd.getPageLayoutForDoc(fullName, context));
     verifyAll(injectedInheritorFactory, inheritor);
   }
 
@@ -231,6 +280,18 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "WebHome");
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
+    DocumentReference layoutPropDocRef = new DocumentReference("celements2web",
+        "MyPageLayout", "WebHome");
+    expect(xwiki.exists(eq(layoutPropDocRef), same(context))).andReturn(true);
+    XWikiDocument layoutPropDoc = new XWikiDocument(layoutPropDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference("celements2web",
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(layoutPropDocRef), same(context))).andReturn(
+        layoutPropDoc).once();
     replayAll(injectedInheritorFactory, inheritor);
     assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
     verifyAll(injectedInheritorFactory, inheritor);
@@ -325,6 +386,12 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     XWikiDocument xWikiPrefDoc = new XWikiDocument(xWikiPrefDocRef);
     expect(xwiki.getDocument(eq(xWikiPrefDocRef), same(context))).andReturn(
         xWikiPrefDoc).atLeastOnce();
+    expect(xwiki.Param(eq("celements.layout.default"), eq("SimpleLayout"))).andReturn(
+        "SimpleLayout").once();
+    expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), "SimpleLayout",
+        "WebHome")), same(context))).andReturn(false);
+    expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout",
+      "WebHome")), same(context))).andReturn(false);
     replayAll();
     assertNull(plCmd.getLayoutPropDoc());
     verifyAll();
