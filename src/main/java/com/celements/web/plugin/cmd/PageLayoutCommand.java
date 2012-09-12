@@ -224,6 +224,7 @@ public class PageLayoutCommand {
   }
 
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
     IRenderStrategy cellRenderer = new CellRenderer(getContext()).setOutputWriter(
         new DivWriter());
    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
