@@ -274,8 +274,14 @@ public class PageLayoutCommand {
     return layoutSpaceRef;
   }
 
-  private String getDefaultLayout() {
-    return getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT, SIMPLE_LAYOUT);
+  String getDefaultLayout() {
+    String defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT,
+        SIMPLE_LAYOUT);
+    if ((getContext().getAction() != null) && !"view".equals(getContext().getAction())) {
+      defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
+          + getContext().getAction(), defaultLayout);
+    }
+    return defaultLayout;
   }
 
   private SpaceReference decideLocalOrCentral(SpaceReference layoutSpaceRef) {

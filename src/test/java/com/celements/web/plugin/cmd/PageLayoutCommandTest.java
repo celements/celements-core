@@ -56,6 +56,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
   @Before
   public void setUp_PageLayoutCommandTest() throws Exception {
     context = getContext();
+    context.setAction("view");
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     storeMock = createMock(XWikiStoreInterface.class);
@@ -430,7 +431,53 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     assertTrue(plCmd.deleteLayout(layoutSpaceRef));
     verifyAll(queryManagerMock, queryMock);
   }
-  
+
+  @Test
+  public void testGetDefaultLayout_default() {
+    expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT), eq(
+        PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
+    replayAll();
+    assertEquals("TestLayout", plCmd.getDefaultLayout());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetDefaultLayout_null() {
+    context.setAction(null);
+    expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT), eq(
+        PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
+    replayAll();
+    assertEquals("TestLayout", plCmd.getDefaultLayout());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetDefaultLayout_login() {
+    context.setAction("login");
+    expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT), eq(
+        PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
+    expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
+        + context.getAction()), eq("TestLayout"))).andReturn(
+            "LoginLayout");
+    replayAll();
+    assertEquals("LoginLayout", plCmd.getDefaultLayout());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetDefaultLayout_edit() {
+    context.setAction("edit");
+    expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT), eq(
+        PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
+    expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
+        + context.getAction()), eq("TestLayout"))).andReturn(
+            "EditLayout");
+    replayAll();
+    assertEquals("EditLayout", plCmd.getDefaultLayout());
+    verifyAll();
+  }
+
+
   private void replayAll(Object ... mocks) {
     replay(xwiki, storeMock);
     replay(mocks);
