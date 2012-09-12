@@ -188,9 +188,12 @@ public class AppScriptService implements IAppScriptService {
       return path.substring(getStartIndex(path)).replaceAll("^/+", "");
     } else if (isAppScriptOverwriteDocRequest()) {
       String path = getContext().getRequest().getPathInfo().replaceAll("^/+", "");
+      path = path.replaceFirst("^" + defaultEntityReferenceValueProvider.getDefaultValue(
+          EntityType.SPACE) + "/", "");
       if ("".equals(path)) {
-        path = defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE) + "."
-        + defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT);
+        path = defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT);
+      } else if (path.endsWith("/")) {
+        path += defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT);
       }
       return path;
     }

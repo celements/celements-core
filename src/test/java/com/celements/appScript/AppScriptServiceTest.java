@@ -378,7 +378,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetScriptNameFromURL() {
+  public void testGetScriptNameFromURL_emptyPathInfo() {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -393,7 +393,87 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
         ).andReturn("Main.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("").anyTimes();
     replayAll(mockRequest);
-    assertEquals("Main.WebHome", appScriptService.getScriptNameFromURL());
+    assertEquals("WebHome", appScriptService.getScriptNameFromURL());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetScriptNameFromURL_explicit_DefaultSpace() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Main", "Test");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Main.Test").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/Main/Test").anyTimes();
+    replayAll(mockRequest);
+    assertEquals("Test", appScriptService.getScriptNameFromURL());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetScriptNameFromURL_explicit_DefaultPage() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Test", "WebHome");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Test.WebHome").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/Test/WebHome").anyTimes();
+    replayAll(mockRequest);
+    assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetScriptNameFromURL_implicit_DefaultPage() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Test", "WebHome");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Test.WebHome").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/Test/").anyTimes();
+    replayAll(mockRequest);
+    assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetScriptNameFromURL_explicit_DefaultSpace_DefaultPage() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Main", "WebHome");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Main.WebHome").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/Main/WebHome").anyTimes();
+    replayAll(mockRequest);
+    assertEquals("WebHome", appScriptService.getScriptNameFromURL());
     verifyAll(mockRequest);
   }
 
