@@ -277,9 +277,14 @@ public class PageLayoutCommand {
   String getDefaultLayout() {
     String defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT,
         SIMPLE_LAYOUT);
-    if ((getContext().getAction() != null) && !"view".equals(getContext().getAction())) {
+    if ((getContext() != null) && (getContext().getAction() != null)
+        && !"view".equals(getContext().getAction())) {
       defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
           + getContext().getAction(), defaultLayout);
+      LOGGER.debug("getDefaultLayout for action [" + getContext().getAction() + "] got ["
+          + defaultLayout + "].");
+    } else {
+      LOGGER.debug("getDefaultLayout got [" + defaultLayout + "].");
     }
     return defaultLayout;
   }
