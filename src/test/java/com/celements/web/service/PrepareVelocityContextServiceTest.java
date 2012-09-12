@@ -62,7 +62,16 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   }
 
   @Test
-  public void testPrepareVelocityContext_checkNPEs_forNullContext() throws Exception {
+  public void testPrepareVelocityContext_checkNPEs_forNull_Context() throws Exception {
+    context.setUser("XWiki.myTestUser");
+    replayAll();
+    context.remove("vcontext");
+    prepVeloContextService.prepareVelocityContext((XWikiContext)null);
+    verifyAll();
+  }
+  
+  @Test
+  public void testPrepareVelocityContext_checkNPEs_forNull_vContext() throws Exception {
     context.setUser("XWiki.myTestUser");
     expect(xwiki.getDefaultLanguage(same(context))).andReturn("de").atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(false).atLeastOnce();

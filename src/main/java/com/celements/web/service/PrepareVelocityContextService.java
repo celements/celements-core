@@ -64,7 +64,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    */
   @Deprecated
   public void prepareVelocityContext(XWikiContext context) {
-    prepareVelocityContext((VelocityContext) context.get("vcontext"));
+    if (context != null) {
+      prepareVelocityContext((VelocityContext) context.get("vcontext"));
+    }
   }
 
   void fixLanguagePreference(VelocityContext vcontext) {
