@@ -42,7 +42,7 @@ public class MenuNameMappingCelements2_8 extends AbstractCelementsHibernateMigra
   public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
       ) throws XWikiException {
     manager.updateSchema(context);
-    new NavigationClasses().runUpdate(context);
+    new NavigationClasses().runUpdate();
     List<Object> result = context.getWiki().search(
         "select o.name from BaseObject o, StringProperty s"
         + " where o.className = 'Celements2.MenuName' and o.id = s.id"
