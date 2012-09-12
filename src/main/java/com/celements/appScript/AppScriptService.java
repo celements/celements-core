@@ -9,7 +9,9 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -30,6 +32,9 @@ public class AppScriptService implements IAppScriptService {
   @Requirement
   Execution execution;
   
+  @Requirement
+  EntityReferenceValueProvider defaultEntityReferenceValueProvider;
+
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
@@ -182,7 +187,12 @@ public class AppScriptService implements IAppScriptService {
       String path = getContext().getRequest().getPathInfo();
       return path.substring(getStartIndex(path)).replaceAll("^/+", "");
     } else if (isAppScriptOverwriteDocRequest()) {
-      return getContext().getRequest().getPathInfo().replaceAll("^/+", "");
+      String path = getContext().getRequest().getPathInfo().replaceAll("^/+", "");
+      if ("".equals(path)) {
+        path = defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE) + "."
+        + defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT);
+      }
+      return path;
     }
     return getContext().getRequest().getParameter("s");
   }

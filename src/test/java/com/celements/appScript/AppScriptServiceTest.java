@@ -377,6 +377,27 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockRequest);
   }
 
+  @Test
+  public void testGetScriptNameFromURL() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("view");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "Main", "WebHome");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("Main.WebHome").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("").anyTimes();
+    replayAll(mockRequest);
+    assertEquals("Main.WebHome", appScriptService.getScriptNameFromURL());
+    verifyAll(mockRequest);
+  }
+
+
   private void replayAll(Object ... mocks) {
     replay(xwiki);
     replay(mocks);
