@@ -20,18 +20,6 @@
 package com.celements.web.utils;
 
 import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -49,7 +37,6 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
-import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
@@ -63,7 +50,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -314,14 +300,44 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
     expect(wiki.getDocument(eq(prevDoc.getDocumentReference()), same(context))
         ).andReturn(prevDoc).once();
-    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), "Celements2.MenuItem", 0);
+    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), "Celements2.MenuItem",
+        0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getPrevMenuItem(doc.getDocumentReference())
         ).andReturn(tnPrev).once();
     replayAll(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(mItemFullName,context);
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(mItemFullName,
+        context);
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem1, prevMenuItem);
+    verifyAll(mockTreeNodeService);
+  }
+  
+  @Test
+  public void testPrevMenuItem_noPrev() throws XWikiException{
+    String mItemFullName = "mySpace.myMenuItemDoc";
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName(mItemFullName);
+    context.setDoc(doc);
+    BaseObject menuItem1 = new BaseObject();
+    String prevFullName = "mySpace.Doc1";
+    menuItem1.setName(prevFullName);
+    menuItem1.setClassName("Celements2.MenuItem");
+    XWikiDocument prevDoc = new XWikiDocument();
+    prevDoc.setFullName(prevFullName);
+    prevDoc.setObject("Celements2.MenuItem", 0, menuItem1);
+    BaseObject menuItemItemDoc = new BaseObject();
+    menuItemItemDoc.setName(mItemFullName);
+    menuItemItemDoc.setClassName("Celements2.MenuItem");
+    doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
+    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injectTreeNodeService(mockTreeNodeService);
+    expect(mockTreeNodeService.getPrevMenuItem(eq(prevDoc.getDocumentReference()))
+        ).andReturn(null).once();
+    replayAll(mockTreeNodeService);
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(prevFullName,
+        context);
+    assertNull(prevMenuItem);
     verifyAll(mockTreeNodeService);
   }
   
@@ -347,7 +363,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getNextMenuItem(doc.getDocumentReference())
+    expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))
         ).andReturn(tnPrev).once();
     replayAll(mockTreeNodeService);
     BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName,context);
@@ -375,10 +391,11 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
     expect(wiki.getDocument(eq(nextDoc.getDocumentReference()), same(context))
         ).andReturn(nextDoc).once();
-    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
+    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem",
+        0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getNextMenuItem(doc.getDocumentReference())
+    expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))
         ).andReturn(tnPrev).once();
     replayAll(mockTreeNodeService);
     BaseObject nextMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName,context);
@@ -386,6 +403,34 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockTreeNodeService);
   }
   
+  @Test
+  public void testNextMenuItem_noNext() throws XWikiException{
+    String mItemFullName = "mySpace.myMenuItemDoc";
+    XWikiDocument doc = new XWikiDocument();
+    doc.setFullName(mItemFullName);
+    context.setDoc(doc);
+    BaseObject menuItem2 = new BaseObject();
+    String nextFullName = "mySpace.Doc2";
+    menuItem2.setName(nextFullName);
+    menuItem2.setClassName("Celements2.MenuItem");
+    XWikiDocument nextDoc = new XWikiDocument();
+    nextDoc.setFullName(nextFullName);
+    nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
+    BaseObject menuItemItemDoc = new BaseObject();
+    menuItemItemDoc.setName(mItemFullName);
+    menuItemItemDoc.setClassName("Celements2.MenuItem");
+    doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
+    ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
+    celUtils.injectTreeNodeService(mockTreeNodeService);
+    expect(mockTreeNodeService.getNextMenuItem(eq(nextDoc.getDocumentReference()))
+        ).andReturn(null).once();
+    replayAll(mockTreeNodeService);
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(nextFullName,
+        context);
+    assertNull(prevMenuItem);
+    verifyAll(mockTreeNodeService);
+  }
+
   @Test
   public void testGetDocSection_empty() throws XWikiException {
     String fullName = "Space.DocName";
