@@ -50,6 +50,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class PageLayoutCommand {
 
+  public static final String SIMPLE_LAYOUT = "SimpleLayout";
+
+  public static final String XWIKICFG_CELEMENTS_LAYOUT_DEFAULT
+      = "celements.layout.default";
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageLayoutCommand.class);
 
@@ -270,7 +275,7 @@ public class PageLayoutCommand {
   }
 
   private String getDefaultLayout() {
-    return getContext().getWiki().Param("celements.layout.default", "SimpleLayout");
+    return getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT, SIMPLE_LAYOUT);
   }
 
   private SpaceReference decideLocalOrCentral(SpaceReference layoutSpaceRef) {
