@@ -39,7 +39,7 @@ public class CellRenderer implements IRenderStrategy {
   public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
     + CELEMENTS_CELL_CLASS_NAME;
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(CellRenderer.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CellRenderer.class);
 
   private ICellWriter cellWriter;
   private XWikiContext context;
@@ -101,7 +101,7 @@ public class CellRenderer implements IRenderStrategy {
         idname  = cellObj.getStringValue("idname");
       }
     } catch (XWikiException e) {
-      mLogger.error("failed to get cell [" + node.getDocumentReference()
+      LOGGER.error("failed to get cell [" + node.getDocumentReference()
           + "] document.", e);
     }
     cellWriter.openLevel(idname, cssClasses, cssStyles);
@@ -127,7 +127,7 @@ public class CellRenderer implements IRenderStrategy {
     try {
       cellContent = ctRendererCmd().renderCelementsCell(parent);
     } catch (XWikiException exp) {
-      mLogger.error("failed to get cell [" + parent + "] document to render cell"
+      LOGGER.error("failed to get cell [" + parent + "] document to render cell"
           + " content.", exp);
     }
     cellWriter.appendContent(cellContent);
