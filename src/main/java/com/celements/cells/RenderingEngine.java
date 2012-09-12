@@ -21,6 +21,8 @@ package com.celements.cells;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.TreeNode;
@@ -29,6 +31,8 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.web.Utils;
 
 public class RenderingEngine implements IRenderingEngine {
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(RenderingEngine.class);
 
   private IRenderStrategy renderStrategy;
 
@@ -64,6 +68,7 @@ public class RenderingEngine implements IRenderingEngine {
    *      org.xwiki.model.reference.SpaceReference)
    */
   public void renderPageLayout(SpaceReference spaceRef) {
+    LOGGER.debug("renderPageLayout: start rendering [" + spaceRef + "].");
     renderStrategy.startRendering();
     renderStrategy.setSpaceReference(spaceRef);
     internal_renderSubCells("");
@@ -82,6 +87,8 @@ public class RenderingEngine implements IRenderingEngine {
     if(renderStrategy.isRenderSubCells(parent)) {
       List<TreeNode> children = getTreeNodeService().getSubNodesForParent(parent,
           renderStrategy.getMenuSpace(parent), renderStrategy.getMenuPart(parent));
+      LOGGER.debug("internal_renderSubCells: for parent [" + parent
+          + "] render [" + children.size() + "] children [" + children + "].");
       if (children.size() > 0) {
         renderStrategy.startRenderChildren(parent);
         boolean isFirstItem = true;
