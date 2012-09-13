@@ -116,6 +116,8 @@ public class CellRenderer implements IRenderStrategy {
     String idname = "";
     try {
       DocumentReference cellDocRef = node.getDocumentReference();
+      LOGGER.debug("startRenderCell: cellDocRef [" + cellDocRef + "] context db ["
+          + context.getDatabase() + "].");
       XWikiDocument cellDoc = context.getWiki().getDocument(cellDocRef, context);
       BaseObject cellObj = cellDoc.getXObject(new DocumentReference(
           cellDocRef.getWikiReference().getName(),
@@ -150,6 +152,7 @@ public class CellRenderer implements IRenderStrategy {
   public void renderEmptyChildren(String parent) {
     String cellContent = "";
     try {
+      LOGGER.debug("renderEmptyChildren: parent [" + parent + "].");
       cellContent = ctRendererCmd().renderCelementsCell(parent);
     } catch (XWikiException exp) {
       LOGGER.error("failed to get cell [" + parent + "] document to render cell"
