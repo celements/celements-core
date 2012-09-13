@@ -196,8 +196,10 @@ public class TreeNodeService implements ITreeNodeService {
    * @param context
    * @return Collection keeps ordering of TreeNodes according to posId
    */
-  List<TreeNode> fetchNodesForParentKey(EntityReference reference) {
-    String parentKey = getParentKey(reference, true);
+  List<TreeNode> fetchNodesForParentKey(EntityReference parentRef) {
+    String parentKey = getParentKey(parentRef, true);
+    LOGGER.trace("fetchNodesForParentKey: parentRef [" + parentRef + "] parentKey ["
+        + parentKey+ "].");
     long starttotal = System.currentTimeMillis();
     long start = System.currentTimeMillis();
     List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
