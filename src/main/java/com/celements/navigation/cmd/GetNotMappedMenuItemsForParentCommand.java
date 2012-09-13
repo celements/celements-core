@@ -61,8 +61,6 @@ public class GetNotMappedMenuItemsForParentCommand {
       Map<String, List<TreeNode>> wikiMenuItemsMap =
         new HashMap<String, List<TreeNode>>();
       queryCount = queryCount + 1;
-      String hql = getHQL();
-      LOGGER.debug("Executing hql: " + hql);
       List<TreeNode> menu = null;
       try {
         //TODO: check if it is ok, that we can get documents from other
@@ -71,8 +69,7 @@ public class GetNotMappedMenuItemsForParentCommand {
         String oldParentKey = "";
         int docCount = 0;
         long start = System.currentTimeMillis();
-        List<Object[]> results = context.getWiki().getStore().search(hql, 0, 0,
-            context);
+        List<Object[]> results = getFromDBForParentKey(parentKey, context);
         long end = System.currentTimeMillis();
         LOGGER.info("getNotMappedMenuItemsFromDatabase: time for searchDocumentsNames: "
             + (end-start));
@@ -142,6 +139,24 @@ public class GetNotMappedMenuItemsForParentCommand {
     return Collections.emptyList();
   }
 
+  List<Object[]> getFromDBForParentKey(String parentKey, XWikiContext context)
+      throws XWikiException {
+    String databaseBefore = context.getDatabase();
+    List<Object[]> results = executeSearch(parentKey, context);
+    context.setDatabase(databaseBefore);
+    return results;
+  }
+
+  List<Object[]> executeSearch(String parentKey, XWikiContext context)
+      throws XWikiException {
+    context.setDatabase(getWikiName(parentKey, context));
+    String hql = getHQL();
+    LOGGER.debug("Executing hql: " + hql);
+    List<Object[]> results = context.getWiki().getStore().search(hql, 0, 0,
+        context);
+    return results;
+  }
+
   String getHQL() {
     /*
      * select doc.XWD_FULLNAME from xwikidoc doc, xwikiobjects obj, xwikiintegers pos
@@ -164,6 +179,10 @@ public class GetNotMappedMenuItemsForParentCommand {
   }
 
   String getCacheKey(String parentKey, XWikiContext context) {
+    return getWikiName(parentKey, context);
+  }
+
+  private String getWikiName(String parentKey, XWikiContext context) {
     String wikiName = context.getDatabase();
     if (parentKey.contains(":")) {
       wikiName = parentKey.split(":", 2)[0];
