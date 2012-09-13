@@ -151,7 +151,7 @@ public class GetNotMappedMenuItemsForParentCommand {
       throws XWikiException {
     context.setDatabase(getWikiName(parentKey, context));
     String hql = getHQL();
-    LOGGER.debug("Executing hql: " + hql);
+    LOGGER.debug("Executing on db [" + context.getDatabase() + "] hql: " + hql);
     List<Object[]> results = context.getWiki().getStore().search(hql, 0, 0,
         context);
     return results;
