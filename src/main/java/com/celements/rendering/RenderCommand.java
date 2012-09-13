@@ -53,6 +53,12 @@ public class RenderCommand {
 
   private static XWikiRenderingEngine defaultRenderingEngine;
 
+  /**
+   * @Deprecated since 2.18.0 instead use new RenderCommand() 
+   */
+  @Deprecated
+  public RenderCommand(XWikiContext context) {}
+  
   public RenderCommand() {}
 
   private XWikiContext getContext() {
