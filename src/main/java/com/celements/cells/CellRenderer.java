@@ -22,15 +22,19 @@ package com.celements.cells;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class CellRenderer implements IRenderStrategy {
   
@@ -47,6 +51,8 @@ public class CellRenderer implements IRenderStrategy {
   private SpaceReference spaceReference;
 
   private RenderCommand ctRendererCmd;
+  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
+  IWebUtilsService webUtilsService = Utils.getComponent(IWebUtilsService.class);
 
   public CellRenderer(XWikiContext context) {
     this.context = context;
@@ -69,12 +75,31 @@ public class CellRenderer implements IRenderStrategy {
       return getSpaceReference().getName();
   }
 
+  @Deprecated
   public SpaceReference getSpaceReference() {
     if (spaceReference == null) {
       return new SpaceReference("Skin", new WikiReference(context.getDatabase()));
     } else {
       return spaceReference;
     }
+  }
+
+  public EntityReference getParentReference(String parent) {
+    EntityReference parentRef;
+    if (spaceReference == null) {
+      spaceReference = pageLayoutCmd.getDefaultLayoutSpaceReference();
+    }
+    if ("".equals(parent)) {
+      parentRef = spaceReference;
+    } else if (parent.contains(".")) {
+      DocumentReference parentKeyRef = webUtilsService.resolveDocumentReference(parent);
+      parentRef = new DocumentReference(spaceReference.getParent().getName(),
+          parentKeyRef.getLastSpaceReference().getName(), parentKeyRef.getName());
+    } else {
+      DocumentReference parentKeyRef = webUtilsService.resolveDocumentReference(parent);
+      parentRef = new DocumentReference(parentKeyRef.getName(), spaceReference);
+    }
+    return parentRef;
   }
 
   public boolean isRenderCell(TreeNode node) {

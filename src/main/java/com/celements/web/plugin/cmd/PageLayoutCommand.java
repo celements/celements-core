@@ -268,11 +268,16 @@ public class PageLayoutCommand {
     }
     layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
     if (layoutSpaceRef == null) {
-      layoutSpaceRef = new SpaceReference(getDefaultLayout(), new WikiReference(
-          getContext().getDatabase()));
-      layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+      layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
     return layoutSpaceRef;
+  }
+
+  public SpaceReference getDefaultLayoutSpaceReference() {
+    SpaceReference defaultLayoutSpaceRef = new SpaceReference(getDefaultLayout(),
+        new WikiReference(getContext().getDatabase()));
+    defaultLayoutSpaceRef = decideLocalOrCentral(defaultLayoutSpaceRef);
+    return defaultLayoutSpaceRef;
   }
 
   String getDefaultLayout() {

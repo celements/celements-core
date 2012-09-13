@@ -27,10 +27,13 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,6 +47,7 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private XWiki xwiki;
   private RenderCommand mockctRendererCmd;
+  private PageLayoutCommand pageLayoutCmdMock;
 
   @Before
   public void setUp_CellRendererTest() throws Exception {
@@ -54,6 +58,8 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     renderer = new CellRenderer(context).setOutputWriter(outWriterMock);
     mockctRendererCmd = createMock(RenderCommand.class);
     renderer.inject_ctRenderCmd(mockctRendererCmd);
+    pageLayoutCmdMock = createMock(PageLayoutCommand.class);
+    renderer.pageLayoutCmd = pageLayoutCmdMock;
   }
 
   @Test
@@ -174,9 +180,9 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
 
-    replay(xwiki, outWriterMock);
+    replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verify(xwiki, outWriterMock);
+    verifyAll();
   }
 
   @Test
@@ -202,9 +208,9 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
 
-    replay(xwiki, outWriterMock);
+    replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verify(xwiki, outWriterMock);
+    verifyAll();
   }
 
   @Test
@@ -215,9 +221,93 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
         ).andReturn(cellContentExpected).once();
     //ASSERT
     outWriterMock.appendContent(eq(cellContentExpected));
-    replay(xwiki, outWriterMock, mockctRendererCmd);
+    replayAll();
     renderer.renderEmptyChildren(fullname);
-    verify(xwiki, outWriterMock, mockctRendererCmd);
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentReference_noSpaceRefSet() {
+    String defaultLayout = "defaultLayout";
+    SpaceReference expectedDefLayoutParentRef = new SpaceReference(defaultLayout,
+        new WikiReference(context.getDatabase()));
+    expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(
+        expectedDefLayoutParentRef).once();
+    replayAll();
+    assertEquals(expectedDefLayoutParentRef, renderer.getParentReference(""));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentReference_mainNodes() {
+    String mySpace = "mySpace";
+    SpaceReference expectedParentRef = new SpaceReference(mySpace, new WikiReference(
+        context.getDatabase()));
+    renderer.setSpaceReference(expectedParentRef);
+    replayAll();
+    assertEquals(expectedParentRef, renderer.getParentReference(""));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentReference_mainNodes_differentWiki() {
+    String mySpace = "mySpace";
+    SpaceReference expectedParentRef = new SpaceReference(mySpace, new WikiReference(
+        "theTestWiki"));
+    renderer.setSpaceReference(expectedParentRef);
+    replayAll();
+    assertEquals(expectedParentRef, renderer.getParentReference(""));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentReference_subnodes_fullName() {
+    String mySpace = "mySpace";
+    SpaceReference nodeSpaceRef = new SpaceReference(mySpace, new WikiReference(
+        "theTestWiki"));
+    renderer.setSpaceReference(nodeSpaceRef);
+    DocumentReference expectedParentRef = new DocumentReference("theTestWiki", mySpace,
+        "MyDoc");
+    replayAll();
+    assertEquals(expectedParentRef, renderer.getParentReference("mySpace.MyDoc"));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentReference_subnodes_Name() {
+    String mySpace = "mySpace";
+    SpaceReference nodeSpaceRef = new SpaceReference(mySpace, new WikiReference(
+        "theTestWiki"));
+    renderer.setSpaceReference(nodeSpaceRef);
+    DocumentReference expectedParentRef = new DocumentReference("theTestWiki", mySpace,
+        "MyDoc");
+    replayAll();
+    assertEquals(expectedParentRef, renderer.getParentReference("MyDoc"));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentReference_subnodes_fullNameWithDB() {
+    String mySpace = "mySpace";
+    SpaceReference nodeSpaceRef = new SpaceReference(mySpace, new WikiReference(
+        "theTestWiki"));
+    renderer.setSpaceReference(nodeSpaceRef);
+    DocumentReference expectedParentRef = new DocumentReference("theTestWiki", mySpace,
+        "MyDoc");
+    replayAll();
+    assertEquals(expectedParentRef, renderer.getParentReference("thewiki:mySpace.MyDoc"));
+    verifyAll();
+  }
+
+
+  private void replayAll(Object ... mocks) {
+    replay(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
+    verify(mocks);
   }
 
 }

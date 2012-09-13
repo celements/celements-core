@@ -19,6 +19,7 @@
  */
 package com.celements.cells;
 
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.TreeNode;
@@ -40,7 +41,13 @@ public interface IRenderStrategy {
   @Deprecated
   public String getMenuSpace(String fullName);
 
+  /**
+   * @deprecated since 2.18.0  use getParentReference(String) instead
+   */
+  @Deprecated
   public SpaceReference getSpaceReference();
+
+  public EntityReference getParentReference(String parent);
 
   public String getMenuPart(String parent);
 
