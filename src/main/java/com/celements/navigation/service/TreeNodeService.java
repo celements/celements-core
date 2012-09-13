@@ -157,6 +157,8 @@ public class TreeNodeService implements ITreeNodeService {
   
   public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
       INavFilter<T> filter) {
+    LOGGER.trace("getSubNodesForParent: entRef [" + entRef + "] filter class ["
+        + filter.getClass() + "].");
     ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
     for(TreeNode node : fetchNodesForParentKey(entRef)) {
       if((node!=null) && filter.includeTreeNode(node, getContext())) {
