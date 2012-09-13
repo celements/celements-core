@@ -223,6 +223,13 @@ public class PageLayoutCommand {
     return renderPageLayout(getPageLayoutForCurrentDoc());
   }
 
+  /**
+   * renderPageLayout(SpaceReference) does NOT check any access rights. Or if the given
+   * layout exists. This MUST be done before calling renderPageLayout(SpaceReference).
+   * 
+   * @param layoutSpaceRef
+   * @return
+   */
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
     LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
     IRenderStrategy cellRenderer = new CellRenderer(getContext()).setOutputWriter(
@@ -232,6 +239,12 @@ public class PageLayoutCommand {
    return cellRenderer.getAsString();
   }
  
+  /**
+   * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may
+   * be used by the current context database.
+   * 
+   * @return
+   */
   public SpaceReference getPageLayoutForCurrentDoc() {
     return getPageLayoutForDoc(getContext().getDoc().getDocumentReference());
   }
@@ -267,10 +280,25 @@ public class PageLayoutCommand {
       }
     }
     layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
-    if (layoutSpaceRef == null) {
+    if ((layoutSpaceRef == null) || !checkLayoutAccess(layoutSpaceRef)) {
       layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
     return layoutSpaceRef;
+  }
+
+  /**
+   * prohibit layout access in different db except central celements2web (or
+   * default layout configured on disk).
+   * 
+   * TODO add allowedDBs to layout properties
+   * 
+   * @param layoutSpaceRef
+   * @return
+   */
+  public boolean checkLayoutAccess(SpaceReference layoutSpaceRef) {
+    String layoutWikiName = layoutSpaceRef.getParent().getName();
+    return getContext().getDatabase().equals(layoutWikiName)
+        || "celements2web".equals(layoutWikiName);
   }
 
   public SpaceReference getDefaultLayoutSpaceReference() {
