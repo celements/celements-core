@@ -69,7 +69,7 @@ public class GetNotMappedMenuItemsForParentCommand {
         String oldParentKey = "";
         int docCount = 0;
         long start = System.currentTimeMillis();
-        List<Object[]> results = getFromDBForParentKey(parentKey, context);
+        List<Object[]> results = getFromDBForParentKey(searchParentKey, context);
         long end = System.currentTimeMillis();
         LOGGER.info("getNotMappedMenuItemsFromDatabase: time for searchDocumentsNames: "
             + (end-start));
