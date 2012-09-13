@@ -164,6 +164,8 @@ public class TreeNodeService implements ITreeNodeService {
       if((node!=null) && filter.includeTreeNode(node, getContext())) {
         // show only Menuitems of pages accessible to the current user
         menuArray.add(node);
+      } else {
+        LOGGER.debug("getSubNodesForParent: omit [" + node + "].");
       }
     }
     return menuArray;
