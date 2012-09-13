@@ -56,6 +56,7 @@ public class GetNotMappedMenuItemsForParentCommand {
   public List<TreeNode> getTreeNodesForParentKey(String searchParentKey,
       XWikiContext context) {
     String cacheKey = getCacheKey(searchParentKey, context);
+    LOGGER.trace("getNotMappedMenuItemsFromDatabase: for cacheKey [" + cacheKey + "].");
     if (!menuItems.containsKey(cacheKey)) {
       Map<String, List<TreeNode>> wikiMenuItemsMap =
         new HashMap<String, List<TreeNode>>();
