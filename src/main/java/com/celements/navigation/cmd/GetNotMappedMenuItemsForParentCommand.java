@@ -69,7 +69,8 @@ public class GetNotMappedMenuItemsForParentCommand {
         String oldParentKey = "";
         int docCount = 0;
         long start = System.currentTimeMillis();
-        List<Object[]> results = getFromDBForParentKey(searchParentKey, context);
+        String wikiName = getWikiName(searchParentKey, context);
+        List<Object[]> results = getFromDBForParentKey(wikiName, context);
         long end = System.currentTimeMillis();
         LOGGER.info("getNotMappedMenuItemsFromDatabase: time for searchDocumentsNames: "
             + (end-start));
@@ -78,7 +79,8 @@ public class GetNotMappedMenuItemsForParentCommand {
           docCount++;
           LOGGER.debug("got item from db: " + docData[0].toString());
           oldParentKey = parentKey;
-          parentKey = getParentKey(docData[2].toString(), docData[1].toString(), context);
+          parentKey = getParentKey(wikiName, docData[2].toString(), docData[1].toString(),
+              context);
           if(!oldParentKey.equals(parentKey) || (menu == null)) {
             if (menu != null) {
               LOGGER.debug("put menu in cache for parent [" + oldParentKey + "]");
@@ -88,16 +90,16 @@ public class GetNotMappedMenuItemsForParentCommand {
           }
           LOGGER.debug("put item [" + docData[0].toString() + "] in cache [" + parentKey
               + "]: ");
-          if ((context.getDatabase() == null) || (docData[1].toString() == null) ||
+          if ((wikiName == null) || (docData[1].toString() == null) ||
               (docData[0].toString().split("\\.")[1] == null)
-              || "".equals(context.getDatabase()) || "".equals(docData[1].toString()) ||
+              || "".equals(wikiName) || "".equals(docData[1].toString()) ||
                   "".equals(docData[0].toString().split("\\.")[1])) {
             LOGGER.warn("getNotMappedMenuItemsFromDatabase: skip ["
                 + docData[0].toString() + "] because of null value!! "
-                + context.getDatabase() + ", " + docData[1].toString() + ", "
+                + wikiName + ", " + docData[1].toString() + ", "
                 + docData[0].toString().split("\\.")[1]);
           } else {
-            TreeNode treeNode = new TreeNode(new DocumentReference(context.getDatabase(),
+            TreeNode treeNode = new TreeNode(new DocumentReference(wikiName,
                 docData[1].toString(), docData[0].toString().split("\\.")[1]),
                 docData[2].toString(), (Integer) docData[3]);
             treeNode.setPartNameGetStrategy(new IPartNameGetStrategy() {
@@ -139,17 +141,17 @@ public class GetNotMappedMenuItemsForParentCommand {
     return Collections.emptyList();
   }
 
-  List<Object[]> getFromDBForParentKey(String parentKey, XWikiContext context)
+  List<Object[]> getFromDBForParentKey(String wikiName, XWikiContext context)
       throws XWikiException {
     String databaseBefore = context.getDatabase();
-    List<Object[]> results = executeSearch(parentKey, context);
+    List<Object[]> results = executeSearch(wikiName, context);
     context.setDatabase(databaseBefore);
     return results;
   }
 
-  List<Object[]> executeSearch(String parentKey, XWikiContext context)
+  List<Object[]> executeSearch(String wikiName, XWikiContext context)
       throws XWikiException {
-    context.setDatabase(getWikiName(parentKey, context));
+    context.setDatabase(wikiName);
     String hql = getHQL();
     LOGGER.debug("Executing on db [" + context.getDatabase() + "] hql: " + hql);
     List<Object[]> results = context.getWiki().getStore().search(hql, 0, 0,
@@ -190,7 +192,7 @@ public class GetNotMappedMenuItemsForParentCommand {
     return wikiName;
   }
 
-  String getParentKey(String parent, String menuSpace, XWikiContext context) {
+  String getParentKey(String wikiName, String parent, String menuSpace, XWikiContext context) {
     String parentKey = "";
     if (parent != null) {
       parentKey = parent;
@@ -199,7 +201,7 @@ public class GetNotMappedMenuItemsForParentCommand {
       parentKey = menuSpace + "." + parentKey;
     }
     if(parentKey.indexOf(':') < 0) {
-      parentKey = context.getDatabase() + ":" + parentKey;
+      parentKey = wikiName + ":" + parentKey;
     }
     return parentKey;
   }

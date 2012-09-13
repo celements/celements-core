@@ -171,12 +171,37 @@ public class GetNotMappedMenuItemsForParentCommandTest
     verifyAll();
   }
 
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testGetTreeNodesForParentKey_differentDbs() throws Exception {
+    context.setDatabase("myTestWiki");
+    String searchParentKey = "mydatabase:MySpace.";
+    List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
+        "mydatabase", "MySpace", "MyDoc1"), "", 1),
+        new TreeNode(new DocumentReference("mydatabase", "MySpace", "MyDoc2"), "", 2));
+    List resultList = Arrays.asList(Arrays.asList("MySpace.MyDoc1", "MySpace", "", 1
+        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
+        resultList).atLeastOnce();
+    replayAll();
+    List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(
+        searchParentKey, context);
+    for (int index = 0; index < resultTNlist.size(); index ++) {
+      TreeNode testNode = resultTNlist.get(index);
+      TreeNode expectedNode = expectedList.get(index);
+      assertEquals("expected [" + expectedNode.getDocumentReference() + "] but found ["
+          + testNode.getDocumentReference() + "].", expectedNode, testNode);
+    }
+    assertEquals(expectedList, resultTNlist);
+    verifyAll();
+  }
+
   @Test
   public void testGetParentKey_FullName() {
     context.setDatabase("mydatabase");
     replayAll();
-    assertEquals("mydatabase:Full.Name", notMappedItemsCmd.getParentKey("Full.Name",
-        "Space", context));
+    assertEquals("mydatabase:Full.Name", notMappedItemsCmd.getParentKey(
+        context.getDatabase(), "Full.Name", "Space", context));
     verifyAll();
   }
 
@@ -184,8 +209,17 @@ public class GetNotMappedMenuItemsForParentCommandTest
   public void testGetParentKey_Name() {
     context.setDatabase("mydatabase");
     replayAll();
-    assertEquals("mydatabase:Space.Name", notMappedItemsCmd.getParentKey("Name", "Space",
-        context));
+    assertEquals("mydatabase:Space.Name", notMappedItemsCmd.getParentKey(
+        context.getDatabase(), "Name", "Space", context));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentKey_Name_differentdb() {
+    context.setDatabase("myTestWiki");
+    replayAll();
+    assertEquals("mydatabase:Space.Name", notMappedItemsCmd.getParentKey("mydatabase",
+        "Name", "Space", context));
     verifyAll();
   }
 
@@ -232,8 +266,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     replayAll();
-    List<Object[]> result = notMappedItemsCmd.executeSearch("mydatabase:MySpace.",
-        context);
+    List<Object[]> result = notMappedItemsCmd.executeSearch("mydatabase", context);
     assertEquals("expect database being adjusted.", "mydatabase", context.getDatabase());
     assertEquals(resultList, result);
     verifyAll();
@@ -243,7 +276,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
   @Test
   public void testGetFromDBForParentKey_preserve_db() throws Exception {
     context.setDatabase("myTestWiki");
-    List resultList = Arrays.asList(Arrays.asList(".MyDoc1", "", "", 1
+    List resultList = Arrays.asList(Arrays.asList("MySpace.MyDoc1", "MySpace", "", 1
         ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
