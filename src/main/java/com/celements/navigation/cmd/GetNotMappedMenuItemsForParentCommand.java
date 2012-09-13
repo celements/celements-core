@@ -164,9 +164,11 @@ public class GetNotMappedMenuItemsForParentCommand {
   }
 
   String getCacheKey(String parentKey, XWikiContext context) {
-//    String parentFullKey = getParentKey(parentKey, "", context);
-//    return parentFullKey.substring(0, parentFullKey.indexOf('.'));
-    return context.getDatabase();
+    String wikiName = context.getDatabase();
+    if (parentKey.contains(":")) {
+      wikiName = parentKey.split(":", 2)[0];
+    }
+    return wikiName;
   }
 
   String getParentKey(String parent, String menuSpace, XWikiContext context) {

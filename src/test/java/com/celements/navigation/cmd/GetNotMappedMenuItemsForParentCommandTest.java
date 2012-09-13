@@ -59,15 +59,22 @@ public class GetNotMappedMenuItemsForParentCommandTest
   @Test
   public void testGetCacheKey_space() {
     context.setDatabase("mydatabase");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey(
-        "mydatabase:MySpace.", context));
+    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace.",
+        context));
   }
 
   @Test
   public void testGetCacheKey_fullName() {
     context.setDatabase("mydatabase");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey(
-        "mydatabase:MySpace2.Doc2", context));
+    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace2.Doc2",
+        context));
+  }
+
+  @Test
+  public void testGetCacheKey_space_different_db() {
+    context.setDatabase("theWiki");
+    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace.",
+        context));
   }
 
   @Test
