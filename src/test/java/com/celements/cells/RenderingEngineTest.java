@@ -29,6 +29,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -129,10 +130,12 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(""))).andReturn(true).once();
     String menuSpace = "MyCellSpace";
     String menuPart = "mainPart";
-    expect(renderStrategyMock.getMenuSpace(eq(""))).andReturn(menuSpace);
+    EntityReference menuSpaceRef = new SpaceReference(menuSpace, new WikiReference(
+        context.getDatabase()));
+    expect(renderStrategyMock.getParentReference(eq(""))).andReturn(menuSpaceRef);
     expect(renderStrategyMock.getMenuPart(eq(""))).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
-    expect(mockTreeNodeService.getSubNodesForParent(eq(""), eq(menuSpace), eq(menuPart))
+    expect(mockTreeNodeService.getSubNodesForParent(eq(menuSpaceRef), eq(menuPart))
         ).andReturn(subCellList);
     renderStrategyMock.renderEmptyChildren(eq(""));
     expectLastCall().once();
@@ -158,10 +161,12 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(""))).andReturn(true).once();
     String menuSpace = "celements2web:MyCellSpace";
     String menuPart = "mainPart";
-    expect(renderStrategyMock.getMenuSpace(eq(""))).andReturn(menuSpace);
+    EntityReference menuSpaceRef = new SpaceReference("MyCellSpace", new WikiReference(
+        "celements2web"));
+    expect(renderStrategyMock.getParentReference(eq(""))).andReturn(menuSpaceRef);
     expect(renderStrategyMock.getMenuPart(eq(""))).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
-    expect(mockTreeNodeService.getSubNodesForParent(eq(""), eq(menuSpace), eq(menuPart))
+    expect(mockTreeNodeService.getSubNodesForParent(eq(menuSpaceRef), eq(menuPart))
         ).andReturn(subCellList);
     renderStrategyMock.renderEmptyChildren(eq(""));
     expectLastCall().once();
@@ -219,11 +224,13 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(fullName))).andReturn(true).once();
     String menuSpace = "MyCellSpace";
     String menuPart = "mainPart";
-    expect(renderStrategyMock.getMenuSpace(eq(fullName))).andReturn(menuSpace);
+    EntityReference parentDocRef = new DocumentReference(context.getDatabase(),
+        menuSpace, "Cell2");
+    expect(renderStrategyMock.getParentReference(eq(fullName))).andReturn(parentDocRef);
     expect(renderStrategyMock.getMenuPart(eq(fullName))).andReturn(menuPart);
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
-    expect(mockTreeNodeService.getSubNodesForParent(eq(fullName), eq(menuSpace),
-        eq(menuPart))).andReturn(subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(parentDocRef), eq(menuPart))
+        ).andReturn(subCellList);
     renderStrategyMock.renderEmptyChildren(eq(fullName));
     expectLastCall().once();
 
@@ -238,7 +245,9 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     expect(renderStrategyMock.isRenderSubCells(eq(fullName))).andReturn(true).once();
     String menuSpace = "MyCellSpace";
     String menuPart = "mainPart";
-    expect(renderStrategyMock.getMenuSpace(eq(fullName))).andReturn(menuSpace).once();
+    EntityReference parentDocRef = new DocumentReference(context.getDatabase(), menuSpace,
+        "Cell2");
+    expect(renderStrategyMock.getParentReference(eq(fullName))).andReturn(parentDocRef);
     expect(renderStrategyMock.getMenuPart(eq(fullName))).andReturn(menuPart).once();
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
     TreeNode subCell1 = new TreeNode(new DocumentReference(context.getDatabase(),
@@ -253,8 +262,8 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     TreeNode subCell4 = new TreeNode(new DocumentReference(context.getDatabase(),
         menuSpace, "subCell4"), "", 4);
     subCellList.add(subCell4);
-    expect(mockTreeNodeService.getSubNodesForParent(eq(fullName), eq(menuSpace),
-        eq(menuPart))).andReturn(subCellList);
+    expect(mockTreeNodeService.getSubNodesForParent(eq(parentDocRef), eq(menuPart))
+        ).andReturn(subCellList);
     renderStrategyMock.startRenderChildren(eq(fullName));
     expectLastCall().once();
     renderStrategyMock.endRenderChildren(eq(fullName));

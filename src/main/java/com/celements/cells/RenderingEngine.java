@@ -85,8 +85,8 @@ public class RenderingEngine implements IRenderingEngine {
 
   void internal_renderSubCells(String parent) {
     if(renderStrategy.isRenderSubCells(parent)) {
-      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(parent,
-          renderStrategy.getMenuSpace(parent), renderStrategy.getMenuPart(parent));
+      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(
+          renderStrategy.getParentReference(parent), renderStrategy.getMenuPart(parent));
       LOGGER.debug("internal_renderSubCells: for parent [" + parent
           + "] render [" + children.size() + "] children [" + children + "].");
       if (children.size() > 0) {
