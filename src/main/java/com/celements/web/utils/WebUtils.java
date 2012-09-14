@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.inheritor.InheritorFactory;
+import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.ExternalUsageFilter;
 import com.celements.navigation.filter.INavFilter;
@@ -291,24 +292,31 @@ public class WebUtils implements IWebUtils {
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
-  public BaseObject getPrevMenuItem(String fullName,
-      XWikiContext context) throws XWikiException {
-    DocumentReference docRef = getTreeNodeService().getPrevMenuItem(getRef(fullName)
-        ).getDocumentReference();
-    return context.getWiki().getDocument(docRef, context)
-        .getXObject(getRef("Celements2.MenuItem"));
+  public BaseObject getPrevMenuItem(String fullName, XWikiContext context
+      ) throws XWikiException {
+    TreeNode prevTreeNode = getTreeNodeService().getPrevMenuItem(getRef(fullName));
+    if (prevTreeNode != null) {
+      DocumentReference docRef = prevTreeNode.getDocumentReference();
+      return context.getWiki().getDocument(docRef, context
+          ).getXObject(getRef("Celements2.MenuItem"));
+    }
+    return null;
   }
 
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
-  public BaseObject getNextMenuItem(String fullName,
-      XWikiContext context) throws XWikiException {
-    DocumentReference docRef = getTreeNodeService().getNextMenuItem(getRef(fullName)
-        ).getDocumentReference();
-    return context.getWiki().getDocument(docRef, context)
-        .getXObject(getRef("Celements2.MenuItem"));
+  public BaseObject getNextMenuItem(String fullName, XWikiContext context
+      ) throws XWikiException {
+    TreeNode nextTreeNode = getTreeNodeService().getNextMenuItem(getRef(fullName));
+    if (nextTreeNode != null) {
+      DocumentReference docRef = nextTreeNode.getDocumentReference();
+      return context.getWiki().getDocument(docRef, context
+          ).getXObject(new NavigationClasses().getMenuItemClassRef(context.getDatabase())
+              );
+    }
+    return null;
   }
 
   /* (non-Javadoc)

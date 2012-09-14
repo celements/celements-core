@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -110,5 +111,7 @@ public interface IWebUtilsService {
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
   
   public String getMajorVersion(XWikiDocument doc);
-  
+
+  public WikiReference getWikiRef(DocumentReference docRef);
+
 }

@@ -157,11 +157,15 @@ public class TreeNodeService implements ITreeNodeService {
   
   public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
       INavFilter<T> filter) {
+    LOGGER.trace("getSubNodesForParent: entRef [" + entRef + "] filter class ["
+        + filter.getClass() + "].");
     ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
     for(TreeNode node : fetchNodesForParentKey(entRef)) {
       if((node!=null) && filter.includeTreeNode(node, getContext())) {
         // show only Menuitems of pages accessible to the current user
         menuArray.add(node);
+      } else {
+        LOGGER.debug("getSubNodesForParent: omit [" + node + "].");
       }
     }
     return menuArray;
@@ -196,8 +200,10 @@ public class TreeNodeService implements ITreeNodeService {
    * @param context
    * @return Collection keeps ordering of TreeNodes according to posId
    */
-  List<TreeNode> fetchNodesForParentKey(EntityReference reference) {
-    String parentKey = getParentKey(reference, true);
+  List<TreeNode> fetchNodesForParentKey(EntityReference parentRef) {
+    String parentKey = getParentKey(parentRef, true);
+    LOGGER.trace("fetchNodesForParentKey: parentRef [" + parentRef + "] parentKey ["
+        + parentKey+ "].");
     long starttotal = System.currentTimeMillis();
     long start = System.currentTimeMillis();
     List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);

@@ -27,23 +27,27 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class CellRendererTest extends AbstractBridgedComponentTestCase {
+public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
-  private CellRenderer renderer;
+  private CellRenderStrategy renderer;
   private ICellWriter outWriterMock;
   private XWikiContext context;
   private XWiki xwiki;
   private RenderCommand mockctRendererCmd;
+  private PageLayoutCommand pageLayoutCmdMock;
 
   @Before
   public void setUp_CellRendererTest() throws Exception {
@@ -51,25 +55,27 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
-    renderer = new CellRenderer(context).setOutputWriter(outWriterMock);
+    renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
     mockctRendererCmd = createMock(RenderCommand.class);
-    renderer.inject_ctRenderCmd(mockctRendererCmd);
+    renderer.rendererCmd = mockctRendererCmd;
+    pageLayoutCmdMock = createMock(PageLayoutCommand.class);
+    renderer.pageLayoutCmd = pageLayoutCmdMock;
   }
 
   @Test
   public void testPageTypeCmd() {
-    renderer.inject_ctRenderCmd(null);
-    assertNotNull(renderer.ctRendererCmd());
-    assertSame("Expecting singleton.", renderer.ctRendererCmd(), 
-        renderer.ctRendererCmd());
+    renderer.rendererCmd = null;
+    assertNotNull(renderer.getRendererCmd());
+    assertSame("Expecting singleton.", renderer.getRendererCmd(), 
+        renderer.getRendererCmd());
   }
 
   @Test
   public void testInject_ctRendererCmd() {
-    renderer.inject_ctRenderCmd(mockctRendererCmd);
-    assertNotNull(renderer.ctRendererCmd());
+    renderer.rendererCmd = mockctRendererCmd;
+    assertNotNull(renderer.getRendererCmd());
     assertSame("Expecting injected mock object.", mockctRendererCmd,
-        renderer.ctRendererCmd());
+        renderer.getRendererCmd());
   }
 
   @Test
@@ -106,12 +112,6 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetMenuSpace() {
-    assertEquals("expecting 'Skin' menuSpace for cells.", "Skin",
-        renderer.getMenuSpace(null));
-  }
-
-  @Test
   public void testIsRenderCell() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
         "MasterCell");
@@ -120,35 +120,47 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testSetSpaceName() {
-    String spaceName = "TestLayout";
-    renderer.setSpaceName(spaceName);
-    assertEquals(spaceName, renderer.getMenuSpace(""));
+  public void testGetSpaceReference_default() {
+    renderer.setSpaceReference(null);
+    SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
+        context.getDatabase()));
+    expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
+    replayAll();
+    assertEquals("expecting default layout space", defaultLayout,
+        renderer.getSpaceReference());
+    verifyAll();
   }
 
   @Test
-  public void testSetSpaceName_null_default() {
-    renderer.setSpaceName(null);
-    assertEquals("Skin", renderer.getMenuSpace(""));
+  public void testGetSpaceReference() {
+    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
+        context.getDatabase()));
+    renderer.setSpaceReference(layoutSpaceRef);
+    replayAll();
+    assertEquals(layoutSpaceRef, renderer.getSpaceReference());
+    verifyAll();
   }
 
   @Test
-  public void testSetSpaceName_emptyString_default() {
-    renderer.setSpaceName("");
-    assertEquals("Skin", renderer.getMenuSpace(""));
-  }
-
-  @Test
-  public void testSetSpaceName_null_setBack() {
-    renderer.setSpaceName("initSpace");
-    renderer.setSpaceName(null);
-    assertEquals("Skin", renderer.getMenuSpace(""));
+  public void testGetSpaceReference_null_setBack() {
+    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
+        context.getDatabase()));
+    renderer.setSpaceReference(layoutSpaceRef);
+    renderer.setSpaceReference(null);
+    SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
+        context.getDatabase()));
+    expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
+    replayAll();
+    assertEquals(defaultLayout, renderer.getSpaceReference());
+    verifyAll();
   }
 
   @Test
   public void testIsRenderSubCells() {
     assertFalse(renderer.isRenderSubCells(null));
-    assertTrue(renderer.isRenderSubCells("notNullValue"));
+    SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
+        context.getDatabase()));
+    assertTrue(renderer.isRenderSubCells(layoutSpaceRef));
   }
 
   @Test
@@ -169,14 +181,14 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     Vector<BaseObject> cellObjList = new Vector<BaseObject>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        CellRenderer.CELEMENTS_CELL_CLASS_SPACE, CellRenderer.CELEMENTS_CELL_CLASS_NAME);
+        CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
 
-    replay(xwiki, outWriterMock);
+    replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verify(xwiki, outWriterMock);
+    verifyAll();
   }
 
   @Test
@@ -197,27 +209,40 @@ public class CellRendererTest extends AbstractBridgedComponentTestCase {
     Vector<BaseObject> cellObjList = new Vector<BaseObject>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(masterCellDb,
-        CellRenderer.CELEMENTS_CELL_CLASS_SPACE, CellRenderer.CELEMENTS_CELL_CLASS_NAME);
+        CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
 
-    replay(xwiki, outWriterMock);
+    replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verify(xwiki, outWriterMock);
+    verifyAll();
   }
 
   @Test
   public void testRenderEmptyChildren() throws XWikiException {
-    String fullname = "Skin.MasterCell";
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin",
+        "MasterCell");
+    TreeNode cellNode = new TreeNode(cellRef, "", 0);
     String cellContentExpected = "Cell test content Skin.MasterCell";
-    expect(mockctRendererCmd.renderCelementsCell(eq(fullname))
-        ).andReturn(cellContentExpected).once();
+    expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(
+        cellContentExpected).once();
     //ASSERT
     outWriterMock.appendContent(eq(cellContentExpected));
-    replay(xwiki, outWriterMock, mockctRendererCmd);
-    renderer.renderEmptyChildren(fullname);
-    verify(xwiki, outWriterMock, mockctRendererCmd);
+    replayAll();
+    renderer.renderEmptyChildren(cellNode);
+    verifyAll();
+  }
+
+
+  private void replayAll(Object ... mocks) {
+    replay(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
+    verify(mocks);
   }
 
 }

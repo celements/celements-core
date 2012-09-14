@@ -22,33 +22,37 @@ package com.celements.cells;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
-public class CellRenderer implements IRenderStrategy {
-  
-  public static final String CELEMENTS_CELL_CLASS_SPACE = "Celements";
-  public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
-  public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
-    + CELEMENTS_CELL_CLASS_NAME;
+public class CellRenderStrategy implements IRenderStrategy {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(CellRenderer.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      CellRenderStrategy.class);
 
   private ICellWriter cellWriter;
   private XWikiContext context;
 
   private SpaceReference spaceReference;
 
-  private RenderCommand ctRendererCmd;
+  RenderCommand rendererCmd;
+  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
+  IWebUtilsService webUtilsService = Utils.getComponent(IWebUtilsService.class);
+  CellsClasses cellClasses = (CellsClasses) Utils.getComponent(IClassCollectionRole.class,
+      "celements.celCellsClasses");
 
-  public CellRenderer(XWikiContext context) {
+  public CellRenderStrategy(XWikiContext context) {
     this.context = context;
   }
 
@@ -56,22 +60,17 @@ public class CellRenderer implements IRenderStrategy {
     cellWriter.closeLevel();
   }
 
-  public void endRenderChildren(String parent) {}
+  public void endRenderChildren(EntityReference parentRef) {}
 
   public void endRendering() {}
 
-  public String getMenuPart(String parent) {
+  public String getMenuPart(TreeNode node) {
     return "";
-  }
-
-  @Deprecated
-  public String getMenuSpace(String fullName) {
-      return getSpaceReference().getName();
   }
 
   public SpaceReference getSpaceReference() {
     if (spaceReference == null) {
-      return new SpaceReference("Skin", new WikiReference(context.getDatabase()));
+      return pageLayoutCmd.getDefaultLayoutSpaceReference();
     } else {
       return spaceReference;
     }
@@ -81,8 +80,8 @@ public class CellRenderer implements IRenderStrategy {
     return node != null;
   }
 
-  public boolean isRenderSubCells(String parent) {
-    return parent != null;
+  public boolean isRenderSubCells(EntityReference parentRef) {
+    return parentRef != null;
   }
 
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
@@ -91,29 +90,30 @@ public class CellRenderer implements IRenderStrategy {
     String idname = "";
     try {
       DocumentReference cellDocRef = node.getDocumentReference();
+      LOGGER.debug("startRenderCell: cellDocRef [" + cellDocRef + "] context db ["
+          + context.getDatabase() + "].");
       XWikiDocument cellDoc = context.getWiki().getDocument(cellDocRef, context);
-      BaseObject cellObj = cellDoc.getXObject(new DocumentReference(
-          cellDocRef.getWikiReference().getName(),
-          CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME));
+      BaseObject cellObj = cellDoc.getXObject(cellClasses.getCellClassRef(
+          cellDocRef.getWikiReference().getName()));
       if(cellObj != null) {
         cssClasses = cellObj.getStringValue("css_classes");
         cssStyles = cellObj.getStringValue("css_styles");
         idname  = cellObj.getStringValue("idname");
       }
     } catch (XWikiException e) {
-      mLogger.error("failed to get cell [" + node.getDocumentReference()
+      LOGGER.error("failed to get cell [" + node.getDocumentReference()
           + "] document.", e);
     }
     cellWriter.openLevel(idname, cssClasses, cssStyles);
   }
 
-  public void startRenderChildren(String parent) {}
+  public void startRenderChildren(EntityReference parentRef) {}
 
   public void startRendering() {
     cellWriter.clear();
   }
 
-  public CellRenderer setOutputWriter(ICellWriter newWriter) {
+  public CellRenderStrategy setOutputWriter(ICellWriter newWriter) {
     this.cellWriter = newWriter;
     return this;
   }
@@ -122,36 +122,23 @@ public class CellRenderer implements IRenderStrategy {
     return cellWriter.getAsString();
   }
 
-  public void renderEmptyChildren(String parent) {
+  public void renderEmptyChildren(TreeNode node) {
     String cellContent = "";
     try {
-      cellContent = ctRendererCmd().renderCelementsCell(parent);
+      LOGGER.debug("renderEmptyChildren: parent [" + node + "].");
+      cellContent = getRendererCmd().renderCelementsCell(node.getDocumentReference());
     } catch (XWikiException exp) {
-      mLogger.error("failed to get cell [" + parent + "] document to render cell"
+      LOGGER.error("failed to get cell [" + node + "] document to render cell"
           + " content.", exp);
     }
     cellWriter.appendContent(cellContent);
   }
 
-  RenderCommand ctRendererCmd() {
-    if (ctRendererCmd == null) {
-      ctRendererCmd = new RenderCommand();
+  RenderCommand getRendererCmd() {
+    if (rendererCmd == null) {
+      rendererCmd = new RenderCommand();
     }
-    return ctRendererCmd;
-  }
-
-  void inject_ctRenderCmd(RenderCommand mockPtRenderCmd) {
-    ctRendererCmd = mockPtRenderCmd;
-  }
-
-  @Deprecated
-  public void setSpaceName(String spaceName) {
-    if ((spaceName != null) && (!"".equals(spaceName))) {
-      setSpaceReference(new SpaceReference(spaceName, new WikiReference(
-        context.getDatabase())));
-    } else {
-      setSpaceReference(null);
-    }
+    return rendererCmd;
   }
 
   public void setSpaceReference(SpaceReference spaceReference) {

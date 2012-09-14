@@ -51,10 +51,15 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   public void prepareVelocityContext(VelocityContext vcontext) {
+    LOGGER.debug("prepareVelocityContext: with vcontext [" + vcontext + "].");
     fixLanguagePreference(vcontext);
+    LOGGER.trace("prepareVelocityContext: after fixLanguagePreference.");
     fixTdocForInvalidLanguage(vcontext);
+    LOGGER.trace("prepareVelocityContext: after fixTdocForInvalidLanguage.");
     initCelementsVelocity(vcontext);
+    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
     initPanelsVelocity(vcontext);
+    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
   }
 
   /**
@@ -64,7 +69,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    */
   @Deprecated
   public void prepareVelocityContext(XWikiContext context) {
-    prepareVelocityContext((VelocityContext) context.get("vcontext"));
+    if (context != null) {
+      prepareVelocityContext((VelocityContext) context.get("vcontext"));
+    }
   }
 
   void fixLanguagePreference(VelocityContext vcontext) {

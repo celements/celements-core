@@ -33,7 +33,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.celements.cells.CellRenderer;
+import com.celements.cells.CellRenderStrategy;
 import com.celements.cells.DivWriter;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
@@ -49,6 +49,11 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.web.Utils;
 
 public class PageLayoutCommand {
+
+  public static final String SIMPLE_LAYOUT = "SimpleLayout";
+
+  public static final String XWIKICFG_CELEMENTS_LAYOUT_DEFAULT
+      = "celements.layout.default";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageLayoutCommand.class);
@@ -218,14 +223,28 @@ public class PageLayoutCommand {
     return renderPageLayout(getPageLayoutForCurrentDoc());
   }
 
+  /**
+   * renderPageLayout(SpaceReference) does NOT check any access rights. Or if the given
+   * layout exists. This MUST be done before calling renderPageLayout(SpaceReference).
+   * 
+   * @param layoutSpaceRef
+   * @return
+   */
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
-    IRenderStrategy cellRenderer = new CellRenderer(getContext()).setOutputWriter(
+    LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
+    IRenderStrategy cellRenderer = new CellRenderStrategy(getContext()).setOutputWriter(
         new DivWriter());
    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
     renderEngine.renderPageLayout(layoutSpaceRef);
    return cellRenderer.getAsString();
   }
  
+  /**
+   * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may
+   * be used by the current context database.
+   * 
+   * @return
+   */
   public SpaceReference getPageLayoutForCurrentDoc() {
     return getPageLayoutForDoc(getContext().getDoc().getDocumentReference());
   }
@@ -261,16 +280,47 @@ public class PageLayoutCommand {
       }
     }
     layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
-    if (layoutSpaceRef == null) {
-      layoutSpaceRef = new SpaceReference(getDefaultLayout(), new WikiReference(
-          getContext().getDatabase()));
-      layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    if ((layoutSpaceRef == null) || !checkLayoutAccess(layoutSpaceRef)) {
+      layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
     return layoutSpaceRef;
   }
 
-  private String getDefaultLayout() {
-    return getContext().getWiki().Param("celements.layout.default", "SimpleLayout");
+  /**
+   * prohibit layout access in different db except central celements2web (or
+   * default layout configured on disk).
+   * 
+   * TODO add allowedDBs to layout properties
+   * 
+   * @param layoutSpaceRef
+   * @return
+   */
+  public boolean checkLayoutAccess(SpaceReference layoutSpaceRef) {
+    String layoutWikiName = layoutSpaceRef.getParent().getName();
+    return getContext().getDatabase().equals(layoutWikiName)
+        || "celements2web".equals(layoutWikiName);
+  }
+
+  public SpaceReference getDefaultLayoutSpaceReference() {
+    SpaceReference defaultLayoutSpaceRef = new SpaceReference(getDefaultLayout(),
+        new WikiReference(getContext().getDatabase()));
+    defaultLayoutSpaceRef = decideLocalOrCentral(defaultLayoutSpaceRef);
+    return defaultLayoutSpaceRef;
+  }
+
+  String getDefaultLayout() {
+    String defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT,
+        SIMPLE_LAYOUT);
+    if ((getContext() != null) && (getContext().getAction() != null)
+        && !"view".equals(getContext().getAction())) {
+      defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
+          + getContext().getAction(), defaultLayout);
+      LOGGER.debug("getDefaultLayout for action [" + getContext().getAction() + "] got ["
+          + defaultLayout + "].");
+    } else {
+      LOGGER.debug("getDefaultLayout got [" + defaultLayout + "].");
+    }
+    return defaultLayout;
   }
 
   private SpaceReference decideLocalOrCentral(SpaceReference layoutSpaceRef) {

@@ -42,10 +42,24 @@ public class Navigation implements INavigation {
 
   public static final int DEFAULT_MAX_LEVEL = 100;
 
-  public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
-  public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
-  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
-      + "." + NAVIGATION_CONFIG_CLASS_DOC;
+  /**
+   * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS_DOC
+   */
+  @Deprecated
+  public static final String NAVIGATION_CONFIG_CLASS_DOC =
+    NavigationClasses.NAVIGATION_CONFIG_CLASS_DOC;
+  /**
+   * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS_SPACE
+   */
+  @Deprecated
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE =
+    NavigationClasses.NAVIGATION_CONFIG_CLASS_SPACE;
+  /**
+   * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS
+   */
+  @Deprecated
+  public static final String NAVIGATION_CONFIG_CLASS =
+    NavigationClasses.NAVIGATION_CONFIG_CLASS;
 
   private INavigationBuilder navBuilder;
 
@@ -80,8 +94,6 @@ public class Navigation implements INavigation {
   private String cmCssClass;
 
   private String mainUlCssClasses;
-
-  private IMenuTypeRepository menuType;
 
   private String dataType;
 
@@ -118,6 +130,10 @@ public class Navigation implements INavigation {
     utils = WebUtils.getInstance();
   }
 
+  /**
+   * @deprecated since 2.18.0 instead use getNavigationConfigClassRef of NavigationClasses
+   */
+  @Deprecated
   public static DocumentReference getNavigationConfigClassReference(String wikiName) {
     return new DocumentReference(wikiName, NAVIGATION_CONFIG_CLASS_SPACE,
         NAVIGATION_CONFIG_CLASS_DOC);

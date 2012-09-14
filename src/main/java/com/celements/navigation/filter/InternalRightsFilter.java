@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class InternalRightsFilter implements INavFilter<BaseObject> {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       InternalRightsFilter.class);
   private String menuPart;
 
@@ -47,7 +47,7 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
           baseObj.getName(), context) && ("".equals(getMenuPart())
               || getMenuPart().equals(baseObj.getStringValue("part_name")));
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       return false;
     }
   }
@@ -66,12 +66,12 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
    * @param context
    */
   public boolean includeTreeNode(TreeNode node, XWikiContext context) {
-    mLogger.debug("includeTreeNode: for [" + node.getFullName() + "]");
+    LOGGER.debug("includeTreeNode: for [" + node.getFullName() + "]");
     try {
       return context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
           node.getFullName(), context) && checkMenuPart(node, context);
     } catch (XWikiException exp) {
-      mLogger.error(exp);
+      LOGGER.error(exp);
       return false;
     }
   }

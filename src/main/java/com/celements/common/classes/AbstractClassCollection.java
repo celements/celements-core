@@ -36,8 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * since 2.18.0
  */
-public abstract class AbstractClassCollection
-    implements IClassCollectionRole {
+public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   @Requirement
   protected Execution execution;
