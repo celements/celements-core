@@ -32,46 +32,23 @@ public interface IRenderStrategy {
 
   public void endRendering();
 
-  /**
-   * @param fullName
-   * @return
-   * 
-   * @deprecated since 2.14.0  use getSpaceReference instead
-   */
-  @Deprecated
-  public String getMenuSpace(String fullName);
-
-  /**
-   * @deprecated since 2.18.0  use getParentReference(String) instead
-   */
-  @Deprecated
   public SpaceReference getSpaceReference();
 
-  public EntityReference getParentReference(String parent);
-
-  public String getMenuPart(String parent);
+  public String getMenuPart(TreeNode node);
 
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem);
 
-  public void startRenderChildren(String parent);
+  public void startRenderChildren(EntityReference parentRef);
 
-  public void endRenderChildren(String parent);
+  public void endRenderChildren(EntityReference parentRef);
 
   public void endRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem);
 
-  public boolean isRenderSubCells(String parent);
+  public boolean isRenderSubCells(EntityReference parentRef);
 
   public String getAsString();
 
-  public void renderEmptyChildren(String parent);
-
-  /**
-   * @param spaceName
-   * 
-   * @deprecated since 2.14.0  use setSpaceReference instead
-   */
-  @Deprecated
-  public void setSpaceName(String spaceName);
+  public void renderEmptyChildren(TreeNode node);
 
   public void setSpaceReference(SpaceReference spaceReference);
 

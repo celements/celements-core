@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
@@ -36,25 +35,26 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class CellRenderer implements IRenderStrategy {
+public class CellRenderStrategy implements IRenderStrategy {
   
   public static final String CELEMENTS_CELL_CLASS_SPACE = "Celements";
   public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
   public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
     + CELEMENTS_CELL_CLASS_NAME;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CellRenderer.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      CellRenderStrategy.class);
 
   private ICellWriter cellWriter;
   private XWikiContext context;
 
   private SpaceReference spaceReference;
 
-  private RenderCommand ctRendererCmd;
+  RenderCommand rendererCmd;
   PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
   IWebUtilsService webUtilsService = Utils.getComponent(IWebUtilsService.class);
 
-  public CellRenderer(XWikiContext context) {
+  public CellRenderStrategy(XWikiContext context) {
     this.context = context;
   }
 
@@ -62,52 +62,28 @@ public class CellRenderer implements IRenderStrategy {
     cellWriter.closeLevel();
   }
 
-  public void endRenderChildren(String parent) {}
+  public void endRenderChildren(EntityReference parentRef) {}
 
   public void endRendering() {}
 
-  public String getMenuPart(String parent) {
+  public String getMenuPart(TreeNode node) {
     return "";
   }
 
-  @Deprecated
-  public String getMenuSpace(String fullName) {
-      return getSpaceReference().getName();
-  }
-
-  @Deprecated
   public SpaceReference getSpaceReference() {
     if (spaceReference == null) {
-      return new SpaceReference("Skin", new WikiReference(context.getDatabase()));
+      return pageLayoutCmd.getDefaultLayoutSpaceReference();
     } else {
       return spaceReference;
     }
-  }
-
-  public EntityReference getParentReference(String parent) {
-    EntityReference parentRef;
-    if (spaceReference == null) {
-      spaceReference = pageLayoutCmd.getDefaultLayoutSpaceReference();
-    }
-    if ("".equals(parent)) {
-      parentRef = spaceReference;
-    } else if (parent.contains(".")) {
-      DocumentReference parentKeyRef = webUtilsService.resolveDocumentReference(parent);
-      parentRef = new DocumentReference(spaceReference.getParent().getName(),
-          parentKeyRef.getLastSpaceReference().getName(), parentKeyRef.getName());
-    } else {
-      DocumentReference parentKeyRef = webUtilsService.resolveDocumentReference(parent);
-      parentRef = new DocumentReference(parentKeyRef.getName(), spaceReference);
-    }
-    return parentRef;
   }
 
   public boolean isRenderCell(TreeNode node) {
     return node != null;
   }
 
-  public boolean isRenderSubCells(String parent) {
-    return parent != null;
+  public boolean isRenderSubCells(EntityReference parentRef) {
+    return parentRef != null;
   }
 
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
@@ -134,13 +110,13 @@ public class CellRenderer implements IRenderStrategy {
     cellWriter.openLevel(idname, cssClasses, cssStyles);
   }
 
-  public void startRenderChildren(String parent) {}
+  public void startRenderChildren(EntityReference parentRef) {}
 
   public void startRendering() {
     cellWriter.clear();
   }
 
-  public CellRenderer setOutputWriter(ICellWriter newWriter) {
+  public CellRenderStrategy setOutputWriter(ICellWriter newWriter) {
     this.cellWriter = newWriter;
     return this;
   }
@@ -149,37 +125,23 @@ public class CellRenderer implements IRenderStrategy {
     return cellWriter.getAsString();
   }
 
-  public void renderEmptyChildren(String parent) {
+  public void renderEmptyChildren(TreeNode node) {
     String cellContent = "";
     try {
-      LOGGER.debug("renderEmptyChildren: parent [" + parent + "].");
-      cellContent = ctRendererCmd().renderCelementsCell(parent);
+      LOGGER.debug("renderEmptyChildren: parent [" + node + "].");
+      cellContent = getRendererCmd().renderCelementsCell(node.getDocumentReference());
     } catch (XWikiException exp) {
-      LOGGER.error("failed to get cell [" + parent + "] document to render cell"
+      LOGGER.error("failed to get cell [" + node + "] document to render cell"
           + " content.", exp);
     }
     cellWriter.appendContent(cellContent);
   }
 
-  RenderCommand ctRendererCmd() {
-    if (ctRendererCmd == null) {
-      ctRendererCmd = new RenderCommand();
+  RenderCommand getRendererCmd() {
+    if (rendererCmd == null) {
+      rendererCmd = new RenderCommand();
     }
-    return ctRendererCmd;
-  }
-
-  void inject_ctRenderCmd(RenderCommand mockPtRenderCmd) {
-    ctRendererCmd = mockPtRenderCmd;
-  }
-
-  @Deprecated
-  public void setSpaceName(String spaceName) {
-    if ((spaceName != null) && (!"".equals(spaceName))) {
-      setSpaceReference(new SpaceReference(spaceName, new WikiReference(
-        context.getDatabase())));
-    } else {
-      setSpaceReference(null);
-    }
+    return rendererCmd;
   }
 
   public void setSpaceReference(SpaceReference spaceReference) {

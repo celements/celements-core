@@ -33,7 +33,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.celements.cells.CellRenderer;
+import com.celements.cells.CellRenderStrategy;
 import com.celements.cells.DivWriter;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
@@ -232,7 +232,7 @@ public class PageLayoutCommand {
    */
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
     LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
-    IRenderStrategy cellRenderer = new CellRenderer(getContext()).setOutputWriter(
+    IRenderStrategy cellRenderer = new CellRenderStrategy(getContext()).setOutputWriter(
         new DivWriter());
    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
     renderEngine.renderPageLayout(layoutSpaceRef);
