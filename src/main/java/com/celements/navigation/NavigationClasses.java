@@ -61,7 +61,7 @@ public class NavigationClasses extends AbstractClassCollection {
     getNavigationConfigClass();
   }
 
-  private DocumentReference getMenuNameClassRef(String wikiName) {
+  public DocumentReference getMenuNameClassRef(String wikiName) {
     return new DocumentReference(wikiName, "Celements2", "MenuName");
   }
 
@@ -95,8 +95,8 @@ public class NavigationClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getNavigationConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, NAVIGATION_CONFIG_CLASS_DOC,
-        NAVIGATION_CONFIG_CLASS_SPACE);
+    return new DocumentReference(wikiName, NAVIGATION_CONFIG_CLASS_SPACE,
+        NAVIGATION_CONFIG_CLASS_DOC);
   }
 
   BaseClass getNavigationConfigClass() throws XWikiException {
