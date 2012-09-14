@@ -616,4 +616,8 @@ public class WebUtilsService implements IWebUtilsService {
     return splitedStr;
   }
 
+  public WikiReference getWikiRef(DocumentReference docRef) {
+    return (WikiReference) docRef.getLastSpaceReference().getParent();
+  }
+
 }

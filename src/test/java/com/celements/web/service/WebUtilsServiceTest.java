@@ -869,6 +869,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(att1, att2, att3);
   }
 
+  @Test
+  public void testGetWikiRef() {
+    String wikiName = "myTestWikiName";
+    DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName"
+        );
+    replayAll();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(docRef));
+    verifyAll();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
