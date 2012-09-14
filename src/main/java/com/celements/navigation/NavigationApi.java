@@ -32,8 +32,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class NavigationApi extends Api {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      NavigationApi.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(NavigationApi.class);
 
   private INavigation navigation;
 

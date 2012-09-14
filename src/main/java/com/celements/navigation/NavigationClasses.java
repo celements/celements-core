@@ -33,6 +33,11 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celNavigationClasses")
 public class NavigationClasses extends AbstractClassCollection {
 
+  public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
+  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
+      + "." + NAVIGATION_CONFIG_CLASS_DOC;
+
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
   public static final String MENU_ITEM_CLASS_SPACE = "Celements2";
 
@@ -90,7 +95,8 @@ public class NavigationClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getNavigationConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements2", "NavigationConfigClass");
+    return new DocumentReference(wikiName, NAVIGATION_CONFIG_CLASS_DOC,
+        NAVIGATION_CONFIG_CLASS_SPACE);
   }
 
   BaseClass getNavigationConfigClass() throws XWikiException {
