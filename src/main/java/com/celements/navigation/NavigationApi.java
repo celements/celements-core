@@ -23,12 +23,16 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.common.classes.IClassCollectionRole;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class NavigationApi extends Api {
 
@@ -125,32 +129,65 @@ public class NavigationApi extends Api {
     return navigation.isNavigationEnabled();
   }
 
+  private DocumentReference getNavigationConfigClassRef(XWikiDocument doc) {
+    return getNavigationClasses().getNavigationConfigClassRef(getWebUtilsService(
+        ).getWikiRef(doc.getDocumentReference()).getName());
+  }
+
   public void loadConfigByName(String configName) {
     navigation.loadConfigByName(configName, context);
   }
 
+  /**
+   * @deprecated since 2.18.0 instead use loadConfigFromDoc(DocumentReference)
+   */
+  @Deprecated
   public void loadConfigFromDoc(String fullName) {
+    DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(
+        fullName);
+    loadConfig_internal(configDocRef, null);
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use loadConfigFromDoc(DocumentReference, int)
+   */
+  @Deprecated
+  public void loadConfigFromDoc(String fullName, int objNum) {
+    DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(
+        fullName);
+    loadConfig_internal(configDocRef, objNum);
+  }
+
+  public void loadConfigFromDoc(DocumentReference configDocRef) {
+    loadConfig_internal(configDocRef, null);
+  }
+
+  public void loadConfigFromDoc(DocumentReference configDocRef, int objNum) {
+    loadConfig_internal(configDocRef, objNum);
+  }
+
+  private void loadConfig_internal(DocumentReference configDocRef, Integer objNum) {
     try {
-      XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-      BaseObject navConfigXobj = doc.getObject(Navigation.NAVIGATION_CONFIG_CLASS);
-      LOGGER.debug("loadConfigFromObject: configName [" + navConfigXobj.getStringValue(
-      "menu_element_name") + "] , " + navConfigXobj);
-      navigation.loadConfigFromObject(navConfigXobj);
+      XWikiDocument doc = context.getWiki().getDocument(configDocRef, context);
+      BaseObject navConfigXobj = getNavigationConfigObject(doc, objNum);
+      if (navConfigXobj != null) {
+        LOGGER.debug("loadConfig_internal: configName [" + navConfigXobj.getStringValue(
+            "menu_element_name") + "] , " + navConfigXobj);
+        navigation.loadConfigFromObject(navConfigXobj);
+      }
     } catch (XWikiException exp) {
-      LOGGER.warn("failed to get document: " + fullName);
+      LOGGER.warn("failed to get document [" + configDocRef + "].");
     }
   }
 
-  public void loadConfigFromDoc(String fullName, int objNum) {
-    try {
-      XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-      BaseObject navConfigXobj = doc.getObject(Navigation.NAVIGATION_CONFIG_CLASS, objNum);
-      LOGGER.debug("loadConfigFromObject: configName [" + navConfigXobj.getStringValue(
-      "menu_element_name") + "] , " + navConfigXobj);
-      navigation.loadConfigFromObject(navConfigXobj);
-    } catch (XWikiException exp) {
-      LOGGER.warn("failed to get document: " + fullName);
+  private BaseObject getNavigationConfigObject(XWikiDocument doc, Integer objNum) {
+    BaseObject navConfigXobj;
+    if (objNum == null) {
+      navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc));
+    } else {
+      navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc), objNum);
     }
+    return navConfigXobj;
   }
 
   public void setCMcssClass(String cmCssClass) {
@@ -183,6 +220,15 @@ public class NavigationApi extends Api {
 
   public void setShowInactiveToLevel(int showInactiveToLevel) {
     navigation.setShowInactiveToLevel(showInactiveToLevel);
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private NavigationClasses getNavigationClasses() {
+    return (NavigationClasses) Utils.getComponent(IClassCollectionRole.class,
+        "celements.celNavigationClasses");
   }
 
 }
