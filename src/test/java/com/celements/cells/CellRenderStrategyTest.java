@@ -181,8 +181,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     Vector<BaseObject> cellObjList = new Vector<BaseObject>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        CellRenderStrategy.CELEMENTS_CELL_CLASS_SPACE,
-        CellRenderStrategy.CELEMENTS_CELL_CLASS_NAME);
+        CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
@@ -210,8 +209,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     Vector<BaseObject> cellObjList = new Vector<BaseObject>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(masterCellDb,
-        CellRenderStrategy.CELEMENTS_CELL_CLASS_SPACE,
-        CellRenderStrategy.CELEMENTS_CELL_CLASS_NAME);
+        CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));

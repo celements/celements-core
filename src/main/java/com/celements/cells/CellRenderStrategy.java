@@ -25,6 +25,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -36,11 +37,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
-  
-  public static final String CELEMENTS_CELL_CLASS_SPACE = "Celements";
-  public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
-  public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
-    + CELEMENTS_CELL_CLASS_NAME;
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CellRenderStrategy.class);
@@ -53,6 +49,8 @@ public class CellRenderStrategy implements IRenderStrategy {
   RenderCommand rendererCmd;
   PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
   IWebUtilsService webUtilsService = Utils.getComponent(IWebUtilsService.class);
+  CellsClasses cellClasses = (CellsClasses) Utils.getComponent(IClassCollectionRole.class,
+      "celements.celCellsClasses");
 
   public CellRenderStrategy(XWikiContext context) {
     this.context = context;
@@ -95,9 +93,8 @@ public class CellRenderStrategy implements IRenderStrategy {
       LOGGER.debug("startRenderCell: cellDocRef [" + cellDocRef + "] context db ["
           + context.getDatabase() + "].");
       XWikiDocument cellDoc = context.getWiki().getDocument(cellDocRef, context);
-      BaseObject cellObj = cellDoc.getXObject(new DocumentReference(
-          cellDocRef.getWikiReference().getName(),
-          CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME));
+      BaseObject cellObj = cellDoc.getXObject(cellClasses.getCellClassRef(
+          cellDocRef.getWikiReference().getName()));
       if(cellObj != null) {
         cssClasses = cellObj.getStringValue("css_classes");
         cssStyles = cellObj.getStringValue("css_styles");
