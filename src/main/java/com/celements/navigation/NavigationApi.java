@@ -145,7 +145,7 @@ public class NavigationApi extends Api {
   public void loadConfigFromDoc(String fullName) {
     DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(
         fullName);
-    loadConfig_internal(configDocRef, null);
+    loadConfig_internal(configDocRef, -1);
   }
 
   /**
@@ -159,14 +159,14 @@ public class NavigationApi extends Api {
   }
 
   public void loadConfigFromDoc(DocumentReference configDocRef) {
-    loadConfig_internal(configDocRef, null);
+    loadConfig_internal(configDocRef, -1);
   }
 
   public void loadConfigFromDoc(DocumentReference configDocRef, int objNum) {
     loadConfig_internal(configDocRef, objNum);
   }
 
-  private void loadConfig_internal(DocumentReference configDocRef, Integer objNum) {
+  private void loadConfig_internal(DocumentReference configDocRef, int objNum) {
     try {
       XWikiDocument doc = context.getWiki().getDocument(configDocRef, context);
       BaseObject navConfigXobj = getNavigationConfigObject(doc, objNum);
@@ -174,15 +174,18 @@ public class NavigationApi extends Api {
         LOGGER.debug("loadConfig_internal: configName [" + navConfigXobj.getStringValue(
             "menu_element_name") + "] , " + navConfigXobj);
         navigation.loadConfigFromObject(navConfigXobj);
+      } else {
+        LOGGER.warn("cannot load navigation config from doc [" + configDocRef + "],"
+            + " because no config object found.");
       }
     } catch (XWikiException exp) {
       LOGGER.warn("failed to get document [" + configDocRef + "].");
     }
   }
 
-  private BaseObject getNavigationConfigObject(XWikiDocument doc, Integer objNum) {
+  private BaseObject getNavigationConfigObject(XWikiDocument doc, int objNum) {
     BaseObject navConfigXobj;
-    if (objNum == null) {
+    if (objNum >= 0) {
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc));
     } else {
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc), objNum);
