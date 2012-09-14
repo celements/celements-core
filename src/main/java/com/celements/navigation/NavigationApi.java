@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class NavigationApi extends Api {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       NavigationApi.class);
 
   private INavigation navigation;
@@ -134,11 +134,11 @@ public class NavigationApi extends Api {
     try {
       XWikiDocument doc = context.getWiki().getDocument(fullName, context);
       BaseObject navConfigXobj = doc.getObject(Navigation.NAVIGATION_CONFIG_CLASS);
-      mLogger.debug("loadConfigFromObject: configName [" + navConfigXobj.getStringValue(
+      LOGGER.debug("loadConfigFromObject: configName [" + navConfigXobj.getStringValue(
       "menu_element_name") + "] , " + navConfigXobj);
       navigation.loadConfigFromObject(navConfigXobj);
     } catch (XWikiException exp) {
-      mLogger.warn("failed to get document: " + fullName);
+      LOGGER.warn("failed to get document: " + fullName);
     }
   }
 
@@ -146,11 +146,11 @@ public class NavigationApi extends Api {
     try {
       XWikiDocument doc = context.getWiki().getDocument(fullName, context);
       BaseObject navConfigXobj = doc.getObject(Navigation.NAVIGATION_CONFIG_CLASS, objNum);
-      mLogger.debug("loadConfigFromObject: configName [" + navConfigXobj.getStringValue(
+      LOGGER.debug("loadConfigFromObject: configName [" + navConfigXobj.getStringValue(
       "menu_element_name") + "] , " + navConfigXobj);
       navigation.loadConfigFromObject(navConfigXobj);
     } catch (XWikiException exp) {
-      mLogger.warn("failed to get document: " + fullName);
+      LOGGER.warn("failed to get document: " + fullName);
     }
   }
 
