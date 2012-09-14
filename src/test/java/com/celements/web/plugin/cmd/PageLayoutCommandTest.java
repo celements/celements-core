@@ -542,6 +542,66 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
     verifyAll();
   }
 
+  @Test
+  public void testLayoutEditorAvailable_local() throws Exception {
+    DocumentReference layoutEditorPropDocRef = new DocumentReference(
+        context.getDatabase(), PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true
+        ).once();
+    XWikiDocument layoutEditorPropDoc = new XWikiDocument(layoutEditorPropDocRef);
+    expect(xwiki.getDocument(eq(layoutEditorPropDocRef), same(context))).andReturn(
+        layoutEditorPropDoc).once();
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference localPagePropClassRef = new DocumentReference(
+        context.getDatabase(), PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(localPagePropClassRef);
+    layoutEditorPropDoc.addXObject(layoutPropObj);
+    replayAll();
+    assertTrue(plCmd.layoutEditorAvailable());
+    verifyAll();
+  }
+
+  @Test
+  public void testLayoutEditorAvailable_central() throws Exception {
+    DocumentReference layoutEditorPropDocRef = new DocumentReference(
+        context.getDatabase(), PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(false
+        ).once();
+    DocumentReference centralLayoutEditorPropDocRef = new DocumentReference(
+        "celements2web", PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
+    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(true
+        ).once();
+    XWikiDocument centralLayoutEditorPropDoc = new XWikiDocument(
+        centralLayoutEditorPropDocRef);
+    expect(xwiki.getDocument(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
+        centralLayoutEditorPropDoc).once();
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference centralPagePropClassRef = new DocumentReference("celements2web",
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(centralPagePropClassRef);
+    centralLayoutEditorPropDoc.addXObject(layoutPropObj);
+    replayAll();
+    assertTrue(plCmd.layoutEditorAvailable());
+    verifyAll();
+  }
+
+  @Test
+  public void testLayoutEditorAvailable_notavailable() throws Exception {
+    DocumentReference layoutEditorPropDocRef = new DocumentReference(
+        context.getDatabase(), PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(false
+        ).once();
+    DocumentReference centralLayoutEditorPropDocRef = new DocumentReference(
+        "celements2web", PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
+    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(false
+        ).once();
+    replayAll();
+    assertFalse(plCmd.layoutEditorAvailable());
+    verifyAll();
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, storeMock);
