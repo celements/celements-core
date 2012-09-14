@@ -145,7 +145,7 @@ public class NavigationApi extends Api {
   public void loadConfigFromDoc(String fullName) {
     DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(
         fullName);
-    loadConfig_internal(configDocRef, -1);
+    loadConfig_internal(configDocRef, null);
   }
 
   /**
@@ -159,14 +159,14 @@ public class NavigationApi extends Api {
   }
 
   public void loadConfigFromDoc(DocumentReference configDocRef) {
-    loadConfig_internal(configDocRef, -1);
+    loadConfig_internal(configDocRef, null);
   }
 
   public void loadConfigFromDoc(DocumentReference configDocRef, int objNum) {
     loadConfig_internal(configDocRef, objNum);
   }
 
-  private void loadConfig_internal(DocumentReference configDocRef, int objNum) {
+  private void loadConfig_internal(DocumentReference configDocRef, Integer objNum) {
     try {
       XWikiDocument doc = context.getWiki().getDocument(configDocRef, context);
       BaseObject navConfigXobj = getNavigationConfigObject(doc, objNum);
@@ -183,11 +183,16 @@ public class NavigationApi extends Api {
     }
   }
 
-  private BaseObject getNavigationConfigObject(XWikiDocument doc, int objNum) {
+  private BaseObject getNavigationConfigObject(XWikiDocument doc, Integer objNum) {
     BaseObject navConfigXobj;
-    if (objNum >= 0) {
+    if (objNum == null) {
+      LOGGER.debug("get xobject for [" + getNavigationConfigClassRef(doc) + "] on doc ["
+          + doc.getDocumentReference() + "].");
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc));
     } else {
+      LOGGER.debug("get xobject objNum [" + objNum + "] for ["
+          + getNavigationConfigClassRef(doc) + "] on doc [" + doc.getDocumentReference()
+          + "].");
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc), objNum);
     }
     return navConfigXobj;
