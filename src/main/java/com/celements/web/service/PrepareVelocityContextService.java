@@ -439,36 +439,41 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       return language;
     }
 
-    // As the wiki is multilingual try to find the language to use from the
-    // request by looking
-    // for a language parameter. If the language value is "default" use the
-    // default language
-    // from the XWiki preferences settings. Otherwise set a cookie to remember
-    // the language
-    // in use.
-    try {
-      language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-      if ((language != null) && (!language.equals(""))) {
-        if (isInvalidLanguageOrDefault(language)) {
-          // forgetting language cookie
-          Cookie cookie = new Cookie("language", "");
-          cookie.setMaxAge(0);
-          cookie.setPath("/");
-          context.getResponse().addCookie(cookie);
-          language = defaultLanguage;
-        } else {
-          // setting language cookie
-          Cookie cookie = new Cookie("language", language);
-          cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-          cookie.setPath("/");
-          context.getResponse().addCookie(cookie);
+    if (context.getRequest() != null) {
+      // As the wiki is multilingual try to find the language to use from the
+      // request by looking
+      // for a language parameter. If the language value is "default" use the
+      // default language
+      // from the XWiki preferences settings. Otherwise set a cookie to remember
+      // the language
+      // in use.
+      try {
+        language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
+        if ((language != null) && (!language.equals(""))) {
+          if (isInvalidLanguageOrDefault(language)) {
+            // forgetting language cookie
+            Cookie cookie = new Cookie("language", "");
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            context.getResponse().addCookie(cookie);
+            language = defaultLanguage;
+          } else {
+            // setting language cookie
+            Cookie cookie = new Cookie("language", language);
+            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+            cookie.setPath("/");
+            context.getResponse().addCookie(cookie);
+          }
+          context.setLanguage(language);
+          LOGGER.debug("getLanguagePreference: found parameter language " + language);
+          return language;
         }
-        context.setLanguage(language);
-        LOGGER.debug("getLanguagePreference: found parameter language " + language);
-        return language;
+      } catch (Exception e) {
+        LOGGER.error(e);
       }
-    } catch (Exception e) {
-      LOGGER.error(e);
+    } else {
+      LOGGER.info("getLanguagePreference: skip language parameter in request check,"
+          + " because request is null.");
     }
 
     // As no language parameter was passed in the request, try to get the
@@ -548,6 +553,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         // to next
         // phase (use default language).
       }
+    } else {
+      LOGGER.info("getLanguagePreference: skip accept-language in request,"
+          + " because request is null.");
     }
 
     // Finally, use the default language from the global preferences.
