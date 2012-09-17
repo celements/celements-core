@@ -469,28 +469,31 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
           return language;
         }
       } catch (Exception e) {
-        LOGGER.error(e);
+        LOGGER.error("Failed to get the language paramter from the request.", e);
+      }
+
+      // As no language parameter was passed in the request, try to get the
+      // language to use
+      // from a cookie.
+      try {
+        // First we get the language from the cookie
+        // !!! getUserPreferenceFromCookie throws NPE if request ist NULL !!!
+        language = Util.normalizeLanguage(xwiki.getUserPreferenceFromCookie("language",
+            context));
+        if ((language != null) && (!language.equals(""))) {
+          context.setLanguage(language);
+          LOGGER.debug("getLanguagePreference: found cookie language " + language);
+          return language;
+        }
+      } catch (Exception e) {
+        LOGGER.error("Failed to get the language from the cookie.", e);
       }
     } else {
-      LOGGER.info("getLanguagePreference: skip language parameter in request check,"
-          + " because request is null.");
+      LOGGER.info("getLanguagePreference: skip language parameter in request and"
+          + " language cookie check, because request is null.");
     }
 
-    // As no language parameter was passed in the request, try to get the
-    // language to use
-    // from a cookie.
-    try {
-      // First we get the language from the cookie
-      language = Util.normalizeLanguage(xwiki.getUserPreferenceFromCookie("language",
-          context));
-      if ((language != null) && (!language.equals(""))) {
-        context.setLanguage(language);
-        LOGGER.debug("getLanguagePreference: found cookie language " + language);
-        return language;
-      }
-    } catch (Exception e) {
-      LOGGER.error(e);
-    }
+    LOGGER.trace("getLanguagepreference: Next from the default user preference.");
 
     // Next from the default user preference
     try {
@@ -508,8 +511,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         }
       }
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error("Failed to get the default language from the user preferences.", e);
     }
+
+    LOGGER.trace("getLanguagepreference: Next from preferDefault? ");
 
     // If the default language is preferred, and since the user didn't
     // explicitly ask for a
@@ -521,6 +526,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       LOGGER.debug("getLanguagePreference: found preferDefault language " + language);
       return language;
     }
+
+    LOGGER.trace("getLanguagepreference: Then from the navigator language setting.");
 
     // Then from the navigator language setting
     if (context.getRequest() != null) {
