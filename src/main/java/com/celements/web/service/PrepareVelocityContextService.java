@@ -18,6 +18,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.PageTypeApi;
@@ -37,6 +38,14 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
+  public static final String CEL_SUPPRESS_INVALID_LANG = "celSuppressInvalidLang";
+
+  public static final String CFG_LANGUAGE_SUPPRESS_INVALID =
+    "celements.language.suppressInvalid";
+
+  public static final String ADD_LANGUAGE_COOKIE_DONE =
+    "celements.addLanguageCookie.done";
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PrepareVelocityContextService.class);
 
@@ -47,7 +56,11 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   IWebUtilsService webUtilsService;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext)getExecContext().getProperty("xwikicontext");
+  }
+
+  private ExecutionContext getExecContext() {
+    return execution.getContext();
   }
 
   public void prepareVelocityContext(VelocityContext vcontext) {
@@ -450,19 +463,24 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       try {
         language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
         if ((language != null) && (!language.equals(""))) {
-          if (isInvalidLanguageOrDefault(language)) {
-            // forgetting language cookie
-            Cookie cookie = new Cookie("language", "");
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-            context.getResponse().addCookie(cookie);
-            language = defaultLanguage;
-          } else {
-            // setting language cookie
-            Cookie cookie = new Cookie("language", language);
-            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-            cookie.setPath("/");
-            context.getResponse().addCookie(cookie);
+          Object cookieAddedBefore = getExecContext().getProperty(
+              ADD_LANGUAGE_COOKIE_DONE);
+          if ((cookieAddedBefore == null) || !(Boolean)cookieAddedBefore) {
+            if (isInvalidLanguageOrDefault(language)) {
+              // forgetting language cookie
+              Cookie cookie = new Cookie("language", "");
+              cookie.setMaxAge(0);
+              cookie.setPath("/");
+              context.getResponse().addCookie(cookie);
+              language = defaultLanguage;
+            } else {
+              // setting language cookie
+              Cookie cookie = new Cookie("language", language);
+              cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+              cookie.setPath("/");
+              context.getResponse().addCookie(cookie);
+            }
+            getExecContext().setProperty(ADD_LANGUAGE_COOKIE_DONE, new Boolean(true));
           }
           context.setLanguage(language);
           LOGGER.debug("getLanguagePreference: found parameter language " + language);
@@ -583,8 +601,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   private boolean isSuppressInvalid() {
-    return getContext().getWiki().getXWikiPreference("celSuppressInvalidLang",
-        "celements.language.suppressInvalid", "0", getContext()).equals("1");
+    return getContext().getWiki().getXWikiPreference(CEL_SUPPRESS_INVALID_LANG,
+        CFG_LANGUAGE_SUPPRESS_INVALID, "0", getContext()).equals("1");
   }
 
   /**
@@ -618,23 +636,41 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   void fixTdocForInvalidLanguage(VelocityContext vcontext) {
     XWikiDocument doc = getContext().getDoc();
     if ((doc != null) && (vcontext != null)) {
-      try {
-        XWikiDocument tdoc = doc.getTranslatedDocument(getContext());
+      Document vTdocBefore = (Document) vcontext.get("tdoc");
+      if (isTdocLanguageWrong(vTdocBefore)) {
         try {
-            String rev = (String) getContext().get("rev");
-            if (StringUtils.isNotEmpty(rev)) {
-                tdoc = getContext().getWiki().getDocument(tdoc, rev, getContext());
-            }
-        } catch (Exception ex) {
-          LOGGER.debug("Invalid version, just use the most recent one.", ex);
+          XWikiDocument tdoc = doc.getTranslatedDocument(getContext());
+          try {
+              String rev = (String) getContext().get("rev");
+              if (StringUtils.isNotEmpty(rev)) {
+                  tdoc = getContext().getWiki().getDocument(tdoc, rev, getContext());
+              }
+          } catch (Exception ex) {
+            LOGGER.debug("Invalid version, just use the most recent one.", ex);
+          }
+          getContext().put("tdoc", tdoc);
+          vcontext.put("tdoc", tdoc.newDocument(getContext()));
+        } catch (XWikiException exp) {
+          LOGGER.error("Faild to get translated document for ["
+              + getContext().getDoc().getDocumentReference() + "].", exp);
         }
-        getContext().put("tdoc", tdoc);
-        vcontext.put("tdoc", tdoc.newDocument(getContext()));
-      } catch (XWikiException exp) {
-        LOGGER.error("Faild to get translated document for ["
-            + getContext().getDoc().getDocumentReference() + "].", exp);
+      } else {
+        LOGGER.debug("skip fixTdocForInvalidLanguage because vTdoc launguage is"
+            + " correct.");
       }
+    } else {
+      LOGGER.debug("skip fixTdocForInvalidLanguage doc [" + doc + "] vcontext ["
+          + vcontext + "].");
     }
+  }
+
+  boolean isTdocLanguageWrong(Document vTdocBefore) {
+    if (vTdocBefore == null) return true;
+    String vTdocLang = vTdocBefore.getLanguage();
+    if ("".equals(vTdocLang)) {
+      vTdocLang = vTdocBefore.getDefaultLanguage();
+    }
+    return (!getContext().getLanguage().equals(vTdocLang));
   }
 
 }
