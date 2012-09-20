@@ -186,7 +186,6 @@ public class Navigation implements INavigation {
   public String includeNavigation(XWikiContext context) {
     LOGGER.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
     if(navigationEnabled){
-      //TODO add registry for dataType providers
       StringBuilder outStream = new StringBuilder();
       if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
         try {
