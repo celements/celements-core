@@ -439,7 +439,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     String language = context.getLanguage();
 
     XWiki xwiki = context.getWiki();
-    String defaultLanguage = xwiki.getDefaultLanguage(context);
+    String defaultLanguage = webUtilsService.getDefaultLanguage();
 
     LOGGER.debug("getLanguagePreference: isMultiLingual ["
         + context.getWiki().isMultiLingual(context) + "] defaultLanguage ["

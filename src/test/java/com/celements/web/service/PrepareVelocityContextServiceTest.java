@@ -77,7 +77,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   @Test
   public void testPrepareVelocityContext_checkNPEs_forNull_vContext() throws Exception {
     context.setUser("XWiki.myTestUser");
-    expect(xwiki.getDefaultLanguage(same(context))).andReturn("de").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(false).atLeastOnce();
     replayAll();
     context.remove("vcontext");
@@ -169,7 +170,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     context.put("vcontext", vContext);
     XWikiRequest requestMock = createMock(XWikiRequest.class);
     context.setRequest(requestMock);
-    expect(xwiki.getDefaultLanguage(same(context))).andReturn("de").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))
         ).andReturn("").atLeastOnce();
@@ -205,7 +207,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     context.put("vcontext", vContext);
     XWikiRequest requestMock = createMock(XWikiRequest.class);
     context.setRequest(requestMock);
-    expect(xwiki.getDefaultLanguage(same(context))).andReturn("en").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("en"
+        ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))
         ).andReturn("").atLeastOnce();
@@ -243,7 +246,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     context.setRequest(requestMock);
     XWikiResponse responseMock = createMock(XWikiResponse.class);
     context.setResponse(responseMock);
-    expect(xwiki.getDefaultLanguage(same(context))).andReturn("de").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
