@@ -188,19 +188,19 @@ public class Navigation implements INavigation {
     if(navigationEnabled){
       StringBuilder outStream = new StringBuilder();
       if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
-        try {
           if (fromHierarchyLevel > 0) {
             String parent = utils.getParentForLevel(fromHierarchyLevel, context);
-        	  if(parent != null) {
-                addNavigationForParent(outStream, parent, getNumLevels(), context);
-        	  }
+            try {
+          	  if(parent != null) {
+                  addNavigationForParent(outStream, parent, getNumLevels(), context);
+          	  }
+            } catch (XWikiException e) {
+              LOGGER.error("addNavigationForParent failed for [" + parent + "].", e);
+            }
           } else {
             throw new IllegalArgumentException("fromHierarchyLevel [" + fromHierarchyLevel
                 + "] must be greater than zero");
           }
-        } catch (XWikiException e) {
-          LOGGER.error(e);
-        }
       } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
         navBuilder.useStream(outStream);
         generateLanguageMenu(navBuilder, context);
@@ -456,7 +456,7 @@ public class Navigation implements INavigation {
           cssClass += " " + pageType.getPageType();
         }
       } catch (XWikiException exp) {
-        LOGGER.error(exp);
+        LOGGER.error(exp, exp);
       }
       if (isActiveMenuItem(fullName, context)) {
         cssClass += " active";
@@ -531,7 +531,7 @@ public class Navigation implements INavigation {
     try {
       prevMenuItem = WebUtils.getInstance().getPrevMenuItem(fullName, context);
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
     if (prevMenuItem != null) {
       return prevMenuItem.getName();
@@ -546,7 +546,7 @@ public class Navigation implements INavigation {
     try {
       nextMenuItem = WebUtils.getInstance().getNextMenuItem(fullName, context);
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
     if (nextMenuItem != null) {
       return nextMenuItem.getName();
@@ -576,7 +576,7 @@ public class Navigation implements INavigation {
               "menu_element_name", configName, false);
       loadConfigFromObject(prefObj);
     } catch(XWikiException e){
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
   }
 
@@ -598,7 +598,7 @@ public class Navigation implements INavigation {
         try {
           setLayoutType(prefObj.getStringValue("layout_type"));
         } catch (UnknownLayoutTypeException exp) {
-          LOGGER.error(exp);
+          LOGGER.error(exp, exp);
         }
       }
       setCMcssClass(prefObj.getStringValue("cm_css_class"));
