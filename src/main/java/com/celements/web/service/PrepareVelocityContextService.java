@@ -560,7 +560,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         if (xwiki.Param("xwiki.language.forceSupported", "0").equals("1")) {
           List<String> available = getValidLanguages();
           LOGGER.debug("getLanguagePreference: forceSupported lang " + available
-              + " languages [" + xwiki.getXWikiPreference("languages", context)
+              + " languages [" + xwiki.getSpacePreference("languages", context)
               + "] splitArray [" + Arrays.deepToString(available.toArray(new String[] {}))
               + "].");
           // Filter only configured languages
@@ -589,8 +589,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return defaultLanguage;
   }
 
-  private List<String> getValidLanguages() {
-    List<String> available = Arrays.asList(getContext().getWiki().getXWikiPreference(
+  List<String> getValidLanguages() {
+    List<String> available = Arrays.asList(getContext().getWiki().getSpacePreference(
         "languages", getContext()).split("[, |]"));
     return available;
   }
