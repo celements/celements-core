@@ -323,8 +323,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc + " , "
             + templateDocument);
         return pageTypeDoc;
-      } catch (XWikiException e) {
-        LOGGER.error(e);
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to getPageTypeDoc.", exp);
       }
     }
     return null;
