@@ -360,5 +360,34 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   public void testGetPrepareVelocityContextService() {
    assertNotNull(plugin.getPrepareVelocityContextService()); 
   }
+  
+  @Test
+  public void testGetPossibleLogins_none() {
+    expect(xwiki.getXWikiPreference(eq("cellogin"), same(getContext()))).andReturn(null
+        ).anyTimes();
+    replay(xwiki);
+    assertEquals("loginname", plugin.getPossibleLogins(getContext()));
+    verify(xwiki);
+  }
+  
+  @Test
+  public void testGetPossibleLogins_local() {
+    expect(xwiki.getXWikiPreference(eq("cellogin"), same(getContext()))).andReturn("a,b"
+        ).once();
+    replay(xwiki);
+    assertEquals("a,b", plugin.getPossibleLogins(getContext()));
+    verify(xwiki);
+  }
+  
+  @Test
+  public void testGetPossibleLogins_mainWiki() {
+    expect(xwiki.getXWikiPreference(eq("cellogin"), same(getContext()))).andReturn("   "
+        ).once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), same(getContext()))).andReturn("x,y"
+        ).once();
+    replay(xwiki);
+    assertEquals("x,y", plugin.getPossibleLogins(getContext()));
+    verify(xwiki);
+  }
 
 }
