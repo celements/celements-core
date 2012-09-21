@@ -122,13 +122,15 @@ public class TreeNode {
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj)
+    if (this == obj) {
       return true;
-      if((obj == null) || (obj.getClass() != this.getClass()))
+    }
+    if ((obj == null) || (obj.getClass() != this.getClass())) {
       return false;
-      // object must be Test at this point
-      TreeNode node = (TreeNode)obj;
-      return docRef.equals(node.docRef) && (position == node.position);
+    }
+    // object must be Test at this point
+    TreeNode node = (TreeNode) obj;
+    return docRef.equals(node.docRef) && (position == node.position);
   }
 
   @Override
