@@ -136,7 +136,7 @@ public class TreeNode {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash = 31 * hash + position;
+    hash = 31 * hash + (position == null ? 0 : position.hashCode());
     hash = 31 * hash + (docRef == null ? 0 : docRef.hashCode());
     return hash;
   }
