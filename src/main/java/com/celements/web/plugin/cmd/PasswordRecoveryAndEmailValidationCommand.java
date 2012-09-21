@@ -220,7 +220,19 @@ public class PasswordRecoveryAndEmailValidationCommand {
     sendNewValidation(user);
   }
 
+  public void sendNewValidation(String login, String possibleFields,
+      DocumentReference activationMailDocRef) throws XWikiException {
+    String user = new UserNameForUserDataCommand().getUsernameForUserData(login,
+        possibleFields, getContext());
+    sendNewValidation(user, activationMailDocRef);
+  }
+
   public void sendNewValidation(String accountName) throws XWikiException {
+    sendNewValidation(accountName, (DocumentReference)null);
+  }
+
+  public void sendNewValidation(String accountName, DocumentReference activationMailDocRef
+      ) throws XWikiException {
     accountName = completeAccountFN(accountName);
     DocumentReference accountDocRef = getWebUtilsService().resolveDocumentReference(
         accountName);
@@ -238,11 +250,22 @@ public class PasswordRecoveryAndEmailValidationCommand {
       vcontext.put("admin_language", newAdminLanguage);
       vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
     }
-    sendValidationMessage(obj.getStringValue("email"), validkey, new DocumentReference(
-        getContext().getDatabase(), "Tools", "AccountActivationMail"));
+    if (activationMailDocRef == null) {
+      activationMailDocRef = getDefaultAccountActivationMailDocRef();
+    } else if (!getContext().getWiki().exists(activationMailDocRef, getContext())) {
+      LOGGER.warn("Failed to get activation mail [" + activationMailDocRef
+          + "] now using default.");
+      activationMailDocRef = getDefaultAccountActivationMailDocRef();
+    }
+    sendValidationMessage(obj.getStringValue("email"), validkey, activationMailDocRef);
     getContext().setLanguage(oldLanguage);
     vcontext.put("admin_language", oldAdminLanguage); 
     vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
+  }
+
+  private DocumentReference getDefaultAccountActivationMailDocRef() {
+    return new DocumentReference(getContext().getDatabase(), "Tools",
+        "AccountActivationMail");
   }
 
   /**

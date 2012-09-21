@@ -343,11 +343,29 @@ public class CelementsWebPluginApi extends Api {
     return encryptString("hash:SHA-512:", str);
   }
   
-  public void sendNewValidation(String user, String possibleFields) throws XWikiException{
+  public void sendNewValidation(String user, String possibleFields) {
     if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "].");
-      new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
-          possibleFields);
+      try {
+        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
+            possibleFields);
+      } catch (XWikiException exp) {
+        LOGGER.error("sendNewValidation: failed.", exp);
+      }
+    }
+  }
+  
+  public void sendNewValidation(String user, String possibleFields,
+      DocumentReference mailContentDocRef) {
+    if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
+      LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
+          + mailContentDocRef + "].");
+      try {
+        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
+            possibleFields, mailContentDocRef);
+      } catch (XWikiException exp) {
+        LOGGER.error("sendNewValidation: failed.", exp);
+      }
     }
   }
   
