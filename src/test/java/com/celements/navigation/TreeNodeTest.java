@@ -35,7 +35,14 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
         "MySpace", "myPage"), "", 1);
     replayAll();
-    assertEquals(treeNodeTest, treeNode);
+    assertTrue(treeNode.equals(treeNodeTest));
+    verifyAll();
+  }
+
+  @Test
+  public void testEquals_null() {
+    replayAll();
+    assertFalse(treeNode.equals(null));
     verifyAll();
   }
 
@@ -43,6 +50,16 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
   public void testHash() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
         "MySpace", "myPage"), "", 1);
+    replayAll();
+    assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
+    verifyAll();
+  }
+
+  @Test
+  public void testHash_null_position() {
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
+        "MySpace", "myPage"), "", null);
+    treeNode.setPosition(null);
     replayAll();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyAll();
