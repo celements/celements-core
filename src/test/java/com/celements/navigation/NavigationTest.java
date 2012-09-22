@@ -86,6 +86,19 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testSetMenuSpace() {
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().atLeastOnce();
+    expect(utils.getSubNodesForParent(eq(""), eq("MySpace"), same(navFilterMock),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(utils.hasParentSpace(same(context))).andReturn(false);
+    replayAll();
+    nav.setMenuSpace("");
+    assertEquals("MySpace", nav.getMenuSpace(context));
+    verifyAll();
+  }
+
+  @Test
   public void testGetUniqueId_null() {
     String menuItemName = null;
     String menuPart = "menuPartTest";

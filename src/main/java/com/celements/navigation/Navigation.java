@@ -183,7 +183,11 @@ public class Navigation implements INavigation {
    * @param menuSpace (default: $doc.web)
    */
   public void setMenuSpace(String menuSpace) {
-    this.menuSpace = menuSpace;
+    if ((menuSpace != null) && (!"".equals(menuSpace))) {
+      this.menuSpace = menuSpace;
+    } else {
+      this.menuSpace = null;
+    }
   }
 
   public String includeNavigation(XWikiContext context) {
