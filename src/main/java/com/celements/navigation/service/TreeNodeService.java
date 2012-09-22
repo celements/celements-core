@@ -93,7 +93,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   public int getMenuItemPos(DocumentReference docRef, String menuPart) {
     try {
-      DocumentReference parent = getParentRef(docRef);
+      EntityReference parent = getParentEntityRef(docRef);
       int pos = -1;
       for (TreeNode menuItem : getSubNodesForParent(parent, menuPart)) {
         pos = pos + 1;
@@ -406,14 +406,13 @@ public class TreeNodeService implements ITreeNodeService {
     return getSiblingMenuItem(docRef, false);
   }
 
-  TreeNode getSiblingMenuItem(DocumentReference docRef, boolean previous)
-      throws XWikiException {
+  TreeNode getSiblingMenuItem(DocumentReference docRef, boolean previous
+      ) throws XWikiException {
     XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
     BaseObject menuItem = doc.getXObject(getRef("Celements2", "MenuItem"));
-    if(menuItem!=null){
-      DocumentReference parent;
+    if (menuItem != null) {
       try {
-        parent = getParentRef(docRef);
+        EntityReference parent = getParentEntityRef(docRef);
         List<TreeNode> subMenuItems = getSubNodesForParent(parent,
             menuItem.getStringValue("part_name"));
         LOGGER.debug("getPrevMenuItem: " + subMenuItems.size()
@@ -436,7 +435,7 @@ public class TreeNodeService implements ITreeNodeService {
     }
     return null;
   }
-  
+
   public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart) {
     DocumentReference parent = new WebUtilsService().getParentForLevel(menuLevel);
     if (parent != null) {
@@ -452,10 +451,16 @@ public class TreeNodeService implements ITreeNodeService {
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
   
-  private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
-    return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
+  private EntityReference getParentEntityRef(DocumentReference docRef
+      ) throws XWikiException {
+    EntityReference parent = getContext().getWiki().getDocument(docRef,
+        getContext()).getParentReference();
+    if ((parent == null) || ("".equals(parent))) {
+      parent = docRef.getLastSpaceReference();
+    }
+    return parent;
   }
-  
+
   /**
    * FOR TEST PURPOSES ONLY
    */
