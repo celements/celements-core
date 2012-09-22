@@ -643,7 +643,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testLoadConfigFromObject() {
+  public void testLoadConfigFromObject_menuSpace() {
     DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "MyDoc");
     BaseObject navConfigObj = new BaseObject();
@@ -654,6 +654,20 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     replayAll();
     nav.loadConfigFromObject(navConfigObj);
     assertEquals("theMenuSpace", nav.getMenuSpace(context));
+    verifyAll();
+  }
+
+  @Test
+  public void testLoadConfigFromObject_menuSpace_empty() {
+    DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDoc");
+    BaseObject navConfigObj = new BaseObject();
+    navConfigObj.setDocumentReference(cellConfigDocRef);
+    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
+        context.getDatabase()));
+    replayAll();
+    nav.loadConfigFromObject(navConfigObj);
+    assertEquals("MySpace", nav.getMenuSpace(context));
     verifyAll();
   }
 
