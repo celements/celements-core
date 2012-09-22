@@ -88,16 +88,54 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetUniqueId_null() {
     String menuItemName = null;
-    nav.setMenuPart("menuPartTest");
+    String menuPart = "menuPartTest";
+    nav.setMenuPart(menuPart);
+    navFilterMock.setMenuPart(eq(menuPart));
+    expectLastCall().atLeastOnce();
+    expect(utils.getSubNodesForParent(eq(""), eq("MySpace"), same(navFilterMock),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(utils.hasParentSpace(same(context))).andReturn(false);
+    replayAll();
     assertTrue(nav.getUniqueId(menuItemName).endsWith(":menuPartTest:"));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetUniqueId_null_menuSpace() {
+    String menuItemName = null;
+    nav.setMenuPart("menuPartTest");
+    nav.setMenuSpace("testMenuSpace");
+    replayAll();
+    assertTrue(nav.getUniqueId(menuItemName).endsWith(":testMenuSpace:menuPartTest:"));
+    verifyAll();
   }
 
   @Test
   public void testGetUniqueId() {
     BaseObject menuItem = new BaseObject();
     menuItem.setName("Space.TestName");
-    nav.setMenuPart("menuPartTest");
+    String menuPart = "menuPartTest";
+    nav.setMenuPart(menuPart);
+    navFilterMock.setMenuPart(eq(menuPart));
+    expectLastCall().atLeastOnce();
+    expect(utils.getSubNodesForParent(eq(""), eq("MySpace"), same(navFilterMock),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(utils.hasParentSpace(same(context))).andReturn(false);
+    replayAll();
     assertTrue(nav.getUniqueId(menuItem.getName()).endsWith(":Space.TestName"));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetUniqueId_menuSpace() {
+    BaseObject menuItem = new BaseObject();
+    menuItem.setName("Space.TestName");
+    nav.setMenuPart("menuPartTest");
+    nav.setMenuSpace("testMenuSpace");
+    replayAll();
+    assertTrue(nav.getUniqueId(menuItem.getName()).endsWith(
+        ":testMenuSpace:Space.TestName"));
+    verifyAll();
   }
 
   @Test
@@ -429,8 +467,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         ).andReturn("/MySpace/MyCurrentDoc");
     expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
         currentDoc).anyTimes();
-    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
-        ).andReturn(0);
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
+        )).andReturn(0);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
@@ -439,12 +477,17 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn(menuName).atLeastOnce();
     expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
         ))).andReturn("").atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().atLeastOnce();
+    expect(utils.getSubNodesForParent(eq(""), eq("MySpace"), same(navFilterMock),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(utils.hasParentSpace(same(context))).andReturn(false);
     replayAll(pageTypeApi, menuNameCmdMock);
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
         context);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace.MyCurrentDoc\""
+        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
     verifyAll(pageTypeApi, menuNameCmdMock);
   }
@@ -468,8 +511,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
-        ).andReturn(1);
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
+        )).andReturn(1);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
@@ -480,13 +523,18 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("style=\"background-image:url(abc);\"").atLeastOnce();
     expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
         ))).andReturn("").atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().atLeastOnce();
+    expect(utils.getSubNodesForParent(eq(""), eq("MySpace"), same(navFilterMock),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(utils.hasParentSpace(same(context))).andReturn(false);
     replayAll(pageTypeApi, menuNameCmdMock);
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
         context);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " style=\"background-image:url(abc);\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace.MyCurrentDoc\""
+        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
     verifyAll(pageTypeApi, menuNameCmdMock);
   }
@@ -509,8 +557,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     nav.setHasLink(false);
-    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context))
-      ).andReturn(0);
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
+        )).andReturn(0);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
         MultilingualMenuNameCommand.class);
     nav.inject_menuNameCmd(menuNameCmdMock);
@@ -518,12 +566,17 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("My Current Doc").atLeastOnce();
     expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
         ))).andReturn("").atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().atLeastOnce();
+    expect(utils.getSubNodesForParent(eq(""), eq("MySpace"), same(navFilterMock),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(utils.hasParentSpace(same(context))).andReturn(false);
     replayAll(pageTypeApi, menuNameCmdMock);
     nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), true,
         context);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
-        + " currentPage myUltimativePageType active\" id=\"N1:MySpace.MyCurrentDoc\""
-        + ">My Current Doc</span>", outStream.toString());
+        + " currentPage myUltimativePageType active\" id=\"N1:MySpace:MySpace."
+        + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
     verifyAll(pageTypeApi, menuNameCmdMock);
   }
 

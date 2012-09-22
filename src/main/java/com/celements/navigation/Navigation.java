@@ -24,18 +24,21 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.pagetype.IPageType;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class Navigation implements INavigation {
@@ -274,7 +277,7 @@ public class Navigation implements INavigation {
         openMenuItemOut(outStream, null, true, true, false, context);
         outStream.append("<span " + addUniqueElementId(null)
             + " " + addCssClasses(null, true, true, true, false, context)
-            + ">" + utils.getAdminMessageTool(context).get("cel_nav_nomenuitems")
+            + ">" + getWebUtilsService().getAdminMessageTool().get("cel_nav_nomenuitems")
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
@@ -412,10 +415,11 @@ public class Navigation implements INavigation {
   }
 
   public String getUniqueId(String menuItemName) {
+    String theMenuSpace = getMenuSpace(getContext());
     if (menuItemName != null) {
-      return uniqueName + ":" + menuItemName;
+      return uniqueName + ":" + theMenuSpace + ":" + menuItemName;
     } else {
-      return uniqueName + ":" + menuPart + ":";
+      return uniqueName + ":" + theMenuSpace + ":" + menuPart + ":";
     }
   }
 
@@ -691,6 +695,18 @@ public class Navigation implements INavigation {
 
   public void inject_menuNameCmd(MultilingualMenuNameCommand menuNameCmd) {
     this.menuNameCmd = menuNameCmd;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
   }
 
 }
