@@ -300,6 +300,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   //TODO Delegation can be removed as soon as latin1 flag can be removed
+  /**
+   * @deprecated since 2.19.0 instead use CelSendMail class directly.
+   */
+  @Deprecated
   public int sendMail(
       String from, String replyTo, 
       String to, String cc, String bcc, 
@@ -310,6 +314,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         attachments, others, false, context);
   }
   
+  /**
+   * @deprecated since 2.19.0 instead use CelSendMail class directly.
+   */
+  @Deprecated
   public int sendMail(
         String from, String replyTo, 
         String to, String cc, String bcc, 
