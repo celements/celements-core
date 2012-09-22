@@ -589,6 +589,7 @@ public class Navigation implements INavigation {
       toHierarchyLevel = prefObj.getIntValue("to_hierarchy_level", DEFAULT_MAX_LEVEL);
       showInactiveToLevel = prefObj.getIntValue("show_inactive_to_level", 0);
       menuPart = prefObj.getStringValue("menu_part");
+      menuSpace = prefObj.getStringValue("menu_space");
       if (!"".equals(prefObj.getStringValue("data_type"))
           && (prefObj.getStringValue("data_type") != null)) {
         dataType = prefObj.getStringValue("data_type");

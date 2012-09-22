@@ -28,7 +28,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
@@ -40,6 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 
 public class NavigationTest extends AbstractBridgedComponentTestCase {
@@ -573,6 +576,29 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
+  @Test
+  public void testLoadConfigFromObject() {
+    DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDoc");
+    BaseObject navConfigObj = new BaseObject();
+    navConfigObj.setDocumentReference(cellConfigDocRef);
+    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
+        context.getDatabase()));
+    navConfigObj.setStringValue("menu_space", "theMenuSpace");
+    replayAll();
+    nav.loadConfigFromObject(navConfigObj);
+    assertEquals("theMenuSpace", nav.getMenuSpace(context));
+    verifyAll();
+  }
+
+  //*****************************************************************
+  //*                  H E L P E R  - M E T H O D S                 *
+  //*****************************************************************/
+
+  private NavigationClasses getNavClasses() {
+    return (NavigationClasses) Utils.getComponent(
+        IClassCollectionRole.class, "celements.celNavigationClasses");
+  }
   
   private void replayAll(Object ... mocks) {
     replay(xwiki, navFilterMock, utils);
