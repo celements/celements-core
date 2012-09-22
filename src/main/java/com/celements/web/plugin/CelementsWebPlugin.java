@@ -433,8 +433,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   public int createUser(boolean validate, XWikiContext context) throws XWikiException{
+    String possibleLogins = getPossibleLogins(context);
+    return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
+  }
+
+  public String getPossibleLogins(XWikiContext context) {
     String possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
-    if((possibleLogins == null) || "".equals(possibleLogins)) {
+    if((possibleLogins == null) || "".equals(possibleLogins.trim())) {
       String db = context.getDatabase();
       context.setDatabase("celements2web");
       possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
@@ -443,7 +448,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         possibleLogins = "loginname";
       }
     }
-    return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
+    return possibleLogins;
   }
   
   @SuppressWarnings("deprecation")

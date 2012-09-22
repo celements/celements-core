@@ -300,9 +300,23 @@ public class CelementsWebPluginApi extends Api {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
 
+  public String getUsernameForUserData(String login) {
+    String possibleLogins = plugin.getPossibleLogins(context);
+    String account = "";
+    try {
+      LOGGER.debug("executing getUsernameForUserData in plugin");
+      account = new UserNameForUserDataCommand().getUsernameForUserData(login,
+          possibleLogins, context);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get usernameForUserData for login [" + login
+          + "] and possibleLogins [" + possibleLogins + "].", exp);
+    }
+    return account;
+  }
+
   public String getUsernameForUserData(String login, String possibleLogins) {
     String account = "";
-    if(hasProgrammingRights()) {
+    if(hasProgrammingRights() || hasAdminRights()) {
       try {
         LOGGER.debug("executing getUsernameForUserData in plugin");
         account = new UserNameForUserDataCommand().getUsernameForUserData(login,
