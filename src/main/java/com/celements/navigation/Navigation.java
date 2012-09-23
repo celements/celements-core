@@ -26,10 +26,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
@@ -109,6 +111,10 @@ public class Navigation implements INavigation {
   private MultilingualMenuNameCommand menuNameCmd;
 
   private String navLanguage;
+
+  ITreeNodeService injected_TreeNodeService;
+
+  IWebUtilsService injected_WebUtilsService;
 
   public Navigation(String navUniqueId) {
     this.menuNameCmd = new MultilingualMenuNameCommand();
@@ -220,17 +226,19 @@ public class Navigation implements INavigation {
 
   public String getMenuSpace(XWikiContext context) {
     if (menuSpace == null) {
+      SpaceReference currentDocSpaceRef = context.getDoc().getDocumentReference(
+        ).getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
         getNavFilter().setMenuPart(getMenuPartForLevel(1));
-        if ((utils.getSubNodesForParent("", context.getDoc().getSpace(), getNavFilter(),
-            context).size() == 0)
-           && utils.hasParentSpace(context)) {
+        if ((getTreeNodeService().getSubNodesForParent(currentDocSpaceRef, getNavFilter()
+            ).size() == 0)
+           && getWebUtilsService().hasParentSpace()) {
           // is main Menu and no mainMenuItem found ; user has edit rights
-          menuSpace = utils.getParentSpace(context);
+          menuSpace = getWebUtilsService().getParentSpace();
         }
       }
       if (menuSpace == null) {
-        menuSpace = context.getDoc().getSpace();
+        menuSpace = currentDocSpaceRef.getName();
       }
     }
     return menuSpace;
@@ -702,6 +710,9 @@ public class Navigation implements INavigation {
   }
 
   private IWebUtilsService getWebUtilsService() {
+    if (injected_WebUtilsService != null) {
+      return injected_WebUtilsService;
+    }
     return Utils.getComponent(IWebUtilsService.class);
   }
 
@@ -711,6 +722,13 @@ public class Navigation implements INavigation {
 
   private Execution getExecution() {
     return Utils.getComponent(Execution.class);
+  }
+
+  private ITreeNodeService getTreeNodeService() {
+    if (injected_TreeNodeService != null) {
+      return injected_TreeNodeService;
+    }
+    return Utils.getComponent(ITreeNodeService.class);
   }
 
 }
