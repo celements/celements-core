@@ -226,22 +226,25 @@ public class Navigation implements INavigation {
 
   public String getMenuSpace(XWikiContext context) {
     if (menuSpace == null) {
-      SpaceReference currentDocSpaceRef = context.getDoc().getDocumentReference(
+      SpaceReference currentSpaceRef = context.getDoc().getDocumentReference(
         ).getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
-        getNavFilter().setMenuPart(getMenuPartForLevel(1));
-        if ((getTreeNodeService().getSubNodesForParent(currentDocSpaceRef, getNavFilter()
-            ).size() == 0)
-           && getWebUtilsService().hasParentSpace()) {
+        if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace()) {
           // is main Menu and no mainMenuItem found ; user has edit rights
           menuSpace = getWebUtilsService().getParentSpace();
         }
       }
       if (menuSpace == null) {
-        menuSpace = currentDocSpaceRef.getName();
+        menuSpace = currentSpaceRef.getName();
       }
     }
     return menuSpace;
+  }
+
+  private boolean isEmptyMainMenu(SpaceReference spaceRef) {
+    getNavFilter().setMenuPart(getMenuPartForLevel(1));
+    return getTreeNodeService().getSubNodesForParent(spaceRef, getNavFilter()
+        ).size() == 0;
   }
 
   INavFilter<BaseObject> getNavFilter() {
