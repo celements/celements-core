@@ -34,6 +34,12 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 
+/**
+ * TODO implement VelocityContextInitializer role
+ * @author fabian
+ *
+ */
+
 @Component
 @Singleton
 public class PrepareVelocityContextService implements IPrepareVelocityContext {
