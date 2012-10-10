@@ -114,31 +114,36 @@ public class RenderCommand {
       String renderMode) throws XWikiException {
     LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
-    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    vcontext.put("celldoc", cellDoc.newDocument(getContext()));
-    PageType cellType = pageTypeCmd().getPageTypeWithDefaultObj(cellDoc, defaultPageType,
-        getContext());
     String cellDocFN = getRefSerializer().serialize(cellDoc.getDocumentReference());
-    String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
-        renderMode);
-    String templateContent;
-    XWikiDocument templateDoc = getContext().getDoc();
-    if (renderTemplatePath.startsWith(":")) {
-      String templatePath = getTemplatePathOnDisk(renderTemplatePath);
-      try {
-        templateContent = getContext().getWiki().getResourceContent(templatePath);
-      } catch (IOException exp) {
-        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-        return "";
+    if (getContext().getWiki().getRightService().hasAccessLevel(renderMode,
+        getContext().getUser(), cellDocFN , getContext())) {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      vcontext.put("celldoc", cellDoc.newDocument(getContext()));
+      PageType cellType = pageTypeCmd().getPageTypeWithDefaultObj(cellDoc, defaultPageType,
+          getContext());
+      String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
+          renderMode);
+      String templateContent;
+      XWikiDocument templateDoc = getContext().getDoc();
+      if (renderTemplatePath.startsWith(":")) {
+        String templatePath = getTemplatePathOnDisk(renderTemplatePath);
+        try {
+          templateContent = getContext().getWiki().getResourceContent(templatePath);
+        } catch (IOException exp) {
+          LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
+          return "";
+        }
+      } else {
+        DocumentReference renderTemplateDocRef = getWebUtilsService(
+            ).resolveDocumentReference(renderTemplatePath);
+        templateDoc = getTemplateDoc(renderTemplateDocRef);
+        templateContent = getTranslatedContent(templateDoc, lang);
       }
+      return getRenderingEngine().renderText(templateContent,
+          templateDoc, getContext().getDoc(), getContext());
     } else {
-      DocumentReference renderTemplateDocRef = getWebUtilsService(
-          ).resolveDocumentReference(renderTemplatePath);
-      templateDoc = getTemplateDoc(renderTemplateDocRef);
-      templateContent = getTranslatedContent(templateDoc, lang);
+      return "";
     }
-    return getRenderingEngine().renderText(templateContent,
-        templateDoc, getContext().getDoc(), getContext());
   }
 
   public String renderDocument(DocumentReference docRef) {
