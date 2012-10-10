@@ -251,8 +251,7 @@ public class WebUtilsService implements IWebUtilsService {
     try {
       DocumentReference userDocRef = resolveDocumentReference(userFullName);
       DocumentReference xwikiUsersClassRef = new DocumentReference(
-          getContext().getDatabase(), "XWiki", "XWikiUsers");
-      xwikiUsersClassRef.setWikiReference(userDocRef.getWikiReference());
+          userDocRef.getWikiReference().getName(), "XWiki", "XWikiUsers");
       BaseObject userObj = getContext().getWiki().getDocument(userDocRef, getContext()
           ).getXObject(xwikiUsersClassRef);
       if (userObj != null) {
@@ -282,10 +281,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   public DocumentReference resolveDocumentReference(String fullName) {
     DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
-        fullName, EntityType.DOCUMENT));
-    if (!fullName.contains(":")) {
-      eventRef.setWikiReference(new WikiReference(getContext().getDatabase()));
-    }
+        fullName, EntityType.DOCUMENT, new WikiReference(getContext().getDatabase())));
     LOGGER.debug("getDocRefFromFullName: for [" + fullName + "] got reference ["
         + eventRef + "].");
     return eventRef;
