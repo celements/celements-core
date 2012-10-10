@@ -300,6 +300,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   //TODO Delegation can be removed as soon as latin1 flag can be removed
+  /**
+   * @deprecated since 2.19.0 instead use CelSendMail class directly.
+   */
+  @Deprecated
   public int sendMail(
       String from, String replyTo, 
       String to, String cc, String bcc, 
@@ -310,6 +314,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         attachments, others, false, context);
   }
   
+  /**
+   * @deprecated since 2.19.0 instead use CelSendMail class directly.
+   */
+  @Deprecated
   public int sendMail(
         String from, String replyTo, 
         String to, String cc, String bcc, 
@@ -433,8 +441,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   public int createUser(boolean validate, XWikiContext context) throws XWikiException{
+    String possibleLogins = getPossibleLogins(context);
+    return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
+  }
+
+  public String getPossibleLogins(XWikiContext context) {
     String possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
-    if((possibleLogins == null) || "".equals(possibleLogins)) {
+    if((possibleLogins == null) || "".equals(possibleLogins.trim())) {
       String db = context.getDatabase();
       context.setDatabase("celements2web");
       possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
@@ -443,7 +456,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         possibleLogins = "loginname";
       }
     }
-    return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
+    return possibleLogins;
   }
   
   @SuppressWarnings("deprecation")

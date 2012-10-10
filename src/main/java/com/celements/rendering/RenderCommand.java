@@ -96,7 +96,7 @@ public class RenderCommand {
 
   public String renderCelementsDocument(DocumentReference elemDocRef, String renderMode
       ) throws XWikiException {
-      return renderCelementsDocument(elemDocRef, renderMode, getContext().getLanguage());
+      return renderCelementsDocument(elemDocRef, getContext().getLanguage(), renderMode);
   }
 
   public String renderCelementsDocument(DocumentReference elemDocRef, String lang,

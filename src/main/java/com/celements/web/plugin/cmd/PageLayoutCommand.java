@@ -389,7 +389,9 @@ public class PageLayoutCommand {
   }
 
   public boolean layoutEditorAvailable() {
-    return layoutExists(getCelLayoutEditorSpaceRef());
+    SpaceReference localLayoutEditorSpaceRef = getCelLayoutEditorSpaceRef();
+    SpaceReference layoutEditorSpaceRef = decideLocalOrCentral(localLayoutEditorSpaceRef);
+    return (layoutEditorSpaceRef != null);
   }
 
   /**

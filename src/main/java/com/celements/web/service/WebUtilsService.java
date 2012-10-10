@@ -194,8 +194,17 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public List<String> getAllowedLanguages(){
+    List<String> languages = new ArrayList<String>();
+    languages.addAll(Arrays.asList(getContext().getWiki(
+      ).getSpacePreference("languages", getContext()).split("[ ,]")));
+    languages.remove("");
+    if (languages.size() > 0) {
+      return languages;
+    }
+    LOGGER.warn("Deprecated usage of Preferences field 'language'."
+        + " Instead use 'languages'.");
     return Arrays.asList(getContext().getWiki(
-        ).getSpacePreference("language", getContext()).split("[ ,]"));
+      ).getSpacePreference("language", getContext()).split("[ ,]"));
   }
 
   public Date parseDate(String date, String format){

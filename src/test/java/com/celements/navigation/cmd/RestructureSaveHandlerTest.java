@@ -19,16 +19,16 @@
  */
 package com.celements.navigation.cmd;
 
-import java.util.Set;
-
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
+
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.navigation.Navigation;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -57,8 +57,19 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testExtractDocFN() {
-    assertEquals("MySpace.MyDoc", restrSaveCmd.extractDocFN("CN1:MySpace.MyDoc"));
+    assertEquals("MySpace.MyDoc", restrSaveCmd.extractDocFN("CN1:MySpace:MySpace.MyDoc"));
     assertEquals("", restrSaveCmd.extractDocFN("CN1:"));
+  }
+
+  @Test
+  public void testExtractDocFN_NavigationCreateID() {
+    Navigation helpNav = new Navigation("N1");
+    helpNav.setMenuSpace("MySpace");
+    String menuItemName = "MySpace.MyDoc";
+    String navUniqLiId = helpNav.getUniqueId(menuItemName);
+    assertEquals("getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
+        + " parsed correctly in extractDocFN.", menuItemName, restrSaveCmd.extractDocFN(
+            navUniqLiId));
   }
 
   @Test
@@ -82,7 +93,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
     expect(wiki.exists(eq("MySpace.MyDoc"), same(context))).andReturn(true);
     replay(wiki);
-    restrSaveCmd.readPropertyKey("CN1:MySpace.MyDoc");
+    restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
     assertEquals("MySpace.MyDoc", restrSaveCmd.getParentFN());
     verify(wiki);
   }
@@ -92,7 +103,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
     expect(wiki.exists(eq("MySpace.MyDoc"), same(context))).andReturn(false);
     replay(wiki);
-    restrSaveCmd.readPropertyKey("CN1:MySpace.MyDoc");
+    restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
     assertEquals("", restrSaveCmd.getParentFN());
     verify(wiki);
   }
@@ -113,7 +124,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
     replay(wiki);
-    restrSaveCmd.stringEvent("LIN1:MySpace.MyDoc1");
+    restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
     assertEquals("expecting position reset.", 0,
@@ -141,7 +152,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
     replay(wiki);
-    restrSaveCmd.stringEvent("LIN1:MySpace.MyDoc1");
+    restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentFN, xdoc.getParent());
@@ -170,7 +181,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
     replay(wiki);
-    restrSaveCmd.stringEvent("LIN1:MySpace.MyDoc1");
+    restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentFN, xdoc.getParent());
@@ -200,7 +211,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
     replay(wiki);
-    restrSaveCmd.stringEvent("LIN1:MySpace.MyDoc1");
+    restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", "", xdoc.getParent());
@@ -224,7 +235,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     xdoc.setObject("Celements2.MenuItem", 0, menuItemObj);
     expect(wiki.getDocument(eq(docFN), same(context))).andReturn(xdoc);
     replay(wiki);
-    restrSaveCmd.stringEvent("LIN1:MySpace.MyDoc1");
+    restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentFN, xdoc.getParent());

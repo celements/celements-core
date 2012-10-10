@@ -24,18 +24,23 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class Navigation implements INavigation {
@@ -106,6 +111,10 @@ public class Navigation implements INavigation {
   private MultilingualMenuNameCommand menuNameCmd;
 
   private String navLanguage;
+
+  ITreeNodeService injected_TreeNodeService;
+
+  IWebUtilsService injected_WebUtilsService;
 
   public Navigation(String navUniqueId) {
     this.menuNameCmd = new MultilingualMenuNameCommand();
@@ -180,28 +189,31 @@ public class Navigation implements INavigation {
    * @param menuSpace (default: $doc.web)
    */
   public void setMenuSpace(String menuSpace) {
-    this.menuSpace = menuSpace;
+    if ((menuSpace != null) && (!"".equals(menuSpace))) {
+      this.menuSpace = menuSpace;
+    } else {
+      this.menuSpace = null;
+    }
   }
 
   public String includeNavigation(XWikiContext context) {
     LOGGER.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
     if(navigationEnabled){
-      //TODO add registry for dataType providers
       StringBuilder outStream = new StringBuilder();
       if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
-        try {
           if (fromHierarchyLevel > 0) {
             String parent = utils.getParentForLevel(fromHierarchyLevel, context);
-        	  if(parent != null) {
-                addNavigationForParent(outStream, parent, getNumLevels(), context);
-        	  }
+            try {
+          	  if(parent != null) {
+                  addNavigationForParent(outStream, parent, getNumLevels(), context);
+          	  }
+            } catch (XWikiException e) {
+              LOGGER.error("addNavigationForParent failed for [" + parent + "].", e);
+            }
           } else {
             throw new IllegalArgumentException("fromHierarchyLevel [" + fromHierarchyLevel
                 + "] must be greater than zero");
           }
-        } catch (XWikiException e) {
-          LOGGER.error(e);
-        }
       } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
         navBuilder.useStream(outStream);
         generateLanguageMenu(navBuilder, context);
@@ -214,20 +226,25 @@ public class Navigation implements INavigation {
 
   public String getMenuSpace(XWikiContext context) {
     if (menuSpace == null) {
+      SpaceReference currentSpaceRef = context.getDoc().getDocumentReference(
+        ).getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
-        getNavFilter().setMenuPart(getMenuPartForLevel(1));
-        if ((utils.getSubNodesForParent("", context.getDoc().getSpace(), getNavFilter(),
-            context).size() == 0)
-           && utils.hasParentSpace(context)) {
+        if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace()) {
           // is main Menu and no mainMenuItem found ; user has edit rights
-          menuSpace = utils.getParentSpace(context);
+          menuSpace = getWebUtilsService().getParentSpace();
         }
       }
       if (menuSpace == null) {
-        menuSpace = context.getDoc().getSpace();
+        menuSpace = currentSpaceRef.getName();
       }
     }
     return menuSpace;
+  }
+
+  private boolean isEmptyMainMenu(SpaceReference spaceRef) {
+    getNavFilter().setMenuPart(getMenuPartForLevel(1));
+    return getTreeNodeService().getSubNodesForParent(spaceRef, getNavFilter()
+        ).size() == 0;
   }
 
   INavFilter<BaseObject> getNavFilter() {
@@ -275,7 +292,7 @@ public class Navigation implements INavigation {
         openMenuItemOut(outStream, null, true, true, false, context);
         outStream.append("<span " + addUniqueElementId(null)
             + " " + addCssClasses(null, true, true, true, false, context)
-            + ">" + utils.getAdminMessageTool(context).get("cel_nav_nomenuitems")
+            + ">" + getWebUtilsService().getAdminMessageTool().get("cel_nav_nomenuitems")
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
@@ -413,10 +430,11 @@ public class Navigation implements INavigation {
   }
 
   public String getUniqueId(String menuItemName) {
+    String theMenuSpace = getMenuSpace(getContext());
     if (menuItemName != null) {
-      return uniqueName + ":" + menuItemName;
+      return uniqueName + ":" + theMenuSpace + ":" + menuItemName;
     } else {
-      return uniqueName + ":" + menuPart + ":";
+      return uniqueName + ":" + theMenuSpace + ":" + menuPart + ":";
     }
   }
 
@@ -457,7 +475,7 @@ public class Navigation implements INavigation {
           cssClass += " " + pageType.getPageType();
         }
       } catch (XWikiException exp) {
-        LOGGER.error(exp);
+        LOGGER.error(exp, exp);
       }
       if (isActiveMenuItem(fullName, context)) {
         cssClass += " active";
@@ -532,7 +550,7 @@ public class Navigation implements INavigation {
     try {
       prevMenuItem = WebUtils.getInstance().getPrevMenuItem(fullName, context);
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
     if (prevMenuItem != null) {
       return prevMenuItem.getName();
@@ -547,7 +565,7 @@ public class Navigation implements INavigation {
     try {
       nextMenuItem = WebUtils.getInstance().getNextMenuItem(fullName, context);
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
     if (nextMenuItem != null) {
       return nextMenuItem.getName();
@@ -577,7 +595,7 @@ public class Navigation implements INavigation {
               "menu_element_name", configName, false);
       loadConfigFromObject(prefObj);
     } catch(XWikiException e){
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
   }
 
@@ -590,6 +608,7 @@ public class Navigation implements INavigation {
       toHierarchyLevel = prefObj.getIntValue("to_hierarchy_level", DEFAULT_MAX_LEVEL);
       showInactiveToLevel = prefObj.getIntValue("show_inactive_to_level", 0);
       menuPart = prefObj.getStringValue("menu_part");
+      setMenuSpace(prefObj.getStringValue("menu_space"));
       if (!"".equals(prefObj.getStringValue("data_type"))
           && (prefObj.getStringValue("data_type") != null)) {
         dataType = prefObj.getStringValue("data_type");
@@ -599,7 +618,7 @@ public class Navigation implements INavigation {
         try {
           setLayoutType(prefObj.getStringValue("layout_type"));
         } catch (UnknownLayoutTypeException exp) {
-          LOGGER.error(exp);
+          LOGGER.error(exp, exp);
         }
       }
       setCMcssClass(prefObj.getStringValue("cm_css_class"));
@@ -691,6 +710,28 @@ public class Navigation implements INavigation {
 
   public void inject_menuNameCmd(MultilingualMenuNameCommand menuNameCmd) {
     this.menuNameCmd = menuNameCmd;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    if (injected_WebUtilsService != null) {
+      return injected_WebUtilsService;
+    }
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
+  }
+
+  private ITreeNodeService getTreeNodeService() {
+    if (injected_TreeNodeService != null) {
+      return injected_TreeNodeService;
+    }
+    return Utils.getComponent(ITreeNodeService.class);
   }
 
 }

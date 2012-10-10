@@ -879,6 +879,33 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
+  @Test
+  public void testGetAllowedLanguages_WebPreferences() {
+    expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("fr,it"
+        ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("de,en"
+        ).once();
+    replayAll();
+    List<String> resultList = Arrays.asList("de", "en");
+    assertEquals("Expect languages from space preferences", resultList,
+        webUtilsService.getAllowedLanguages());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetAllowedLanguages_deprecatedUsageOfFieldLanguage() {
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreference(eq("language"), same(context))).andReturn("fr it"
+        ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("language"), same(context))).andReturn("de en"
+        ).once();
+    replayAll();
+    List<String> resultList = Arrays.asList("de", "en");
+    assertEquals("Expect languages from space preferences", resultList,
+        webUtilsService.getAllowedLanguages());
+    verifyAll();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/

@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
+import javax.servlet.http.Cookie;
+
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
@@ -28,6 +31,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
 
 public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -73,14 +77,79 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   @Test
   public void testPrepareVelocityContext_checkNPEs_forNull_vContext() throws Exception {
     context.setUser("XWiki.myTestUser");
-    expect(xwiki.getDefaultLanguage(same(context))).andReturn("de").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(false).atLeastOnce();
     replayAll();
     context.remove("vcontext");
     prepVeloContextService.prepareVelocityContext(context);
     verifyAll();
   }
-  
+
+  @Test
+  public void testIsTdocLanguageWrong_false() {
+    context.setLanguage("fr");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc");
+    XWikiDocument tdoc = new XWikiDocument(docRef);
+    tdoc.setDefaultLanguage("de");
+    tdoc.setLanguage("fr");
+    tdoc.setTranslation(1);
+    Document vTdocBefore = tdoc.newDocument(context);
+    replayAll();
+    assertFalse(prepVeloContextService.isTdocLanguageWrong(vTdocBefore));
+    verifyAll();
+  }
+
+  @Test
+  public void testFixTdocForInvalidLanguage_wrong_tdoc() throws Exception {
+    context.setLanguage("fr");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc");
+    XWikiDocument docMock = createMock(XWikiDocument.class);
+    expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
+    expect(docMock.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(docMock.getLanguage()).andReturn("").anyTimes();
+    XWikiDocument tdoc = new XWikiDocument(docRef);
+    tdoc.setDefaultLanguage("de");
+    tdoc.setLanguage("fr");
+    tdoc.setTranslation(1);
+    expect(docMock.getTranslatedDocument(same(context))).andReturn(tdoc);
+    context.setDoc(docMock);
+    VelocityContext vcontext = new VelocityContext();
+    replayAll(docMock);
+    prepVeloContextService.fixTdocForInvalidLanguage(vcontext);
+    Document vTdoc = (Document) vcontext.get("tdoc");
+    assertEquals("fr", vTdoc.getLanguage());
+    verifyAll(docMock);
+  }
+
+  @Test
+  public void testFixTdocForInvalidLanguage_right_tdoc() throws Exception {
+    context.setLanguage("fr");
+    //IMPORTANT: do not touch velocity context if the tdoc is in the correct language.
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc");
+    XWikiDocument docMock = createMock(XWikiDocument.class);
+    expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
+    expect(docMock.getDefaultLanguage()).andReturn("de").anyTimes();
+    expect(docMock.getLanguage()).andReturn("").anyTimes();
+    XWikiDocument tdoc = new XWikiDocument(docRef);
+    tdoc.setDefaultLanguage("de");
+    tdoc.setLanguage("fr");
+    tdoc.setTranslation(1);
+    context.setDoc(docMock);
+    VelocityContext vcontext = new VelocityContext();
+    Document tdocBefore = tdoc.newDocument(context);
+    vcontext.put("tdoc", tdocBefore);
+    replayAll(docMock);
+    prepVeloContextService.fixTdocForInvalidLanguage(vcontext);
+    Document vTdoc = (Document) vcontext.get("tdoc");
+    assertEquals("fr", vTdoc.getLanguage());
+    assertSame(tdocBefore, vTdoc);
+    verifyAll(docMock);
+  }
+
   @Test
   public void testFixLanguagePreference() throws Exception {
     context.setUser("XWiki.myTestUser");
@@ -88,7 +157,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     context.put("vcontext", vContext);
     XWikiRequest requestMock = createMock(XWikiRequest.class);
     context.setRequest(requestMock);
-    expect(xwiki.getDefaultLanguage(same(context))).andReturn("de").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))
         ).andReturn("").atLeastOnce();
@@ -107,7 +177,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
         ).atLeastOnce();
-    expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("en,de,fr"
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de,fr"
         ).atLeastOnce();
     replayAll(requestMock);
     context.remove("vcontext");
@@ -115,6 +185,115 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     prepVeloContextService.fixLanguagePreference(vContext);
     verifyAll(requestMock);
     assertEquals("en", vContext.get("language"));
+  }
+
+  @Test
+  public void testFixLanguagePreference_noAcceptLanguageValid() throws Exception {
+    context.setUser("XWiki.myTestUser");
+    VelocityContext vContext = new VelocityContext();
+    context.put("vcontext", vContext);
+    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    context.setRequest(requestMock);
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("en"
+        ).atLeastOnce();
+    expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))
+        ).andReturn("").atLeastOnce();
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "myTestUser");
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
+        new XWikiDocument(userDocRef)).atLeastOnce();
+    expect(xwiki.Param(eq("xwiki.language.preferDefault"), eq("0"))).andReturn("0"
+        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context))
+        ).andReturn("0").atLeastOnce();
+    expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
+    expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("de").atLeastOnce();
+    Enumeration<Locale> testEnum = new Vector<Locale>(Arrays.asList(new Locale("de"))
+        ).elements();
+    expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
+    expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
+        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en"
+        ).atLeastOnce();
+    replayAll(requestMock);
+    context.remove("vcontext");
+    vContext.put("language", "de");
+    prepVeloContextService.fixLanguagePreference(vContext);
+    verifyAll(requestMock);
+    assertEquals("en", vContext.get("language"));
+  }
+
+  @Test
+  public void testFixLanguagePreference_invalidLanguageFromCookie() throws Exception {
+    context.setUser("XWiki.myTestUser");
+    VelocityContext vContext = new VelocityContext();
+    context.put("vcontext", vContext);
+    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    context.setRequest(requestMock);
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("en"
+        ).atLeastOnce();
+    expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getUserPreferenceFromCookie(eq("language"), same(context))
+        ).andReturn("ru").atLeastOnce(); // test invalid language from cookie
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "myTestUser");
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
+        new XWikiDocument(userDocRef)).atLeastOnce();
+    expect(xwiki.Param(eq("xwiki.language.preferDefault"), eq("0"))).andReturn("0"
+        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("preferDefaultLanguage"), eq("0"), same(context))
+        ).andReturn("0").atLeastOnce();
+    expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
+    expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("de").atLeastOnce();
+    Enumeration<Locale> testEnum = new Vector<Locale>(Arrays.asList(new Locale("de"))
+        ).elements();
+    expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
+    expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
+        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en"
+        ).atLeastOnce();
+    replayAll(requestMock);
+    context.remove("vcontext");
+    vContext.put("language", "de");
+    prepVeloContextService.fixLanguagePreference(vContext);
+    verifyAll(requestMock);
+    assertEquals("en", vContext.get("language"));
+  }
+
+  @Test
+  public void testFixLanguagePreference_addCookieOnlyOnce() throws Exception {
+    context.setUser("XWiki.myTestUser");
+    VelocityContext vContext = new VelocityContext();
+    context.put("vcontext", vContext);
+    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    context.setRequest(requestMock);
+    XWikiResponse responseMock = createMock(XWikiResponse.class);
+    context.setResponse(responseMock);
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
+    expect(xwiki.isMultiLingual(same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
+        eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
+            ).atLeastOnce();
+    responseMock.addCookie(isA(Cookie.class));
+    expectLastCall().once();
+    expect(requestMock.getParameter(eq("language"))).andReturn("fr").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de,fr"
+        ).atLeastOnce();
+    replayAll(requestMock, responseMock);
+    context.remove("vcontext");
+    vContext.put("language", "de");
+    prepVeloContextService.fixLanguagePreference(vContext);
+    ExecutionContext execContext = prepVeloContextService.execution.getContext();
+    Object addCookieBefore = execContext.getProperty(
+        PrepareVelocityContextService.ADD_LANGUAGE_COOKIE_DONE);
+    assertNotNull(addCookieBefore);
+    assertTrue((Boolean)addCookieBefore);
+    //check addCookie is only called once
+    prepVeloContextService.fixLanguagePreference(vContext);
+    verifyAll(requestMock, responseMock);
+    assertEquals("fr", vContext.get("language"));
   }
 
   @Test
@@ -126,7 +305,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
 
   @Test
   public void testIsInvalidLanguageOrDefault_yes() {
-    expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("en,de"
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de"
         ).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
@@ -138,7 +317,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
 
   @Test
   public void testIsInvalidLanguageOrDefault_no() {
-    expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("en,de"
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de"
         ).atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
@@ -170,6 +349,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn(""
       ).anyTimes();
     expect(xwiki.getSpacePreference(eq("language"), same(context))).andReturn(""
+      ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn(""
       ).anyTimes();
     expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(""
       ).anyTimes();
@@ -275,7 +456,6 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     assertEquals("700", prepVeloContextService.getRTEwidth(context));
     verifyAll(request);
   }
-
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, skinDoc, rightServiceMock);

@@ -18,6 +18,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.PageTypeApi;
@@ -33,9 +34,23 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 
+/**
+ * TODO implement VelocityContextInitializer role
+ * @author fabian
+ *
+ */
+
 @Component
 @Singleton
 public class PrepareVelocityContextService implements IPrepareVelocityContext {
+
+  public static final String CEL_SUPPRESS_INVALID_LANG = "celSuppressInvalidLang";
+
+  public static final String CFG_LANGUAGE_SUPPRESS_INVALID =
+    "celements.language.suppressInvalid";
+
+  public static final String ADD_LANGUAGE_COOKIE_DONE =
+    "celements.addLanguageCookie.done";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PrepareVelocityContextService.class);
@@ -47,7 +62,11 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   IWebUtilsService webUtilsService;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext)getExecContext().getProperty("xwikicontext");
+  }
+
+  private ExecutionContext getExecContext() {
+    return execution.getContext();
   }
 
   public void prepareVelocityContext(VelocityContext vcontext) {
@@ -76,6 +95,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   void fixLanguagePreference(VelocityContext vcontext) {
     String langPref = getLanguagePreference(getContext());
+    getContext().setLanguage(langPref);
     if (vcontext != null) {
       vcontext.put("language", langPref);
     }
@@ -310,8 +330,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc + " , "
             + templateDocument);
         return pageTypeDoc;
-      } catch (XWikiException e) {
-        LOGGER.error(e);
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to getPageTypeDoc.", exp);
       }
     }
     return null;
@@ -417,159 +437,196 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * 
    * @return the language to use
    * 
-   * @deprecated introduced in 2.18.0 because of a but in xwiki 2.7.2 it is fixed
-   *             in unstable-xwiki4
+   * introduced in 2.18.0 because of a bug in xwiki 2.7.2 it is fixed
+   * in unstable-xwiki4 YET celements allows default_language and language change
+   * between spaces. XWiki does not!
    */
-  @Deprecated
   String getLanguagePreference(XWikiContext context) {
     LOGGER.debug("getLanguagePreference: start " + context.getLanguage());
     String language = context.getLanguage();
 
-    XWiki xwiki = context.getWiki();
-    String defaultLanguage = xwiki.getDefaultLanguage(context);
-
     LOGGER.debug("getLanguagePreference: isMultiLingual ["
         + context.getWiki().isMultiLingual(context) + "] defaultLanguage ["
-        + defaultLanguage + "].");
+        + webUtilsService.getDefaultLanguage() + "].");
     // If the wiki is non multilingual then the language is the default
     // language.
     if (!context.getWiki().isMultiLingual(context)) {
-      language = defaultLanguage;
-      context.setLanguage(language);
-      return language;
+      return webUtilsService.getDefaultLanguage();
     }
 
-    // As the wiki is multilingual try to find the language to use from the
-    // request by looking
-    // for a language parameter. If the language value is "default" use the
-    // default language
-    // from the XWiki preferences settings. Otherwise set a cookie to remember
-    // the language
-    // in use.
+    if (context.getRequest() != null) {
+      try {
+        language = getLanguageInRequestParam();
+        if (isValidLanguage(language)) {
+          LOGGER.debug("getLanguagePreference: found parameter language " + language);
+          return language;
+        }
+      } catch (Exception e) {
+        LOGGER.error("Failed to get the language paramter from the request.", e);
+      }
+      // As no language parameter was passed in the request, try to get the
+      // language to use from a cookie.
+      try {
+        language = getLanguageFromCookie();
+        if (isValidLanguage(language)) {
+          LOGGER.debug("getLanguagePreference: found cookie language " + language);
+          return language;
+        }
+      } catch (Exception e) {
+        LOGGER.error("Failed to get the language from the cookie.", e);
+      }
+    } else {
+      LOGGER.info("getLanguagePreference: skip language parameter in request and"
+          + " language cookie check, because request is null.");
+    }
+
+    LOGGER.trace("getLanguagePreference: Next from the default user preference.");
+
+    // Next from the default user preference
     try {
-      language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-      if ((language != null) && (!language.equals(""))) {
+      language = getLanguageFromUserPreferences();
+      if (isValidLanguage(language)) {
+        LOGGER.debug("getLanguagePreference: found userpref language " + language);
+        return language;
+      }
+    } catch (XWikiException e) {
+      LOGGER.error("Failed to get the default language from the user preferences.", e);
+    }
+
+    LOGGER.trace("getLanguagePreference: Next from preferDefault? ");
+
+    if (isConsiderBrowserAcceptLanguages()) {
+      LOGGER.trace("getLanguagePreference: Then from the navigator language setting.");
+      // Then from the navigator language setting
+      if (context.getRequest() != null) {
+        language = getLanguageFromAcceptedHeaderLanguages();
+        if (isValidLanguage(language)) {
+          LOGGER.debug("getLanguagePreference: found accepted language " + language);
+          return language;
+        }
+      } else {
+        LOGGER.info("getLanguagePreference: skip accept-language in request,"
+            + " because request is null.");
+      }
+    } else {
+      LOGGER.debug("getLanguagePreference: found preferDefault language " + language);
+    }
+
+    // Finally, use the default language from the global preferences.
+    LOGGER.debug("getLanguagePreference: use default language " + language);
+    return webUtilsService.getDefaultLanguage();
+  }
+
+  private boolean isValidLanguage(String language) {
+    boolean isValidLanguage = (language != null) && !"".equals(language)
+              && webUtilsService.getAllowedLanguages().contains(language);
+    return isValidLanguage;
+  }
+
+  private String getLanguageFromAcceptedHeaderLanguages() {
+    String language = "";
+    XWiki xwiki = getContext().getWiki();
+    String acceptHeader = getContext().getRequest().getHeader("Accept-Language");
+    // If the client didn't specify some languages, skip this phase
+    if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
+      List<String> acceptedLanguages = getAcceptedLanguages(getContext().getRequest());
+      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: getAcceptedLanguages "
+          + acceptedLanguages);
+      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported "
+          + xwiki.Param("xwiki.language.forceSupported", "0"));
+      // We can force one of the configured languages to be accepted
+      if (xwiki.Param("xwiki.language.forceSupported", "0").equals("1")) {
+        List<String> available = webUtilsService.getAllowedLanguages();
+        LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported lang "
+            + " languages [" + Arrays.deepToString(available.toArray(new String[] {}))
+            + "].");
+        // Filter only configured languages
+        acceptedLanguages.retainAll(available);
+      }
+      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: acceptedLanguages after "
+          + acceptedLanguages);
+      if (acceptedLanguages.size() > 0) {
+        // Use the "most-preferred" language, as requested by the client.
+        language = acceptedLanguages.get(0);
+      }
+      // If none of the languages requested by the client is acceptable, skip
+      // to next
+      // phase (use default language).
+    }
+    return language;
+  }
+
+  private boolean isConsiderBrowserAcceptLanguages() {
+    XWiki xwiki = getContext().getWiki();
+    return !xwiki.Param("xwiki.language.preferDefault", "0").equals("1")
+        && !xwiki.getSpacePreference("preferDefaultLanguage", "0", getContext()).equals(
+            "1");
+  }
+
+  private String getLanguageFromUserPreferences() throws XWikiException {
+    String language = null;
+    String userFN = getContext().getUser();
+    XWikiDocument userdoc = null;
+    userdoc = getContext().getWiki().getDocument(webUtilsService.resolveDocumentReference(
+        userFN), getContext());
+    if (userdoc != null) {
+      language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers",
+          "default_language"));
+    }
+    return language;
+  }
+
+  private String getLanguageFromCookie() {
+    // First we get the language from the cookie
+    // !!! getUserPreferenceFromCookie throws NPE if request is NULL !!!
+    return Util.normalizeLanguage(getContext().getWiki().getUserPreferenceFromCookie(
+        "language", getContext()));
+  }
+
+  /**
+   * As the wiki is multilingual try to find the language to use from the request by
+   * looking for a language parameter. If the language value is "default" use the
+   * default language from the XWiki preferences settings. Otherwise set a cookie to
+   * remember the language in use.
+   *    
+   * @return
+   */
+  private String getLanguageInRequestParam() {
+    String language = Util.normalizeLanguage(getContext().getRequest().getParameter(
+        "language"));
+    if ((language != null) && (!language.equals(""))) {
+      Object cookieAddedBefore = getExecContext().getProperty(
+          ADD_LANGUAGE_COOKIE_DONE);
+      if ((cookieAddedBefore == null) || !(Boolean)cookieAddedBefore) {
         if (isInvalidLanguageOrDefault(language)) {
           // forgetting language cookie
           Cookie cookie = new Cookie("language", "");
           cookie.setMaxAge(0);
           cookie.setPath("/");
-          context.getResponse().addCookie(cookie);
-          language = defaultLanguage;
+          getContext().getResponse().addCookie(cookie);
+          language = webUtilsService.getDefaultLanguage();
         } else {
           // setting language cookie
           Cookie cookie = new Cookie("language", language);
           cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
           cookie.setPath("/");
-          context.getResponse().addCookie(cookie);
+          getContext().getResponse().addCookie(cookie);
         }
-        context.setLanguage(language);
-        LOGGER.debug("getLanguagePreference: found parameter language " + language);
-        return language;
-      }
-    } catch (Exception e) {
-      LOGGER.error(e);
-    }
-
-    // As no language parameter was passed in the request, try to get the
-    // language to use
-    // from a cookie.
-    try {
-      // First we get the language from the cookie
-      language = Util.normalizeLanguage(xwiki.getUserPreferenceFromCookie("language",
-          context));
-      if ((language != null) && (!language.equals(""))) {
-        context.setLanguage(language);
-        LOGGER.debug("getLanguagePreference: found cookie language " + language);
-        return language;
-      }
-    } catch (Exception e) {
-      LOGGER.error(e);
-    }
-
-    // Next from the default user preference
-    try {
-      String userFN = context.getUser();
-      XWikiDocument userdoc = null;
-      userdoc = xwiki.getDocument(webUtilsService.resolveDocumentReference(userFN),
-          context);
-      if (userdoc != null) {
-        language = Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers",
-            "default_language"));
-        if (!language.equals("")) {
-          context.setLanguage(language);
-          LOGGER.debug("getLanguagePreference: found userpref language " + language);
-          return language;
-        }
-      }
-    } catch (XWikiException e) {
-      LOGGER.error(e);
-    }
-
-    // If the default language is preferred, and since the user didn't
-    // explicitly ask for a
-    // language already, then use the default wiki language.
-    if (xwiki.Param("xwiki.language.preferDefault", "0").equals("1")
-        || xwiki.getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
-      language = defaultLanguage;
-      context.setLanguage(language);
-      LOGGER.debug("getLanguagePreference: found preferDefault language " + language);
-      return language;
-    }
-
-    // Then from the navigator language setting
-    if (context.getRequest() != null) {
-      String acceptHeader = context.getRequest().getHeader("Accept-Language");
-      // If the client didn't specify some languages, skip this phase
-      if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
-        List<String> acceptedLanguages = getAcceptedLanguages(context.getRequest());
-        LOGGER.debug("getLanguagePreference: getAcceptedLanguages " + acceptedLanguages);
-        LOGGER.debug("getLanguagePreference: forceSupported "
-            + xwiki.Param("xwiki.language.forceSupported", "0"));
-        // We can force one of the configured languages to be accepted
-        if (xwiki.Param("xwiki.language.forceSupported", "0").equals("1")) {
-          List<String> available = getValidLanguages();
-          LOGGER.debug("getLanguagePreference: forceSupported lang " + available
-              + " languages [" + xwiki.getXWikiPreference("languages", context)
-              + "] splitArray [" + Arrays.deepToString(available.toArray(new String[] {}))
-              + "].");
-          // Filter only configured languages
-          acceptedLanguages.retainAll(available);
-        }
-        LOGGER.debug("getLanguagePreference: acceptedLanguages after "
-            + acceptedLanguages);
-        if (acceptedLanguages.size() > 0) {
-          // Use the "most-preferred" language, as requested by the client.
-          context.setLanguage(acceptedLanguages.get(0));
-          LOGGER.debug("getLanguagePreference: found accepted language " + language);
-          return acceptedLanguages.get(0);
-        }
-        // If none of the languages requested by the client is acceptable, skip
-        // to next
-        // phase (use default language).
+        getExecContext().setProperty(ADD_LANGUAGE_COOKIE_DONE, new Boolean(true));
       }
     }
-
-    // Finally, use the default language from the global preferences.
-    context.setLanguage(defaultLanguage);
-    LOGGER.debug("getLanguagePreference: use default language " + language);
-    return defaultLanguage;
-  }
-
-  private List<String> getValidLanguages() {
-    List<String> available = Arrays.asList(getContext().getWiki().getXWikiPreference(
-        "languages", getContext()).split("[, |]"));
-    return available;
+    return language;
   }
 
   boolean isInvalidLanguageOrDefault(String language) {
     return language.equals("default")
-          || (isSuppressInvalid() && !getValidLanguages().contains(language));
+          || (isSuppressInvalid() && !webUtilsService.getAllowedLanguages().contains(
+              language));
   }
 
   private boolean isSuppressInvalid() {
-    return getContext().getWiki().getXWikiPreference("celSuppressInvalidLang",
-        "celements.language.suppressInvalid", "0", getContext()).equals("1");
+    return getContext().getWiki().getXWikiPreference(CEL_SUPPRESS_INVALID_LANG,
+        CFG_LANGUAGE_SUPPRESS_INVALID, "0", getContext()).equals("1");
   }
 
   /**
@@ -584,42 +641,58 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    *         empty if the header is not well formed.
    */
   @SuppressWarnings("unchecked")
-  @Deprecated
-  private List<String> getAcceptedLanguages(XWikiRequest request)
-  {
-      List<String> result = new ArrayList<String>();
-      Enumeration<Locale> e = request.getLocales();
-      while (e.hasMoreElements()) {
-          String language = e.nextElement().getLanguage().toLowerCase();
-          LOGGER.debug("getAcceptedLanguages: found language " + language);
-          // All language codes should have 2 letters.
-          if (StringUtils.isAlpha(language)) {
-              result.add(language);
-          }
+  private List<String> getAcceptedLanguages(XWikiRequest request) {
+    List<String> result = new ArrayList<String>();
+    Enumeration<Locale> e = request.getLocales();
+    while (e.hasMoreElements()) {
+      String language = e.nextElement().getLanguage().toLowerCase();
+      LOGGER.debug("getAcceptedLanguages: found language " + language);
+      // All language codes should have 2 letters.
+      if (StringUtils.isAlpha(language)) {
+        result.add(language);
       }
-      return result;
+    }
+    return result;
   }
 
   void fixTdocForInvalidLanguage(VelocityContext vcontext) {
     XWikiDocument doc = getContext().getDoc();
     if ((doc != null) && (vcontext != null)) {
-      try {
-        XWikiDocument tdoc = doc.getTranslatedDocument(getContext());
+      Document vTdocBefore = (Document) vcontext.get("tdoc");
+      if (isTdocLanguageWrong(vTdocBefore)) {
         try {
-            String rev = (String) getContext().get("rev");
-            if (StringUtils.isNotEmpty(rev)) {
-                tdoc = getContext().getWiki().getDocument(tdoc, rev, getContext());
-            }
-        } catch (Exception ex) {
-          LOGGER.debug("Invalid version, just use the most recent one.", ex);
+          XWikiDocument tdoc = doc.getTranslatedDocument(getContext());
+          try {
+              String rev = (String) getContext().get("rev");
+              if (StringUtils.isNotEmpty(rev)) {
+                  tdoc = getContext().getWiki().getDocument(tdoc, rev, getContext());
+              }
+          } catch (Exception ex) {
+            LOGGER.debug("Invalid version, just use the most recent one.", ex);
+          }
+          getContext().put("tdoc", tdoc);
+          vcontext.put("tdoc", tdoc.newDocument(getContext()));
+        } catch (XWikiException exp) {
+          LOGGER.error("Faild to get translated document for ["
+              + getContext().getDoc().getDocumentReference() + "].", exp);
         }
-        getContext().put("tdoc", tdoc);
-        vcontext.put("tdoc", tdoc.newDocument(getContext()));
-      } catch (XWikiException exp) {
-        LOGGER.error("Faild to get translated document for ["
-            + getContext().getDoc().getDocumentReference() + "].", exp);
+      } else {
+        LOGGER.debug("skip fixTdocForInvalidLanguage because vTdoc launguage is"
+            + " correct.");
       }
+    } else {
+      LOGGER.debug("skip fixTdocForInvalidLanguage doc [" + doc + "] vcontext ["
+          + vcontext + "].");
     }
+  }
+
+  boolean isTdocLanguageWrong(Document vTdocBefore) {
+    if (vTdocBefore == null) return true;
+    String vTdocLang = vTdocBefore.getLanguage();
+    if ("".equals(vTdocLang)) {
+      vTdocLang = vTdocBefore.getDefaultLanguage();
+    }
+    return (!getContext().getLanguage().equals(vTdocLang));
   }
 
 }

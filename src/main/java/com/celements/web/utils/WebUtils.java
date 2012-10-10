@@ -155,7 +155,7 @@ public class WebUtils implements IWebUtils {
         nextParent = getParentFullName(nextParent, context);
       }
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
     return docParents;
   }
@@ -506,7 +506,7 @@ public class WebUtils implements IWebUtils {
         return imgList;
       }
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error(e, e);
     }
     return Collections.emptyList();
   }

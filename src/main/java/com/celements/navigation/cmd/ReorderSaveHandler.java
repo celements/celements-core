@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       ReorderSaveHandler.class);
   private XWikiContext context;
   private String parentFN;
@@ -47,23 +47,23 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
   }
 
   public void closeEvent(EReorderLiteral literal) {
-    mLogger.debug("close event: " + literal.name());
+    LOGGER.debug("close event: " + literal.name());
   }
 
   public void openEvent(EReorderLiteral literal) {
-    mLogger.debug("open event: " + literal.name());
+    LOGGER.debug("open event: " + literal.name());
       currentCommand = literal;
   }
 
   public void readPropertyKey(String key) {
-    mLogger.debug("read property key: " + key);
+    LOGGER.debug("read property key: " + key);
     if (currentCommand == EReorderLiteral.PARENT_CHILDREN_PROPERTY) {
       String newParentFN = extractDocFN(key);
       if (context.getWiki().exists(newParentFN, context)) {
         parentFN = newParentFN;
       } else {
         parentFN = null;
-        mLogger.error("readPropertyKey: cannot load parentDocument [" + newParentFN 
+        LOGGER.error("readPropertyKey: cannot load parentDocument [" + newParentFN 
             + "].");
       }
       currentPos = 0;
@@ -74,8 +74,8 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
   }
 
   String extractDocFN(String param) {
-    if (param.split(":").length > 1) {
-      return param.split(":")[1];
+    if (param.split(":").length > 2) {
+      return param.split(":")[2];
     } else {
       return "";
     }
@@ -112,7 +112,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
   }
 
   public void stringEvent(String value) {
-    mLogger.debug("string event: " + value + " with parent " + getParentFN());
+    LOGGER.debug("string event: " + value + " with parent " + getParentFN());
     if (currentCommand == EReorderLiteral.ELEMENT_ID) {
       String docFN = extractDocFN(value);
       if (context.getWiki().exists(docFN, context)) {
@@ -137,12 +137,12 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
             setFlushCacheNeeded();
           }
         } catch (XWikiException e) {
-          mLogger.error("readPropertyKey: cannot load document [" + docFN 
+          LOGGER.error("readPropertyKey: cannot load document [" + docFN 
               + "].");
         }
         currentPos = getCurrentPos() + 1;
       } else {
-        mLogger.error("readPropertyKey: cannot load parentDocument [" + docFN 
+        LOGGER.error("readPropertyKey: cannot load parentDocument [" + docFN 
             + "].");
       }
     } else {

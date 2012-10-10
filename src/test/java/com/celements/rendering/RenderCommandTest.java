@@ -213,6 +213,34 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testRenderCelementsDocument_elemDocRef_renderMode() throws Exception {
+    String expectedRenderedContent = "Expected rendered content";
+    XWikiDocument myDoc = createMock(XWikiDocument.class);
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "myPage");
+    expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
+    expect(mockPageTypeCmd.getPageTypeWithDefaultObj(same(myDoc), (String)isNull(),
+        same(context))).andReturn(null);
+    expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).atLeastOnce();
+    String expectedContent = "expected Content $doc.fullName";
+    expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(expectedContent
+        );
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    expect(myDoc.newDocument(same(context))).andReturn(new Document(myDoc, context));
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+      "groovy"));
+    replay(xwiki, mockPageTypeCmd, renderingEngineMock, myDoc);
+    assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDocRef,
+        "view"));
+    assertEquals("Document object in velocity space musst be a Document api object.",
+        Document.class, velocityContext.get("celldoc").getClass());
+    assertEquals("expecting celldoc to be set to the rendered cell document.",
+        myDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
+    verify(xwiki, mockPageTypeCmd, renderingEngineMock, myDoc);
+  }
+
+  @Test
   public void testRenderCelementsDocument_noCellType_default() throws Exception {
     String expectedRenderedContent = "Expected rendered content";
     XWikiDocument myDoc = createMock(XWikiDocument.class);

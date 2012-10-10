@@ -174,6 +174,9 @@ public class NavigationApi extends Api {
         LOGGER.debug("loadConfig_internal: configName [" + navConfigXobj.getStringValue(
             "menu_element_name") + "] , " + navConfigXobj);
         navigation.loadConfigFromObject(navConfigXobj);
+      } else {
+        LOGGER.warn("cannot load navigation config from doc [" + configDocRef + "],"
+            + " because no config object found.");
       }
     } catch (XWikiException exp) {
       LOGGER.warn("failed to get document [" + configDocRef + "].");
@@ -183,8 +186,13 @@ public class NavigationApi extends Api {
   private BaseObject getNavigationConfigObject(XWikiDocument doc, Integer objNum) {
     BaseObject navConfigXobj;
     if (objNum == null) {
+      LOGGER.debug("get xobject for [" + getNavigationConfigClassRef(doc) + "] on doc ["
+          + doc.getDocumentReference() + "].");
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc));
     } else {
+      LOGGER.debug("get xobject objNum [" + objNum + "] for ["
+          + getNavigationConfigClassRef(doc) + "] on doc [" + doc.getDocumentReference()
+          + "].");
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc), objNum);
     }
     return navConfigXobj;

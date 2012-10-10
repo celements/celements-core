@@ -337,4 +337,9 @@ public class CelementsWebScriptService implements ScriptService {
         removePre, rendererNameList);
   }
 
+  public boolean useNewButtons() {
+    return getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
+        "celements.usenewbuttons", 0, getContext()) == 1;
+  }
+
 }
