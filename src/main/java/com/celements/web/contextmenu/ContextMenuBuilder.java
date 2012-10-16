@@ -78,17 +78,17 @@ public class ContextMenuBuilder {
     }
 
     public void stringEvent(String value) {
-      mLogger.debug("stringEvent: " + currentLiteral + ", " + value);
+      LOGGER.debug("stringEvent: " + currentLiteral + ", " + value);
       switch (currentLiteral) {
       case CSS_CLASS_NAME_VALUE:
         cssClassName = value;
         break;
       case ELEMENT_ID:
-        mLogger.debug("before adding cmi for " + cssClassName + ", " + value
+        LOGGER.debug("before adding cmi for " + cssClassName + ", " + value
             + ": " + getCurrentMenu(value).size());
         getCurrentMenu(value).addAll(getCMItemsForClassAndId(cssClassName, value,
             context));
-        mLogger.debug("after adding cmi for " + cssClassName + ", " + value
+        LOGGER.debug("after adding cmi for " + cssClassName + ", " + value
             + ": " + getCurrentMenu(value).size());
         break;
       default:
@@ -110,7 +110,14 @@ public class ContextMenuBuilder {
 
   }
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  /**
+   * class ContextMenuBuilder
+   */
+
+  /**
+   * internal LOGGER
+   */
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       ContextMenuBuilder.class);
 
   private Map<String, List<ContextMenuItem>> contextMenus =
@@ -132,7 +139,8 @@ public class ContextMenuBuilder {
         }
       }
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error("getCMItemsForClassAndId: failed to evaluate CMItems for className ["
+          + className + "] and elemId [" + elemId + "].", e);
     }
     return contextMenuItemList;
   }
@@ -170,10 +178,11 @@ public class ContextMenuBuilder {
           ERequestLiteral.REQUEST_ARRAY, requestHandler);
       try {
         cmReqParser.parse(jsonDictionary);
-      } catch (JsonParseException e) {
-        mLogger.error(e);
-      } catch (IOException e) {
-        mLogger.error(e);
+      } catch (JsonParseException exp) {
+        LOGGER.error("addElementsCMforClassNames: failed to parse [" + jsonDictionary
+            + "].", exp);
+      } catch (IOException exp) {
+        LOGGER.error("Failed to parse json.", exp);
       }
     }
   }
