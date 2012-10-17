@@ -87,13 +87,15 @@ public class PageTypeCommand {
   }
 
   XWikiDocument getTemplateDoc(XWikiDocument doc, XWikiContext context) {
-    String templName = context.getRequest().get("template");
-    if((templName != null) && !"".equals(templName.trim())
-        && context.getWiki().exists(templName, context)) {
-      try {
-        doc = context.getWiki().getDocument(templName, context);
-      } catch (XWikiException e) {
-        LOGGER.error("Exception while getting template doc '" + templName + "'", e);
+    if (context.getRequest() != null) {
+      String templName = context.getRequest().get("template");
+      if((templName != null) && !"".equals(templName.trim())
+          && context.getWiki().exists(templName, context)) {
+        try {
+          doc = context.getWiki().getDocument(templName, context);
+        } catch (XWikiException e) {
+          LOGGER.error("Exception while getting template doc '" + templName + "'", e);
+        }
       }
     }
     return doc;

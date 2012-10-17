@@ -881,10 +881,14 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAllowedLanguages_WebPreferences() {
+    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument currentDoc = new XWikiDocument(curDocRef);
+    context.setDoc(currentDoc);
     expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("fr,it"
         ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("de,en"
-        ).once();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("de,en").once();
     replayAll();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
@@ -893,16 +897,57 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetAllowedLanguages_spaceName_WebPreferences() {
+    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument currentDoc = new XWikiDocument(curDocRef);
+    context.setDoc(currentDoc);
+    expect(xwiki.getXWikiPreference(eq("languages"), same(context))).andReturn("fr,it"
+        ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""),
+        same(context))).andReturn("de,en").once();
+    replayAll();
+    List<String> resultList = Arrays.asList("de", "en");
+    assertEquals("Expect languages from space preferences", resultList,
+        webUtilsService.getAllowedLanguages("testSpace"));
+    verifyAll();
+  }
+
+  @Test
   public void testGetAllowedLanguages_deprecatedUsageOfFieldLanguage() {
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("").once();
+    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+          "myDoc");
+      XWikiDocument currentDoc = new XWikiDocument(curDocRef);
+      context.setDoc(currentDoc);
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("").once();
     expect(xwiki.getXWikiPreference(eq("language"), same(context))).andReturn("fr it"
         ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), same(context))).andReturn("de en"
-        ).once();
+    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("de en").once();
     replayAll();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
         webUtilsService.getAllowedLanguages());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetAllowedLanguages_spaceName_deprecatedUsageOfFieldLanguage() {
+    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+          "myDoc");
+      XWikiDocument currentDoc = new XWikiDocument(curDocRef);
+      context.setDoc(currentDoc);
+    expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""),
+        same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreference(eq("language"), same(context))).andReturn("fr it"
+        ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("language"), eq("testSpace"), eq(""),
+        same(context))).andReturn("de en").once();
+    replayAll();
+    List<String> resultList = Arrays.asList("de", "en");
+    assertEquals("Expect languages from space preferences", resultList,
+        webUtilsService.getAllowedLanguages("testSpace"));
     verifyAll();
   }
 

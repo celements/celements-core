@@ -40,6 +40,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   private PrepareVelocityContextService prepVeloContextService;
   private XWikiDocument skinDoc;
   private XWikiRightService rightServiceMock;
+  private DocumentReference curDocRef;
+  private XWikiDocument currentDoc;
 
   @Before
   public void setUp_PrepareVelocityContextServiceTest() throws Exception {
@@ -63,6 +65,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getDocument(eq(new DocumentReference("celements2web", "XWiki",
         "Celements2Skin")), same(context))
       ).andReturn(skinDoc).anyTimes();
+    curDocRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
+    currentDoc = new XWikiDocument(curDocRef);
+    context.setDoc(currentDoc);
   }
 
   @Test
@@ -177,8 +182,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
         ).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de,fr"
-        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("en,de,fr").atLeastOnce();
     replayAll(requestMock);
     context.remove("vcontext");
     vContext.put("language", "de");
@@ -214,8 +219,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
         ).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en"
-        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("en").atLeastOnce();
     replayAll(requestMock);
     context.remove("vcontext");
     vContext.put("language", "de");
@@ -251,8 +256,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
         ).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en"
-        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("en").atLeastOnce();
     replayAll(requestMock);
     context.remove("vcontext");
     vContext.put("language", "de");
@@ -279,8 +284,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     responseMock.addCookie(isA(Cookie.class));
     expectLastCall().once();
     expect(requestMock.getParameter(eq("language"))).andReturn("fr").atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de,fr"
-        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("en,de,fr").atLeastOnce();
     replayAll(requestMock, responseMock);
     context.remove("vcontext");
     vContext.put("language", "de");
@@ -305,8 +310,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
 
   @Test
   public void testIsInvalidLanguageOrDefault_yes() {
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de"
-        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("en,de").atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
             ).atLeastOnce();
@@ -317,8 +322,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
 
   @Test
   public void testIsInvalidLanguageOrDefault_no() {
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn("en,de"
-        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("en,de").atLeastOnce();
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
             ).atLeastOnce();
@@ -348,10 +353,10 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
       ).anyTimes();
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn(""
       ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("language"), same(context))).andReturn(""
-      ).anyTimes();
-    expect(xwiki.getSpacePreference(eq("languages"), same(context))).andReturn(""
-      ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("").anyTimes();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("").anyTimes();
     expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(""
       ).anyTimes();
     expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
@@ -381,6 +386,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
         same(context))).andReturn(groupRefList).atLeastOnce();
     context.setWiki(xwiki);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.myTestUser"),
+        eq("mySpace.myDoc"), same(context))).andReturn(false).anyTimes();
+    expect(rightServiceMock.hasAdminRights(same(context))).andReturn(false).anyTimes();
     replayAll(groupServiceMock);
     prepVeloContextService.initCelementsVelocity(vContext);
     assertEquals("expecting tinyMCE_width be set.", "123", vContext.get("tinyMCE_width"));
@@ -389,6 +397,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   
   @Test
   public void testInitPanelsVelocity_checkNPEs_forEmptyVContext() {
+    context.setDoc(null);
     context.put("vcontext", new VelocityContext());
     expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(null
       ).atLeastOnce();

@@ -622,6 +622,10 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsService().getAllowedLanguages();
   }
   
+  public List<String> getAllowedLanguages(String spaceName) {
+    return getWebUtilsService().getAllowedLanguages(spaceName);
+  }
+  
   public int createUser() throws XWikiException {
     return plugin.createUser(true, context);
   }

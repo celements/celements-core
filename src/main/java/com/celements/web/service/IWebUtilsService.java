@@ -114,4 +114,6 @@ public interface IWebUtilsService {
 
   public WikiReference getWikiRef(DocumentReference docRef);
 
+  public List<String> getAllowedLanguages(String spaceName);
+
 }

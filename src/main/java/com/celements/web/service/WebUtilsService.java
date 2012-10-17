@@ -193,10 +193,15 @@ public class WebUtilsService implements IWebUtilsService {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
 
-  public List<String> getAllowedLanguages(){
+  public List<String> getAllowedLanguages() {
+    return getAllowedLanguages(getContext().getDoc().getDocumentReference(
+        ).getLastSpaceReference().getName());
+  }
+
+  public List<String> getAllowedLanguages(String spaceName) {
     List<String> languages = new ArrayList<String>();
     languages.addAll(Arrays.asList(getContext().getWiki(
-      ).getSpacePreference("languages", getContext()).split("[ ,]")));
+      ).getSpacePreference("languages", spaceName, "", getContext()).split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
       return languages;
@@ -204,7 +209,7 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.warn("Deprecated usage of Preferences field 'language'."
         + " Instead use 'languages'.");
     return Arrays.asList(getContext().getWiki(
-      ).getSpacePreference("language", getContext()).split("[ ,]"));
+      ).getSpacePreference("language", spaceName, "", getContext()).split("[ ,]"));
   }
 
   public Date parseDate(String date, String format){
