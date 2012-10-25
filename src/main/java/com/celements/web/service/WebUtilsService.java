@@ -72,6 +72,10 @@ public class WebUtilsService implements IWebUtilsService {
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
 
+  //TODO check if space configuration uses inheritance
+//  @Requirement("space")
+//  ConfigurationSource configuration;
+
   @Requirement
   Execution execution;
 
@@ -194,8 +198,11 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public List<String> getAllowedLanguages() {
-    return getAllowedLanguages(getContext().getDoc().getDocumentReference(
-        ).getLastSpaceReference().getName());
+    if ((getContext() != null) && (getContext().getDoc() != null)) {
+      return getAllowedLanguages(getContext().getDoc().getDocumentReference(
+          ).getLastSpaceReference().getName());
+    }
+    return Collections.emptyList();
   }
 
   public List<String> getAllowedLanguages(String spaceName) {
