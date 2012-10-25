@@ -72,9 +72,26 @@ public class WebUtilsService implements IWebUtilsService {
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
 
-  //TODO check if space configuration uses inheritance
-//  @Requirement("space")
-//  ConfigurationSource configuration;
+  /**
+   * TODO change access to wiki-configuration "default" and check access to e.g.
+   * 'languages' property
+   * 
+   * You get access to this configuration source by using:
+   * 
+   * @Requirement private ConfigurationSource configuration;
+   * 
+   *              Configuration properties are first looked for in the "space"
+   *              source, if not found then in the "wiki" source and if not
+   *              found in the "xwikiproperties" source. This is the recommended
+   *              configuration source for most usages since it allows to
+   *              defined configuration properties in the xwiki.propertieds file
+   *              and to override them in the running wiki (globally or per
+   *              space).
+   *  
+   *  Source: http://extensions.xwiki.org/xwiki/bin/view/Extension/Configuration+Module
+   */
+
+
 
   @Requirement
   Execution execution;
