@@ -43,18 +43,18 @@ public class GetPageTypesCommand {
     String currentDatabase = context.getDatabase();
     try {
       context.setDatabase("celements2web");
-      pageTypeSet.addAll(getPateTypesForOneDatabase(catList, onlyVisible, context));
+      pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
     } finally {
       context.setDatabase(currentDatabase);
     }
-    pageTypeSet.addAll(getPateTypesForOneDatabase(catList, onlyVisible, context));
+    pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
     if (doesContainEmptyCategory(catList)) {
       pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
     }
     return new ArrayList<String>(pageTypeSet);
   }
 
-  private List<String> getPateTypesForOneDatabase(Set<String> catList,
+  private List<String> getPageTypesForOneDatabase(Set<String> catList,
       boolean onlyVisible, XWikiContext context) {
     List<String> result = Collections.emptyList();
     try {
