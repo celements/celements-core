@@ -19,7 +19,7 @@
  */
 package com.celements.web.plugin;
 
-import com.celements.pagetype.PageTypeCommand;
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;

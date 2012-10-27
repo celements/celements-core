@@ -31,7 +31,7 @@ import org.junit.Test;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.pagetype.PageType;
 import com.celements.pagetype.PageTypeClasses;
-import com.celements.pagetype.PageTypeCommand;
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

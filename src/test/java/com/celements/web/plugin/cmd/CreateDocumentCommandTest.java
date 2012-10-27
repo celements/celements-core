@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.pagetype.PageTypeCommand;
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

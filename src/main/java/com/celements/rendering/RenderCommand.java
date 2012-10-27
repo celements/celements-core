@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.pagetype.PageType;
-import com.celements.pagetype.PageTypeCommand;
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.pagetype.PageType;
-import com.celements.pagetype.PageTypeCommand;
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
