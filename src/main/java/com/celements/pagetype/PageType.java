@@ -23,17 +23,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class PageType {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
+//  private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
 
   /**
    * @deprecated since 2.18.0 instead use PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS
@@ -46,6 +47,12 @@ public class PageType {
 
   public PageType(String pageTypeFN) {
     this.pageTypeFN = pageTypeFN;
+  }
+
+  public String getConfigName(XWikiContext context) {
+    DocumentReference pageTypeDocRef = getWebUtilsService().resolveDocumentReference(
+        getFullName());
+    return pageTypeDocRef.getName();
   }
 
   public XWikiDocument getTemplateDocument(XWikiContext context) throws XWikiException {
@@ -133,4 +140,9 @@ public class PageType {
     }
     return "";
   }
+
+  IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
 }

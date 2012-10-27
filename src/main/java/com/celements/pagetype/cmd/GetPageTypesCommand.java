@@ -37,8 +37,21 @@ public class GetPageTypesCommand {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       GetPageTypesCommand.class);
 
-  public List<String> getPageTypesForCategories(Set<String> catList,
-      boolean onlyVisible, XWikiContext context) {
+  public List<String> getPageTypesForCategories(Set<String> catList, boolean onlyVisible,
+      XWikiContext context) {
+    Set<String> pageTypeSet = getXObjectPageTypes(catList, onlyVisible, context);
+    if (doesContainEmptyCategory(catList)) {
+      pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
+    }
+    return new ArrayList<String>(pageTypeSet);
+  }
+
+  public Set<String> getAllXObjectPageTypes(XWikiContext context) {
+    return getXObjectPageTypes(Collections.<String>emptySet(), false, context);
+  }
+
+  private Set<String> getXObjectPageTypes(Set<String> catList, boolean onlyVisible,
+      XWikiContext context) {
     Set<String> pageTypeSet = new HashSet<String>();
     String currentDatabase = context.getDatabase();
     try {
@@ -48,10 +61,7 @@ public class GetPageTypesCommand {
       context.setDatabase(currentDatabase);
     }
     pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
-    if (doesContainEmptyCategory(catList)) {
-      pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
-    }
-    return new ArrayList<String>(pageTypeSet);
+    return pageTypeSet;
   }
 
   private List<String> getPageTypesForOneDatabase(Set<String> catList,
