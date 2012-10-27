@@ -34,7 +34,7 @@ import com.xpn.xwiki.XWikiException;
 
 public class GetPageTypesCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       GetPageTypesCommand.class);
 
   public List<String> getPageTypesForCategories(Set<String> catList,
@@ -60,7 +60,7 @@ public class GetPageTypesCommand {
     try {
       result = context.getWiki().search(getPThql(catList, onlyVisible), context);
     } catch (XWikiException exp) {
-      mLogger.error("getPageTypesForCategories: Failed to get pagetypes.", exp);
+      LOGGER.error("getPageTypesForCategories: Failed to get pagetypes.", exp);
     }
     return result;
   }
