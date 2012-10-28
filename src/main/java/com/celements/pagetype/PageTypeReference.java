@@ -63,4 +63,9 @@ public class PageTypeReference {
     return this.getConfigName().hashCode();
   }
 
+  @Override
+  public String toString() {
+    return configName + "@" + providerHint;
+  }
+
 }
