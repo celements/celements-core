@@ -20,12 +20,15 @@
 package com.celements.pagetype.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
@@ -35,6 +38,8 @@ import com.celements.pagetype.PageTypeReference;
 
 @Component
 public class PageTypeService implements IPageTypeRole {
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeService.class);
 
   @Requirement
   Map<String, IPageTypeProviderRole> pageTypeProviders;
@@ -55,6 +60,8 @@ public class PageTypeService implements IPageTypeRole {
         onlyVisible)) {
       pageTypeConfigNameList.add(pageTypeRef.getConfigName());
     }
+    LOGGER.debug("getPageTypesConfigNamesForCategories: return " + Arrays.deepToString(
+        pageTypeConfigNameList.toArray()));
     return pageTypeConfigNameList;
   }
 
@@ -68,6 +75,9 @@ public class PageTypeService implements IPageTypeRole {
           visiblePTSet.add(pageTypeRef);
         }
       }
+      LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
+          catList.toArray()) + "] and onlyVisible [" + onlyVisible + "] return "
+          + Arrays.deepToString(visiblePTSet.toArray()));
       return new ArrayList<PageTypeReference>(visiblePTSet);
     } else {
       return new ArrayList<PageTypeReference>(getPageTypeRefsForCategories(catList));
@@ -90,6 +100,8 @@ public class PageTypeService implements IPageTypeRole {
         pageTypeRefSet.add(pageTypeRef);
       }
     }
+    LOGGER.debug("getAllPageTypeRefs: return " + Arrays.deepToString(
+        pageTypeRefSet.toArray()));
     return pageTypeRefSet;
   }
 
@@ -103,6 +115,8 @@ public class PageTypeService implements IPageTypeRole {
         }
       }
     }
+    LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
+        catList.toArray()) + "] return " + Arrays.deepToString(filteredPTset.toArray()));
     return filteredPTset;
   }
 
