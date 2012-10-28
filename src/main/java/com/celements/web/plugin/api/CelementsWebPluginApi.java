@@ -515,6 +515,9 @@ public class CelementsWebPluginApi extends Api {
    * @param fullName of the celements document
    * @return
    * @throws XWikiException
+   * 
+   * @deprecated since 2.21.0 instead use
+   *             com.celements.pagetype.service.PageTypeScriptService.getPageTypeConfig()
    */
   public IPageType getPageType(String fullName) throws XWikiException {
     return new PageTypeApi(fullName, context);
