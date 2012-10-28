@@ -112,6 +112,8 @@ public class PageTypeService implements IPageTypeRole {
       for (String category : pageTypeRef.getCategories()) {
         if (catList.contains(category)) {
           filteredPTset.add(pageTypeRef);
+        } else {
+          LOGGER.trace("getPageTypeRefsForCategories: skip [" + pageTypeRef + "].");
         }
       }
     }
