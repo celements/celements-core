@@ -28,7 +28,6 @@ import org.xwiki.context.Execution;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageType;
-import com.celements.pagetype.cmd.PageTypeCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
@@ -39,7 +38,6 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
       XObjectPageTypeConfig.class);
 
   PageType pageType;
-  PageTypeCommand pageTypeCmd = new PageTypeCommand();
 
   private XWikiContext getContext() {
     return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
@@ -60,8 +58,12 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   public List<String> getCategories() {
     List<String> categories = pageType.getCategories(getContext());
     if (categories.isEmpty()) {
+      LOGGER.debug("getCategories for [" + getName() + "] empty List found returning"
+          + " [\"\"].");
       return Arrays.asList("");
     } else {
+      LOGGER.debug("getCategories for [" + getName() + "] returning ["
+          + Arrays.deepToString(categories.toArray()) + "]");
       return categories;
     }
   }
@@ -90,14 +92,7 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   }
 
   public boolean isVisible() {
-    try {
-      return pageTypeCmd.isVisible(pageType.getTemplateDocument(getContext()),
-          getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get isVisible for pageType [" + pageType.getConfigName(
-          getContext()) + "].", exp);
-    }
-    return false;
+    return (pageType.getPageTypeProperties(getContext()).getIntValue("visible", 0) > 0);
   }
 
 }

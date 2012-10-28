@@ -9,13 +9,14 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.pagetype.PageType;
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.PageTypeClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase {
 
@@ -23,7 +24,6 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
   private PageType pageTypeMock;
   private XWikiContext context;
   private XWiki xwiki;
-  private PageTypeCommand pageTypeCmdMock;
 
   @Before
   public void setUp_XObjectPageTypeConfigTest() throws Exception {
@@ -33,8 +33,6 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     context.setWiki(xwiki);
     pageTypeMock = createMock(PageType.class);
     xObjPTconfig.pageType = pageTypeMock;
-    pageTypeCmdMock = createMock(PageTypeCommand.class);
-    xObjPTconfig.pageTypeCmd = pageTypeCmdMock;
     expect(pageTypeMock.getConfigName(same(context))).andReturn("TestPageType"
         ).anyTimes();
   }
@@ -128,13 +126,30 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
+  public void testIsVisible_yes() throws Exception {
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    testPageTypePropObj.setIntValue("visible", 1);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
+        testPageTypePropObj);
+    replayAll();
+    assertTrue(xObjPTconfig.isVisible());
+    verifyAll();
+  }
+
+  @Test
   public void testIsVisible_no() throws Exception {
-    DocumentReference pageTypeConfigDocRef = new DocumentReference(context.getDatabase(),
-        "PageTypes", "TestPageType");
-    XWikiDocument pageTypeConfigDoc = new XWikiDocument(pageTypeConfigDocRef);
-    expect(pageTypeMock.getTemplateDocument(same(context))).andReturn(pageTypeConfigDoc);
-    expect(pageTypeCmdMock.isVisible(same(pageTypeConfigDoc), same(context))).andReturn(
-        false);
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    testPageTypePropObj.setIntValue("visible", 0);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
+        testPageTypePropObj);
     replayAll();
     assertFalse(xObjPTconfig.isVisible());
     verifyAll();
@@ -142,12 +157,12 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
 
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki, pageTypeMock, pageTypeCmdMock);
+    replay(xwiki, pageTypeMock);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki, pageTypeMock, pageTypeCmdMock);
+    verify(xwiki, pageTypeMock);
     verify(mocks);
   }
 }
