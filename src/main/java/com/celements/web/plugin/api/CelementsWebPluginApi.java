@@ -1092,24 +1092,49 @@ public class CelementsWebPluginApi extends Api {
     return getPageLayoutCmd().layoutEditorAvailable();
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAllPageTypes()
+   */
+  @Deprecated
   public List<String> getAllPageTypes() {
     return getPageTypesByCategories(Arrays.asList("", "pageType"), false);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAvailablePageTypes()
+   */
+  @Deprecated
   public List<String> getAvailablePageTypes() {
     return getPageTypesByCategories(Arrays.asList("", "pageType"), true);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getPageTypesByCategories()
+   */
+  @Deprecated
   public List<String> getPageTypesByCategories(List<String> catList,
       boolean onlyVisible) {
     return new GetPageTypesCommand().getPageTypesForCategories(
         new HashSet<String>(catList), onlyVisible, context);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAllCellTypes()
+   */
+  @Deprecated
   public List<String> getAllCellTypes() {
     return getPageTypesByCategories(Arrays.asList("celltype"), false);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAvailableCellTypes()
+   */
+  @Deprecated
   public List<String> getAvailableCellTypes() {
     return getPageTypesByCategories(Arrays.asList("celltype"), true);
   }
