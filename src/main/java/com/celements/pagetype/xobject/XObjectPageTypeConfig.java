@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype.xobject;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -57,7 +58,12 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   }
 
   public List<String> getCategories() {
-    return pageType.getCategories(getContext());
+    List<String> categories = pageType.getCategories(getContext());
+    if (categories.isEmpty()) {
+      return Arrays.asList("");
+    } else {
+      return categories;
+    }
   }
 
   public String getName() {
