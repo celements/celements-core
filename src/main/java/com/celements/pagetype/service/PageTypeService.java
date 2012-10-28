@@ -105,15 +105,27 @@ public class PageTypeService implements IPageTypeRole {
     return pageTypeRefSet;
   }
 
-  private Set<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList) {
+  Set<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList) {
     catList = new HashSet<String>(catList);
     Set<PageTypeReference> filteredPTset = new HashSet<PageTypeReference>();
     for (PageTypeReference pageTypeRef : getAllPageTypeRefs()) {
+      List<String> categories = pageTypeRef.getCategories();
+      if (categories.isEmpty()) {
+        LOGGER.warn("getPageTypeRefsForCategories: skip pageTypeRef [" + pageTypeRef
+            + "] because no categories found!");
+      } else if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("getPageTypeRefsForCategories: test [" + pageTypeRef
+            + "] for categories [" + Arrays.deepToString(categories.toArray())
+            + "] size [" + categories.size() + "].");
+      }
       for (String category : pageTypeRef.getCategories()) {
         if (catList.contains(category)) {
           filteredPTset.add(pageTypeRef);
+          LOGGER.trace("getPageTypeRefsForCategories: added [" + pageTypeRef
+              + "] with category [" + category + "].");
         } else {
-          LOGGER.trace("getPageTypeRefsForCategories: skip [" + pageTypeRef + "].");
+          LOGGER.trace("getPageTypeRefsForCategories: skip [" + pageTypeRef
+              + "] with category [" + category + "].");
         }
       }
     }
