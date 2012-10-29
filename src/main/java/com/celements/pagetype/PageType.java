@@ -121,14 +121,20 @@ public class PageType {
     if (getPageTypeProperties(context) != null) {
       specView = getPageTypeProperties(context
           ).getStringValue("page_" + renderMode);
-      if((specView != null) && (specView.trim().length() > 0)
-          && !context.getWiki().exists(specView, context)) {
-        if (!specView.startsWith("celements2web:")
-            && context.getWiki().exists("celements2web:" + specView, context)) {
-          specView = "celements2web:" + specView;
-        } else {
-          specView = ":" + specView.replaceAll("celements2web:", "");
-        }
+      specView = resolveTemplatePath(specView, context);
+    }
+    return specView;
+  }
+
+  //TODO check where to move to. RenderCommand or PageTypeTemplateResolver?
+  public String resolveTemplatePath(String specView, XWikiContext context) {
+    if((specView != null) && (specView.trim().length() > 0)
+        && !context.getWiki().exists(specView, context)) {
+      if (!specView.startsWith("celements2web:")
+          && context.getWiki().exists("celements2web:" + specView, context)) {
+        specView = "celements2web:" + specView;
+      } else {
+        specView = ":" + specView.replaceAll("celements2web:", "");
       }
     }
     return specView;
