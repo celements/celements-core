@@ -30,10 +30,26 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @deprecated since 2.21.0 instead use com.celements.pagetype.service.PageTypeResolverService
+ */
+@Deprecated
 public class PageTypeCommand {
 
+  /**
+   * @deprecated since 2.21.0 instead use PageTypeClassCollection.PAGE_TYPE_CLASS_DOC
+   */
+  @Deprecated
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
+  /**
+   * @deprecated since 2.21.0 instead use PageTypeClassCollection.PAGE_TYPE_CLASS_SPACE
+   */
+  @Deprecated
   public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
+  /**
+   * @deprecated since 2.21.0 instead use PageTypeClassCollection.PAGE_TYPE_CLASSNAME
+   */
+  @Deprecated
   public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
        + PAGE_TYPE_CLASS_DOC;
 

@@ -45,8 +45,16 @@ public class PageTypeService implements IPageTypeRole {
   Map<String, IPageTypeProviderRole> pageTypeProviders;
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {
-    PageTypeReference pageTypeRef = getPageTypeRefsByConfigNames().get(pageTypeName);
+    PageTypeReference pageTypeRef = getPageTypeRefByConfigName(pageTypeName);
+    return getPageTypeConfigForPageTypeRef(pageTypeRef);
+  }
+
+  public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef) {
     return getProviderForPageTypeRef(pageTypeRef).getPageTypeByReference(pageTypeRef);
+  }
+
+  public PageTypeReference getPageTypeRefByConfigName(String pageTypeName) {
+    return getPageTypeRefsByConfigNames().get(pageTypeName);
   }
 
   private IPageTypeProviderRole getProviderForPageTypeRef(PageTypeReference pageTypeRef) {
@@ -70,8 +78,7 @@ public class PageTypeService implements IPageTypeRole {
     if (onlyVisible) {
       Set<PageTypeReference> visiblePTSet = new HashSet<PageTypeReference>();
       for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList)) {
-        if (getProviderForPageTypeRef(pageTypeRef).getPageTypeByReference(pageTypeRef
-            ).isVisible()) {
+        if (getPageTypeConfigForPageTypeRef(pageTypeRef).isVisible()) {
           visiblePTSet.add(pageTypeRef);
         }
       }

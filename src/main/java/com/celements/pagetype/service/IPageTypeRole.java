@@ -32,6 +32,10 @@ public interface IPageTypeRole {
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName);
 
+  public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef);
+
+  public PageTypeReference getPageTypeRefByConfigName(String pageTypeName);
+
   public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
       boolean onlyVisible);
 

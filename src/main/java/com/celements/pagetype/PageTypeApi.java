@@ -29,6 +29,12 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @deprecated since 2.21.0 instead use com.celements.pagetype.IPageTypeConfig
+ *             you can get IPageTypeConfig objects over PageTypeScriptService
+ *             or PageTypeService.
+ */
+@Deprecated
 public class PageTypeApi implements IPageType {
   private XWikiContext context;
   private XWiki xwiki;

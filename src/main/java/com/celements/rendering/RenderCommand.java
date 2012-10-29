@@ -32,8 +32,10 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import com.celements.pagetype.PageType;
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.IPageTypeConfig;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,11 +47,13 @@ public class RenderCommand {
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(RenderCommand.class);
 
-  private PageTypeCommand pageTypeCmd;
-
-  private String defaultPageType = null;
+  private PageTypeReference defaultPageTypeRef = null;
 
   private XWikiRenderingEngine renderingEngine;
+
+  IPageTypeRole injectedPageTypeService;
+
+  IPageTypeResolverRole injectedPageTypeResolver;
 
   private static XWikiRenderingEngine defaultRenderingEngine;
 
@@ -69,8 +73,17 @@ public class RenderCommand {
     return Utils.getComponent(Execution.class).getContext();
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use setDefaultPageTypeReference
+   */
+  @Deprecated
   public void setDefaultPageType(String defaultPageType) {
-    this.defaultPageType = defaultPageType;
+    this.defaultPageTypeRef = getPageTypeService().getPageTypeRefByConfigName(
+        defaultPageType);
+  }
+
+  public void setDefaultPageTypeReference(PageTypeReference defaultPageTypeRef) {
+    this.defaultPageTypeRef = defaultPageTypeRef;
   }
 
   public String renderCelementsCell(DocumentReference elemDocRef) throws XWikiException {
@@ -116,11 +129,15 @@ public class RenderCommand {
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
     String cellDocFN = getRefSerializer().serialize(cellDoc.getDocumentReference());
     if (getContext().getWiki().getRightService().hasAccessLevel(renderMode,
-        getContext().getUser(), cellDocFN , getContext())) {
+        getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("celldoc", cellDoc.newDocument(getContext()));
-      PageType cellType = pageTypeCmd().getPageTypeWithDefaultObj(cellDoc, defaultPageType,
-          getContext());
+      PageTypeReference cellTypeRef = getPageTypeResolver(
+          ).getPageTypeRefForDocWithDefault(cellDoc, defaultPageTypeRef);
+      IPageTypeConfig cellType = null;
+      if (cellTypeRef != null) {
+        cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
+      }
       String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
           renderMode);
       String templateContent;
@@ -204,17 +221,6 @@ public class RenderCommand {
       this.renderingEngine = renderingEngine;
   }
 
-  PageTypeCommand pageTypeCmd() {
-    if (pageTypeCmd == null) {
-      pageTypeCmd = new PageTypeCommand();
-    }
-    return pageTypeCmd;
-  }
-
-  void inject_PageTypeCmd(PageTypeCommand mockPTcmd) {
-    pageTypeCmd = mockPTcmd;
-  }
-
   String getTranslatedContent(XWikiDocument templateDoc, String lang
       ) throws XWikiException {
     LOGGER.debug("getTranslatedContent for lang  [" + lang + "] and templateDoc ["
@@ -236,25 +242,38 @@ public class RenderCommand {
         ) + ".vm";
   }
 
-  String getRenderTemplatePath(PageType cellType, String cellDocFN,
+  String getRenderTemplatePath(IPageTypeConfig cellType, String cellDocFN,
       String renderMode) throws XWikiException {
     if (cellType != null) {
-      String renderTemplateFullName = cellType.getRenderTemplate(renderMode,
-          getContext());
+      String renderTemplateFullName = cellType.getRenderTemplateForRenderMode(renderMode);
       if ((renderTemplateFullName != null) && !"".equals(renderTemplateFullName)) {
         LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
-            + cellType.getFullName() + "] and renderTemplate ["
+            + cellType.getName() + "] and renderTemplate ["
             + renderTemplateFullName + "].");
         return renderTemplateFullName;
       }
       LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
-          + cellType.getFullName() + "] using content of cellDoc [" + cellDocFN + "].");
+          + cellType.getName() + "] using content of cellDoc [" + cellDocFN + "].");
     }
     return cellDocFN;
   }
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  IPageTypeResolverRole getPageTypeResolver() {
+    if (injectedPageTypeResolver != null) {
+      return injectedPageTypeResolver;
+    }
+    return Utils.getComponent(IPageTypeResolverRole.class);
+  }
+
+  IPageTypeRole getPageTypeService() {
+    if (injectedPageTypeService != null) {
+      return injectedPageTypeService;
+    }
+    return Utils.getComponent(IPageTypeRole.class);
   }
 
   private DefaultStringEntityReferenceSerializer getRefSerializer() {

@@ -654,4 +654,30 @@ public class WebUtilsService implements IWebUtilsService {
     return (WikiReference) docRef.getLastSpaceReference().getParent();
   }
 
+  public DocumentReference getWikiTemplateDocRef() {
+    if (getContext().getRequest() != null) {
+      String templateFN = getContext().getRequest().get("template");
+      if ((templateFN != null) && !"".equals(templateFN.trim())) {
+        DocumentReference templateDocRef = resolveDocumentReference(templateFN);
+        if (getContext().getWiki().exists(templateDocRef, getContext())) {
+          return templateDocRef;
+        }
+      }
+    }
+    return null;
+  }
+
+  public XWikiDocument getWikiTemplateDoc() {
+    DocumentReference templateDocRef = getWikiTemplateDocRef();
+    if (templateDocRef != null) {
+      try {
+        return getContext().getWiki().getDocument(templateDocRef, getContext());
+      } catch (XWikiException exp) {
+        LOGGER.error("Exception while getting template doc '" + templateDocRef + "'",
+            exp);
+      }
+    }
+    return null;
+  }
+
 }
