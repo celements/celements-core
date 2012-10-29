@@ -48,7 +48,7 @@ public class PageTypeScriptService implements ScriptService {
   public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible
       ) {
     return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<String>(
-        catList), false);
+        catList), onlyVisible);
   }
 
   public List<String> getAllCellTypes() {
