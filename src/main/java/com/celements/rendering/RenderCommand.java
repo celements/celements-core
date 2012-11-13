@@ -244,6 +244,9 @@ public class RenderCommand {
 
   String getRenderTemplatePath(IPageTypeConfig cellType, String cellDocFN,
       String renderMode) throws XWikiException {
+    LOGGER.trace("getRenderTemplatePath: for cellDoc [" + cellDocFN + "] with cellType ["
+        + (cellType != null ? cellType.getName() : "null") + "] and renderMode ["
+        + renderMode + "].");
     if (cellType != null) {
       String renderTemplateFullName = cellType.getRenderTemplateForRenderMode(renderMode);
       if ((renderTemplateFullName != null) && !"".equals(renderTemplateFullName)) {
