@@ -63,7 +63,7 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
         "ArticleTemplate");
     XWikiDocument templDoc = new XWikiDocument(templDocRef);
     BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setXClassReference(getPageTypeClassRef());
+    pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     templDoc.addXObject(pageTypeObj);
     expect(xwiki.exists(eq(templDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(templDocRef), same(context))).andReturn(templDoc
@@ -73,6 +73,24 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(doc);
     verifyAll();
     assertNotNull(resultPTObj);
+    assertSame(pageTypeObj, resultPTObj);
+  }
+
+  @Test
+  public void testGetPageTypeObject_cellFromCentralDB() throws XWikiException {
+    doc.setNew(true);
+    DocumentReference centralCellDocRef = new DocumentReference("celements2web",
+        "SimpleLayout", "cell1");
+    XWikiDocument centralCellDoc = new XWikiDocument(centralCellDocRef);
+    BaseObject pageTypeObj = new BaseObject();
+    pageTypeObj.setXClassReference(getPageTypeClassRef("celements2web"));
+    centralCellDoc.addXObject(pageTypeObj);
+    expect(request.get(eq("template"))).andReturn(null).anyTimes();
+    replayAll();
+    BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(centralCellDoc);
+    verifyAll();
+    assertNotNull("no page type object found. Maybe class ref has the wrong wiki"
+        + " reference?", resultPTObj);
     assertSame(pageTypeObj, resultPTObj);
   }
 
@@ -93,7 +111,7 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     doc.setNew(false);
     BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setXClassReference(getPageTypeClassRef());
+    pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     pageTypeObj.setStringValue("page_type", "MyPageType");
     doc.addXObject(pageTypeObj);
     PageTypeReference myPTref = new PageTypeReference("MyPageType", "xObjectProvider",
@@ -135,7 +153,7 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
   public void testGetPageTypeRefForDocWithDefault_MyPageType() throws Exception {
     doc.setNew(false);
     BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setXClassReference(getPageTypeClassRef());
+    pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     pageTypeObj.setStringValue("page_type", "MyPageType");
     doc.addXObject(pageTypeObj);
     PageTypeReference myPTref = new PageTypeReference("MyPageType", "xObjectProvider",
@@ -149,20 +167,20 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     verifyAll();
   }
 
-  private DocumentReference getPageTypeClassRef() {
-    return new DocumentReference(context.getDatabase(),
-        PageTypeClassCollection.PAGE_TYPE_CLASS_SPACE,
+  private DocumentReference getPageTypeClassRef(String wikiName) {
+    return new DocumentReference(wikiName, PageTypeClassCollection.PAGE_TYPE_CLASS_SPACE,
         PageTypeClassCollection.PAGE_TYPE_CLASS_DOC);
   }
 
   @Test
-  public void testGetPageTypeRefForDocWithDefault_NewDocFromTemplate() throws XWikiException {
+  public void testGetPageTypeRefForDocWithDefault_NewDocFromTemplate(
+      ) throws XWikiException {
     doc.setNew(true);
     DocumentReference templDocRef = new DocumentReference(context.getDatabase(), "Blog",
         "ArticleTemplate");
     XWikiDocument templDoc = new XWikiDocument(templDocRef);
     BaseObject pageTypeObj = new BaseObject();
-    pageTypeObj.setXClassReference(getPageTypeClassRef());
+    pageTypeObj.setXClassReference(getPageTypeClassRef(context.getDatabase()));
     pageTypeObj.setStringValue("page_type", "Article");
     templDoc.addXObject(pageTypeObj);
     expect(xwiki.exists(eq(templDocRef), same(context))).andReturn(true).anyTimes();

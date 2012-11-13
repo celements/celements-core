@@ -60,6 +60,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     if (pageTypeRef == null) {
       pageTypeRef = defaultPTRef;
     }
+    LOGGER.debug("getPageTypeRefForDocWithDefault: for [" + doc.getDocumentReference()
+        + "] returning [" + pageTypeRef + "].");
     return pageTypeRef;
   }
 
@@ -94,11 +96,22 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
       checkDoc = webUtilsService.getWikiTemplateDoc();
     }
     DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
-        getContext().getDatabase());
+        checkDoc.getDocumentReference().getLastSpaceReference().getParent().getName());
     if ((checkDoc != null) && (checkDoc.getXObjects(pageTypeClassRef) != null)
         && (checkDoc.getXObjects(pageTypeClassRef).size() > 0)) {
-      return checkDoc.getXObject(pageTypeClassRef);
+      BaseObject pageTypeObj = checkDoc.getXObject(pageTypeClassRef);
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("getPageTypeObject: page type object for class [" + pageTypeClassRef
+            + "] found for [" + checkDoc + "] with object details: "
+            + pageTypeObj.toXMLString());
+      } else {
+        LOGGER.debug("getPageTypeObject: page type object for class [" + pageTypeClassRef
+            + "] found for [" + checkDoc + "].");
+      }
+      return pageTypeObj;
     }
+    LOGGER.debug("getPageTypeObject: no page type object for class [" + pageTypeClassRef
+          + "] found for [" + checkDoc + "].");
     return null;
   }
 
