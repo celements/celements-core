@@ -358,7 +358,8 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public void sendNewValidation(String user, String possibleFields) {
-    if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
+    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
+        && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "].");
       try {
         new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
@@ -371,7 +372,8 @@ public class CelementsWebPluginApi extends Api {
   
   public void sendNewValidation(String user, String possibleFields,
       DocumentReference mailContentDocRef) {
-    if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
+    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
+        && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
           + mailContentDocRef + "].");
       try {
@@ -380,6 +382,9 @@ public class CelementsWebPluginApi extends Api {
       } catch (XWikiException exp) {
         LOGGER.error("sendNewValidation: failed.", exp);
       }
+    } else {
+      LOGGER.warn("sendNewValidation: new validation email for user [" + user
+          + "] not sent.");
     }
   }
   
