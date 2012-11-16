@@ -117,8 +117,7 @@ public class NewCelementsTokenForUserCommand {
           ).getName()).execute()) {
         int nr = Integer.parseInt(retNr.toString());
         BaseObject obj = userDoc.getXObject(getTokenClassDocRef(new WikiReference(
-            userDoc.getDocumentReference().getLastSpaceReference().getParent().getName())
-            ), nr);
+            userDoc.getDocumentReference().getLastSpaceReference().getParent())), nr);
         userDoc.removeXObject(obj);
       }
     } catch (QueryException qe) {
