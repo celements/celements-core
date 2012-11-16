@@ -19,11 +19,22 @@
  */
 package com.celements.web.token;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,8 +43,17 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class NewCelementsTokenForUserCommand {
+  
+  @Requirement
+  QueryManager queryManager;
+  
+  @Requirement
+  EntityReferenceResolver<String> stringRefResolver;
+  
+  @Requirement
+  EntityReferenceSerializer<String> refSerializer;
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewCelementsTokenForUserCommand.class);
 
   /**
@@ -59,9 +79,10 @@ public class NewCelementsTokenForUserCommand {
    * @return token (or null if token can not be generated)
    * @throws XWikiException
    */
-  public String getNewCelementsTokenForUser(String accountName,
-      Boolean guestPlus, int minutesValid, XWikiContext context) throws XWikiException {
-    mLogger.debug("getNewCelementsTokenForUser: with guestPlus [" + guestPlus
+  public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus, 
+      int minutesValid, XWikiContext context) throws XWikiException {
+    LOGGER.debug("getNewCelementsTokenForUser: check for expired tokens.");
+    LOGGER.debug("getNewCelementsTokenForUser: with guestPlus [" + guestPlus
         + "] for account [" + accountName + "].");
     String validkey = null;
     if (guestPlus && "XWiki.XWikiGuest".equals(accountName)) {
@@ -70,6 +91,7 @@ public class NewCelementsTokenForUserCommand {
     XWikiDocument doc1 = context.getWiki().getDocument(accountName, context);
     if (context.getWiki().exists(accountName, context)
         && (doc1.getObject("XWiki.XWikiUsers") != null)) {
+      removeOutdatedTokens(doc1);
       validkey = getUniqueValidationKey(context);
       BaseObject obj = doc1.newObject("Classes.TokenClass", context);
       obj.set("tokenvalue", validkey, context);
@@ -77,12 +99,37 @@ public class NewCelementsTokenForUserCommand {
       myCal.add(Calendar.MINUTE, minutesValid);
       obj.set("validuntil", myCal.getTime(), context);
       context.getWiki().saveDocument(doc1, context);
-      mLogger.debug("getNewCelementsTokenForUser: sucessfully created token for account ["
+      LOGGER.debug("getNewCelementsTokenForUser: sucessfully created token for account ["
           + accountName + "].");
     }
     return validkey;
   }
 
+  void removeOutdatedTokens(XWikiDocument userDoc) {
+    String xwql = "select obj.number " +
+        "from Document as doc, doc.object(Classes.TokenClass) as obj " +
+        "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
+    String now = (new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")).format(new Date());
+    try {
+      for(Object retNr : queryManager.createQuery(xwql, Query.XWQL).bindValue("now", now
+          ).bindValue("doc", refSerializer.serialize(userDoc.getDocumentReference())
+          ).setWiki(userDoc.getDocumentReference().getLastSpaceReference().getParent(
+          ).getName()).execute()) {
+        int nr = Integer.parseInt(retNr.toString());
+        BaseObject obj = userDoc.getXObject(getTokenClassDocRef(new WikiReference(
+            userDoc.getDocumentReference().getLastSpaceReference().getParent())), nr);
+        userDoc.removeXObject(obj);
+      }
+    } catch (QueryException qe) {
+      LOGGER.error("Exception querying for outdated tokens with xwql [" + xwql + "]", qe);
+    }
+  }
+  
+  DocumentReference getTokenClassDocRef(WikiReference wikiRef) {
+    return new DocumentReference(stringRefResolver.resolve(
+        "Classes.TokenClass", EntityType.DOCUMENT, wikiRef));
+  }
+  
   public String getUniqueValidationKey(XWikiContext context)
       throws XWikiException {
     XWikiStoreInterface storage = context.getWiki().getStore();
