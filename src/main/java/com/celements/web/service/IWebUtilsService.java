@@ -116,4 +116,8 @@ public interface IWebUtilsService {
 
   public List<String> getAllowedLanguages(String spaceName);
 
+  public DocumentReference getWikiTemplateDocRef();
+
+  public XWikiDocument getWikiTemplateDoc();
+
 }

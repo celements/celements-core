@@ -72,6 +72,27 @@ public class WebUtilsService implements IWebUtilsService {
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
 
+  /**
+   * TODO change access to wiki-configuration "default" and check access to e.g.
+   * 'languages' property
+   * 
+   * You get access to this configuration source by using:
+   * 
+   * @Requirement private ConfigurationSource configuration;
+   * 
+   *              Configuration properties are first looked for in the "space"
+   *              source, if not found then in the "wiki" source and if not
+   *              found in the "xwikiproperties" source. This is the recommended
+   *              configuration source for most usages since it allows to
+   *              defined configuration properties in the xwiki.propertieds file
+   *              and to override them in the running wiki (globally or per
+   *              space).
+   *  
+   *  Source: http://extensions.xwiki.org/xwiki/bin/view/Extension/Configuration+Module
+   */
+
+
+
   @Requirement
   Execution execution;
 
@@ -194,8 +215,11 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public List<String> getAllowedLanguages() {
-    return getAllowedLanguages(getContext().getDoc().getDocumentReference(
-        ).getLastSpaceReference().getName());
+    if ((getContext() != null) && (getContext().getDoc() != null)) {
+      return getAllowedLanguages(getContext().getDoc().getDocumentReference(
+          ).getLastSpaceReference().getName());
+    }
+    return Collections.emptyList();
   }
 
   public List<String> getAllowedLanguages(String spaceName) {
@@ -628,6 +652,32 @@ public class WebUtilsService implements IWebUtilsService {
 
   public WikiReference getWikiRef(DocumentReference docRef) {
     return (WikiReference) docRef.getLastSpaceReference().getParent();
+  }
+
+  public DocumentReference getWikiTemplateDocRef() {
+    if (getContext().getRequest() != null) {
+      String templateFN = getContext().getRequest().get("template");
+      if ((templateFN != null) && !"".equals(templateFN.trim())) {
+        DocumentReference templateDocRef = resolveDocumentReference(templateFN);
+        if (getContext().getWiki().exists(templateDocRef, getContext())) {
+          return templateDocRef;
+        }
+      }
+    }
+    return null;
+  }
+
+  public XWikiDocument getWikiTemplateDoc() {
+    DocumentReference templateDocRef = getWikiTemplateDocRef();
+    if (templateDocRef != null) {
+      try {
+        return getContext().getWiki().getDocument(templateDocRef, getContext());
+      } catch (XWikiException exp) {
+        LOGGER.error("Exception while getting template doc '" + templateDocRef + "'",
+            exp);
+      }
+    }
+    return null;
   }
 
 }

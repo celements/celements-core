@@ -23,3 +23,8 @@ com.celements.web.service.PrepareVelocityContextService
 com.celements.collections.CollectionsService
 com.celements.collections.service.CollectionsScriptService
 com.celements.pagetype.PageTypeClasses
+com.celements.pagetype.service.PageTypeService
+com.celements.pagetype.xobject.XObjectPageTypeProvider
+com.celements.pagetype.service.PageTypeScriptService
+com.celements.pagetype.service.PageTypeResolverService
+com.celements.pagetype.classcollection.PageTypeClassCollection

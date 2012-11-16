@@ -17,20 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.pagetype;
+package com.celements.pagetype.cmd;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.celements.pagetype.IPageType;
+import com.celements.pagetype.PageType;
+import com.celements.pagetype.PageTypeApi;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @deprecated since 2.21.0 instead use com.celements.pagetype.service.PageTypeResolverService
+ */
+@Deprecated
 public class PageTypeCommand {
 
+  /**
+   * @deprecated since 2.21.0 instead use PageTypeClassCollection.PAGE_TYPE_CLASS_DOC
+   */
+  @Deprecated
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
+  /**
+   * @deprecated since 2.21.0 instead use PageTypeClassCollection.PAGE_TYPE_CLASS_SPACE
+   */
+  @Deprecated
   public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
+  /**
+   * @deprecated since 2.21.0 instead use PageTypeClassCollection.PAGE_TYPE_CLASSNAME
+   */
+  @Deprecated
   public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
        + PAGE_TYPE_CLASS_DOC;
 

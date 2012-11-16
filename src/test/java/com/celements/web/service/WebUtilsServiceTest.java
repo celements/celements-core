@@ -880,6 +880,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetAllowedLanguages_NPE() {
+    context.setDoc(null);
+    replayAll();
+    List<String> resultList = Arrays.asList();
+    assertEquals("Expect empty list if no context or current doc available.", resultList,
+        webUtilsService.getAllowedLanguages());
+    verifyAll();
+  }
+
+  @Test
   public void testGetAllowedLanguages_WebPreferences() {
     DocumentReference curDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");

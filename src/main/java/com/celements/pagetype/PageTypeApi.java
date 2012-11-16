@@ -21,6 +21,7 @@ package com.celements.pagetype;
 
 import java.util.List;
 
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -28,6 +29,12 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * @deprecated since 2.21.0 instead use com.celements.pagetype.IPageTypeConfig
+ *             you can get IPageTypeConfig objects over PageTypeScriptService
+ *             or PageTypeService.
+ */
+@Deprecated
 public class PageTypeApi implements IPageType {
   private XWikiContext context;
   private XWiki xwiki;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin.cmd;
+package com.celements.pagetype.cmd;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.pagetype.PageTypeClasses;
+import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
