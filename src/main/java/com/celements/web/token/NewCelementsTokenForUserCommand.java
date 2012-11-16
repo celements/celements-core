@@ -31,6 +31,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -49,8 +50,8 @@ public class NewCelementsTokenForUserCommand {
   @Requirement
   EntityReferenceResolver<String> stringRefResolver;
   
-  @Requirement("local")
-  EntityReferenceSerializer<String> refLocalSerializer;
+  @Requirement
+  EntityReferenceSerializer<String> refSerializer;
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewCelementsTokenForUserCommand.class);
@@ -104,27 +105,30 @@ public class NewCelementsTokenForUserCommand {
     return validkey;
   }
 
-  void removeOutdatedTokens(XWikiDocument doc1) {
+  void removeOutdatedTokens(XWikiDocument userDoc) {
     String xwql = "select obj.number " +
         "from Document as doc, doc.object(Classes.TokenClass) as obj " +
         "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
     String now = (new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")).format(new Date());
     try {
       for(Object retNr : queryManager.createQuery(xwql, Query.XWQL).bindValue("now", now
-          ).bindValue("doc", refLocalSerializer.serialize(doc1.getDocumentReference())
-          ).execute()) {
+          ).bindValue("doc", refSerializer.serialize(userDoc.getDocumentReference())
+          ).setWiki(userDoc.getDocumentReference().getLastSpaceReference().getParent(
+          ).getName()).execute()) {
         int nr = Integer.parseInt(retNr.toString());
-        BaseObject obj = doc1.getXObject(getTokenClassDocRef(), nr);
-        doc1.removeXObject(obj);
+        BaseObject obj = userDoc.getXObject(getTokenClassDocRef(new WikiReference(
+            userDoc.getDocumentReference().getLastSpaceReference().getParent().getName())
+            ), nr);
+        userDoc.removeXObject(obj);
       }
     } catch (QueryException qe) {
       LOGGER.error("Exception querying for outdated tokens with xwql [" + xwql + "]", qe);
     }
   }
   
-  DocumentReference getTokenClassDocRef() {
+  DocumentReference getTokenClassDocRef(WikiReference wikiRef) {
     return new DocumentReference(stringRefResolver.resolve(
-        "Classes.TokenClass", EntityType.DOCUMENT));
+        "Classes.TokenClass", EntityType.DOCUMENT, wikiRef));
   }
   
   public String getUniqueValidationKey(XWikiContext context)

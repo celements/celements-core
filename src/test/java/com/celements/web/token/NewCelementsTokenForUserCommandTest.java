@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -57,7 +58,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
   public void setUp_NewCelementsTokenForUserCommandTest() throws Exception {
     context = getContext();
     celTokenForUserCmd = new NewCelementsTokenForUserCommand();
-    celTokenForUserCmd.refLocalSerializer = Utils.getComponent(
+    celTokenForUserCmd.refSerializer = Utils.getComponent(
         EntityReferenceSerializer.class);
     celTokenForUserCmd.stringRefResolver = Utils.getComponent(
         EntityReferenceResolver.class);
@@ -87,11 +88,14 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
         ).anyTimes();
     expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
         ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
     expect(query.execute()).andReturn(Collections.emptyList());
     replay(query, queryManager);
     celTokenForUserCmd.removeOutdatedTokens(doc);
     verify(query, queryManager);
-    assertNull(doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef()));
+    assertNull(doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(
+        new WikiReference(dRef.getLastSpaceReference().getParent().getName()))));
   }
   
   @Test
@@ -99,7 +103,8 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
     XWikiDocument doc = new XWikiDocument(dRef);
     BaseObject obj = new BaseObject();
-    obj.setXClassReference(celTokenForUserCmd.getTokenClassDocRef());
+    obj.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
     Date afterNow = new Date();
     afterNow.setTime(afterNow.getTime() + 1000000l);
     obj.setDateValue("validuntil", afterNow);
@@ -111,11 +116,14 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
         ).anyTimes();
     expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
         ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
     expect(query.execute()).andReturn(Collections.emptyList());
     replay(query, queryManager);
     celTokenForUserCmd.removeOutdatedTokens(doc);
     verify(query, queryManager);
-    assertEquals(1, doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef()).size());
+    assertEquals(1, doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(
+        new WikiReference(dRef.getLastSpaceReference().getParent().getName()))).size());
   }
   
   @Test
@@ -123,7 +131,8 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
     XWikiDocument doc = new XWikiDocument(dRef);
     BaseObject obj = new BaseObject();
-    obj.setXClassReference(celTokenForUserCmd.getTokenClassDocRef());
+    obj.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
     Date beforeNow = new Date();
     beforeNow.setTime(beforeNow.getTime() - 1000000l);
     obj.setDateValue("validuntil", beforeNow);
@@ -135,13 +144,16 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
         ).anyTimes();
     expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
         ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
     List<Object> list = new ArrayList<Object>();
     list.add("0");
     expect(query.execute()).andReturn(list);
     replay(query, queryManager);
     celTokenForUserCmd.removeOutdatedTokens(doc);
     verify(query, queryManager);
-    assertNull(doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef()).get(0));
+    assertNull(doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName()))).get(0));
   }
   
   @Test
@@ -149,19 +161,22 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
     XWikiDocument doc = new XWikiDocument(dRef);
     BaseObject obj1 = new BaseObject();
-    obj1.setXClassReference(celTokenForUserCmd.getTokenClassDocRef());
+    obj1.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
     Date afterNow = new Date();
     afterNow.setTime(afterNow.getTime() + 1000000l);
     obj1.setDateValue("validuntil", afterNow);
     doc.addXObject(obj1);
     BaseObject obj2 = new BaseObject();
-    obj2.setXClassReference(celTokenForUserCmd.getTokenClassDocRef());
+    obj2.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
     Date beforeNow = new Date();
     beforeNow.setTime(beforeNow.getTime() - 1000000l);
     obj2.setDateValue("validuntil", beforeNow);
     doc.addXObject(obj2);
     BaseObject obj3 = new BaseObject();
-    obj3.setXClassReference(celTokenForUserCmd.getTokenClassDocRef());
+    obj3.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
     beforeNow.setTime(beforeNow.getTime() - 1000000l);
     obj3.setDateValue("validuntil", beforeNow);
     doc.addXObject(obj3);
@@ -172,6 +187,8 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
         ).anyTimes();
     expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
         ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
     List<Object> list = new ArrayList<Object>();
     list.add("1");
     list.add(2);
@@ -179,7 +196,8 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     replay(query, queryManager);
     celTokenForUserCmd.removeOutdatedTokens(doc);
     verify(query, queryManager);
-    List<BaseObject> objs = doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef());
+    List<BaseObject> objs = doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(
+        new WikiReference(dRef.getLastSpaceReference().getParent().getName())));
     assertEquals(3, objs.size());
     assertEquals(afterNow, objs.get(0).getDateValue("validuntil"));
     assertNull(objs.get(1));
@@ -227,8 +245,10 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
         ).anyTimes();
     expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
         ).anyTimes();
+    expect(query.setWiki(eq("X"))).andReturn(query).anyTimes();
     expect(query.execute()).andReturn(Collections.emptyList());
-    expect(doc.getDocumentReference()).andReturn(new DocumentReference("X", "Y", "Z"));
+    expect(doc.getDocumentReference()).andReturn(new DocumentReference("X", "Y", "Z")
+        ).anyTimes();
     replay(xwiki, store, baseObject, doc, query, queryManager);
     assertEquals(randomString, celTokenForUserCmd.getNewCelementsTokenForUser(
         "XWiki.XWikiGuest",  true, context));
