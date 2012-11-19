@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -38,6 +40,7 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.PageTypeResolverService;
@@ -733,6 +736,78 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.loadConfigFromObject(navConfigObj);
     assertEquals("MySpace", nav.getMenuSpace(context));
     verifyAll();
+  }
+
+  @Test
+  public void testLoadConfigFromObject_presentationType_notEmpty() throws Exception {
+    DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDoc");
+    BaseObject navConfigObj = new BaseObject();
+    navConfigObj.setDocumentReference(cellConfigDocRef);
+    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
+        context.getDatabase()));
+    navConfigObj.setStringValue(NavigationClasses.NAVIGATION_CONFIG_PRESENTATION_TYPE,
+        "testPresentationType");
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    ComponentManager mockComponentManager = createMock(ComponentManager.class);
+    Utils.setComponentManager(mockComponentManager);
+    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+        eq("testPresentationType"))).andReturn(componentInstance);
+    replayAll(mockComponentManager, componentInstance);
+    nav.loadConfigFromObject(navConfigObj);
+    verifyAll(mockComponentManager, componentInstance);
+    assertSame(componentInstance, nav.getPresentationType());
+  }
+
+  @Test
+  public void testSetPresentationType() throws Exception {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    ComponentManager mockComponentManager = createMock(ComponentManager.class);
+    Utils.setComponentManager(mockComponentManager);
+    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+        eq("testPresentationType"))).andReturn(componentInstance);
+    replayAll(mockComponentManager, componentInstance);
+    nav.setPresentationType("testPresentationType");
+    verifyAll(mockComponentManager, componentInstance);
+    assertSame(componentInstance, nav.getPresentationType());
+  }
+
+  @Test
+  public void testSetPresentationType_null() throws Exception {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    nav.setPresentationType(componentInstance);
+    replayAll(componentInstance);
+    nav.setPresentationType((String)null);
+    verifyAll(componentInstance);
+    assertNull(nav.getPresentationType());
+  }
+
+  @Test
+  public void testSetPresentationType_NotFoundException() throws Exception {
+    ComponentManager mockComponentManager = createMock(ComponentManager.class);
+    Utils.setComponentManager(mockComponentManager);
+    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+        eq("testNotFoundPresentationType"))).andThrow(new ComponentLookupException(
+            "not found"));
+    replayAll(mockComponentManager);
+    nav.setPresentationType("testNotFoundPresentationType");
+    verifyAll(mockComponentManager);
+    assertNull(nav.getPresentationType());
+  }
+
+  @Test
+  public void testWriteMenuItemContent_PresentationType() throws Exception {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    nav.setPresentationType(componentInstance);
+    StringBuilder outStream = new StringBuilder();
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    componentInstance.writeNodeContent(same(outStream), eq(true), eq(false), eq(docRef),
+        eq(true), same(nav));
+    expectLastCall().once();
+    replayAll(componentInstance);
+    nav.writeMenuItemContent(outStream, true, false, docRef, true);
+    verifyAll(componentInstance);
   }
 
   //*****************************************************************

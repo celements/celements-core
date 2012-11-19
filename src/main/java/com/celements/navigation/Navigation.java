@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -33,6 +34,7 @@ import org.xwiki.model.reference.SpaceReference;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.PageTypeResolverService;
@@ -105,6 +107,8 @@ public class Navigation implements INavigation {
 
   private String dataType;
 
+  private IPresentationTypeRole presentationType = null;
+
   private boolean _showAll;
 
   private boolean _hasLink;
@@ -164,6 +168,29 @@ public class Navigation implements INavigation {
       this.navBuilder = new ListBuilder(uniqueName);
     } else {
       throw new UnknownLayoutTypeException(layoutType);
+    }
+  }
+
+  public IPresentationTypeRole getPresentationType() {
+    return presentationType;
+  }
+
+  public void setPresentationType(IPresentationTypeRole presentationType) {
+    this.presentationType = presentationType;
+  }
+
+  public void setPresentationType(String presentationTypeHint) {
+    if (presentationTypeHint != null) {
+      try {
+        setPresentationType(Utils.getComponentManager().lookup(
+            IPresentationTypeRole.class, presentationTypeHint));
+      } catch (ComponentLookupException failedToLoadException) {
+        LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
+            + presentationTypeHint + "].", failedToLoadException);
+        this.presentationType = null;
+      }
+    } else {
+      this.presentationType = null;
     }
   }
 
@@ -368,10 +395,14 @@ public class Navigation implements INavigation {
     closeMenuItemOut(outStream);
   }
 
-  private void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem,
+  void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf) throws XWikiException {
-    //TODO appendPresentationCell or appendMenuItemLink depending on presentation type
-    appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf);
+    if (getPresentationType() != null) {
+      presentationType.writeNodeContent(outStream, isFirstItem, isLastItem, docRef,
+          isLeaf, this);
+    } else {
+      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf);
+    }
   }
 
   private boolean isLeaf(String fullName, XWikiContext context) {
@@ -645,6 +676,11 @@ public class Navigation implements INavigation {
         } catch (UnknownLayoutTypeException exp) {
           LOGGER.error(exp, exp);
         }
+      }
+      String presentationTypeStr = prefObj.getStringValue(
+          NavigationClasses.NAVIGATION_CONFIG_PRESENTATION_TYPE);
+      if (!"".equals(presentationTypeStr)) {
+        setPresentationType(presentationTypeStr);
       }
       setCMcssClass(prefObj.getStringValue("cm_css_class"));
 //        setMenuTypeByTypeName(prefObj.getStringValue("menu_type"));
