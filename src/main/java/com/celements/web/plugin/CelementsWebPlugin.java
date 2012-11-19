@@ -21,7 +21,6 @@ package com.celements.web.plugin;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -228,34 +227,15 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * 
-   * @param accountName
-   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
-   * XWiki.XWikiGuestPlus will be used to get the token.
-   * @param context
-   * @return token (or null if token can not be generated)
-   * @throws XWikiException
+   * @deprecated since 2.22.0
+   * instead use NewCelementsTokenForUserCommand.getNewCelementsTokenForUserWithAutentication
    */
+  @Deprecated
   public String getNewCelementsTokenForUser(String accountName,
       Boolean guestPlus, XWikiContext context) throws XWikiException {
-    if (!"".equals(context.getRequest().getParameter("j_username"))
-        && !"".equals(context.getRequest().getParameter("j_password"))) {
-      LOGGER.info("getNewCelementsTokenForUser: trying to authenticate  "
-          + context.getRequest().getParameter("j_username"));
-      Principal principal = context.getWiki().getAuthService().authenticate(
-          context.getRequest().getParameter("j_username"),
-          context.getRequest().getParameter("j_password"), context);
-      if(principal != null) {
-        LOGGER.info("getNewCelementsTokenForUser: successfully autenthicated "
-            + principal.getName());
-        context.setUser(principal.getName());
-        accountName = principal.getName();
-      }
-    }
-    return new NewCelementsTokenForUserCommand().getNewCelementsTokenForUser(accountName,
-        guestPlus, context);
+    return new NewCelementsTokenForUserCommand(
+        ).getNewCelementsTokenForUserWithAutentication(accountName, guestPlus, context);
   }
-
   public String encryptString(String encoding, String str) {
     return new PasswordClass().getEquivalentPassword(encoding, str);
   }
