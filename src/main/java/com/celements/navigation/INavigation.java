@@ -21,6 +21,8 @@ package com.celements.navigation;
 
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.xpn.xwiki.XWikiContext;
@@ -61,8 +63,7 @@ public interface INavigation {
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel,
       XWikiContext context);
 
-  public String getPrevMenuItemFullName(String fullName,
-      XWikiContext context);
+  public String getPrevMenuItemFullName(String fullName, XWikiContext context);
 
   public String getMenuSpace(XWikiContext context);
 
@@ -74,7 +75,9 @@ public interface INavigation {
 
   public String getNextMenuItemFullName(String name, XWikiContext context);
 
-  public String getUniqueId(String menuItemName);
+  public String getUniqueId(DocumentReference docRef);
+
+  public String getUniqueId(String fullName);
 
   public void setShowAll(boolean showAll);
 
