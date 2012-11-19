@@ -234,7 +234,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public String getNewCelementsTokenForUser(String accountName,
       Boolean guestPlus, XWikiContext context) throws XWikiException {
     return new NewCelementsTokenForUserCommand(
-        ).getNewCelementsTokenForUserWithAutentication(accountName, guestPlus, context);
+        ).getNewCelementsTokenForUserWithAuthentication(accountName, guestPlus, context);
   }
   public String encryptString(String encoding, String str) {
     return new PasswordClass().getEquivalentPassword(encoding, str);

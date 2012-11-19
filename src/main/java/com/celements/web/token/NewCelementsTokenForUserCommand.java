@@ -156,16 +156,32 @@ public class NewCelementsTokenForUserCommand {
    * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
    * XWiki.XWikiGuestPlus will be used to get the token.
    * @param context
+   * @param minutesValid 
    * @return token (or null if token can not be generated)
    * @throws XWikiException
    */
-  public String getNewCelementsTokenForUserWithAutentication(String accountName,
+  public String getNewCelementsTokenForUserWithAuthentication(String accountName,
+      Boolean guestPlus, int minutesValid, XWikiContext context) throws XWikiException {
+    accountName = authenticateForRequest(accountName, context);
+    return getNewCelementsTokenForUser(accountName, guestPlus, minutesValid, context);
+  }
+
+  /**
+   * 
+   * @param accountName
+   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
+   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param context
+   * @return token (or null if token can not be generated)
+   * @throws XWikiException
+   */
+  public String getNewCelementsTokenForUserWithAuthentication(String accountName,
       Boolean guestPlus, XWikiContext context) throws XWikiException {
-    accountName = autenticateForRequest(accountName, context);
+    accountName = authenticateForRequest(accountName, context);
     return getNewCelementsTokenForUser(accountName, guestPlus, context);
   }
 
-  private String autenticateForRequest(String accountName, XWikiContext context
+  private String authenticateForRequest(String accountName, XWikiContext context
       ) throws XWikiException {
     if (!"".equals(context.getRequest().getParameter("j_username"))
         && !"".equals(context.getRequest().getParameter("j_password"))) {
