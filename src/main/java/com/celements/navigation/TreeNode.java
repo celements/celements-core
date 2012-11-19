@@ -19,9 +19,12 @@
  */
 package com.celements.navigation;
 
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 public class TreeNode {
 
@@ -139,6 +142,20 @@ public class TreeNode {
     hash = 31 * hash + (position == null ? 0 : position.hashCode());
     hash = 31 * hash + (docRef == null ? 0 : docRef.hashCode());
     return hash;
+  }
+
+  @Override
+  public String toString() {
+    return "[ docRef = [" + docRef + "], parent = [" + parent + "], position = ["
+    + position + "], partName = [" + getPartName(getContext()) + "] ]";
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecutionContext().getProperty("xwikicontext");
+  }
+
+  private ExecutionContext getExecutionContext() {
+    return Utils.getComponent(Execution.class).getContext();
   }
 
 }

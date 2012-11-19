@@ -268,6 +268,7 @@ public class PageLayoutCommand {
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+    LOGGER.debug("getPageLayoutForDoc: for [" + documentReference + "].");
     SpaceReference layoutSpaceRef = null;
     if (layoutExists(documentReference.getLastSpaceReference())) {
       layoutSpaceRef = getCelLayoutEditorSpaceRef();
@@ -283,6 +284,8 @@ public class PageLayoutCommand {
     if ((layoutSpaceRef == null) || !checkLayoutAccess(layoutSpaceRef)) {
       layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
+    LOGGER.info("getPageLayoutForDoc: for [" + documentReference + "] returning ["
+        + layoutSpaceRef + "].");
     return layoutSpaceRef;
   }
 

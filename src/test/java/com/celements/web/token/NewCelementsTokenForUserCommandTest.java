@@ -20,17 +20,25 @@
 package com.celements.web.token;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -39,6 +47,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponentTestCase {
 
@@ -49,6 +58,10 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
   public void setUp_NewCelementsTokenForUserCommandTest() throws Exception {
     context = getContext();
     celTokenForUserCmd = new NewCelementsTokenForUserCommand();
+    celTokenForUserCmd.refSerializer = Utils.getComponent(
+        EntityReferenceSerializer.class);
+    celTokenForUserCmd.stringRefResolver = Utils.getComponent(
+        EntityReferenceResolver.class);
   }
 
   @Test
@@ -65,8 +78,135 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
   }
   
   @Test
+  public void testRemoveOutdatedTokens_noTokens() throws QueryException {
+    DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
+    XWikiDocument doc = new XWikiDocument(dRef);
+    QueryManager queryManager = createMock(QueryManager.class);
+    celTokenForUserCmd.queryManager = queryManager;
+    Query query = createMock(Query.class);
+    expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
+        ).anyTimes();
+    expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
+        ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
+    expect(query.execute()).andReturn(Collections.emptyList());
+    replay(query, queryManager);
+    celTokenForUserCmd.removeOutdatedTokens(doc);
+    verify(query, queryManager);
+    assertNull(doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(
+        new WikiReference(dRef.getLastSpaceReference().getParent().getName()))));
+  }
+  
+  @Test
+  public void testRemoveOutdatedTokens_1new() throws QueryException {
+    DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
+    XWikiDocument doc = new XWikiDocument(dRef);
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
+    Date afterNow = new Date();
+    afterNow.setTime(afterNow.getTime() + 1000000l);
+    obj.setDateValue("validuntil", afterNow);
+    doc.addXObject(obj);
+    QueryManager queryManager = createMock(QueryManager.class);
+    celTokenForUserCmd.queryManager = queryManager;
+    Query query = createMock(Query.class);
+    expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
+        ).anyTimes();
+    expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
+        ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
+    expect(query.execute()).andReturn(Collections.emptyList());
+    replay(query, queryManager);
+    celTokenForUserCmd.removeOutdatedTokens(doc);
+    verify(query, queryManager);
+    assertEquals(1, doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(
+        new WikiReference(dRef.getLastSpaceReference().getParent().getName()))).size());
+  }
+  
+  @Test
+  public void testRemoveOutdatedTokens_1outdated() throws QueryException {
+    DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
+    XWikiDocument doc = new XWikiDocument(dRef);
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
+    Date beforeNow = new Date();
+    beforeNow.setTime(beforeNow.getTime() - 1000000l);
+    obj.setDateValue("validuntil", beforeNow);
+    doc.addXObject(obj);
+    QueryManager queryManager = createMock(QueryManager.class);
+    celTokenForUserCmd.queryManager = queryManager;
+    Query query = createMock(Query.class);
+    expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
+        ).anyTimes();
+    expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
+        ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
+    List<Object> list = new ArrayList<Object>();
+    list.add("0");
+    expect(query.execute()).andReturn(list);
+    replay(query, queryManager);
+    celTokenForUserCmd.removeOutdatedTokens(doc);
+    verify(query, queryManager);
+    assertNull(doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName()))).get(0));
+  }
+  
+  @Test
+  public void testRemoveOutdatedTokens_multiple() throws QueryException {
+    DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
+    XWikiDocument doc = new XWikiDocument(dRef);
+    BaseObject obj1 = new BaseObject();
+    obj1.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
+    Date afterNow = new Date();
+    afterNow.setTime(afterNow.getTime() + 1000000l);
+    obj1.setDateValue("validuntil", afterNow);
+    doc.addXObject(obj1);
+    BaseObject obj2 = new BaseObject();
+    obj2.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
+    Date beforeNow = new Date();
+    beforeNow.setTime(beforeNow.getTime() - 1000000l);
+    obj2.setDateValue("validuntil", beforeNow);
+    doc.addXObject(obj2);
+    BaseObject obj3 = new BaseObject();
+    obj3.setXClassReference(celTokenForUserCmd.getTokenClassDocRef(new WikiReference(
+        dRef.getLastSpaceReference().getParent().getName())));
+    beforeNow.setTime(beforeNow.getTime() - 1000000l);
+    obj3.setDateValue("validuntil", beforeNow);
+    doc.addXObject(obj3);
+    QueryManager queryManager = createMock(QueryManager.class);
+    celTokenForUserCmd.queryManager = queryManager;
+    Query query = createMock(Query.class);
+    expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
+        ).anyTimes();
+    expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
+        ).anyTimes();
+    expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))
+        ).andReturn(query).anyTimes();
+    List<Object> list = new ArrayList<Object>();
+    list.add("1");
+    list.add(2);
+    expect(query.execute()).andReturn(list);
+    replay(query, queryManager);
+    celTokenForUserCmd.removeOutdatedTokens(doc);
+    verify(query, queryManager);
+    List<BaseObject> objs = doc.getXObjects(celTokenForUserCmd.getTokenClassDocRef(
+        new WikiReference(dRef.getLastSpaceReference().getParent().getName())));
+    assertEquals(3, objs.size());
+    assertEquals(afterNow, objs.get(0).getDateValue("validuntil"));
+    assertNull(objs.get(1));
+    assertNull(objs.get(2));
+  }
+  
+  @Test
   public void testGetNewCelementsTokenForUser_XWikiGuest_withGuestPlus(
-      ) throws XWikiException {
+      ) throws XWikiException, QueryException {
     XWiki xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
@@ -98,7 +238,18 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
         ).once();
     xwiki.saveDocument(eq(doc), same(context));
     expectLastCall().once();
-    replay(xwiki, store, baseObject, doc);
+    QueryManager queryManager = createMock(QueryManager.class);
+    celTokenForUserCmd.queryManager = queryManager;
+    Query query = createMock(Query.class);
+    expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
+        ).anyTimes();
+    expect(query.bindValue((String)anyObject(), (String)anyObject())).andReturn(query
+        ).anyTimes();
+    expect(query.setWiki(eq("X"))).andReturn(query).anyTimes();
+    expect(query.execute()).andReturn(Collections.emptyList());
+    expect(doc.getDocumentReference()).andReturn(new DocumentReference("X", "Y", "Z")
+        ).anyTimes();
+    replay(xwiki, store, baseObject, doc, query, queryManager);
     assertEquals(randomString, celTokenForUserCmd.getNewCelementsTokenForUser(
         "XWiki.XWikiGuest",  true, context));
     Calendar expectedDateCal = Calendar.getInstance();
@@ -107,7 +258,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     // the computed time values.
     assertFalse("The token must not be valid for more than one day",
         expectedDateCal.getTime().before(captDate.getValue()));
-    verify(xwiki, store, baseObject, doc);
+    verify(xwiki, store, baseObject, doc, query, queryManager);
   }
   
 }

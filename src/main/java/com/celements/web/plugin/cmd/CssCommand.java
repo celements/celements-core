@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.pagetype.PageTypeCommand;
+import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSEngine;
 import com.xpn.xwiki.XWikiContext;

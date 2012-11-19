@@ -55,6 +55,14 @@ public class NavigationApi extends Api {
         context);
   }
 
+  /**
+   * getMultilingualMenuName DOES NOT allow empty menu names as return value
+   * in contrast to getMultilingualMenuNameOnly
+   * 
+   * @param fullName
+   * @param language
+   * @return
+   */
   public String getMultilingualMenuName(String fullName, String language) {
     return navigation.getMenuNameCmd().getMultilingualMenuName(fullName, language,
         context);
@@ -72,6 +80,14 @@ public class NavigationApi extends Api {
         language, allowEmptyMenuNames, context);
   }
 
+  /**
+   * getMultilingualMenuNameOnly DOES allow empty menu names as return value
+   * in contrast to getMultilingualMenuName
+   * 
+   * @param fullName
+   * @param language
+   * @return
+   */
   public String getMultilingualMenuNameOnly(String fullName, String language) {
     return navigation.getMenuNameCmd().getMultilingualMenuNameOnly(fullName, language,
         true, context);

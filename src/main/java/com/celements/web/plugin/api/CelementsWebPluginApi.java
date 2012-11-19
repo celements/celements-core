@@ -44,6 +44,7 @@ import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
+import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
@@ -62,7 +63,6 @@ import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
-import com.celements.web.plugin.cmd.GetPageTypesCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
@@ -358,7 +358,8 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public void sendNewValidation(String user, String possibleFields) {
-    if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
+    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
+        && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "].");
       try {
         new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
@@ -371,7 +372,8 @@ public class CelementsWebPluginApi extends Api {
   
   public void sendNewValidation(String user, String possibleFields,
       DocumentReference mailContentDocRef) {
-    if(hasAdminRights() && (user != null) && (user.trim().length() > 0)) {
+    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
+        && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
           + mailContentDocRef + "].");
       try {
@@ -380,6 +382,9 @@ public class CelementsWebPluginApi extends Api {
       } catch (XWikiException exp) {
         LOGGER.error("sendNewValidation: failed.", exp);
       }
+    } else {
+      LOGGER.warn("sendNewValidation: new validation email for user [" + user
+          + "] not sent.");
     }
   }
   
@@ -515,6 +520,9 @@ public class CelementsWebPluginApi extends Api {
    * @param fullName of the celements document
    * @return
    * @throws XWikiException
+   * 
+   * @deprecated since 2.21.0 instead use
+   *             com.celements.pagetype.service.PageTypeScriptService.getPageTypeConfig()
    */
   public IPageType getPageType(String fullName) throws XWikiException {
     return new PageTypeApi(fullName, context);
@@ -620,6 +628,10 @@ public class CelementsWebPluginApi extends Api {
 
   public List<String> getAllowedLanguages() {
     return getWebUtilsService().getAllowedLanguages();
+  }
+  
+  public List<String> getAllowedLanguages(String spaceName) {
+    return getWebUtilsService().getAllowedLanguages(spaceName);
   }
   
   public int createUser() throws XWikiException {
@@ -1088,24 +1100,49 @@ public class CelementsWebPluginApi extends Api {
     return getPageLayoutCmd().layoutEditorAvailable();
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAllPageTypes()
+   */
+  @Deprecated
   public List<String> getAllPageTypes() {
     return getPageTypesByCategories(Arrays.asList("", "pageType"), false);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAvailablePageTypes()
+   */
+  @Deprecated
   public List<String> getAvailablePageTypes() {
     return getPageTypesByCategories(Arrays.asList("", "pageType"), true);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getPageTypesByCategories()
+   */
+  @Deprecated
   public List<String> getPageTypesByCategories(List<String> catList,
       boolean onlyVisible) {
     return new GetPageTypesCommand().getPageTypesForCategories(
         new HashSet<String>(catList), onlyVisible, context);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAllCellTypes()
+   */
+  @Deprecated
   public List<String> getAllCellTypes() {
     return getPageTypesByCategories(Arrays.asList("celltype"), false);
   }
 
+  /**
+   * @deprecated since 2.21.0 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getAvailableCellTypes()
+   */
+  @Deprecated
   public List<String> getAvailableCellTypes() {
     return getPageTypesByCategories(Arrays.asList("celltype"), true);
   }

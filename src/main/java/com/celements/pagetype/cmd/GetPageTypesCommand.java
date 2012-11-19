@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin.cmd;
+package com.celements.pagetype.cmd;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,33 +34,43 @@ import com.xpn.xwiki.XWikiException;
 
 public class GetPageTypesCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       GetPageTypesCommand.class);
 
-  public List<String> getPageTypesForCategories(Set<String> catList,
-      boolean onlyVisible, XWikiContext context) {
-    Set<String> pageTypeSet = new HashSet<String>();
-    String currentDatabase = context.getDatabase();
-    try {
-      context.setDatabase("celements2web");
-      pageTypeSet.addAll(getPateTypesForOneDatabase(catList, onlyVisible, context));
-    } finally {
-      context.setDatabase(currentDatabase);
-    }
-    pageTypeSet.addAll(getPateTypesForOneDatabase(catList, onlyVisible, context));
+  public List<String> getPageTypesForCategories(Set<String> catList, boolean onlyVisible,
+      XWikiContext context) {
+    Set<String> pageTypeSet = getXObjectPageTypes(catList, onlyVisible, context);
     if (doesContainEmptyCategory(catList)) {
       pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
     }
     return new ArrayList<String>(pageTypeSet);
   }
 
-  private List<String> getPateTypesForOneDatabase(Set<String> catList,
+  public Set<String> getAllXObjectPageTypes(XWikiContext context) {
+    return getXObjectPageTypes(Collections.<String>emptySet(), false, context);
+  }
+
+  private Set<String> getXObjectPageTypes(Set<String> catList, boolean onlyVisible,
+      XWikiContext context) {
+    Set<String> pageTypeSet = new HashSet<String>();
+    String currentDatabase = context.getDatabase();
+    try {
+      context.setDatabase("celements2web");
+      pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
+    } finally {
+      context.setDatabase(currentDatabase);
+    }
+    pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
+    return pageTypeSet;
+  }
+
+  private List<String> getPageTypesForOneDatabase(Set<String> catList,
       boolean onlyVisible, XWikiContext context) {
     List<String> result = Collections.emptyList();
     try {
       result = context.getWiki().search(getPThql(catList, onlyVisible), context);
     } catch (XWikiException exp) {
-      mLogger.error("getPageTypesForCategories: Failed to get pagetypes.", exp);
+      LOGGER.error("getPageTypesForCategories: Failed to get pagetypes.", exp);
     }
     return result;
   }
