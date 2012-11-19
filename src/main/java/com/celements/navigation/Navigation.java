@@ -344,12 +344,18 @@ public class Navigation implements INavigation {
         ), context);
     boolean isLeaf = isLeaf(fullName, context);
     openMenuItemOut(outStream, fullName, isFirstItem, isLastItem, isLeaf, context);
-    appendMenuItemLink(outStream, isFirstItem, isLastItem, fullName, isLeaf, context);
+    writeMenuItemContent(outStream, isFirstItem, isLastItem, fullName, isLeaf);
     if (showSubmenu) {
       addNavigationForParent(outStream, fullName, numMoreLevels - 1,
           context);
     }
     closeMenuItemOut(outStream);
+  }
+
+  private void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem,
+      boolean isLastItem, String fullName, boolean isLeaf) throws XWikiException {
+    //TODO appendPresentationCell or appendMenuItemLink depending on presentation type
+    appendMenuItemLink(outStream, isFirstItem, isLastItem, fullName, isLeaf);
   }
 
   private boolean isLeaf(String fullName, XWikiContext context) {
@@ -360,7 +366,7 @@ public class Navigation implements INavigation {
   }
 
   void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, String fullName, boolean isLeaf, XWikiContext context
+      boolean isLastItem, String fullName, boolean isLeaf
       ) throws XWikiException {
     String tagName;
     if (hasLink()) {
@@ -370,20 +376,21 @@ public class Navigation implements INavigation {
     }
     String menuItemHTML = "<" + tagName;
     if (hasLink()) {
-      menuItemHTML += " href=\"" + getMenuLink(fullName, context) + "\"";
+      menuItemHTML += " href=\"" + getMenuLink(fullName, getContext()) + "\"";
     }
-    if (useImagesForNavigation(context)) {
-      menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, getNavLanguage(context
-          ), context);
+    if (useImagesForNavigation(getContext())) {
+      menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, getNavLanguage(
+          getContext()), getContext());
     }
-    String tooltip = menuNameCmd.addToolTip(fullName, getNavLanguage(context), context);
+    String tooltip = menuNameCmd.addToolTip(fullName, getNavLanguage(getContext()),
+        getContext());
     if (!"".equals(tooltip)) {
       menuItemHTML += " " + tooltip;
     }
     String menuName = menuNameCmd.getMultilingualMenuName(fullName, getNavLanguage(
-        context), context);
+        getContext()), getContext());
     menuItemHTML += addCssClasses(fullName, true, isFirstItem, isLastItem, isLeaf,
-        context);
+        getContext());
     menuItemHTML += " " + addUniqueElementId(fullName)
       + ">" + menuName + "</" + tagName + ">";
     outStream.append(menuItemHTML);

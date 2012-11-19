@@ -521,8 +521,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
     replayAll(pageTypeApi, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
-        context);
+    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
         + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
@@ -569,8 +568,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
     replayAll(pageTypeApi, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
-        context);
+    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " style=\"background-image:url(abc);\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
@@ -614,8 +612,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
     replayAll(pageTypeApi, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), true,
-        context);
+    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), true);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
         + " currentPage myUltimativePageType active\" id=\"N1:MySpace:MySpace."
         + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
