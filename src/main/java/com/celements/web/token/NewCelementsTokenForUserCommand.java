@@ -112,10 +112,12 @@ public class NewCelementsTokenForUserCommand {
         "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
     String now = (new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")).format(new Date());
     try {
-      for(Object retNr : queryManager.createQuery(xwql, Query.XWQL).bindValue("now", now
-          ).bindValue("doc", refSerializer.serialize(userDoc.getDocumentReference())
-          ).setWiki(userDoc.getDocumentReference().getLastSpaceReference().getParent(
-          ).getName()).execute()) {
+      DocumentReference docRef = userDoc.getDocumentReference();
+      Query query = queryManager.createQuery(xwql, Query.XWQL);
+      query.bindValue("now", now);
+      query.bindValue("doc", refSerializer.serialize(docRef));
+      query.setWiki(docRef.getLastSpaceReference().getParent().getName());
+      for(Object retNr : query.execute()) {
         int nr = Integer.parseInt(retNr.toString());
         BaseObject obj = userDoc.getXObject(getTokenClassDocRef(new WikiReference(
             userDoc.getDocumentReference().getLastSpaceReference().getParent())), nr);
