@@ -408,7 +408,23 @@ public class CelementsWebPluginApi extends Api {
   public String getNewCelementsTokenForUser(Boolean guestPlus) {
     if(context.getUser() != null) {
       try {
-        return plugin.getNewCelementsTokenForUser(context.getUser(), guestPlus, context);
+        return new NewCelementsTokenForUserCommand(
+            ).getNewCelementsTokenForUserWithAuthentication(context.getUser(), guestPlus,
+                context);
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to create new validation Token for user: "
+            + context.getUser(), exp);
+      }
+    }
+    return null;
+  }
+
+  public String getNewCelementsTokenForUser(Boolean guestPlus, int minutesValid) {
+    if(context.getUser() != null) {
+      try {
+        return new NewCelementsTokenForUserCommand(
+            ).getNewCelementsTokenForUserWithAuthentication(context.getUser(), guestPlus,
+                minutesValid, context);
       } catch (XWikiException exp) {
         LOGGER.error("Failed to create new validation Token for user: "
             + context.getUser(), exp);
