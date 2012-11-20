@@ -37,6 +37,7 @@ import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
@@ -800,11 +801,11 @@ public class Navigation implements INavigation {
     return Utils.getComponent(EntityReferenceSerializer.class, "local");
   }
 
-  private PageTypeResolverService getPageTypeResolverService() {
+  IPageTypeResolverRole getPageTypeResolverService() {
     if (injected_PageTypeResolverService != null) {
       return injected_PageTypeResolverService;
     }
-    return Utils.getComponent(PageTypeResolverService.class);
+    return Utils.getComponent(IPageTypeResolverRole.class);
   }
 
 }

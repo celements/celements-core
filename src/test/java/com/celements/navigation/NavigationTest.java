@@ -90,6 +90,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetPageTypeResolverService() {
+    nav.injected_PageTypeResolverService = null;
+    assertNotNull(nav.getPageTypeResolverService());
+  }
+
+  @Test
   public void testGetRightsFilter() {
     nav.setNavFilter(null);
     INavFilter<BaseObject> filterNew = nav.getNavFilter();
