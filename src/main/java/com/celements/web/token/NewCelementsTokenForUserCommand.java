@@ -27,32 +27,23 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
-  
-  @Requirement
-  QueryManager queryManager;
-  
-  @Requirement
-  EntityReferenceResolver<String> stringRefResolver;
-  
-  @Requirement
-  EntityReferenceSerializer<String> refSerializer;
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewCelementsTokenForUserCommand.class);
@@ -113,9 +104,9 @@ public class NewCelementsTokenForUserCommand {
     String now = (new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")).format(new Date());
     try {
       DocumentReference docRef = userDoc.getDocumentReference();
-      Query query = queryManager.createQuery(xwql, Query.XWQL);
+      Query query = getQueryManagerComponent().createQuery(xwql, Query.XWQL);
       query.bindValue("now", now);
-      query.bindValue("doc", refSerializer.serialize(docRef));
+      query.bindValue("doc", getSerializerComponent().serialize(docRef));
       query.setWiki(docRef.getLastSpaceReference().getParent().getName());
       for(Object retNr : query.execute()) {
         int nr = Integer.parseInt(retNr.toString());
@@ -129,8 +120,20 @@ public class NewCelementsTokenForUserCommand {
   }
   
   DocumentReference getTokenClassDocRef(WikiReference wikiRef) {
-    return new DocumentReference(stringRefResolver.resolve(
-        "Classes.TokenClass", EntityType.DOCUMENT, wikiRef));
+    return new DocumentReference(getWebUtilsComponent().resolveDocumentReference(
+        "Classes.TokenClass"));
+  }
+  
+  QueryManager getQueryManagerComponent() {
+    return Utils.getComponent(QueryManager.class);
+  }
+  
+  EntityReferenceSerializer<String> getSerializerComponent() {
+    return Utils.getComponent(EntityReferenceSerializer.class);
+  }
+  
+  WebUtilsService getWebUtilsComponent() {
+    return Utils.getComponent(WebUtilsService.class);
   }
   
   public String getUniqueValidationKey(XWikiContext context)
