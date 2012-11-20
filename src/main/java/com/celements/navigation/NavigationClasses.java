@@ -33,6 +33,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celNavigationClasses")
 public class NavigationClasses extends AbstractClassCollection {
 
+  public static final String NAVIGATION_CONFIG_PRESENTATION_TYPE = "presentation_type";
   public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
   public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
   public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
@@ -130,6 +131,8 @@ public class NavigationClasses extends AbstractClassCollection {
         "Navigation Source Data Type (empty for general Page Menu)", 30);
     needsUpdate |= bclass.addTextField("layout_type",
         "Navigation Layout Type (empty for html list)", 30);
+    needsUpdate |= bclass.addTextField(NAVIGATION_CONFIG_PRESENTATION_TYPE,
+        "Navigation Presentation Type (empty for menu name links)", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;

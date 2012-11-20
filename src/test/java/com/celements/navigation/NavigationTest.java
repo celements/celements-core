@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -38,8 +40,10 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.pagetype.IPageType;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.xpn.xwiki.XWiki;
@@ -61,6 +65,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   private ITreeNodeService tNServiceMock;
   private DocumentReference currentDocRef;
   private IWebUtilsService wUServiceMock;
+  private PageTypeResolverService ptResolverServiceMock;
 
   @Before
   public void setUp_NavigationTest() throws Exception {
@@ -80,6 +85,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = createMock(IWebUtilsService.class);
     nav.injected_WebUtilsService = wUServiceMock;
+    ptResolverServiceMock = createMock(PageTypeResolverService.class);
+    nav.injected_PageTypeResolverService = ptResolverServiceMock;
   }
 
   @Test
@@ -175,42 +182,49 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testOpenMenuItemOut_notActive() throws Exception {
     String pageType = "myUltimativePageType";
-    String fullNameMenuItem = "MySpace.MyMenuItemDoc";
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(fullNameMenuItem), same(context))
-        ).andReturn(pageTypeApi);
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla", "bli", "blu"));
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(fullNameMenuItem);
-    replayAll(pageTypeApi);
+    menuItem.setDocumentReference(docRef);
+    replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
-    nav.openMenuItemOut(outStream, menuItem.getName(), false, false, false, context);
+    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false);
     assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType\">",
         outStream.toString());
-    verifyAll();
+    verifyAll(pageTypeRef);
+  }
+
+  private DocumentReference getDocRefForDocName(String docName) {
+    return new DocumentReference(context.getDatabase(), "MySpace", docName);
   }
 
   @Test
   public void testOpenMenuItemOut_active() throws Exception {
     String pageType = "myUltimativePageType";
-    String fullNameMenuItem = "MySpace.MyMenuItemDoc";
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(fullNameMenuItem), same(context))
-        ).andReturn(pageTypeApi);
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla", "bli", "blu",
-            fullNameMenuItem));
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu"), docRef));
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(fullNameMenuItem);
-    replayAll(pageTypeApi);
+    menuItem.setDocumentReference(docRef);
+    replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
-    nav.openMenuItemOut(outStream, menuItem.getName(), false, false, false, context);
+    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false);
     assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType active\">",
         outStream.toString());
-    verifyAll();
+    verifyAll(pageTypeRef);
   }
 
   @Test
@@ -274,19 +288,21 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetCssClasses_withOut_CM() throws XWikiException {
     String pageType = "myUltimativePageType";
-    String fullNameMenuItem = "MySpace.MyMenuItemDoc";
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(fullNameMenuItem), same(context))
-        ).andReturn(pageTypeApi);
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(fullNameMenuItem);
-    replayAll(pageTypeApi);
-    String cssClasses = nav.getCssClasses(menuItem.getName(), false, false, false, false,
-        context);
-    verifyAll(pageTypeApi);
+    menuItem.setDocumentReference(docRef);
+    replayAll(pageTypeRef);
+    String cssClasses = nav.getCssClasses(menuItem.getDocumentReference(), false, false,
+        false, false);
+    verifyAll(pageTypeRef);
     assertFalse("Expected to NOT find the cmCSSclass. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" cel_cm_navigation_menuitem "));
@@ -295,17 +311,20 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetCssClasses_pageType() throws XWikiException {
     String pageType = "myUltimativePageType";
-    String fullNameMenuItem = "MySpace.MyMenuItemDoc";
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(fullNameMenuItem), same(context))
-        ).andReturn(pageTypeApi);
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
-    replayAll(pageTypeApi);
-    String cssClasses = nav.getCssClasses(fullNameMenuItem, true, false, false, false,
-        context);
-    verifyAll(pageTypeApi);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    replayAll(pageTypeRef);
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false);
+    verifyAll(pageTypeRef);
     assertTrue("Expected to found pageType in css classes. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" " + pageType + " "));
@@ -314,10 +333,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetCssClasses_NullName() throws XWikiException {
     String pageType = "myUltimativePageType";
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    //FIXME getDocumentParentsList not needed anymore?
+//    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
+//        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+//            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     replayAll();
-    String cssClasses = nav.getCssClasses(null, true, false, false, false, context);
+    String cssClasses = nav.getCssClasses(null, true, false, false, false);
     verifyAll();
     assertFalse("Expected to not find pageType (because fullName is null) in css classes."
       + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" " + pageType + " "));
@@ -325,10 +346,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCssClasses_hasChildren() throws XWikiException {
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    //FIXME getDocumentParentsList not needed anymore?
+//    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
+//        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+//            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     replayAll();
-    String cssClasses = nav.getCssClasses(null, true, false, false, false, context);
+    String cssClasses = nav.getCssClasses(null, true, false, false, false);
     verifyAll();
     assertTrue("Expected to find 'cel_nav_hasChildren' (because not a leaf) in css"
         + " classes. [" + cssClasses + "]", (" " + cssClasses + " ").contains(
@@ -337,10 +360,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCssClasses_isLeaf() throws XWikiException {
-    expect(utils.getDocumentParentsList(isA(String.class), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    //FIXME getDocumentParentsList not needed anymore?
+//    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class),
+//        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+//            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     replayAll();
-    String cssClasses = nav.getCssClasses(null, true, false, false, true, context);
+    String cssClasses = nav.getCssClasses(null, true, false, false, true);
     verifyAll();
     assertTrue("Expected to find 'cel_nav_isLeaf' (because no children) in css classes."
       + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_isLeaf "));
@@ -370,118 +395,132 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsActiveMenuItem_isActive() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu",
-            currentDoc.getFullName()));
+    menuItem.setDocumentReference(currentDocRef);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu"), currentDocRef));
     replayAll();
-    assertTrue(nav.isActiveMenuItem(menuItem.getName(), context));
+    assertTrue(nav.isActiveMenuItem(menuItem.getDocumentReference()));
     verifyAll();
   }
 
   @Test
   public void testIsActiveMenuItem_isActive_currentDoc() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    menuItem.setDocumentReference(currentDocRef);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
     replayAll();
-    assertTrue(nav.isActiveMenuItem(menuItem.getName(), context));
+    assertTrue(nav.isActiveMenuItem(menuItem.getDocumentReference()));
     verifyAll();
   }
 
   @Test
   public void testIsActiveMenuItem_isNOTActive() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName("MySpace.isNotActiveDoc");
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    menuItem.setDocumentReference(new DocumentReference(context.getDatabase(), "MySpace",
+        "isNotActiveDoc"));
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
     replayAll();
-    assertFalse(nav.isActiveMenuItem(menuItem.getName(), context));
+    assertFalse(nav.isActiveMenuItem(menuItem.getDocumentReference()));
     verifyAll();
   }
 
   @Test
   public void testIsActiveMenuItem_menuItemNULL() {
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu", null));
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+      ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+          getDocRefForDocName("blu"), null));
     replayAll();
-    assertFalse(nav.isActiveMenuItem(null, context));
+    assertFalse(nav.isActiveMenuItem(null));
     verifyAll();
   }
 
   @Test
   public void testShowSubmenuForMenuItem_isActive() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu",
-            currentDoc.getFullName()));
+    menuItem.setDocumentReference(currentDocRef);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu"), currentDocRef));
     replayAll();
-    assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 1, context));
+    assertTrue(nav.showSubmenuForMenuItem(menuItem.getDocumentReference(), 1, context));
     verifyAll();
   }
 
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName("MySpace.isNotActiveDoc");
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    menuItem.setDocumentReference(new DocumentReference(context.getDatabase(), "MySpace",
+        "isNotActiveDoc"));
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
     replayAll();
-    assertFalse(nav.showSubmenuForMenuItem(menuItem.getName(), 1, context));
+    assertFalse(nav.showSubmenuForMenuItem(menuItem.getDocumentReference(), 1, context));
     verifyAll();
   }
 
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive_ShowAll() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName("MySpace.isNotActiveDoc");
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    menuItem.setDocumentReference(new DocumentReference(context.getDatabase(), "MySpace",
+        "isNotActiveDoc"));
+    //FIXME getDocumentParentsList not needed anymore?
+//    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+//        ).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+//            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     nav.setShowAll(true);
     replayAll();
-    assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 1, context));
+    assertTrue(nav.showSubmenuForMenuItem(menuItem.getDocumentReference(), 1, context));
     verifyAll();
   }
 
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive_showHierarchyLevel() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName("MySpace.isNotActiveDoc");
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    menuItem.setDocumentReference(new DocumentReference(context.getDatabase(), "MySpace",
+        "isNotActiveDoc"));
+    //FIXME getDocumentParentsList not needed anymore?
+//    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+//        ).andReturn(Arrays.asList(getDocRefForDocName("bla"),
+//            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     nav.setShowAll(false);
     nav.setShowInactiveToLevel(3);
     replayAll();
-    assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 2, context));
+    assertTrue(nav.showSubmenuForMenuItem(menuItem.getDocumentReference(), 2, context));
     verifyAll();
   }
 
   @Test
   public void testShowSubmenuForMenuItem_isNOTActive_showHierarchyLevel_Over() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName("MySpace.isNotActiveDoc");
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
+    menuItem.setDocumentReference(new DocumentReference(context.getDatabase(), "MySpace",
+        "isNotActiveDoc"));
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
     nav.setShowAll(false);
     nav.setShowInactiveToLevel(3);
     replayAll();
-    assertFalse(nav.showSubmenuForMenuItem(menuItem.getName(), 3, context));
+    assertFalse(nav.showSubmenuForMenuItem(menuItem.getDocumentReference(), 3, context));
     verifyAll();
   }
 
   @Test
   public void testShowSubmenuForMenuItem_isActive_showHierarchyLevel_Over() {
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu",
-            currentDoc.getFullName()));
+    menuItem.setDocumentReference(currentDocRef);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu"), currentDocRef));
     nav.setShowAll(false);
     nav.setShowInactiveToLevel(3);
     replayAll();
-    assertTrue(nav.showSubmenuForMenuItem(menuItem.getName(), 5, context));
+    assertTrue(nav.showSubmenuForMenuItem(menuItem.getDocumentReference(), 5, context));
     verifyAll();
   }
 
@@ -489,20 +528,19 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   public void testAppendMenuItemLink() throws Exception {
     String pageType = "myUltimativePageType";
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setDocumentReference(currentDocRef);
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(currentDoc.getFullName()), same(context))
-        ).andReturn(pageTypeApi);
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
-    expect(xwiki.getURL(eq(currentDoc.getFullName()), eq("view"), same(context))
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(currentDocRef))
+        ).andReturn(pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    expect(xwiki.getURL(eq(currentDocRef), eq("view"), same(context))
         ).andReturn("/MySpace/MyCurrentDoc");
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
         )).andReturn(0);
     MultilingualMenuNameCommand menuNameCmdMock = createMock(
@@ -520,34 +558,33 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
-    replayAll(pageTypeApi, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
-        context);
+    replayAll(pageTypeRef, menuNameCmdMock);
+    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem,
+        menuItem.getDocumentReference(), false);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
         + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeApi, menuNameCmdMock);
+    verifyAll(pageTypeRef, menuNameCmdMock);
   }
 
   @Test
   public void testAppendMenuItemLink_use_navImages() throws Exception {
     String pageType = "myUltimativePageType";
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setDocumentReference(currentDocRef);
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(currentDoc.getFullName()), same(context))
-        ).andReturn(pageTypeApi);
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
-    expect(xwiki.getURL(eq(currentDoc.getFullName()), eq("view"), same(context))
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(currentDocRef))
+        ).andReturn(pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    expect(xwiki.getURL(eq(currentDocRef), eq("view"), same(context))
         ).andReturn("/MySpace/MyCurrentDoc");
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
         )).andReturn(1);
@@ -568,33 +605,32 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
-    replayAll(pageTypeApi, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), false,
-        context);
+    replayAll(pageTypeRef, menuNameCmdMock);
+    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem,
+        menuItem.getDocumentReference(), false);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " style=\"background-image:url(abc);\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
         + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeApi, menuNameCmdMock);
+    verifyAll(pageTypeRef, menuNameCmdMock);
   }
 
   @Test
   public void testAppendMenuItemLink_noLink() throws Exception {
     String pageType = "myUltimativePageType";
     BaseObject menuItem = new BaseObject();
-    menuItem.setName(currentDoc.getFullName());
+    menuItem.setDocumentReference(currentDocRef);
     StringBuilder outStream = new StringBuilder();
     boolean isFirstItem = true;
     boolean isLastItem = true;
-    IPageType pageTypeApi= createMock(IPageType.class);
-    expect(utils.getPageTypeApi(eq(currentDoc.getFullName()), same(context))
-        ).andReturn(pageTypeApi);
-    expect(pageTypeApi.getPageType()).andStubReturn(pageType);
-    expect(utils.getDocumentParentsList(eq(currentDoc.getFullName()), anyBoolean(),
-        same(context))).andStubReturn(Arrays.asList("bla","bli","blu"));
-    expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
-        currentDoc).anyTimes();
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(currentDocRef))
+        ).andReturn(pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     nav.setHasLink(false);
     expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
@@ -613,13 +649,13 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
-    replayAll(pageTypeApi, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem, menuItem.getName(), true,
-        context);
+    replayAll(pageTypeRef, menuNameCmdMock);
+    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem,
+        menuItem.getDocumentReference(), true);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
         + " currentPage myUltimativePageType active\" id=\"N1:MySpace:MySpace."
         + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
-    verifyAll(pageTypeApi, menuNameCmdMock);
+    verifyAll(pageTypeRef, menuNameCmdMock);
   }
 
   @Test
@@ -664,10 +700,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMenuLink_Content_WebHome() throws Exception {
-    expect(xwiki.getURL(eq("Content.WebHome"), eq("view"), same(context))
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Content",
+        "WebHome");
+    expect(xwiki.getURL(eq(docRef), eq("view"), same(context))
         ).andReturn(""); // BUG IN XWIKI !!!
     replayAll();
-    assertEquals("/", nav.getMenuLink("Content.WebHome", context));
+    assertEquals("/", nav.getMenuLink(docRef, context));
     verifyAll();
   }
 
@@ -700,6 +738,78 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
+  @Test
+  public void testLoadConfigFromObject_presentationType_notEmpty() throws Exception {
+    DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDoc");
+    BaseObject navConfigObj = new BaseObject();
+    navConfigObj.setDocumentReference(cellConfigDocRef);
+    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
+        context.getDatabase()));
+    navConfigObj.setStringValue(NavigationClasses.NAVIGATION_CONFIG_PRESENTATION_TYPE,
+        "testPresentationType");
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    ComponentManager mockComponentManager = createMock(ComponentManager.class);
+    Utils.setComponentManager(mockComponentManager);
+    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+        eq("testPresentationType"))).andReturn(componentInstance);
+    replayAll(mockComponentManager, componentInstance);
+    nav.loadConfigFromObject(navConfigObj);
+    verifyAll(mockComponentManager, componentInstance);
+    assertSame(componentInstance, nav.getPresentationType());
+  }
+
+  @Test
+  public void testSetPresentationType() throws Exception {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    ComponentManager mockComponentManager = createMock(ComponentManager.class);
+    Utils.setComponentManager(mockComponentManager);
+    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+        eq("testPresentationType"))).andReturn(componentInstance);
+    replayAll(mockComponentManager, componentInstance);
+    nav.setPresentationType("testPresentationType");
+    verifyAll(mockComponentManager, componentInstance);
+    assertSame(componentInstance, nav.getPresentationType());
+  }
+
+  @Test
+  public void testSetPresentationType_null() throws Exception {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    nav.setPresentationType(componentInstance);
+    replayAll(componentInstance);
+    nav.setPresentationType((String)null);
+    verifyAll(componentInstance);
+    assertNull(nav.getPresentationType());
+  }
+
+  @Test
+  public void testSetPresentationType_NotFoundException() throws Exception {
+    ComponentManager mockComponentManager = createMock(ComponentManager.class);
+    Utils.setComponentManager(mockComponentManager);
+    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+        eq("testNotFoundPresentationType"))).andThrow(new ComponentLookupException(
+            "not found"));
+    replayAll(mockComponentManager);
+    nav.setPresentationType("testNotFoundPresentationType");
+    verifyAll(mockComponentManager);
+    assertNull(nav.getPresentationType());
+  }
+
+  @Test
+  public void testWriteMenuItemContent_PresentationType() throws Exception {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    nav.setPresentationType(componentInstance);
+    StringBuilder outStream = new StringBuilder();
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    componentInstance.writeNodeContent(same(outStream), eq(true), eq(false), eq(docRef),
+        eq(true), same(nav));
+    expectLastCall().once();
+    replayAll(componentInstance);
+    nav.writeMenuItemContent(outStream, true, false, docRef, true);
+    verifyAll(componentInstance);
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
@@ -710,12 +820,14 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
   
   private void replayAll(Object ... mocks) {
-    replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock);
+    replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
+        ptResolverServiceMock);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock);
+    verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
+        ptResolverServiceMock);
     verify(mocks);
   }
 
