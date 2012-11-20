@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -44,7 +45,10 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
+  EntityReferenceSerializer injected_refSerializer;
 
+  QueryManager injected_queryManager;
+  
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewCelementsTokenForUserCommand.class);
 
@@ -120,22 +124,23 @@ public class NewCelementsTokenForUserCommand {
   }
   
   DocumentReference getTokenClassDocRef(WikiReference wikiRef) {
-    return new DocumentReference(getWebUtilsComponent().resolveDocumentReference(
-        "Classes.TokenClass"));
+    return new DocumentReference(wikiRef.getName(), "Classes", "TokenClass");
   }
   
   QueryManager getQueryManagerComponent() {
+    if(injected_queryManager != null) {
+      return injected_queryManager;
+    }
     return Utils.getComponent(QueryManager.class);
   }
   
   EntityReferenceSerializer<String> getSerializerComponent() {
+    if(injected_refSerializer != null) {
+      return injected_refSerializer;
+    }
     return Utils.getComponent(EntityReferenceSerializer.class);
   }
-  
-  WebUtilsService getWebUtilsComponent() {
-    return Utils.getComponent(WebUtilsService.class);
-  }
-  
+
   public String getUniqueValidationKey(XWikiContext context)
       throws XWikiException {
     XWikiStoreInterface storage = context.getWiki().getStore();

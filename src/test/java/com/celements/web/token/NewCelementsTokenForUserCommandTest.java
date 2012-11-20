@@ -41,6 +41,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -58,10 +59,8 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
   public void setUp_NewCelementsTokenForUserCommandTest() throws Exception {
     context = getContext();
     celTokenForUserCmd = new NewCelementsTokenForUserCommand();
-    celTokenForUserCmd.refSerializer = Utils.getComponent(
+    celTokenForUserCmd.injected_refSerializer = Utils.getComponent(
         EntityReferenceSerializer.class);
-    celTokenForUserCmd.stringRefResolver = Utils.getComponent(
-        EntityReferenceResolver.class);
   }
 
   @Test
@@ -82,7 +81,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     DocumentReference dRef = new DocumentReference(getContext().getDatabase(), "X", "Y");
     XWikiDocument doc = new XWikiDocument(dRef);
     QueryManager queryManager = createMock(QueryManager.class);
-    celTokenForUserCmd.queryManager = queryManager;
+    celTokenForUserCmd.injected_queryManager = queryManager;
     Query query = createMock(Query.class);
     expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
         ).anyTimes();
@@ -110,7 +109,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     obj.setDateValue("validuntil", afterNow);
     doc.addXObject(obj);
     QueryManager queryManager = createMock(QueryManager.class);
-    celTokenForUserCmd.queryManager = queryManager;
+    celTokenForUserCmd.injected_queryManager = queryManager;
     Query query = createMock(Query.class);
     expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
         ).anyTimes();
@@ -138,7 +137,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     obj.setDateValue("validuntil", beforeNow);
     doc.addXObject(obj);
     QueryManager queryManager = createMock(QueryManager.class);
-    celTokenForUserCmd.queryManager = queryManager;
+    celTokenForUserCmd.injected_queryManager = queryManager;
     Query query = createMock(Query.class);
     expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
         ).anyTimes();
@@ -181,7 +180,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     obj3.setDateValue("validuntil", beforeNow);
     doc.addXObject(obj3);
     QueryManager queryManager = createMock(QueryManager.class);
-    celTokenForUserCmd.queryManager = queryManager;
+    celTokenForUserCmd.injected_queryManager = queryManager;
     Query query = createMock(Query.class);
     expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
         ).anyTimes();
@@ -239,7 +238,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     xwiki.saveDocument(eq(doc), same(context));
     expectLastCall().once();
     QueryManager queryManager = createMock(QueryManager.class);
-    celTokenForUserCmd.queryManager = queryManager;
+    celTokenForUserCmd.injected_queryManager = queryManager;
     Query query = createMock(Query.class);
     expect(queryManager.createQuery((String)anyObject(), eq(Query.XWQL))).andReturn(query
         ).anyTimes();
