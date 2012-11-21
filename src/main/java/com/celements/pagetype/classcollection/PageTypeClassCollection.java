@@ -8,7 +8,11 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * @deprecated instead use PageTypeClasses
+ */
 @Component("com.celements.pagetype.classcollection")
+@Deprecated
 public class PageTypeClassCollection extends AbstractClassCollection {
 
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
