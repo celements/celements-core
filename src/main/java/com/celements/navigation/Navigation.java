@@ -532,7 +532,7 @@ public class Navigation implements INavigation {
         cssClass += " currentPage";
       }
       PageTypeReference pageTypeRef = getPageTypeResolverService(
-          ).getDefaultPageTypeRefForDoc(docRef);
+          ).getPageTypeRefForDocWithDefault(docRef);
       cssClass += " " + pageTypeRef.getConfigName();
       if (isActiveMenuItem(docRef)) {
         cssClass += " active";
