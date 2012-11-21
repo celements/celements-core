@@ -636,7 +636,9 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       actionContent = context.getWiki().getRenderingEngine().interpretText(
           execContent, includingDoc, context);
     }
-    boolean successful = "true".equals(vcontext.get("successful"));
+    Object successfulObj = vcontext.get("successful");
+    boolean successful = (successfulObj != null)
+                          && "true".equals(successfulObj.toString());
     if(!successful) {
       LOGGER.error("Error executing action. Output:" + vcontext.get("actionScriptOutput"));
       LOGGER.error("Rendered Action Script: " + actionContent);
