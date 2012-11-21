@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -42,7 +43,9 @@ import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.pagetype.service.PageTypeResolverService;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
@@ -183,6 +186,30 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     assertTrue(nav.getUniqueId(menuItem.getName()).endsWith(
         ":testMenuSpace:Space.TestName"));
     verifyAll();
+  }
+
+  @Test
+  public void testGetPageTypeConfigName_integrationTest() throws Exception {
+    nav.injected_PageTypeResolverService = null;
+    ComponentManager componentManager = Utils.getComponentManager();
+    ComponentDescriptor<IPageTypeRole> ptServiceDesc =
+      componentManager.getComponentDescriptor(IPageTypeRole.class, "default");
+    IPageTypeRole ptServiceMock = createMock(IPageTypeRole.class);
+    componentManager.registerComponent(ptServiceDesc, ptServiceMock);
+    BaseObject ptObj = new BaseObject();
+    ptObj.setXClassReference(new PageTypeClasses().getPageTypeClassRef(
+        context.getDatabase()));
+    ptObj.setStringValue(PageTypeClasses.PAGE_TYPE_FIELD, "TestPageType");
+    currentDoc.addXObject(ptObj);
+    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc);
+    String testPageType = "TestPageType";
+    expect(ptServiceMock.getPageTypeRefByConfigName(testPageType)).andReturn(
+        new PageTypeReference(testPageType, "myTestProvider",
+            Collections.<String>emptyList()));
+    replayAll(ptServiceMock);
+    assertEquals(testPageType, nav.getPageTypeConfigName(currentDocRef));
+    verifyAll(ptServiceMock);
+    componentManager.release(ptServiceMock);
   }
 
   @Test

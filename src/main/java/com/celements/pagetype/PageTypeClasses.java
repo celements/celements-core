@@ -33,6 +33,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celPageTypeClasses")
 public class PageTypeClasses extends AbstractClassCollection {
 
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeClasses.class);
 
   public static final String PAGE_TYPE_PROPERTIES_CLASS_SPACE = "Celements2";
@@ -44,6 +45,7 @@ public class PageTypeClasses extends AbstractClassCollection {
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
   public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "."
       + PAGE_TYPE_CLASS_DOC;
+  public static final String PAGE_TYPE_FIELD = "page_type";
 
   public PageTypeClasses() {}
 
@@ -124,7 +126,7 @@ public class PageTypeClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(pageTypeClassRef);
-    needsUpdate |= bclass.addTextField("page_type", "Page Type", 30);
+    needsUpdate |= bclass.addTextField(PAGE_TYPE_FIELD, "Page Type", 30);
     needsUpdate |= bclass.addTextField("page_layout", "Page Layout", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);

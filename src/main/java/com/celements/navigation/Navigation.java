@@ -531,14 +531,19 @@ public class Navigation implements INavigation {
       if (docRef.equals(getContext().getDoc().getDocumentReference())) {
         cssClass += " currentPage";
       }
-      PageTypeReference pageTypeRef = getPageTypeResolverService(
-          ).getPageTypeRefForDocWithDefault(docRef);
-      cssClass += " " + pageTypeRef.getConfigName();
+      cssClass += " " + getPageTypeConfigName(docRef);
       if (isActiveMenuItem(docRef)) {
         cssClass += " active";
       }
     }
     return cssClass.trim();
+  }
+
+  String getPageTypeConfigName(DocumentReference docRef) {
+    PageTypeReference pageTypeRef = getPageTypeResolverService(
+        ).getPageTypeRefForDocWithDefault(docRef);
+    String getPageTypeConfigName = pageTypeRef.getConfigName();
+    return getPageTypeConfigName;
   }
 
   boolean isActiveMenuItem(DocumentReference docRef) {
