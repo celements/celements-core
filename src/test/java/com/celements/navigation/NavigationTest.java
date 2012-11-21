@@ -191,7 +191,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyMenuItemDoc");
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
         )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
@@ -217,7 +217,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyMenuItemDoc");
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
         )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
@@ -297,7 +297,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyMenuItemDoc");
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
         )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
@@ -320,7 +320,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyMenuItemDoc");
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(docRef))).andReturn(
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
         pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
@@ -539,7 +539,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     boolean isFirstItem = true;
     boolean isLastItem = true;
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(currentDocRef))
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))
         ).andReturn(pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
@@ -583,7 +583,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     boolean isFirstItem = true;
     boolean isLastItem = true;
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(currentDocRef))
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))
         ).andReturn(pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
@@ -631,7 +631,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     boolean isFirstItem = true;
     boolean isLastItem = true;
     PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getDefaultPageTypeRefForDoc(eq(currentDocRef))
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))
         ).andReturn(pageTypeRef);
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
