@@ -111,10 +111,15 @@ public class NewCelementsTokenForUserCommand {
       query.bindValue("now", new Date());
       query.bindValue("doc", getSerializerComponent().serialize(docRef));
       query.setWiki(docRef.getLastSpaceReference().getParent().getName());
-      for(Object retNr : query.execute()) {
+      List<Object> tokenResults = query.execute();
+      LOGGER.trace("userDoc: " + userDoc);
+      LOGGER.trace("Tokens to delete: " + tokenResults.size() + " in wiki " + docRef.getLastSpaceReference().getParent().getName());
+      DocumentReference tokenClassRef = getTokenClassDocRef(new WikiReference(
+          userDoc.getDocumentReference().getLastSpaceReference().getParent()));
+      for(Object retNr : tokenResults) {
         int nr = Integer.parseInt(retNr.toString());
-        BaseObject obj = userDoc.getXObject(getTokenClassDocRef(new WikiReference(
-            userDoc.getDocumentReference().getLastSpaceReference().getParent())), nr);
+        BaseObject obj = userDoc.getXObject(tokenClassRef, nr);
+        LOGGER.trace("deleting token " + nr + " of ref '" + tokenClassRef + "' obj is " + obj);
         userDoc.removeXObject(obj);
       }
     } catch (QueryException qe) {
@@ -137,7 +142,7 @@ public class NewCelementsTokenForUserCommand {
     if(injected_refSerializer != null) {
       return injected_refSerializer;
     }
-    return Utils.getComponent(EntityReferenceSerializer.class);
+    return Utils.getComponent(EntityReferenceSerializer.class, "local");
   }
 
   public String getUniqueValidationKey(XWikiContext context)
