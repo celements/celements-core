@@ -28,3 +28,4 @@ com.celements.pagetype.xobject.XObjectPageTypeProvider
 com.celements.pagetype.service.PageTypeScriptService
 com.celements.pagetype.service.PageTypeResolverService
 com.celements.pagetype.classcollection.PageTypeClassCollection
+com.celements.navigation.presentation.DefaultPresentationType

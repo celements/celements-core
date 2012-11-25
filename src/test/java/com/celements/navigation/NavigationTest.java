@@ -38,9 +38,9 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.navigation.presentation.DefaultPresentationType;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.PageTypeClasses;
@@ -232,10 +232,6 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType\">",
         outStream.toString());
     verifyAll(pageTypeRef);
-  }
-
-  private DocumentReference getDocRefForDocName(String docName) {
-    return new DocumentReference(context.getDatabase(), "MySpace", docName);
   }
 
   @Test
@@ -558,140 +554,6 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testAppendMenuItemLink() throws Exception {
-    String pageType = "myUltimativePageType";
-    BaseObject menuItem = new BaseObject();
-    menuItem.setDocumentReference(currentDocRef);
-    StringBuilder outStream = new StringBuilder();
-    boolean isFirstItem = true;
-    boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))
-        ).andReturn(pageTypeRef);
-    expect(pageTypeRef.getConfigName()).andReturn(pageType);
-    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
-        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
-            getDocRefForDocName("blu")));
-    expect(xwiki.getURL(eq(currentDocRef), eq("view"), same(context))
-        ).andReturn("/MySpace/MyCurrentDoc");
-    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
-        )).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(
-        MultilingualMenuNameCommand.class);
-    nav.inject_menuNameCmd(menuNameCmdMock);
-    String menuName = "My Current Doc";
-    expect(menuNameCmdMock.getMultilingualMenuName(eq(currentDoc.getFullName()), eq("de"),
-        same(context))).andReturn(menuName).atLeastOnce();
-    expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
-        ))).andReturn("").atLeastOnce();
-    navFilterMock.setMenuPart(eq(""));
-    expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
-        new WikiReference(context.getDatabase()));
-    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
-        ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
-    replayAll(pageTypeRef, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem,
-        menuItem.getDocumentReference(), false);
-    assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
-        + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
-        + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
-  }
-
-  @Test
-  public void testAppendMenuItemLink_use_navImages() throws Exception {
-    String pageType = "myUltimativePageType";
-    BaseObject menuItem = new BaseObject();
-    menuItem.setDocumentReference(currentDocRef);
-    StringBuilder outStream = new StringBuilder();
-    boolean isFirstItem = true;
-    boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))
-        ).andReturn(pageTypeRef);
-    expect(pageTypeRef.getConfigName()).andReturn(pageType);
-    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
-        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
-            getDocRefForDocName("blu")));
-    expect(xwiki.getURL(eq(currentDocRef), eq("view"), same(context))
-        ).andReturn("/MySpace/MyCurrentDoc");
-    expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
-        )).andReturn(1);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(
-        MultilingualMenuNameCommand.class);
-    nav.inject_menuNameCmd(menuNameCmdMock);
-    String menuName = "My Current Doc";
-    expect(menuNameCmdMock.getMultilingualMenuName(eq(currentDoc.getFullName()), eq("de"),
-        same(context))).andReturn(menuName).atLeastOnce();
-    expect(menuNameCmdMock.addNavImageStyle(eq(currentDoc.getFullName()), eq("de"),
-        same(context))).andReturn("style=\"background-image:url(abc);\"").atLeastOnce();
-    expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
-        ))).andReturn("").atLeastOnce();
-    navFilterMock.setMenuPart(eq(""));
-    expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
-        new WikiReference(context.getDatabase()));
-    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
-        ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
-    replayAll(pageTypeRef, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem,
-        menuItem.getDocumentReference(), false);
-    assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
-        + " style=\"background-image:url(abc);\""
-        + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
-        + ">My Current Doc</a>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
-  }
-
-  @Test
-  public void testAppendMenuItemLink_noLink() throws Exception {
-    String pageType = "myUltimativePageType";
-    BaseObject menuItem = new BaseObject();
-    menuItem.setDocumentReference(currentDocRef);
-    StringBuilder outStream = new StringBuilder();
-    boolean isFirstItem = true;
-    boolean isLastItem = true;
-    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
-    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(currentDocRef))
-        ).andReturn(pageTypeRef);
-    expect(pageTypeRef.getConfigName()).andReturn(pageType);
-    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
-        ).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
-            getDocRefForDocName("blu")));
-    expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    nav.setHasLink(false);
-    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
-        )).andReturn(0);
-    MultilingualMenuNameCommand menuNameCmdMock = createMock(
-        MultilingualMenuNameCommand.class);
-    nav.inject_menuNameCmd(menuNameCmdMock);
-    expect(menuNameCmdMock.getMultilingualMenuName(eq(currentDoc.getFullName()), eq("de"),
-        same(context))).andReturn("My Current Doc").atLeastOnce();
-    expect(menuNameCmdMock.addToolTip(eq(currentDoc.getFullName()), eq("de"), same(context
-        ))).andReturn("").atLeastOnce();
-    navFilterMock.setMenuPart(eq(""));
-    expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
-        new WikiReference(context.getDatabase()));
-    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
-        ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
-    replayAll(pageTypeRef, menuNameCmdMock);
-    nav.appendMenuItemLink(outStream, isFirstItem, isLastItem,
-        menuItem.getDocumentReference(), true);
-    assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
-        + " currentPage myUltimativePageType active\" id=\"N1:MySpace:MySpace."
-        + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
-    verifyAll(pageTypeRef, menuNameCmdMock);
-  }
-
-  @Test
   public void testAddUlCSSClass() throws Exception {
     nav.addUlCSSClass("mainCss");
     nav.addUlCSSClass("firstCss");
@@ -718,7 +580,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   public void testGetNavLanguage_contextLanguage() {
     context.setLanguage("de");
     replayAll();
-    assertEquals("de", nav.getNavLanguage(context));
+    assertEquals("de", nav.getNavLanguage());
     verifyAll();
   }
 
@@ -727,7 +589,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     context.setLanguage("de");
     nav.setLanguage("fr");
     replayAll();
-    assertEquals("fr", nav.getNavLanguage(context));
+    assertEquals("fr", nav.getNavLanguage());
     verifyAll();
   }
 
@@ -738,7 +600,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getURL(eq(docRef), eq("view"), same(context))
         ).andReturn(""); // BUG IN XWIKI !!!
     replayAll();
-    assertEquals("/", nav.getMenuLink(docRef, context));
+    assertEquals("/", nav.getMenuLink(docRef));
     verifyAll();
   }
 
@@ -811,8 +673,9 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setPresentationType(componentInstance);
     replayAll(componentInstance);
     nav.setPresentationType((String)null);
+    assertNotNull(nav.getPresentationType());
+    assertEquals(DefaultPresentationType.class, nav.getPresentationType().getClass());
     verifyAll(componentInstance);
-    assertNull(nav.getPresentationType());
   }
 
   @Test
@@ -825,7 +688,6 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     replayAll(mockComponentManager);
     nav.setPresentationType("testNotFoundPresentationType");
     verifyAll(mockComponentManager);
-    assertNull(nav.getPresentationType());
   }
 
   @Test
@@ -846,6 +708,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
+
+  private DocumentReference getDocRefForDocName(String docName) {
+    return new DocumentReference(context.getDatabase(), "MySpace", docName);
+  }
 
   private NavigationClasses getNavClasses() {
     return (NavigationClasses) Utils.getComponent(
