@@ -641,7 +641,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         context.getDatabase()));
-    navConfigObj.setStringValue(NavigationClasses.NAVIGATION_CONFIG_PRESENTATION_TYPE,
+    navConfigObj.setStringValue(NavigationClasses.PRESENTATION_TYPE_FIELD,
         "testPresentationType");
     IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
     ComponentManager mockComponentManager = createMock(ComponentManager.class);

@@ -652,7 +652,7 @@ public class Navigation implements INavigation {
         }
       }
       String presentationTypeStr = prefObj.getStringValue(
-          NavigationClasses.NAVIGATION_CONFIG_PRESENTATION_TYPE);
+          NavigationClasses.PRESENTATION_TYPE_FIELD);
       if (!"".equals(presentationTypeStr)) {
         setPresentationType(presentationTypeStr);
       }
