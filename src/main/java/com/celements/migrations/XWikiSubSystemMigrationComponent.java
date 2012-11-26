@@ -34,6 +34,11 @@ import com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager;
  * http://jira.xwiki.org/browse/XWIKI-1859
  * we need to adapt our version to make it compile on unstable branch
  * 
+ * Liquibase is used to automate any database schema changes not automatically done by
+ * hibernate schema update process. e.g. adding important indexes can be done with
+ * liquibase. 
+ * http://www.liquibase.org/quickstart
+ * 
  * @author fabian
  *
  */
