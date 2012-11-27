@@ -37,7 +37,6 @@ public class NavigationClasses extends AbstractClassCollection {
   public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
   public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
       + "." + NAVIGATION_CONFIG_CLASS_DOC;
-  public static final String PRESENTATION_TYPE_FIELD = "presentation_type";
   public static final String MENU_ELEMENT_NAME_FIELD = "menu_element_name";
   public static final String FROM_HIERARCHY_LEVEL_FIELD = "from_hierarchy_level";
   public static final String TO_HIERARCHY_LEVEL_FIELD = "to_hierarchy_level";
@@ -46,6 +45,7 @@ public class NavigationClasses extends AbstractClassCollection {
   public static final String MENU_PART_FIELD = "menu_part";
   public static final String CM_CSS_CLASS_FIELD = "cm_css_class";
   public static final String LAYOUT_TYPE_FIELD = "layout_type";
+  public static final String PRESENTATION_TYPE_FIELD = "presentation_type";
 
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
   public static final String MENU_ITEM_CLASS_SPACE = "Celements2";
