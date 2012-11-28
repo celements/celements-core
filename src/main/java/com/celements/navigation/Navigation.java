@@ -120,11 +120,11 @@ public class Navigation implements INavigation {
 
   private String navLanguage;
 
-  ITreeNodeService injected_TreeNodeService;
+  public ITreeNodeService injected_TreeNodeService;
 
-  IWebUtilsService injected_WebUtilsService;
+  public IWebUtilsService injected_WebUtilsService;
 
-  PageTypeResolverService injected_PageTypeResolverService;
+  public PageTypeResolverService injected_PageTypeResolverService;
 
   public Navigation(String navUniqueId) {
     this.menuNameCmd = new MultilingualMenuNameCommand();
@@ -173,7 +173,11 @@ public class Navigation implements INavigation {
   }
 
   public IPresentationTypeRole getPresentationType() {
-    return presentationType;
+    if (presentationType == null) {
+      return Utils.getComponent(IPresentationTypeRole.class);
+    } else {
+      return presentationType;
+    }
   }
 
   public void setPresentationType(IPresentationTypeRole presentationType) {
@@ -390,20 +394,16 @@ public class Navigation implements INavigation {
     openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf);
     writeMenuItemContent(outStream, isFirstItem, isLastItem, docRef, isLeaf);
     if (showSubmenu) {
-      addNavigationForParent(outStream, docRef, numMoreLevels - 1,
-          context);
+      addNavigationForParent(outStream, docRef, numMoreLevels - 1, context);
     }
     closeMenuItemOut(outStream);
   }
 
   void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf) throws XWikiException {
-    if (getPresentationType() != null) {
-      presentationType.writeNodeContent(outStream, isFirstItem, isLastItem, docRef,
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf
+      ) throws XWikiException {
+    getPresentationType().writeNodeContent(outStream, isFirstItem, isLastItem, docRef,
           isLeaf, this);
-    } else {
-      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf);
-    }
   }
 
   private boolean isLeaf(String fullName, XWikiContext context) {
@@ -413,47 +413,16 @@ public class Navigation implements INavigation {
     return isLeaf;
   }
 
-  void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf
-      ) throws XWikiException {
-    String fullName = getSerializer().serialize(docRef);
-    String tagName;
-    if (hasLink()) {
-      tagName = "a";
-    } else {
-      tagName = "span";
-    }
-    String menuItemHTML = "<" + tagName;
-    if (hasLink()) {
-      menuItemHTML += " href=\"" + getMenuLink(docRef, getContext()) + "\"";
-    }
-    if (useImagesForNavigation(getContext())) {
-      menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, getNavLanguage(
-          getContext()), getContext());
-    }
-    String tooltip = menuNameCmd.addToolTip(fullName, getNavLanguage(getContext()),
-        getContext());
-    if (!"".equals(tooltip)) {
-      menuItemHTML += " " + tooltip;
-    }
-    String menuName = menuNameCmd.getMultilingualMenuName(fullName, getNavLanguage(
-        getContext()), getContext());
-    menuItemHTML += addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf);
-    menuItemHTML += " " + addUniqueElementId(docRef)
-      + ">" + menuName + "</" + tagName + ">";
-    outStream.append(menuItemHTML);
-  }
-
-  String getNavLanguage(XWikiContext context) {
+  public String getNavLanguage() {
     if (this.navLanguage != null) {
       return this.navLanguage;
     }
-    return context.getLanguage();
+    return getContext().getLanguage();
   }
 
-  private boolean useImagesForNavigation(XWikiContext context) {
-    return context.getWiki().getSpacePreferenceAsInt("use_navigation_images", 0, context
-        ) > 0;
+  public boolean useImagesForNavigation() {
+    return getContext().getWiki().getSpacePreferenceAsInt("use_navigation_images", 0,
+        getContext()) > 0;
   }
 
   private void closeMenuItemOut(StringBuilder outStream) {
@@ -466,7 +435,7 @@ public class Navigation implements INavigation {
         + ">");
   }
 
-  private String addCssClasses(DocumentReference docRef, boolean withCM,
+  public String addCssClasses(DocumentReference docRef, boolean withCM,
       boolean isFirstItem, boolean isLastItem, boolean isLeaf) {
     String cssClasses = getCssClasses(docRef, withCM, isFirstItem, isLastItem, isLeaf);
     if (!"".equals(cssClasses.trim())) {
@@ -475,7 +444,7 @@ public class Navigation implements INavigation {
     return "";
   }
 
-  private String addUniqueElementId(DocumentReference docRef) {
+  public String addUniqueElementId(DocumentReference docRef) {
     return "id=\"" + getUniqueId(docRef) + "\"";
   }
 
@@ -558,9 +527,8 @@ public class Navigation implements INavigation {
           || docRef.equals(currentDocRef));
   }
 
-  String getMenuLink(DocumentReference docRef, XWikiContext context
-      ) throws XWikiException {
-    String docURL = context.getWiki().getURL(docRef, "view", context);
+  public String getMenuLink(DocumentReference docRef) {
+    String docURL = getContext().getWiki().getURL(docRef, "view", getContext());
     //FIX for bug in xwiki url-factory 2.7.2
     if ("".equals(docURL)) {
       docURL = "/";
@@ -684,7 +652,7 @@ public class Navigation implements INavigation {
         }
       }
       String presentationTypeStr = prefObj.getStringValue(
-          NavigationClasses.NAVIGATION_CONFIG_PRESENTATION_TYPE);
+          NavigationClasses.PRESENTATION_TYPE_FIELD);
       if (!"".equals(presentationTypeStr)) {
         setPresentationType(presentationTypeStr);
       }
@@ -704,8 +672,7 @@ public class Navigation implements INavigation {
       navBuilder.openMenuItemOut();
       boolean isLastItem = (langs.lastIndexOf(language) == (langs.size() - 1));
       navBuilder.appendMenuItemLink(language, "?language=" + language, getLanguageName(
-          language, context), language.equals(getNavLanguage(context)), isLastItem,
-          cmCssClass);
+          language, context), language.equals(getNavLanguage()), isLastItem, cmCssClass);
       navBuilder.closeMenuItemOut();
     }
     navBuilder.closeLevel();
@@ -736,7 +703,7 @@ public class Navigation implements INavigation {
   /**
    *  for Tests only !!!
    **/
-  void testInjectUtils(IWebUtils utils) {
+  public void testInjectUtils(IWebUtils utils) {
     this.utils = utils;
   }
 
@@ -763,7 +730,7 @@ public class Navigation implements INavigation {
     this._hasLink = hasLink;
   }
 
-  boolean hasLink() {
+  public boolean hasLink() {
     return this._hasLink;
   }
 

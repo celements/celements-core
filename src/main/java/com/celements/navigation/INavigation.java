@@ -93,4 +93,17 @@ public interface INavigation {
 
   public void setShowInactiveToLevel(int showInactiveToLevel);
 
+  public boolean hasLink();
+
+  public boolean useImagesForNavigation();
+
+  public String getMenuLink(DocumentReference docRef);
+
+  public String getNavLanguage();
+
+  public String addUniqueElementId(DocumentReference docRef);
+
+  public String addCssClasses(DocumentReference docRef, boolean withCM,
+      boolean isFirstItem, boolean isLastItem, boolean isLeaf);
+
 }

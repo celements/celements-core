@@ -33,11 +33,19 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celNavigationClasses")
 public class NavigationClasses extends AbstractClassCollection {
 
-  public static final String NAVIGATION_CONFIG_PRESENTATION_TYPE = "presentation_type";
   public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
   public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
   public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
       + "." + NAVIGATION_CONFIG_CLASS_DOC;
+  public static final String MENU_ELEMENT_NAME_FIELD = "menu_element_name";
+  public static final String FROM_HIERARCHY_LEVEL_FIELD = "from_hierarchy_level";
+  public static final String TO_HIERARCHY_LEVEL_FIELD = "to_hierarchy_level";
+  public static final String SHOW_INACTIVE_TO_LEVEL_FIELD = "show_inactive_to_level";
+  public static final String MENU_SPACE_FIELD = "menu_space";
+  public static final String MENU_PART_FIELD = "menu_part";
+  public static final String CM_CSS_CLASS_FIELD = "cm_css_class";
+  public static final String LAYOUT_TYPE_FIELD = "layout_type";
+  public static final String PRESENTATION_TYPE_FIELD = "presentation_type";
 
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
   public static final String MENU_ITEM_CLASS_SPACE = "Celements2";
@@ -115,23 +123,23 @@ public class NavigationClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("menu_element_name", "Menu Element Name", 30);
-    needsUpdate |= bclass.addNumberField("from_hierarchy_level", "From Hierarchy Level",
+    needsUpdate |= bclass.addTextField(MENU_ELEMENT_NAME_FIELD, "Menu Element Name", 30);
+    needsUpdate |= bclass.addNumberField(FROM_HIERARCHY_LEVEL_FIELD,
+        "From Hierarchy Level", 30, "integer");
+    needsUpdate |= bclass.addNumberField(TO_HIERARCHY_LEVEL_FIELD, "To Hierarchy Level",
         30, "integer");
-    needsUpdate |= bclass.addNumberField("to_hierarchy_level", "To Hierarchy Level", 30,
-        "integer");
-    needsUpdate |= bclass.addNumberField("show_inactive_to_level",
+    needsUpdate |= bclass.addNumberField(SHOW_INACTIVE_TO_LEVEL_FIELD,
         "Always Show Inactive To Level", 30, "integer");
-    needsUpdate |= bclass.addTextField("menu_space", "Menu Space Name (leave empty for "
-        + "current space)", 30);
-    needsUpdate |= bclass.addTextField("menu_part", "Menu Part Name", 30);
-    needsUpdate |= bclass.addTextField("cm_css_class",
+    needsUpdate |= bclass.addTextField(MENU_SPACE_FIELD, "Menu Space Name (leave empty"
+        + " for current space)", 30);
+    needsUpdate |= bclass.addTextField(MENU_PART_FIELD, "Menu Part Name", 30);
+    needsUpdate |= bclass.addTextField(CM_CSS_CLASS_FIELD,
         "Context Menu CSS Class Name (empty for default)", 30);
     needsUpdate |= bclass.addTextField("data_type",
         "Navigation Source Data Type (empty for general Page Menu)", 30);
-    needsUpdate |= bclass.addTextField("layout_type",
+    needsUpdate |= bclass.addTextField(LAYOUT_TYPE_FIELD,
         "Navigation Layout Type (empty for html list)", 30);
-    needsUpdate |= bclass.addTextField(NAVIGATION_CONFIG_PRESENTATION_TYPE,
+    needsUpdate |= bclass.addTextField(PRESENTATION_TYPE_FIELD,
         "Navigation Presentation Type (empty for menu name links)", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
