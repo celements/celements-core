@@ -101,7 +101,7 @@ public class NewCelementsTokenForUserCommand {
     return validkey;
   }
 
-  void removeOutdatedTokens(XWikiDocument userDoc) {
+  synchronized void removeOutdatedTokens(XWikiDocument userDoc) {
     String xwql = "select obj.number " +
         "from Document as doc, doc.object(Classes.TokenClass) as obj " +
         "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
