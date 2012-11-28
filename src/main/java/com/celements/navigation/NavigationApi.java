@@ -134,7 +134,10 @@ public class NavigationApi extends Api {
   }
 
   public String getPrevMenuItemFullName(com.xpn.xwiki.api.Object menuItem) {
-    return navigation.getPrevMenuItemFullName(menuItem.getName(), context);
+    if (menuItem != null) {
+      return navigation.getPrevMenuItemFullName(menuItem.getName(), context);
+    }
+    return null;
   }
 
   public String getNextMenuItemFullName(com.xpn.xwiki.api.Object menuItem) {
