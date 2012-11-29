@@ -101,7 +101,7 @@ public class NewCelementsTokenForUserCommand {
     return validkey;
   }
 
-  void removeOutdatedTokens(XWikiDocument userDoc) {
+  synchronized void removeOutdatedTokens(XWikiDocument userDoc) {
     String xwql = "select obj.number " +
         "from Document as doc, doc.object(Classes.TokenClass) as obj " +
         "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
@@ -120,7 +120,9 @@ public class NewCelementsTokenForUserCommand {
         int nr = Integer.parseInt(retNr.toString());
         BaseObject obj = userDoc.getXObject(tokenClassRef, nr);
         LOGGER.trace("deleting token " + nr + " of ref '" + tokenClassRef + "' obj is " + obj);
-        userDoc.removeXObject(obj);
+        if(obj != null) {
+          userDoc.removeXObject(obj);
+        }
       }
     } catch (QueryException qe) {
       LOGGER.error("Exception querying for outdated tokens with xwql [" + xwql + "]", qe);
