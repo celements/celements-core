@@ -82,10 +82,17 @@ public class RenderedContentPresentationTypeTest
     String expectedNodeContent = "expected rendered content for node";
     expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view"))
         ).andReturn(expectedNodeContent);
+    expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
+    "id=\"N3:Content:Content.MyPage\"").once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
+        eq(isLeaf))).andReturn("class=\"cel_cm_navigation_menuitem"
+            + " first cel_nav_isLeaf RichText\"").once();
     replayAll();
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf,
         nav);
-    assertEquals(expectedNodeContent, outStream.toString());
+    assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
+        + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
+        outStream.toString());
     verifyAll();
   }
 
@@ -94,12 +101,12 @@ public class RenderedContentPresentationTypeTest
   //*****************************************************************/
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki, testRenderEngine.getMock(), renderCmdMock);
+    replay(xwiki, testRenderEngine.getMock(), renderCmdMock, nav);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki, testRenderEngine.getMock(), renderCmdMock);
+    verify(xwiki, testRenderEngine.getMock(), renderCmdMock, nav);
     verify(mocks);
   }
 
