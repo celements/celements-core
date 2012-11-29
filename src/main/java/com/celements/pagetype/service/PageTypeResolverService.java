@@ -8,6 +8,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.inheritor.FieldInheritor;
+import com.celements.inheritor.InheritorFactory;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.web.service.IWebUtilsService;
@@ -76,7 +78,15 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   public PageTypeReference getDefaultPageTypeRefForDoc(DocumentReference docRef) {
-    //TODO get default PageType from WebPreferences
+    FieldInheritor inheritor = new InheritorFactory().getConfigFieldInheritor(
+        getPageTypeClasses().getPageTypeClassRef(getContext().getDatabase()), docRef);
+    String defPageTypeName = inheritor.getStringValue(PageTypeClasses.PAGE_TYPE_FIELD,
+        "RichText");
+    PageTypeReference pageTypeRef = pageTypeService.getPageTypeRefByConfigName(
+        defPageTypeName);
+    if (pageTypeRef != null) {
+      return pageTypeRef;
+    }
     return pageTypeService.getPageTypeRefByConfigName("RichText");
   }
 
