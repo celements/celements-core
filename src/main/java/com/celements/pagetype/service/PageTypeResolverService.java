@@ -8,8 +8,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.classcollection.PageTypeClassCollection;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -22,7 +22,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageTypeResolverService.class);
 
-  @Requirement("com.celements.pagetype.classcollection")
+  @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;
 
   @Requirement
@@ -38,8 +38,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
   }
 
-  private PageTypeClassCollection getPageTypeClasses() {
-    return (PageTypeClassCollection) pageTypeClasses;
+  private PageTypeClasses getPageTypeClasses() {
+    return (PageTypeClasses) pageTypeClasses;
   }
 
   public PageTypeReference getPageTypeRefForCurrentDoc() {
@@ -83,8 +83,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   public PageTypeReference getPageTypeRefForDoc(XWikiDocument checkDoc) {
     BaseObject pageTypeObj = getPageTypeObject(checkDoc);
     if (pageTypeObj != null) {
-      String pageType = pageTypeObj.getStringValue(
-          PageTypeClassCollection.PAGE_TYPE_FIELD);
+      String pageType = pageTypeObj.getStringValue(PageTypeClasses.PAGE_TYPE_FIELD);
       return pageTypeService.getPageTypeRefByConfigName(pageType);
     }
     return null;
