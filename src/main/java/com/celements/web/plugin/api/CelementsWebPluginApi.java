@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.api;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -1382,6 +1383,22 @@ public class CelementsWebPluginApi extends Api {
   public boolean executeAction(Document actionDoc) {
     return plugin.executeAction(actionDoc, context.getRequest().getParameterMap(),
         context.getDoc(), context);
+  }
+
+  public boolean executeAction(Document actionDoc,
+      Map<String, List<Object>> fakeRequestMap) {
+    Map<String, String[]> requestMap = new HashMap<String, String[]>();
+    for (String key : fakeRequestMap.keySet()) {
+      if (fakeRequestMap.get(key) != null) {
+        ArrayList<String> stringArray = new ArrayList<String>(fakeRequestMap.get(key
+            ).size());
+        for (Object value : fakeRequestMap.get(key)) {
+          stringArray.add(value.toString());
+        }
+        requestMap.put(key, stringArray.toArray(new String[0]));
+      }
+    }
+    return plugin.executeAction(actionDoc, requestMap, context.getDoc(), context);
   }
 
   /**
