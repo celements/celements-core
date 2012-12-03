@@ -520,8 +520,10 @@ public class Navigation implements INavigation {
       List<DocumentReference> docParentList = getWebUtilsService().getDocumentParentsList(
           currentDocRef, true);
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("isActiveMenuItem: for [" + docRef + "] with parents ["
-            + Arrays.deepToString(docParentList.toArray(new String[0])) + "].");
+        LOGGER.debug("isActiveMenuItem: for [" + docRef + "] with ["
+            + docParentList.size() + "] parents ["
+            + Arrays.deepToString(docParentList.toArray(new DocumentReference[0]))
+            + "].");
       }
       return (docRef != null) && (docParentList.contains(docRef)
           || docRef.equals(currentDocRef));
