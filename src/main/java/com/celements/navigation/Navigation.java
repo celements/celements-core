@@ -88,7 +88,7 @@ public class Navigation implements INavigation {
 
   private static final String _LANGUAGE_MENU_DATA_TYPE = "languages";
 
-  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
+  public PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
   String uniqueName;
   IWebUtils utils;

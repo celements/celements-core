@@ -22,6 +22,7 @@ import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.PageTypeResolverService;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.xpn.xwiki.XWiki;
@@ -43,6 +44,7 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
   private IWebUtilsService wUServiceMock;
   private PageTypeResolverService ptResolverServiceMock;
   private DefaultPresentationType defPresType;
+  private PageLayoutCommand mockLayoutCmd;
 
   @Before
   public void setUp_DefaultPresentationTypeTest() throws Exception {
@@ -54,6 +56,8 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
     nav = new Navigation("N1");
     navFilterMock = createMock(InternalRightsFilter.class);
     nav.setNavFilter(navFilterMock);
+    mockLayoutCmd = createMock(PageLayoutCommand.class);
+    nav.pageLayoutCmd = mockLayoutCmd;
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     utils = createMock(IWebUtils.class);
@@ -102,11 +106,13 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         ))).andReturn("").atLeastOnce();
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, nav);
@@ -155,6 +161,7 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), false, nav);
@@ -200,6 +207,7 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), true, nav);
@@ -219,13 +227,13 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
-        ptResolverServiceMock);
+        ptResolverServiceMock, mockLayoutCmd);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
     verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
-        ptResolverServiceMock);
+        ptResolverServiceMock, mockLayoutCmd);
     verify(mocks);
   }
 
