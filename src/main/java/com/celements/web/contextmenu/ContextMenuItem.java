@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
 import com.celements.sajson.Builder;
@@ -33,6 +35,8 @@ public class ContextMenuItem {
   
   public static String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
   
+  private static Log LOGGER = LogFactory.getFactory().getInstance(ContextMenuItem.class);
+
   private String cmiLink;
   private String cmiText;
   private String cmiIcon;
@@ -40,8 +44,7 @@ public class ContextMenuItem {
 
   private String elemId;
 
-  public ContextMenuItem(BaseObject menuItem, String elemId,
-      XWikiContext context) {
+  public ContextMenuItem(BaseObject menuItem, String elemId, XWikiContext context) {
     String[] elemIdParts = elemId.split(":", -1);
     elemId = elemIdParts[elemIdParts.length - 1];
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -55,6 +58,8 @@ public class ContextMenuItem {
     cmiText = renderText(menuItem.getStringValue("cmi_text"), context);
     cmiIcon = renderText(menuItem.getStringValue("cmi_icon"), context);
     shortcut = renderText(menuItem.getStringValue("cmi_shortcut"), context);
+    LOGGER.trace("ContextMenuItem created for cmiLink = [" + cmiLink + "], cmiText = ["
+        + cmiText + "], cmiIcon = [" + cmiIcon + "], shortcut = [" + shortcut + "].");
     context.put("vcontext", vcontext);
   }
 
