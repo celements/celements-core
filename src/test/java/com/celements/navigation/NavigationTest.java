@@ -705,6 +705,26 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyAll(componentInstance);
   }
 
+  @Test
+  public void testGetCMcssClass_default() {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    nav.setPresentationType(componentInstance);
+    expect(componentInstance.getDefaultCssClass()).andReturn("cel_cm_menu").atLeastOnce();
+    replayAll(componentInstance);
+    assertEquals("cel_cm_menu", nav.getCMcssClass());
+    verifyAll(componentInstance);
+  }
+
+  @Test
+  public void testGetCMcssClass() {
+    IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
+    nav.setPresentationType(componentInstance);
+    replayAll(componentInstance);
+    nav.setCMcssClass("cm_test_class");
+    assertEquals("cm_test_class", nav.getCMcssClass());
+    verifyAll(componentInstance);
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/

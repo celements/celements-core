@@ -19,6 +19,9 @@ public class DefaultPresentationType implements IPresentationTypeRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DefaultPresentationType.class);
 
+  private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS =
+    "cel_cm_navigation_menuitem";
+
   @Requirement("local")
   EntityReferenceSerializer<String> serializer;
 
@@ -70,6 +73,10 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     menuItemHTML += " " + nav.addUniqueElementId(docRef)
       + ">" + menuName + "</" + tagName + ">";
     outStream.append(menuItemHTML);
+  }
+
+  public String getDefaultCssClass() {
+    return _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
   }
 
 }

@@ -73,6 +73,8 @@ public interface INavigation {
 
   public void setCMcssClass(String cmCssClass);
 
+  public String getCMcssClass();
+
   public String getNextMenuItemFullName(String name, XWikiContext context);
 
   public String getUniqueId(DocumentReference docRef);

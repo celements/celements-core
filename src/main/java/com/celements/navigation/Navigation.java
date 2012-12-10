@@ -78,9 +78,6 @@ public class Navigation implements INavigation {
 
   private static final String _PAGE_MENU_DATA_TYPE = "pageMenu";
 
-  private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS =
-    "cel_cm_navigation_menuitem";
-
   public static final String MENU_TYPE_MENUITEM = "menuitem";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(Navigation.class);
@@ -145,7 +142,7 @@ public class Navigation implements INavigation {
     }
     this.menuSpace = null;
     this.mainUlCssClasses = "";
-    this.cmCssClass = _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
+    this.cmCssClass = "";
     utils = WebUtils.getInstance();
   }
 
@@ -483,7 +480,7 @@ public class Navigation implements INavigation {
       boolean isLastItem, boolean isLeaf) {
     String cssClass = "";
     if (withCM) {
-      cssClass += cmCssClass;
+      cssClass += getCMcssClass();
     }
     if (isFirstItem) {
       cssClass += " first";
@@ -695,10 +692,14 @@ public class Navigation implements INavigation {
   }
 
   public void setCMcssClass(String cmCssClass) {
+    this.cmCssClass = cmCssClass;
+  }
+
+  public String getCMcssClass() {
     if ((cmCssClass == null) || "".equals(cmCssClass)) {
-      this.cmCssClass = _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
+      return getPresentationType().getDefaultCssClass();
     } else {
-      this.cmCssClass = cmCssClass;
+      return cmCssClass;
     }
   }
 

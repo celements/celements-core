@@ -12,4 +12,6 @@ public interface IPresentationTypeRole {
       boolean isLastItem, DocumentReference docRef, boolean isLeaf,
       INavigation navigation);
 
+  public String getDefaultCssClass();
+
 }

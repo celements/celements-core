@@ -15,6 +15,9 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       RenderedContentPresentationType.class);
 
+  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS =
+    "cel_cm_presentation_treenode";
+
   RenderCommand renderCmd;
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
@@ -37,6 +40,10 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
       renderCmd = new RenderCommand();
     }
     return renderCmd;
+  }
+
+  public String getDefaultCssClass() {
+    return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
   }
 
 }
