@@ -39,6 +39,7 @@ import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.PageTypeResolverService;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -86,6 +87,8 @@ public class Navigation implements INavigation {
     NavigationApi.class.getCanonicalName() + "_NavigationCounter";
 
   private static final String _LANGUAGE_MENU_DATA_TYPE = "languages";
+
+  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
   String uniqueName;
   IWebUtils utils;
@@ -498,11 +501,23 @@ public class Navigation implements INavigation {
         cssClass += " currentPage";
       }
       cssClass += " " + getPageTypeConfigName(docRef);
+      String pageLayoutName = getPageLayoutName(docRef);
+      if (!"".equals(pageLayoutName)) {
+        cssClass += " " + pageLayoutName;
+      }
       if (isActiveMenuItem(docRef)) {
         cssClass += " active";
       }
     }
     return cssClass.trim();
+  }
+
+  String getPageLayoutName(DocumentReference docRef) {
+    SpaceReference pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
+    if (pageLayoutRef != null) {
+      return "layout_" + pageLayoutRef.getName();
+    }
+    return "";
   }
 
   String getPageTypeConfigName(DocumentReference docRef) {

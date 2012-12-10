@@ -47,6 +47,7 @@ import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.pagetype.service.PageTypeResolverService;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.xpn.xwiki.XWiki;
@@ -69,6 +70,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   private DocumentReference currentDocRef;
   private IWebUtilsService wUServiceMock;
   private PageTypeResolverService ptResolverServiceMock;
+  private PageLayoutCommand mockLayoutCmd;
 
   @Before
   public void setUp_NavigationTest() throws Exception {
@@ -90,6 +92,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.injected_WebUtilsService = wUServiceMock;
     ptResolverServiceMock = createMock(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
+    mockLayoutCmd = createMock(PageLayoutCommand.class);
+    nav.pageLayoutCmd = mockLayoutCmd;
   }
 
   @Test
@@ -226,6 +230,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false);
@@ -248,6 +253,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false);
@@ -328,6 +334,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(pageTypeRef.getConfigName()).andReturn(pageType);
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     String cssClasses = nav.getCssClasses(menuItem.getDocumentReference(), false, false,
         false, false);
@@ -351,12 +358,38 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
             getDocRefForDocName("blu")));
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     String cssClasses = nav.getCssClasses(docRef, true, false, false, false);
     verifyAll(pageTypeRef);
     assertTrue("Expected to found pageType in css classes. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" " + pageType + " "));
+  }
+
+  @Test
+  public void testGetCssClasses_pageLayout() throws XWikiException {
+    String pageType = "myUltimativePageType";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
+    replayAll(pageTypeRef);
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false);
+    verifyAll(pageTypeRef);
+    assertTrue("Expected to found pageLayout in css classes. ["
+        + cssClasses + "]",
+        (" " + cssClasses + " ").contains(" layout_MyLayout "));
   }
 
   @Test
@@ -725,6 +758,28 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyAll(componentInstance);
   }
 
+  @Test
+  public void testGetPageLayoutName_null() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null);
+    replayAll();
+    assertEquals("", nav.getPageLayoutName(docRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetPageLayoutName() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef);
+    replayAll();
+    assertEquals("layout_MyLayout", nav.getPageLayoutName(docRef));
+    verifyAll();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
@@ -740,13 +795,13 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   
   private void replayAll(Object ... mocks) {
     replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
-        ptResolverServiceMock);
+        ptResolverServiceMock, mockLayoutCmd);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
     verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
-        ptResolverServiceMock);
+        ptResolverServiceMock, mockLayoutCmd);
     verify(mocks);
   }
 
