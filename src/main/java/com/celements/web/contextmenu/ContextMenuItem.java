@@ -58,8 +58,9 @@ public class ContextMenuItem {
     cmiText = renderText(menuItem.getStringValue("cmi_text"), context);
     cmiIcon = renderText(menuItem.getStringValue("cmi_icon"), context);
     shortcut = renderText(menuItem.getStringValue("cmi_shortcut"), context);
-    LOGGER.trace("ContextMenuItem created for cmiLink = [" + cmiLink + "], cmiText = ["
-        + cmiText + "], cmiIcon = [" + cmiIcon + "], shortcut = [" + shortcut + "].");
+    LOGGER.trace("ContextMenuItem created for [" + menuItem.getDocumentReference() + ","
+        + menuItem.getNumber() + "]: cmiLink = [" + cmiLink + "], cmiText = [" + cmiText
+        + "], cmiIcon = [" + cmiIcon + "], shortcut = [" + shortcut + "].");
     context.put("vcontext", vcontext);
   }
 
