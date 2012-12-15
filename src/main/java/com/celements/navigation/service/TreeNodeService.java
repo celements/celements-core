@@ -68,7 +68,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeService.class);
 
-  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
+  public PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
   @Requirement
   ITreeNodeCache treeNodeCache;
