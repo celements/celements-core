@@ -43,6 +43,7 @@ import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
@@ -180,7 +181,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public int getMaxConfiguredNavigationLevel() {
-    return WebUtils.getInstance().getMaxConfiguredNavigationLevel(context);
+    return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
 
   public boolean isNavigationEnabled(String configName) {
@@ -1556,6 +1557,10 @@ public class CelementsWebPluginApi extends Api {
   private DefaultStringEntityReferenceSerializer getEntitySerializer() {
     return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
         EntityReferenceSerializer.class));
+  }
+
+  private ITreeNodeService getTreeNodeService() {
+    return Utils.getComponent(ITreeNodeService.class);
   }
 
 }

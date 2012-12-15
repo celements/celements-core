@@ -21,9 +21,11 @@ package com.celements.navigation.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,12 +36,17 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.inheritor.InheritorFactory;
+import com.celements.iterator.XObjectIterator;
 import com.celements.navigation.Navigation;
+import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -61,8 +68,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeService.class);
 
-  @Requirement
-  Execution execution;
+  PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
   @Requirement
   ITreeNodeCache treeNodeCache;
@@ -78,10 +84,21 @@ public class TreeNodeService implements ITreeNodeService {
   @Requirement
   Map<String, ITreeNodeProvider> nodeProviders;
 
+  @Requirement("celements.celNavigationClasses")
+  IClassCollectionRole navigationClasses;
+
+  @Requirement
+  Execution execution;
+
+  
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
-    
+
+  private NavigationClasses getNavigationClasses() {
+    return (NavigationClasses) navigationClasses;
+  }
+
   public int getActiveMenuItemPos(int menuLevel, String menuPart) {
     List<DocumentReference> parents = webUtilsService.getDocumentParentsList(
         getContext().getDoc().getDocumentReference(), true);
@@ -371,31 +388,76 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   public Integer getMaxConfiguredNavigationLevel() {
-    try {
-      BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
-          Navigation.NAVIGATION_CONFIG_CLASS, getParentKey(
-              getContext().getDoc().getDocumentReference(), false),
-              getContext()).getObject("menu_element_name");
-      if(navConfigObj!=null){
-        XWikiDocument navConfigDoc = getContext().getWiki().getDocument(
-            navConfigObj.getDocumentReference(), getContext());
-        List<BaseObject> navConfigObjects = navConfigDoc.getXObjects(
-            getRef(Navigation.NAVIGATION_CONFIG_CLASS_SPACE, 
-                   Navigation.NAVIGATION_CONFIG_CLASS_DOC));
-        int maxLevel = 0;
-        if (navConfigObj != null) {
-          for (BaseObject navObj : navConfigObjects) {
-            if (navObj != null) {
-              maxLevel = Math.max(maxLevel, navObj.getIntValue("to_hierarchy_level"));
-            }
+    List<BaseObject> navConfigObjects = new Vector<BaseObject>();
+    List<BaseObject> navConfigDocsObjs = getNavObjectsOnConfigDocs();
+    if (navConfigDocsObjs != null) {
+      navConfigObjects.addAll(navConfigDocsObjs);
+    }
+    List<BaseObject> navConfigLayoutObjs = getNavObjectsFromLayout();
+    if (navConfigLayoutObjs != null) {
+      navConfigObjects.addAll(navConfigLayoutObjs);
+    }
+    if ((navConfigObjects != null) && (!navConfigObjects.isEmpty())) {
+      int maxLevel = 0;
+      for (BaseObject navObj : navConfigObjects) {
+        if (navObj != null) {
+          maxLevel = Math.max(maxLevel, navObj.getIntValue(
+              NavigationClasses.TO_HIERARCHY_LEVEL_FIELD));
+        }
+      }
+      return maxLevel;
+    }
+    return Navigation.DEFAULT_MAX_LEVEL;
+  }
+
+  List<BaseObject> getNavObjectsFromLayout() {
+    List<BaseObject> navObjects = new Vector<BaseObject>();
+    SpaceReference layoutRef = pageLayoutCmd.getPageLayoutForCurrentDoc();
+    if (layoutRef != null) {
+      XObjectIterator objectIterator = new XObjectIterator(getContext());
+      List<String> layoutCellList = new Vector<String>();
+      List<TreeNode> subNodesForParent = getSubNodesForParent(layoutRef, "");
+      while (!subNodesForParent.isEmpty()) {
+        List<TreeNode> newSubNodes = new Vector<TreeNode>();
+        for (TreeNode node : subNodesForParent) {
+          List<TreeNode> subNodes = getSubNodesForParent(node.getDocumentReference(), "");
+          newSubNodes.addAll(subNodes);
+          if (subNodes.isEmpty()) {
+            layoutCellList.add(serializer.serialize(node.getDocumentReference()));
           }
         }
-        return maxLevel;
+        subNodesForParent = newSubNodes;
+      }
+      objectIterator.setDocList(layoutCellList);
+      objectIterator.setClassName(NavigationClasses.NAVIGATION_CONFIG_CLASS);
+      for (BaseObject navConfigObj : objectIterator) {
+        navObjects.add(navConfigObj);
+      }
+    }
+    return navObjects;
+  }
+
+  private List<BaseObject> getNavObjectsOnConfigDocs() {
+    List<BaseObject> navConfigObjects2 = Collections.emptyList();
+    try {
+      BaseCollection navConfigObj = getInheritorFactory().getConfigDocFieldInheritor(
+          NavigationClasses.NAVIGATION_CONFIG_CLASS, getParentKey(
+              getContext().getDoc().getDocumentReference(), false),
+              getContext()).getObject("menu_element_name");
+      if (navConfigObj != null) {
+        XWikiDocument navConfigDoc = getContext().getWiki().getDocument(
+            navConfigObj.getDocumentReference(), getContext());
+        String navConfigDocWikiName = navConfigDoc.getDocumentReference(
+            ).getLastSpaceReference().getParent().getName();
+        navConfigObjects2 = navConfigDoc.getXObjects(
+            getNavigationClasses().getNavigationConfigClassRef(navConfigDocWikiName));
+      } else {
+        LOGGER.info("no config object found");
       }
     } catch (XWikiException e) {
       LOGGER.error("unable to get configDoc.", e);
     }
-    return Navigation.DEFAULT_MAX_LEVEL;
+    return navConfigObjects2;
   }
   
   public TreeNode getPrevMenuItem(DocumentReference docRef) throws XWikiException {
