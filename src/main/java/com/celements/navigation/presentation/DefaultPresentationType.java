@@ -30,7 +30,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
-  private XWikiContext getContext() {
+  protected XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
@@ -44,7 +44,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     }
   }
 
-  void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
+  protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, INavigation nav
       ) throws XWikiException {
     String fullName = serializer.serialize(docRef);
