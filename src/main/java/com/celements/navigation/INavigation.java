@@ -108,4 +108,6 @@ public interface INavigation {
   public String addCssClasses(DocumentReference docRef, boolean withCM,
       boolean isFirstItem, boolean isLastItem, boolean isLeaf);
 
+  public void setPresentationType(String presentationTypeHint);
+
 }

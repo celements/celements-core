@@ -249,6 +249,10 @@ public class NavigationApi extends Api {
     navigation.setShowInactiveToLevel(showInactiveToLevel);
   }
 
+  public void setPresentationType(String presentationTypeHint) {
+    navigation.setPresentationType(presentationTypeHint);
+  }
+
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
