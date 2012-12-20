@@ -41,7 +41,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
     }
   }
 
-  private void addLanguageLinks(StringBuilder outStream, DocumentReference docRef) {
+  void addLanguageLinks(StringBuilder outStream, DocumentReference docRef) {
     XWiki wiki = getContext().getWiki();
     try {
       XWikiDocument nodeDoc = wiki.getDocument(docRef, getContext());
@@ -62,7 +62,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
         } else {
           cssClasses += " transNotExists";
         }
-        outStream.append("class=\"" + cssClasses.trim() + "\" ");
+        outStream.append("class=\"" + cssClasses.trim() + "\">");
         outStream.append(lang);
         outStream.append("</a>");
       }
