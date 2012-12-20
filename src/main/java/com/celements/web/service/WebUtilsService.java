@@ -299,7 +299,12 @@ public class WebUtilsService implements IWebUtilsService {
   public String getDefaultLanguage() {
     return getContext().getWiki().getSpacePreference("default_language", getContext());
   }
-  
+
+  public String getDefaultLanguage(String spaceName) {
+    return getContext().getWiki().getSpacePreference("default_language", spaceName, "",
+        getContext());
+  }
+
   public boolean hasParentSpace() {
     return getParentSpace()!=null && !"".equals(getParentSpace());
   }
