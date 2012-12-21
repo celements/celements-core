@@ -48,7 +48,6 @@ import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -499,7 +498,7 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart) {
-    DocumentReference parent = new WebUtilsService().getParentForLevel(menuLevel);
+    DocumentReference parent = webUtilsService.getParentForLevel(menuLevel);
     if (parent != null) {
       List<TreeNode> submenuItems = getSubNodesForParent(parent, menuPart);
       LOGGER.debug("submenuItems for parent: " + parent + " ; " + submenuItems);
