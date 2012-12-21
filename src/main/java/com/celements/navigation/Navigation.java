@@ -245,11 +245,7 @@ public class Navigation implements INavigation {
     if (fromHierarchyLevel > 0) {
       DocumentReference parentRef = getWebUtilsService().getParentForLevel(
           fromHierarchyLevel);
-      if(parentRef != null) {
-        return includeNavigation(parentRef);
-      }
-      LOGGER.debug("returning empty render result for parentRef [" + parentRef + "].");
-      return "";
+      return includeNavigation(parentRef);
     } else {
       throw new IllegalArgumentException("fromHierarchyLevel [" + fromHierarchyLevel
           + "] must be greater than zero");
@@ -261,18 +257,14 @@ public class Navigation implements INavigation {
     if(navigationEnabled){
       StringBuilder outStream = new StringBuilder();
       if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
-          if (fromHierarchyLevel > 0) {
-            String parent = getSerializer().serialize(parentRef);
-            try {
-          	  if(parent != null) {
-                  addNavigationForParent(outStream, parent, getNumLevels(), getContext());
-          	  }
-            } catch (XWikiException e) {
-              LOGGER.error("addNavigationForParent failed for [" + parent + "].", e);
-            }
-          } else {
-            throw new IllegalArgumentException("fromHierarchyLevel [" + fromHierarchyLevel
-                + "] must be greater than zero");
+          String parent = "";
+          if(parent != null) {
+            parent = getSerializer().serialize(parentRef);
+          }
+          try {
+            addNavigationForParent(outStream, parent, getNumLevels(), getContext());
+          } catch (XWikiException e) {
+            LOGGER.error("addNavigationForParent failed for [" + parent + "].", e);
           }
       } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
         navBuilder.useStream(outStream);
