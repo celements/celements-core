@@ -48,6 +48,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
       List<String> transList = nodeDoc.getTranslationList(getContext());
       String spaceName = docRef.getLastSpaceReference().getName();
       String defaultLanguage = webUtilsService.getDefaultLanguage(spaceName);
+      outStream.append("<div class=\"docLangs\">");
       for (String lang : webUtilsService.getAllowedLanguages(spaceName)) {
         outStream.append("<a ");
         outStream.append("title=\"" + getLangName(lang) + "\" ");
@@ -66,6 +67,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
         outStream.append(lang);
         outStream.append("</a>");
       }
+      outStream.append("</div>");
     } catch (XWikiException exp) {
       LOGGER.error("addLanguageButtons: failed to get nodeDoc for [" + docRef + "].",
           exp);
