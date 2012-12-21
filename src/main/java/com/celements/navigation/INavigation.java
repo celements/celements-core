@@ -54,7 +54,15 @@ public interface INavigation {
    */
   public void setMenuSpace(String menuSpace);
 
+  /**
+   * @deprecated since 2.24.0 use includeNavigation() instead.
+   */
+  @Deprecated
   public String includeNavigation(XWikiContext context);
+
+  public String includeNavigation();
+
+  public String includeNavigation(DocumentReference parentRef);
 
   public int getMenuItemPos(String fullName, XWikiContext context);
 

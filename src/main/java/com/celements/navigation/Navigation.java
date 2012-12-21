@@ -233,16 +233,39 @@ public class Navigation implements INavigation {
     }
   }
 
+  /**
+   * @deprecated since 2.24.0 use includeNavigation() instead.
+   */
+  @Deprecated
   public String includeNavigation(XWikiContext context) {
+    return includeNavigation();
+  }
+
+  public String includeNavigation() {
+    if (fromHierarchyLevel > 0) {
+      DocumentReference parentRef = getWebUtilsService().getParentForLevel(
+          fromHierarchyLevel);
+      if(parentRef != null) {
+        return includeNavigation(parentRef);
+      }
+      LOGGER.debug("returning empty render result for parentRef [" + parentRef + "].");
+      return "";
+    } else {
+      throw new IllegalArgumentException("fromHierarchyLevel [" + fromHierarchyLevel
+          + "] must be greater than zero");
+    }
+  }
+
+  public String includeNavigation(DocumentReference parentRef) {
     LOGGER.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
     if(navigationEnabled){
       StringBuilder outStream = new StringBuilder();
       if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
           if (fromHierarchyLevel > 0) {
-            String parent = utils.getParentForLevel(fromHierarchyLevel, context);
+            String parent = getSerializer().serialize(parentRef);
             try {
           	  if(parent != null) {
-                  addNavigationForParent(outStream, parent, getNumLevels(), context);
+                  addNavigationForParent(outStream, parent, getNumLevels(), getContext());
           	  }
             } catch (XWikiException e) {
               LOGGER.error("addNavigationForParent failed for [" + parent + "].", e);
@@ -253,7 +276,7 @@ public class Navigation implements INavigation {
           }
       } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
         navBuilder.useStream(outStream);
-        generateLanguageMenu(navBuilder, context);
+        generateLanguageMenu(navBuilder, getContext());
       }
       return outStream.toString();
     } else{

@@ -100,7 +100,11 @@ public class NavigationApi extends Api {
   }
 
   public String includeNavigation() {
-    return navigation.includeNavigation(context);
+    return navigation.includeNavigation();
+  }
+  
+  public String includeNavigation(DocumentReference parentRef) {
+    return navigation.includeNavigation(parentRef);
   }
   
   public int getMenuItemPos(String fullName) {
