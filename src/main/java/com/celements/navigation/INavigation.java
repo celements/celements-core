@@ -22,6 +22,7 @@ package com.celements.navigation;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
@@ -74,6 +75,8 @@ public interface INavigation {
   public String getPrevMenuItemFullName(String fullName, XWikiContext context);
 
   public String getMenuSpace(XWikiContext context);
+
+  public boolean isEmptyMainMenu(SpaceReference spaceRef);
 
   public boolean isNavigationEnabled();
 

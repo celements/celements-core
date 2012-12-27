@@ -293,7 +293,7 @@ public class Navigation implements INavigation {
     return menuSpace;
   }
 
-  private boolean isEmptyMainMenu(SpaceReference spaceRef) {
+  public boolean isEmptyMainMenu(SpaceReference spaceRef) {
     getNavFilter().setMenuPart(getMenuPartForLevel(1));
     return getTreeNodeService().getSubNodesForParent(spaceRef, getNavFilter()
         ).size() == 0;
