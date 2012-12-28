@@ -99,7 +99,7 @@ public class Navigation implements INavigation {
   int fromHierarchyLevel;
   int toHierarchyLevel;
   String menuPart;
-  String menuSpace;
+  SpaceReference nodeSpaceRef;
   private int showInactiveToLevel;
 
   private String cmCssClass;
@@ -143,7 +143,7 @@ public class Navigation implements INavigation {
       throw new IllegalStateException("Native List Layout Type not available!",
           exp);
     }
-    this.menuSpace = null;
+    this.nodeSpaceRef = null;
     this.mainUlCssClasses = "";
     this.cmCssClass = "";
     utils = WebUtils.getInstance();
@@ -224,13 +224,20 @@ public class Navigation implements INavigation {
   /**
    * 
    * @param menuSpace (default: $doc.web)
+   * 
+   * @deprecated since 2.24.0 instead use setNodeSpace
    */
+  @Deprecated
   public void setMenuSpace(String menuSpace) {
     if ((menuSpace != null) && (!"".equals(menuSpace))) {
-      this.menuSpace = menuSpace;
+      setNodeSpace(getWebUtilsService().resolveSpaceReference(menuSpace));
     } else {
-      this.menuSpace = null;
+      setNodeSpace(null);
     }
+  }
+
+  public void setNodeSpace(SpaceReference newNodeSpaceRef) {
+    this.nodeSpaceRef = newNodeSpaceRef;
   }
 
   /**
@@ -276,21 +283,35 @@ public class Navigation implements INavigation {
     }
   }
 
+  /**
+   * @deprecated since 2.24.0 instead use getNodeSpaceRef()
+   */
+  @Deprecated
   public String getMenuSpace(XWikiContext context) {
-    if (menuSpace == null) {
-      SpaceReference currentSpaceRef = context.getDoc().getDocumentReference(
+    return getSerializer().serialize(getNodeSpaceRef());
+  }
+
+  public SpaceReference getNodeSpaceRef() {
+    if (nodeSpaceRef == null) {
+      SpaceReference currentSpaceRef = getContext().getDoc().getDocumentReference(
         ).getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
         if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace()) {
           // is main Menu and no mainMenuItem found ; user has edit rights
-          menuSpace = getWebUtilsService().getParentSpace();
+          nodeSpaceRef = getWebUtilsService().resolveSpaceReference(getWebUtilsService(
+              ).getParentSpace());
         }
       }
-      if (menuSpace == null) {
-        menuSpace = currentSpaceRef.getName();
+      if (nodeSpaceRef == null) {
+        nodeSpaceRef = currentSpaceRef;
       }
     }
-    return menuSpace;
+    SpaceReference theNodeSpaceRef = nodeSpaceRef;
+    return theNodeSpaceRef;
+  }
+
+  public boolean isEmptyMainMenu() {
+    return isEmptyMainMenu(getNodeSpaceRef());
   }
 
   public boolean isEmptyMainMenu(SpaceReference spaceRef) {

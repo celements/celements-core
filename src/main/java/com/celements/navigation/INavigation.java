@@ -51,9 +51,14 @@ public interface INavigation {
 
   /**
    * 
-   * @param menuSpace (default: $doc.space)
+   * @param menuSpace (default: $doc.web)
+   * 
+   * @deprecated since 2.24.0 instead use setNodeSpace
    */
+  @Deprecated
   public void setMenuSpace(String menuSpace);
+
+  public void setNodeSpace(SpaceReference newNodeSpaceRef);
 
   /**
    * @deprecated since 2.24.0 use includeNavigation() instead.
@@ -74,9 +79,15 @@ public interface INavigation {
 
   public String getPrevMenuItemFullName(String fullName, XWikiContext context);
 
+  /**
+   * @deprecated since 2.24.0 instead use getNodeSpaceRef()
+   */
+  @Deprecated
   public String getMenuSpace(XWikiContext context);
 
-  public boolean isEmptyMainMenu(SpaceReference spaceRef);
+  public SpaceReference getNodeSpaceRef();
+
+  public boolean isEmptyMainMenu();
 
   public boolean isNavigationEnabled();
 

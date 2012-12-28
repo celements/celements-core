@@ -24,8 +24,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.web.service.IWebUtilsService;
@@ -268,13 +266,8 @@ public class NavigationApi extends Api {
         "celements.celNavigationClasses");
   }
 
-  public boolean isEmptyMainMenu(SpaceReference spaceRef) {
-    return navigation.isEmptyMainMenu(spaceRef);
-  }
-
-  public boolean isEmptyMainMenu(String spaceName) {
-    return navigation.isEmptyMainMenu(new SpaceReference(spaceName, new WikiReference(
-        context.getDatabase())));
+  public boolean isEmptyMainMenu() {
+    return navigation.isEmptyMainMenu();
   }
 
 }

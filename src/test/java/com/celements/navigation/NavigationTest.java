@@ -153,9 +153,14 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetUniqueId_null_menuSpace() {
     String menuItemName = null;
+    String menuSpace = "testMenuSpace";
     nav.setMenuPart("menuPartTest");
-    nav.setMenuSpace("testMenuSpace");
+    SpaceReference menuSpaceRef = new SpaceReference(menuSpace, new WikiReference(
+        context.getDatabase()));
+    expect(wUServiceMock.resolveSpaceReference(eq(menuSpace))).andReturn(menuSpaceRef
+        ).anyTimes();
     replayAll();
+    nav.setMenuSpace(menuSpace);
     assertTrue(nav.getUniqueId(menuItemName).endsWith(":testMenuSpace:menuPartTest:"));
     verifyAll();
   }
@@ -182,11 +187,16 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetUniqueId_menuSpace() {
+    String menuSpace = "testMenuSpace";
     BaseObject menuItem = new BaseObject();
     menuItem.setName("Space.TestName");
     nav.setMenuPart("menuPartTest");
-    nav.setMenuSpace("testMenuSpace");
+    SpaceReference menuSpaceRef = new SpaceReference(menuSpace, new WikiReference(
+        context.getDatabase()));
+    expect(wUServiceMock.resolveSpaceReference(eq(menuSpace))).andReturn(menuSpaceRef
+        ).anyTimes();
     replayAll();
+    nav.setMenuSpace(menuSpace);
     assertTrue(nav.getUniqueId(menuItem.getName()).endsWith(
         ":testMenuSpace:Space.TestName"));
     verifyAll();
@@ -447,6 +457,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.testInjectUtils(utils);
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().once();
+    SpaceReference parentSpaceRef = new SpaceReference(parentSpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(wUServiceMock.resolveSpaceReference(eq(parentSpaceName))).andReturn(
+        parentSpaceRef).anyTimes();
     replayAll();
     String menuSpace = nav.getMenuSpace(context);
     verifyAll();
@@ -645,7 +659,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         context.getDatabase()));
-    navConfigObj.setStringValue("menu_space", "theMenuSpace");
+    String nodeSpaceName = "theMenuSpace";
+    navConfigObj.setStringValue("menu_space", nodeSpaceName);
+    SpaceReference parentSpaceRef = new SpaceReference(nodeSpaceName, new WikiReference(
+        context.getDatabase()));
+    expect(wUServiceMock.resolveSpaceReference(eq(nodeSpaceName))).andReturn(
+        parentSpaceRef).anyTimes();
     replayAll();
     nav.loadConfigFromObject(navConfigObj);
     assertEquals("theMenuSpace", nav.getMenuSpace(context));
