@@ -58,7 +58,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
         if (lang.equals(defaultLanguage)) {
           cssClasses += " defaultLanguage";
         }
-        if (transList.contains(lang)) {
+        if (transList.contains(lang) || lang.equals(defaultLanguage)) {
           cssClasses += " transExists";
         } else {
           cssClasses += " transNotExists";

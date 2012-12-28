@@ -66,7 +66,7 @@ public class SitemapPresentationTypeTest extends AbstractBridgedComponentTestCas
     allowedLangs.add("fr");
     allowedLangs.add("en");
     List<String> docTransList = new ArrayList<String>();
-    docTransList.add("de");
+//    docTransList.add("de"); <-- defaultLanguage DOES NOT show up in translist!!!
     docTransList.add("en");
     expect(mockXWikiStore.getTranslationList(same(currentDoc), same(context))).andReturn(
         docTransList).atLeastOnce();
