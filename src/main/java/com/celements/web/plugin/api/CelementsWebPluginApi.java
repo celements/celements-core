@@ -185,6 +185,13 @@ public class CelementsWebPluginApi extends Api {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
 
+  /**
+   * since 2.24.0
+   */
+  public boolean isTreeNode(DocumentReference docRef) {
+    return getTreeNodeService().isTreeNode(docRef);
+  }
+
   public boolean isNavigationEnabled(String configName) {
     NavigationApi nav = NavigationApi.createNavigation(context);
     nav.loadConfigByName(configName);

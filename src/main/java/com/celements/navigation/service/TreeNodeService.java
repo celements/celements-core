@@ -122,7 +122,20 @@ public class TreeNodeService implements ITreeNodeService {
     }
     return -1;
   }
-  
+
+  public boolean isTreeNode(DocumentReference docRef) {
+    //TODO move to ITreeNodeProvider and integrate over all nodeProviders
+    try {
+      XWikiDocument document = getContext().getWiki().getDocument(docRef, getContext());
+      List<BaseObject> menuItems = document.getXObjects(getNavigationClasses(
+          ).getMenuItemClassRef(getContext().getDatabase()));
+      return ((menuItems != null) && !menuItems.isEmpty());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get document for reference [" + docRef + "].", exp);
+    }
+    return false;
+  }
+
   /**
    * 
    * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
