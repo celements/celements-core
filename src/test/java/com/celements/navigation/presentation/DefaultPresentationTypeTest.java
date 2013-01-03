@@ -111,7 +111,7 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
@@ -156,11 +156,12 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         ))).andReturn("").atLeastOnce();
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
@@ -202,11 +203,12 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         ))).andReturn("").atLeastOnce();
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
