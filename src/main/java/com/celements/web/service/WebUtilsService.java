@@ -100,12 +100,13 @@ public class WebUtilsService implements IWebUtilsService {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
-  public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException{
+  public DocumentReference getParentForLevel(int level) {
+    LOGGER.debug("getParentForLevel: " + level);
     DocumentReference parent = null;
-    if(level!=1){
-      List<DocumentReference> parentList = getDocumentParentsList(
-          getContext().getDoc().getDocumentReference(), true);
-      int startAtItem = parentList.size()-level+1;
+    List<DocumentReference> parentList = getDocumentParentsList(
+        getContext().getDoc().getDocumentReference(), true);
+    int startAtItem = parentList.size() - level + 1;
+    if ((startAtItem > -1) && (startAtItem < parentList.size())) {
       parent = parentList.get(startAtItem);
     }
     return parent;
@@ -116,19 +117,19 @@ public class WebUtilsService implements IWebUtilsService {
     ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
     try {
       DocumentReference nextParent;
-      if(includeDoc){
+      if (includeDoc) {
         nextParent = docRef;
       } else {
         nextParent = getParentRef(docRef);
       }
-      while (nextParent!=null
-          && (getContext().getWiki().exists(nextParent, getContext()))
+      while ((nextParent != null)
+          && getContext().getWiki().exists(nextParent, getContext())
           && !docParents.contains(nextParent)) {
         docParents.add(nextParent);
         nextParent = getParentRef(nextParent);
       }
     } catch (XWikiException e) {
-      LOGGER.error(e);
+      LOGGER.error("Failed to get parent reference. ", e);
     }
     return docParents;
   }

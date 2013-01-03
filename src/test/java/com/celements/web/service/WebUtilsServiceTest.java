@@ -113,24 +113,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     
     context.setDoc(doc);
     replayAll();
-    try{
-      webUtilsService.getParentForLevel(4);
-      assertFalse(true);
-    } catch(IndexOutOfBoundsException e){
-      assertEquals("-1", e.getMessage());
-    }    
-    try{
-      webUtilsService.getParentForLevel(0);
-      assertFalse(true);
-    } catch(IndexOutOfBoundsException e){
-      assertEquals("Index: 3, Size: 2", e.getMessage());
-    }
-    try{
-      webUtilsService.getParentForLevel(-1);
-      assertFalse(true);
-    } catch(IndexOutOfBoundsException e){
-      assertEquals("Index: 4, Size: 2", e.getMessage());
-    }
+    assertNull(webUtilsService.getParentForLevel(4));
+    assertNull(webUtilsService.getParentForLevel(0));
+    assertNull(webUtilsService.getParentForLevel(-1));
     verifyAll();
   }
   
