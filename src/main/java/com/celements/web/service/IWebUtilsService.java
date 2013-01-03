@@ -75,7 +75,11 @@ public interface IWebUtilsService {
   
   public boolean hasParentSpace();
 
+  public boolean hasParentSpace(String spaceName);
+
   public String getParentSpace();
+
+  public String getParentSpace(String spaceName);
 
   public DocumentReference resolveDocumentReference(String fullName);
 

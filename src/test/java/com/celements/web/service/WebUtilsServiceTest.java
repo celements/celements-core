@@ -946,6 +946,24 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
+  @Test
+  public void testGetParentSpace() {
+    expect(xwiki.getSpacePreference(eq("parent"), same(context))).andReturn(
+        "parentSpaceName").atLeastOnce();
+    replayAll();
+    assertEquals("parentSpaceName", webUtilsService.getParentSpace());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentSpace_spaceName() {
+    expect(xwiki.getSpacePreference(eq("parent"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("parentSpaceName").atLeastOnce();
+    replayAll();
+    assertEquals("parentSpaceName", webUtilsService.getParentSpace("mySpace"));
+    verifyAll();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/

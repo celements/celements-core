@@ -307,11 +307,20 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public boolean hasParentSpace() {
-    return getParentSpace()!=null && !"".equals(getParentSpace());
+    return ((getParentSpace() != null) && !"".equals(getParentSpace()));
+  }
+
+  public boolean hasParentSpace(String spaceName) {
+    return ((getParentSpace(spaceName) != null) && !"".equals(getParentSpace(spaceName)));
   }
 
   public String getParentSpace() {
     return getContext().getWiki().getSpacePreference("parent", getContext());
+  }
+
+  public String getParentSpace(String spaceName) {
+    return getContext().getWiki().getSpacePreference("parent", spaceName, "",
+        getContext());
   }
 
   public DocumentReference resolveDocumentReference(String fullName) {

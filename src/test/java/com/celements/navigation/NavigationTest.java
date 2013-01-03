@@ -94,6 +94,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.injected_PageTypeResolverService = ptResolverServiceMock;
     mockLayoutCmd = createMock(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
+    expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
   }
 
   @Test
@@ -122,11 +123,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   public void testSetMenuSpace() {
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     replayAll();
     nav.setMenuSpace("");
     assertEquals("MySpace", nav.getMenuSpace(context));
@@ -140,11 +142,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setMenuPart(menuPart);
     navFilterMock.setMenuPart(eq(menuPart));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     replayAll();
     assertTrue(nav.getUniqueId(menuItemName).endsWith(":menuPartTest:"));
     verifyAll();
@@ -175,11 +178,12 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.setMenuPart(menuPart);
     navFilterMock.setMenuPart(eq(menuPart));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     replayAll();
     assertTrue(nav.getUniqueId(menuItem.getName()).endsWith(":Space.TestName"));
     verifyAll();
@@ -447,9 +451,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   public void testGetMenuSpace() {
     List<TreeNode> emptyMenuItemList = Collections.emptyList();
     String parentSpaceName = "MyParentSpace";
-    expect(wUServiceMock.hasParentSpace()).andReturn(true);
-    expect(wUServiceMock.getParentSpace()).andReturn(parentSpaceName);
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(true);
+    expect(wUServiceMock.getParentSpace(eq(spaceName))).andReturn(parentSpaceName);
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(emptyMenuItemList);
@@ -796,6 +801,57 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef);
     replayAll();
     assertEquals("layout_MyLayout", nav.getPageLayoutName(docRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testIncludeNavigation_noItemLevel3() {
+    nav.fromHierarchyLevel = 3;
+    nav.toHierarchyLevel = 3;
+    expect(wUServiceMock.getParentForLevel(3)).andReturn(null).atLeastOnce();
+    replayAll();
+    assertEquals("no menuitem for level 3. Thus empty string expected.", "",
+        nav.includeNavigation());
+    verifyAll();
+  }
+
+  @Test
+  public void testIncludeNavigation_hasItemsLevel1() throws Exception {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 99;
+    expect(wUServiceMock.getParentForLevel(1)).andReturn(null).atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(context.getDatabase()));
+    DocumentReference homeDocRef = new DocumentReference(context.getDatabase(), spaceName,
+        "Home");
+    List<TreeNode> mainNodeList = Arrays.asList(new TreeNode(homeDocRef, "", 1));
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(mainNodeList);
+    expect(tNServiceMock.getSubNodesForParent((String)isNull(), eq(spaceName),
+        same(navFilterMock))).andReturn(mainNodeList);
+    expect(tNServiceMock.getSubNodesForParent(eq("MySpace.Home"), eq(spaceName),
+        same(navFilterMock))).andReturn(Collections.<TreeNode>emptyList());
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(homeDocRef))
+        ).andReturn(new PageTypeReference("RichText", "test",
+            Collections.<String>emptyList())).atLeastOnce();
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(homeDocRef))).andReturn(null
+        ).atLeastOnce();
+    expect(wUServiceMock.getDocumentParentsList(eq(currentDocRef), anyBoolean())
+        ).andReturn(Collections.<DocumentReference>emptyList()).atLeastOnce();
+    expect(xwiki.getURL(eq(homeDocRef), eq("view"), same(context))).andReturn("/Home");
+    expect(xwiki.getSpacePreferenceAsInt(eq("use_navigation_images"), eq(0), same(context)
+        )).andReturn(0);
+    expect(xwiki.getDocument(eq("MySpace.Home"), same(context))).andReturn(
+        new XWikiDocument(homeDocRef)).atLeastOnce();
+    replayAll();
+    assertEquals("one tree node for level 1. Thus output expected.", "<ul"
+        + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_isLeaf RichText\">"
+        + "<a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
+        + " RichText\" id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
+        nav.includeNavigation());
     verifyAll();
   }
 

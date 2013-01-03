@@ -252,7 +252,10 @@ public class Navigation implements INavigation {
     if (fromHierarchyLevel > 0) {
       DocumentReference parentRef = getWebUtilsService().getParentForLevel(
           fromHierarchyLevel);
-      return includeNavigation(parentRef);
+      if ((fromHierarchyLevel == 1) || (parentRef != null)) {
+        return includeNavigation(parentRef);
+      }
+      return "";
     } else {
       throw new IllegalArgumentException("fromHierarchyLevel [" + fromHierarchyLevel
           + "] must be greater than zero");
@@ -296,10 +299,11 @@ public class Navigation implements INavigation {
       SpaceReference currentSpaceRef = getContext().getDoc().getDocumentReference(
         ).getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
-        if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace()) {
+        if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace(
+            currentSpaceRef.getName())) {
           // is main Menu and no mainMenuItem found ; user has edit rights
           nodeSpaceRef = getWebUtilsService().resolveSpaceReference(getWebUtilsService(
-              ).getParentSpace());
+              ).getParentSpace(currentSpaceRef.getName()));
         }
       }
       if (nodeSpaceRef == null) {
