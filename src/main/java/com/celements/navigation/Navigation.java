@@ -206,7 +206,9 @@ public class Navigation implements INavigation {
    *           of all Spaces)
    */
   public void setFromHierarchyLevel(int fromHierarchyLevel) {
-    this.fromHierarchyLevel = fromHierarchyLevel;
+    if (fromHierarchyLevel > 0) {
+      this.fromHierarchyLevel = fromHierarchyLevel;
+    }
   }
 
   /**
@@ -677,7 +679,7 @@ public class Navigation implements INavigation {
       configName = prefObj.getStringValue("menu_element_name");
       LOGGER.debug("loadConfigFromObject: configName [" + configName + "] from doc ["
           + prefObj.getName() + "].");
-      fromHierarchyLevel = prefObj.getIntValue("from_hierarchy_level", 0);
+      fromHierarchyLevel = prefObj.getIntValue("from_hierarchy_level", 1);
       toHierarchyLevel = prefObj.getIntValue("to_hierarchy_level", DEFAULT_MAX_LEVEL);
       showInactiveToLevel = prefObj.getIntValue("show_inactive_to_level", 0);
       menuPart = prefObj.getStringValue("menu_part");

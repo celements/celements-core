@@ -675,6 +675,30 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testLoadConfigFromObject_defaults() {
+    DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
+        "MySpace", "MyDoc");
+    BaseObject navConfigObj = new BaseObject();
+    navConfigObj.setDocumentReference(cellConfigDocRef);
+    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
+        context.getDatabase()));
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().once();
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(context.getDatabase()));
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
+    replayAll();
+    nav.loadConfigFromObject(navConfigObj);
+    assertEquals("MySpace", nav.getMenuSpace(context));
+    assertEquals("default for fromHierarchyLevel must be greater than zero.", 1,
+        nav.fromHierarchyLevel);
+    verifyAll();
+  }
+
+  @Test
   public void testLoadConfigFromObject_menuSpace() {
     DocumentReference cellConfigDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "MyDoc");
@@ -702,6 +726,14 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         context.getDatabase()));
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().once();
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(context.getDatabase()));
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     replayAll();
     nav.loadConfigFromObject(navConfigObj);
     assertEquals("MySpace", nav.getMenuSpace(context));
