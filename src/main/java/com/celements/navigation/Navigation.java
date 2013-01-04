@@ -267,14 +267,10 @@ public class Navigation implements INavigation {
     if(navigationEnabled){
       StringBuilder outStream = new StringBuilder();
       if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
-          String parent = "";
-          if(parent != null) {
-            parent = getSerializer().serialize(parentRef);
-          }
           try {
-            addNavigationForParent(outStream, parent, getNumLevels(), getContext());
+            addNavigationForParent(outStream, parentRef, getNumLevels());
           } catch (XWikiException e) {
-            LOGGER.error("addNavigationForParent failed for [" + parent + "].", e);
+            LOGGER.error("addNavigationForParent failed for [" + parentRef + "].", e);
           }
       } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
         navBuilder.useStream(outStream);
@@ -339,25 +335,18 @@ public class Navigation implements INavigation {
     return toHierarchyLevel - fromHierarchyLevel + 1;
   }
 
-  void addNavigationForParent(StringBuilder outStream,
-      EntityReference parentRef, int numMoreLevels, XWikiContext context
-  ) throws XWikiException {
-    String parent = "";
-    if (parentRef != null) {
-      parent = getSerializer().serialize(parentRef);
-    }
-    addNavigationForParent(outStream, parent, numMoreLevels, context);
-  }
-
-  void addNavigationForParent(StringBuilder outStream,
-      String parent, int numMoreLevels, XWikiContext context
-      ) throws XWikiException {
-    LOGGER.trace("addNavigationForParent: parent [" + parent + "] numMoreLevels ["
+  void addNavigationForParent(StringBuilder outStream, EntityReference parentRef,
+      int numMoreLevels) throws XWikiException {
+    LOGGER.trace("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
         + numMoreLevels + "].");
     if (numMoreLevels > 0) {
       getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
+      String parent = "";
+      if (parentRef != null) {
+        parent = getSerializer().serialize(parentRef);
+      }
       List<TreeNode> currentMenuItems =
-        getTreeNodeService().getSubNodesForParent(parent, getMenuSpace(context),
+        getTreeNodeService().getSubNodesForParent(parent, getMenuSpace(getContext()),
             getNavFilter());
       if (currentMenuItems.size() > 0) {
         outStream.append("<ul " + addUniqueContainerId(parent) + " "
@@ -367,13 +356,13 @@ public class Navigation implements INavigation {
           DocumentReference nodeRef = treeNode.getDocumentReference();
           boolean isLastItem = (currentMenuItems.lastIndexOf(treeNode)
               == (currentMenuItems.size() - 1));
-          writeMenuItemWithSubmenu(outStream, parent, numMoreLevels, nodeRef,
-              isFirstItem, isLastItem, context);
+          writeMenuItemWithSubmenu(outStream, parent, numMoreLevels, nodeRef, isFirstItem,
+              isLastItem);
           isFirstItem = false;
         }
         outStream.append("</ul>");
       } else if ((getCurrentLevel(numMoreLevels) == 1)
-          && "".equals(parent) && hasedit(context)) {
+          && (parentRef != null) && hasedit()) {
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul>");
         openMenuItemOut(outStream, null, true, true, false);
@@ -419,22 +408,22 @@ public class Navigation implements INavigation {
     }
   }
 
-  private boolean hasedit(XWikiContext context) throws XWikiException {
-    return context.getWiki().getRightService().hasAccessLevel("edit",
-        context.getUser(), context.getDoc().getFullName(), context);
+  private boolean hasedit() throws XWikiException {
+    return getContext().getWiki().getRightService().hasAccessLevel("edit",
+        getContext().getUser(), getContext().getDoc().getFullName(), getContext());
   }
 
   private void writeMenuItemWithSubmenu(StringBuilder outStream, String parent,
       int numMoreLevels, DocumentReference docRef, boolean isFirstItem,
-      boolean isLastItem, XWikiContext context) throws XWikiException {
+      boolean isLastItem) throws XWikiException {
     boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels
-        ), context);
+        ), getContext());
     String fullName = getSerializer().serialize(docRef);
-    boolean isLeaf = isLeaf(fullName, context);
+    boolean isLeaf = isLeaf(fullName, getContext());
     openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf);
     writeMenuItemContent(outStream, isFirstItem, isLastItem, docRef, isLeaf);
     if (showSubmenu) {
-      addNavigationForParent(outStream, docRef, numMoreLevels - 1, context);
+      addNavigationForParent(outStream, docRef, numMoreLevels - 1);
     }
     closeMenuItemOut(outStream);
   }
@@ -502,7 +491,7 @@ public class Navigation implements INavigation {
 
   public String getUniqueId(String fullName) {
     String theMenuSpace = getMenuSpace(getContext());
-    if (fullName != null) {
+    if ((fullName != null) && !"".equals(fullName)){
       return uniqueName + ":" + theMenuSpace + ":" + fullName;
     } else {
       return uniqueName + ":" + theMenuSpace + ":" + menuPart + ":";

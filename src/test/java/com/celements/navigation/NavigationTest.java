@@ -154,6 +154,24 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetUniqueId_emptyString() {
+    String menuItemName = "";
+    String menuPart = "menuPartTest";
+    nav.setMenuPart(menuPart);
+    navFilterMock.setMenuPart(eq(menuPart));
+    expectLastCall().atLeastOnce();
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(context.getDatabase()));
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
+    replayAll();
+    assertTrue(nav.getUniqueId(menuItemName).endsWith(":menuPartTest:"));
+    verifyAll();
+  }
+
+  @Test
   public void testGetUniqueId_null_menuSpace() {
     String menuItemName = null;
     String menuSpace = "testMenuSpace";
@@ -830,8 +848,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> mainNodeList = Arrays.asList(new TreeNode(homeDocRef, "", 1));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(mainNodeList);
-    expect(tNServiceMock.getSubNodesForParent((String)isNull(), eq(spaceName),
-        same(navFilterMock))).andReturn(mainNodeList);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName),same(navFilterMock))
+        ).andReturn(mainNodeList);
     expect(tNServiceMock.getSubNodesForParent(eq("MySpace.Home"), eq(spaceName),
         same(navFilterMock))).andReturn(Collections.<TreeNode>emptyList());
     expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(homeDocRef))
