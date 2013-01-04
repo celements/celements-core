@@ -760,6 +760,7 @@ public class CelementsWebPluginApi extends Api {
   public boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
+
   public String getParentSpace() {
     return getWebUtilsService().getParentSpace();
   }
