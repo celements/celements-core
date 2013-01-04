@@ -68,6 +68,9 @@ public class CelementsWebScriptService implements ScriptService {
   IAppScriptService appScriptService;
 
   @Requirement
+  IWebUtilsService webUtilsService;
+
+  @Requirement
   Execution execution;
   
   private XWikiContext getContext() {
@@ -340,6 +343,14 @@ public class CelementsWebScriptService implements ScriptService {
   public boolean useNewButtons() {
     return getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
         "celements.usenewbuttons", 0, getContext()) == 1;
+  }
+
+  public String getDefaultLanguage() {
+    return webUtilsService.getDefaultLanguage();
+  }
+
+  public String getDefaultLanguage(String spaceName) {
+    return webUtilsService.getDefaultLanguage(spaceName);
   }
 
 }
