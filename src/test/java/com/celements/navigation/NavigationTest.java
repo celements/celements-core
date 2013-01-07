@@ -55,6 +55,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 
@@ -71,6 +72,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   private IWebUtilsService wUServiceMock;
   private PageTypeResolverService ptResolverServiceMock;
   private PageLayoutCommand mockLayoutCmd;
+  private XWikiRightService mockRightService;
 
   @Before
   public void setUp_NavigationTest() throws Exception {
@@ -95,6 +97,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     mockLayoutCmd = createMock(PageLayoutCommand.class);
     nav.pageLayoutCmd = mockLayoutCmd;
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
+    mockRightService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
   }
 
   @Test
@@ -855,6 +859,38 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testIncludeNavigation_noItemLevel1_hasEdit() throws Exception {
+    String myUserName = "XWiki.MyUserName";
+    context.setUser(myUserName);
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    expect(wUServiceMock.getParentForLevel(1)).andReturn(null).atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().atLeastOnce();
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
+        new WikiReference(context.getDatabase()));
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName),same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
+    expect(mockRightService.hasAccessLevel(eq("edit"), eq(myUserName),
+        eq("MySpace.MyCurrentDoc"), same(context))).andReturn(true);
+    expect(wUServiceMock.getAdminMessageTool()).andReturn(context.getMessageTool()
+        ).anyTimes();
+    ((TestMessageTool)context.getMessageTool()).injectMessage("cel_nav_nomenuitems",
+        "No Navitems found.");
+    replayAll();
+    assertEquals("no menuitem for level 1. Yet with hasEdit, thus no empty string"
+        + " expected.", "<ul><li class=\"first last cel_nav_hasChildren\">"
+        + "<span id=\"N1:MySpace::\" "
+        + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren\">"
+        + "No Navitems found.</span><!-- IE6 --></li></ul>", nav.includeNavigation());
+    verifyAll();
+  }
+
+  @Test
   public void testIncludeNavigation_noItemLevel3() {
     nav.fromHierarchyLevel = 3;
     nav.toHierarchyLevel = 3;
@@ -920,13 +956,13 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   
   private void replayAll(Object ... mocks) {
     replay(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
-        ptResolverServiceMock, mockLayoutCmd);
+        ptResolverServiceMock, mockLayoutCmd, mockRightService);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
     verify(xwiki, navFilterMock, utils, tNServiceMock, wUServiceMock,
-        ptResolverServiceMock, mockLayoutCmd);
+        ptResolverServiceMock, mockLayoutCmd, mockRightService);
     verify(mocks);
   }
 

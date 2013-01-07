@@ -363,8 +363,7 @@ public class Navigation implements INavigation {
           isFirstItem = false;
         }
         outStream.append("</ul>");
-      } else if ((getCurrentLevel(numMoreLevels) == 1)
-          && (parentRef != null) && hasedit()) {
+      } else if ((getCurrentLevel(numMoreLevels) == 1) && hasedit()) {
         LOGGER.trace("addNavigationForParent: empty navigation hint for parent ["
             + parentRef + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
             + getCurrentLevel(numMoreLevels) + "].");
