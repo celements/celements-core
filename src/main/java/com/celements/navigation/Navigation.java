@@ -339,7 +339,7 @@ public class Navigation implements INavigation {
 
   void addNavigationForParent(StringBuilder outStream, EntityReference parentRef,
       int numMoreLevels) throws XWikiException {
-    LOGGER.trace("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
+    LOGGER.debug("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
         + numMoreLevels + "].");
     if (numMoreLevels > 0) {
       getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
@@ -365,6 +365,9 @@ public class Navigation implements INavigation {
         outStream.append("</ul>");
       } else if ((getCurrentLevel(numMoreLevels) == 1)
           && (parentRef != null) && hasedit()) {
+        LOGGER.trace("addNavigationForParent: empty navigation hint for parent ["
+            + parentRef + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
+            + getCurrentLevel(numMoreLevels) + "].");
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul>");
         openMenuItemOut(outStream, null, true, true, false);
@@ -374,6 +377,10 @@ public class Navigation implements INavigation {
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
+      } else {
+        LOGGER.debug("addNavigationForParent: empty output for parent [" + parentRef
+            + "] numMoreLevels [" + numMoreLevels + "], currentLevel [" + getCurrentLevel(
+                numMoreLevels) + "], hasEdit [" + hasedit() + "].");
       }
     }
   }
