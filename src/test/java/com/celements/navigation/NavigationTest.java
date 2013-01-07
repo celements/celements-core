@@ -229,6 +229,36 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testSetFromHierarchyLevel_ignore_invalid_value() {
+    nav.fromHierarchyLevel = 3;
+    replayAll();
+    nav.setFromHierarchyLevel(0);
+    assertEquals("ignore invalid value in setFromHierarchyLevel", 3,
+        nav.fromHierarchyLevel);
+    verifyAll();
+  }
+
+  @Test
+  public void testSetFromHierarchyLevel_smaller() {
+    nav.fromHierarchyLevel = 3;
+    replayAll();
+    nav.setFromHierarchyLevel(2);
+    assertEquals("ignore invalid value in setFromHierarchyLevel", 2,
+        nav.fromHierarchyLevel);
+    verifyAll();
+  }
+
+  @Test
+  public void testSetFromHierarchyLevel_bigger() {
+    nav.fromHierarchyLevel = 3;
+    replayAll();
+    nav.setFromHierarchyLevel(10);
+    assertEquals("ignore invalid value in setFromHierarchyLevel", 10,
+        nav.fromHierarchyLevel);
+    verifyAll();
+  }
+
+  @Test
   public void testGetPageTypeConfigName_integrationTest() throws Exception {
     nav.injected_PageTypeResolverService = null;
     ComponentManager componentManager = Utils.getComponentManager();
