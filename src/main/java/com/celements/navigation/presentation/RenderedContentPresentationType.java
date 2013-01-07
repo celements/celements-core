@@ -46,4 +46,8 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
     return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
   }
 
+  public String getEmptyDictionaryKey() {
+    return "cel_nav_empty_presentation";
+  }
+
 }

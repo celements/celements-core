@@ -14,4 +14,6 @@ public interface IPresentationTypeRole {
 
   public String getDefaultCssClass();
 
+  public String getEmptyDictionaryKey();
+
 }

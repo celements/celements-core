@@ -79,4 +79,8 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     return _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
   }
 
+  public String getEmptyDictionaryKey() {
+    return "cel_nav_nomenuitems";
+  }
+
 }

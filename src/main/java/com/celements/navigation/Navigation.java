@@ -372,7 +372,8 @@ public class Navigation implements INavigation {
         openMenuItemOut(outStream, null, true, true, false);
         outStream.append("<span " + addUniqueElementId(null)
             + " " + addCssClasses(null, true, true, true, false)
-            + ">" + getWebUtilsService().getAdminMessageTool().get("cel_nav_nomenuitems")
+            + ">" + getWebUtilsService().getAdminMessageTool().get(getPresentationType(
+                ).getEmptyDictionaryKey())
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
