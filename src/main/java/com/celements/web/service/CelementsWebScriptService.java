@@ -353,4 +353,21 @@ public class CelementsWebScriptService implements ScriptService {
     return webUtilsService.getDefaultLanguage(spaceName);
   }
 
+  public List<Object> getDeletedDocuments() {
+    List<Object> resultList = Collections.emptyList();
+    try {
+      Query query = queryManager.createQuery(getDeletedDocsHql(), Query.HQL);
+      resultList = query.execute();
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
+    }
+    return resultList;
+  }
+
+  private String getDeletedDocsHql() {
+    return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
+         + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
+         + " order by 1 asc";
+  }
+
 }
