@@ -19,14 +19,23 @@
  */
 package com.celements.web.plugin.cmd;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class UserNameForUserDataCommand {
 
@@ -51,7 +60,7 @@ public class UserNameForUserDataCommand {
         if(i > 0){ hql += "or "; }
         hql += "str.id.name='" + fields[i] + "' ";
       }
-      hql += ") and str.value='" + login.replace("'", "''") + "'";
+      hql += ") and lower(str.value)='" + login.toLowerCase().replace("'", "''") + "'";
       
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, context);
@@ -69,15 +78,25 @@ public class UserNameForUserDataCommand {
             + "' in possible fields '" + possibleLogins + "'");
         return null;
       }
-    }
-    
-    if((userDoc.trim().length() == 0)
-        && (possibleLogins.matches("(.*,)?loginname(,.*)?"))){
-      if(!login.startsWith("XWiki.")){
-        login = "XWiki." + login;
-      }
-      if(context.getWiki().exists(login, context)){
-        userDoc = login;
+      
+      if((userDoc.trim().length() == 0)
+          && (possibleLogins.matches("(.*,)?loginname(,.*)?"))){
+        if(!login.startsWith("XWiki.")){
+          login = "XWiki." + login;
+        }
+        if(context.getWiki().exists(login, context)){
+          userDoc = login;
+        } else {
+          List<String> argsList = new ArrayList<String>();
+          argsList.add(login.replaceAll("XWiki.", ""));
+          List<XWikiDocument> docs = storage.searchDocuments("where lower(doc.name)=?", 
+              argsList, context);
+          if(docs.size() == 1) {
+            userDoc = getRefSerializer().serialize(docs.get(0).getDocumentReference());
+          } else if(docs.size() > 1) {
+            return null;
+          }
+        }
       }
     }
     
@@ -86,5 +105,9 @@ public class UserNameForUserDataCommand {
     
     return userDoc;
   }
-
+  
+  private DefaultStringEntityReferenceSerializer getRefSerializer() {
+    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
+        EntityReferenceSerializer.class, "local");
+  }
 }
