@@ -354,12 +354,14 @@ public class Navigation implements INavigation {
         outStream.append("<ul " + addUniqueContainerId(parent) + " "
             + getMainUlCSSClasses() + ">");
         boolean isFirstItem = true;
+        int numItem = 0;
         for (TreeNode treeNode : currentMenuItems) {
+          numItem = numItem + 1;
           DocumentReference nodeRef = treeNode.getDocumentReference();
           boolean isLastItem = (currentMenuItems.lastIndexOf(treeNode)
               == (currentMenuItems.size() - 1));
           writeMenuItemWithSubmenu(outStream, parent, numMoreLevels, nodeRef, isFirstItem,
-              isLastItem);
+              isLastItem, numItem);
           isFirstItem = false;
         }
         outStream.append("</ul>");
@@ -369,9 +371,9 @@ public class Navigation implements INavigation {
             + getCurrentLevel(numMoreLevels) + "].");
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul>");
-        openMenuItemOut(outStream, null, true, true, false);
+        openMenuItemOut(outStream, null, true, true, false, 1);
         outStream.append("<span " + addUniqueElementId(null)
-            + " " + addCssClasses(null, true, true, true, false)
+            + " " + addCssClasses(null, true, true, true, false, 1)
             + ">" + getWebUtilsService().getAdminMessageTool().get(getPresentationType(
                 ).getEmptyDictionaryKey())
             + "</span>");
@@ -424,13 +426,13 @@ public class Navigation implements INavigation {
 
   private void writeMenuItemWithSubmenu(StringBuilder outStream, String parent,
       int numMoreLevels, DocumentReference docRef, boolean isFirstItem,
-      boolean isLastItem) throws XWikiException {
+      boolean isLastItem, int numItem) throws XWikiException {
     boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels
         ), getContext());
     String fullName = getSerializer().serialize(docRef);
     boolean isLeaf = isLeaf(fullName, getContext());
-    openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf);
-    writeMenuItemContent(outStream, isFirstItem, isLastItem, docRef, isLeaf);
+    openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf, numItem);
+    writeMenuItemContent(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem);
     if (showSubmenu) {
       addNavigationForParent(outStream, docRef, numMoreLevels - 1);
     }
@@ -438,10 +440,10 @@ public class Navigation implements INavigation {
   }
 
   void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem
       ) throws XWikiException {
     getPresentationType().writeNodeContent(outStream, isFirstItem, isLastItem, docRef,
-          isLeaf, this);
+          isLeaf, numItem, this);
   }
 
   private boolean isLeaf(String fullName, XWikiContext context) {
@@ -468,14 +470,15 @@ public class Navigation implements INavigation {
   }
 
   void openMenuItemOut(StringBuilder outStream, DocumentReference docRef,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf) {
-    outStream.append("<li" + addCssClasses(docRef, false, isFirstItem, isLastItem, isLeaf)
-        + ">");
+      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem) {
+    outStream.append("<li" + addCssClasses(docRef, false, isFirstItem, isLastItem, isLeaf,
+        numItem) + ">");
   }
 
   public String addCssClasses(DocumentReference docRef, boolean withCM,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf) {
-    String cssClasses = getCssClasses(docRef, withCM, isFirstItem, isLastItem, isLeaf);
+      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem) {
+    String cssClasses = getCssClasses(docRef, withCM, isFirstItem, isLastItem, isLeaf,
+        numItem);
     if (!"".equals(cssClasses.trim())) {
       return " class=\"" + cssClasses + "\"";
     }
@@ -518,7 +521,7 @@ public class Navigation implements INavigation {
   }
 
   String getCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
-      boolean isLastItem, boolean isLeaf) {
+      boolean isLastItem, boolean isLeaf, int numItem) {
     String cssClass = "";
     if (withCM) {
       cssClass += getCMcssClass();
@@ -529,6 +532,12 @@ public class Navigation implements INavigation {
     if (isLastItem) {
       cssClass += " last";
     }
+    if (numItem%2 == 0) {
+      cssClass += " cel_nav_even";
+    } else {
+      cssClass += " cel_nav_odd";
+    }
+    cssClass += " cel_nav_item" + numItem;
     if (isLeaf) {
       cssClass += " cel_nav_isLeaf";
     } else {

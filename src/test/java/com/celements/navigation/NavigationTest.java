@@ -299,9 +299,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
-    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false);
-    assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType\">",
-        outStream.toString());
+    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
+        2);
+    assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
+        + " myUltimativePageType\">", outStream.toString());
     verifyAll(pageTypeRef);
   }
 
@@ -322,8 +323,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
-    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false);
-    assertEquals("<li class=\"cel_nav_hasChildren myUltimativePageType active\">",
+    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
+        2);
+    assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
+        + " myUltimativePageType active\">",
         outStream.toString());
     verifyAll(pageTypeRef);
   }
@@ -403,7 +406,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
     String cssClasses = nav.getCssClasses(menuItem.getDocumentReference(), false, false,
-        false, false);
+        false, false, 2);
     verifyAll(pageTypeRef);
     assertFalse("Expected to NOT find the cmCSSclass. ["
         + cssClasses + "]",
@@ -426,7 +429,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     menuItem.setDocumentReference(docRef);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
     replayAll(pageTypeRef);
-    String cssClasses = nav.getCssClasses(docRef, true, false, false, false);
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 3);
     verifyAll(pageTypeRef);
     assertTrue("Expected to found pageType in css classes. ["
         + cssClasses + "]",
@@ -451,7 +454,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         context.getDatabase()));
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
     replayAll(pageTypeRef);
-    String cssClasses = nav.getCssClasses(docRef, true, false, false, false);
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 2);
     verifyAll(pageTypeRef);
     assertTrue("Expected to found pageLayout in css classes. ["
         + cssClasses + "]",
@@ -466,7 +469,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 //        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
 //            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     replayAll();
-    String cssClasses = nav.getCssClasses(null, true, false, false, false);
+    String cssClasses = nav.getCssClasses(null, true, false, false, false, 3);
     verifyAll();
     assertFalse("Expected to not find pageType (because fullName is null) in css classes."
       + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" " + pageType + " "));
@@ -479,7 +482,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 //        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
 //            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     replayAll();
-    String cssClasses = nav.getCssClasses(null, true, false, false, false);
+    String cssClasses = nav.getCssClasses(null, true, false, false, false, 2);
     verifyAll();
     assertTrue("Expected to find 'cel_nav_hasChildren' (because not a leaf) in css"
         + " classes. [" + cssClasses + "]", (" " + cssClasses + " ").contains(
@@ -493,10 +496,41 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
 //        anyBoolean())).andReturn(Arrays.asList(getDocRefForDocName("bla"),
 //            getDocRefForDocName("bli"), getDocRefForDocName("blu")));
     replayAll();
-    String cssClasses = nav.getCssClasses(null, true, false, false, true);
+    String cssClasses = nav.getCssClasses(null, true, false, false, true, 3);
     verifyAll();
     assertTrue("Expected to find 'cel_nav_isLeaf' (because no children) in css classes."
       + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_isLeaf "));
+  }
+
+  @Test
+  public void testGetCssClasses_numItem_odd() throws XWikiException {
+    replayAll();
+    String cssClasses = nav.getCssClasses(null, true, false, false, true, 3);
+    verifyAll();
+    assertFalse("Expected NOT to find 'cel_nav_even' in css classes."
+        + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_even "));
+    assertTrue("Expected to find 'cel_nav_odd' in css classes."
+      + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_odd "));
+  }
+
+  @Test
+  public void testGetCssClasses_numItem_even() throws XWikiException {
+    replayAll();
+    String cssClasses = nav.getCssClasses(null, true, false, false, true, 4);
+    verifyAll();
+    assertTrue("Expected to find 'cel_nav_even' in css classes."
+      + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_even "));
+    assertFalse("Expected NOT to find 'cel_nav_odd' in css classes."
+        + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_odd "));
+  }
+
+  @Test
+  public void testGetCssClasses_numItem() throws XWikiException {
+    replayAll();
+    String cssClasses = nav.getCssClasses(null, true, false, false, true, 4321);
+    verifyAll();
+    assertTrue("Expected to find 'cel_nav_item4321' in css classes."
+      + " [" + cssClasses + "]", (" " + cssClasses + " ").contains(" cel_nav_item4321 "));
   }
 
   @Test
@@ -839,10 +873,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyMenuItemDoc");
     componentInstance.writeNodeContent(same(outStream), eq(true), eq(false), eq(docRef),
-        eq(true), same(nav));
+        eq(true), eq(1), same(nav));
     expectLastCall().once();
     replayAll(componentInstance);
-    nav.writeMenuItemContent(outStream, true, false, docRef, true);
+    nav.writeMenuItemContent(outStream, true, false, docRef, true, 1);
     verifyAll(componentInstance);
   }
 
@@ -913,9 +947,11 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         "No Navitems found.");
     replayAll();
     assertEquals("no menuitem for level 1. Yet with hasEdit, thus no empty string"
-        + " expected.", "<ul><li class=\"first last cel_nav_hasChildren\">"
+        + " expected.", "<ul><li class=\"first last cel_nav_odd cel_nav_item1"
+        + " cel_nav_hasChildren\">"
         + "<span id=\"N1:MySpace::\" "
-        + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren\">"
+        + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
+        + " cel_nav_hasChildren\">"
         + "No Navitems found.</span><!-- IE6 --></li></ul>", nav.includeNavigation());
     verifyAll();
   }
@@ -964,8 +1000,10 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         new XWikiDocument(homeDocRef)).atLeastOnce();
     replayAll();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
-        + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_isLeaf RichText\">"
-        + "<a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
+        + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"
+        + " cel_nav_isLeaf RichText\">"
+        + "<a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last cel_nav_odd"
+        + " cel_nav_item1 cel_nav_isLeaf"
         + " RichText\" id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
         nav.includeNavigation());
     verifyAll();

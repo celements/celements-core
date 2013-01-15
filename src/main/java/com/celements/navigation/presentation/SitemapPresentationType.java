@@ -31,10 +31,11 @@ public class SitemapPresentationType extends DefaultPresentationType {
   }
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf,
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
       INavigation navigation) {
     try {
-      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, navigation);
+      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem,
+          navigation);
       addLanguageLinks(outStream, docRef);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);

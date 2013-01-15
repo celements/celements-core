@@ -128,7 +128,7 @@ public interface INavigation {
   public String addUniqueElementId(DocumentReference docRef);
 
   public String addCssClasses(DocumentReference docRef, boolean withCM,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf);
+      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem);
 
   public void setPresentationType(String presentationTypeHint);
 

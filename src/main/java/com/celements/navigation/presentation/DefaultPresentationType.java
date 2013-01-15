@@ -35,18 +35,19 @@ public class DefaultPresentationType implements IPresentationTypeRole {
   }
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf,
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
       INavigation navigation) {
     try {
-      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, navigation);
+      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem,
+          navigation);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);
     }
   }
 
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, INavigation nav
-      ) throws XWikiException {
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
+      INavigation nav) throws XWikiException {
     String fullName = serializer.serialize(docRef);
     String tagName;
     if (nav.hasLink()) {
@@ -69,7 +70,8 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     }
     String menuName = menuNameCmd.getMultilingualMenuName(fullName, nav.getNavLanguage(),
         getContext());
-    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf);
+    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
+        numItem);
     menuItemHTML += " " + nav.addUniqueElementId(docRef)
       + ">" + menuName + "</" + tagName + ">";
     outStream.append(menuItemHTML);
