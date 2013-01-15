@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
@@ -184,6 +185,13 @@ public class CelementsWebPluginApi extends Api {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
   }
 
+  /**
+   * since 2.24.0
+   */
+  public boolean isTreeNode(DocumentReference docRef) {
+    return getTreeNodeService().isTreeNode(docRef);
+  }
+
   public boolean isNavigationEnabled(String configName) {
     NavigationApi nav = NavigationApi.createNavigation(context);
     nav.loadConfigByName(configName);
@@ -212,14 +220,41 @@ public class CelementsWebPluginApi extends Api {
     return plugin.getSubMenuItemsForParent(parent, menuSpace, menuPart, context);
   }
 
+  /**
+   * getSubNodesForParent
+   * @param parent
+   * @param menuSpace
+   * @return
+   * 
+   * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference)
+   */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, "", context);
   }
 
+  public List<TreeNode> getSubNodesForParentRef(EntityReference parentRef) {
+    return getTreeNodeService().getSubNodesForParent(parentRef, "");
+  }
+
+  /**
+   * 
+   * @param parent
+   * @param menuSpace
+   * @param menuPart
+   * @return
+   * 
+   * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference, String)
+   */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart) {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, menuPart,
         context);
+  }
+
+  public List<TreeNode> getSubNodesForParent(EntityReference parentRef, String menuPart) {
+    return getTreeNodeService().getSubNodesForParent(parentRef, menuPart);
   }
 
   public int queryCount() {
@@ -725,6 +760,7 @@ public class CelementsWebPluginApi extends Api {
   public boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
+
   public String getParentSpace() {
     return getWebUtilsService().getParentSpace();
   }

@@ -21,11 +21,12 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
   RenderCommand renderCmd;
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, INavigation nav) {
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
+      INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
     outStream.append("<div ");
-    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf)
-        + " ");
+    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
+        numItem) + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     try {
       outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));
@@ -44,6 +45,10 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
 
   public String getDefaultCssClass() {
     return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
+  }
+
+  public String getEmptyDictionaryKey() {
+    return "cel_nav_empty_presentation";
   }
 
 }

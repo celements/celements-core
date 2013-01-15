@@ -113,24 +113,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     
     context.setDoc(doc);
     replayAll();
-    try{
-      webUtilsService.getParentForLevel(4);
-      assertFalse(true);
-    } catch(IndexOutOfBoundsException e){
-      assertEquals("-1", e.getMessage());
-    }    
-    try{
-      webUtilsService.getParentForLevel(0);
-      assertFalse(true);
-    } catch(IndexOutOfBoundsException e){
-      assertEquals("Index: 3, Size: 2", e.getMessage());
-    }
-    try{
-      webUtilsService.getParentForLevel(-1);
-      assertFalse(true);
-    } catch(IndexOutOfBoundsException e){
-      assertEquals("Index: 4, Size: 2", e.getMessage());
-    }
+    assertNull(webUtilsService.getParentForLevel(4));
+    assertNull(webUtilsService.getParentForLevel(0));
+    assertNull(webUtilsService.getParentForLevel(-1));
     verifyAll();
   }
   
@@ -958,6 +943,24 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
         webUtilsService.getAllowedLanguages("testSpace"));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentSpace() {
+    expect(xwiki.getSpacePreference(eq("parent"), same(context))).andReturn(
+        "parentSpaceName").atLeastOnce();
+    replayAll();
+    assertEquals("parentSpaceName", webUtilsService.getParentSpace());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetParentSpace_spaceName() {
+    expect(xwiki.getSpacePreference(eq("parent"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("parentSpaceName").atLeastOnce();
+    replayAll();
+    assertEquals("parentSpaceName", webUtilsService.getParentSpace("mySpace"));
     verifyAll();
   }
 

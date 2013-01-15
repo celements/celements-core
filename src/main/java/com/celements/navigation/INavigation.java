@@ -22,6 +22,7 @@ package com.celements.navigation;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.navigation.filter.INavFilter;
@@ -50,11 +51,24 @@ public interface INavigation {
 
   /**
    * 
-   * @param menuSpace (default: $doc.space)
+   * @param menuSpace (default: $doc.web)
+   * 
+   * @deprecated since 2.24.0 instead use setNodeSpace
    */
+  @Deprecated
   public void setMenuSpace(String menuSpace);
 
+  public void setNodeSpace(SpaceReference newNodeSpaceRef);
+
+  /**
+   * @deprecated since 2.24.0 use includeNavigation() instead.
+   */
+  @Deprecated
   public String includeNavigation(XWikiContext context);
+
+  public String includeNavigation();
+
+  public String includeNavigation(DocumentReference parentRef);
 
   public int getMenuItemPos(String fullName, XWikiContext context);
 
@@ -65,7 +79,15 @@ public interface INavigation {
 
   public String getPrevMenuItemFullName(String fullName, XWikiContext context);
 
+  /**
+   * @deprecated since 2.24.0 instead use getNodeSpaceRef()
+   */
+  @Deprecated
   public String getMenuSpace(XWikiContext context);
+
+  public SpaceReference getNodeSpaceRef();
+
+  public boolean isEmptyMainMenu();
 
   public boolean isNavigationEnabled();
 
@@ -106,6 +128,8 @@ public interface INavigation {
   public String addUniqueElementId(DocumentReference docRef);
 
   public String addCssClasses(DocumentReference docRef, boolean withCM,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf);
+      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem);
+
+  public void setPresentationType(String presentationTypeHint);
 
 }

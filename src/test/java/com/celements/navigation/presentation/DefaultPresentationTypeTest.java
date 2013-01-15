@@ -111,13 +111,14 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
-        menuItem.getDocumentReference(), false, nav);
+        menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
-        + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
+        + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
+        + " cel_nav_hasChildren currentPage"
         + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
     verifyAll(pageTypeRef, menuNameCmdMock);
@@ -156,18 +157,20 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         ))).andReturn("").atLeastOnce();
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
-        menuItem.getDocumentReference(), false, nav);
+        menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " style=\"background-image:url(abc);\""
-        + " class=\"cel_cm_navigation_menuitem first last cel_nav_hasChildren currentPage"
+        + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
+        + " cel_nav_hasChildren currentPage"
         + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
         + ">My Current Doc</a>", outStream.toString());
     verifyAll(pageTypeRef, menuNameCmdMock);
@@ -202,16 +205,18 @@ public class DefaultPresentationTypeTest extends AbstractBridgedComponentTestCas
         ))).andReturn("").atLeastOnce();
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().atLeastOnce();
-    EntityReference mySpaceRef = new SpaceReference("MySpace",
+    String spaceName = "MySpace";
+    EntityReference mySpaceRef = new SpaceReference(spaceName,
         new WikiReference(context.getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(Collections.<TreeNode>emptyList());
-    expect(wUServiceMock.hasParentSpace()).andReturn(false);
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(currentDocRef))).andReturn(null);
     replayAll(pageTypeRef, menuNameCmdMock);
     defPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
-        menuItem.getDocumentReference(), true, nav);
-    assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_isLeaf"
+        menuItem.getDocumentReference(), true, 1, nav);
+    assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_odd"
+        + " cel_nav_item1 cel_nav_isLeaf"
         + " currentPage myUltimativePageType active\" id=\"N1:MySpace:MySpace."
         + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
     verifyAll(pageTypeRef, menuNameCmdMock);

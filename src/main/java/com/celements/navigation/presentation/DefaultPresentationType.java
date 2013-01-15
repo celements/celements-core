@@ -30,23 +30,24 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
-  private XWikiContext getContext() {
+  protected XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf,
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
       INavigation navigation) {
     try {
-      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, navigation);
+      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem,
+          navigation);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);
     }
   }
 
-  void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, INavigation nav
-      ) throws XWikiException {
+  protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
+      INavigation nav) throws XWikiException {
     String fullName = serializer.serialize(docRef);
     String tagName;
     if (nav.hasLink()) {
@@ -69,7 +70,8 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     }
     String menuName = menuNameCmd.getMultilingualMenuName(fullName, nav.getNavLanguage(),
         getContext());
-    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf);
+    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
+        numItem);
     menuItemHTML += " " + nav.addUniqueElementId(docRef)
       + ">" + menuName + "</" + tagName + ">";
     outStream.append(menuItemHTML);
@@ -77,6 +79,10 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   public String getDefaultCssClass() {
     return _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
+  }
+
+  public String getEmptyDictionaryKey() {
+    return "cel_nav_nomenuitems";
   }
 
 }

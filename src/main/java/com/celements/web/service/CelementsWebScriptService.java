@@ -68,6 +68,9 @@ public class CelementsWebScriptService implements ScriptService {
   IAppScriptService appScriptService;
 
   @Requirement
+  IWebUtilsService webUtilsService;
+
+  @Requirement
   Execution execution;
   
   private XWikiContext getContext() {
@@ -340,6 +343,31 @@ public class CelementsWebScriptService implements ScriptService {
   public boolean useNewButtons() {
     return getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
         "celements.usenewbuttons", 0, getContext()) == 1;
+  }
+
+  public String getDefaultLanguage() {
+    return webUtilsService.getDefaultLanguage();
+  }
+
+  public String getDefaultLanguage(String spaceName) {
+    return webUtilsService.getDefaultLanguage(spaceName);
+  }
+
+  public List<Object> getDeletedDocuments() {
+    List<Object> resultList = Collections.emptyList();
+    try {
+      Query query = queryManager.createQuery(getDeletedDocsHql(), Query.HQL);
+      resultList = query.execute();
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
+    }
+    return resultList;
+  }
+
+  private String getDeletedDocsHql() {
+    return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
+         + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
+         + " order by 1 asc";
   }
 
 }
