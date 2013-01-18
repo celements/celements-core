@@ -50,6 +50,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       getLogger().debug("calling initClasses for database: " + getContext().getDatabase()
           );
       initClasses();
+    } else {
+      getLogger().info("skipping not activated class collection: " + getConfigName());
     }
   }
 
