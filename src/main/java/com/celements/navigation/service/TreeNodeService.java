@@ -67,7 +67,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeService.class);
 
-  public PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
+  public PageLayoutCommand pageLayoutCmd;
 
   @Requirement
   ITreeNodeCache treeNodeCache;
@@ -96,6 +96,13 @@ public class TreeNodeService implements ITreeNodeService {
 
   private NavigationClasses getNavigationClasses() {
     return (NavigationClasses) navigationClasses;
+  }
+
+  private PageLayoutCommand getPageLayoutCmd() {
+    if (pageLayoutCmd == null) {
+      pageLayoutCmd = new PageLayoutCommand();
+    }
+    return pageLayoutCmd;
   }
 
   public int getActiveMenuItemPos(int menuLevel, String menuPart) {
@@ -424,7 +431,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   List<BaseObject> getNavObjectsFromLayout() {
     List<BaseObject> navObjects = new Vector<BaseObject>();
-    SpaceReference layoutRef = pageLayoutCmd.getPageLayoutForCurrentDoc();
+    SpaceReference layoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
     if (layoutRef != null) {
       XObjectIterator objectIterator = new XObjectIterator(getContext());
       List<String> layoutCellList = new Vector<String>();

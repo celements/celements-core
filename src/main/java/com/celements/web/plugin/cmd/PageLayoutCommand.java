@@ -58,7 +58,7 @@ public class PageLayoutCommand {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageLayoutCommand.class);
 
-  QueryManager queryManager = Utils.getComponent(QueryManager.class);
+  QueryManager queryManager;
 
   IWebUtilsService webUtilsService;
 
@@ -76,6 +76,13 @@ public class PageLayoutCommand {
   private static final String PACKAGEPLUGIN_NAME = "package";
 
   private InheritorFactory _injectedInheritorFactory;
+
+  private QueryManager getQueryManager() {
+    if (queryManager == null) {
+      queryManager = Utils.getComponent(QueryManager.class);
+    }
+    return queryManager;
+  }
 
   public Map<String, String> getAllPageLayouts() {
     return getPageLayoutMap(false);
@@ -138,7 +145,7 @@ public class PageLayoutCommand {
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {
     XWiki xwiki = getContext().getWiki();
     try {
-      Query spaceDocsQuery = queryManager.createQuery(
+      Query spaceDocsQuery = getQueryManager().createQuery(
           "where doc.space = :space", Query.XWQL);
       spaceDocsQuery.bindValue("space", layoutSpaceRef.getName());
       for (String docName : spaceDocsQuery.<String> execute()) {
