@@ -87,7 +87,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
-    String cssClasses = "";
+    String cssClasses = "cel_cell";
     String cssStyles = "";
     String idname = "";
     try {
@@ -98,7 +98,10 @@ public class CellRenderStrategy implements IRenderStrategy {
       BaseObject cellObj = cellDoc.getXObject(cellClasses.getCellClassRef(
           cellDocRef.getWikiReference().getName()));
       if(cellObj != null) {
-        cssClasses = cellObj.getStringValue("css_classes");
+        String cellObjCssClasses = cellObj.getStringValue("css_classes");
+        if ((cellObjCssClasses != null) && !"".equals(cellObjCssClasses)) {
+          cssClasses += " " + cellObjCssClasses;
+        }
         cssStyles = cellObj.getStringValue("css_styles");
         idname  = cellObj.getStringValue("idname");
       }

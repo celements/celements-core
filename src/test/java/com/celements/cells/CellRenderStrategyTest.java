@@ -184,7 +184,32 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
         CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
+    replayAll();
+    renderer.startRenderCell(node, isFirstItem, isLastItem);
+    verifyAll();
+  }
+
+  @Test
+  public void testStartRenderCell_noCssClasses() throws XWikiException {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
+        "MasterCell");
+    boolean isLastItem = true;
+    boolean isFirstItem = false;
+    TreeNode node = new TreeNode(docRef, "", 0);
+    XWikiDocument doc = new XWikiDocument(docRef);
+    BaseObject cellObj = new BaseObject();
+    String idname = "myDivId";
+    String cssStyles = "width:100px;\nheight:10px;\n";
+    cellObj.setStringValue("idname", idname);
+    cellObj.setStringValue("css_styles", cssStyles);
+    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    cellObjList.add(cellObj);
+    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
+        CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
+    doc.setXObjects(cellClassRef, cellObjList);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    outWriterMock.openLevel(eq(idname), eq("cel_cell"), eq(cssStyles));
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -210,7 +235,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -237,7 +262,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -262,7 +287,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     doc.addXObject(cellObj);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     String idname = "cell:layoutDb..Skin.MasterCell";
-    outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -289,7 +314,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
         CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(idname), eq(cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
