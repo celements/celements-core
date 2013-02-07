@@ -26,6 +26,12 @@ import org.xwiki.context.Execution;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Extend CelementsClassCollection and make the implementor a named component.
@@ -68,7 +74,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       needsUpdate = true;
       doc.setContent(" ");
     }
-    
+
     if (needsUpdate){
       getContext().getWiki().saveDocument(doc, getContext());
     }
@@ -77,4 +83,93 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   abstract protected void initClasses() throws XWikiException;
 
   abstract protected Log getLogger();
+
+  protected final boolean addTextField(BaseClass bclass, String name, String prettyName,
+      int size, String validationRegExp, String validationMessage) {
+    if(bclass.get(name) == null) {
+      StringClass element = new StringClass();
+      element.setName(name);
+      element.setPrettyName(prettyName);
+      element.setSize(size);
+      element.setValidationRegExp(validationRegExp);
+      element.setValidationMessage(validationMessage);
+      element.setObject(bclass);
+      bclass.addField(name, element);
+      return true;
+    }
+    return false;
+  }
+
+  protected final boolean addTextAreaField(BaseClass bclass, String name,
+      String prettyName, int cols, int rows, String validationRegExp,
+      String validationMessage) {
+    if(bclass.get(name) == null) {
+      TextAreaClass element = new TextAreaClass();
+      element.setName(name);
+      element.setPrettyName(prettyName);
+      element.setSize(cols);
+      element.setRows(rows);
+      element.setValidationRegExp(validationRegExp);
+      element.setValidationMessage(validationMessage);
+      element.setObject(bclass);
+      bclass.addField(name, element);
+      return true;
+    }
+    return false;
+  }
+
+  protected final boolean addNumberField(BaseClass bclass, String name,
+      String prettyName, int size, String ntype, String validationRegExp,
+      String validationMessage) {
+    if (bclass.get(name) == null) {
+      NumberClass element = new NumberClass();
+      element.setName(name);
+      element.setPrettyName(prettyName);
+      element.setSize(size);
+      element.setNumberType(ntype);
+      element.setValidationRegExp(validationRegExp);
+      element.setValidationMessage(validationMessage);
+      bclass.addField(name, element);
+    }
+    return false;
+  }
+
+  protected final boolean addDateField(BaseClass bclass, String name, String prettyName,
+      int size, int emptyIsToday, String validationRegExp, String validationMessage) {
+    if(bclass.get(name) == null) {
+      DateClass element = new DateClass();
+      element.setName(name);
+      element.setPrettyName(prettyName);
+      element.setSize(size);
+      element.setEmptyIsToday(emptyIsToday);
+      element.setDateFormat("dd.MM.yyyy");
+      element.setValidationRegExp(validationRegExp);
+      element.setValidationMessage(validationMessage);
+      element.setObject(bclass);
+      bclass.addField(name, element);
+      return true;
+    }
+    return false;
+  }
+
+  protected final boolean addDBListField(BaseClass bclass, String name,
+      String prettyName, boolean multiselect, boolean useSuggest, String hql,
+      String validationRegExp, String validationMessage) {
+    if(bclass.get(name) == null) {
+      DBListClass element = new DBListClass();
+      element.setName(name);
+      element.setPrettyName(prettyName);
+      element.setDisplayType("select");
+      element.setPicker(useSuggest);
+      element.setMultiSelect(multiselect);
+      element.setSql(hql);
+      element.setValidationRegExp(validationRegExp);
+      element.setValidationMessage(validationMessage);
+      element.setObject(bclass);
+      bclass.addField(name, element);
+      return true;
+    }
+    return false;
+  }
+
 }
