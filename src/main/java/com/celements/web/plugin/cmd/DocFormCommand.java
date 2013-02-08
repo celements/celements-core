@@ -262,8 +262,9 @@ public class DocFormCommand {
           if(!context.getUtil().match(regexp, value)) {
             isValidResult = validationMsg;
           }
-        } catch (MalformedPerl5PatternException e) {
-          LOGGER.error(e);
+        } catch (MalformedPerl5PatternException exp) {
+          LOGGER.error("Failed to execute validation regex for field [" + fieldName
+              + "] in class [" + className + "].", exp);
           isValidResult = validationMsg;
         }
       }
@@ -286,8 +287,8 @@ public class DocFormCommand {
         className);
     try {
       bclass = context.getWiki().getDocument(bclassDocRef, context).getXClass();
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Cannot get document class [" + className + "].", exp);
     }
     return bclass;
   }
