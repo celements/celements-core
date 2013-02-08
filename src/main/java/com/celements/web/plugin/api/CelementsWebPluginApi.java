@@ -939,6 +939,7 @@ public class CelementsWebPluginApi extends Api {
    *         validating fields.
    */
   public Map<String, String> validateRequest() {
+    //TODO replace with validateRequest call on FormValidationService (IFormValidationRole component)
     return getDocFormCommand().validateRequest(context);
   }
 
