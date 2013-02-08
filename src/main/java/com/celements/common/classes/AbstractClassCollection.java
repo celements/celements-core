@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
@@ -84,6 +85,21 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   abstract protected Log getLogger();
 
+  protected final boolean addBooleanField(BaseClass bclass, String name,
+      String prettyName, String displayType, int defaultValue) {
+    if(bclass.get(name) == null) {
+      BooleanClass element = new BooleanClass();
+      element.setName(name);
+      element.setPrettyName("wheelchair");
+      element.setDisplayType(displayType);
+      element.setDefaultValue(defaultValue);
+      element.setObject(bclass);
+      bclass.addField(name, element);
+      return true;
+    }
+    return false;
+  }
+
   protected final boolean addTextField(BaseClass bclass, String name, String prettyName,
       int size, String validationRegExp, String validationMessage) {
     if(bclass.get(name) == null) {
@@ -135,14 +151,18 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   }
 
   protected final boolean addDateField(BaseClass bclass, String name, String prettyName,
-      int size, int emptyIsToday, String validationRegExp, String validationMessage) {
+      String dateFormat, int size, int emptyIsToday, String validationRegExp,
+      String validationMessage) {
     if(bclass.get(name) == null) {
       DateClass element = new DateClass();
       element.setName(name);
       element.setPrettyName(prettyName);
+      if (dateFormat != null) {
+        element.setDateFormat(dateFormat);
+      }
       element.setSize(size);
       element.setEmptyIsToday(emptyIsToday);
-      element.setDateFormat("dd.MM.yyyy");
+      element.setDateFormat(dateFormat);
       element.setValidationRegExp(validationRegExp);
       element.setValidationMessage(validationMessage);
       element.setObject(bclass);
@@ -153,16 +173,17 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   }
 
   protected final boolean addDBListField(BaseClass bclass, String name,
-      String prettyName, boolean multiselect, boolean useSuggest, String hql,
+      String prettyName, int size, boolean multiSelect, boolean useSuggest, String sql,
       String validationRegExp, String validationMessage) {
     if(bclass.get(name) == null) {
       DBListClass element = new DBListClass();
       element.setName(name);
       element.setPrettyName(prettyName);
+      element.setSize(size);
+      element.setMultiSelect(multiSelect);
       element.setDisplayType("select");
       element.setPicker(useSuggest);
-      element.setMultiSelect(multiselect);
-      element.setSql(hql);
+      element.setSql(sql);
       element.setValidationRegExp(validationRegExp);
       element.setValidationMessage(validationMessage);
       element.setObject(bclass);
