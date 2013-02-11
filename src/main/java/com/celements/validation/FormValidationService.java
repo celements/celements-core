@@ -22,13 +22,17 @@ public class FormValidationService implements IFormValidationRole {
       FormValidationService.class);
 
   @Requirement
-  Map<String, IValidationRuleRole> validationRules;
+  private Map<String, IValidationRuleRole> validationRules;
 
   @Requirement
   private Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  void injectValidationRules(Map<String, IValidationRuleRole> validationRules) {
+    this.validationRules = validationRules;
   }
 
   public Map<String, Set<String>> validateRequest() {
@@ -38,7 +42,7 @@ public class FormValidationService implements IFormValidationRole {
     return validateMap(requestMap);
   }
 
-  private Map<String, String[]> convertRequestMap(Map<?, ?> requestMap) {
+  Map<String, String[]> convertRequestMap(Map<?, ?> requestMap) {
     Map<String, String[]> convertedMap = new HashMap<String, String[]>();
     for (Object keyObj : requestMap.keySet()) {
       String key = keyObj.toString();
@@ -48,7 +52,7 @@ public class FormValidationService implements IFormValidationRole {
     return convertedMap;
   }
 
-  private String[] getValueAsStringArray(Object value) {
+  String[] getValueAsStringArray(Object value) {
     if (value instanceof String) {
       LOGGER.trace("requestMap value '" + value + "'");
       return new String[] { value.toString() };
@@ -87,25 +91,25 @@ public class FormValidationService implements IFormValidationRole {
     return validationMap;
   }
 
-  private void mergeMaps(Map<String, Set<String>> mergeMap,
+  void mergeMaps(Map<String, Set<String>> mergeMap,
       Map<String, Set<String>> toMap) {
     for (String key : mergeMap.keySet()) {
       Set<String> set = mergeMap.get(key);
       Set<String> toSet = toMap.get(key);
       if (toSet == null) {
-        toMap.put(key, set);
+        toMap.put(key, new HashSet<String>(set));
       } else {
         toSet.addAll(set);
       }
     }
   }
 
-  private Map<FieldName, String[]> convertMapKeyToField(Map<String, String[]> requestMap) {
+  Map<FieldName, String[]> convertMapKeyToField(Map<String, String[]> requestMap) {
     Map<FieldName, String[]> retMap = new HashMap<FieldName, String[]>();
     for (String key : requestMap.keySet()) {
-      FieldName field = resolveFieldNameFromParam(key);
-      if (field != null) {
-        retMap.put(field, requestMap.get(key));
+      FieldName fieldName = resolveFieldNameFromParam(key);
+      if (fieldName != null) {
+        retMap.put(fieldName, requestMap.get(key));
       }
     }
     return retMap;
