@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class ParameterRequestTest {
+public class RequestParameterTest {
 
   @Test
   public void testCreate_null() {
