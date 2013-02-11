@@ -39,9 +39,13 @@ public class XClassRegexRule implements IValidationRuleRole {
   public Map<String, Set<String>> validate(Map<FieldName, String[]> requestMap) {
     Map<String, Set<String>> resultMap = new HashMap<String, Set<String>>();
     for (FieldName field : requestMap.keySet()) {
-      Set<String> set = new HashSet<String>();
+      Set<String> resultSet = new HashSet<String>();
       for (String value : requestMap.get(field)) {
-        set.addAll(validateField(field.getClassName(), field.getFieldName(), value));
+        resultSet.addAll(validateField(field.getClassName(), field.getFieldName(), value));
+      }
+      if (!resultSet.isEmpty()) {
+        //TODO wie soll key aussehen? number in FieldName?
+        resultMap.put(field.toString(), resultSet);
       }
     }
     return resultMap;

@@ -39,7 +39,7 @@ class FieldName {
 
   @Override
   public String toString() {
-    return "Field [className=" + className + ", fieldName=" + fieldName + "]";
+    return className + "_" + fieldName;
   }
 
 }
