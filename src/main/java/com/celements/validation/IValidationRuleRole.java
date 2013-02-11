@@ -13,7 +13,7 @@ public interface IValidationRuleRole {
    * @return empty map if all values pass validation, else set of validation messages
    *         (dictionary key possible) for the invalid keys
    */
-  public Map<String, Set<String>> validate(Map<FieldName, String[]> requestMap);
+  public Map<String, Set<String>> validate(Map<RequestParameter, String[]> requestMap);
 
   /**
    * @param className

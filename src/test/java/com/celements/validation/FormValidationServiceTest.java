@@ -6,9 +6,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -80,10 +78,10 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     requestMap.put("asdf", new String[] { "1" });
     requestMap.put("qwer", new String[] { "2", "3" });
 
-    expect(validationRuleMock1.validate(formValidationService.convertMapKeyToField(
-        requestMap))).andReturn(new HashMap<String, Set<String>>()).once();
-    expect(validationRuleMock2.validate(formValidationService.convertMapKeyToField(
-        requestMap))).andReturn(new HashMap<String, Set<String>>()).once();
+    expect(validationRuleMock1.validate(formValidationService.convertMapKeys(requestMap))
+        ).andReturn(new HashMap<String, Set<String>>()).once();
+    expect(validationRuleMock2.validate(formValidationService.convertMapKeys(requestMap))
+        ).andReturn(new HashMap<String, Set<String>>()).once();
 
     replayAll();
     Map<String, Set<String>> validationMap = formValidationService.validateMap(requestMap);
@@ -102,10 +100,10 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     set.add("invalid");
     map.put("asdf", set);
 
-    expect(validationRuleMock1.validate(formValidationService.convertMapKeyToField(
-        requestMap))).andReturn(map).once();
-    expect(validationRuleMock2.validate(formValidationService.convertMapKeyToField(
-        requestMap))).andReturn(new HashMap<String, Set<String>>()).once();
+    expect(validationRuleMock1.validate(formValidationService.convertMapKeys(requestMap))
+        ).andReturn(map).once();
+    expect(validationRuleMock2.validate(formValidationService.convertMapKeys(requestMap))
+        ).andReturn(new HashMap<String, Set<String>>()).once();
 
     replayAll();
     Map<String, Set<String>> validationMap = formValidationService.validateMap(requestMap);
@@ -137,10 +135,10 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     set3.add("invalid4");
     map2.put("qwer", set3);
 
-    expect(validationRuleMock1.validate(formValidationService.convertMapKeyToField(
-        requestMap))).andReturn(map1).once();
-    expect(validationRuleMock2.validate(formValidationService.convertMapKeyToField(
-        requestMap))).andReturn(map2).once();
+    expect(validationRuleMock1.validate(formValidationService.convertMapKeys(requestMap))
+        ).andReturn(map1).once();
+    expect(validationRuleMock2.validate(formValidationService.convertMapKeys(requestMap))
+        ).andReturn(map2).once();
 
     replayAll();
     Map<String, Set<String>> validationMap = formValidationService.validateMap(requestMap);
@@ -188,64 +186,6 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     assertNotNull(set3);
     assertEquals(1, set3.size());
     assertTrue(set3.contains("3"));
-  }
-
-  @Test
-  public void testResolveFieldNameFromParam_null() {
-    assertNull(formValidationService.resolveFieldNameFromParam(""));
-    assertNull(formValidationService.resolveFieldNameFromParam("Class.Name_field"));
-  }
-
-  @Test
-  public void testResolveFieldNameFromParam() {
-    String param = "Class.Name_3_field";
-    FieldName fieldName = formValidationService.resolveFieldNameFromParam(param);
-    assertNotNull(fieldName);
-    assertEquals("Class.Name", fieldName.getClassName());
-    assertEquals("field", fieldName.getFieldName());
-  }
-
-  @Test
-  public void testResolveFieldNameFromParam_withDoc() {
-    String param = "Space.Doc_Class.Name_3_field";
-    FieldName fieldName = formValidationService.resolveFieldNameFromParam(param);
-    assertNotNull(fieldName);
-    assertEquals("Class.Name", fieldName.getClassName());
-    assertEquals("field", fieldName.getFieldName());
-  }
-
-  @Test
-  public void testIsValidRequestKey_noMatch() {
-    String key = "";
-    assertFalse(formValidationService.isValidRequestParam(key));
-    key = "abcd";
-    assertFalse(formValidationService.isValidRequestParam(key));
-    key = "Hi_0_there";
-    assertFalse(formValidationService.isValidRequestParam(key));
-  }
-
-  @Test
-  public void testIsValidRequestKey_match() {
-    String key = "Space.Doc_0_field_one";
-    assertTrue(formValidationService.isValidRequestParam(key));
-    key = "Space.Doc_Class.Name_3_field";
-    assertTrue(formValidationService.isValidRequestParam(key));
-  }
-
-  @Test
-  public void testIncludesDocName_noMatch() {
-    String key = "";
-    assertFalse(formValidationService.includesDocName(key));
-    key = "abcd";
-    assertFalse(formValidationService.includesDocName(key));
-    key = "Space.Doc_0_field_one";
-    assertFalse(formValidationService.includesDocName(key));
-  }
-
-  @Test
-  public void testIncludesDocName_match() {
-    String key = "Space.Doc_Class.Name_3_field";
-    assertTrue(formValidationService.includesDocName(key));
   }
 
   @Test

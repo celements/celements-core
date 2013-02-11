@@ -64,31 +64,24 @@ public class FormValidationService implements IFormValidationRole {
     }
   }
 
-  //  public Map<String, Set<String>> validateMap(Map<String, String[]> requestMap) {
-  //    Map<String, Set<String>> resultMap = new HashMap<String, Set<String>>();
-  //    for (String key : requestMap.keySet()) {
-  //      Set<String> validationSet = new HashSet<String>();
-  //      for (String value : requestMap.get(key)) {
-  //        Field field = resolveFieldNameFromParam(key);
-  //        if (field != null) {
-  //          validationSet.addAll(validateField(field.getClassName(), field.getFieldName(),
-  //              value));
-  //        }
-  //      }
-  //      if (!validationSet.isEmpty()) {
-  //        resultMap.put(key, validationSet);
-  //      }
-  //    }
-  //    return resultMap;
-  //  }
-
   public Map<String, Set<String>> validateMap(Map<String, String[]> requestMap) {
     Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
-    Map<FieldName, String[]> convertedMap = convertMapKeyToField(requestMap);
+    Map<RequestParameter, String[]> convertedMap = convertMapKeys(requestMap);
     for (IValidationRuleRole validationRule : validationRules.values()) {
       mergeMaps(validationRule.validate(convertedMap), validationMap);
     }
     return validationMap;
+  }
+
+  Map<RequestParameter, String[]> convertMapKeys(Map<String, String[]> requestMap) {
+    Map<RequestParameter, String[]> retMap = new HashMap<RequestParameter, String[]>();
+    for (String key : requestMap.keySet()) {
+      RequestParameter requestparam = RequestParameter.create(key);
+      if (requestparam != null) {
+        retMap.put(requestparam, requestMap.get(key));
+      }
+    }
+    return retMap;
   }
 
   void mergeMaps(Map<String, Set<String>> mergeMap,
@@ -102,40 +95,6 @@ public class FormValidationService implements IFormValidationRole {
         toSet.addAll(set);
       }
     }
-  }
-
-  Map<FieldName, String[]> convertMapKeyToField(Map<String, String[]> requestMap) {
-    Map<FieldName, String[]> retMap = new HashMap<FieldName, String[]>();
-    for (String key : requestMap.keySet()) {
-      FieldName fieldName = resolveFieldNameFromParam(key);
-      if (fieldName != null) {
-        retMap.put(fieldName, requestMap.get(key));
-      }
-    }
-    return retMap;
-  }
-
-  FieldName resolveFieldNameFromParam(String paramName) {
-    if (isValidRequestParam(paramName)) {
-      int pos = includesDocName(paramName) ? 1 : 0;
-      String[] paramSplit = paramName.split("_");
-      String className = paramSplit[pos];
-      String fieldName = paramSplit[pos + 2];
-      for (int i = pos + 3; i < paramSplit.length; i++) {
-        fieldName += "_" + paramSplit[i];
-      }
-      return new FieldName(className, fieldName);
-    }
-    LOGGER.debug("request parameter is not valid '" + paramName + "'");
-    return null;
-  }
-
-  boolean isValidRequestParam(String key) {
-    return key.matches("([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_){1,2}-?(\\d)*_(.*)");
-  }
-
-  boolean includesDocName(String key) {
-    return key.matches("([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_){2}-?(\\d)*_(.*)");
   }
 
   public Set<String> validateField(String className, String fieldName, String value) {

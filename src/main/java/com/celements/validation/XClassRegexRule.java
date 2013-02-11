@@ -36,16 +36,15 @@ public class XClassRegexRule implements IValidationRuleRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  public Map<String, Set<String>> validate(Map<FieldName, String[]> requestMap) {
+  public Map<String, Set<String>> validate(Map<RequestParameter, String[]> requestMap) {
     Map<String, Set<String>> resultMap = new HashMap<String, Set<String>>();
-    for (FieldName field : requestMap.keySet()) {
+    for (RequestParameter param : requestMap.keySet()) {
       Set<String> resultSet = new HashSet<String>();
-      for (String value : requestMap.get(field)) {
-        resultSet.addAll(validateField(field.getClassName(), field.getFieldName(), value));
+      for (String value : requestMap.get(param)) {
+        resultSet.addAll(validateField(param.getClassName(), param.getFieldName(), value));
       }
       if (!resultSet.isEmpty()) {
-        //TODO wie soll key aussehen? number in FieldName?
-        resultMap.put(field.toString(), resultSet);
+        resultMap.put(param.getParameterName(), resultSet);
       }
     }
     return resultMap;
