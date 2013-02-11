@@ -10,24 +10,32 @@ final class RequestParameter {
 
   private final String parameterName;
   private final String className;
+  private final long objectNr;
   private final String fieldName;
 
-  private RequestParameter(String parameterName, String className, String fieldName) {
+  private RequestParameter(String parameterName, String className, long objectNr,
+      String fieldName) {
     this.parameterName = parameterName;
     this.className = className;
+    this.objectNr = objectNr;
     this.fieldName = fieldName;
   }
 
+  /**
+   * @param requestParameterName
+   * @return new RequestParameter or null if requestParameterName is invalid
+   */
   static RequestParameter create(String requestParameterName) {
     if (isValidRequestParam(requestParameterName)) {
       int pos = includesDocName(requestParameterName) ? 1 : 0;
       String[] paramSplit = requestParameterName.split("_");
       String className = paramSplit[pos];
+      long objectNr = Long.parseLong(paramSplit[pos + 1]);
       String fieldName = paramSplit[pos + 2];
       for (int i = pos + 3; i < paramSplit.length; i++) {
         fieldName += "_" + paramSplit[i];
       }
-      return new RequestParameter(requestParameterName, className, fieldName);
+      return new RequestParameter(requestParameterName, className, objectNr, fieldName);
     }
     LOGGER.debug("request parameter is not valid '" + requestParameterName + "'");
     return null;
@@ -47,6 +55,10 @@ final class RequestParameter {
 
   String getClassName() {
     return className;
+  }
+
+  long getObjectNr() {
+    return objectNr;
   }
 
   String getFieldName() {
@@ -70,7 +82,7 @@ final class RequestParameter {
   @Override
   public String toString() {
     return "FieldName [parameterName=" + parameterName + ", className=" + className
-        + ", fieldName=" + fieldName + "]";
+        + ", objectNr=" + objectNr + ", fieldName=" + fieldName + "]";
   }
 
 }

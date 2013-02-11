@@ -18,21 +18,23 @@ public class ParameterRequestTest {
 
   @Test
   public void testCreate() {
-    String paramName = "Class.Name_3_field";
+    String paramName = "Class.Name_5_field";
     RequestParameter param = RequestParameter.create(paramName);
     assertNotNull(param);
     assertEquals(paramName, param.getParameterName());
     assertEquals("Class.Name", param.getClassName());
+    assertEquals(5, param.getObjectNr());
     assertEquals("field", param.getFieldName());
   }
 
   @Test
   public void testResolveFieldNameFromParam_withDoc() {
-    String paramName = "Space.Doc_Class.Name_3_field";
+    String paramName = "Space.Doc_Class.Name_-123_field";
     RequestParameter param = RequestParameter.create(paramName);
     assertNotNull(param);
     assertEquals(paramName, param.getParameterName());
     assertEquals("Class.Name", param.getClassName());
+    assertEquals(-123, param.getObjectNr());
     assertEquals("field", param.getFieldName());
   }
 
@@ -66,7 +68,7 @@ public class ParameterRequestTest {
 
   @Test
   public void testIncludesDocName_match() {
-    String paramName = "Space.Doc_Class.Name_3_field";
+    String paramName = "Space.Doc_Class.Name_5_field";
     assertTrue(RequestParameter.includesDocName(paramName));
   }
 
