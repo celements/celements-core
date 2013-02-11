@@ -1,5 +1,10 @@
 package com.celements.validation;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.oro.text.perl.MalformedPerl5PatternException;
@@ -31,8 +36,19 @@ public class XClassRegexRule implements IValidationRuleRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  public String validateField(String className, String fieldName, String value) {
-    String validation = null;
+  public Map<String, Set<String>> validate(Map<FieldName, String[]> requestMap) {
+    Map<String, Set<String>> resultMap = new HashMap<String, Set<String>>();
+    for (FieldName field : requestMap.keySet()) {
+      Set<String> set = new HashSet<String>();
+      for (String value : requestMap.get(field)) {
+        set.addAll(validateField(field.getClassName(), field.getFieldName(), value));
+      }
+    }
+    return resultMap;
+  }
+
+  public Set<String> validateField(String className, String fieldName, String value) {
+    Set<String> validationSet = new HashSet<String>();
     BaseClass bclass = getBaseClass(className);
     if(bclass != null) {
       PropertyClass propertyClass = (PropertyClass) bclass.getField(fieldName);
@@ -40,15 +56,15 @@ public class XClassRegexRule implements IValidationRuleRole {
       String validationMsg = getFieldFromProperty(propertyClass, "validationMessage");
       try {
         if (!matchesRegex(regex, value)) {
-          return validationMsg;
+          validationSet.add(validationMsg);
         }
       } catch (MalformedPerl5PatternException exc) {
         LOGGER.error("Failed to execute validation regex for field '" + fieldName
             + "' in class '" + className + "'", exc);
-        validation = validationMsg;
+        validationSet.add(validationMsg);
       }
     }
-    return validation;
+    return validationSet;
   }
 
   private boolean matchesRegex(String regex, String str)
