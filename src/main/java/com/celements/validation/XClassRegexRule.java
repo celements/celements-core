@@ -37,17 +37,17 @@ public class XClassRegexRule implements IValidationRuleRole {
   }
 
   public Map<String, Set<String>> validate(Map<RequestParameter, String[]> requestMap) {
-    Map<String, Set<String>> resultMap = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
     for (RequestParameter param : requestMap.keySet()) {
       Set<String> resultSet = new HashSet<String>();
       for (String value : requestMap.get(param)) {
         resultSet.addAll(validateField(param.getClassName(), param.getFieldName(), value));
       }
       if (!resultSet.isEmpty()) {
-        resultMap.put(param.getParameterName(), resultSet);
+        validationMap.put(param.getParameterName(), resultSet);
       }
     }
-    return resultMap;
+    return validationMap;
   }
 
   public Set<String> validateField(String className, String fieldName, String value) {
@@ -70,14 +70,6 @@ public class XClassRegexRule implements IValidationRuleRole {
     return validationSet;
   }
 
-  private boolean matchesRegex(String regex, String str)
-      throws MalformedPerl5PatternException {
-    if ((regex != null) && !regex.trim().equals("")) {
-      return getContext().getUtil().match(regex, str);
-    }
-    return false;
-  }
-
   private BaseClass getBaseClass(String className) {
     BaseClass bclass = null;
     DocumentReference classDocRef = webUtils.resolveDocumentReference(className);
@@ -95,6 +87,14 @@ public class XClassRegexRule implements IValidationRuleRole {
       return property.getValue().toString();
     }
     return "";
+  }
+
+  private boolean matchesRegex(String regex, String str)
+      throws MalformedPerl5PatternException {
+    if ((regex != null) && !regex.trim().equals("")) {
+      return getContext().getUtil().match(regex, str);
+    }
+    return false;
   }
 
 }

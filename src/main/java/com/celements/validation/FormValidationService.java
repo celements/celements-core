@@ -84,13 +84,12 @@ public class FormValidationService implements IFormValidationRole {
     return retMap;
   }
 
-  void mergeMaps(Map<String, Set<String>> mergeMap,
-      Map<String, Set<String>> toMap) {
-    for (String key : mergeMap.keySet()) {
-      Set<String> set = mergeMap.get(key);
-      Set<String> toSet = toMap.get(key);
+  void mergeMaps(Map<String, Set<String>> merge, Map<String, Set<String>> to) {
+    for (String key : merge.keySet()) {
+      Set<String> set = merge.get(key);
+      Set<String> toSet = to.get(key);
       if (toSet == null) {
-        toMap.put(key, new HashSet<String>(set));
+        to.put(key, new HashSet<String>(set));
       } else {
         toSet.addAll(set);
       }

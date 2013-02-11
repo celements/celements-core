@@ -9,6 +9,8 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface IValidationRuleRole {
 
   /**
+   * validates any form fields in the given map
+   * 
    * @param requestMap
    * @return empty map if all values pass validation, else set of validation messages
    *         (dictionary key possible) for the invalid keys
@@ -16,6 +18,8 @@ public interface IValidationRuleRole {
   public Map<String, Set<String>> validate(Map<RequestParameter, String[]> requestMap);
 
   /**
+   * validates the given class name, field name and value
+   * 
    * @param className
    * @param fieldName
    * @param value

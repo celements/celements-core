@@ -9,7 +9,8 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface IFormValidationRole {
 
   /**
-   * validateRequest validates any form fields in the given http request
+   * validates any form fields in the given http request for all validationRule
+   * implementations
    * 
    * @return error map (key = request field-name ; value = set of validation messages
    *         (dictionary keys possible))
@@ -17,7 +18,7 @@ public interface IFormValidationRole {
   public Map<String, Set<String>> validateRequest();
 
   /**
-   * validateRequest validates any form fields in the given Map
+   * validates any form fields in the given Map for all validationRule implementations
    * 
    * @return error map (key = request field-name ; value = set of validation messages
    *         (dictionary keys possible))
@@ -25,6 +26,9 @@ public interface IFormValidationRole {
   public Map<String, Set<String>> validateMap(Map<String, String[]> requestMap);
 
   /**
+   * validateField validates the given class name, field name and value for all
+   * validationRule implementations
+   * 
    * @param className
    * @param fieldName
    * @param value
