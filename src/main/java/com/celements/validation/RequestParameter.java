@@ -25,7 +25,7 @@ public final class RequestParameter {
    * @param requestParameterName
    * @return new RequestParameter or null if requestParameterName is invalid
    */
-  static RequestParameter create(String requestParameterName) {
+  public static RequestParameter create(String requestParameterName) {
     if (isValidRequestParam(requestParameterName)) {
       int pos = includesDocName(requestParameterName) ? 1 : 0;
       String[] paramSplit = requestParameterName.split("_");
