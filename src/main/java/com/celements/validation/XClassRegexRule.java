@@ -21,7 +21,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 @Component("XClassRegexValidation")
-public class XClassRegexRule implements IValidationRuleRole {
+public class XClassRegexRule implements IRequestValidationRuleRole,
+    IFieldValidationRuleRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       XClassRegexRule.class);
@@ -36,7 +37,8 @@ public class XClassRegexRule implements IValidationRuleRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  public Map<String, Set<String>> validate(Map<RequestParameter, String[]> requestMap) {
+  public Map<String, Set<String>> validateRequest(Map<RequestParameter,
+      String[]> requestMap) {
     Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
     for (RequestParameter param : requestMap.keySet()) {
       Set<String> resultSet = new HashSet<String>();

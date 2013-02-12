@@ -22,7 +22,10 @@ public class FormValidationService implements IFormValidationRole {
       FormValidationService.class);
 
   @Requirement
-  private Map<String, IValidationRuleRole> validationRules;
+  private Map<String, IRequestValidationRuleRole> requestValidationRules;
+
+  @Requirement
+  private Map<String, IFieldValidationRuleRole> fieldValidationRules;
 
   @Requirement
   private Execution execution;
@@ -31,8 +34,10 @@ public class FormValidationService implements IFormValidationRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  void injectValidationRules(Map<String, IValidationRuleRole> validationRules) {
-    this.validationRules = validationRules;
+  void injectValidationRules(Map<String, IRequestValidationRuleRole> requestValidationRules,
+      Map<String, IFieldValidationRuleRole> fieldValidationRules) {
+    this.requestValidationRules = requestValidationRules;
+    this.fieldValidationRules = fieldValidationRules;
   }
 
   public Map<String, Set<String>> validateRequest() {
@@ -69,8 +74,8 @@ public class FormValidationService implements IFormValidationRole {
   public Map<String, Set<String>> validateMap(Map<String, String[]> requestMap) {
     Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
     Map<RequestParameter, String[]> convertedMap = convertMapKeys(requestMap);
-    for (IValidationRuleRole validationRule : validationRules.values()) {
-      mergeMaps(validationRule.validate(convertedMap), validationMap);
+    for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
+      mergeMaps(validationRule.validateRequest(convertedMap), validationMap);
     }
     return validationMap;
   }
@@ -100,7 +105,7 @@ public class FormValidationService implements IFormValidationRole {
 
   public Set<String> validateField(String className, String fieldName, String value) {
     Set<String> validationSet = new HashSet<String>();
-    for (IValidationRuleRole validationRule : validationRules.values()) {
+    for (IFieldValidationRuleRole validationRule : fieldValidationRules.values()) {
       validationSet.addAll(validationRule.validateField(className, fieldName, value));
     }
     return validationSet;
