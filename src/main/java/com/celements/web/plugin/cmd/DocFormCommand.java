@@ -217,7 +217,7 @@ public class DocFormCommand {
   }
 
   /**
-   * @deprecated since 2.2.0 instead use ValidationService
+   * @deprecated since 2.2.0 instead use FormValidationService
    */
   @Deprecated
   public Map<String, String> validateRequest(XWikiContext context) {
@@ -236,7 +236,7 @@ public class DocFormCommand {
   }
 
   /**
-   * @deprecated since 2.2.0 instead use ValidationService and XClassRegexRule
+   * @deprecated since 2.2.0 instead use FormValidationService
    */
   @Deprecated
   private String validateParameter(String param, String value,
@@ -256,7 +256,7 @@ public class DocFormCommand {
   }
 
   /**
-   * @deprecated since 2.2.0 instead use ValidationService and XClassRegexRule
+   * @deprecated since 2.2.0 instead use FormValidationService
    */
   @Deprecated
   public String validateField(String className, String fieldName, String value,
@@ -286,7 +286,7 @@ public class DocFormCommand {
   }
 
   /**
-   * @deprecated since 2.2.0 instead use ValidationService and XClassRegexRule
+   * @deprecated since 2.2.0 instead use FormValidationService
    */
   @Deprecated
   String getFieldFromProperty(PropertyClass propclass, String field) {

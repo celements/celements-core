@@ -3,7 +3,7 @@ package com.celements.validation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-final class RequestParameter {
+public final class RequestParameter {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       RequestParameter.class);
@@ -49,19 +49,19 @@ final class RequestParameter {
     return paramName.matches("([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_){2}-?(\\d)*_(.*)");
   }
 
-  String getParameterName() {
+  public String getParameterName() {
     return parameterName;
   }
 
-  String getClassName() {
+  public String getClassName() {
     return className;
   }
 
-  long getObjectNr() {
+  public long getObjectNr() {
     return objectNr;
   }
 
-  String getFieldName() {
+  public String getFieldName() {
     return fieldName;
   }
 
