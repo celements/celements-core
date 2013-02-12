@@ -36,7 +36,7 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
   private IFieldValidationRuleRole fieldValidationRuleMock2;
 
   @Before
-  public void setUp_DocFormCommandTest() throws Exception {
+  public void setUp_FormValidationServiceTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);

@@ -36,7 +36,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
   private XClassRegexRule xClassRegexRule;
 
   @Before
-  public void setUp_DocFormCommandTest() throws Exception {
+  public void setUp_XClassRegeRuleTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
