@@ -58,8 +58,8 @@ public class DocFormCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocFormCommand.class);
-  private Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
-  private Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
+  private final Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
+  private final Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
 
   public Set<XWikiDocument> updateDocFromMap(String fullname, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
@@ -78,7 +78,7 @@ public class DocFormCommand {
         doc.readFromTemplate(templRef, context);
       } catch (XWikiException e) {
         if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
-            context.put("exception", e);
+          context.put("exception", e);
         }
         LOGGER.error("Exception reading doc " + docRef + " from template " + templRef, e);
       }
@@ -160,7 +160,7 @@ public class DocFormCommand {
       Integer objNr) {
     DocumentReference docRef = doc.getDocumentReference();
     return docRef.getLastSpaceReference().getName() + "." + docRef.getName() + "_"
-        + className + "_" + objNr;
+    + className + "_" + objNr;
   }
 
   String collapse(String[] value) {
@@ -188,7 +188,7 @@ public class DocFormCommand {
     }
     return doc;
   }
-  
+
   XWikiDocument getTranslatedDoc(DocumentReference docRef, XWikiContext context
       ) throws XWikiException {
     XWikiDocument tdoc;
@@ -216,21 +216,29 @@ public class DocFormCommand {
     return docRef.getLastSpaceReference().getName() + "." + docRef.getName();
   }
 
+  /**
+   * @deprecated since 2.2.0 instead use ValidationService
+   */
+  @Deprecated
   public Map<String, String> validateRequest(XWikiContext context) {
     XWikiRequest request = context.getRequest();
     Map<String, String> result = new HashMap<String, String>();
     for (Object paramObj : request.getParameterMap().keySet()) {
       String param = paramObj.toString();
-      
+
       String validate = validateParameter(param, request.get(param), context);
       if(validate != null) {
         result.put(param, validate);
       }
     }
-    
+
     return result;
   }
 
+  /**
+   * @deprecated since 2.2.0 instead use ValidationService and XClassRegexRule
+   */
+  @Deprecated
   private String validateParameter(String param, String value,
       XWikiContext context) {
     if(param.matches(getFindObjectFieldInRequestRegex())){
@@ -247,11 +255,15 @@ public class DocFormCommand {
     return null;
   }
 
+  /**
+   * @deprecated since 2.2.0 instead use ValidationService and XClassRegexRule
+   */
+  @Deprecated
   public String validateField(String className, String fieldName, String value,
       XWikiContext context) {
     String isValidResult = null;
     BaseClass bclass = getBaseClass(className, context);
-    
+
     if(bclass != null) {
       PropertyClass propclass = (PropertyClass)bclass.getField(fieldName);
 
@@ -262,16 +274,21 @@ public class DocFormCommand {
           if(!context.getUtil().match(regexp, value)) {
             isValidResult = validationMsg;
           }
-        } catch (MalformedPerl5PatternException e) {
-          LOGGER.error(e);
+        } catch (MalformedPerl5PatternException exp) {
+          LOGGER.error("Failed to execute validation regex for field [" + fieldName
+              + "] in class [" + className + "].", exp);
           isValidResult = validationMsg;
         }
       }
     }
-    
+
     return isValidResult;
   }
 
+  /**
+   * @deprecated since 2.2.0 instead use ValidationService and XClassRegexRule
+   */
+  @Deprecated
   String getFieldFromProperty(PropertyClass propclass, String field) {
     BaseProperty prop = (BaseProperty) propclass.getField(field);
     if ((prop != null) && (prop.getValue() != null)) {
@@ -286,8 +303,8 @@ public class DocFormCommand {
         className);
     try {
       bclass = context.getWiki().getDocument(bclassDocRef, context).getXClass();
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Cannot get document class [" + className + "].", exp);
     }
     return bclass;
   }
