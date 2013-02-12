@@ -36,12 +36,12 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
   private XClassRegexRule xClassRegexRule;
 
   @Before
-  public void setUp_DocFormCommandTest() throws Exception {
+  public void setUp_XClassRegeRuleTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
-    xClassRegexRule = (XClassRegexRule) Utils.getComponent(IValidationRuleRole.class,
-        "XClassRegexValidation");
+    xClassRegexRule = (XClassRegexRule) Utils.getComponent(
+        IRequestValidationRuleRole.class, "XClassRegexValidation");
   }
 
   @Test
@@ -49,7 +49,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
 
     replayAll();
-    Map<String, Set<String>> result = xClassRegexRule.validate(requestMap);
+    Map<String, Set<String>> result = xClassRegexRule.validateRequest(requestMap);
     verifyAll();
 
     assertTrue("Successful validation should result in an empty map",
@@ -78,7 +78,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(bclassDocRef2), same(context))).andReturn(doc2).times(2);
 
     replayAll();
-    Map<String, Set<String>> result = xClassRegexRule.validate(requestMap);
+    Map<String, Set<String>> result = xClassRegexRule.validateRequest(requestMap);
     verifyAll();
 
     assertTrue("Successful validation should result in an empty map",
@@ -107,7 +107,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(bclassDocRef2), same(context))).andReturn(doc2).times(2);
 
     replayAll();
-    Map<String, Set<String>> result = xClassRegexRule.validate(requestMap);
+    Map<String, Set<String>> result = xClassRegexRule.validateRequest(requestMap);
     verifyAll();
 
     assertNotNull(result);
