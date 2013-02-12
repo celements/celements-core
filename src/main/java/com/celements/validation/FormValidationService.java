@@ -57,7 +57,9 @@ public class FormValidationService implements IFormValidationRole {
       LOGGER.trace("requestMap value '" + value + "'");
       return new String[] { value.toString() };
     } else if (value instanceof String[]) {
-      LOGGER.trace("requestMap value '" + Arrays.toString((String[]) value) + "'");
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("requestMap value '" + Arrays.toString((String[]) value) + "'");
+      }
       return (String[]) value;
     } else {
       throw new IllegalArgumentException("Invalid requestMap value type");

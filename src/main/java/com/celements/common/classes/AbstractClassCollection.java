@@ -90,7 +90,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     if(bclass.get(name) == null) {
       BooleanClass element = new BooleanClass();
       element.setName(name);
-      element.setPrettyName("wheelchair");
+      element.setPrettyName(prettyName);
       element.setDisplayType(displayType);
       element.setDefaultValue(defaultValue);
       element.setObject(bclass);
