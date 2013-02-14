@@ -65,6 +65,12 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
+  public void testNoInitQueryManagerOnCreation() {
+    assertNull("do not use Utils.getComponentManager on object creation."
+        + " It may fail application startup!", new PageLayoutCommand().queryManager);
+  }
+
+  @Test
   public void testGetPageLayoutHQL() {
     assertEquals("select doc.space, pl.prettyname"
         + " from XWikiDocument as doc, BaseObject obj,"

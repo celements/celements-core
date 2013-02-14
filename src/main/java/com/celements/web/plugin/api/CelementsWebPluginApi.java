@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,19 +104,19 @@ public class CelementsWebPluginApi extends Api {
   public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
-    "com.celements.web.ExternalJavaScriptFilesCommand";
-  
+      "com.celements.web.ExternalJavaScriptFilesCommand";
+
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
-    "com.celements.web.PageLayoutCommand";
+      "com.celements.web.PageLayoutCommand";
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebPluginApi.class);
-  
+
   private CelementsWebPlugin plugin;
 
-  private EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
+  private final EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
 
   public CelementsWebPluginApi(
       CelementsWebPlugin plugin,
@@ -176,7 +177,7 @@ public class CelementsWebPluginApi extends Api {
   public NavigationApi createNavigation() {
     return NavigationApi.createNavigation(context);
   }
-  
+
   public void enableMappedMenuItems() {
     plugin.enableMappedMenuItems(context);
   }
@@ -282,15 +283,15 @@ public class CelementsWebPluginApi extends Api {
     return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
   }
 
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator, 
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator, 
+    return getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
         imagesOnly, start, nb);
   }
 
   public List<Attachment> getRandomImages(String fullName,
       int num) throws ClassNotFoundException{
-      return WebUtils.getInstance().getRandomImages(fullName, num, context);
+    return WebUtils.getInstance().getRandomImages(fullName, num, context);
   }
 
   public XWikiMessageTool getMessageTool(String adminLanguage) {
@@ -300,7 +301,7 @@ public class CelementsWebPluginApi extends Api {
   public String getVersionMode() {
     return plugin.getVersionMode(context);
   }
-  
+
   public String getAllExternalJavaScriptFiles() throws XWikiException {
     return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
   }
@@ -312,7 +313,7 @@ public class CelementsWebPluginApi extends Api {
     }
     return (ExternalJavaScriptFilesCommand) context.get(JAVA_SCRIPT_FILES_COMMAND_KEY);
   }
-  
+
   /**
    * @deprecated since 2.11.3 instead use celementsweb script service
    */
@@ -320,7 +321,7 @@ public class CelementsWebPluginApi extends Api {
   public void addImageMapConfig(String configName) {
     getService().addImageMapConfig(configName);
   }
-  
+
   /**
    * @deprecated since 2.11.3 instead use celementsweb script service
    */
@@ -368,32 +369,32 @@ public class CelementsWebPluginApi extends Api {
     }
     return account;
   }
-  
+
   public int getNextObjPageId(String spacename, String classname, String propertyName) throws XWikiException{
     String sql = ", BaseObject as obj, IntegerProperty as art_id";
     sql += " where obj.name=doc.fullName";
     sql += " and obj.className='" + classname + "'";
     sql += " and doc.space='" + spacename + "' and obj.id = art_id.id.id";
     sql += " and art_id.id.name='" + propertyName + "' order by art_id.value desc";
-    
+
     int nextId = 1;
-    
+
     List<XWikiDocument> docs = context.getWiki().getStore().searchDocuments(sql, context);
     if(docs.size() > 0){
       nextId = 1 + docs.get(0).getObject(classname).getIntValue(propertyName);
     }
-    
+
     return nextId;
   }
-  
+
   public String encryptString(String encoding, String str){
     return plugin.encryptString(encoding, str);
   }
-  
+
   public String encryptString(String str){
     return encryptString("hash:SHA-512:", str);
   }
-  
+
   public void sendNewValidation(String user, String possibleFields) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
@@ -406,7 +407,7 @@ public class CelementsWebPluginApi extends Api {
       }
     }
   }
-  
+
   public void sendNewValidation(String user, String possibleFields,
       DocumentReference mailContentDocRef) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
@@ -424,7 +425,7 @@ public class CelementsWebPluginApi extends Api {
           + "] not sent.");
     }
   }
-  
+
   public String getNewValidationTokenForUser() {
     if(hasProgrammingRights() && (context.getUser() != null)) {
       try {
@@ -437,11 +438,11 @@ public class CelementsWebPluginApi extends Api {
     }
     return null;
   }
-  
+
   public String getNewCelementsTokenForUser() {
     return getNewCelementsTokenForUser(false);
   }
-  
+
   public String getNewCelementsTokenForUser(Boolean guestPlus) {
     if(context.getUser() != null) {
       try {
@@ -470,20 +471,20 @@ public class CelementsWebPluginApi extends Api {
     return null;
   }
 
-//  /**
-//   * If a template in the template dir on disk is parsed the hasProbrammingRights will
-//   * return false, because the sdoc and idoc are NULL. hasCelProgrammingRights in contrast
-//   * returns true in this case.
-//   * TODO: Check if there are other cases in which the sdoc AND idoc are null. Check
-//   * TODO: if there is a better way to recognize that a template from disk is rendered.
-//   * 
-//   * @return
-//   */
-//  public boolean hasCelProgrammingRights() {
-//    return (hasProgrammingRights()
-//        || ((context.get("sdoc") == null) && (context.get("idoc") == null)));
-//  }
-  
+  //  /**
+  //   * If a template in the template dir on disk is parsed the hasProbrammingRights will
+  //   * return false, because the sdoc and idoc are NULL. hasCelProgrammingRights in contrast
+  //   * returns true in this case.
+  //   * TODO: Check if there are other cases in which the sdoc AND idoc are null. Check
+  //   * TODO: if there is a better way to recognize that a template from disk is rendered.
+  //   *
+  //   * @return
+  //   */
+  //  public boolean hasCelProgrammingRights() {
+  //    return (hasProgrammingRights()
+  //        || ((context.get("sdoc") == null) && (context.get("idoc") == null)));
+  //  }
+
   private CssCommand getCssCmd() {
     if (!context.containsKey(CELEMENTS_CSSCOMMAND)) {
       context.put(CELEMENTS_CSSCOMMAND, new CssCommand());
@@ -494,7 +495,7 @@ public class CelementsWebPluginApi extends Api {
   public List<CSS> getAllCSS() throws XWikiException{
     return getCssCmd().getAllCSS(context);
   }
-  
+
   public String displayAllCSS() throws XWikiException{
     return getCssCmd().displayAllCSS(context);
   }
@@ -502,7 +503,7 @@ public class CelementsWebPluginApi extends Api {
   public List<CSS> getRTEContentCSS() throws XWikiException{
     return getCssCmd().getRTEContentCSS(context);
   }
-  
+
   public void includeCSSPage(String css) {
     getCssCmd().includeCSSPage(css, context);
   }
@@ -510,7 +511,7 @@ public class CelementsWebPluginApi extends Api {
   public void includeCSSAfterPreferences(String css) throws XWikiException{
     getCssCmd().includeCSSAfterPreferences(css, context);
   }
-  
+
   public void includeCSSAfterSkin(String css){
     getCssCmd().includeCSSAfterSkin(css, context);
   }
@@ -526,15 +527,15 @@ public class CelementsWebPluginApi extends Api {
         + docRef.getName() + "].");
     return emptyCheckCmd.isEmptyRTEDocument(fullName, context);
   }
-  
+
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
     return emptyCheckCmd.isEmptyRTEDocument(documentRef);
   }
-  
+
   public String getEmailAdressForCurrentUser() {
     return plugin.getEmailAdressForUser(context.getUser(), context);
   }
-  
+
   public String getEmailAdressForUser(String username) {
     if (hasProgrammingRights()) {
       return plugin.getEmailAdressForUser(username, context);
@@ -542,16 +543,16 @@ public class CelementsWebPluginApi extends Api {
       return null;
     }
   }
-  
+
   public Map<String, String> activateAccount(String activationCode) throws XWikiException{
     Map<String, String> result = new HashMap<String, String>();
     //TODO Why do we need Programming rights here? and do we realy need them?
-//    if(hasProgrammingRights()){
+    //    if(hasProgrammingRights()){
     result = plugin.activateAccount(activationCode, context);
-//    }
+    //    }
     return result;
   }
-  
+
   /**
    * Returns a list of all parent for a specified doc
    * 
@@ -577,6 +578,7 @@ public class CelementsWebPluginApi extends Api {
    * @deprecated since 2.21.0 instead use
    *             com.celements.pagetype.service.PageTypeScriptService.getPageTypeConfig()
    */
+  @Deprecated
   public IPageType getPageType(String fullName) throws XWikiException {
     return new PageTypeApi(fullName, context);
   }
@@ -584,39 +586,39 @@ public class CelementsWebPluginApi extends Api {
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
     BaseObject skinConfigObj = plugin.getSkinConfigObj(context);
     if (skinConfigObj != null) {
-      return skinConfigObj.newObjectApi(skinConfigObj, context); 
+      return skinConfigObj.newObjectApi(skinConfigObj, context);
     } else {
       return null;
     }
   }
 
   public int sendMail(
-      String from, String replyTo, 
-      String to, String cc, String bcc, 
-      String subject, String htmlContent, String textContent, 
+      String from, String replyTo,
+      String to, String cc, String bcc,
+      String subject, String htmlContent, String textContent,
       List<Attachment> attachments, Map<String, String> others) {
     return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent,
         textContent, attachments, others, context);
   }
-  
+
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = Collections.emptyList();
     if (hasProgrammingRights()){
       LOGGER.info("getAttachmentsForDocs: fetching attachments...");
-      attachments = plugin.getAttachmentsForDocs(docsFN, context);      
+      attachments = plugin.getAttachmentsForDocs(docsFN, context);
     }
     else {
       LOGGER.info("getAttachmentsForDocs: no programming rights");
     }
     return attachments;
   }
-  
+
   // TODO Propabely can be removed as soon as all installations are on xwiki 2+
   @Deprecated
   public int sendLatin1Mail(
-      String from, String replyTo, 
-      String to, String cc, String bcc, 
-      String subject, String htmlContent, String textContent, 
+      String from, String replyTo,
+      String to, String cc, String bcc,
+      String subject, String htmlContent, String textContent,
       List<Attachment> attachments, Map<String, String> others){
     DocumentReference docRef = context.getDoc().getDocumentReference();
     LOGGER.warn("usage of deprecated sendLatin1Mail on ["
@@ -625,11 +627,11 @@ public class CelementsWebPluginApi extends Api {
     return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent,
         attachments, others, true, context);
   }
-  
+
   public String getNextTitledPageFullName(String space, String title){
     return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title, context);
   }
-  
+
   public String getNextUntitledPageFullName(String space) {
     return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, context);
   }
@@ -682,15 +684,15 @@ public class CelementsWebPluginApi extends Api {
   public List<String> getAllowedLanguages() {
     return getWebUtilsService().getAllowedLanguages();
   }
-  
+
   public List<String> getAllowedLanguages(String spaceName) {
     return getWebUtilsService().getAllowedLanguages(spaceName);
   }
-  
+
   public int createUser() throws XWikiException {
     return plugin.createUser(true, context);
   }
-  
+
   public int createUser(boolean validate) throws XWikiException {
     return plugin.createUser(validate, context);
   }
@@ -698,16 +700,16 @@ public class CelementsWebPluginApi extends Api {
   public String getUniqueValidationKey() throws XWikiException {
     return new NewCelementsTokenForUserCommand().getUniqueValidationKey(context);
   }
-  
+
   public String recoverPassword() throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
   }
-  
+
   public String recoverPassword(String account) throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account,
         account);
   }
-  
+
   /**
    * @deprecated since 2.18.0 use instead velocity $datetool.format(format, date)
    */
@@ -715,12 +717,12 @@ public class CelementsWebPluginApi extends Api {
   public Date parseDate(String date, String format) {
     return getWebUtilsService().parseDate(date, format);
   }
-  
+
   @Deprecated
   private ISynCustom getSynCustom() {
     return (ISynCustom) Utils.getComponent(ScriptService.class, "syncustom");
   }
-  
+
   /**
    * @deprecated since 2.10 use syncustom script service direcly instead
    */
@@ -743,7 +745,7 @@ public class CelementsWebPluginApi extends Api {
         + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
     getSynCustom().paymentCallback();
   }
-  
+
   /**
    * @deprecated since 2.10 use syncustom script service direcly instead
    */
@@ -756,7 +758,7 @@ public class CelementsWebPluginApi extends Api {
         + docRef.getName() + "].");
     getSynCustom().sendCallbackNotificationMail(data, recipients);
   }
-  
+
   public boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
@@ -764,15 +766,15 @@ public class CelementsWebPluginApi extends Api {
   public String getParentSpace() {
     return getWebUtilsService().getParentSpace();
   }
-  
+
   public String getRTEConfigField(String name) throws XWikiException {
     return RTEConfig.getInstance(context).getRTEConfigField(name, context);
   }
-  
+
   public String getJSONContent(Document contentDoc) {
     return getWebUtilsService().getJSONContent(contentDoc.getDocument());
   }
-  
+
   /**
    * 
    * @param authorDocName
@@ -785,7 +787,7 @@ public class CelementsWebPluginApi extends Api {
   public String getUserNameForDocName(String authorDocName) throws XWikiException{
     return WebUtils.getInstance().getUserNameForDocName(authorDocName, context);
   }
-  
+
   /**
    * 
    * @param authorDocName
@@ -799,7 +801,7 @@ public class CelementsWebPluginApi extends Api {
     }
     return "N/A";
   }
-  
+
   public String getMajorVersion(Document doc) {
     return getWebUtilsService().getMajorVersion(doc.getDocument());
   }
@@ -841,7 +843,7 @@ public class CelementsWebPluginApi extends Api {
   public Set<Document> updateDocFromRequest() throws XWikiException {
     return updateDocFromRequest(null);
   }
-  
+
   @SuppressWarnings("unchecked")
   public Set<Document> updateDocFromRequest(String fullname
       ) throws XWikiException {
@@ -872,15 +874,15 @@ public class CelementsWebPluginApi extends Api {
     }
     return 0;
   }
-  
+
   public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken) {
     return tokenBasedUpload(attachToDocFN, fieldName, userToken, false);
   }
 
-  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken, 
+  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken,
       Boolean createIfNotExists) {
     try {
-      return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken, 
+      return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken,
           createIfNotExists, context);
     } catch (XWikiException exp) {
       LOGGER.error("token based attachment upload failed: " + exp);
@@ -908,15 +910,15 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-  * Check authentication from logincredential and password and set according persitent
-  * login information If it fails user is unlogged
-  * 
-  * @param username logincredential to check
-  * @param password password to check
-  * @param rememberme "1" if you want to remember the login accross navigator restart
-  * @return null if failed, non null XWikiUser if sucess
-  * @throws XWikiException
-  */
+   * Check authentication from logincredential and password and set according persitent
+   * login information If it fails user is unlogged
+   * 
+   * @param username logincredential to check
+   * @param password password to check
+   * @param rememberme "1" if you want to remember the login accross navigator restart
+   * @return null if failed, non null XWikiUser if sucess
+   * @throws XWikiException
+   */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
     return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
@@ -931,15 +933,21 @@ public class CelementsWebPluginApi extends Api {
   public String validateField(String className, String fieldName, String value) {
     return getDocFormCommand().validateField(className, fieldName, value, context);
   }
- 
+
   /**
-   * 
-   * @return empty map means the validation has been successful. Otherwise the
-   *         validation message configured in the class is returned for not
-   *         validating fields.
+   * @deprecated since 2.2.0 instead use celementsweb script service
    */
+  @Deprecated
   public Map<String, String> validateRequest() {
-    return getDocFormCommand().validateRequest(context);
+    Map<String, String> validateMap = new HashMap<String, String>();
+    Map<String, Set<String>> validateSetMap = getService().validateRequest();
+    for (String key : validateSetMap.keySet()) {
+      Iterator<String> iter = validateSetMap.get(key).iterator();
+      if (iter.hasNext()) {
+        validateMap.put(key, iter.next());
+      }
+    }
+    return validateMap;
   }
 
   private PageLayoutCommand getPageLayoutCmd() {
@@ -986,11 +994,11 @@ public class CelementsWebPluginApi extends Api {
   public boolean addTranslation(String fullName, String language) {
     return new AddTranslationCommand().addTranslation(fullName, language, context);
   }
- 
+
   public boolean addTranslation(DocumentReference docRef, String language) {
     return new AddTranslationCommand().addTranslation(docRef, language);
   }
- 
+
   /**
    * @deprecated since 2.10 use syncustom script service direcly instead
    */
@@ -1013,16 +1021,16 @@ public class CelementsWebPluginApi extends Api {
   public List<String> getSupportedAdminLanguages() {
     return plugin.getSupportedAdminLanguages();
   }
-  
+
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
     return plugin.writeUTF8Response(filename, renderDocFullName, context);
   }
-  
+
   /**
    * @deprecated since 2.10 use syncustom script service direcly instead
    */
   @Deprecated
-  public int countObjsWithField(String fullName, String className, String fieldName, 
+  public int countObjsWithField(String fullName, String className, String fieldName,
       String value, String valueEnd) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
     LOGGER.warn("deprecated usage of countObjsWithField on [" + docRef.getWikiReference()
@@ -1030,12 +1038,12 @@ public class CelementsWebPluginApi extends Api {
     return getSynCustom().countObjsWithField(fullName, className, fieldName, value,
         valueEnd);
   }
-  
+
   /**
    * @deprecated since 2.10 use syncustom script service direcly instead
    */
   @Deprecated
-  public Map<String, Integer> getRegistrationStatistics(Document mappingDoc, 
+  public Map<String, Integer> getRegistrationStatistics(Document mappingDoc,
       String congressName) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
     LOGGER.warn("deprecated usage of getRegistrationStatistics on ["
@@ -1043,7 +1051,7 @@ public class CelementsWebPluginApi extends Api {
         + docRef.getName() + "].");
     return getSynCustom().getRegistrationStatistics(mappingDoc, congressName);
   }
-  
+
   /**
    * @deprecated since 2.10 use syncustom script service direcly instead
    */
@@ -1084,13 +1092,13 @@ public class CelementsWebPluginApi extends Api {
   public Map<String,String> getAllPageLayouts() {
     return getPageLayoutCmd().getAllPageLayouts();
   }
-  
+
   @SuppressWarnings("unchecked")
   public boolean isFormFilled() {
-    return plugin.isFormFilled(context.getRequest().getParameterMap(), 
+    return plugin.isFormFilled(context.getRequest().getParameterMap(),
         Collections.<String>emptySet());
   }
-  
+
   @SuppressWarnings("unchecked")
   public boolean isFormFilled(String excludeFields) {
     Set<String> excludeSet = new HashSet<String>();
@@ -1310,7 +1318,7 @@ public class CelementsWebPluginApi extends Api {
   public boolean isValidLanguage() {
     return getAllowedLanguages().contains(context.getLanguage());
   }
-  
+
   public DocumentCreationWorkerControlApi getTestDocumentCreationWorker() {
     return new DocumentCreationWorkerControlApi(context);
   }
@@ -1327,11 +1335,11 @@ public class CelementsWebPluginApi extends Api {
     LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
   }
 
-  public String isValidUserJSON(String username, String password, String memberOfGroup, 
+  public String isValidUserJSON(String username, String password, String memberOfGroup,
       List<String> returnGroupMemberships) {
     RemoteUserValidator validater = new RemoteUserValidator();
     if(hasProgrammingRights()) {
-      return validater.isValidUserJSON(username, password, memberOfGroup, 
+      return validater.isValidUserJSON(username, password, memberOfGroup,
           returnGroupMemberships, context);
     }
     return null;
@@ -1352,7 +1360,7 @@ public class CelementsWebPluginApi extends Api {
   public boolean congressRegistrationPlausibility(Document document) {
     return getSynCustom().congressRegistrationPlausibility(document);
   }
-  
+
   public com.xpn.xwiki.api.Object newObjectForFormStorage(Document storageDoc,
       String className) {
     if (hasProgrammingRights()) {
@@ -1364,11 +1372,11 @@ public class CelementsWebPluginApi extends Api {
     }
     return null;
   }
-  
+
   public boolean checkCaptcha() {
     return new CaptchaCommand().checkCaptcha(context);
   }
-  
+
   public String getCaptchaId() {
     return new CaptchaCommand().getCaptchaId(context);
   }
@@ -1377,7 +1385,7 @@ public class CelementsWebPluginApi extends Api {
    * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as
    * a Map.
    * @param options The String saved in the store object
-   * @return Map containing all the 
+   * @return Map containing all the
    */
   public Map<String, String> getObjStoreOptionsMap(String options) {
     return (new ParseObjStoreCommand()).getObjStoreOptionsMap(options, context);
@@ -1411,7 +1419,7 @@ public class CelementsWebPluginApi extends Api {
     }
     return loginRedirectURL;
   }
-  
+
   public boolean isCelementsRights(String fullName) {
     return new CelementsRightsCommand().isCelementsRights(fullName, context);
   }
@@ -1474,23 +1482,23 @@ public class CelementsWebPluginApi extends Api {
     return getService().getSkinFile(fileName, action);
   }
 
-  public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference, 
+  public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference,
       String fieldname) {
     return new SuggestBaseClass(classreference, fieldname, context);
   }
 
-  public List<Object> getSuggestList(DocumentReference classRef, String fieldname, 
+  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
       String input) {
     return new SuggestListCommand().getSuggestList(classRef, fieldname, null, input, "",
         "", 0, context);
   }
 
-  public List<Object> getSuggestList(DocumentReference classRef, String fieldname, 
+  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
       List<String> excludes, String input, String firstCol, String secCol, int limit) {
-    return new SuggestListCommand().getSuggestList(classRef, fieldname, excludes, 
+    return new SuggestListCommand().getSuggestList(classRef, fieldname, excludes,
         input, firstCol, secCol, limit, context);
   }
-  
+
   public String getDefaultSpace() {
     return context.getWiki().getDefaultSpace(context);
   }

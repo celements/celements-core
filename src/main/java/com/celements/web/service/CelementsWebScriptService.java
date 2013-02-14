@@ -24,6 +24,8 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +43,7 @@ import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
+import com.celements.validation.IFormValidationRole;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
@@ -71,8 +74,11 @@ public class CelementsWebScriptService implements ScriptService {
   IWebUtilsService webUtilsService;
 
   @Requirement
+  IFormValidationRole formValidationService;
+
+  @Requirement
   Execution execution;
-  
+
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
@@ -196,7 +202,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   public String getHumanReadableSize(int bytes, boolean si, Locale locale) {
     int unit = si ? 1000 : 1024;
-    if (bytes < unit) return bytes + " B";
+    if (bytes < unit) {
+      return bytes + " B";
+    }
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
     NumberFormat decimalFormat = DecimalFormat.getInstance(locale);
@@ -244,7 +252,7 @@ public class CelementsWebScriptService implements ScriptService {
   public void addImageMapConfig(String configName) {
     getImageMapCommand().addMapConfig(configName);
   }
-  
+
   public String displayImageMapConfigs() {
     return getImageMapCommand().displayAllImageMapConfigs();
   }
@@ -366,8 +374,17 @@ public class CelementsWebScriptService implements ScriptService {
 
   private String getDeletedDocsHql() {
     return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
-         + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
-         + " order by 1 asc";
+        + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
+        + " order by 1 asc";
+  }
+
+  /**
+   * 
+   * @return empty map means the validation has been successful. Otherwise validation
+   *          messages are returned for invalid fields.
+   */
+  public Map<String, Set<String>> validateRequest() {
+    return formValidationService.validateRequest();
   }
 
 }
