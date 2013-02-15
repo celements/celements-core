@@ -23,6 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xwiki.context.Execution;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
@@ -30,6 +35,7 @@ import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 public class InheritorFactory {
 
@@ -120,6 +126,29 @@ public class InheritorFactory {
 
   String getSpacePreferencesFullName(String fullName) {
     return fullName.substring(0, fullName.indexOf('.')) + ".WebPreferences";
+  }
+
+  public FieldInheritor getConfigFieldInheritor(DocumentReference classDocRef,
+      DocumentReference docRef) {
+    String className = getRefSerializer().serialize(classDocRef);
+    String fullName = getRefSerializer().serialize(docRef);
+    return getFieldInheritor(className, Arrays.asList(fullName,
+        getSpacePreferencesFullName(fullName), getXWikiPreferencesFullName(fullName)),
+        getContext());
+  }
+
+  private String getXWikiPreferencesFullName(String fullName) {
+    return fullName.substring(0, fullName.indexOf(':')) + ":XWiki.XWikiPreferences";
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
+  }
+
+  private DefaultStringEntityReferenceSerializer getRefSerializer() {
+    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
+        EntityReferenceSerializer.class);
   }
 
 }

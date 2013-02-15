@@ -130,8 +130,7 @@ public class ContextMenuBuilder {
       for (Object theobj : getCMIobjects(className, context)) {
         if (theobj instanceof BaseObject) {
           BaseObject menuItem = (BaseObject)theobj;
-          ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId,
-              context);
+          ContextMenuItem cmItem = new ContextMenuItem(menuItem, elemId, context);
           if (!"".equals(cmItem.getLink().trim())
               && !"".equals(cmItem.getText().trim())) {
             contextMenuItemList.add(cmItem);
@@ -146,7 +145,7 @@ public class ContextMenuBuilder {
   }
 
   @SuppressWarnings("unchecked")
-  private Vector getCMIobjects(String className, XWikiContext context)
+  private List getCMIobjects(String className, XWikiContext context)
       throws XWikiException {
     String fullName = "CelementsContextMenu." + className;
     Vector cmiObjects = new Vector();

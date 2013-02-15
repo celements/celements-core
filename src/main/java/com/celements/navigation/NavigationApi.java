@@ -100,7 +100,11 @@ public class NavigationApi extends Api {
   }
 
   public String includeNavigation() {
-    return navigation.includeNavigation(context);
+    return navigation.includeNavigation();
+  }
+  
+  public String includeNavigation(DocumentReference parentRef) {
+    return navigation.includeNavigation(parentRef);
   }
   
   public int getMenuItemPos(String fullName) {
@@ -134,7 +138,10 @@ public class NavigationApi extends Api {
   }
 
   public String getPrevMenuItemFullName(com.xpn.xwiki.api.Object menuItem) {
-    return navigation.getPrevMenuItemFullName(menuItem.getName(), context);
+    if (menuItem != null) {
+      return navigation.getPrevMenuItemFullName(menuItem.getName(), context);
+    }
+    return null;
   }
 
   public String getNextMenuItemFullName(com.xpn.xwiki.api.Object menuItem) {
@@ -246,6 +253,10 @@ public class NavigationApi extends Api {
     navigation.setShowInactiveToLevel(showInactiveToLevel);
   }
 
+  public void setPresentationType(String presentationTypeHint) {
+    navigation.setPresentationType(presentationTypeHint);
+  }
+
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
@@ -253,6 +264,10 @@ public class NavigationApi extends Api {
   private NavigationClasses getNavigationClasses() {
     return (NavigationClasses) Utils.getComponent(IClassCollectionRole.class,
         "celements.celNavigationClasses");
+  }
+
+  public boolean isEmptyMainMenu() {
+    return navigation.isEmptyMainMenu();
   }
 
 }

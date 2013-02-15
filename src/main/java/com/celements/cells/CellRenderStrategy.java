@@ -21,8 +21,10 @@ package com.celements.cells;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.common.classes.IClassCollectionRole;
@@ -85,7 +87,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   }
 
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
-    String cssClasses = "";
+    String cssClasses = "cel_cell";
     String cssStyles = "";
     String idname = "";
     try {
@@ -96,9 +98,17 @@ public class CellRenderStrategy implements IRenderStrategy {
       BaseObject cellObj = cellDoc.getXObject(cellClasses.getCellClassRef(
           cellDocRef.getWikiReference().getName()));
       if(cellObj != null) {
-        cssClasses = cellObj.getStringValue("css_classes");
+        String cellObjCssClasses = cellObj.getStringValue("css_classes");
+        if ((cellObjCssClasses != null) && !"".equals(cellObjCssClasses)) {
+          cssClasses += " " + cellObjCssClasses;
+        }
         cssStyles = cellObj.getStringValue("css_styles");
         idname  = cellObj.getStringValue("idname");
+      }
+      if ((idname == null) || "".equals(idname)) {
+        String nodeFN = getRefSerializer().serialize(node.getDocumentReference());
+        nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
+        idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
     } catch (XWikiException e) {
       LOGGER.error("failed to get cell [" + node.getDocumentReference()
@@ -143,6 +153,11 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   public void setSpaceReference(SpaceReference spaceReference) {
     this.spaceReference = spaceReference;
+  }
+
+  private DefaultStringEntityReferenceSerializer getRefSerializer() {
+    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
+        EntityReferenceSerializer.class);
   }
 
 }

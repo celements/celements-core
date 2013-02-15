@@ -74,15 +74,16 @@ public class PageType {
 
   public BaseObject getPageTypeProperties(XWikiContext context) {
     try {
-      return getTemplateDocument(context).getObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
+      return getTemplateDocument(context).getObject(
+          PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     } catch (XWikiException e) {
       return null;
     }
   }
 
   public boolean hasPageTitle(XWikiContext context) {
-    return (getPageTypeProperties(context
-        ).getIntValue("haspagetitle") == 1);
+    BaseObject ptPropObj = getPageTypeProperties(context);
+    return ((ptPropObj != null) && (ptPropObj.getIntValue("haspagetitle") == 1));
   }
 
   public boolean showFrame(XWikiContext context) {

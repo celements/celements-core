@@ -18,6 +18,11 @@ public interface ITreeNodeService {
   public int getMenuItemPos(DocumentReference docRef, String menuPart);
 
   /**
+   * since 2.24.0
+   */
+  public boolean isTreeNode(DocumentReference docRef);
+
+  /**
    * 
    * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
    * getSubNodesForParent(EntityReference, String) instead

@@ -38,6 +38,7 @@ import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.navigation.service.TreeNodeService;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -136,12 +138,15 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
+    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
+        ).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
+    context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
-    context.setDoc(doc);
+    expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
@@ -169,12 +174,15 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
+    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
+        ).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
+    context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
-    context.setDoc(doc);
+    expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
@@ -201,12 +209,15 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
+    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
+        ).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
+    context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
-    context.setDoc(doc);
+    expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
@@ -238,12 +249,15 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
+    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
+        ).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
+    context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))
         ).andReturn(null).atLeastOnce();
-    context.setDoc(doc);
+    expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
     DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);

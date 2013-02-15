@@ -19,6 +19,7 @@
  */
 package com.celements.web.token;
 
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,7 +27,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -36,23 +36,19 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
-  
-  @Requirement
-  QueryManager queryManager;
-  
-  @Requirement
-  EntityReferenceResolver<String> stringRefResolver;
-  
-  @Requirement
-  EntityReferenceSerializer<String> refSerializer;
+  EntityReferenceSerializer injected_refSerializer;
 
+  QueryManager injected_queryManager;
+  
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewCelementsTokenForUserCommand.class);
 
@@ -105,20 +101,28 @@ public class NewCelementsTokenForUserCommand {
     return validkey;
   }
 
-  void removeOutdatedTokens(XWikiDocument userDoc) {
+  synchronized void removeOutdatedTokens(XWikiDocument userDoc) {
     String xwql = "select obj.number " +
         "from Document as doc, doc.object(Classes.TokenClass) as obj " +
         "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
-    String now = (new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")).format(new Date());
     try {
-      for(Object retNr : queryManager.createQuery(xwql, Query.XWQL).bindValue("now", now
-          ).bindValue("doc", refSerializer.serialize(userDoc.getDocumentReference())
-          ).setWiki(userDoc.getDocumentReference().getLastSpaceReference().getParent(
-          ).getName()).execute()) {
+      DocumentReference docRef = userDoc.getDocumentReference();
+      Query query = getQueryManagerComponent().createQuery(xwql, Query.XWQL);
+      query.bindValue("now", new Date());
+      query.bindValue("doc", getSerializerComponent().serialize(docRef));
+      query.setWiki(docRef.getLastSpaceReference().getParent().getName());
+      List<Object> tokenResults = query.execute();
+      LOGGER.trace("userDoc: " + userDoc);
+      LOGGER.trace("Tokens to delete: " + tokenResults.size() + " in wiki " + docRef.getLastSpaceReference().getParent().getName());
+      DocumentReference tokenClassRef = getTokenClassDocRef(new WikiReference(
+          userDoc.getDocumentReference().getLastSpaceReference().getParent()));
+      for(Object retNr : tokenResults) {
         int nr = Integer.parseInt(retNr.toString());
-        BaseObject obj = userDoc.getXObject(getTokenClassDocRef(new WikiReference(
-            userDoc.getDocumentReference().getLastSpaceReference().getParent())), nr);
-        userDoc.removeXObject(obj);
+        BaseObject obj = userDoc.getXObject(tokenClassRef, nr);
+        LOGGER.trace("deleting token " + nr + " of ref '" + tokenClassRef + "' obj is " + obj);
+        if(obj != null) {
+          userDoc.removeXObject(obj);
+        }
       }
     } catch (QueryException qe) {
       LOGGER.error("Exception querying for outdated tokens with xwql [" + xwql + "]", qe);
@@ -126,10 +130,23 @@ public class NewCelementsTokenForUserCommand {
   }
   
   DocumentReference getTokenClassDocRef(WikiReference wikiRef) {
-    return new DocumentReference(stringRefResolver.resolve(
-        "Classes.TokenClass", EntityType.DOCUMENT, wikiRef));
+    return new DocumentReference(wikiRef.getName(), "Classes", "TokenClass");
   }
   
+  QueryManager getQueryManagerComponent() {
+    if(injected_queryManager != null) {
+      return injected_queryManager;
+    }
+    return Utils.getComponent(QueryManager.class);
+  }
+  
+  EntityReferenceSerializer<String> getSerializerComponent() {
+    if(injected_refSerializer != null) {
+      return injected_refSerializer;
+    }
+    return Utils.getComponent(EntityReferenceSerializer.class, "local");
+  }
+
   public String getUniqueValidationKey(XWikiContext context)
       throws XWikiException {
     XWikiStoreInterface storage = context.getWiki().getStore();
@@ -147,6 +164,56 @@ public class NewCelementsTokenForUserCommand {
     }
     
     return validkey;
+  }
+
+  /**
+   * 
+   * @param accountName
+   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
+   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param context
+   * @param minutesValid 
+   * @return token (or null if token can not be generated)
+   * @throws XWikiException
+   */
+  public String getNewCelementsTokenForUserWithAuthentication(String accountName,
+      Boolean guestPlus, int minutesValid, XWikiContext context) throws XWikiException {
+    accountName = authenticateForRequest(accountName, context);
+    return getNewCelementsTokenForUser(accountName, guestPlus, minutesValid, context);
+  }
+
+  /**
+   * 
+   * @param accountName
+   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
+   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param context
+   * @return token (or null if token can not be generated)
+   * @throws XWikiException
+   */
+  public String getNewCelementsTokenForUserWithAuthentication(String accountName,
+      Boolean guestPlus, XWikiContext context) throws XWikiException {
+    accountName = authenticateForRequest(accountName, context);
+    return getNewCelementsTokenForUser(accountName, guestPlus, context);
+  }
+
+  private String authenticateForRequest(String accountName, XWikiContext context
+      ) throws XWikiException {
+    if (!"".equals(context.getRequest().getParameter("j_username"))
+        && !"".equals(context.getRequest().getParameter("j_password"))) {
+      LOGGER.info("getNewCelementsTokenForUser: trying to authenticate  "
+          + context.getRequest().getParameter("j_username"));
+      Principal principal = context.getWiki().getAuthService().authenticate(
+          context.getRequest().getParameter("j_username"),
+          context.getRequest().getParameter("j_password"), context);
+      if(principal != null) {
+        LOGGER.info("getNewCelementsTokenForUser: successfully autenthicated "
+            + principal.getName());
+        context.setUser(principal.getName());
+        accountName = principal.getName();
+      }
+    }
+    return accountName;
   }
 
 }

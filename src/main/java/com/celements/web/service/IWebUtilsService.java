@@ -70,10 +70,16 @@ public interface IWebUtilsService {
   public String getAdminLanguage(String userFullName);
 
   public String getDefaultLanguage();
+
+  public String getDefaultLanguage(String spaceName);
   
   public boolean hasParentSpace();
 
+  public boolean hasParentSpace(String spaceName);
+
   public String getParentSpace();
+
+  public String getParentSpace(String spaceName);
 
   public DocumentReference resolveDocumentReference(String fullName);
 

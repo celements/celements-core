@@ -449,8 +449,6 @@ public class CheckClassesCommand {
     needsUpdate |= bclass.addTextField("doc_fullName", "doc_fullName", 30);
     needsUpdate |= bclass.addTextAreaField("completeRuleSnippet",
         "is Form complete Rule", 80, 15);
-    needsUpdate |= bclass.addTextField("excludeFromIsFilledCheck", "Exclude fields from"
-        + " 'isFilled' check. (separator: ',')", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
@@ -475,6 +473,8 @@ public class CheckClassesCommand {
     bclass.setName("Celements2.FormConfigClass");
     needsUpdate |= bclass.addTextField("successfulpage", "successfulpage", 30);
     needsUpdate |= bclass.addTextField("failedpage", "failedpage", 30);
+    needsUpdate |= bclass.addTextField("excludeFromIsFilledCheck", "Exclude fields from"
+        + " 'isFilled' check. (separator: ',')", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
