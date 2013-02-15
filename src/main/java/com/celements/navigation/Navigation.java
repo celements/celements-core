@@ -187,8 +187,9 @@ public class Navigation implements INavigation {
   public void setPresentationType(String presentationTypeHint) {
     if (presentationTypeHint != null) {
       try {
-        setPresentationType(Utils.getComponentManager().lookup(
-            IPresentationTypeRole.class, presentationTypeHint));
+        setPresentationType(Utils.getComponentManager(
+            ).<IPresentationTypeRole>getInstance(IPresentationTypeRole.class,
+                presentationTypeHint));
       } catch (ComponentLookupException failedToLoadException) {
         LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
             + presentationTypeHint + "].", failedToLoadException);
