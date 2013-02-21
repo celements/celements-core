@@ -66,7 +66,7 @@ IFieldValidationRuleRole {
       String regex = getFieldFromProperty(propertyClass, "validationRegExp");
       String validationMsg = getFieldFromProperty(propertyClass, "validationMessage");
       try {
-        if (!matchesRegex(regex, value)) {
+        if (!regex.isEmpty() && !matchesRegex(regex, value)) {
           validationSet.add(validationMsg);
           LOGGER.trace("For field '" + className + "_" + fieldName + "', value '" + value
               + "' didn't match regex '" + regex + "'. validationMsg: " + validationMsg);
