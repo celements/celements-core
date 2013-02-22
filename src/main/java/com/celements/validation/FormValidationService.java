@@ -1,6 +1,5 @@
 package com.celements.validation;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -54,17 +53,17 @@ public class FormValidationService implements IFormValidationRole {
       String[] value = getValueAsStringArray(requestMap.get(keyObj));
       convertedMap.put(key, value);
     }
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("request map: " + requestMap);
+      LOGGER.trace("converted map: " + convertedMap);
+    }
     return convertedMap;
   }
 
   String[] getValueAsStringArray(Object value) {
     if (value instanceof String) {
-      LOGGER.trace("requestMap value '" + value + "'");
       return new String[] { value.toString() };
     } else if (value instanceof String[]) {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("requestMap value '" + Arrays.toString((String[]) value) + "'");
-      }
       return (String[]) value;
     } else {
       throw new IllegalArgumentException("Invalid requestMap value type");
@@ -75,6 +74,7 @@ public class FormValidationService implements IFormValidationRole {
     Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
     Map<RequestParameter, String[]> convertedMap = convertMapKeys(requestMap);
     for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
+      LOGGER.trace("Calling validateRequest() for rule '" + validationRule + "'");
       mergeMaps(validationRule.validateRequest(convertedMap), validationMap);
     }
     return validationMap;
