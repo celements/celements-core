@@ -22,7 +22,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 @Component("XClassRegexValidation")
 public class XClassRegexRule implements IRequestValidationRuleRole,
-    IFieldValidationRuleRole {
+IFieldValidationRuleRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       XClassRegexRule.class);
@@ -39,6 +39,9 @@ public class XClassRegexRule implements IRequestValidationRuleRole,
 
   public Map<String, Set<String>> validateRequest(Map<RequestParameter,
       String[]> requestMap) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("validateRequest() called with requestMap: " + requestMap);
+    }
     Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
     for (RequestParameter param : requestMap.keySet()) {
       Set<String> resultSet = new HashSet<String>();
@@ -48,6 +51,9 @@ public class XClassRegexRule implements IRequestValidationRuleRole,
       if (!resultSet.isEmpty()) {
         validationMap.put(param.getParameterName(), resultSet);
       }
+    }
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Returning validation map: " + validationMap);
     }
     return validationMap;
   }
@@ -60,14 +66,20 @@ public class XClassRegexRule implements IRequestValidationRuleRole,
       String regex = getFieldFromProperty(propertyClass, "validationRegExp");
       String validationMsg = getFieldFromProperty(propertyClass, "validationMessage");
       try {
-        if (!matchesRegex(regex, value)) {
+        if (!regex.isEmpty() && !matchesRegex(regex, value)) {
           validationSet.add(validationMsg);
+          LOGGER.trace("For field '" + className + "_" + fieldName + "', value '" + value
+              + "' didn't match regex '" + regex + "'. validationMsg: " + validationMsg);
         }
       } catch (MalformedPerl5PatternException exc) {
         LOGGER.error("Failed to execute validation regex for field '" + fieldName
             + "' in class '" + className + "'", exc);
         validationSet.add(validationMsg);
       }
+    }
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Returning validation set for field '" + className + "_" + fieldName
+          + "' and value '" + value + "': " + validationSet);
     }
     return validationSet;
   }
@@ -85,10 +97,11 @@ public class XClassRegexRule implements IRequestValidationRuleRole,
 
   String getFieldFromProperty(PropertyClass propertyClass, String fieldName) {
     BaseProperty property = (BaseProperty) propertyClass.getField(fieldName);
+    String field = "";
     if ((property != null) && (property.getValue() != null)) {
-      return property.getValue().toString();
+      field = property.getValue().toString();
     }
-    return "";
+    return field;
   }
 
   private boolean matchesRegex(String regex, String str)
