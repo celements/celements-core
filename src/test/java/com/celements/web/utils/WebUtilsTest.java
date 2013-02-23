@@ -75,6 +75,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     mockXStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockXStore).anyTimes();
     context.setURLFactory(mockURLFactory);
+    expect(wiki.isVirtualMode()).andReturn(true).anyTimes();
   }
   
   @Test
@@ -631,7 +632,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_defaultToDocLanguage() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser(userName);
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
@@ -639,6 +639,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
         ).andReturn("de");
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(userName);
     assertEquals("de", celUtils.getAdminLanguage(context));
     verifyAll();
   }
@@ -647,7 +650,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_contextUser() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser(userName);
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
@@ -659,6 +661,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     userDoc.setXObject(0, userObj);
     expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(userName);
     assertEquals("fr", celUtils.getAdminLanguage(context));
     verifyAll();
   }
@@ -667,7 +672,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_notContextUser() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser("XWiki.NotMyUser");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
@@ -679,6 +683,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     userDoc.setXObject(0, userObj);
     expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.NotMyUser");
     assertEquals("fr", celUtils.getAdminLanguage(userName, context));
     verifyAll();
   }
@@ -687,7 +694,6 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_defaultToWebPreferences() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser("XWiki.NotMyUser");
     expect(wiki.getSpacePreference(eq("admin_language"), isA(String.class), same(context))
         ).andReturn("en");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
@@ -701,6 +707,9 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     userDoc.setXObject(0, userObj);
     expect(wiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.NotMyUser");
     assertEquals("en", celUtils.getAdminLanguage(userName, context));
     verifyAll();
   }
