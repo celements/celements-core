@@ -821,7 +821,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
     ComponentManager mockComponentManager = createMock(ComponentManager.class);
     Utils.setComponentManager(mockComponentManager);
-    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+    expect(mockComponentManager.getInstance(eq(IPresentationTypeRole.class),
         eq("testPresentationType"))).andReturn(componentInstance);
     replayAll(mockComponentManager, componentInstance);
     nav.loadConfigFromObject(navConfigObj);
@@ -834,7 +834,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     IPresentationTypeRole componentInstance = createMock(IPresentationTypeRole.class);
     ComponentManager mockComponentManager = createMock(ComponentManager.class);
     Utils.setComponentManager(mockComponentManager);
-    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+    expect(mockComponentManager.getInstance(eq(IPresentationTypeRole.class),
         eq("testPresentationType"))).andReturn(componentInstance);
     replayAll(mockComponentManager, componentInstance);
     nav.setPresentationType("testPresentationType");
@@ -857,7 +857,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   public void testSetPresentationType_NotFoundException() throws Exception {
     ComponentManager mockComponentManager = createMock(ComponentManager.class);
     Utils.setComponentManager(mockComponentManager);
-    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+    expect(mockComponentManager.getInstance(eq(IPresentationTypeRole.class),
         eq("testNotFoundPresentationType"))).andThrow(new ComponentLookupException(
             "not found"));
     replayAll(mockComponentManager);
