@@ -19,10 +19,10 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.util.Date;
-
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
+
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +49,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     createDocumentCmd = new CreateDocumentCommand();
     webServiceMock = createMock(IWebUtilsService.class);
     createDocumentCmd.injected_webService = webServiceMock;
@@ -58,11 +59,13 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testInitNewXWikiDocument() {
     String authorUser = "XWiki.MyAuthor";
-    context.setUser(authorUser);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myNewDocument");
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(authorUser);
     Date beforeDate = new Date();
     createDocumentCmd.initNewXWikiDocument(theNewDoc);
     Date afterDate = new Date();

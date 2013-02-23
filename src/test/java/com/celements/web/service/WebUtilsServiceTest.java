@@ -41,6 +41,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
   
   @Test
@@ -384,7 +385,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_defaultToDocLanguage() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser(userName);
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
@@ -392,6 +392,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
         ).andReturn("de");
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(userName);
     assertEquals("de", webUtilsService.getAdminLanguage());
     verifyAll();
   }
@@ -400,7 +403,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_contextUser() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser(userName);
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
@@ -412,6 +414,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     userDoc.setXObject(0, userObj);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(userName);
     assertEquals("fr", webUtilsService.getAdminLanguage());
     verifyAll();
   }
@@ -420,7 +425,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_notContextUser() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser("XWiki.NotMyUser");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
@@ -432,6 +436,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     userDoc.setXObject(0, userObj);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.NotMyUser");
     assertEquals("fr", webUtilsService.getAdminLanguage(userName));
     verifyAll();
   }
@@ -440,7 +447,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_defaultToWebPreferences() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
-    context.setUser("XWiki.NotMyUser");
     expect(xwiki.getSpacePreference(eq("admin_language"), isA(String.class), same(context))
         ).andReturn("en");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
@@ -454,39 +460,45 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     userDoc.setXObject(0, userObj);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.NotMyUser");
     assertEquals("en", webUtilsService.getAdminLanguage(userName));
     verifyAll();
   }
 
   @Test
   public void testIsAdminUser_noAdminRights_noRightsService() {
-    context.setUser("XWiki.TestUser");
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "MyDocument");
     context.setDoc(new XWikiDocument(currentDocRef));
     expect(xwiki.getRightService()).andReturn(null).anyTimes();
 
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.TestUser");
     assertFalse(webUtilsService.isAdminUser());
     verifyAll();
   }
   
   @Test
   public void testIsAdminUser_noContextDoc() {
-    context.setUser("XWiki.TestUser");
     context.setDoc(null);
     XWikiRightService mockRightsService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     //hasAdminRights must not be called it will fail with an NPE
 
     replayAll(mockRightsService);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.TestUser");
     assertFalse(webUtilsService.isAdminUser());
     verifyAll(mockRightsService);
   }
   
   @Test
   public void testIsAdminUser_noAdminRights_notInAdminGroup() throws Exception {
-    context.setUser("XWiki.TestUser");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "TestUser");
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
@@ -501,13 +513,15 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
         same(context))).andReturn(emptyGroupList).atLeastOnce();
     replayAll(mockRightsService, groupServiceMock);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.TestUser");
     assertFalse(webUtilsService.isAdminUser());
     verifyAll(mockRightsService, groupServiceMock);
   }
   
   @Test
   public void testIsAdminUser_noAdminRights_isInAdminGroup() throws Exception {
-    context.setUser("XWiki.TestUser");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "TestUser");
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
@@ -523,13 +537,15 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
         same(context))).andReturn(Arrays.asList(adminGroupDocRef)).atLeastOnce();
     replayAll(mockRightsService, groupServiceMock);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.TestUser");
     assertTrue(webUtilsService.isAdminUser());
     verifyAll(mockRightsService, groupServiceMock);
   }
   
   @Test
   public void testIsAdminUser_adminRights_notInAdminGroup() {
-    context.setUser("XWiki.TestUser");
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "MyDocument");
     context.setDoc(new XWikiDocument(currentDocRef));
@@ -538,6 +554,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
 
     replayAll(mockRightsService);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.TestUser");
     assertNotNull(context.getXWikiUser());
     assertNotNull(context.getDoc());
     assertTrue(webUtilsService.isAdminUser());
@@ -546,7 +565,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsAdvancedAdmin_NPE_noUserObj() throws Exception {
-    context.setUser("XWiki.XWikiGuest");
     DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiGuest");
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
@@ -559,6 +577,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(guestUserDoc
         ).anyTimes();
     replayAll(mockRightsService);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.XWikiGuest");
     assertNotNull(context.getXWikiUser());
     assertNotNull(context.getDoc());
     assertFalse(webUtilsService.isAdvancedAdmin());

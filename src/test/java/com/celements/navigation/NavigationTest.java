@@ -20,6 +20,8 @@
 package com.celements.navigation;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -99,6 +101,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     mockRightService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test
@@ -925,7 +928,6 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeNavigation_noItemLevel1_hasEdit() throws Exception {
     String myUserName = "XWiki.MyUserName";
-    context.setUser(myUserName);
     nav.fromHierarchyLevel = 1;
     nav.toHierarchyLevel = 1;
     expect(wUServiceMock.getParentForLevel(1)).andReturn(null).atLeastOnce();
@@ -946,6 +948,9 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     ((TestMessageTool)context.getMessageTool()).injectMessage("cel_nav_nomenuitems",
         "No Navitems found.");
     replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(myUserName);
     assertEquals("no menuitem for level 1. Yet with hasEdit, thus no empty string"
         + " expected.", "<ul><li class=\"first last cel_nav_odd cel_nav_item1"
         + " cel_nav_hasChildren\">"
