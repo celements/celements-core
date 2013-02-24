@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -125,5 +126,9 @@ public interface IWebUtilsService {
   public DocumentReference getWikiTemplateDocRef();
 
   public XWikiDocument getWikiTemplateDoc();
+
+  public EntityReferenceSerializer<String> getRefDefaultSerializer();
+
+  public EntityReferenceSerializer<String> getRefLocalSerializer();
 
 }

@@ -695,4 +695,12 @@ public class WebUtilsService implements IWebUtilsService {
     return null;
   }
 
+  public EntityReferenceSerializer<String> getRefDefaultSerializer() {
+    return serializer_default;
+  }
+
+  public EntityReferenceSerializer<String> getRefLocalSerializer() {
+    return serializer_local;
+  }
+
 }
