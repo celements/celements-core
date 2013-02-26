@@ -44,6 +44,7 @@ import com.celements.iterator.XObjectIterator;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
+import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -526,6 +527,13 @@ public class TreeNodeService implements ITreeNodeService {
     }
     LOGGER.debug("parent is null");
     return new ArrayList<TreeNode>();
+  }
+
+  public void enableMappedMenuItems() {
+    GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
+    cmd.set_isActive(true);
+    getContext().put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, 
+        cmd);
   }
   
   DocumentReference getRef(String spaceName, String pageName){

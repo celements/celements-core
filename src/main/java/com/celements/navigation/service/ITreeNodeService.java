@@ -67,6 +67,8 @@ public interface ITreeNodeService {
   
   public TreeNode getNextMenuItem(DocumentReference docRef) throws XWikiException;
   
-  public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart); 
+  public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart);
+  
+  public void enableMappedMenuItems();
 
 }

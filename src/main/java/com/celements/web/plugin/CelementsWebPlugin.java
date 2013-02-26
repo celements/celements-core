@@ -605,6 +605,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         context);
   }
 
+  /**
+   * @deprecated since 2.2 use ITreeNodeService instead
+   */
+  @Deprecated
   public void enableMappedMenuItems(XWikiContext context) {
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
     cmd.set_isActive(true);

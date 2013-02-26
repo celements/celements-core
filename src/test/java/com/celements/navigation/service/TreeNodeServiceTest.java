@@ -913,6 +913,17 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(spaceName+"."+docName,
         treeNodeService.getParentKey(docRef, false));
   }
+  
+  @Test
+  public void testEnableMappedMenuItems() {
+    treeNodeService.enableMappedMenuItems();
+    assertTrue(context.get(GetMappedMenuItemsForParentCommand.
+        CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
+    assertTrue(context.get(GetMappedMenuItemsForParentCommand.
+        CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
+    assertTrue(((GetMappedMenuItemsForParentCommand)context.get(
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).is_isActive());
+  }
 
 
   private void replayAll(Object ... mocks) {
