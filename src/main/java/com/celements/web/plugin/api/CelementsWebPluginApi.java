@@ -45,7 +45,7 @@ import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
-import com.celements.navigation.service.ITreeNodeService;
+import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
@@ -170,43 +170,68 @@ public class CelementsWebPluginApi extends Api {
     return new ContextMenuItemApi(menuItem, elemId, context);
   }
 
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public NavContextMenuApi getNavContextMenu() {
-    return NavContextMenuApi.getNavContextMenu(context);
-  }
-
-  public NavigationApi createNavigation() {
-    return NavigationApi.createNavigation(context);
-  }
-
-  public void enableMappedMenuItems() {
-    plugin.enableMappedMenuItems(context);
-  }
-
-  public int getMaxConfiguredNavigationLevel() {
-    return getTreeNodeService().getMaxConfiguredNavigationLevel();
+    return getTreeNodeScriptService().getNavContextMenu();
   }
 
   /**
-   * since 2.24.0
+   * @deprecated since 2.2 use treeNode script service instead
    */
+  @Deprecated
+  public NavigationApi createNavigation() {
+    return getTreeNodeScriptService().createNavigation();
+  }
+
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
+  public void enableMappedMenuItems() {
+    getTreeNodeScriptService().enableMappedMenuItems();
+  }
+
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
+  public int getMaxConfiguredNavigationLevel() {
+    return getTreeNodeScriptService().getMaxConfiguredNavigationLevel();
+  }
+
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public boolean isTreeNode(DocumentReference docRef) {
-    return getTreeNodeService().isTreeNode(docRef);
+    return getTreeNodeScriptService().isTreeNode(docRef);
   }
 
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public boolean isNavigationEnabled(String configName) {
-    NavigationApi nav = NavigationApi.createNavigation(context);
-    nav.loadConfigByName(configName);
-    return nav.isNavigationEnabled();
+    return getTreeNodeScriptService().isNavigationEnabled(configName);
   }
 
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public NavigationApi getNavigation(String configName) {
-    NavigationApi nav = NavigationApi.createNavigation(context);
-    nav.loadConfigByName(configName);
-    return nav;
+    return getTreeNodeScriptService().getNavigation(configName);
   }
 
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public String includeNavigation(String configName) {
-    return getNavigation(configName).includeNavigation();
+    return getTreeNodeScriptService().includeNavigation(configName);
   }
 
   @Deprecated
@@ -233,9 +258,13 @@ public class CelementsWebPluginApi extends Api {
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, "", context);
   }
-
+  
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public List<TreeNode> getSubNodesForParentRef(EntityReference parentRef) {
-    return getTreeNodeService().getSubNodesForParent(parentRef, "");
+    return getTreeNodeScriptService().getSubNodesForParent(parentRef, "");
   }
 
   /**
@@ -253,9 +282,13 @@ public class CelementsWebPluginApi extends Api {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, menuPart,
         context);
   }
-
+  
+  /**
+   * @deprecated since 2.2 use treeNode script service instead
+   */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(EntityReference parentRef, String menuPart) {
-    return getTreeNodeService().getSubNodesForParent(parentRef, menuPart);
+    return getTreeNodeScriptService().getSubNodesForParent(parentRef, menuPart);
   }
 
   public int queryCount() {
@@ -1282,6 +1315,11 @@ public class CelementsWebPluginApi extends Api {
     return renderCommand;
   }
 
+  /**
+   * @deprecated since 2.17.0
+   *             instead use renderCelementsDocument in CelementsWebScriptService
+   */
+  @Deprecated
   public String renderCelementsDocument(Document renderDoc) {
     return renderCelementsDocument(renderDoc, "view");
   }
@@ -1590,6 +1628,10 @@ public class CelementsWebPluginApi extends Api {
         "contextMenu");
   }
 
+  private TreeNodeScriptService getTreeNodeScriptService() {
+    return (TreeNodeScriptService) Utils.getComponent(ScriptService.class, "treeNode");
+  }
+
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
@@ -1601,10 +1643,6 @@ public class CelementsWebPluginApi extends Api {
   private DefaultStringEntityReferenceSerializer getEntitySerializer() {
     return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
         EntityReferenceSerializer.class));
-  }
-
-  private ITreeNodeService getTreeNodeService() {
-    return Utils.getComponent(ITreeNodeService.class);
   }
 
 }
