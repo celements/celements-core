@@ -47,6 +47,7 @@ import com.celements.validation.IFormValidationRole;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
+import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -385,6 +386,16 @@ public class CelementsWebScriptService implements ScriptService {
    */
   public Map<String, Set<String>> validateRequest() {
     return formValidationService.validateRequest();
+  }
+  
+  /**
+   * getLastStartupTimeStamp
+   * 
+   *  to solve browser caching issues with files on disk e.g. tinymce
+   * @return
+   */
+  public String getLastStartupTimeStamp(){
+    return new LastStartupTimeStamp().getLastStartupTimeStamp();
   }
 
 }

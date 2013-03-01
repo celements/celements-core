@@ -133,17 +133,19 @@ public class CelementsWebPluginApi extends Api {
   public void setPlugin(CelementsWebPlugin plugin) {
     this.plugin = plugin;
   }
-
+  
+  /**
+   * @deprecated since 2.2 instead use TreeNodeCache
+   */
+  @Deprecated
   public void flushCache() {
     plugin.flushCache(context);
   }
 
   /**
-   * getLastStartupTimeStamp
-   * 
-   *  to solve browser caching issues with files on disk e.g. tinymce
-   * @return
+   * @deprecated since 2.2 instead use CelementsWebScriptService
    */
+  @Deprecated
   public String getLastStartupTimeStamp(){
     return new LastStartupTimeStamp().getLastStartupTimeStamp();
   }
