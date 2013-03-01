@@ -41,7 +41,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.menu.MenuScriptService;
-import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
@@ -168,14 +167,6 @@ public class CelementsWebPluginApi extends Api {
   public ContextMenuItemApi getWrapper(com.xpn.xwiki.api.Object menuItem,
       String elemId) {
     return new ContextMenuItemApi(menuItem, elemId, context);
-  }
-
-  /**
-   * @deprecated since 2.2 use treeNode script service instead
-   */
-  @Deprecated
-  public NavContextMenuApi getNavContextMenu() {
-    return getTreeNodeScriptService().getNavContextMenu();
   }
 
   /**

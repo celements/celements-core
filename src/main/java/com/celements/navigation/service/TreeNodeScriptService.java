@@ -10,19 +10,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.appScript.IAppScriptService;
-import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
-import com.celements.validation.IFormValidationRole;
-import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 
 @Component("treeNode")
 public class TreeNodeScriptService implements ScriptService {
@@ -44,10 +37,6 @@ public class TreeNodeScriptService implements ScriptService {
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-  }
-
-  public NavContextMenuApi getNavContextMenu() {
-    return NavContextMenuApi.getNavContextMenu(getContext());
   }
 
   public NavigationApi createNavigation() {
