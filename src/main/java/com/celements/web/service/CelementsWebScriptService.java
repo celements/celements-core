@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -60,9 +59,6 @@ public class CelementsWebScriptService implements ScriptService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebScriptService.class);
-
-  @Requirement("local")
-  EntityReferenceSerializer<String> modelSerializer;
 
   @Requirement
   QueryManager queryManager;
@@ -154,7 +150,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean deleteMenuItem(DocumentReference docRef) {
-    String docFN = modelSerializer.serialize(docRef);
+    String docFN = webUtilsService.getRefLocalSerializer().serialize(docRef);
     try {
       if (getContext().getWiki().getRightService().hasAccessLevel("edit",
           getContext().getUser(), docFN, getContext())) {
