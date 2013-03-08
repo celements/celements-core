@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -47,9 +46,6 @@ import com.xpn.xwiki.objects.BaseObject;
 public class MenuService implements IMenuService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(MenuService.class);
-
-  @Requirement("default")
-  EntityReferenceSerializer<String> modelSerializer;
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -87,7 +83,8 @@ public class MenuService implements IMenuService {
   boolean hasview(DocumentReference menuBarDocRef) throws XWikiException {
     String database = getContext().getDatabase();
     getContext().setDatabase(getContext().getOriginalDatabase());
-    if (modelSerializer.serialize(menuBarDocRef).endsWith("Celements2.AdminMenu")) {
+    if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
+        ).endsWith("Celements2.AdminMenu")) {
       LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
           + webUtilsService.isAdvancedAdmin() + "].");
       return webUtilsService.isAdvancedAdmin();
@@ -95,7 +92,8 @@ public class MenuService implements IMenuService {
     getContext().setDatabase("celements2web");
     DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
         menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
-    String menuBar2webFullName = modelSerializer.serialize(menuBar2webDocRef);
+    String menuBar2webFullName = webUtilsService.getRefDefaultSerializer(
+        ).serialize(menuBar2webDocRef);
     boolean centralView = !getContext().getWiki().exists(menuBar2webDocRef, getContext())
       || getContext().getWiki().getRightService().hasAccessLevel("view",
           getContext().getUser(), menuBar2webFullName, getContext());
@@ -106,7 +104,8 @@ public class MenuService implements IMenuService {
     DocumentReference menuBarLocalDocRef = new DocumentReference(getContext(
         ).getOriginalDatabase(), menuBarDocRef.getLastSpaceReference().getName(),
         menuBarDocRef.getName());
-    String menuBarFullName = modelSerializer.serialize(menuBarLocalDocRef);
+    String menuBarFullName = webUtilsService.getRefDefaultSerializer(
+        ).serialize(menuBarLocalDocRef);
     boolean localView = !getContext().getWiki().exists(menuBarLocalDocRef, getContext())
       || getContext().getWiki().getRightService().hasAccessLevel("view",
           getContext().getUser(), menuBarFullName, getContext());
@@ -132,17 +131,18 @@ public class MenuService implements IMenuService {
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(
               menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef(
                   menuBarDocRef.getWikiReference().getName()));
-          LOGGER.trace("addMenuHeaders: hasview for [" + modelSerializer.serialize(
-              menuBarDocRef) + "] adding items [" + ((headerObjList != null) ?
-                  headerObjList.size() : "null") + ".");
+          LOGGER.trace("addMenuHeaders: hasview for [" + 
+              webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + 
+              "] adding items [" + ((headerObjList != null) ?headerObjList.size() : "null"
+              ) + ".");
           if (headerObjList != null) {
             for (BaseObject obj : headerObjList) {
               menuHeadersMap.put(obj.getIntValue("pos"), obj);
             }
           }
         } else {
-          LOGGER.trace("addMenuHeaders: NO hasview for [" + modelSerializer.serialize(
-              menuBarDocRef) + "].");
+          LOGGER.trace("addMenuHeaders: NO hasview for [" + 
+              webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + "].");
         }
       }
     } catch (XWikiException e) {
