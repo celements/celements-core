@@ -53,8 +53,8 @@ public class DocHeaderTitleCommand {
             context.getLanguage(), false, context);
       }
       if (!"".equals(context.getWiki().getSpacePreference("title", "", context))) {
-        docHeaderTitle = context.getWiki().parseContent(context.getWiki(
-            ).getSpacePreference("title", "", context), context) + docHeaderTitle;
+        docHeaderTitle = docHeaderTitle + context.getWiki().parseContent(context.getWiki(
+            ).getSpacePreference("title", "", context), context);
       }
     } catch (Exception exp) {
       mLogger.error(exp);
