@@ -33,6 +33,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,13 +66,15 @@ public class WebUtilsService implements IWebUtilsService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtilsService.class);
 
-  @Requirement("default")
+  @Inject
+  @Named("default")
   EntityReferenceSerializer<String> serializer_default;
   
-  @Requirement("local")
+  @Inject
+  @Named("local")
   EntityReferenceSerializer<String> serializer_local;
   
-  @Requirement
+  @Inject
   EntityReferenceResolver<String> referenceResolver;
 
   /**

@@ -11,9 +11,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -43,23 +47,37 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
-  
+
+  @Test
+  public void testCompontentManager() {
+    assertNotNull(webUtilsService);
+    assertNotNull(Utils.getComponent(Execution.class));
+    assertNotNull(Utils.getComponent(EntityReferenceSerializer.TYPE_STRING));
+    assertNotNull(Utils.getComponent(new DefaultParameterizedType(null,
+        EntityReferenceSerializer.class, String.class)));
+    assertNotNull(Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local"));
+    assertNotNull(Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "default"));
+    assertSame(Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "default"),
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING));
+  }
+
   @Test
   public void testGetParentForLevel_1() {
-    DocumentReference
-      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc");
-
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
-  
+    replayAll();
     context.setDoc(doc);
     assertNull(webUtilsService.getParentForLevel(1)); //root
+    verifyAll();
   }
   
   @Test
   public void testGetParentForLevel_2() throws XWikiException {    
-    DocumentReference
-      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
-      parentRef = new DocumentReference(context.getDatabase(),"mySpace","parent1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "parent1");
   
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiDocument docP = new XWikiDocument(parentRef);
