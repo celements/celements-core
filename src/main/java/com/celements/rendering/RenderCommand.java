@@ -28,9 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
@@ -127,7 +125,7 @@ public class RenderCommand {
       String renderMode) throws XWikiException {
     LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
-    String cellDocFN = getRefSerializer().serialize(cellDoc.getDocumentReference());
+    String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(cellDoc.getDocumentReference());
     if (getContext().getWiki().getRightService().hasAccessLevel(renderMode,
         getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
@@ -277,11 +275,6 @@ public class RenderCommand {
       return injectedPageTypeService;
     }
     return Utils.getComponent(IPageTypeRole.class);
-  }
-
-  private DefaultStringEntityReferenceSerializer getRefSerializer() {
-    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
-        EntityReferenceSerializer.class);
   }
 
 }
