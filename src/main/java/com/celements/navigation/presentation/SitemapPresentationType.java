@@ -5,11 +5,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.INavigation;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -19,9 +17,6 @@ public class SitemapPresentationType extends DefaultPresentationType {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       SitemapPresentationType.class);
-
-  @Requirement
-  IWebUtilsService webUtilsService;
 
   private static final String _CEL_CM_SM_TREENODE_DEFAULT_CSSCLASS =
     "cel_cm_sitemap_treenode";
