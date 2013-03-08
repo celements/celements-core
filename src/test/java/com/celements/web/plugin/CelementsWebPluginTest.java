@@ -128,8 +128,6 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testCheckAuthByToken() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     String userToken = "123456789012345678901234";
     List<String> userDocs = new Vector<String>();
