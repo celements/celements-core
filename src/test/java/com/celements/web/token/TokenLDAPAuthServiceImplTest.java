@@ -20,6 +20,8 @@
 package com.celements.web.token;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Collections;
@@ -52,6 +54,8 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     tokenAuthImpl = new TokenLDAPAuthServiceImpl();
     store = createMock(XWikiStoreInterface.class);
     expect(xwiki.getStore()).andReturn(store).anyTimes();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test
