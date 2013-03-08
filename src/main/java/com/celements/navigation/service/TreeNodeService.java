@@ -35,7 +35,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.common.classes.IClassCollectionRole;
@@ -71,9 +70,6 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Requirement
   ITreeNodeCache treeNodeCache;
-  
-  @Requirement("default")
-  EntityReferenceSerializer<String> serializer;
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -176,7 +172,7 @@ public class TreeNodeService implements ITreeNodeService {
   String getParentKey(EntityReference reference, boolean withDataBase) {
     String parentKey = "";
     if (reference != null) {
-      parentKey = serializer.serialize(reference);
+      parentKey = webUtilsService.getRefDefaultSerializer().serialize(reference);
       if (!parentKey.contains(":") && !parentKey.endsWith(":")) {
         parentKey += ":";
       } else if (!parentKey.contains(".") && !parentKey.endsWith(".")) {
@@ -442,7 +438,8 @@ public class TreeNodeService implements ITreeNodeService {
           List<TreeNode> subNodes = getSubNodesForParent(node.getDocumentReference(), "");
           newSubNodes.addAll(subNodes);
           if (subNodes.isEmpty()) {
-            layoutCellList.add(serializer.serialize(node.getDocumentReference()));
+            layoutCellList.add(webUtilsService.getRefDefaultSerializer(
+                ).serialize(node.getDocumentReference()));
           }
         }
         subNodesForParent = newSubNodes;

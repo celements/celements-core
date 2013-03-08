@@ -6,10 +6,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.navigation.INavigation;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -22,13 +22,14 @@ public class DefaultPresentationType implements IPresentationTypeRole {
   private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS =
     "cel_cm_navigation_menuitem";
 
-  @Requirement("local")
-  EntityReferenceSerializer<String> serializer;
-
   @Requirement
   Execution execution;
 
+  @Requirement
+  IWebUtilsService webUtilsService;
+  
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
+
 
   protected XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -48,7 +49,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
       INavigation nav) throws XWikiException {
-    String fullName = serializer.serialize(docRef);
+    String fullName = webUtilsService.getRefLocalSerializer().serialize(docRef);
     String tagName;
     if (nav.hasLink()) {
       tagName = "a";

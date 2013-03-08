@@ -21,10 +21,8 @@ package com.celements.cells;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.common.classes.IClassCollectionRole;
@@ -106,7 +104,7 @@ public class CellRenderStrategy implements IRenderStrategy {
         idname  = cellObj.getStringValue("idname");
       }
       if ((idname == null) || "".equals(idname)) {
-        String nodeFN = getRefSerializer().serialize(node.getDocumentReference());
+        String nodeFN = webUtilsService.getRefDefaultSerializer().serialize(node.getDocumentReference());
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
         idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
@@ -154,10 +152,4 @@ public class CellRenderStrategy implements IRenderStrategy {
   public void setSpaceReference(SpaceReference spaceReference) {
     this.spaceReference = spaceReference;
   }
-
-  private DefaultStringEntityReferenceSerializer getRefSerializer() {
-    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
-        EntityReferenceSerializer.class);
-  }
-
 }

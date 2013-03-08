@@ -24,13 +24,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -92,7 +88,8 @@ public class UserNameForUserDataCommand {
           List<XWikiDocument> docs = storage.searchDocuments("where lower(doc.name)=?", 
               argsList, context);
           if(docs.size() == 1) {
-            userDoc = getRefSerializer().serialize(docs.get(0).getDocumentReference());
+            userDoc = Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer(
+                ).serialize(docs.get(0).getDocumentReference());
           } else if(docs.size() > 1) {
             return null;
           }
@@ -104,10 +101,5 @@ public class UserNameForUserDataCommand {
         + possibleLogins + "' Result: '" + userDoc + "'");
     
     return userDoc;
-  }
-  
-  private DefaultStringEntityReferenceSerializer getRefSerializer() {
-    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
-        EntityReferenceSerializer.class, "local");
   }
 }
