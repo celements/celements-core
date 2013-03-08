@@ -93,6 +93,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     tNServiceMock = createMock(ITreeNodeService.class);
     nav.injected_TreeNodeService = tNServiceMock;
     wUServiceMock = createMock(IWebUtilsService.class);
+    expect(wUServiceMock.getRefLocalSerializer()).andReturn(
+        Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer()).anyTimes();
     nav.injected_WebUtilsService = wUServiceMock;
     ptResolverServiceMock = createMock(PageTypeResolverService.class);
     nav.injected_PageTypeResolverService = ptResolverServiceMock;

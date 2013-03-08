@@ -28,7 +28,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -290,7 +289,7 @@ public class Navigation implements INavigation {
    */
   @Deprecated
   public String getMenuSpace(XWikiContext context) {
-    return getSerializer().serialize(getNodeSpaceRef());
+    return getWebUtilsService().getRefLocalSerializer().serialize(getNodeSpaceRef());
   }
 
   public SpaceReference getNodeSpaceRef() {
@@ -346,7 +345,7 @@ public class Navigation implements INavigation {
       getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
       String parent = "";
       if (parentRef != null) {
-        parent = getSerializer().serialize(parentRef);
+        parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
       }
       List<TreeNode> currentMenuItems =
         getTreeNodeService().getSubNodesForParent(parent, getMenuSpace(getContext()),
@@ -430,7 +429,7 @@ public class Navigation implements INavigation {
       boolean isLastItem, int numItem) throws XWikiException {
     boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels
         ), getContext());
-    String fullName = getSerializer().serialize(docRef);
+    String fullName = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
     boolean isLeaf = isLeaf(fullName, getContext());
     openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf, numItem);
     writeMenuItemContent(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem);
@@ -497,7 +496,7 @@ public class Navigation implements INavigation {
   public String getUniqueId(DocumentReference docRef) {
     String fullName = null;
     if (docRef != null) {
-      fullName = getSerializer().serialize(docRef);
+      fullName = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
     }
     return getUniqueId(fullName);
   }
@@ -832,11 +831,6 @@ public class Navigation implements INavigation {
       return injected_TreeNodeService;
     }
     return Utils.getComponent(ITreeNodeService.class);
-  }
-
-  @SuppressWarnings("unchecked")
-  private EntityReferenceSerializer<String> getSerializer() {
-    return Utils.getComponent(EntityReferenceSerializer.class, "local");
   }
 
   IPageTypeResolverRole getPageTypeResolverService() {
