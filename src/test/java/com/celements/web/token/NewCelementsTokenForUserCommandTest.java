@@ -33,22 +33,18 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.service.WebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponentTestCase {
 
@@ -59,8 +55,6 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
   public void setUp_NewCelementsTokenForUserCommandTest() throws Exception {
     context = getContext();
     celTokenForUserCmd = new NewCelementsTokenForUserCommand();
-    celTokenForUserCmd.injected_refSerializer = Utils.getComponent(
-        EntityReferenceSerializer.class);
   }
 
   @Test
