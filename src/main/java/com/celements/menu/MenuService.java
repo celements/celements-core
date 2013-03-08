@@ -32,7 +32,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -49,9 +48,6 @@ public class MenuService implements IMenuService {
 
   @Requirement
   IWebUtilsService webUtilsService;
-
-  @Requirement
-  EntityReferenceResolver<String> referenceResolver;
 
   @Requirement
   QueryManager queryManager;
