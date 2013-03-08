@@ -20,6 +20,8 @@
 package com.celements.web.plugin;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -54,6 +56,8 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     plugin = new CelementsWebPlugin("celementsweb", "CelementsWebPlugin", context);
   }
   
