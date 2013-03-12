@@ -199,6 +199,9 @@ public class AppScriptService implements IAppScriptService {
       return path.substring(getStartIndex(path)).replaceAll("^/+", "");
     } else if (isAppScriptOverwriteDocRef(getContext().getDoc().getDocumentReference())) {
       String path = getContext().getRequest().getPathInfo().replaceAll("^/+", "");
+      if (path.startsWith(getContext().getAction())) {
+        path = path.replaceAll("^" + getContext().getAction() + "/+", "");
+      }
       path = path.replaceFirst("^" + defaultEntityReferenceValueProvider.getDefaultValue(
           EntityType.SPACE) + "/", "");
       if ("".equals(path)) {
