@@ -382,6 +382,21 @@ public class CelementsWebScriptService implements ScriptService {
         + " order by 1 asc";
   }
 
+  public List<Object> getDeletedAttachments() {
+    List<Object> resultList = Collections.emptyList();
+    try {
+      Query query = queryManager.createQuery(getDeletedAttachmentsHql(), Query.HQL);
+      resultList = query.execute();
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to parse or execute deletedAttachments hql query.", queryExp);
+    }
+    return resultList;
+  }
+
+  private String getDeletedAttachmentsHql() {
+    return "select datt.id from DeletedAttachment as datt order by datt.filename asc";
+  }
+
   /**
    * 
    * @return empty map means the validation has been successful. Otherwise validation
