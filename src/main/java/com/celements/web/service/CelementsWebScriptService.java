@@ -103,8 +103,16 @@ public class CelementsWebScriptService implements ScriptService {
     return appScriptService.getCentralAppScriptDocRef(scriptName);
   }
 
+  public String getScriptNameFromDocRef(DocumentReference docRef) {
+    return appScriptService.getScriptNameFromDocRef(docRef);
+  }
+
   public String getAppScriptTemplatePath(String scriptName) {
     return appScriptService.getAppScriptTemplatePath(scriptName);
+  }
+
+  public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
+    return appScriptService.isAppScriptOverwriteDocRef(docRef);
   }
 
   public boolean isAppScriptAvailable(String scriptName) {

@@ -477,6 +477,25 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockRequest);
   }
 
+  @Test
+  public void testGetScriptNameFromDocRef_defaultSpace() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
+    replayAll();
+    assertEquals("WebHome", appScriptService.getScriptNameFromDocRef(docRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetScriptNameFromDocRef_anySpace() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "ScriptSpace",
+        "TestScript");
+    replayAll();
+    assertEquals("ScriptSpace/TestScript", appScriptService.getScriptNameFromDocRef(
+        docRef));
+    verifyAll();
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);
