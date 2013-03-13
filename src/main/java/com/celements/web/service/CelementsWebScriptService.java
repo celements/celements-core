@@ -204,7 +204,15 @@ public class CelementsWebScriptService implements ScriptService {
     return getHumanReadableSize(bytes, si, getLocal(language));
   }
 
-  public String getHumanReadableSize(int bytes, boolean si, Locale locale) {
+  public String getHumanReadableSize(long bytes, boolean si) {
+    return getHumanReadableSize(bytes, si, getContext().getLanguage());
+  }
+
+  public String getHumanReadableSize(long bytes, boolean si, String language) {
+    return getHumanReadableSize(bytes, si, getLocal(language));
+  }
+
+  public String getHumanReadableSize(long bytes, boolean si, Locale locale) {
     int unit = si ? 1000 : 1024;
     if (bytes < unit) {
       return bytes + " B";
