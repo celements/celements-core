@@ -103,8 +103,16 @@ public class CelementsWebScriptService implements ScriptService {
     return appScriptService.getCentralAppScriptDocRef(scriptName);
   }
 
+  public String getScriptNameFromDocRef(DocumentReference docRef) {
+    return appScriptService.getScriptNameFromDocRef(docRef);
+  }
+
   public String getAppScriptTemplatePath(String scriptName) {
     return appScriptService.getAppScriptTemplatePath(scriptName);
+  }
+
+  public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
+    return appScriptService.isAppScriptOverwriteDocRef(docRef);
   }
 
   public boolean isAppScriptAvailable(String scriptName) {
@@ -196,7 +204,15 @@ public class CelementsWebScriptService implements ScriptService {
     return getHumanReadableSize(bytes, si, getLocal(language));
   }
 
-  public String getHumanReadableSize(int bytes, boolean si, Locale locale) {
+  public String getHumanReadableSize(long bytes, boolean si) {
+    return getHumanReadableSize(bytes, si, getContext().getLanguage());
+  }
+
+  public String getHumanReadableSize(long bytes, boolean si, String language) {
+    return getHumanReadableSize(bytes, si, getLocal(language));
+  }
+
+  public String getHumanReadableSize(long bytes, boolean si, Locale locale) {
     int unit = si ? 1000 : 1024;
     if (bytes < unit) {
       return bytes + " B";
@@ -372,6 +388,21 @@ public class CelementsWebScriptService implements ScriptService {
     return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
         + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
         + " order by 1 asc";
+  }
+
+  public List<Object> getDeletedAttachments() {
+    List<Object> resultList = Collections.emptyList();
+    try {
+      Query query = queryManager.createQuery(getDeletedAttachmentsHql(), Query.HQL);
+      resultList = query.execute();
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to parse or execute deletedAttachments hql query.", queryExp);
+    }
+    return resultList;
+  }
+
+  private String getDeletedAttachmentsHql() {
+    return "select datt.id from DeletedAttachment as datt order by datt.filename asc";
   }
 
   /**

@@ -40,8 +40,12 @@ public interface IAppScriptService {
 
   public boolean isAppScriptCurrentPage(String scriptName);
 
+  public String getScriptNameFromDocRef(DocumentReference docRef);
+
   public String getScriptNameFromURL();
 
   public boolean isAppScriptRequest();
+
+  public boolean isAppScriptOverwriteDocRef(DocumentReference docRef);
 
 }

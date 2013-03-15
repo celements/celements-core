@@ -126,6 +126,16 @@ public class AppScriptService implements IAppScriptService {
     return (!"".equals(scriptStr) && (scriptStr.equals(scriptName)));
   }
 
+  public String getScriptNameFromDocRef(DocumentReference docRef) {
+    String spaceName = docRef.getLastSpaceReference().getName();
+    if (spaceName.equals(defaultEntityReferenceValueProvider.getDefaultValue(
+          EntityType.SPACE))) {
+      return docRef.getName();
+    } else {
+      return spaceName + "/" + docRef.getName();
+    }
+  }
+
   public String getScriptNameFromURL() {
     String scriptStr = "";
     if (isAppScriptRequest()) {
@@ -139,10 +149,11 @@ public class AppScriptService implements IAppScriptService {
   public boolean isAppScriptRequest() {
     //TODO exclude isOverlayRequest
     return isAppScriptXpageRequest() || isAppScriptActionRequest()
-        || isAppScriptSpaceRequest() || isAppScriptOverwriteDocRequest();
+        || isAppScriptSpaceRequest() || isAppScriptOverwriteDocRef(
+            getContext().getDoc().getDocumentReference());
   }
 
-  private boolean isAppScriptOverwriteDocRequest() {
+  public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
     String overwriteAppDocs = getContext().getWiki().getXWikiPreference(
         APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
     List<DocumentReference> overwAppDocList = new Vector<DocumentReference>();
@@ -158,7 +169,7 @@ public class AppScriptService implements IAppScriptService {
         }
       }
     }
-    return overwAppDocList.contains(getContext().getDoc().getDocumentReference());
+    return overwAppDocList.contains(docRef);
   }
 
   private boolean isAppScriptActionRequest() {
@@ -186,8 +197,11 @@ public class AppScriptService implements IAppScriptService {
     if (isAppScriptActionRequest() || isAppScriptSpaceRequest()) {
       String path = getContext().getRequest().getPathInfo();
       return path.substring(getStartIndex(path)).replaceAll("^/+", "");
-    } else if (isAppScriptOverwriteDocRequest()) {
+    } else if (isAppScriptOverwriteDocRef(getContext().getDoc().getDocumentReference())) {
       String path = getContext().getRequest().getPathInfo().replaceAll("^/+", "");
+      if (path.startsWith(getContext().getAction())) {
+        path = path.replaceAll("^" + getContext().getAction() + "/+", "");
+      }
       path = path.replaceFirst("^" + defaultEntityReferenceValueProvider.getDefaultValue(
           EntityType.SPACE) + "/", "");
       if ("".equals(path)) {

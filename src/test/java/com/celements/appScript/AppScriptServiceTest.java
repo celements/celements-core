@@ -477,6 +477,46 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll(mockRequest);
   }
 
+  @Test
+  public void testGetScriptNameFromURL_export_action() {
+    XWikiRequest mockRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockRequest);
+    context.setAction("export");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestScript");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
+    expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
+    expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
+        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
+        ).andReturn("TestSpace.TestScript").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/export/TestSpace/TestScript"
+        ).anyTimes();
+    replayAll(mockRequest);
+    assertEquals("TestSpace/TestScript", appScriptService.getScriptNameFromURL());
+    verifyAll(mockRequest);
+  }
+
+  @Test
+  public void testGetScriptNameFromDocRef_defaultSpace() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
+    replayAll();
+    assertEquals("WebHome", appScriptService.getScriptNameFromDocRef(docRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetScriptNameFromDocRef_anySpace() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "ScriptSpace",
+        "TestScript");
+    replayAll();
+    assertEquals("ScriptSpace/TestScript", appScriptService.getScriptNameFromDocRef(
+        docRef));
+    verifyAll();
+  }
+
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);

@@ -89,19 +89,29 @@ public interface IWebUtilsService {
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
-  
+
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException;
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly);
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
       boolean imagesOnly, int start, int nb);
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
 

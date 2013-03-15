@@ -270,4 +270,8 @@ public class NavigationApi extends Api {
     return navigation.isEmptyMainMenu();
   }
 
+  public boolean isEmpty() {
+    return navigation.isEmpty();
+  }
+
 }

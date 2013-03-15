@@ -89,6 +89,8 @@ public interface INavigation {
 
   public boolean isEmptyMainMenu();
 
+  public boolean isEmpty();
+
   public boolean isNavigationEnabled();
 
   public void loadConfigByName(String configName, XWikiContext context);

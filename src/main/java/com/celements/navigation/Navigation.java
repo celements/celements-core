@@ -322,6 +322,17 @@ public class Navigation implements INavigation {
         ).size() == 0;
   }
 
+  public boolean isEmpty() {
+    EntityReference parentRef = getWebUtilsService().getParentForLevel(
+        fromHierarchyLevel);
+    getNavFilter().setMenuPart(getMenuPartForLevel(getNumLevels()));
+    if (parentRef == null) {
+      parentRef = getNodeSpaceRef();
+    }
+    return getTreeNodeService().getSubNodesForParent(parentRef, getNavFilter()
+        ).size() == 0;
+  }
+
   INavFilter<BaseObject> getNavFilter() {
     if (navFilter == null) {
       navFilter = new InternalRightsFilter();
