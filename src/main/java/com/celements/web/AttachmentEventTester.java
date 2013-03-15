@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.Utils;
 public class AttachmentEventTester implements EventListener{
 
   /** Logging helper. */
-  private static final Log LOGGER = LogFactory.getLog(FileAction.class);
+  private static final Log LOGGER = LogFactory.getLog(AttachmentEventTester.class);
 
   @Requirement
   EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
