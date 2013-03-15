@@ -55,17 +55,15 @@ public class AttachmentEventTester implements EventListener{
 
     try {
       for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
-        LOGGER.debug("AttachmentEventTester: attachment diff for [" + diff.getFileName()
-            + "] on [" + reference + "].");
         if (StringUtils.isEmpty(diff.getOrigVersion())) {
-          om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source,
-                  data);
+          LOGGER.debug("AttachmentEventTester: attachment diff for [" + diff.getFileName()
+              + "] on [" + reference + "] added.");
         } else if (StringUtils.isEmpty(diff.getNewVersion())) {
-          om.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), source,
-              data);
+          LOGGER.debug("AttachmentEventTester: attachment diff for [" + diff.getFileName()
+              + "] on [" + reference + "] deleted.");
         } else {
-          om.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), source,
-              data);
+          LOGGER.debug("AttachmentEventTester: attachment diff for [" + diff.getFileName()
+              + "] on [" + reference + "] updated.");
         }
       }
     } catch (XWikiException ex) {
