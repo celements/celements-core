@@ -20,9 +20,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
-import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
-import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
 import com.xpn.xwiki.web.Utils;
 
 /**
