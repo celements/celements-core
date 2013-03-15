@@ -30,7 +30,7 @@ import com.xpn.xwiki.web.Utils;
  */
 @Component("AttachmentEventTester")
 @Deprecated
-public class AttachmentEventTester implements EventListener{
+public class AttachmentEventTester implements EventListener {
 
   /** Logging helper. */
   private static final Log LOGGER = LogFactory.getLog(AttachmentEventTester.class);
@@ -48,7 +48,7 @@ public class AttachmentEventTester implements EventListener{
         doc.getDocumentReference());
 
     LOGGER.debug("AttachmentEventTester: onEvent for [" + event.getClass() + "] on ["
-        + reference + "].");
+        + reference + "] same test [" + (originalDoc == doc) + "].");
 
     try {
       for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
