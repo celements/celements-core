@@ -1,0 +1,100 @@
+package com.celements.web;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.AttachmentDiff;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
+import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
+import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.web.Utils;
+
+/**
+ * remove me after testing AttachmentDiff
+ * 
+ * @author fabian
+ *
+ */
+@Component("AttachmentEventTester")
+@Deprecated
+public class AttachmentEventTester implements EventListener{
+
+  /** Logging helper. */
+  private static final Log LOGGER = LogFactory.getLog(FileAction.class);
+
+  @Requirement
+  EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+  public void onEvent(Event event, Object source, Object data) {
+    XWikiDocument doc = (XWikiDocument) source;
+    XWikiDocument originalDoc = doc.getOriginalDocument();
+    XWikiContext context = (XWikiContext) data;
+
+    ObservationManager om = Utils.getComponent(ObservationManager.class);
+    String reference = this.defaultEntityReferenceSerializer.serialize(
+        doc.getDocumentReference());
+
+    LOGGER.debug("AttachmentEventTester: onEvent for [" + event.getClass() + "] on ["
+        + reference + "].");
+
+    try {
+      for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
+        LOGGER.debug("AttachmentEventTester: attachment diff for [" + diff.getFileName()
+            + "] on [" + reference + "].");
+        if (StringUtils.isEmpty(diff.getOrigVersion())) {
+          om.notify(new AttachmentAddedEvent(reference, diff.getFileName()), source,
+                  data);
+        } else if (StringUtils.isEmpty(diff.getNewVersion())) {
+          om.notify(new AttachmentDeletedEvent(reference, diff.getFileName()), source,
+              data);
+        } else {
+          om.notify(new AttachmentUpdatedEvent(reference, diff.getFileName()), source,
+              data);
+        }
+      }
+    } catch (XWikiException ex) {
+      LOGGER.warn("Failed to refine events: " + ex.getMessage());
+    }
+  }
+
+  private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+  {
+      /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+      {
+          add(new DocumentCreatedEvent());
+          add(new DocumentUpdatedEvent());
+          add(new DocumentDeletedEvent());
+      }
+  };
+
+  @Override
+  public List<Event> getEvents() {
+    return LISTENER_EVENTS;
+  }
+
+  @Override
+  public String getName() {
+    return "AttachmentEventTester";
+  }
+
+}

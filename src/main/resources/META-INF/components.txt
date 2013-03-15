@@ -28,3 +28,4 @@ com.celements.navigation.presentation.RenderedContentPresentationType
 com.celements.navigation.presentation.SitemapPresentationType
 com.celements.validation.FormValidationService
 com.celements.validation.XClassRegexRule
+com.celements.web.AttachmentEventTester
