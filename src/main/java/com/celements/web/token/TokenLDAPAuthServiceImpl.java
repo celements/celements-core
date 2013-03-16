@@ -82,7 +82,7 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
     return null;
   }
 
-  String getUsernameForToken(String userToken, XWikiContext context
+  public String getUsernameForToken(String userToken, XWikiContext context
       ) throws XWikiException{
 
     String hashedCode = encryptString("hash:SHA-512:", userToken);
