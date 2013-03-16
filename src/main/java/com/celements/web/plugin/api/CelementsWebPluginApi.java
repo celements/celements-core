@@ -870,7 +870,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return plugin.tokenBasedUpload(attachToDoc, fieldName, userToken, context);
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }
@@ -885,7 +885,7 @@ public class CelementsWebPluginApi extends Api {
       return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken,
           createIfNotExists, context);
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }

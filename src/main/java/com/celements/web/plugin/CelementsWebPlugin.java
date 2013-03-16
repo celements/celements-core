@@ -554,7 +554,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken,
       XWikiContext context) throws XWikiException {
     return new TokenBasedUploadCommand().tokenBasedUpload(attachToDoc, fieldName,
-        userToken);
+        userToken, context);
   }
   
   /**
@@ -573,7 +573,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken, 
       Boolean createIfNotExists, XWikiContext context) throws XWikiException {
     return new TokenBasedUploadCommand().tokenBasedUpload(attachToDocFN, fieldName,
-        userToken, createIfNotExists);
+        userToken, createIfNotExists, context);
   }
 
   /**
