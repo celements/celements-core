@@ -46,13 +46,14 @@ public class AttachmentEventTester implements EventListener {
         doc.getDocumentReference());
 
     LOGGER.debug("AttachmentEventTester: onEvent for [" + event.getClass() + "] on ["
-        + reference + "] same test [" + (originalDoc == doc) + "].");
+        + reference + "] same test [" + (originalDoc == doc) + "] origdoc version ["
+        + originalDoc.getVersion() + "] newdoc version [" + doc.getVersion() + "].");
     for (XWikiAttachment origAttach : originalDoc.getAttachmentList()) {
       LOGGER.debug("origialDoc: " + origAttach.getFilename() + ", "
           + origAttach.getVersion());
     }
     for (XWikiAttachment newAttach : doc.getAttachmentList()) {
-      LOGGER.debug("doc: " + newAttach.getFilename() + ", " + newAttach.getVersion());
+      LOGGER.debug("newdoc: " + newAttach.getFilename() + ", " + newAttach.getVersion());
     }
 
     try {
