@@ -13,14 +13,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.AttachmentDiff;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * remove me after testing AttachmentDiff
@@ -43,12 +42,18 @@ public class AttachmentEventTester implements EventListener {
     XWikiDocument originalDoc = doc.getOriginalDocument();
     XWikiContext context = (XWikiContext) data;
 
-    ObservationManager om = Utils.getComponent(ObservationManager.class);
     String reference = this.defaultEntityReferenceSerializer.serialize(
         doc.getDocumentReference());
 
     LOGGER.debug("AttachmentEventTester: onEvent for [" + event.getClass() + "] on ["
         + reference + "] same test [" + (originalDoc == doc) + "].");
+    for (XWikiAttachment origAttach : originalDoc.getAttachmentList()) {
+      LOGGER.debug("origialDoc: " + origAttach.getFilename() + ", "
+          + origAttach.getVersion());
+    }
+    for (XWikiAttachment newAttach : doc.getAttachmentList()) {
+      LOGGER.debug("doc: " + newAttach.getFilename() + ", " + newAttach.getVersion());
+    }
 
     try {
       for (AttachmentDiff diff : doc.getAttachmentDiff(originalDoc, doc, context)) {
