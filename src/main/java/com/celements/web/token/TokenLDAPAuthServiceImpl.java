@@ -103,12 +103,16 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-      LOGGER.info("searching token and found " + users.size() + " with parameters " + 
-          Arrays.deepToString(parameterList.toArray()));
+      LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found "
+          + users.size() + " with parameters "
+          + Arrays.deepToString(parameterList.toArray()));
       if(users == null || users.size() == 0) {
         String db = context.getDatabase();
         context.setDatabase("xwiki");
         users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
+        LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found "
+            + users.size() + " with parameters "
+            + Arrays.deepToString(parameterList.toArray()));
         if(users != null && users.size() == 1) {
           users.add("xwiki:" + users.remove(0));
         }
@@ -127,7 +131,8 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       }
     } else {
       LOGGER.warn("No valid token given");
-    }    
+    }
+    LOGGER.info("getUsernameForToken: returning user [" + userDoc + "].");
     return userDoc;
   }
 
