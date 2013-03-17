@@ -36,7 +36,7 @@ import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
 
 public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
 
-  private static final Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Log LOGGER = LogFactory.getFactory().getInstance(
       TokenLDAPAuthServiceImpl.class);
 
   @Override
@@ -51,14 +51,14 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       String username = context.getRequest().getParameter("username");
       boolean hasToken = (token != null) && !"".equals(token);
       if (hasToken && (username != null) && !"".equals(username)) {
-        mLogger.info("trying to authenticate user [" + username + "] with token ["
+        LOGGER.info("trying to authenticate user [" + username + "] with token ["
             + hasToken + "].");
           XWikiUser tokenUser = checkAuthByToken(username, token, context);
           if (tokenUser != null) {
             return tokenUser;
           }
       }
-      mLogger.info("checkAuth for token skipped or failed. user [" + username
+      LOGGER.info("checkAuth for token skipped or failed. user [" + username
           + "] with token [" + hasToken + "].");
     }
     return super.checkAuth(context);
@@ -71,12 +71,12 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       if((usernameByToken != null) && !usernameByToken.equals("")
           && (usernameByToken.equals("XWiki." + loginname) 
           || usernameByToken.equals("xwiki:XWiki." + loginname))){
-        mLogger.info("checkAuthByToken: user " + usernameByToken
+        LOGGER.info("checkAuthByToken: user " + usernameByToken
             + " identified by userToken.");
         context.setUser(usernameByToken);
         return context.getXWikiUser();
       } else {
-        mLogger.warn("checkAuthByToken: username could not be identified by token");
+        LOGGER.warn("checkAuthByToken: username could not be identified by token");
       }
     }
     return null;
@@ -103,7 +103,7 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-      mLogger.info("searching token and found " + users.size() + " with parameters " + 
+      LOGGER.info("searching token and found " + users.size() + " with parameters " + 
           Arrays.deepToString(parameterList.toArray()));
       if(users == null || users.size() == 0) {
         String db = context.getDatabase();
@@ -122,11 +122,11 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
         }
       }
       if(usersFound > 1){
-        mLogger.warn("Found more than one user for token '" + userToken + "'");
+        LOGGER.warn("Found more than one user for token '" + userToken + "'");
         return null;
       }
     } else {
-      mLogger.warn("No valid token given");
+      LOGGER.warn("No valid token given");
     }    
     return userDoc;
   }
