@@ -2,6 +2,7 @@ package com.celements.web.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,9 @@ public class AttachmentService implements IAttachmentServiceRole {
       FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException {
     XWikiResponse response = getContext().getResponse();
     String username = getContext().getUser();
+    LOGGER.debug("uploadAttachment: fieldName [" + fieldName + "], filename [" + filename
+        + "], context username [" + username + "], doc [" + doc.getDocumentReference()
+        + "].");
 
     // Read XWikiAttachment
     XWikiAttachment attachment = doc.getAttachment(filename);
@@ -112,6 +116,8 @@ public class AttachmentService implements IAttachmentServiceRole {
 
     // Save the document.
     try {
+      LOGGER.debug("uploadAttachment: save document [" + doc.getDocumentReference()
+          + "] after adding filename [" + filename + "] in revision [" + nextRev + "].");
       getContext().getWiki().saveDocument(doc, comment, getContext());
     } catch (XWikiException e) {
       // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving
@@ -132,8 +138,8 @@ public class AttachmentService implements IAttachmentServiceRole {
    * @param fieldNamePrefix
    * @return number of saved attachments
    */
-  public int uploadMultipleAttachments(XWikiDocument attachToDoc,
-      String fieldNamePrefix) {
+  public int uploadMultipleAttachments(XWikiDocument attachToDoc, String fieldNamePrefix
+      ) {
     XWikiDocument doc = attachToDoc.clone();
 
     // The document is saved for each attachment in the group.
@@ -155,6 +161,11 @@ public class AttachmentService implements IAttachmentServiceRole {
       }
     }
 
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("uploadMultipleAttachments: found fileNames [ key: "
+          + Arrays.deepToString(fileNames.keySet().toArray()) + " values : "
+          + Arrays.deepToString(fileNames.values().toArray()) + "].");
+    }
     for (Entry<String, String> file : fileNames.entrySet()) {
       try {
         uploadAttachment(file.getValue(), file.getKey(), fileupload, doc);
