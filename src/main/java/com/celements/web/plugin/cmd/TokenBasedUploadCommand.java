@@ -7,6 +7,7 @@ import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class TokenBasedUploadCommand {
@@ -40,6 +41,12 @@ public class TokenBasedUploadCommand {
           context)) {
         LOGGER.info("tokenBasedUpload: add attachment [" + fieldName + "] to doc ["
             + attachToDocFN + "].");
+        if (LOGGER.isTraceEnabled()) {
+          for (XWikiAttachment origAttach : doc.getAttachmentList()) {
+            LOGGER.trace("tokenBasedUpload - origialDoc before addAttachments: "
+                + origAttach.getFilename() + ", " + origAttach.getVersion());
+          }
+        }
         return doc.newDocument(context).addAttachments(fieldName);
       } else {
         LOGGER.warn("tokenBasedUpload: document " + attachToDocFN + " does not exist.");
