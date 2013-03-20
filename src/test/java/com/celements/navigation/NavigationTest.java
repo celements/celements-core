@@ -20,8 +20,6 @@
 package com.celements.navigation;
 
 import static org.easymock.EasyMock.*;
-
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -978,7 +976,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   public void testIncludeNavigation_hasItemsLevel1() throws Exception {
     nav.fromHierarchyLevel = 1;
     nav.toHierarchyLevel = 99;
-    expect(wUServiceMock.getParentForLevel(1)).andReturn(null).atLeastOnce();
+    expect(wUServiceMock.getParentForLevel(eq(1))).andReturn(null).atLeastOnce();
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().anyTimes();
     String spaceName = "MySpace";
@@ -1015,6 +1013,80 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         nav.includeNavigation());
     verifyAll();
   }
+
+  @Test
+  public void testIsEmpty_true() {
+    String spaceName = "MySpace";
+    nav.fromHierarchyLevel = 3;
+    nav.toHierarchyLevel = 4;
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(),spaceName,
+        "myDocument");
+    expect(wUServiceMock.getParentForLevel(eq(3))).andReturn(parentRef).atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    expect(tNServiceMock.getSubNodesForParent(eq(parentRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    replayAll();
+    assertTrue(nav.isEmpty());
+    verifyAll();
+  }
+
+  @Test
+  public void testIsEmpty_false() {
+    String spaceName = "MySpace";
+    nav.fromHierarchyLevel = 3;
+    nav.toHierarchyLevel = 4;
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(),spaceName,
+        "myDocument");
+    expect(wUServiceMock.getParentForLevel(eq(3))).andReturn(parentRef).atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    DocumentReference subNodeRef = new DocumentReference(context.getDatabase(), spaceName,
+        "SubNodeDoc");
+    List<TreeNode> nodeList = Arrays.asList(new TreeNode(subNodeRef, "", 1));
+    expect(tNServiceMock.getSubNodesForParent(eq(parentRef), same(navFilterMock))
+        ).andReturn(nodeList);
+    replayAll();
+    assertFalse(nav.isEmpty());
+    verifyAll();
+  }
+
+  @Test
+  public void testIsEmpty_menuPart_sublevels() {
+    String spaceName = "MySpace";
+    nav.fromHierarchyLevel = 3;
+    nav.toHierarchyLevel = 4;
+    nav.setMenuPart("myPart");
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(),spaceName,
+        "myDocument");
+    expect(wUServiceMock.getParentForLevel(eq(3))).andReturn(parentRef).atLeastOnce();
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    expect(tNServiceMock.getSubNodesForParent(eq(parentRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    replayAll();
+    assertTrue(nav.isEmpty());
+    verifyAll();
+  }
+
+  @Test
+  public void testIsEmpty_menuPart_mainLevel() {
+    String spaceName = "MySpace";
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 4;
+    nav.setMenuPart("myPart");
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(),spaceName,
+        "myDocument");
+    expect(wUServiceMock.getParentForLevel(eq(1))).andReturn(parentRef).atLeastOnce();
+    navFilterMock.setMenuPart(eq("myPart"));
+    expectLastCall().anyTimes();
+    expect(tNServiceMock.getSubNodesForParent(eq(parentRef), same(navFilterMock))
+        ).andReturn(Collections.<TreeNode>emptyList());
+    replayAll();
+    assertTrue(nav.isEmpty());
+    verifyAll();
+  }
+
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *

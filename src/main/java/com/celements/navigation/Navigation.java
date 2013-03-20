@@ -324,12 +324,15 @@ public class Navigation implements INavigation {
   public boolean isEmpty() {
     EntityReference parentRef = getWebUtilsService().getParentForLevel(
         fromHierarchyLevel);
-    getNavFilter().setMenuPart(getMenuPartForLevel(getNumLevels()));
+    getNavFilter().setMenuPart(getMenuPartForLevel(fromHierarchyLevel));
     if (parentRef == null) {
       parentRef = getNodeSpaceRef();
     }
-    return getTreeNodeService().getSubNodesForParent(parentRef, getNavFilter()
-        ).size() == 0;
+    List<TreeNode> subNodeList = getTreeNodeService().getSubNodesForParent(parentRef,
+        getNavFilter());
+    LOGGER.debug("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef ["
+        + parentRef + "].");
+    return subNodeList.size() == 0;
   }
 
   INavFilter<BaseObject> getNavFilter() {
