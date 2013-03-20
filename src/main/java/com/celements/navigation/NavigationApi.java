@@ -276,4 +276,10 @@ public class NavigationApi extends Api {
     return isEmpty;
   }
 
+  public boolean isEmptyNavigation() {
+    boolean isEmpty = navigation.isEmpty();
+    LOGGER.debug("isEmpty api: returning [" + isEmpty + "].");
+    return isEmpty;
+  }
+
 }
