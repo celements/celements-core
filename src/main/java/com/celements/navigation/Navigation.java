@@ -322,15 +322,17 @@ public class Navigation implements INavigation {
   }
 
   public boolean isEmpty() {
+    getNavFilter().setMenuPart(getMenuPartForLevel(fromHierarchyLevel));
     EntityReference parentRef = getWebUtilsService().getParentForLevel(
         fromHierarchyLevel);
-    getNavFilter().setMenuPart(getMenuPartForLevel(fromHierarchyLevel));
+    LOGGER.debug("isEmpty: parentRef [" + parentRef + "] for level [" + fromHierarchyLevel
+        + "]");
     if (parentRef == null) {
       parentRef = getNodeSpaceRef();
     }
     List<TreeNode> subNodeList = getTreeNodeService().getSubNodesForParent(parentRef,
         getNavFilter());
-    LOGGER.debug("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef ["
+    LOGGER.info("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef ["
         + parentRef + "] -> [" + subNodeList.isEmpty() + "].");
     return subNodeList.isEmpty();
   }
