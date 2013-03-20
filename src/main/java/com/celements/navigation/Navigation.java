@@ -328,7 +328,8 @@ public class Navigation implements INavigation {
     LOGGER.debug("isEmpty: parentRef [" + parentRef + "] for level [" + fromHierarchyLevel
         + "]");
     if (parentRef == null) {
-      parentRef = getNodeSpaceRef();
+      LOGGER.info("isEmpty: no subnode for level [" + fromHierarchyLevel + "] found.");
+      return true;
     }
     List<TreeNode> subNodeList = getTreeNodeService().getSubNodesForParent(parentRef,
         getNavFilter());

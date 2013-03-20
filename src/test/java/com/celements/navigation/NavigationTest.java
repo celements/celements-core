@@ -1087,6 +1087,19 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
+  @Test
+  public void testIsEmpty_noParent_on_from_level() {
+    nav.fromHierarchyLevel = 3;
+    nav.toHierarchyLevel = 4;
+    nav.setMenuPart("");
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    expect(wUServiceMock.getParentForLevel(eq(3))).andReturn(null).atLeastOnce();
+    replayAll();
+    assertTrue(nav.isEmpty());
+    verifyAll();
+  }
+
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
