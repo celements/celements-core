@@ -330,9 +330,10 @@ public class Navigation implements INavigation {
     }
     List<TreeNode> subNodeList = getTreeNodeService().getSubNodesForParent(parentRef,
         getNavFilter());
+    boolean isEmpty = (subNodeList.size() == 0);
     LOGGER.debug("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef ["
-        + parentRef + "].");
-    return subNodeList.size() == 0;
+        + parentRef + "] -> [" + isEmpty + "].");
+    return isEmpty;
   }
 
   INavFilter<BaseObject> getNavFilter() {
