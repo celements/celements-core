@@ -101,7 +101,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
   
   public DocumentReference getParentForLevel(int level) {
-    LOGGER.debug("getParentForLevel: " + level);
+    LOGGER.trace("getParentForLevel: start for level " + level);
     DocumentReference parent = null;
     List<DocumentReference> parentList = getDocumentParentsList(
         getContext().getDoc().getDocumentReference(), true);
@@ -109,6 +109,7 @@ public class WebUtilsService implements IWebUtilsService {
     if ((startAtItem > -1) && (startAtItem < parentList.size())) {
       parent = parentList.get(startAtItem);
     }
+    LOGGER.debug("getParentForLevel: level [" + level + "] returning [" + parent + "]");
     return parent;
   }
   
