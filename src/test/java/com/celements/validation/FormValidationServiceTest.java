@@ -59,29 +59,6 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testConvertRequestMap() {
-    Map<Object, Object> requestMap = new HashMap<Object, Object>();
-    requestMap.put("asdf", "1");
-    requestMap.put("qwer", new String[] { "2", "3" });
-
-    Map<String, String[]> convMap = formValidationService.convertRequestMap(requestMap);
-
-    assertNotNull(convMap);
-    assertEquals(2, convMap.size());
-
-    String[] arr1 = convMap.get("asdf");
-    assertNotNull(arr1);
-    assertEquals(1, arr1.length);
-    assertEquals("1", arr1[0]);
-
-    String[] arr2 = convMap.get("qwer");
-    assertNotNull(arr2);
-    assertEquals(2, arr2.length);
-    assertEquals("2", arr2[0]);
-    assertEquals("3", arr2[1]);
-  }
-
-  @Test
   public void testValidateMap_valid() {
     Map<String, String[]> requestMap = new HashMap<String, String[]>();
     requestMap.put("asdf", new String[] { "1" });
