@@ -21,6 +21,7 @@ package com.celements.web.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
@@ -140,5 +141,7 @@ public interface IWebUtilsService {
   public EntityReferenceSerializer<String> getRefDefaultSerializer();
 
   public EntityReferenceSerializer<String> getRefLocalSerializer();
+  
+  public Map<String, String[]> getRequestParameterMap();
 
 }
