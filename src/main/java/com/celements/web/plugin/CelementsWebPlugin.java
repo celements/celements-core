@@ -42,6 +42,7 @@ import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
+import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IPrepareVelocityContext;
@@ -49,7 +50,6 @@ import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -362,21 +362,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         ).renderDocument(viewTemplate, doc, context);
   }
 
+  /**
+   * @deprecated since 2.29.0 use SkinConfigObjCommand instead.
+   */
+  @Deprecated
   public BaseObject getSkinConfigObj(XWikiContext context) {
-    XWikiDocument doc = context.getDoc();
-    try {
-      XWiki xwiki = context.getWiki();
-      XWikiDocument skinDoc = xwiki.getDocument(
-          xwiki.getSpacePreference("skin", context), context);
-      String className = skinDoc.getObject("XWiki.XWikiSkins").getStringValue(
-          "skin_config_class_name");
-      BaseObject configObj = util.getConfigDocByInheritance(doc, className,
-          context).getObject(className);
-      return configObj;
-    } catch(XWikiException e){
-      LOGGER.error(e);
-    }
-    return null;
+    return new SkinConfigObjCommand().getSkinConfigObj();
   }
 
   @Override

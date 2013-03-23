@@ -47,10 +47,13 @@ import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
+import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -412,6 +415,37 @@ public class CelementsWebScriptService implements ScriptService {
    */
   public Map<String, Set<String>> validateRequest() {
     return formValidationService.validateRequest();
+  }
+
+  public com.xpn.xwiki.api.Object getSkinConfigObj() {
+    BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj();
+    if (skinConfigObj != null) {
+      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
+    } else {
+      return null;
+    }
+  }
+
+  public com.xpn.xwiki.api.Object getSkinConfigObj(String fallbackClassName) {
+    BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj(
+        fallbackClassName);
+    if (skinConfigObj != null) {
+      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
+    } else {
+      return null;
+    }
+  }
+
+  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName,
+      String key) {
+    BaseCollection skinConfigBaseColl = new SkinConfigObjCommand(
+        ).getSkinConfigFieldInheritor(fallbackClassName).getObject(key);
+    if ((skinConfigBaseColl != null) && (skinConfigBaseColl instanceof BaseObject)) {
+      BaseObject skinConfigObj = (BaseObject)skinConfigBaseColl;
+      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
+    } else {
+      return null;
+    }
   }
 
 }
