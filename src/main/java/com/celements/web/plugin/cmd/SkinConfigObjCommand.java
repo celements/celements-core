@@ -26,11 +26,7 @@ public class SkinConfigObjCommand {
   public FieldInheritor getSkinConfigFieldInheritor(String fallbackClassName) {
     XWikiDocument doc = getContext().getDoc();
     try {
-      XWiki xwiki = getContext().getWiki();
-      XWikiDocument skinDoc = xwiki.getDocument(getWebService().resolveDocumentReference(
-          xwiki.getSpacePreference("skin", getContext())), getContext());
-      String className = skinDoc.getXObject(getSkinsClassRef()).getStringValue(
-          "skin_config_class_name");
+      String className = getSkinConfigClassNameFromSkinDoc(fallbackClassName);
       return new InheritorFactory().getConfigDocFieldInheritor(
           className, getWebService().getRefLocalSerializer().serialize(
               doc.getDocumentReference()), getContext());
@@ -47,28 +43,32 @@ public class SkinConfigObjCommand {
   public BaseObject getSkinConfigObj(String fallbackClassName) {
     XWikiDocument doc = getContext().getDoc();
     try {
-      XWiki xwiki = getContext().getWiki();
-      XWikiDocument skinDoc = xwiki.getDocument(getWebService().resolveDocumentReference(
-          xwiki.getSpacePreference("skin", getContext())), getContext());
-      BaseObject skinObj = skinDoc.getXObject(getSkinsClassRef());
-      if (skinObj != null) {
-        String className = skinObj.getStringValue("skin_config_class_name");
-        if ((className == null) || "".equals(className)) {
-          className = fallbackClassName;
-        }
-        if ((className != null) && !"".equals(className)) {
-          BaseObject configObj = WebUtils.getInstance().getConfigDocByInheritance(doc,
-              className, getContext()).getObject(className);
-          return configObj;
-        }
-      } else {
-        LOGGER.warn("getSkinConfigObj failed because no 'XWiki.XWikiSkins' object found"
-            + " on skinDoc [" + skinDoc.getDocumentReference() + "].");
+      String className = getSkinConfigClassNameFromSkinDoc(fallbackClassName);
+      if ((className != null) && !"".equals(className)) {
+        BaseObject configObj = WebUtils.getInstance().getConfigDocByInheritance(doc,
+            className, getContext()).getObject(className);
+        return configObj;
       }
     } catch(XWikiException e){
       LOGGER.error(e);
     }
     return null;
+  }
+
+  private String getSkinConfigClassNameFromSkinDoc(String fallbackClassName)
+      throws XWikiException {
+    XWiki xwiki = getContext().getWiki();
+    XWikiDocument skinDoc = xwiki.getDocument(getWebService().resolveDocumentReference(
+        xwiki.getSpacePreference("skin", getContext())), getContext());
+    BaseObject skinObj = skinDoc.getXObject(getSkinsClassRef());
+    String className = fallbackClassName;
+    if (skinObj != null) {
+      String skinConfigClassName = skinObj.getStringValue("skin_config_class_name");
+      if ((skinConfigClassName != null) && !"".equals(skinConfigClassName)) {
+        className = skinConfigClassName;
+      }
+    }
+    return className;
   }
 
   public DocumentReference getSkinsClassRef() {
