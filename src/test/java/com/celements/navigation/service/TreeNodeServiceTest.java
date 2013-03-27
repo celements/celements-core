@@ -366,14 +366,11 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
     expect(wiki.getDocument(eq(webPrefDocRef), eq(context))
         ).andReturn(webPrefDoc).atLeastOnce();
-    Vector<BaseObject> navObjects = new Vector<BaseObject>();
-    navObjects.add(createNavObj(5, webPrefDoc));
-    navObjects.add(null); // deleting an object can lead to a null pointer
-                          // in the object list
-    navObjects.add(createNavObj(8, webPrefDoc));
-    navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setXObjects(Navigation.getNavigationConfigClassReference(
-        context.getDatabase()), navObjects);
+    webPrefDoc.setXObject(0, createNavObj(5, webPrefDoc));
+    //  skipping 1 --> webPrefDoc.setXObject(1, null); // deleting an object can lead to
+                                                      // a null pointer in the object list
+    webPrefDoc.setXObject(2, createNavObj(8, webPrefDoc));
+    webPrefDoc.setXObject(3, createNavObj(3, webPrefDoc));
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
     replayAll(mockPageLayoutCmd);
