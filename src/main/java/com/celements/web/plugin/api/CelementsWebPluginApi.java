@@ -583,13 +583,13 @@ public class CelementsWebPluginApi extends Api {
     return new PageTypeApi(fullName, context);
   }
 
+  /**
+   * 
+   * @deprecated since 2.29.0 instead use celementsweb script service
+   */
+  @Deprecated
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    BaseObject skinConfigObj = plugin.getSkinConfigObj(context);
-    if (skinConfigObj != null) {
-      return skinConfigObj.newObjectApi(skinConfigObj, context);
-    } else {
-      return null;
-    }
+    return getService().getSkinConfigObj();
   }
 
   public int sendMail(
@@ -870,7 +870,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return plugin.tokenBasedUpload(attachToDoc, fieldName, userToken, context);
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }
@@ -885,7 +885,7 @@ public class CelementsWebPluginApi extends Api {
       return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken,
           createIfNotExists, context);
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }

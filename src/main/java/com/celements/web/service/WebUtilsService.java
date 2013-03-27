@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 @Component
 public class WebUtilsService implements IWebUtilsService {
@@ -106,7 +108,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
   
   public DocumentReference getParentForLevel(int level) {
-    LOGGER.debug("getParentForLevel: " + level);
+    LOGGER.trace("getParentForLevel: start for level " + level);
     DocumentReference parent = null;
     List<DocumentReference> parentList = getDocumentParentsList(
         getContext().getDoc().getDocumentReference(), true);
@@ -114,6 +116,7 @@ public class WebUtilsService implements IWebUtilsService {
     if ((startAtItem > -1) && (startAtItem < parentList.size())) {
       parent = parentList.get(startAtItem);
     }
+    LOGGER.debug("getParentForLevel: level [" + level + "] returning [" + parent + "]");
     return parent;
   }
   
@@ -706,6 +709,32 @@ public class WebUtilsService implements IWebUtilsService {
 
   public EntityReferenceSerializer<String> getRefLocalSerializer() {
     return serializer_local;
+  }
+  
+  public Map<String, String[]> getRequestParameterMap() {
+    XWikiRequest request = getContext().getRequest();
+    if (request != null) {
+      Map<?, ?> requestMap = request.getParameterMap();
+      Map<String, String[]> convertedMap = new HashMap<String, String[]>();
+      for (Object keyObj : requestMap.keySet()) {
+        String key = keyObj.toString();
+        String[] value = getValueAsStringArray(requestMap.get(keyObj));
+        convertedMap.put(key, value);
+      }
+      return convertedMap;
+    } else {
+      return null;
+    }
+  }
+
+  private String[] getValueAsStringArray(Object value) {
+    if (value instanceof String) {
+      return new String[] { value.toString() };
+    } else if (value instanceof String[]) {
+      return (String[]) value;
+    } else {
+      throw new IllegalArgumentException("Invalid requestMap value type");
+    }
   }
 
 }

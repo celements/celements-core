@@ -9,10 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
+import com.celements.web.service.IWebUtilsService;
 
 @Component
 public class FormValidationService implements IFormValidationRole {
@@ -21,17 +19,13 @@ public class FormValidationService implements IFormValidationRole {
       FormValidationService.class);
 
   @Requirement
+  private IWebUtilsService webUtils;
+
+  @Requirement
   private Map<String, IRequestValidationRuleRole> requestValidationRules;
 
   @Requirement
   private Map<String, IFieldValidationRuleRole> fieldValidationRules;
-
-  @Requirement
-  private Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-  }
 
   void injectValidationRules(Map<String, IRequestValidationRuleRole> requestValidationRules,
       Map<String, IFieldValidationRuleRole> fieldValidationRules) {
@@ -41,33 +35,8 @@ public class FormValidationService implements IFormValidationRole {
 
   public Map<String, Set<String>> validateRequest() {
     LOGGER.trace("validateRequest() called");
-    XWikiRequest request = getContext().getRequest();
-    Map<String, String[]> requestMap = convertRequestMap(request.getParameterMap());
+    Map<String, String[]> requestMap = webUtils.getRequestParameterMap();
     return validateMap(requestMap);
-  }
-
-  Map<String, String[]> convertRequestMap(Map<?, ?> requestMap) {
-    Map<String, String[]> convertedMap = new HashMap<String, String[]>();
-    for (Object keyObj : requestMap.keySet()) {
-      String key = keyObj.toString();
-      String[] value = getValueAsStringArray(requestMap.get(keyObj));
-      convertedMap.put(key, value);
-    }
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("request map: " + requestMap);
-      LOGGER.trace("converted map: " + convertedMap);
-    }
-    return convertedMap;
-  }
-
-  String[] getValueAsStringArray(Object value) {
-    if (value instanceof String) {
-      return new String[] { value.toString() };
-    } else if (value instanceof String[]) {
-      return (String[]) value;
-    } else {
-      throw new IllegalArgumentException("Invalid requestMap value type");
-    }
   }
 
   public Map<String, Set<String>> validateMap(Map<String, String[]> requestMap) {

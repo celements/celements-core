@@ -271,7 +271,9 @@ public class NavigationApi extends Api {
   }
 
   public boolean isEmpty() {
-    return navigation.isEmpty();
+    boolean isEmpty = navigation.isEmpty();
+    LOGGER.debug("isEmpty api: returning [" + isEmpty + "].");
+    return isEmpty;
   }
 
 }

@@ -1,13 +1,25 @@
 package com.celements.web.service;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.same;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +44,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -1001,6 +1014,42 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     replayAll();
     assertEquals("parentSpaceName", webUtilsService.getParentSpace("mySpace"));
     verifyAll();
+  }
+  
+  @Test
+  public void testGetRequestParameterMap_none() {    
+    replayAll();
+    Map<String, String[]> requestMap = webUtilsService.getRequestParameterMap();
+    verifyAll();
+
+    assertNull(requestMap);
+  }
+  
+  @Test
+  public void testGetRequestParameterMap() {
+    XWikiRequest mockXWikiRequest = createMock(XWikiRequest.class);
+    context.setRequest(mockXWikiRequest);
+    Map<Object, Object> requestMap = new HashMap<Object, Object>();
+    requestMap.put("asdf", "1");
+    requestMap.put("qwer", new String[] { "2", "3" });
+    
+    expect(mockXWikiRequest.getParameterMap()).andReturn(requestMap).once();
+
+    replayAll(mockXWikiRequest);
+    Map<String, String[]> request = webUtilsService.getRequestParameterMap();
+    verifyAll(mockXWikiRequest);
+
+    assertNotNull(request);
+    assertEquals(2, request.size());
+    String[] arr1 = request.get("asdf");
+    assertNotNull(arr1);
+    assertEquals(1, arr1.length);
+    assertEquals("1", arr1[0]);
+    String[] arr2 = request.get("qwer");
+    assertNotNull(arr2);
+    assertEquals(2, arr2.length);
+    assertEquals("2", arr2[0]);
+    assertEquals("3", arr2[1]);
   }
 
   //*****************************************************************

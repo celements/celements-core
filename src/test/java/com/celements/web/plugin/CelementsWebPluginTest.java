@@ -73,7 +73,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams), same(context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", plugin.getUsernameForToken(userToken, context));
     assertTrue(captHQL.getValue().contains("token.tokenvalue=?"));
@@ -97,9 +97,9 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL2 = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(new ArrayList<String>()).once();
+        capture(captParams), same(context))).andReturn(new ArrayList<String>()).once();
     expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams), same(context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("xwiki:Doc.Fullname", plugin.getUsernameForToken(userToken, context));
     assertTrue(captHQL2.getValue().contains("token.tokenvalue=?"));
@@ -121,7 +121,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).times(2);
+        capture(captParams), same(context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
     assertNull(plugin.checkAuthByToken(userToken, context));
   }
@@ -136,7 +136,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams), same(context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", plugin.checkAuthByToken(userToken, context).getUser());
     assertEquals("Doc.Fullname", context.getXWikiUser().getUser());
