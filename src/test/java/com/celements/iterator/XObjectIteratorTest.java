@@ -378,16 +378,13 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   public void testNext_deletedNullObjectsInList() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
-    testObjs.add(firstObj);
-    testObjs.add(null); // deleted second object
+    _testDoc.setXObject(0, firstObj);
+    // skipping 2 -->   _testDoc.setXObject(2, null); // deleted second object
     BaseObject thirdObject = new BaseObject();
     thirdObject.setXClassReference(_testClassRef);
-    testObjs.add(thirdObject);
-    testObjs.add(null); // deleted fourth object
-    _testDoc.setXObjects(_testClassRef, testObjs);
+    _testDoc.setXObject(3, thirdObject);
     expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
         );
     _iterator.setDocList(_docList);
