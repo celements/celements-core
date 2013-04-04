@@ -144,6 +144,8 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "A", "B")).atLeastOnce();
     obj.set(eq("hi"), eq("value"), same(context));
     expectLastCall().once();
+    obj.setOwnerDocument(same(doc));
+    expectLastCall().once();
     replay(obj);
     doc.addXObject(obj);
     replayAll();
@@ -276,15 +278,19 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
       "Noes");
     obj2.setDocumentReference(specificDocRef);
     expectLastCall().atLeastOnce();
-    replay(obj, obj2);
     XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
+    obj.setOwnerDocument(same(defaultDoc));
+    expectLastCall().atLeastOnce();
+    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
+    obj2.setOwnerDocument(same(specificDoc));
+    expectLastCall().atLeastOnce();
+    replay(obj, obj2);
     Vector<BaseObject> cDobjects = new Vector<BaseObject>();
     cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
     DocumentReference cdClassRef = new DocumentReference(context.getDatabase(), "C", "D");
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc
         ).times(2);
-    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<BaseObject>();
     cDobjects2.add(obj2);
     DocumentReference abClassRef = new DocumentReference(context.getDatabase(), "A", "B");
@@ -375,8 +381,13 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
       "Noes");
     obj2.setDocumentReference(specificDocRef);
     expectLastCall().atLeastOnce();
-    replay(obj, obj2);
     XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
+    obj.setOwnerDocument(same(defaultDoc));
+    expectLastCall().atLeastOnce();
+    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
+    obj2.setOwnerDocument(same(specificDoc));
+    expectLastCall().atLeastOnce();
+    replay(obj, obj2);
     Vector<BaseObject> cDobjects = new Vector<BaseObject>();
     cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
     DocumentReference cdClassRef = new DocumentReference(context.getDatabase(), "C", "D");
@@ -385,7 +396,6 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
       "Name");
     expect(xwiki.getDocument(eq(doc1Ref), same(context))).andReturn(defaultDoc
         ).times(2);
-    XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<BaseObject>();
     cDobjects2.add(obj2);
     DocumentReference abClassRef = new DocumentReference(context.getDatabase(), "A", "B");
