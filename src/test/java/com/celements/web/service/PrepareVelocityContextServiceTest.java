@@ -401,6 +401,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(rightServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.myTestUser"),
         eq("mySpace.myDoc"), same(context))).andReturn(false).anyTimes();
     expect(rightServiceMock.hasAdminRights(same(context))).andReturn(false).anyTimes();
+    expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
     replayAll(groupServiceMock);
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay

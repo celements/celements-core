@@ -297,6 +297,12 @@ public class WebUtilsService implements IWebUtilsService {
       adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
           getContext().getLanguage(), getContext());
     }
+    if ((adminLanguage == null) || ("".equals(adminLanguage))) {
+      adminLanguage = getContext().getWiki().Param("celements.admin_language");
+      if ((adminLanguage == null) || ("".equals(adminLanguage))) {
+        adminLanguage = "en";
+      }
+    }
     return adminLanguage;
   }
   
