@@ -483,6 +483,32 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetAdminLanguage_emptySpaceLanguage() throws Exception {
+    String systemDefaultAdminLang = "en";
+    context.setLanguage("de");
+    String userName = "XWiki.MyUser";
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "MyUser");
+    XWikiDocument userDoc = new XWikiDocument(userDocRef);
+    DocumentReference xwikiUserClassRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiUsers");
+    BaseObject userObj = new BaseObject();
+    userObj.setXClassReference(xwikiUserClassRef);
+    userObj.setStringValue("admin_language", "");
+    userDoc.setXObject(0, userObj);
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
+        ).andReturn("");
+    expect(xwiki.Param(eq("celements.admin_language"))).andReturn("");
+    replayAll();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser(userName);
+    assertEquals(systemDefaultAdminLang, webUtilsService.getAdminLanguage());
+    verifyAll();
+  }
+
+  @Test
   public void testIsAdminUser_noAdminRights_noRightsService() {
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
         "MySpace", "MyDocument");
