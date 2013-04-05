@@ -22,7 +22,7 @@ package com.celements.web.utils;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
@@ -766,32 +767,37 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testGetAttachmentListSorted_getAll() throws ClassNotFoundException, 
-      XWikiException, IOException {
+  public void testGetAttachmentListSorted_getAll() throws Exception {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
         "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
-    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("a.jpg").once();
-    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("b.jpg").once();
-    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("c.jpg").once();
-    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("d.jpg").once();
-    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("e.jpg").once();
-    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("f.jpg").once();
-    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("g.jpg").once();
-    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("h.jpg").once();
+//FIXME  xwiki 4.5.x does not call clearName anymore!!
+//    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("a.jpg").once();
+//    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("b.jpg").once();
+//    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("c.jpg").once();
+//    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("d.jpg").once();
+//    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("e.jpg").once();
+//    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("f.jpg").once();
+//    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("g.jpg").once();
+//    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     context.setEngineContext(engContext);
     expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
-    replay(engContext, wiki, rightsService);
+    Environment envMock = createMock(Environment.class); 
+    getComponentManager().registerComponent(getComponentManager().getComponentDescriptor(
+        Environment.class, null), envMock);
+    expect(envMock.getTemporaryDirectory()).andReturn(new File("")).anyTimes();
+    replayAll(engContext, rightsService, envMock);
+    assertNotNull(Utils.getComponent(Environment.class).getTemporaryDirectory());
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
     InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
@@ -805,7 +811,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
         "AttachmentAscendingNameComparator", true, 0, 0);
-    verify(engContext, wiki, rightsService);
+    verifyAll(engContext, rightsService);
     assertEquals(8, result.size());
     assertEquals("a.jpg", result.get(0).getFilename());
     assertEquals("e.jpg", result.get(4).getFilename());
@@ -813,32 +819,36 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testGetAttachmentListSorted_getFirstPart() throws XWikiException, 
-      ClassNotFoundException, IOException {
+  public void testGetAttachmentListSorted_getFirstPart() throws Exception {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
         "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
-    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("a.jpg").once();
-    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("b.jpg").once();
-    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("c.jpg").once();
-    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("d.jpg").once();
-    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("e.jpg").once();
-    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("f.jpg").once();
-    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("g.jpg").once();
-    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("h.jpg").once();
+  //FIXME  xwiki 4.5.x does not call clearName anymore!!
+//    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("a.jpg").once();
+//    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("b.jpg").once();
+//    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("c.jpg").once();
+//    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("d.jpg").once();
+//    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("e.jpg").once();
+//    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("f.jpg").once();
+//    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("g.jpg").once();
+//    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     context.setEngineContext(engContext);
     expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
-    replay(engContext, wiki, rightsService);
+    Environment envMock = createMock(Environment.class); 
+    getComponentManager().registerComponent(getComponentManager().getComponentDescriptor(
+        Environment.class, null), envMock);
+    expect(envMock.getTemporaryDirectory()).andReturn(new File("")).anyTimes();
+    replayAll(engContext, rightsService, envMock);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
     InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
@@ -852,7 +862,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
         "AttachmentAscendingNameComparator", true, -1, 3);
-    verify(engContext, wiki, rightsService);
+    verifyAll(engContext, rightsService, envMock);
     assertEquals(3, result.size());
     assertEquals("a.jpg", result.get(0).getFilename());
     assertEquals("b.jpg", result.get(1).getFilename());
@@ -860,32 +870,36 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testGetAttachmentListSorted_getMiddlePart() throws XWikiException,
-      ClassNotFoundException, IOException {
+  public void testGetAttachmentListSorted_getMiddlePart() throws Exception {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
         "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
-    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("a.jpg").once();
-    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("b.jpg").once();
-    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("c.jpg").once();
-    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("d.jpg").once();
-    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("e.jpg").once();
-    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("f.jpg").once();
-    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("g.jpg").once();
-    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("h.jpg").once();
+  //FIXME  xwiki 4.5.x does not call clearName anymore!!
+//    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("a.jpg").once();
+//    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("b.jpg").once();
+//    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("c.jpg").once();
+//    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("d.jpg").once();
+//    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("e.jpg").once();
+//    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("f.jpg").once();
+//    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("g.jpg").once();
+//    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     context.setEngineContext(engContext);
     expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
-    replay(engContext, wiki, rightsService);
+    Environment envMock = createMock(Environment.class); 
+    getComponentManager().registerComponent(getComponentManager().getComponentDescriptor(
+        Environment.class, null), envMock);
+    expect(envMock.getTemporaryDirectory()).andReturn(new File("")).anyTimes();
+    replayAll(engContext, rightsService, envMock);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
     InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
@@ -899,7 +913,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
         "AttachmentAscendingNameComparator", true, 3, 3);
-    verify(engContext, wiki, rightsService);
+    verifyAll(engContext, rightsService, envMock);
     assertEquals(3, result.size());
     assertEquals("d.jpg", result.get(0).getFilename());
     assertEquals("e.jpg", result.get(1).getFilename());
@@ -907,32 +921,36 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testGetAttachmentListSorted_getLastPart() throws XWikiException,
-      ClassNotFoundException, IOException {
+  public void testGetAttachmentListSorted_getLastPart() throws Exception {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
         "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
-    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("a.jpg").once();
-    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("b.jpg").once();
-    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("c.jpg").once();
-    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("d.jpg").once();
-    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("e.jpg").once();
-    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("f.jpg").once();
-    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("g.jpg").once();
-    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("h.jpg").once();
+  //FIXME  xwiki 4.5.x does not call clearName anymore!!
+//    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("a.jpg").once();
+//    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("b.jpg").once();
+//    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("c.jpg").once();
+//    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("d.jpg").once();
+//    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("e.jpg").once();
+//    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("f.jpg").once();
+//    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("g.jpg").once();
+//    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     context.setEngineContext(engContext);
     expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
-    replay(engContext, wiki, rightsService);
+    Environment envMock = createMock(Environment.class); 
+    getComponentManager().registerComponent(getComponentManager().getComponentDescriptor(
+        Environment.class, null), envMock);
+    expect(envMock.getTemporaryDirectory()).andReturn(new File("")).anyTimes();
+    replayAll(engContext, rightsService, envMock);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
     InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
@@ -946,39 +964,43 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
         "AttachmentAscendingNameComparator", true, 6, 3);
-    verify(engContext, wiki, rightsService);
+    verifyAll(engContext, rightsService, envMock);
     assertEquals(2, result.size());
     assertEquals("g.jpg", result.get(0).getFilename());
     assertEquals("h.jpg", result.get(1).getFilename());
   }
   
   @Test
-  public void testGetAttachmentListSorted_getEmpty() throws XWikiException,
-      ClassNotFoundException, IOException {
+  public void testGetAttachmentListSorted_getEmpty() throws Exception {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
         "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
-    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("a.jpg").once();
-    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("b.jpg").once();
-    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("c.jpg").once();
-    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("d.jpg").once();
-    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("e.jpg").once();
-    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("f.jpg").once();
-    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("g.jpg").once();
-    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("h.jpg").once();
+  //FIXME  xwiki 4.5.x does not call clearName anymore!!
+//    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("a.jpg").once();
+//    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("b.jpg").once();
+//    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("c.jpg").once();
+//    expect(wiki.clearName(eq("d.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("d.jpg").once();
+//    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("e.jpg").once();
+//    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("f.jpg").once();
+//    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("g.jpg").once();
+//    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     context.setEngineContext(engContext);
     expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
-    replay(engContext, wiki, rightsService);
+    Environment envMock = createMock(Environment.class); 
+    getComponentManager().registerComponent(getComponentManager().getComponentDescriptor(
+        Environment.class, null), envMock);
+    expect(envMock.getTemporaryDirectory()).andReturn(new File("")).anyTimes();
+    replayAll(engContext, rightsService, envMock);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
     InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
@@ -992,38 +1014,42 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
         "AttachmentAscendingNameComparator", true, 7, 0);
-    verify(engContext, wiki, rightsService);
+    verifyAll(engContext, rightsService, envMock);
     assertEquals(0, result.size());
   }
 
   @Test
-  public void testGetAttachmentListSorted_getWithNonImages() throws XWikiException,
-      ClassNotFoundException, IOException {
+  public void testGetAttachmentListSorted_getWithNonImages() throws Exception {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService).anyTimes();
     expect(wiki.getDocument(eq(new DocumentReference(context.getDatabase(), "XWiki", 
         "XWikiPreferences")), same(context))).andReturn(null).anyTimes();
-    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("a.jpg").once();
-    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("b.jpg").once();
-    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("c.jpg").once();
-    expect(wiki.clearName(eq("d.txt"), eq(false), eq(true), same(context))
-        ).andReturn("d.txt").once();
-    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("e.jpg").once();
-    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("f.jpg").once();
-    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("g.jpg").once();
-    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
-        ).andReturn("h.jpg").once();
+  //FIXME  xwiki 4.5.x does not call clearName anymore!!
+//    expect(wiki.clearName(eq("a.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("a.jpg").once();
+//    expect(wiki.clearName(eq("b.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("b.jpg").once();
+//    expect(wiki.clearName(eq("c.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("c.jpg").once();
+//    expect(wiki.clearName(eq("d.txt"), eq(false), eq(true), same(context))
+//        ).andReturn("d.txt").once();
+//    expect(wiki.clearName(eq("e.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("e.jpg").once();
+//    expect(wiki.clearName(eq("f.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("f.jpg").once();
+//    expect(wiki.clearName(eq("g.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("g.jpg").once();
+//    expect(wiki.clearName(eq("h.jpg"), eq(false), eq(true), same(context))
+//        ).andReturn("h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     context.setEngineContext(engContext);
     expect(engContext.getMimeType("d.txt")).andReturn("txt").once();
     expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
-    replay(engContext, wiki, rightsService);
+    Environment envMock = createMock(Environment.class); 
+    getComponentManager().registerComponent(getComponentManager().getComponentDescriptor(
+        Environment.class, null), envMock);
+    expect(envMock.getTemporaryDirectory()).andReturn(new File("")).anyTimes();
+    replayAll(engContext, rightsService, envMock);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), context);
     InputStream in = getClass().getClassLoader().getResourceAsStream("test.jpg");
@@ -1038,7 +1064,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("f.jpg", in);
     List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
         "AttachmentAscendingNameComparator", true, 2, 3);
-    verify(engContext, wiki, rightsService);
+    verifyAll(engContext, rightsService, envMock);
     assertEquals(3, result.size());
     assertEquals("c.jpg", result.get(0).getFilename());
     assertEquals("e.jpg", result.get(1).getFilename());
