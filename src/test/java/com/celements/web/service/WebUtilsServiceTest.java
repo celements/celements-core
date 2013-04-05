@@ -63,13 +63,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         Utils.getComponent(EntityReferenceSerializer.TYPE_STRING));
   }
 
-  @Test
-  public void testGetParentForLevel_1() {
+  public void testGetParentForLevel_1() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setParentReference((EntityReference)null);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     replayAll();
     context.setDoc(doc);
+    assertNull(doc.getParentReference());
     assertNull(webUtilsService.getParentForLevel(1)); //root
     verifyAll();
   }
@@ -80,60 +83,53 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         "myDoc");
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
-  
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiDocument docP = new XWikiDocument(parentRef);
     doc.setParentReference(parentRef.extractReference(EntityType.DOCUMENT));
-    
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).once();
     expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).once();
-    
-    context.setDoc(doc);
     replayAll();
+    context.setDoc(doc);
     assertEquals(parentRef,webUtilsService.getParentForLevel(2));
     verifyAll();
   }
   
   @Test
   public void testGetParentForLevel_3() throws XWikiException {    
-    DocumentReference
-      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
-      parentRef = new DocumentReference(context.getDatabase(),"mySpace","parent1");
-  
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiDocument docP = new XWikiDocument(parentRef);
     doc.setParentReference(parentRef.extractReference(EntityType.DOCUMENT));
-    
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).once();
     expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).once();
-    
-    context.setDoc(doc);
     replayAll();
+    context.setDoc(doc);
     assertEquals(docRef,webUtilsService.getParentForLevel(3));
     verifyAll();
   }
   
   @Test
   public void testGetParentForLevel_IndexOutOfBounds() throws XWikiException {    
-    DocumentReference
-      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
-      parentRef = new DocumentReference(context.getDatabase(),"mySpace","parent1");
-  
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "parent1");
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiDocument docP = new XWikiDocument(parentRef);
     doc.setParentReference(parentRef.extractReference(EntityType.DOCUMENT));
-    
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).times(3);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).times(3);
     expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).times(3);
     expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).times(3);
-    
-    context.setDoc(doc);
     replayAll();
+    context.setDoc(doc);
     assertNull(webUtilsService.getParentForLevel(4));
     assertNull(webUtilsService.getParentForLevel(0));
     assertNull(webUtilsService.getParentForLevel(-1));
@@ -142,23 +138,22 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetDocumentParentsList() throws XWikiException {
-    DocumentReference
-      docRef = new DocumentReference(context.getDatabase(),"mySpace","myDoc"),
-      parentRef1 = new DocumentReference(context.getDatabase(),"mySpace","parent1"),
-      parentRef2 = new DocumentReference(context.getDatabase(),"mySpace","parent2");
-    
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
+        "parent1");
+    DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "mySpace",
+        "parent2");
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiDocument docP1 = new XWikiDocument(parentRef1);
     XWikiDocument docP2 = new XWikiDocument(parentRef2);
     docP1.setParentReference(parentRef2.extractReference(EntityType.DOCUMENT));
     doc.setParentReference(parentRef1.extractReference(EntityType.DOCUMENT));
-    
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.getDocument(eq(parentRef1), same(context))).andReturn(docP1).once();
     expect(xwiki.exists(eq(parentRef1), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(parentRef2), same(context))).andReturn(docP2).once();
     expect(xwiki.exists(eq(parentRef2), same(context))).andReturn(true).once();
-    
     List<DocumentReference> docParentsList = Arrays.asList(parentRef1, parentRef2);
     replayAll();
     assertEquals(docParentsList, webUtilsService.getDocumentParentsList(docRef, false));
