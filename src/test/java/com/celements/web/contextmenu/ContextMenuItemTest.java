@@ -28,8 +28,10 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -51,25 +53,36 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_ContextMenuItemTest() {
     context = getContext();
-    context.setDoc(new XWikiDocument());
+    xwiki = getWikiMock();
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    context.setDoc(new XWikiDocument(myDocRef ));
     velocityContext = new VelocityContext();
     context.put("vcontext", velocityContext);
-    theCMI = createCMI("N1:Content.Agenda");
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    renderingEngine = createMock(XWikiRenderingEngine.class);
+    renderingEngine = createMockAndAddToDefault(XWikiRenderingEngine.class);
     expect(xwiki.getRenderingEngine()).andReturn(renderingEngine).anyTimes();
+    theCMI = createCMI("N1:Content.Agenda");
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public void testContextMenuItem_withPrefix() {
-    replay(xwiki, renderingEngine);
+    expect(renderingEngine.interpretText(eq("link"), same(context.getDoc()),
+        same(context))).andReturn("link");
+    expect(renderingEngine.interpretText(eq("Test Menu Item"), same(context.getDoc()),
+        same(context))).andReturn("Test Menu Item");
+    expect(renderingEngine.interpretText(eq("shortcut"), same(context.getDoc()),
+        same(context))).andReturn("shortcut");
+    expect(renderingEngine.interpretText(eq(""), same(context.getDoc()), same(context))
+        ).andReturn("");
+    replayDefault();
     assertEquals("Content.Agenda", theCMI.getElemId());
+    Builder builder = new Builder();
+    theCMI.generateJSON(builder);
     assertEquals("Content.Agenda", velocityContext.get("elemId"));
     assertNotNull(velocityContext.get("elemParams"));
     assertEquals(1, ((List<String>)velocityContext.get("elemParams")).size());
-    verify(xwiki, renderingEngine);
+    verifyDefault();
   }
 
 
@@ -84,15 +97,19 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("shortcut");
     expect(renderingEngine.interpretText(eq(""), same(context.getDoc()), same(context))
         ).andReturn("");
-    replay(xwiki, renderingEngine);
+    replayDefault();
     ContextMenuItem localCMI = createCMI("N1:menuPartTest:");
+    assertEquals("link", localCMI.getLink());
+    assertEquals("Test Menu Item", localCMI.getText());
+    assertEquals("shortcut", localCMI.getShortcut());
+    assertEquals("", localCMI.getCmiIcon());
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     assertEquals("", localCMI.getElemId());
     assertEquals("", vcontext.get("elemId"));
     assertNotNull(vcontext.get("elemParams"));
     assertEquals(2, ((List<String>)vcontext.get("elemParams")).size());
     assertEquals("menuPartTest", ((List<String>)vcontext.get("elemParams")).get(1));
-    verify(xwiki, renderingEngine);
+    verifyDefault();
   }
 
   @SuppressWarnings("unchecked")
@@ -106,13 +123,18 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("shortcut");
     expect(renderingEngine.interpretText(eq(""), same(context.getDoc()), same(context))
         ).andReturn("");
-    replay(xwiki, renderingEngine);
-    assertEquals("Content.Test2", createCMI("Content.Test2").getElemId());
+    replayDefault();
+    ContextMenuItem localCMI = createCMI("Content.Test2");
+    Builder builder = new Builder();
+    localCMI.generateJSON(builder);
+    assertEquals("Content.Test2", localCMI.getElemId());
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     assertEquals("Content.Test2", vcontext.get("elemId"));
     assertNotNull(vcontext.get("elemParams"));
     assertEquals(0, ((List<String>)vcontext.get("elemParams")).size());
-    verify(xwiki, renderingEngine);
+    assertEquals("{\"link\" : \"link\", \"text\" : \"Test Menu Item\", \"icon\" : \"\","
+        + " \"shortcut\" : {\"shortcut\" : true}}", builder.getJSON());
+    verifyDefault();
   }
 
   @Test
@@ -130,14 +152,17 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn("shortcut");
     expect(renderingEngine.interpretText(eq(""), same(context.getDoc()), same(context))
         ).andReturn("");
-    replay(xwiki, renderingEngine);
-    assertEquals("Content.Test2", createCMI("Content.Test2").getElemId());
+    replayDefault();
+    ContextMenuItem localCMI = createCMI("Content.Test2");
+    assertEquals("Content.Test2", localCMI.getElemId());
     assertSame(vcontextBefore, context.get("vcontext"));
+    Builder builder = new Builder();
+    localCMI.generateJSON(builder);
     assertFalse(mockRenderEngine.recordedVcontextList.isEmpty());
     for (VelocityContext vContext : mockRenderEngine.recordedVcontextList) {
       assertNotSame(vcontextBefore, vContext);
     }
-    verify(xwiki, renderingEngine);
+    verifyDefault();
   }
 
   //*****************************************************************
@@ -150,7 +175,7 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
     menuItem.setStringValue("cmi_text", "Test Menu Item");
     menuItem.setStringValue("cmi_icon", null);
     menuItem.setStringValue("cmi_shortcut", "shortcut");
-    return new ContextMenuItem(menuItem, elementId, context);
+    return new ContextMenuItem(menuItem, elementId);
   }
 
   private class TestRenderingEngine implements XWikiRenderingEngine {
