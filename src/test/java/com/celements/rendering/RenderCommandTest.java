@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
@@ -110,7 +109,6 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         renderCmd.getPageTypeResolver());
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testGetRenderingEngine() throws Exception {
     expect(xwiki.Param(isA(String.class), eq("0"))).andReturn("0").anyTimes();
@@ -123,8 +121,10 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getXWikiPreference(eq("macros_groovy"), eq("XWiki.GroovyMacros"),
         same(context))).andReturn("XWiki.GroovyMacros").anyTimes();
     expect(xwiki.getMacroList(same(context))).andReturn("").anyTimes();
-    CacheFactory cacheFactory = createMock(CacheFactory.class);
-    expect(xwiki.getCacheFactory()).andReturn(cacheFactory);
+//    DefaultXWikiRenderingEngine in 4.5.x  uses the cache module. Thus we do not need
+//    to mock the cacheFactory anymore.
+//    CacheFactory cacheFactory = createMock(CacheFactory.class);
+//    expect(xwiki.getCacheFactory()).andReturn(cacheFactory);
     XWikiConfig conf = new XWikiConfig();
     expect(xwiki.getConfig()).andReturn(conf);
     Object[] mocks = {};
