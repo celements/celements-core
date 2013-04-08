@@ -921,8 +921,25 @@ public class CelementsWebPluginApi extends Api {
    */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
-    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
+    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins, null,
         context);
+  }
+
+  /**
+   * Check authentication from logincredential and password and set according persitent
+   * login information If it fails user is unlogged
+   * 
+   * @param username logincredential to check
+   * @param password password to check
+   * @param rememberme "1" if you want to remember the login accross navigator restart
+   * @param noRedirect supress auto redirect to xredirect parameter
+   * @return null if failed, non null XWikiUser if sucess
+   * @throws XWikiException
+   */
+  public XWikiUser checkAuth(String logincredential, String password, String rememberme,
+      String possibleLogins, boolean noRedirect) throws XWikiException {
+    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
+        noRedirect, context);
   }
 
   /**

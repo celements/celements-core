@@ -591,11 +591,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public XWikiUser checkAuth(String logincredential, String password,
-        String rememberme, String possibleLogins, XWikiContext context
+        String rememberme, String possibleLogins, Boolean noRedirect, XWikiContext context
       ) throws XWikiException {
     String loginname = getUsernameForUserData(logincredential, possibleLogins, context);
     if ("".equals(loginname) && possibleLogins.matches("(.*,)?loginname(,.*)?")) {
         loginname = logincredential;
+    }
+    if (noRedirect != null) {
+      context.put("ajax", noRedirect);
     }
     return context.getWiki().getAuthService().checkAuth(loginname, password, rememberme,
         context);
