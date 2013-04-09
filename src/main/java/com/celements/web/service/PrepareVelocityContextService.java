@@ -662,6 +662,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   void fixTdocForInvalidLanguage(VelocityContext vcontext) {
+    //FIXME should be executed only once per vcontext right?
     XWikiDocument doc = getContext().getDoc();
     if ((doc != null) && (vcontext != null)) {
       Document vTdocBefore = (Document) vcontext.get("tdoc");
