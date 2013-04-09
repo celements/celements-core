@@ -21,8 +21,10 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.pagetype.PageTypeApi;
+import com.celements.pagetype.PageType;
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +62,12 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   @Requirement
   IWebUtilsService webUtilsService;
+
+  @Requirement
+  IPageTypeResolverRole pageTypeResolver;
+
+  @Requirement
+  IPageTypeRole pageTypeService;
 
   private XWikiContext getContext() {
     return (XWikiContext)getExecContext().getProperty("xwikicontext");
@@ -188,8 +196,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         }
       }
       if (!vcontext.containsKey("page_type")) {
-        vcontext.put("page_type", new PageTypeCommand().getPageType(getContext().getDoc(),
-            getContext()));
+        vcontext.put("page_type", pageTypeResolver.getPageTypeRefForCurrentDoc(
+            ).getConfigName());
       }
       if (!vcontext.containsKey("user")) {
         vcontext.put("user", getContext().getUser());
@@ -323,12 +331,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private XWikiDocument getPageTypeDoc(XWikiContext context) {
     if(context.getDoc() != null) {
       try {
-        Document templateDocument = new PageTypeApi(
-        context.getDoc().getFullName(), context).getTemplateDocument();
-        XWikiDocument pageTypeDoc = context.getWiki().getDocument(
-            templateDocument.getFullName(), context);
-        LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc + " , "
-            + templateDocument);
+        XWikiDocument pageTypeDoc = new PageType(
+            pageTypeResolver.getPageTypeRefForCurrentDoc().getConfigName()
+            ).getTemplateDocument(getContext());
+        LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
         return pageTypeDoc;
       } catch (XWikiException exp) {
         LOGGER.error("Failed to getPageTypeDoc.", exp);
