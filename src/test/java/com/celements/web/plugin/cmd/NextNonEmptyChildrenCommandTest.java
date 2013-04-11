@@ -40,11 +40,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
+public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private XWiki xwiki;
-  private EmptyCheckCommand emptyChildCheckCmd;
+  private NextNonEmptyChildrenCommand nextNonEmptChildCmd;
   private ITreeNodeService treeNodeService;
   private ComponentDescriptor<ITreeNodeService> treeNodeServiceDesc;
   private ITreeNodeService savedTreeNodeServiceDesc;
@@ -53,7 +53,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   public void setUp_EmptyCheckCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    emptyChildCheckCmd = new EmptyCheckCommand();
+    nextNonEmptChildCmd = new NextNonEmptyChildrenCommand();
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
@@ -70,74 +70,6 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testIsEmptyRTEDocument_empty() {
-    assertTrue(emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp;</p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Break() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p><br /></p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_manualizer_example() {
-    assertTrue("Paragraph with span surrounding break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-        "<p><span style=\"line-height: normal; font-size: 10px;\"><br /></span></p>")));
-  }
-  
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space1Break() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp; <br /></p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_3Space1Break() {
-    assertTrue("Lonly non breaking spaces (3) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp;&nbsp;<br /></p>")));
-  }
-
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Space2Break() {
-    assertTrue("Lonly non breaking spaces with break (2) should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;<br /><br /></p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_REGULAR_TEXT() {
-    assertFalse("Regular Text (2) should not be treated as empty.",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>adsf  &nbsp; <br />sadf</p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_nbsp() {
-    assertTrue("Lonly non breaking spaces should be treated as empty",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("&nbsp;")));
-    assertTrue("Non breaking spaces in a paragraph should be treated as empty",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
-    assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>  &nbsp; </p>")));
-    assertFalse("Regular Text should not be treated as empty.",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));
-  }
-
-  @Test
   public void testGetNextNonEmptyChildren_notEmpty() throws Exception {
     DocumentReference documentRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyDoc");
@@ -146,7 +78,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
     Object[] mocks = {};
     replayDefault(mocks);
-    assertEquals(documentRef, emptyChildCheckCmd.getNextNonEmptyChildren(documentRef));
+    assertEquals(documentRef, nextNonEmptChildCmd.getNextNonEmptyChildren(documentRef));
     Object[] mocks1 = {};
     verifyDefault(mocks1);
   }
@@ -161,7 +93,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         ).andReturn(noChildrenList).once();
     Object[] mocks = { myXdoc };
     replayDefault(mocks);
-    assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
+    assertEquals(emptyDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     Object[] mocks1 = { myXdoc };
     verifyDefault(mocks1);
   }
@@ -185,7 +117,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         ).once();
     Object[] mocks = { myXdoc };
     replayDefault(mocks);
-    assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
     Object[] mocks1 = { myXdoc };
     verifyDefault(mocks1);
@@ -220,7 +152,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         childChildXdoc).once();
     Object[] mocks = { myXdoc, childXdoc };
     replayDefault(mocks);
-    assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
     Object[] mocks1 = { myXdoc, childXdoc };
     verifyDefault(mocks1);
@@ -257,7 +189,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         ).andReturn(childrenList3).once();
     Object[] mocks = { myXdoc, childXdoc, childChildXdoc };
     replayDefault(mocks);
-    assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
     Object[] mocks1 = { myXdoc, childXdoc, childChildXdoc };
     verifyDefault(mocks1);
@@ -276,13 +208,6 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(emptyDocRef), same(context))).andReturn(myXdoc
         ).atLeastOnce();
     return myXdoc;
-  }
-
-  private XWikiDocument getTestDoc(String inStr) {
-    DocumentReference testDocRef = new DocumentReference("xwiki", "testSpace", "testDoc");
-    XWikiDocument doc = new XWikiDocument(testDocRef );
-    doc.setContent(inStr);
-    return doc;
   }
 
 }

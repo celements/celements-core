@@ -80,6 +80,7 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
+import com.celements.web.service.IEmptyCheckRole;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
@@ -115,8 +116,6 @@ public class CelementsWebPluginApi extends Api {
       CelementsWebPluginApi.class);
 
   private CelementsWebPlugin plugin;
-
-  private final EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
 
   public CelementsWebPluginApi(
       CelementsWebPlugin plugin,
@@ -525,11 +524,11 @@ public class CelementsWebPluginApi extends Api {
     LOGGER.warn("usage of deprecated isEmptyRTEDocument(String) on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
-    return emptyCheckCmd.isEmptyRTEDocument(fullName, context);
+    return new EmptyCheckCommand().isEmptyRTEDocument(fullName, context);
   }
 
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
-    return emptyCheckCmd.isEmptyRTEDocument(documentRef);
+    return getEmptyCheckService().isEmptyRTEDocument(documentRef);
   }
 
   public String getEmailAdressForCurrentUser() {
@@ -1525,7 +1524,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return emptyCheckCmd.getNextNonEmptyChildren(documentRef);
+    return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
   }
 
   public boolean useImageAnimations() {
@@ -1622,6 +1621,10 @@ public class CelementsWebPluginApi extends Api {
 
   private ITreeNodeService getTreeNodeService() {
     return Utils.getComponent(ITreeNodeService.class);
+  }
+
+  private IEmptyCheckRole getEmptyCheckService() {
+    return Utils.getComponent(IEmptyCheckRole.class);
   }
 
 }
