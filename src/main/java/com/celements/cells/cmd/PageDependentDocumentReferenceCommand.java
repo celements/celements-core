@@ -20,7 +20,6 @@
 package com.celements.cells.cmd;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -90,7 +89,8 @@ public class PageDependentDocumentReferenceCommand {
   public XWikiDocument getTranslatedDocument(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) throws XWikiException {
     if (!isCurrentDocument(document, cellDocRef, context)) {
-      return getDocument(document, cellDocRef, context).getTranslatedDocument(context);
+      return getDocument(document, cellDocRef, context).getTranslatedDocument(
+          context.getLanguage(), context);
     }
     return document;
   }

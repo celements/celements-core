@@ -343,6 +343,8 @@ public class PageDependentDocumentReferenceCommandTest
 
   @Test
   public void testGetTranslatedDocument_isNotCurrent() throws XWikiException {
+    String contextLang = "fr";
+    context.setLanguage(contextLang);
     BaseObject cellConfig = new BaseObject();
     cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
         "myDepSpace");
@@ -359,8 +361,8 @@ public class PageDependentDocumentReferenceCommandTest
     expect(xwiki.getDocument(eq(expectedDocRef), same(context))).andReturn(expectedDoc
         ).once();
     XWikiDocument expectedTransDoc = new XWikiDocument(expectedDocRef);
-    expect(expectedDoc.getTranslatedDocument(same(context))).andReturn(expectedTransDoc
-        ).once();
+    expect(expectedDoc.getTranslatedDocument(eq(contextLang), same(context))).andReturn(
+        expectedTransDoc).once();
     replayAll(expectedDoc);
     assertEquals(expectedTransDoc, pageDepDocRefCmd.getTranslatedDocument(document,
         cellDocRef, context));
