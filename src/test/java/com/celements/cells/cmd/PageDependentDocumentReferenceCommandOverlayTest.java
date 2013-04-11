@@ -7,12 +7,15 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.utils.IWebUtils;
+import com.celements.navigation.service.ITreeNodeService;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -27,7 +30,9 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   private XWiki xwiki;
   private DocumentReference cellDocRef;
   private XWikiDocument cellDoc;
-  private IWebUtils webUtilsMock;
+  private IWebUtilsService webUtilsMock;
+  private IWebUtilsService savedWebUtilsService;
+  private ComponentDescriptor<IWebUtilsService> webUtilsServiceDesc;
 
   @Before
   public void setUp_PageDependentDocumentReferenceCommandOverlayTest() throws Exception {
@@ -40,8 +45,18 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(xwiki.getDocument(eq(cellDocRef), same(context))).andReturn(cellDoc).anyTimes(
         );
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
-    webUtilsMock = createMock(IWebUtils.class);
-    pageDepDocRefCmd.webUtils = webUtilsMock;
+    webUtilsMock = createMock(IWebUtilsService.class);
+    webUtilsServiceDesc = getComponentManager().getComponentDescriptor(
+        IWebUtilsService.class, "default");
+    savedWebUtilsService = getComponentManager().lookup(IWebUtilsService.class);
+    getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
+    getComponentManager().registerComponent(webUtilsServiceDesc, webUtilsMock);
+  }
+
+  @After
+  public void shutdown_EmptyCheckCommandTest() throws Exception {
+    getComponentManager().unregisterComponent(IWebUtilsService.class, "default");
+    getComponentManager().registerComponent(webUtilsServiceDesc, savedWebUtilsService);
   }
 
   @Test
@@ -81,15 +96,17 @@ public class PageDependentDocumentReferenceCommandOverlayTest
 
   @Test
   public void testGetDependentDocList() {
-    String fullName = "mySpace.MyDoc";
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
     List<String> expDepDocList = Arrays.asList("leftColumn_mySpace.MyDoc",
         "leftColumn_mySpace.MyParentDoc");
-    List<String> docParentList = Arrays.asList("mySpace.MyDoc", "mySpace.MyParentDoc");
-    expect(webUtilsMock.getDocumentParentsList(eq(fullName), eq(true), same(context))
-        ).andReturn(docParentList);
+    List<DocumentReference> docParentList = Arrays.asList(myDocRef, new DocumentReference(
+        context.getDatabase(), "mySpace", "MyParentDoc"));
+    expect(webUtilsMock.getDocumentParentsList(eq(myDocRef), eq(true))).andReturn(
+        docParentList);
     replayAll();
-    List<String> depDocList = pageDepDocRefCmd.getDependentDocList(fullName,
-        "leftColumn_mySpace", context);
+    List<String> depDocList = pageDepDocRefCmd.getDependentDocList(myDocRef,
+        "leftColumn_mySpace");
     assertEquals(expDepDocList, depDocList);
     verifyAll();
   }
@@ -97,19 +114,15 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   @Test
   public void testGetDependentDocumentReference() throws Exception {
     setDependentDocSpace("leftColumn", 1);
-    String fullName = "mySpace.MyDoc";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
-    String parentFullName = "mySpace.MyParentDoc";
+        "MyDoc");
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyParentDoc");
-    List<String> docParentList = Arrays.asList(fullName, parentFullName);
-    expect(webUtilsMock.getDocumentParentsList(eq(fullName), eq(true), same(context))
-        ).andReturn(docParentList);
+    List<DocumentReference> docParentList = Arrays.asList(myDocRef, parentDocRef);
+    expect(webUtilsMock.getDocumentParentsList(eq(myDocRef), eq(true))).andReturn(
+        docParentList);
     DocumentReference expDepDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn", "MyParentDoc");
-    expect(document.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
-    expect(document.getFullName()).andReturn(fullName).atLeastOnce();
     expect(xwiki.exists(eq("mySpace_leftColumn.MyDoc"), same(context))).andReturn(
         false).atLeastOnce();
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
@@ -121,8 +134,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(leftParentDoc.getContent()).andReturn("parent Content").atLeastOnce();
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
     replayAll(leftParentDoc);
-    DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(document,
-        cellDocRef, context);
+    DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
+        cellDocRef);
     assertEquals(expDepDocRef, depDocRef);
     verifyAll(leftParentDoc);
   }
@@ -130,26 +143,24 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   @Test
   public void testGetDependentDocumentReference_defaultContent() throws Exception {
     setDependentDocSpace("leftColumn", 1);
-    String fullName = "mySpace.MyDoc";
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
-    String parentFullName = "mySpace.MyParentDoc";
-    List<String> docParentList = Arrays.asList(fullName, parentFullName);
-    expect(webUtilsMock.getDocumentParentsList(eq(fullName), eq(true), same(context))
+        "MyDoc");
+    DocumentReference parentDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "MyParentDoc");
+    List<DocumentReference> docParentList = Arrays.asList(myDocRef, parentDocRef);
+    expect(webUtilsMock.getDocumentParentsList(eq(myDocRef), eq(true))
         ).andReturn(docParentList);
     DocumentReference expDepDocRef = new DocumentReference(context.getDatabase(),
         "mySpace_leftColumn",
         PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
-    expect(document.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
-    expect(document.getFullName()).andReturn(fullName).atLeastOnce();
     expect(xwiki.exists(eq("mySpace_leftColumn.MyDoc"), same(context))).andReturn(
         false).atLeastOnce();
     String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
     expect(xwiki.exists(eq(leftParentFullName), same(context))).andReturn(
         false).atLeastOnce();
     replayAll();
-    DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(document,
-        cellDocRef, context);
+    DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
+        cellDocRef);
     assertEquals(expDepDocRef, depDocRef);
     verifyAll();
   }

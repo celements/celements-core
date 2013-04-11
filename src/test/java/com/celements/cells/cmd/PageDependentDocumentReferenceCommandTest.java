@@ -55,13 +55,12 @@ public class PageDependentDocumentReferenceCommandTest
   @Test
   public void testGetCurrentDocumentSpaceName_ZeroSpaces() {
     DocumentReference currentDocRef = createMock(DocumentReference.class);
-    expect(document.getDocumentReference()).andReturn(currentDocRef).atLeastOnce();
     List<SpaceReference> emptySpaceRefList = Collections.emptyList();
     expect(currentDocRef.getSpaceReferences()).andReturn(emptySpaceRefList);
     expect(xwiki.getDefaultSpace(same(context))).andReturn("myDefaultSpace").once();
     replayAll(currentDocRef);
-    assertEquals("myDefaultSpace", pageDepDocRefCmd.getCurrentDocumentSpaceName(document,
-        context));
+    assertEquals("myDefaultSpace", pageDepDocRefCmd.getCurrentDocumentSpaceName(
+        currentDocRef));
     verifyAll(currentDocRef);
   }
 
@@ -69,17 +68,15 @@ public class PageDependentDocumentReferenceCommandTest
   public void testGetCurrentDocumentSpaceName_greaterZeroSpaces() {
     DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
         "Content", "myDocument");
-    expect(document.getDocumentReference()).andReturn(currentDocRef).atLeastOnce();
     replayAll();
-    assertEquals("Content", pageDepDocRefCmd.getCurrentDocumentSpaceName(document,
-        context));
+    assertEquals("Content", pageDepDocRefCmd.getCurrentDocumentSpaceName(currentDocRef));
     verifyAll();
   }
 
   @Test
   public void testGetDepCellSpace_cellDocWithoutObject() throws Exception {
     replayAll();
-    assertEquals("", pageDepDocRefCmd.getDepCellSpace(cellDocRef, context));
+    assertEquals("", pageDepDocRefCmd.getDepCellSpace(cellDocRef));
     verifyAll();
   }
 
@@ -91,7 +88,7 @@ public class PageDependentDocumentReferenceCommandTest
     cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
         Arrays.asList(cellConfig));
     replayAll();
-    assertEquals("", pageDepDocRefCmd.getDepCellSpace(cellDocRef, context));
+    assertEquals("", pageDepDocRefCmd.getDepCellSpace(cellDocRef));
     verifyAll();
   }
 
@@ -105,14 +102,14 @@ public class PageDependentDocumentReferenceCommandTest
     cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
         Arrays.asList(cellConfig));
     replayAll();
-    assertEquals("myDepSpace", pageDepDocRefCmd.getDepCellSpace(cellDocRef, context));
+    assertEquals("myDepSpace", pageDepDocRefCmd.getDepCellSpace(cellDocRef));
     verifyAll();
   }
 
   @Test
   public void testIsCurrentDocument_cellDocWithoutObject() throws Exception {
     replayAll();
-    assertTrue(pageDepDocRefCmd.isCurrentDocument(document, cellDocRef, context));
+    assertTrue(pageDepDocRefCmd.isCurrentDocument(cellDocRef));
     verifyAll();
   }
 
@@ -124,7 +121,7 @@ public class PageDependentDocumentReferenceCommandTest
     cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
         Arrays.asList(cellConfig));
     replayAll();
-    assertTrue(pageDepDocRefCmd.isCurrentDocument(document, cellDocRef, context));
+    assertTrue(pageDepDocRefCmd.isCurrentDocument(cellDocRef));
     verifyAll();
   }
 
@@ -138,7 +135,7 @@ public class PageDependentDocumentReferenceCommandTest
     cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
         Arrays.asList(cellConfig));
     replayAll();
-    assertFalse(pageDepDocRefCmd.isCurrentDocument(document, cellDocRef, context));
+    assertFalse(pageDepDocRefCmd.isCurrentDocument(cellDocRef));
     verifyAll();
   }
 
@@ -150,7 +147,7 @@ public class PageDependentDocumentReferenceCommandTest
           new XWikiException()).atLeastOnce();
       replayAll();
       assertTrue("expecting fallback to currentDoc.", pageDepDocRefCmd.isCurrentDocument(
-          document, cellDocRef, context));
+          cellDocRef));
       verifyAll();
     } catch (XWikiException exp) {
       fail("Expecting isCurrentDocument to catch XWikiException and returning True.");
