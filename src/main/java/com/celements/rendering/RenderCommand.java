@@ -137,8 +137,7 @@ public class RenderCommand {
       if (cellTypeRef != null) {
         cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
       }
-      String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
-          renderMode);
+      String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN, renderMode);
       String templateContent;
       XWikiDocument templateDoc = getContext().getDoc();
       if (renderTemplatePath.startsWith(":")) {
@@ -250,8 +249,8 @@ public class RenderCommand {
       String renderTemplateFullName = cellType.getRenderTemplateForRenderMode(renderMode);
       if ((renderTemplateFullName != null) && !"".equals(renderTemplateFullName)) {
         LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
-            + cellType.getName() + "] and renderTemplate ["
-            + renderTemplateFullName + "].");
+            + cellType.getName() + "] and renderTemplate ["+ renderTemplateFullName
+            + "].");
         return renderTemplateFullName;
       }
       LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["

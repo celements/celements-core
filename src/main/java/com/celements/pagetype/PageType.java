@@ -111,8 +111,7 @@ public class PageType {
 
   public String getRenderTemplate(String renderMode, XWikiContext context
       ) throws XWikiException {
-    String specView = getRenderTemplateForRenderMode(
-        renderMode, context);
+    String specView = getRenderTemplateForRenderMode(renderMode, context);
     return specView;
   }
   
@@ -120,8 +119,7 @@ public class PageType {
       ) throws XWikiException {
     String specView = null;
     if (getPageTypeProperties(context) != null) {
-      specView = getPageTypeProperties(context
-          ).getStringValue("page_" + renderMode);
+      specView = getPageTypeProperties(context).getStringValue("page_" + renderMode);
       specView = resolveTemplatePath(specView, context);
     }
     return specView;
