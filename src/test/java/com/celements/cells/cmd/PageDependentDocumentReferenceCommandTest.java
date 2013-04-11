@@ -273,7 +273,7 @@ public class PageDependentDocumentReferenceCommandTest
   public void testGetDocumentReference_isCurrent() {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myDocument");
-    expect(document.getDocumentReference()).andReturn(expectedDocRef).once();
+    expect(document.getDocumentReference()).andReturn(expectedDocRef).atLeastOnce();
     replayAll();
     assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(document,
         cellDocRef, context));
@@ -302,6 +302,9 @@ public class PageDependentDocumentReferenceCommandTest
 
   @Test
   public void testGetDocument_isCurrent() throws XWikiException {
+    DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myDocument");
+    expect(document.getDocumentReference()).andReturn(expectedDocRef).atLeastOnce();
     replayAll();
     assertSame(document, pageDepDocRefCmd.getDocument(document, cellDocRef, context));
     verifyAll();
@@ -332,6 +335,9 @@ public class PageDependentDocumentReferenceCommandTest
 
   @Test
   public void testGetTranslatedDocument_isCurrent() throws XWikiException {
+    DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myDocument");
+    expect(document.getDocumentReference()).andReturn(expectedDocRef).atLeastOnce();
     replayAll();
     assertSame(document, pageDepDocRefCmd.getTranslatedDocument(document, cellDocRef,
         context));
