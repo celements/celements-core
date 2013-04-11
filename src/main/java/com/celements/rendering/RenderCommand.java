@@ -125,7 +125,8 @@ public class RenderCommand {
       String renderMode) throws XWikiException {
     LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
-    String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(cellDoc.getDocumentReference());
+    String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(
+        cellDoc.getDocumentReference());
     if (getContext().getWiki().getRightService().hasAccessLevel(renderMode,
         getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
