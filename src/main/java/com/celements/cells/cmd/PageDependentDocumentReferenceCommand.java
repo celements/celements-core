@@ -50,6 +50,9 @@ public class PageDependentDocumentReferenceCommand {
 
   public DocumentReference getDocumentReference(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) {
+    LOGGER.debug("getDocumentReference: document [" + document.getDocumentReference()
+        + "] cellDocRef [" + cellDocRef + "] context language ["
+        + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
       return getDependentDocumentReference(document.getDocumentReference(), cellDocRef);
     }
@@ -58,6 +61,9 @@ public class PageDependentDocumentReferenceCommand {
 
   public DocumentReference getDocumentReference(XWikiDocument document,
       DocumentReference cellDocRef, boolean isInheritable, XWikiContext context) {
+    LOGGER.debug("getDocumentReference: document [" + document.getDocumentReference()
+        + "] cellDocRef [" + cellDocRef + "] isInheritable [" + isInheritable
+        + "] context language [" + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
       return getDependentDocumentReference(document.getDocumentReference(), cellDocRef,
           isInheritable);
@@ -67,6 +73,9 @@ public class PageDependentDocumentReferenceCommand {
 
   public XWikiDocument getDocument(XWikiDocument document, DocumentReference cellDocRef,
       XWikiContext context) throws XWikiException {
+    LOGGER.debug("getDocument: document [" + document.getDocumentReference()
+        + "] cellDocRef [" + cellDocRef + "] context language ["
+        + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
       DocumentReference dependentDocRef = getDependentDocumentReference(
           document.getDocumentReference(), cellDocRef);
@@ -87,6 +96,9 @@ public class PageDependentDocumentReferenceCommand {
 
   public XWikiDocument getTranslatedDocument(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) throws XWikiException {
+    LOGGER.debug("getTranslatedDocument: document [" + document.getDocumentReference()
+        + "] cellDocRef [" + cellDocRef + "] context language ["
+        + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
       return getDocument(document, cellDocRef, getContext()).getTranslatedDocument(
           getContext().getLanguage(), getContext());
