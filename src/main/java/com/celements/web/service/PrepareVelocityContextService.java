@@ -1,7 +1,5 @@
 package com.celements.web.service;
 
-import groovy.lang.Singleton;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +7,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
