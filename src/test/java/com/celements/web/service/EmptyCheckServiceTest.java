@@ -47,7 +47,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
   private EmptyCheckService emptyCheckService;
   private ITreeNodeService treeNodeService;
   private ComponentDescriptor<ITreeNodeService> treeNodeServiceDesc;
-  private ITreeNodeService savedTreeNodeServiceDesc;
+  private ITreeNodeService savedTreeNodeService;
 
   @Before
   public void setUp_EmptyCheckCommandTest() throws Exception {
@@ -58,7 +58,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
-    savedTreeNodeServiceDesc = getComponentManager().lookup(ITreeNodeService.class);
+    savedTreeNodeService = getComponentManager().lookup(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
   }
@@ -66,8 +66,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
   @After
   public void shutdown_EmptyCheckCommandTest() throws Exception {
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
-    getComponentManager().registerComponent(treeNodeServiceDesc,
-        savedTreeNodeServiceDesc);
+    getComponentManager().registerComponent(treeNodeServiceDesc, savedTreeNodeService);
   }
 
   @Test
