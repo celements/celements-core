@@ -48,8 +48,18 @@ public class PageDependentDocumentReferenceCommand {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageDependentDocumentReferenceCommand.class);
 
+  /**
+   * @deprecated since 2.29.0 instead use getDocumentReference(XWikiDocument,
+   *             DocumentReference)
+   */
+  @Deprecated
   public DocumentReference getDocumentReference(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) {
+    return getDocumentReference(document, cellDocRef);
+  }
+
+  public DocumentReference getDocumentReference(XWikiDocument document,
+      DocumentReference cellDocRef) {
     LOGGER.debug("getDocumentReference: document [" + document.getDocumentReference()
         + "] cellDocRef [" + cellDocRef + "] context language ["
         + getContext().getLanguage() + "].");
@@ -59,8 +69,18 @@ public class PageDependentDocumentReferenceCommand {
     return document.getDocumentReference();
   }
 
+  /**
+   * @deprecated since 2.29.0 instead use getDocumentReference(XWikiDocument,
+   *             DocumentReference, boolean)
+   */
+  @Deprecated
   public DocumentReference getDocumentReference(XWikiDocument document,
       DocumentReference cellDocRef, boolean isInheritable, XWikiContext context) {
+    return getDocumentReference(document, cellDocRef, isInheritable);
+  }
+
+  public DocumentReference getDocumentReference(XWikiDocument document,
+      DocumentReference cellDocRef, boolean isInheritable) {
     LOGGER.debug("getDocumentReference: document [" + document.getDocumentReference()
         + "] cellDocRef [" + cellDocRef + "] isInheritable [" + isInheritable
         + "] context language [" + getContext().getLanguage() + "].");
@@ -71,8 +91,17 @@ public class PageDependentDocumentReferenceCommand {
     return document.getDocumentReference();
   }
 
+  /**
+   * @deprecated since 2.29.0 instead use getDocument(XWikiDocument, DocumentReference)
+   */
+  @Deprecated
   public XWikiDocument getDocument(XWikiDocument document, DocumentReference cellDocRef,
       XWikiContext context) throws XWikiException {
+    return getDocument(document, cellDocRef);
+  }
+
+  public XWikiDocument getDocument(XWikiDocument document, DocumentReference cellDocRef
+      ) throws XWikiException {
     LOGGER.debug("getDocument: document [" + document.getDocumentReference()
         + "] cellDocRef [" + cellDocRef + "] context language ["
         + getContext().getLanguage() + "].");
@@ -94,8 +123,18 @@ public class PageDependentDocumentReferenceCommand {
     return depDocList;
   }
 
+  /**
+   * @deprecated since 2.29.0 instead use getTranslatedDocument(XWikiDocument,
+   *             DocumentReference)
+   */
+  @Deprecated
   public XWikiDocument getTranslatedDocument(XWikiDocument document,
       DocumentReference cellDocRef, XWikiContext context) throws XWikiException {
+    return getTranslatedDocument(document, cellDocRef);
+  }
+
+  public XWikiDocument getTranslatedDocument(XWikiDocument document,
+        DocumentReference cellDocRef) throws XWikiException {
     LOGGER.debug("getTranslatedDocument: document [" + document.getDocumentReference()
         + "] cellDocRef [" + cellDocRef + "] context language ["
         + getContext().getLanguage() + "].");
@@ -206,7 +245,15 @@ public class PageDependentDocumentReferenceCommand {
     return "";
   }
 
+  /**
+   * @deprecated since 2.29.0 instead use isInheritable(DocumentReference)
+   */
+  @Deprecated
   public boolean isInheritable(DocumentReference cellDocRef, XWikiContext context) {
+    return isInheritable(cellDocRef);
+  }
+
+  public boolean isInheritable(DocumentReference cellDocRef) {
     try {
       BaseObject cellConfObj = getDepCellXObject(cellDocRef);
       if (cellConfObj != null) {
