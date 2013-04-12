@@ -100,8 +100,11 @@ public class PageDependentDocumentReferenceCommand {
         + "] cellDocRef [" + cellDocRef + "] context language ["
         + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
-      return getDocument(document, cellDocRef, getContext()).getTranslatedDocument(
-          getContext().getLanguage(), getContext());
+      XWikiDocument tdoc = getDocument(document, cellDocRef, getContext()
+          ).getTranslatedDocument(getContext().getLanguage(), getContext());
+      LOGGER.trace("getTranslatedDocument returning tdoc [" + tdoc.getDocumentReference()
+          + "] lang [" + tdoc.getLanguage() + "," + tdoc.getDefaultLanguage() + "].");
+      return tdoc;
     }
     return document;
   }
