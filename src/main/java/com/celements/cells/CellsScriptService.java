@@ -31,6 +31,7 @@ import com.celements.cells.cmd.PageDependentDocumentReferenceCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("cells")
 public class CellsScriptService implements ScriptService {
@@ -74,14 +75,23 @@ public class CellsScriptService implements ScriptService {
   public Document getPageDependentTranslatedDocument(Document currentDoc,
       DocumentReference cellDocRef) {
     try {
-      return getPageDepDocRefCmd().getTranslatedDocument(getContext().getWiki(
-        ).getDocument(currentDoc.getDocumentReference(), getContext()), cellDocRef,
-         getContext()).newDocument(getContext());
+      return getPageDepDocRefCmd().getTranslatedDocument(getCurrentXWikiDoc(currentDoc),
+          cellDocRef).newDocument(getContext());
     } catch (XWikiException exp) {
       mLogger.error("Failed to get xwiki document for ["
           + currentDoc.getDocumentReference() + "].", exp);
     }
     return currentDoc;
+  }
+
+  private XWikiDocument getCurrentXWikiDoc(Document currentDoc) throws XWikiException {
+    return getCurrentXWikiDocDef(currentDoc).getTranslatedDocument(
+        currentDoc.getLanguage(), getContext());
+  }
+
+  private XWikiDocument getCurrentXWikiDocDef(Document currentDoc) throws XWikiException {
+    return getContext().getWiki().getDocument(currentDoc.getDocumentReference(),
+        getContext());
   }
 
   public boolean isInheritable(DocumentReference cellDocRef) {
