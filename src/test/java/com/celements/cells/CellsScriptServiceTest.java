@@ -87,8 +87,8 @@ public class CellsScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetPageDependentDocRef_DocumentReference() {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myExpectedDoc");
-    expect(mockPageDepDocRefCmd.getDocumentReference(same(currentXDoc), same(cellDocRef),
-        same(context))).andReturn(expectedDocRef).once();
+    expect(mockPageDepDocRefCmd.getDocumentReference(eq(currentDocRef), same(cellDocRef))
+        ).andReturn(expectedDocRef).once();
     replayAll();
     assertEquals(expectedDocRef, cellsScriptService.getPageDependentDocRef(cellDocRef));
     verifyAll();
@@ -99,23 +99,10 @@ public class CellsScriptServiceTest extends AbstractBridgedComponentTestCase {
       ) throws Exception {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myExpectedDoc");
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentXDoc
-      ).once();
-    expect(mockPageDepDocRefCmd.getDocumentReference(same(currentXDoc), same(cellDocRef),
-        same(context))).andReturn(expectedDocRef).once();
+    expect(mockPageDepDocRefCmd.getDocumentReference(eq(currentDocRef), same(cellDocRef))
+        ).andReturn(expectedDocRef).once();
     replayAll();
     assertEquals(expectedDocRef, cellsScriptService.getPageDependentDocRef(currentDocRef,
-        cellDocRef));
-    verifyAll();
-  }
-
-  @Test
-  public void testGetPageDependentDocRef_DocumentReferenceDocumentReference_Exception(
-      ) throws Exception {
-    expect(xwiki.getDocument(eq(currentDocRef), same(context))).andThrow(
-        new XWikiException()).once();
-    replayAll();
-    assertEquals(currentDocRef, cellsScriptService.getPageDependentDocRef(currentDocRef,
         cellDocRef));
     verifyAll();
   }

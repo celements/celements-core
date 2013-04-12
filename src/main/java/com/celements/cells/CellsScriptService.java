@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("cells")
 public class CellsScriptService implements ScriptService {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CellsScriptService.class);
 
   @Requirement
@@ -45,31 +45,19 @@ public class CellsScriptService implements ScriptService {
   private PageDependentDocumentReferenceCommand injected_pageDepDocRefCmd;
 
   public DocumentReference getPageDependentDocRef(DocumentReference cellDocRef) {
-    return getPageDepDocRefCmd().getDocumentReference(getContext().getDoc(), cellDocRef,
-        getContext());
+    return getPageDepDocRefCmd().getDocumentReference(getContext().getDoc(
+        ).getDocumentReference(), cellDocRef);
   }
 
   public DocumentReference getPageDependentDocRef(DocumentReference currentPageRef,
       DocumentReference cellDocRef) {
-    try {
-      return getPageDepDocRefCmd().getDocumentReference(getContext().getWiki(
-          ).getDocument(currentPageRef, getContext()), cellDocRef, getContext());
-    } catch (XWikiException exp) {
-      mLogger.error("Failed to get xwiki document for [" + currentPageRef + "].", exp);
-    }
-    return currentPageRef;
+    return getPageDepDocRefCmd().getDocumentReference(currentPageRef, cellDocRef);
   }
 
   public DocumentReference getPageDependentDocRef(DocumentReference currentPageRef,
       DocumentReference cellDocRef, boolean isInheritable) {
-    try {
-      return getPageDepDocRefCmd().getDocumentReference(getContext().getWiki(
-          ).getDocument(currentPageRef, getContext()), cellDocRef, isInheritable,
-          getContext());
-    } catch (XWikiException exp) {
-      mLogger.error("Failed to get xwiki document for [" + currentPageRef + "].", exp);
-    }
-    return currentPageRef;
+    return getPageDepDocRefCmd().getDocumentReference(currentPageRef, cellDocRef,
+        isInheritable);
   }
 
   public Document getPageDependentTranslatedDocument(Document currentDoc,
@@ -78,7 +66,7 @@ public class CellsScriptService implements ScriptService {
       return getPageDepDocRefCmd().getTranslatedDocument(getCurrentXWikiDoc(currentDoc),
           cellDocRef).newDocument(getContext());
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get xwiki document for ["
+      LOGGER.error("Failed to get xwiki document for ["
           + currentDoc.getDocumentReference() + "].", exp);
     }
     return currentDoc;
@@ -95,7 +83,7 @@ public class CellsScriptService implements ScriptService {
   }
 
   public boolean isInheritable(DocumentReference cellDocRef) {
-    return getPageDepDocRefCmd().isInheritable(cellDocRef, getContext());
+    return getPageDepDocRefCmd().isInheritable(cellDocRef);
   }
 
   private XWikiContext getContext() {
