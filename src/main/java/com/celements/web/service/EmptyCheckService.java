@@ -30,7 +30,12 @@ public class EmptyCheckService implements IEmptyCheckRole {
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return new NextNonEmptyChildrenCommand().getNextNonEmptyChildren(documentRef);
+    DocumentReference nonEmptyChildRef = new NextNonEmptyChildrenCommand(
+        ).getNextNonEmptyChildren(documentRef);
+    if (nonEmptyChildRef != null) {
+      return nonEmptyChildRef;
+    }
+    return documentRef;
   }
 
   public boolean isEmptyRTEDocument(DocumentReference docRef) {
@@ -51,7 +56,8 @@ public class EmptyCheckService implements IEmptyCheckRole {
   public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
     try {
       return isEmptyRTEDocument(getContext().getWiki(
-          ).getDocument(docRef, getContext()).getTranslatedDocument(getContext()));
+          ).getDocument(docRef, getContext()).getTranslatedDocument(
+              getContext().getLanguage(), getContext()));
     } catch (XWikiException e) {
       LOGGER.error(e);
     }

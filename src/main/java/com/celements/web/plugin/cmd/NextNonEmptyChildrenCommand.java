@@ -25,16 +25,20 @@ public class NextNonEmptyChildrenCommand {
     if (getEmptyCheckService().isEmptyRTEDocument(documentRef)) {
       List<TreeNode> children = getTreeNodeService().getSubNodesForParent(documentRef,
           "");
-      if (children.size() > 0) {
+      for (TreeNode childNode : children) {
         getVisitedDocRefs().add(documentRef);
-        DocumentReference nextChild = children.get(0).getDocumentReference();
+        DocumentReference nextChild = childNode.getDocumentReference();
         if (!getVisitedDocRefs().contains(nextChild)) {
-          return getNextNonEmptyChildren(nextChild);
+          DocumentReference result = getNextNonEmptyChildren(nextChild);
+          if (result != null) {
+            return result;
+          }
         } else {
           LOGGER.warn("getNextNonEmptyChildren_internal: recursion detected on ["
               + nextChild + "].");
         }
       }
+      return null;
     }
     return documentRef;
   }
