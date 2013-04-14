@@ -140,8 +140,8 @@ public class PageDependentDocumentReferenceCommand {
         + "] cellDocRef [" + cellDocRef + "] context language ["
         + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
-      XWikiDocument tdoc = getDocument(document, cellDocRef, getContext()
-          ).getTranslatedDocument(getContext().getLanguage(), getContext());
+      XWikiDocument tdoc = getDocument(document, cellDocRef).getTranslatedDocument(
+          getContext().getLanguage(), getContext());
       LOGGER.trace("getTranslatedDocument returning tdoc [" + tdoc.getDocumentReference()
           + "] lang [" + tdoc.getLanguage() + "," + tdoc.getDefaultLanguage() + "].");
       return tdoc;
@@ -151,8 +151,7 @@ public class PageDependentDocumentReferenceCommand {
 
   DocumentReference getDependentDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef) {
-    return getDependentDocumentReference(docRef, cellDocRef, isInheritable(cellDocRef,
-        getContext()));
+    return getDependentDocumentReference(docRef, cellDocRef, isInheritable(cellDocRef));
   }
 
   DocumentReference getDependentDocumentReference(DocumentReference docRef,
@@ -270,7 +269,7 @@ public class PageDependentDocumentReferenceCommand {
   private BaseObject getDepCellXObject(DocumentReference cellDocRef)
       throws XWikiException {
     BaseObject cellConfObj = getContext().getWiki().getDocument(cellDocRef, getContext()
-        ).getXObject(getPageDepCellConfigClassDocRef(getContext()));
+        ).getXObject(getPageDepCellConfigClassDocRef());
     return cellConfObj;
   }
 
