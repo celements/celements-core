@@ -193,8 +193,8 @@ public class PageDependentDocumentReferenceCommand {
     String spaceName;
     try {
       if (!"".equals(getDepCellSpace(cellDocRef))) {
-        spaceName = getCurrentDocumentSpaceName(docRef) + "_"
-          + getDepCellSpace(cellDocRef);
+        spaceName = getCurrentDocumentSpaceName(docRef) + "_" + getDepCellSpace(
+            cellDocRef);
       } else {
         LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
             + " check with isCurrentDocument method before calling"
