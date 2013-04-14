@@ -25,7 +25,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class PageDependentDocumentReferenceCommandOverlayTest
+@Deprecated
+public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest
     extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
@@ -71,7 +72,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   @Test
   public void testIsInheritable() throws Exception {
     replayDefault();
-    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -79,7 +81,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   public void testIsInheritable_noValue() throws Exception {
     setDependentDocSpace("leftColumn", null);
     replayDefault();
-    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -87,7 +90,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   public void testIsInheritable_zero() throws Exception {
     setDependentDocSpace("leftColumn", 0);
     replayDefault();
-    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -95,7 +99,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   public void testIsInheritable_one() throws Exception {
     setDependentDocSpace("leftColumn", 1);
     replayDefault();
-    assertTrue("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertTrue("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -422,8 +427,9 @@ public class PageDependentDocumentReferenceCommandOverlayTest
       cellConfig.setIntValue(
           PageDependentDocumentReferenceCommand.PROPNAME_IS_INHERITABLE, isInheritable);
     }
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(),
+    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(
+        context));
+    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
         Arrays.asList(cellConfig));
   }
 
