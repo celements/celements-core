@@ -326,6 +326,34 @@ public class PageDependentDocumentReferenceCommandTest
   }
 
   @Test
+  public void testGetDocumentReference_isCurrent_inheritable() {
+    DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myDocument");
+    replayDefault();
+    assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(expectedDocRef,
+        cellDocRef, false));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetDocumentReference_isNotCurrent_inheritable() {
+    BaseObject cellConfig = new BaseObject();
+    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
+        "myDepSpace");
+    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
+    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(),
+        Arrays.asList(cellConfig));
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myDocument");
+    DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace_myDepSpace", "myDocument");
+    replayDefault();
+    assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(currentDocRef,
+        cellDocRef, false));
+    verifyDefault();
+  }
+
+  @Test
   public void testGetDocument_isCurrent() throws XWikiException {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myDocument");

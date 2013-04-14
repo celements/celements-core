@@ -200,6 +200,37 @@ public class PageDependentDocumentReferenceCommandDeprecatedTest
   }
 
   @Test
+  public void testGetDocumentReference_isCurrent_inheritable() {
+    DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myDocument");
+    expect(document.getDocumentReference()).andReturn(expectedDocRef).atLeastOnce();
+    replayAll();
+    assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(document,
+        cellDocRef, false, context));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetDocumentReference_isNotCurrent_inheritable() {
+    BaseObject cellConfig = new BaseObject();
+    cellConfig.setStringValue(PageDependentDocumentReferenceCommand.PROPNAME_SPACE_NAME,
+        "myDepSpace");
+    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(
+        context));
+    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
+        Arrays.asList(cellConfig));
+    DocumentReference currentDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myDocument");
+    expect(document.getDocumentReference()).andReturn(currentDocRef).atLeastOnce();
+    DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace_myDepSpace", "myDocument");
+    replayAll();
+    assertEquals(expectedDocRef, pageDepDocRefCmd.getDocumentReference(document,
+        cellDocRef, false, context));
+    verifyAll();
+  }
+
+  @Test
   public void testGetDocument_isCurrent() throws XWikiException {
     DocumentReference expectedDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "myDocument");

@@ -93,8 +93,7 @@ public class PageDependentDocumentReferenceCommand {
         + "] cellDocRef [" + cellDocRef + "] isInheritable [" + isInheritable
         + "] context language [" + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
-      return getDependentDocumentReference(docRef, cellDocRef,
-          isInheritable);
+      return getDependentDocumentReference(docRef, cellDocRef, isInheritable);
     }
     return docRef;
   }
