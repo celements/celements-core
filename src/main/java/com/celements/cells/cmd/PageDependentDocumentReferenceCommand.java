@@ -182,24 +182,16 @@ public class PageDependentDocumentReferenceCommand {
 
   public DocumentReference getDependentDefaultDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef) {
-    DocumentReference spaceDefault = new DocumentReference(PDC_DEFAULT_CONTENT_NAME,
-        getDependentDocumentSpaceRef(docRef, cellDocRef));
-    DocumentReference wikiDefault = new DocumentReference(PDC_DEFAULT_CONTENT_NAME,
-        getDependentWikiSpaceRef(docRef, cellDocRef));
+    DocumentReference spaceDefault = getSpaceDefaultDocRef(docRef, cellDocRef);
     List<String> depDefaultDocList = new ArrayList<String>();
     depDefaultDocList.add(getRefSerializer().serialize(spaceDefault));
-    depDefaultDocList.add(getRefSerializer().serialize(wikiDefault));
+    depDefaultDocList.add(getRefSerializer().serialize(getWikiDefaultDocRef(docRef,
+        cellDocRef)));
     SpaceReference currLayoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
     if (currLayoutRef != null) {
-      try {
-        DocumentReference layoutDefault = new DocumentReference(getDepCellSpace(
-            cellDocRef) + "-"
-            + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME,
-            currLayoutRef);
+      DocumentReference layoutDefault = getLayoutDefaultDocRef(currLayoutRef, cellDocRef);
+      if (layoutDefault != null) {
         depDefaultDocList.add(getRefSerializer().serialize(layoutDefault));
-      } catch (XWikiException exp) {
-        LOGGER.warn("Failed to get layoutDefault because unable to get depCellSpace for ["
-            + cellDocRef + "] omitting layout default.", exp);
       }
     }
     XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(
@@ -211,6 +203,46 @@ public class PageDependentDocumentReferenceCommand {
       //For now using spaceDefault for backwards compatibility
       return spaceDefault;
     }
+  }
+
+  public DocumentReference getLayoutDefaultDocRef(SpaceReference currLayoutRef,
+      DocumentReference cellDocRef) {
+    String depCellSpace = null;
+    try {
+      depCellSpace = getDepCellSpace(cellDocRef);
+    } catch (XWikiException exp) {
+      LOGGER.warn("Failed to get layoutDefault because unable to get depCellSpace for ["
+          + cellDocRef + "] omitting layout default.", exp);
+    }
+    return getLayoutDefaultDocRef(currLayoutRef, depCellSpace);
+  }
+
+  public DocumentReference getLayoutDefaultDocRef(SpaceReference currLayoutRef,
+      String depCellSpace) {
+    if ((depCellSpace != null) && (!"".equals(depCellSpace))) {
+      return new DocumentReference(depCellSpace + "-"
+          + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME,
+          currLayoutRef);
+    }
+    return null;
+  }
+
+  public DocumentReference getWikiDefaultDocRef(DocumentReference docRef,
+      DocumentReference cellDocRef) {
+    return getWikiDefaultDocRef(getDependentWikiSpaceRef(docRef, cellDocRef));
+  }
+
+  public DocumentReference getWikiDefaultDocRef(SpaceReference depWikiSpaceRef) {
+    return getSpaceDefaultDocRef(depWikiSpaceRef);
+  }
+
+  public DocumentReference getSpaceDefaultDocRef(DocumentReference docRef,
+      DocumentReference cellDocRef) {
+    return getSpaceDefaultDocRef(getDependentDocumentSpaceRef(docRef, cellDocRef));
+  }
+
+  public DocumentReference getSpaceDefaultDocRef(SpaceReference depDocumentSpaceRef) {
+    return new DocumentReference(PDC_DEFAULT_CONTENT_NAME, depDocumentSpaceRef);
   }
 
   /**

@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.cells.cmd.PageDependentDocumentReferenceCommand;
@@ -84,6 +85,34 @@ public class CellsScriptService implements ScriptService {
 
   public boolean isInheritable(DocumentReference cellDocRef) {
     return getPageDepDocRefCmd().isInheritable(cellDocRef);
+  }
+
+  public DocumentReference getLayoutDefaultDocRef(SpaceReference currLayoutRef,
+      String depCellSpace) {
+    return getPageDepDocRefCmd().getLayoutDefaultDocRef(currLayoutRef, depCellSpace);
+  }
+
+  public DocumentReference getLayoutDefaultDocRef(SpaceReference currLayoutRef,
+      DocumentReference cellDocRef) {
+    return getPageDepDocRefCmd().getLayoutDefaultDocRef(currLayoutRef, cellDocRef);
+  }
+
+  public DocumentReference getWikiDefaultDocRef(DocumentReference docRef,
+      DocumentReference cellDocRef) {
+    return getPageDepDocRefCmd().getWikiDefaultDocRef(docRef, cellDocRef);
+  }
+
+  public DocumentReference getWikiDefaultDocRef(SpaceReference depWikiSpaceRef) {
+    return getPageDepDocRefCmd().getWikiDefaultDocRef(depWikiSpaceRef);
+  }
+
+  public DocumentReference getSpaceDefaultDocRef(DocumentReference docRef,
+      DocumentReference cellDocRef) {
+    return getPageDepDocRefCmd().getSpaceDefaultDocRef(docRef, cellDocRef);
+  }
+
+  public DocumentReference getSpaceDefaultDocRef(SpaceReference depDocumentSpaceRef) {
+    return getPageDepDocRefCmd().getSpaceDefaultDocRef(depDocumentSpaceRef);
   }
 
   private XWikiContext getContext() {
