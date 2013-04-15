@@ -334,7 +334,7 @@ public class PageDependentDocumentReferenceCommand {
     }
   }
 
-  String getDepCellSpace(DocumentReference cellDocRef) throws XWikiException {
+  public String getDepCellSpace(DocumentReference cellDocRef) throws XWikiException {
     BaseObject cellConfObj = getDepCellXObject(cellDocRef);
     if (cellConfObj != null) {
       String spaceName = cellConfObj.getStringValue(PROPNAME_SPACE_NAME);

@@ -83,6 +83,16 @@ public class CellsScriptService implements ScriptService {
         getContext());
   }
 
+  public String getDepCellSpaceSuffix(DocumentReference cellDocRef) {
+    try {
+      return getPageDepDocRefCmd().getDepCellSpace(cellDocRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get depCellSpaceSuffix for cellDocRef [" + cellDocRef
+          + "].", exp);
+    }
+    return "";
+  }
+
   public boolean isInheritable(DocumentReference cellDocRef) {
     return getPageDepDocRefCmd().isInheritable(cellDocRef);
   }
