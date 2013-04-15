@@ -49,11 +49,14 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc) {
-    PageTypeReference pageTypeRef = getPageTypeRefForDoc(doc);
-    if (pageTypeRef == null) {
-      pageTypeRef = getDefaultPageTypeRefForDoc(doc.getDocumentReference());
+    if (doc != null) {
+      PageTypeReference pageTypeRef = getPageTypeRefForDoc(doc);
+      if (pageTypeRef == null) {
+        pageTypeRef = getDefaultPageTypeRefForDoc(doc.getDocumentReference());
+      }
+      return pageTypeRef;
     }
-    return pageTypeRef;
+    return null;
   }
 
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc,
