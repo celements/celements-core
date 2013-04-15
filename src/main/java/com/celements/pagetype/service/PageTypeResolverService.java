@@ -100,27 +100,39 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   }
 
   public BaseObject getPageTypeObject(XWikiDocument checkDoc) {
-    if((checkDoc != null) && checkDoc.isNew()
-        && (webUtilsService.getWikiTemplateDocRef() != null)) {
-      checkDoc = webUtilsService.getWikiTemplateDoc();
-    }
-    DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
-        checkDoc.getDocumentReference().getLastSpaceReference().getParent().getName());
-    if ((checkDoc != null) && (checkDoc.getXObjects(pageTypeClassRef) != null)
-        && (checkDoc.getXObjects(pageTypeClassRef).size() > 0)) {
-      BaseObject pageTypeObj = checkDoc.getXObject(pageTypeClassRef);
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("getPageTypeObject: page type object for class [" + pageTypeClassRef
-            + "] found for [" + checkDoc + "] with object details: "
-            + pageTypeObj.toXMLString());
-      } else {
-        LOGGER.debug("getPageTypeObject: page type object for class [" + pageTypeClassRef
-            + "] found for [" + checkDoc + "].");
+    if ((getPageTypeClasses() != null) && (checkDoc != null)) {
+      if((checkDoc != null) && checkDoc.isNew()
+          && (webUtilsService.getWikiTemplateDocRef() != null)) {
+        checkDoc = webUtilsService.getWikiTemplateDoc();
       }
-      return pageTypeObj;
+      String wikiName = checkDoc.getDocumentReference().getLastSpaceReference().getParent(
+          ).getName();
+      if ((wikiName != null) && (!"".equals(wikiName))) {
+        DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
+            wikiName);
+        if ((checkDoc != null) && (checkDoc.getXObjects(pageTypeClassRef) != null)
+            && (checkDoc.getXObjects(pageTypeClassRef).size() > 0)) {
+          BaseObject pageTypeObj = checkDoc.getXObject(pageTypeClassRef);
+          if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getPageTypeObject: page type object for class ["
+                + pageTypeClassRef + "] found for [" + checkDoc
+                + "] with object details: " + pageTypeObj.toXMLString());
+          } else {
+            LOGGER.debug("getPageTypeObject: page type object for class ["
+                + pageTypeClassRef + "] found for [" + checkDoc + "].");
+          }
+          return pageTypeObj;
+        }
+        LOGGER.debug("getPageTypeObject: no page type object for class ["
+            + pageTypeClassRef + "] found for [" + checkDoc + "].");
+      } else {
+        LOGGER.warn("Failed to get wikiName for [" + checkDoc.getDocumentReference()
+            + "]!");
+      }
+    } else {
+      LOGGER.warn("Failed to get PageTypeClasses for checkDoc ["
+          + checkDoc.getDocumentReference() + "]!");
     }
-    LOGGER.debug("getPageTypeObject: no page type object for class [" + pageTypeClassRef
-          + "] found for [" + checkDoc + "].");
     return null;
   }
 
