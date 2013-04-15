@@ -227,13 +227,13 @@ public class PageDependentDocumentReferenceCommand {
     return null;
   }
 
-  public DocumentReference getWikiDefaultDocRef(DocumentReference docRef,
-      DocumentReference cellDocRef) {
-    return getWikiDefaultDocRef(getDependentWikiSpaceRef(docRef, cellDocRef));
+  public DocumentReference getWikiDefaultDocRef(String depCellSpaceSuffix) {
+    return getSpaceDefaultDocRef(getDependentWikiSpaceRef(depCellSpaceSuffix));
   }
 
-  public DocumentReference getWikiDefaultDocRef(SpaceReference depWikiSpaceRef) {
-    return getSpaceDefaultDocRef(depWikiSpaceRef);
+  public DocumentReference getWikiDefaultDocRef(DocumentReference docRef,
+      DocumentReference cellDocRef) {
+    return getSpaceDefaultDocRef(getDependentWikiSpaceRef(docRef, cellDocRef));
   }
 
   public DocumentReference getSpaceDefaultDocRef(DocumentReference docRef,
@@ -281,20 +281,28 @@ public class PageDependentDocumentReferenceCommand {
       DocumentReference cellDocRef) {
     SpaceReference spaceRef;
     try {
-      if (!"".equals(getDepCellSpace(cellDocRef))) {
-        String spaceName = PDC_WIKIDEFAULT_SPACE_NAME + "_" + getDepCellSpace(cellDocRef);
-        spaceRef = new SpaceReference(spaceName,
-            (WikiReference)getCurrentDocumentSpaceRef(docRef).getParent());
-      } else {
+      String depCellSpace = getDepCellSpace(cellDocRef);
+      spaceRef = getDependentWikiSpaceRef(depCellSpace);
+      if (spaceRef == null) {
         LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
             + " check with isCurrentDocument method before calling"
             + " getDependentDocumentSpace!");
         spaceRef = getCurrentDocumentSpaceRef(docRef);
-      }
+      } 
     } catch (XWikiException exp) {
       spaceRef = getCurrentDocumentSpaceRef(docRef);
       LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from ["
           + cellDocRef + "] assuming" + " [" + spaceRef + "] for document space.", exp);
+    }
+    return spaceRef;
+  }
+
+  private SpaceReference getDependentWikiSpaceRef(String depCellSpaceSuffix) {
+    SpaceReference spaceRef = null;
+    if ((depCellSpaceSuffix != null) && !"".equals(depCellSpaceSuffix)) {
+      String spaceName = PDC_WIKIDEFAULT_SPACE_NAME + "_" + depCellSpaceSuffix;
+      spaceRef = new SpaceReference(spaceName, new WikiReference(getContext().getDatabase(
+          )));
     }
     return spaceRef;
   }

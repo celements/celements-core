@@ -102,8 +102,8 @@ public class CellsScriptService implements ScriptService {
     return getPageDepDocRefCmd().getWikiDefaultDocRef(docRef, cellDocRef);
   }
 
-  public DocumentReference getWikiDefaultDocRef(SpaceReference depWikiSpaceRef) {
-    return getPageDepDocRefCmd().getWikiDefaultDocRef(depWikiSpaceRef);
+  public DocumentReference getWikiDefaultDocRef(String depCellSpaceSuffix) {
+    return getPageDepDocRefCmd().getWikiDefaultDocRef(depCellSpaceSuffix);
   }
 
   public DocumentReference getSpaceDefaultDocRef(DocumentReference docRef,
