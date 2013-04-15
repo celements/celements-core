@@ -21,6 +21,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.PageType;
+import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.service.IPageTypeRole;
@@ -195,8 +196,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         }
       }
       if (!vcontext.containsKey("page_type")) {
-        vcontext.put("page_type", pageTypeResolver.getPageTypeRefForCurrentDoc(
-            ).getConfigName());
+        PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
+        if (pageTypeRef != null) {
+          vcontext.put("page_type", pageTypeRef.getConfigName());
+        }
       }
       if (!vcontext.containsKey("user")) {
         vcontext.put("user", getContext().getUser());
