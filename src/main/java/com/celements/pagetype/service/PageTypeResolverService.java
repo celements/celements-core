@@ -131,7 +131,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
       }
     } else {
       LOGGER.warn("Failed to get PageTypeClasses for checkDoc ["
-          + checkDoc.getDocumentReference() + "]!");
+          + checkDoc + "]!");
     }
     return null;
   }
