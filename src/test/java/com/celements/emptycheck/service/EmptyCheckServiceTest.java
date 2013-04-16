@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin.cmd;
+package com.celements.emptycheck.service;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -33,6 +33,8 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.emptycheck.service.EmptyCheckService;
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;
@@ -40,34 +42,101 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTestCase {
+public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private XWiki xwiki;
-  private NextNonEmptyChildrenCommand nextNonEmptChildCmd;
+  private EmptyCheckService emptyCheckService;
   private ITreeNodeService treeNodeService;
   private ComponentDescriptor<ITreeNodeService> treeNodeServiceDesc;
-  private ITreeNodeService savedTreeNodeServiceDesc;
+  private ITreeNodeService savedTreeNodeService;
 
   @Before
   public void setUp_EmptyCheckCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    nextNonEmptChildCmd = new NextNonEmptyChildrenCommand();
+    emptyCheckService = (EmptyCheckService) getComponentManager().lookup(
+        IEmptyCheckRole.class);
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
-    savedTreeNodeServiceDesc = getComponentManager().lookup(ITreeNodeService.class);
+    savedTreeNodeService = getComponentManager().lookup(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
-    context.setLanguage("de");
   }
 
   @After
   public void shutdown_EmptyCheckCommandTest() throws Exception {
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
-    getComponentManager().registerComponent(treeNodeServiceDesc,
-        savedTreeNodeServiceDesc);
+    getComponentManager().registerComponent(treeNodeServiceDesc, savedTreeNodeService);
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_empty() {
+    assertTrue(emptyCheckService.isEmptyRTEDocument(getTestDoc("")));
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space() {
+    assertTrue("Lonly non breaking spaces (2) with break should be"
+        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
+            "<p>&nbsp;&nbsp;</p>")));
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Break() {
+    assertTrue("Lonly non breaking spaces (2) with break should be"
+        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
+            "<p><br /></p>")));
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_manualizer_example() {
+    assertTrue("Paragraph with span surrounding break should be"
+        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
+        "<p><span style=\"line-height: normal; font-size: 10px;\"><br /></span></p>")));
+  }
+  
+  @Test
+  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space1Break() {
+    assertTrue("Lonly non breaking spaces (2) with break should be"
+        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
+            "<p>&nbsp;&nbsp; <br /></p>")));
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_3Space1Break() {
+    assertTrue("Lonly non breaking spaces (3) with break should be"
+        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
+            "<p>&nbsp;&nbsp;&nbsp;<br /></p>")));
+  }
+
+
+  @Test
+  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Space2Break() {
+    assertTrue("Lonly non breaking spaces with break (2) should be"
+        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
+            "<p>&nbsp;<br /><br /></p>")));
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_REGULAR_TEXT() {
+    assertFalse("Regular Text (2) should not be treated as empty.",
+        emptyCheckService.isEmptyRTEDocument(getTestDoc(
+            "<p>adsf  &nbsp; <br />sadf</p>")));
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_nbsp() {
+    assertTrue("Lonly non breaking spaces should be treated as empty",
+        emptyCheckService.isEmptyRTEDocument(getTestDoc("&nbsp;")));
+    assertTrue("Non breaking spaces in a paragraph should be treated as empty",
+        emptyCheckService.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
+    assertTrue("Non breaking spaces in a paragraph with white spaces"
+        + " should be treated as empty",
+        emptyCheckService.isEmptyRTEDocument(getTestDoc("<p>  &nbsp; </p>")));
+    assertFalse("Regular Text should not be treated as empty.",
+        emptyCheckService.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));
   }
 
   @Test
@@ -78,7 +147,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
     replayDefault();
-    assertEquals(documentRef, nextNonEmptChildCmd.getNextNonEmptyChildren(documentRef));
+    assertEquals(documentRef, emptyCheckService.getNextNonEmptyChildren(documentRef));
     verifyDefault();
   }
 
@@ -87,10 +156,11 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
+    List<TreeNode> noChildrenList = Collections.emptyList();
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
-        ).andReturn(Collections.<TreeNode>emptyList()).once();
+        ).andReturn(noChildrenList).once();
     replayDefault();
-    assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
+    assertEquals(emptyDocRef, emptyCheckService.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
   }
 
@@ -112,43 +182,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc 
         ).once();
     replayDefault();
-    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
-        emptyDocRef));
-    verifyDefault();
-  }
-
-  @Test
-  public void testGetNextNonEmptyChildren_empty_with_nonEmptyChildren_notFirstChildren(
-      ) throws Exception {
-    context.setLanguage("fr");
-    DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace", "MyEmptyDoc");
-    createEmptyDoc(emptyDocRef);
-    DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace", "myChild2");
-    DocumentReference emptyChildDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace", "myChild");
-    List<TreeNode> childrenList = Arrays.asList(new TreeNode(emptyChildDocRef,
-        "mySpace.MyEmptyDoc", 0), new TreeNode(expectedChildDocRef, "mySpace.MyEmptyDoc",
-            1));
-    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
-        ).andReturn(childrenList).once();
-    expect(treeNodeService.getSubNodesForParent(eq(emptyChildDocRef), eq(""))
-        ).andReturn(Collections.<TreeNode>emptyList()).once();
-    XWikiDocument childEmptyXdoc = createMockAndAddToDefault(XWikiDocument.class);
-    expect(childEmptyXdoc.getContent()).andReturn("").once();
-    expect(xwiki.getDocument(eq(emptyChildDocRef), same(context))).andReturn(
-        childEmptyXdoc).times(2);
-    XWikiDocument childEmptyXTdoc = new XWikiDocument(emptyChildDocRef);
-    childEmptyXTdoc.setContent("");
-    expect(childEmptyXdoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(
-        childEmptyXTdoc).once();
-    XWikiDocument childXdoc = new XWikiDocument(expectedChildDocRef);
-    childXdoc.setContent("non empty child content");
-    expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc
-        ).once();
-    replayDefault();
-    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, emptyCheckService.getNextNonEmptyChildren(
         emptyDocRef));
     verifyDefault();
   }
@@ -181,7 +215,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(
         childChildXdoc).once();
     replayDefault();
-    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, emptyCheckService.getNextNonEmptyChildren(
         emptyDocRef));
     verifyDefault();
   }
@@ -223,7 +257,8 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq(""))
         ).andReturn(Collections.<TreeNode>emptyList()).once();
     replayDefault();
-    assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
+    assertEquals(emptyDocRef, emptyCheckService.getNextNonEmptyChildren(
+        emptyDocRef));
     verifyDefault();
   }
 
@@ -249,6 +284,13 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     expect(xwiki.getDocument(eq(emptyDocRef), same(context))).andReturn(myXdoc
         ).atLeastOnce();
     return myXdoc;
+  }
+
+  private XWikiDocument getTestDoc(String inStr) {
+    DocumentReference testDocRef = new DocumentReference("xwiki", "testSpace", "testDoc");
+    XWikiDocument doc = new XWikiDocument(testDocRef );
+    doc.setContent(inStr);
+    return doc;
   }
 
 }

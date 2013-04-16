@@ -40,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
@@ -80,7 +81,6 @@ import com.celements.web.plugin.cmd.SuggestListCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
-import com.celements.web.service.IEmptyCheckRole;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;

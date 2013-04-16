@@ -21,7 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.service.IEmptyCheckRole;
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;

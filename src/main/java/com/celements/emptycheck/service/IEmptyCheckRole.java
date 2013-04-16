@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.emptycheck.service;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;

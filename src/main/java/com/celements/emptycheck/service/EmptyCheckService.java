@@ -1,4 +1,6 @@
-package com.celements.web.service;
+package com.celements.emptycheck.service;
+
+import java.util.Map;
 
 import javax.inject.Singleton;
 
@@ -9,7 +11,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.plugin.cmd.NextNonEmptyChildrenCommand;
+import com.celements.emptycheck.internal.NextNonEmptyChildrenCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -23,6 +25,9 @@ public class EmptyCheckService implements IEmptyCheckRole {
 
   @Requirement
   Execution execution;
+
+  @Requirement
+  Map<String, IEmptyDocStrategyRole> emptyDocStrategies;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty(

@@ -1,4 +1,4 @@
-package com.celements.web.plugin.cmd;
+package com.celements.emptycheck.internal;
 
 import java.util.HashSet;
 import java.util.List;
@@ -8,9 +8,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
-import com.celements.web.service.IEmptyCheckRole;
 import com.xpn.xwiki.web.Utils;
 
 public class NextNonEmptyChildrenCommand {
