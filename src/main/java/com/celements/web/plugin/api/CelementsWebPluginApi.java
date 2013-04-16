@@ -627,16 +627,26 @@ public class CelementsWebPluginApi extends Api {
         attachments, others, true, context);
   }
 
-  public String getNextTitledPageFullName(String space, String title){
-    return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title, context);
+  public String getNextTitledPageFullName(String space, String title) {
+    if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
+      return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title,
+          context);
+    }
+    return "";
   }
 
   public String getNextUntitledPageFullName(String space) {
-    return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, context);
+    if ((space != null) && !"".equals(space)) {
+      return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, context);
+    }
+    return "";
   }
 
   public String getNextUntitledPageName(String space) {
-    return new NextFreeDocNameCommand().getNextUntitledPageName(space, context);
+    if ((space != null) && !"".equals(space)) {
+      return new NextFreeDocNameCommand().getNextUntitledPageName(space, context);
+    }
+    return "";
   }
 
   public int showRightPanels() {
