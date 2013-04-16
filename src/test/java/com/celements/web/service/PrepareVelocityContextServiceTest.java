@@ -81,15 +81,13 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
 
   @Test
   public void testPrepareVelocityContext_checkNPEs_forNull_Context() throws Exception {
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
     context.remove("vcontext");
     prepVeloContextService.prepareVelocityContext((XWikiContext)null);
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
   
   @Test
@@ -97,15 +95,59 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
         ).atLeastOnce();
     expect(xwiki.isMultiLingual(same(context))).andReturn(false).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
     context.remove("vcontext");
     prepVeloContextService.prepareVelocityContext(context);
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
+  }
+
+  @Test
+  public void testPrepareVelocityContext_checkNPEs_forNull_doc() throws Exception {
+    context.setDoc(null);
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
+        ).atLeastOnce();
+    expect(xwiki.isMultiLingual(same(context))).andReturn(false).atLeastOnce();
+    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(context))
+        ).andReturn(null
+      ).anyTimes();
+    expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin"
+        ).anyTimes();
+    DocumentReference cellSkinDoc = new DocumentReference("celements2web","Skins",
+        "CellSkin");
+    expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
+        cellSkinDoc)).atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))
+        ).andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "myTestUser");
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
+        new XWikiDocument(userDocRef)).anyTimes();
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
+        ).andReturn("").anyTimes();
+    expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
+    expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
+    // if context doc is null -> getPageTypeRefForCurrentDoc returns null
+    expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(null).atLeastOnce();
+    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
+        new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123"
+        ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("showRightPanels"), same(context))).andReturn(null
+        ).atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(null
+        ).atLeastOnce();
+    replayDefault();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.myTestUser");
+    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    prepVeloContextService.prepareVelocityContext(vcontext);
+    verifyDefault();
   }
 
   @Test
@@ -118,11 +160,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     tdoc.setLanguage("fr");
     tdoc.setTranslation(1);
     Document vTdocBefore = tdoc.newDocument(context);
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertFalse(prepVeloContextService.isTdocLanguageWrong(vTdocBefore));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -130,7 +170,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     context.setLanguage("fr");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyDoc");
-    XWikiDocument docMock = createMock(XWikiDocument.class);
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(docMock.getDefaultLanguage()).andReturn("de").anyTimes();
     expect(docMock.getLanguage()).andReturn("").anyTimes();
@@ -141,13 +181,11 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(docMock.getTranslatedDocument(same(context))).andReturn(tdoc);
     context.setDoc(docMock);
     VelocityContext vcontext = new VelocityContext();
-    Object[] mocks = { docMock };
-    replayDefault(mocks);
+    replayDefault();
     prepVeloContextService.fixTdocForInvalidLanguage(vcontext);
     Document vTdoc = (Document) vcontext.get("tdoc");
     assertEquals("fr", vTdoc.getLanguage());
-    Object[] mocks1 = { docMock };
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -156,7 +194,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     //IMPORTANT: do not touch velocity context if the tdoc is in the correct language.
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyDoc");
-    XWikiDocument docMock = createMock(XWikiDocument.class);
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     expect(docMock.getDefaultLanguage()).andReturn("de").anyTimes();
     expect(docMock.getLanguage()).andReturn("").anyTimes();
@@ -168,21 +206,19 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     VelocityContext vcontext = new VelocityContext();
     Document tdocBefore = tdoc.newDocument(context);
     vcontext.put("tdoc", tdocBefore);
-    Object[] mocks = { docMock };
-    replayDefault(mocks);
+    replayDefault();
     prepVeloContextService.fixTdocForInvalidLanguage(vcontext);
     Document vTdoc = (Document) vcontext.get("tdoc");
     assertEquals("fr", vTdoc.getLanguage());
     assertSame(tdocBefore, vTdoc);
-    Object[] mocks1 = { docMock };
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
   public void testFixLanguagePreference() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
         ).atLeastOnce();
@@ -206,16 +242,14 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
         ).andReturn("en,de,fr").atLeastOnce();
-    Object[] mocks = { requestMock };
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
     context.remove("vcontext");
     vContext.put("language", "de");
     prepVeloContextService.fixLanguagePreference(vContext);
-    Object[] mocks1 = { requestMock };
-    verifyDefault(mocks1);
+    verifyDefault();
     assertEquals("en", vContext.get("language"));
   }
 
@@ -223,7 +257,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   public void testFixLanguagePreference_noAcceptLanguageValid() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("en"
         ).atLeastOnce();
@@ -247,16 +281,14 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
         ).andReturn("en").atLeastOnce();
-    Object[] mocks = { requestMock };
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
     context.remove("vcontext");
     vContext.put("language", "de");
     prepVeloContextService.fixLanguagePreference(vContext);
-    Object[] mocks1 = { requestMock };
-    verifyDefault(mocks1);
+    verifyDefault();
     assertEquals("en", vContext.get("language"));
   }
 
@@ -264,7 +296,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   public void testFixLanguagePreference_invalidLanguageFromCookie() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(requestMock);
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("en"
         ).atLeastOnce();
@@ -288,16 +320,14 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
         ).andReturn("en").atLeastOnce();
-    Object[] mocks = { requestMock };
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
     context.remove("vcontext");
     vContext.put("language", "de");
     prepVeloContextService.fixLanguagePreference(vContext);
-    Object[] mocks1 = { requestMock };
-    verifyDefault(mocks1);
+    verifyDefault();
     assertEquals("en", vContext.get("language"));
   }
 
@@ -305,9 +335,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   public void testFixLanguagePreference_addCookieOnlyOnce() throws Exception {
     VelocityContext vContext = new VelocityContext();
     context.put("vcontext", vContext);
-    XWikiRequest requestMock = createMock(XWikiRequest.class);
+    XWikiRequest requestMock = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(requestMock);
-    XWikiResponse responseMock = createMock(XWikiResponse.class);
+    XWikiResponse responseMock = createMockAndAddToDefault(XWikiResponse.class);
     context.setResponse(responseMock);
     expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn("de"
         ).atLeastOnce();
@@ -320,8 +350,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(requestMock.getParameter(eq("language"))).andReturn("fr").atLeastOnce();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
         ).andReturn("en,de,fr").atLeastOnce();
-    Object[] mocks = { requestMock, responseMock };
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
@@ -335,18 +364,15 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     assertTrue((Boolean)addCookieBefore);
     //check addCookie is only called once
     prepVeloContextService.fixLanguagePreference(vContext);
-    Object[] mocks1 = { requestMock, responseMock };
-    verifyDefault(mocks1);
+    verifyDefault();
     assertEquals("fr", vContext.get("language"));
   }
 
   @Test
   public void testIsInvalidLanguageOrDefault_default() {
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertTrue(prepVeloContextService.isInvalidLanguageOrDefault("default"));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -356,11 +382,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
             ).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertFalse(prepVeloContextService.isInvalidLanguageOrDefault("en"));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -370,11 +394,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("1"
             ).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertTrue(prepVeloContextService.isInvalidLanguageOrDefault("fr"));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -382,11 +404,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getXWikiPreference(eq("celSuppressInvalidLang"),
         eq("celements.language.suppressInvalid"), eq("0"), same(context))).andReturn("0"
             ).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertFalse(prepVeloContextService.isInvalidLanguageOrDefault("fr"));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -426,7 +446,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         cellSkinDoc)).atLeastOnce();
     expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))
       ).andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
-    XWikiGroupService groupServiceMock = createMock(XWikiGroupService.class);
+    XWikiGroupService groupServiceMock = createMockAndAddToDefault(
+        XWikiGroupService.class);
     expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock).anyTimes();
     List<DocumentReference> groupRefList = Collections.emptyList();
     expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
@@ -436,18 +457,16 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         eq("mySpace.myDoc"), same(context))).andReturn(false).anyTimes();
     expect(rightServiceMock.hasAdminRights(same(context))).andReturn(false).anyTimes();
     expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
-    Object[] mocks = { groupServiceMock };
     PageTypeReference ptRef = new PageTypeReference("RichText", "testProvider",
         Arrays.asList("cat1"));
     expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(ptRef).atLeastOnce();
-    replayDefault(mocks);
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.myTestUser");
     prepVeloContextService.initCelementsVelocity(vContext);
     assertEquals("expecting tinyMCE_width be set.", "123", vContext.get("tinyMCE_width"));
-    Object[] mocks1 = { groupServiceMock };
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
@@ -458,11 +477,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
       ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("showLeftPanels"), same(context))).andReturn(null
       ).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     prepVeloContextService.initPanelsVelocity((VelocityContext) context.get("vcontext"));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
   
   @Test
@@ -472,11 +489,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
       ).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
         new XWikiDocument()).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertEquals("453", prepVeloContextService.getRTEwidth(context));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
   
   @Test
@@ -486,16 +501,14 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
       ).atLeastOnce();
     expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
         new XWikiDocument()).atLeastOnce();
-    Object[] mocks = {};
-    replayDefault(mocks);
+    replayDefault();
     assertEquals("500", prepVeloContextService.getRTEwidth(context));
-    Object[] mocks1 = {};
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
   @Test
   public void testGetRTEwidth_pageType() throws Exception {
-    XWikiRequest request = createMock(XWikiRequest.class);
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
     expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("500"
         ).anyTimes();
@@ -522,11 +535,9 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         "Celements2", "PageTypeProperties");
     pageTypePropObj.setXClassReference(pageTypePropClassRef);
     pageTypeDoc.setXObjects(pageTypePropClassRef, Arrays.asList(pageTypePropObj));
-    Object[] mocks = { request };
-    replayDefault(mocks);
+    replayDefault();
     assertEquals("700", prepVeloContextService.getRTEwidth(context));
-    Object[] mocks1 = { request };
-    verifyDefault(mocks1);
+    verifyDefault();
   }
 
 }

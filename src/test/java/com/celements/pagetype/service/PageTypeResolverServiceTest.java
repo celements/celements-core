@@ -72,6 +72,14 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
   }
 
   @Test
+  public void testGetPageTypeObject_NPEs_null_doc() throws XWikiException {
+    replayAll();
+    BaseObject resultPTObj = pageTypeResolver.getPageTypeObject(null);
+    verifyAll();
+    assertNull(resultPTObj);
+  }
+
+  @Test
   public void testGetPageTypeObject_NewDocFromTemplate() throws XWikiException {
     doc.setNew(true);
     DocumentReference templDocRef = new DocumentReference(context.getDatabase(), "Blog",
@@ -153,6 +161,16 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(
         docRef);
     assertEquals(richTextPTref, pageTypeRef);
+    verifyAll();
+  }
+
+  @Test
+  public void testGetPageTypeRefForDocWithDefault_NPEs_null_doc() throws Exception {
+    replayAll();
+    //No PageType Object prepared -> Default PageType is RichText
+    PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(
+        (XWikiDocument)null);
+    assertNull(pageTypeRef);
     verifyAll();
   }
 

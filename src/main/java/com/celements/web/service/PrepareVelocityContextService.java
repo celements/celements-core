@@ -134,8 +134,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   void initCelementsVelocity(VelocityContext vcontext) {
     if ((vcontext != null) && (getContext().getWiki() != null)) {
       if (!vcontext.containsKey(getVelocityName())) {
-        vcontext.put(getVelocityName(), getContext().getWiki().getPluginApi(getVelocityName(),
-            getContext()));
+        vcontext.put(getVelocityName(), getContext().getWiki().getPluginApi(
+            getVelocityName(), getContext()));
       }
       if (!vcontext.containsKey("default_language")) {
         vcontext.put("default_language", webUtilsService.getDefaultLanguage());
