@@ -10,6 +10,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase {
@@ -39,6 +40,29 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
     expect(untitled2Doc.getLock(same(context))).andReturn(null);
     replayDefault();
     assertEquals("mySpace.untitled2", nextFreeDocNameCmd.getNextUntitledPageFullName(
+        "mySpace", context));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetNextUntitledPageFullName_getDocument_Exception() throws Exception {
+    DocumentReference untitled1DocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "untitled1");
+    expect(xwiki.exists(eq(untitled1DocRef), same(context))).andReturn(true).once();
+    DocumentReference untitled2DocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "untitled2");
+    expect(xwiki.exists(eq(untitled2DocRef), same(context))).andReturn(false).once();
+    expect(xwiki.getDocument(eq(untitled2DocRef), same(context))).andThrow(
+        new XWikiException()).once();
+    DocumentReference untitled3DocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "untitled3");
+    expect(xwiki.exists(eq(untitled3DocRef), same(context))).andReturn(false).once();
+    XWikiDocument untitled3Doc = createMockAndAddToDefault(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(untitled3DocRef), same(context))).andReturn(untitled3Doc
+        ).once();
+    expect(untitled3Doc.getLock(same(context))).andReturn(null);
+    replayDefault();
+    assertEquals("mySpace.untitled3", nextFreeDocNameCmd.getNextUntitledPageFullName(
         "mySpace", context));
     verifyDefault();
   }
