@@ -340,6 +340,9 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(appScriptDoc
         ).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayAll(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");

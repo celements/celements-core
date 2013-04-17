@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -72,12 +73,221 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetCheckImplNamesConfig_bugReturningNull() {
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(null
+            ).anyTimes();
+    replayDefault();
+    assertEquals(Arrays.asList("default"), emptyCheckService.getCheckImplNamesConfig());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCheckImplNamesConfig_bugReturningEmtpy() {
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(""
+            ).anyTimes();
+    replayDefault();
+    assertEquals(Arrays.asList("default"), emptyCheckService.getCheckImplNamesConfig());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCheckImplNamesConfig_noConfig() {
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
+    replayDefault();
+    assertEquals(Arrays.asList("default"), emptyCheckService.getCheckImplNamesConfig());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCheckImplNamesConfig_commaSeparated() {
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default,sharedContent").anyTimes();
+    replayDefault();
+    assertEquals(Arrays.asList("default", "sharedContent"),
+        emptyCheckService.getCheckImplNamesConfig());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCheckImplNames_semicolonSeparated() {
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default;sharedContent").anyTimes();
+    replayDefault();
+    assertEquals(Arrays.asList("default", "sharedContent"),
+        emptyCheckService.getCheckImplNamesConfig());
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_two_impl_oneNotEmpty_skipAfterNotEmpty() {
+    HashMap<String, IEmptyDocStrategyRole> mockStrategyMap =
+        new HashMap<String, IEmptyDocStrategyRole>();
+    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testOne", testOneMock);
+    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testTwo", testTwoMock);
+    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
+    emptyCheckService.emptyDocStrategies = mockStrategyMap;
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
+    expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(false).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "testOne;testTwo;;wrongTest;").anyTimes();
+    replayDefault();
+    assertFalse(emptyCheckService.isEmptyRTEDocument(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_two_impl_oneNotEmpty() {
+    HashMap<String, IEmptyDocStrategyRole> mockStrategyMap =
+        new HashMap<String, IEmptyDocStrategyRole>();
+    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testOne", testOneMock);
+    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testTwo", testTwoMock);
+    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
+    emptyCheckService.emptyDocStrategies = mockStrategyMap;
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
+    expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
+    expect(testTwoMock.isEmptyRTEDocument(eq(docRef))).andReturn(false).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "testOne;testTwo;;wrongTest;").anyTimes();
+    replayDefault();
+    assertFalse(emptyCheckService.isEmptyRTEDocument(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsEmptyRTEDocument_two_impl_isEmpty() {
+    HashMap<String, IEmptyDocStrategyRole> mockStrategyMap =
+        new HashMap<String, IEmptyDocStrategyRole>();
+    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testOne", testOneMock);
+    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testTwo", testTwoMock);
+    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
+    emptyCheckService.emptyDocStrategies = mockStrategyMap;
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
+    expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
+    expect(testTwoMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "testOne;testTwo;;wrongTest;").anyTimes();
+    replayDefault();
+    assertTrue(emptyCheckService.isEmptyRTEDocument(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsEmptyDocument_two_impl_oneNotEmpty_skipAfterNotEmpty() {
+    HashMap<String, IEmptyDocStrategyRole> mockStrategyMap =
+        new HashMap<String, IEmptyDocStrategyRole>();
+    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testOne", testOneMock);
+    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testTwo", testTwoMock);
+    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
+    emptyCheckService.emptyDocStrategies = mockStrategyMap;
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
+    expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(false).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "testOne;testTwo;;wrongTest;").anyTimes();
+    replayDefault();
+    assertFalse(emptyCheckService.isEmptyDocument(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsEmptyDocument_two_impl_oneNotEmpty() {
+    HashMap<String, IEmptyDocStrategyRole> mockStrategyMap =
+        new HashMap<String, IEmptyDocStrategyRole>();
+    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testOne", testOneMock);
+    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testTwo", testTwoMock);
+    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
+    emptyCheckService.emptyDocStrategies = mockStrategyMap;
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
+    expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
+    expect(testTwoMock.isEmptyDocument(eq(docRef))).andReturn(false).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "testOne;testTwo;;wrongTest;").anyTimes();
+    replayDefault();
+    assertFalse(emptyCheckService.isEmptyDocument(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsEmptyDocument_two_impl_isEmpty() {
+    HashMap<String, IEmptyDocStrategyRole> mockStrategyMap =
+        new HashMap<String, IEmptyDocStrategyRole>();
+    IEmptyDocStrategyRole testOneMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testOne", testOneMock);
+    IEmptyDocStrategyRole testTwoMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testTwo", testTwoMock);
+    IEmptyDocStrategyRole testNotConfiguredMock = createMockAndAddToDefault(
+        IEmptyDocStrategyRole.class);
+    mockStrategyMap.put("testNotConfigured", testNotConfiguredMock);
+    emptyCheckService.emptyDocStrategies = mockStrategyMap;
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "MyDoc");
+    expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
+    expect(testTwoMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "testOne;testTwo;;wrongTest;").anyTimes();
+    replayDefault();
+    assertTrue(emptyCheckService.isEmptyDocument(docRef));
+    verifyDefault();
+  }
+
+  @Test
   public void testGetNextNonEmptyChildren_notEmpty() throws Exception {
     DocumentReference documentRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyDoc");
     XWikiDocument myXdoc = new XWikiDocument(documentRef);
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(documentRef, emptyCheckService.getNextNonEmptyChildren(documentRef));
     verifyDefault();
@@ -91,6 +301,9 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> noChildrenList = Collections.emptyList();
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
         ).andReturn(noChildrenList).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyCheckService.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -113,6 +326,9 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc 
         ).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyCheckService.getNextNonEmptyChildren(
         emptyDocRef));
@@ -146,6 +362,9 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     childChildXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(
         childChildXdoc).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyCheckService.getNextNonEmptyChildren(
         emptyDocRef));
@@ -188,6 +407,9 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
         ).andReturn(Collections.<TreeNode>emptyList()).once();
     expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq(""))
         ).andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyCheckService.getNextNonEmptyChildren(
         emptyDocRef));

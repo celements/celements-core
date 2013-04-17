@@ -155,6 +155,9 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myXdoc = new XWikiDocument(documentRef);
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(documentRef, emptyChildCheckCmd.getNextNonEmptyChildren(documentRef));
     verifyDefault();
@@ -169,6 +172,9 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> noChildrenList = Collections.emptyList();
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
         ).andReturn(noChildrenList).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -192,6 +198,9 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc 
         ).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
         emptyDocRef));
@@ -226,6 +235,9 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     childChildXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(
         childChildXdoc).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
         emptyDocRef));
@@ -269,6 +281,9 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         ).andReturn(Collections.<TreeNode>emptyList()).once();
     expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq(""))
         ).andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();

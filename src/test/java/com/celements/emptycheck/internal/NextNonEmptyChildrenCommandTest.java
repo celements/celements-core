@@ -33,7 +33,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.emptycheck.internal.NextNonEmptyChildrenCommand;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;
@@ -78,6 +77,9 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     XWikiDocument myXdoc = new XWikiDocument(documentRef);
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(documentRef, nextNonEmptChildCmd.getNextNonEmptyChildren(documentRef));
     verifyDefault();
@@ -90,6 +92,9 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     createEmptyDoc(emptyDocRef);
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
         ).andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
@@ -112,6 +117,9 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc 
         ).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
@@ -148,6 +156,9 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc
         ).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
@@ -181,6 +192,9 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     childChildXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(
         childChildXdoc).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
@@ -223,6 +237,9 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
         ).andReturn(Collections.<TreeNode>emptyList()).once();
     expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq(""))
         ).andReturn(Collections.<TreeNode>emptyList()).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
     replayDefault();
     assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();

@@ -47,7 +47,10 @@ public class EmptyCheckService implements IEmptyCheckRole {
     boolean isEmptyRTEdoc = true;
     for (String checkImplName : getCheckImplNamesConfig()) {
       if (emptyDocStrategies.keySet().contains(checkImplName)) {
-        isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyRTEDocument(docRef);
+        if (isEmptyRTEdoc) {
+          isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyRTEDocument(
+              docRef);
+        }
       } else if (!"".equals(checkImplName)) {
         LOGGER.warn("wrong checkImpleNames configuration in ["
             + getContext().getDatabase() + "] skipping implName [" + checkImplName
@@ -61,7 +64,9 @@ public class EmptyCheckService implements IEmptyCheckRole {
     boolean isEmptyRTEdoc = true;
     for (String checkImplName : getCheckImplNamesConfig()) {
       if (emptyDocStrategies.keySet().contains(checkImplName)) {
-        isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyDocument(docRef);
+        if (isEmptyRTEdoc) {
+          isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyDocument(docRef);
+        }
       } else if (!"".equals(checkImplName)) {
         LOGGER.warn("wrong checkImpleNames configuration in ["
             + getContext().getDatabase() + "] skipping implName [" + checkImplName
@@ -71,9 +76,9 @@ public class EmptyCheckService implements IEmptyCheckRole {
     return isEmptyRTEdoc;
   }
 
-  private List<String> getCheckImplNamesConfig() {
+  List<String> getCheckImplNamesConfig() {
     String implConfigNames = getContext().getWiki().getXWikiPreference(
-        "cel_emptycheck_impls", "celements.emtpycheckImpls", "default", getContext());
+        "ceL_emptycheck_moduls", "celements.emptycheckModuls", "default", getContext());
     if ((implConfigNames != null) && (!"".equals(implConfigNames))) {
       return Arrays.asList(implConfigNames.split("[;,]"));
     } else {
