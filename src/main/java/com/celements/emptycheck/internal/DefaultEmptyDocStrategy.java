@@ -1,6 +1,5 @@
 package com.celements.emptycheck.internal;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.logging.Log;
@@ -15,9 +14,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component
+@Component("default")
 @Singleton
-@Named("default")
 public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     IDefaultEmptyDocStrategyRole {
 
