@@ -29,4 +29,5 @@ com.celements.navigation.presentation.SitemapPresentationType
 com.celements.validation.FormValidationService
 com.celements.validation.XClassRegexRule
 com.celements.web.service.AttachmentService
-com.celements.emptydoc.service.EmptyCheckService
+com.celements.emptycheck.service.EmptyCheckService
+com.celements.emptycheck.internal.DefaultEmptyDocStrategy

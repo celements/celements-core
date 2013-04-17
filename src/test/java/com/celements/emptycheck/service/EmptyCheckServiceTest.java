@@ -72,74 +72,6 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testIsEmptyRTEDocument_empty() {
-    assertTrue(emptyCheckService.isEmptyRTEDocument(getTestDoc("")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp;</p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Break() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
-            "<p><br /></p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_manualizer_example() {
-    assertTrue("Paragraph with span surrounding break should be"
-        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
-        "<p><span style=\"line-height: normal; font-size: 10px;\"><br /></span></p>")));
-  }
-  
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space1Break() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp; <br /></p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_3Space1Break() {
-    assertTrue("Lonly non breaking spaces (3) with break should be"
-        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp;&nbsp;<br /></p>")));
-  }
-
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Space2Break() {
-    assertTrue("Lonly non breaking spaces with break (2) should be"
-        + " treated as empty", emptyCheckService.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;<br /><br /></p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_REGULAR_TEXT() {
-    assertFalse("Regular Text (2) should not be treated as empty.",
-        emptyCheckService.isEmptyRTEDocument(getTestDoc(
-            "<p>adsf  &nbsp; <br />sadf</p>")));
-  }
-
-  @Test
-  public void testIsEmptyRTEDocument_nbsp() {
-    assertTrue("Lonly non breaking spaces should be treated as empty",
-        emptyCheckService.isEmptyRTEDocument(getTestDoc("&nbsp;")));
-    assertTrue("Non breaking spaces in a paragraph should be treated as empty",
-        emptyCheckService.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
-    assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty",
-        emptyCheckService.isEmptyRTEDocument(getTestDoc("<p>  &nbsp; </p>")));
-    assertFalse("Regular Text should not be treated as empty.",
-        emptyCheckService.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));
-  }
-
-  @Test
   public void testGetNextNonEmptyChildren_notEmpty() throws Exception {
     DocumentReference documentRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyDoc");
@@ -284,13 +216,6 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(emptyDocRef), same(context))).andReturn(myXdoc
         ).atLeastOnce();
     return myXdoc;
-  }
-
-  private XWikiDocument getTestDoc(String inStr) {
-    DocumentReference testDocRef = new DocumentReference("xwiki", "testSpace", "testDoc");
-    XWikiDocument doc = new XWikiDocument(testDocRef );
-    doc.setContent(inStr);
-    return doc;
   }
 
 }

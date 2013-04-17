@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,8 +48,7 @@ public class EmptyCheckCommand {
   public boolean isEmptyRTEDocument(String fullname, XWikiContext context) {
     DocumentReference docRef = new DocumentReference(context.getDatabase(),
         fullname.split("\\.")[0], fullname.split("\\.")[1]);
-    return isEmptyRTEDocumentDefault(docRef, context)
-        && isEmptyRTEDocumentTranslated(docRef);
+    return isEmptyRTEDocument(docRef);
   }
   
   /**
@@ -64,7 +64,7 @@ public class EmptyCheckCommand {
    **/
   @Deprecated
   public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
-    return getEmptyCheckService().isEmptyRTEDocumentTranslated(docRef);
+    return getDefaultEmptyDocStrategy().isEmptyRTEDocumentTranslated(docRef);
   }
   
   /**
@@ -73,7 +73,7 @@ public class EmptyCheckCommand {
   @Deprecated
   public boolean isEmptyRTEDocumentDefault(DocumentReference docRef,
       XWikiContext context) {
-    return getEmptyCheckService().isEmptyRTEDocumentDefault(docRef);
+    return getDefaultEmptyDocStrategy().isEmptyRTEDocumentDefault(docRef);
   }
   
   /**
@@ -81,7 +81,7 @@ public class EmptyCheckCommand {
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(XWikiDocument localdoc) {
-    return getEmptyCheckService().isEmptyRTEDocument(localdoc);
+    return getDefaultEmptyDocStrategy().isEmptyRTEDocument(localdoc);
   }
 
   /**
@@ -89,11 +89,15 @@ public class EmptyCheckCommand {
    **/
   @Deprecated
   public boolean isEmptyRTEString(String rteContent) {
-    return getEmptyCheckService().isEmptyRTEString(rteContent);
+    return getDefaultEmptyDocStrategy().isEmptyRTEString(rteContent);
   }
 
   IEmptyCheckRole getEmptyCheckService() {
     return Utils.getComponent(IEmptyCheckRole.class);
+  }
+
+  IDefaultEmptyDocStrategyRole getDefaultEmptyDocStrategy() {
+    return Utils.getComponent(IDefaultEmptyDocStrategyRole.class);
   }
 
 }

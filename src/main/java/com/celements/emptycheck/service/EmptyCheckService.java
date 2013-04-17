@@ -1,5 +1,7 @@
 package com.celements.emptycheck.service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
@@ -13,8 +15,6 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.emptycheck.internal.NextNonEmptyChildrenCommand;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
 @Singleton
@@ -24,10 +24,10 @@ public class EmptyCheckService implements IEmptyCheckRole {
       EmptyCheckService.class);
 
   @Requirement
-  Execution execution;
+  Map<String, IEmptyDocStrategyRole> emptyDocStrategies;
 
   @Requirement
-  Map<String, IEmptyDocStrategyRole> emptyDocStrategies;
+  Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty(
@@ -44,38 +44,41 @@ public class EmptyCheckService implements IEmptyCheckRole {
   }
 
   public boolean isEmptyRTEDocument(DocumentReference docRef) {
-    return isEmptyRTEDocumentDefault(docRef)
-        && isEmptyRTEDocumentTranslated(docRef);
-  }
-
-  public boolean isEmptyRTEDocumentDefault(DocumentReference docRef) {
-    try {
-      return isEmptyRTEDocument(getContext().getWiki(
-          ).getDocument(docRef, getContext()));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    boolean isEmptyRTEdoc = true;
+    for (String checkImplName : getCheckImplNamesConfig()) {
+      if (emptyDocStrategies.keySet().contains(checkImplName)) {
+        isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyRTEDocument(docRef);
+      } else if (!"".equals(checkImplName)) {
+        LOGGER.warn("wrong checkImpleNames configuration in ["
+            + getContext().getDatabase() + "] skipping implName [" + checkImplName
+            + "].");
+      }
     }
-    return true;
+    return isEmptyRTEdoc;
   }
-  
-  public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
-    try {
-      return isEmptyRTEDocument(getContext().getWiki(
-          ).getDocument(docRef, getContext()).getTranslatedDocument(
-              getContext().getLanguage(), getContext()));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+
+  public boolean isEmptyDocument(DocumentReference docRef) {
+    boolean isEmptyRTEdoc = true;
+    for (String checkImplName : getCheckImplNamesConfig()) {
+      if (emptyDocStrategies.keySet().contains(checkImplName)) {
+        isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyDocument(docRef);
+      } else if (!"".equals(checkImplName)) {
+        LOGGER.warn("wrong checkImpleNames configuration in ["
+            + getContext().getDatabase() + "] skipping implName [" + checkImplName
+            + "].");
+      }
     }
-    return true;
+    return isEmptyRTEdoc;
   }
 
-  public boolean isEmptyRTEDocument(XWikiDocument localdoc) {
-    return isEmptyRTEString(localdoc.getContent());
-  }
-
-  public boolean isEmptyRTEString(String rteContent) {
-    return "".equals(rteContent.replaceAll(
-        "(<p>)?(<span.*?>)?(\\s*(&nbsp;|<br\\s*/>))*\\s*(</span>)?(</p>)?", "").trim());
+  private List<String> getCheckImplNamesConfig() {
+    String implConfigNames = getContext().getWiki().getXWikiPreference(
+        "cel_emptycheck_impls", "celements.emtpycheckImpls", "default", getContext());
+    if ((implConfigNames != null) && (!"".equals(implConfigNames))) {
+      return Arrays.asList(implConfigNames.split("[;,]"));
+    } else {
+      return Arrays.asList("default");
+    }
   }
 
 }
