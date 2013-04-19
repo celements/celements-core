@@ -627,6 +627,18 @@ public class CelementsWebPluginApi extends Api {
         attachments, others, true, context);
   }
 
+  public DocumentReference getNextTitledPageDocRef(String space, String title) {
+    if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
+      return new NextFreeDocNameCommand().getNextTitledPageDocRef(space, title, context);
+    }
+    return null;
+  }
+
+  /**
+   * @deprecated since 2.30.0 instead use
+   *             DocumentReference getNextTitledPageDocRef(String, String)
+   */
+  @Deprecated
   public String getNextTitledPageFullName(String space, String title) {
     if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
       return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title,
