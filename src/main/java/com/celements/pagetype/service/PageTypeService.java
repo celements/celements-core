@@ -45,8 +45,11 @@ public class PageTypeService implements IPageTypeRole {
   Map<String, IPageTypeProviderRole> pageTypeProviders;
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {
-    PageTypeReference pageTypeRef = getPageTypeRefByConfigName(pageTypeName);
-    return getPageTypeConfigForPageTypeRef(pageTypeRef);
+    if (pageTypeName != null) {
+      PageTypeReference pageTypeRef = getPageTypeRefByConfigName(pageTypeName);
+      return getPageTypeConfigForPageTypeRef(pageTypeRef);
+    }
+    return null;
   }
 
   public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef) {
