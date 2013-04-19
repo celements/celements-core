@@ -144,4 +144,6 @@ public interface IWebUtilsService {
   
   public Map<String, String[]> getRequestParameterMap();
 
+  public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
+
 }
