@@ -22,6 +22,12 @@ package com.celements.pagetype;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * PageTypeReference is used to represent one pagetype 'id'. Instances of this class
+ * may be used by scripts (non privileged code). Thus be carefull to NOT expose any
+ * internal classes.
+ *
+ */
 public class PageTypeReference {
 
   private String configName;
