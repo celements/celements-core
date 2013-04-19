@@ -137,28 +137,33 @@ public class RenderCommand {
       if (cellTypeRef != null) {
         cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
       }
-      String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN, renderMode);
-      String templateContent;
-      XWikiDocument templateDoc = getContext().getDoc();
-      if (renderTemplatePath.startsWith(":")) {
-        String templatePath = getTemplatePathOnDisk(renderTemplatePath);
-        try {
-          templateContent = getContext().getWiki().getResourceContent(templatePath);
-        } catch (IOException exp) {
-          LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-          return "";
-        }
-      } else {
-        DocumentReference renderTemplateDocRef = getWebUtilsService(
-            ).resolveDocumentReference(renderTemplatePath);
-        templateDoc = getTemplateDoc(renderTemplateDocRef);
-        templateContent = getTranslatedContent(templateDoc, lang);
-      }
-      return getRenderingEngine().renderText(templateContent,
-          templateDoc, getContext().getDoc(), getContext());
+      return renderTemplatePath(getRenderTemplatePath(cellType, cellDocFN, renderMode),
+          lang);
     } else {
       return "";
     }
+  }
+
+  public String renderTemplatePath(String renderTemplatePath, String lang
+      ) throws XWikiException {
+    String templateContent;
+    XWikiDocument templateDoc = getContext().getDoc();
+    if (renderTemplatePath.startsWith(":")) {
+      String templatePath = getTemplatePathOnDisk(renderTemplatePath);
+      try {
+        templateContent = getContext().getWiki().getResourceContent(templatePath);
+      } catch (IOException exp) {
+        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
+        return "";
+      }
+    } else {
+      DocumentReference renderTemplateDocRef = getWebUtilsService(
+          ).resolveDocumentReference(renderTemplatePath);
+      templateDoc = getTemplateDoc(renderTemplateDocRef);
+      templateContent = getTranslatedContent(templateDoc, lang);
+    }
+    return getRenderingEngine().renderText(templateContent,
+        templateDoc, getContext().getDoc(), getContext());
   }
 
   public String renderDocument(DocumentReference docRef) {
