@@ -738,4 +738,28 @@ public class WebUtilsService implements IWebUtilsService {
     }
   }
 
+  public String getInheritedTemplatedPath(DocumentReference localTemplateRef) {
+    if (localTemplateRef != null) {
+      String templatePath = getRefDefaultSerializer().serialize(localTemplateRef);
+      if (!getContext().getWiki().exists(localTemplateRef, getContext())) {
+        if (!"celements2web".equals(localTemplateRef.getLastSpaceReference().getParent(
+          ).getName())
+          && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef),
+              getContext())) {
+          templatePath = "celements2web:" + templatePath;
+        } else {
+          templatePath = ":" + templatePath.replaceAll("celements2web:", "");
+        }
+      }
+      return templatePath.replaceAll(getContext().getDatabase() + ":", "");
+    }
+    return null;
+  }
+
+  private DocumentReference getCentralTemplateRef(DocumentReference localTemplateRef) {
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        localTemplateRef.getLastSpaceReference().getName(), localTemplateRef.getName());
+    return centralTemplateRef;
+  }
+
 }
