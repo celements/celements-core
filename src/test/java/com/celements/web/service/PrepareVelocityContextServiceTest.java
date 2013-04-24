@@ -540,4 +540,62 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     verifyDefault();
   }
 
+  @Test
+  public void testGetRightPanels() throws Exception {
+    List<String> expectedPanels = Arrays.asList("Panels.VideoPlayerPanel",
+        "Panels.GalleryPanel","Panels.BgPosEditPanel");
+    String ptConfigName = "Movie";
+    PageTypeReference ptRef = new PageTypeReference(ptConfigName,
+        "com.celements.XObjectPageTypeProvider", Arrays.asList(""));
+    expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(ptRef).atLeastOnce();
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
+        "PageTypes", ptConfigName);
+    expect(xwiki.exists(eq("PageTypes.Movie"), same(context))).andReturn(true
+        ).atLeastOnce();
+    XWikiDocument ptConfigDoc = new XWikiDocument(pageTypeDocRef);
+    BaseObject rightPanelsConfigObj = new BaseObject();
+    DocumentReference panelsConfigClassRef = new DocumentReference(context.getDatabase(),
+        "Class", "PanelConfigClass");
+    rightPanelsConfigObj.setXClassReference(panelsConfigClassRef);
+    rightPanelsConfigObj.setStringValue("config_name", "rightPanels");
+    rightPanelsConfigObj.setIntValue("show_panels", 1);
+    rightPanelsConfigObj.setStringValue("panels", "Panels.VideoPlayerPanel,"
+        + "Panels.GalleryPanel,Panels.BgPosEditPanel");
+    ptConfigDoc.addXObject(rightPanelsConfigObj);
+    expect(xwiki.getDocument(eq("PageTypes.Movie"), same(context))).andReturn(ptConfigDoc
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedPanels, prepVeloContextService.getRightPanels());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetLeftPanels() throws Exception {
+    List<String> expectedPanels = Arrays.asList("Panels.VideoPlayerPanel",
+        "Panels.GalleryPanel","Panels.BgPosEditPanel");
+    String ptConfigName = "Movie";
+    PageTypeReference ptRef = new PageTypeReference(ptConfigName,
+        "com.celements.XObjectPageTypeProvider", Arrays.asList(""));
+    expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(ptRef).atLeastOnce();
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
+        "PageTypes", ptConfigName);
+    expect(xwiki.exists(eq("PageTypes.Movie"), same(context))).andReturn(true
+        ).atLeastOnce();
+    XWikiDocument ptConfigDoc = new XWikiDocument(pageTypeDocRef);
+    BaseObject leftPanelsConfigObj = new BaseObject();
+    DocumentReference panelsConfigClassRef = new DocumentReference(context.getDatabase(),
+        "Class", "PanelConfigClass");
+    leftPanelsConfigObj.setXClassReference(panelsConfigClassRef);
+    leftPanelsConfigObj.setStringValue("config_name", "leftPanels");
+    leftPanelsConfigObj.setIntValue("show_panels", 1);
+    leftPanelsConfigObj.setStringValue("panels", "Panels.VideoPlayerPanel,"
+        + "Panels.GalleryPanel,Panels.BgPosEditPanel");
+    ptConfigDoc.addXObject(leftPanelsConfigObj);
+    expect(xwiki.getDocument(eq("PageTypes.Movie"), same(context))).andReturn(ptConfigDoc
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedPanels, prepVeloContextService.getLeftPanels());
+    verifyDefault();
+  }
+
 }
