@@ -61,6 +61,8 @@ public class SkinConfigObjCommand {
 
   public BaseObject getSkinConfigObj(String fallbackClassName) {
     XWikiDocument doc = getContext().getDoc();
+    LOGGER.trace("getSkinConfigObj: start with fallbackClassName [" + fallbackClassName
+        + "] for context doc [" + doc.getDocumentReference() + "].");
     try {
       String className = getSkinConfigClassNameFromSkinDoc(fallbackClassName);
       if ((className != null) && !"".equals(className)) {
@@ -79,7 +81,10 @@ public class SkinConfigObjCommand {
     XWiki xwiki = getContext().getWiki();
     XWikiDocument skinDoc = xwiki.getDocument(getWebService().resolveDocumentReference(
         xwiki.getSpacePreference("skin", getContext())), getContext());
-    BaseObject skinObj = skinDoc.getXObject(getSkinsClassRef());
+    BaseObject skinObj = skinDoc.getXObject(getSkinsClassRef(skinDoc.getDocumentReference(
+        ).getLastSpaceReference().getParent().getName()));
+    LOGGER.debug("getSkinConfigClassNameFromSkinDoc: skinObj [" + skinObj + "] found for"
+        + " skinDoc [" + skinDoc.getDocumentReference() + "].");
     String className = fallbackClassName;
     if (skinObj != null) {
       String skinConfigClassName = skinObj.getStringValue("skin_config_class_name");
@@ -87,11 +92,13 @@ public class SkinConfigObjCommand {
         className = skinConfigClassName;
       }
     }
+    LOGGER.info("getSkinConfigClassNameFromSkinDoc returning className [" + className
+        + "].");
     return className;
   }
 
-  public DocumentReference getSkinsClassRef() {
-    return getWebService().resolveDocumentReference("XWiki.XWikiSkins");
+  public DocumentReference getSkinsClassRef(String wikiName) {
+    return new DocumentReference(wikiName, "XWiki", "XWikiSkins");
   }
 
   private IWebUtilsService getWebService() {
