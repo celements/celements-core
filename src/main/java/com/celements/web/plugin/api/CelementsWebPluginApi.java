@@ -999,6 +999,10 @@ public class CelementsWebPluginApi extends Api {
     return getPageLayoutCmd().renderPageLayout(spaceRef);
   }
 
+  public SpaceReference getCurrentRenderingLayout() {
+    return getPageLayoutCmd().getCurrentRenderingLayout();
+  }
+
   /**
    * @deprecated since 2.18.0 instead use renderPageLayout(SpaceReference)
    */
