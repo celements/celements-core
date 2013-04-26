@@ -15,6 +15,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.service.ITreeNodeService;
@@ -91,6 +92,33 @@ public class PageDependentDocumentReferenceCommandTest
         PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_SPACE,
         PageDependentDocumentReferenceCommand.PAGE_DEP_CELL_CONFIG_CLASS_DOC),
     pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentLayoutRef() {
+    PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(
+        PageLayoutCommand.class);
+    pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
+    SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(pageLayoutCmdMock.getPageLayoutForCurrentDoc()).andReturn(expectedLayoutRef
+        ).once();
+    replayDefault();
+    assertEquals(expectedLayoutRef, pageDepDocRefCmd.getCurrentLayoutRef());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentLayoutRef_injectLayout() {
+    PageLayoutCommand pageLayoutCmdMock = createMockAndAddToDefault(
+        PageLayoutCommand.class);
+    pageDepDocRefCmd.pageLayoutCmd = pageLayoutCmdMock;
+    SpaceReference expectedLayoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    pageDepDocRefCmd.setCurrentLayoutRef(expectedLayoutRef);
+    replayDefault();
+    assertEquals(expectedLayoutRef, pageDepDocRefCmd.getCurrentLayoutRef());
     verifyDefault();
   }
 

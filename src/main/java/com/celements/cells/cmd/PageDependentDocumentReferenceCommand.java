@@ -54,6 +54,7 @@ public class PageDependentDocumentReferenceCommand {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PageDependentDocumentReferenceCommand.class);
   PageLayoutCommand pageLayoutCmd;
+  private SpaceReference currentLayoutRef;
 
   /**
    * @deprecated since 2.29.0 instead use getDocumentReference(DocumentReference,
@@ -187,9 +188,9 @@ public class PageDependentDocumentReferenceCommand {
     depDefaultDocList.add(getRefSerializer().serialize(spaceDefault));
     depDefaultDocList.add(getRefSerializer().serialize(getWikiDefaultDocRef(docRef,
         cellDocRef)));
-    SpaceReference currLayoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
-    if (currLayoutRef != null) {
-      DocumentReference layoutDefault = getLayoutDefaultDocRef(currLayoutRef, cellDocRef);
+    if (getCurrentLayoutRef() != null) {
+      DocumentReference layoutDefault = getLayoutDefaultDocRef(getCurrentLayoutRef(),
+          cellDocRef);
       if (layoutDefault != null) {
         depDefaultDocList.add(getRefSerializer().serialize(layoutDefault));
       }
@@ -203,6 +204,17 @@ public class PageDependentDocumentReferenceCommand {
       //For now using spaceDefault for backwards compatibility
       return spaceDefault;
     }
+  }
+
+  public void setCurrentLayoutRef(SpaceReference currentLayoutRef) {
+    this.currentLayoutRef = currentLayoutRef;
+  }
+
+  SpaceReference getCurrentLayoutRef() {
+    if (currentLayoutRef == null) {
+      currentLayoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
+    }
+    return currentLayoutRef;
   }
 
   public DocumentReference getLayoutDefaultDocRef(SpaceReference currLayoutRef,
