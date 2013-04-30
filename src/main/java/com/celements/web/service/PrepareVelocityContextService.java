@@ -299,8 +299,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     }
   }
 
-  private boolean showPanelByConfigName(XWikiContext context,
-      String configName) {
+  boolean showPanelByConfigName(XWikiContext context, String configName) {
     if (isPageShowPanelOverwrite(configName, context.getDoc())) {
       return (1 == getPagePanelObj(configName, context.getDoc()
           ).getIntValue("show_panels"));
@@ -333,8 +332,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private XWikiDocument getPageTypeDoc(XWikiContext context) {
     if(context.getDoc() != null) {
       try {
-        XWikiDocument pageTypeDoc = new PageType(
-            pageTypeResolver.getPageTypeRefForCurrentDoc().getConfigName()
+        XWikiDocument pageTypeDoc = new PageType(new DocumentReference(
+            context.getDatabase(), "PageTypes",
+            pageTypeResolver.getPageTypeRefForCurrentDoc().getConfigName())
             ).getTemplateDocument(getContext());
         LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
         return pageTypeDoc;

@@ -29,6 +29,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.cells.cmd.PageDependentDocumentReferenceCommand;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -133,7 +134,11 @@ public class CellsScriptService implements ScriptService {
     if (injected_pageDepDocRefCmd != null) {
       return injected_pageDepDocRefCmd;
     }
-    return new PageDependentDocumentReferenceCommand();
+    PageDependentDocumentReferenceCommand pageDepDocRefCmd =
+        new PageDependentDocumentReferenceCommand();
+    pageDepDocRefCmd.setCurrentLayoutRef(new PageLayoutCommand(
+        ).getCurrentRenderingLayout());
+    return pageDepDocRefCmd;
   }
 
   void inject_pageDepDocRefCmd(PageDependentDocumentReferenceCommand mockPageDepDocRefCmd

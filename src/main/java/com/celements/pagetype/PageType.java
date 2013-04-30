@@ -43,10 +43,27 @@ public class PageType {
   public static final String PAGE_TYPE_PROPERTIES =
     PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS;
 
+  /**
+   * @deprecated since 2.29.1 instead use pageTypeDocRef
+   */
+  @Deprecated
   private String pageTypeFN;
+  
+  private DocumentReference pageTypeDocRef;
 
+  /**
+   * @deprecated since 2.29.1 instead use PageType(DocumentReference)
+   */
+  @Deprecated
   public PageType(String pageTypeFN) {
     this.pageTypeFN = pageTypeFN;
+    this.pageTypeDocRef = getWebUtilsService().resolveDocumentReference(pageTypeFN);
+  }
+
+  public PageType(DocumentReference pageTypeDocRef) {
+    this.pageTypeDocRef = pageTypeDocRef;
+    this.pageTypeFN = getWebUtilsService().getRefLocalSerializer().serialize(
+        pageTypeDocRef);
   }
 
   public String getConfigName(XWikiContext context) {
@@ -68,8 +85,16 @@ public class PageType {
     return templateDoc;
   }
 
+  /**
+   * @deprecated since 2.29.1 instead use DocumentReference getDocumentReference()
+   */
+  @Deprecated
   public String getFullName() {
     return pageTypeFN;
+  }
+
+  public DocumentReference getDocumentReference() {
+    return pageTypeDocRef;
   }
 
   public BaseObject getPageTypeProperties(XWikiContext context) {
