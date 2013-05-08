@@ -51,12 +51,12 @@ import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.celements.rendering.RenderCommand;
+import com.celements.rteConfig.RTEConfig;
 import com.celements.sajson.Builder;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
-import com.celements.web.plugin.RTEConfig;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CaptchaCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
@@ -788,8 +788,17 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsService().getParentSpace();
   }
 
-  public String getRTEConfigField(String name) throws XWikiException {
-    return RTEConfig.getInstance(context).getRTEConfigField(name, context);
+  public List<DocumentReference> getRTEConfigsList() {
+    return new RTEConfig().getRTEConfigsList();
+  }
+
+  public String getRTEConfigField(String name) {
+    try {
+      return new RTEConfig().getRTEConfigField(name);
+    } catch (XWikiException exp) {
+      LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
+    }
+    return "";
   }
 
   public String getJSONContent(Document contentDoc) {
