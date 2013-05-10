@@ -21,7 +21,9 @@ package com.celements.web.service;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,9 +50,11 @@ import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -376,8 +380,8 @@ public class CelementsWebScriptService implements ScriptService {
     return webUtilsService.getDefaultLanguage(spaceName);
   }
 
-  public List<Object> getDeletedDocuments() {
-    List<Object> resultList = Collections.emptyList();
+  public List<String> getDeletedDocuments() {
+    List<String> resultList = Collections.emptyList();
     try {
       Query query = queryManager.createQuery(getDeletedDocsHql(), Query.HQL);
       resultList = query.execute();
@@ -391,6 +395,56 @@ public class CelementsWebScriptService implements ScriptService {
     return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
         + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
         + " order by 1 asc";
+  }
+
+  public double getWaitDaysBeforeDelete() {
+    String waitdays;
+    XWikiConfig config = getContext().getWiki().getConfig();
+    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
+        waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+    } else {
+        waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+    }
+    return Double.parseDouble(waitdays);
+  }
+
+  /**
+   * permanentlyEmptyTrash delete all documents after waitDays and minWaitDays
+   * @return
+   */
+  public Integer permanentlyEmptyTrash(int waitDays) {
+    Calendar beforeWaiteDaysCal = Calendar.getInstance();
+    beforeWaiteDaysCal.add(Calendar.DATE, -waitDays);
+    Date delBeforeDate = beforeWaiteDaysCal.getTime();
+    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
+      int countDeleted = 0;
+      for (String fullName : getDeletedDocuments()) {
+        try {
+          for (XWikiDeletedDocument delDoc : getContext().getWiki().getDeletedDocuments(
+              fullName, "", getContext())) {
+            int seconds = (int) (getWaitDaysBeforeDelete() * 24 * 60 * 60 + 0.5);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(delDoc.getDate());
+            cal.add(Calendar.SECOND, seconds);
+            boolean isAfterMinWaitDays = cal.before(Calendar.getInstance());
+            if (isAfterMinWaitDays && delDoc.getDate().before(delBeforeDate)) {
+              XWikiDocument doc = getContext().getWiki().getDocument(
+                  webUtilsService.resolveDocumentReference(fullName), getContext());
+              getContext().getWiki().getRecycleBinStore().deleteFromRecycleBin(doc,
+                  delDoc.getId(), getContext(), true);
+              countDeleted++;
+            }
+          }
+        } catch (XWikiException exp) {
+          LOGGER.error("Failed to delete document [" + fullName + "] in wiki ["
+              + getContext().getDatabase() + "].", exp);
+        }
+      }
+      return countDeleted;
+    } else {
+      LOGGER.error("deleting document trash needs admin rights.");
+    }
+    return null;
   }
 
   public List<Object> getDeletedAttachments() {
