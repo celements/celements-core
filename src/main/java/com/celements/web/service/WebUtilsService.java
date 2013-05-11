@@ -762,4 +762,19 @@ public class WebUtilsService implements IWebUtilsService {
     return centralTemplateRef;
   }
 
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
+    getContext().getWiki().deleteDocument(doc, totrash, getContext());
+  }
+
+  public void deleteAllDocuments(XWikiDocument doc, boolean totrash
+      ) throws XWikiException {
+    // Delete all documents
+    for (String lang : doc.getTranslationList(getContext())) {
+      XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
+      deleteDocument(tdoc, totrash);
+    }
+
+    deleteDocument(doc, totrash);
+  }
+
 }
