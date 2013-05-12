@@ -763,7 +763,21 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
-    getContext().getWiki().deleteDocument(doc, totrash, getContext());
+    /** deleteDocument in XWiki does NOT set context and store database to doc database
+     * Thus deleting the doc fails if it is not in the current context database. Hence we
+     * need to fix the context database before deleting.
+     */
+    String dbBefore = getContext().getDatabase();
+    try {
+      getContext().setDatabase(doc.getDocumentReference().getLastSpaceReference().getParent(
+          ).getName());
+      LOGGER.debug("deleteDocument: doc [" + getRefDefaultSerializer().serialize(
+          doc.getDocumentReference()) + "," + doc.getLanguage() + "] totrash [" + totrash
+          + "] dbBefore [" + dbBefore + "] db now [" + getContext().getDatabase() + "].");
+      getContext().getWiki().deleteDocument(doc, totrash, getContext());
+    } finally {
+      getContext().setDatabase(dbBefore);
+    }
   }
 
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash
