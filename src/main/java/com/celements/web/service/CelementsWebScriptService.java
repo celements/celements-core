@@ -42,7 +42,8 @@ import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
-import com.celements.validation.IFormValidationRole;
+import com.celements.validation.IFormValidationServiceRole;
+import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
@@ -73,7 +74,7 @@ public class CelementsWebScriptService implements ScriptService {
   IWebUtilsService webUtilsService;
 
   @Requirement
-  IFormValidationRole formValidationService;
+  IFormValidationServiceRole formValidationService;
 
   @Requirement
   Execution execution;
@@ -413,7 +414,7 @@ public class CelementsWebScriptService implements ScriptService {
    * @return empty map means the validation has been successful. Otherwise validation
    *          messages are returned for invalid fields.
    */
-  public Map<String, Set<String>> validateRequest() {
+  public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
     return formValidationService.validateRequest();
   }
 

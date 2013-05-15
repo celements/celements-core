@@ -27,6 +27,12 @@ IFieldValidationRuleRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       XClassRegexRule.class);
 
+  private static final String PROPERTY_FIELD_VAL_REGEX = "validationRegExp";
+  private static final String PROPERTY_FIELD_VAL_MSG = "validationMessage";
+
+  private static final MapHandler<String, ValidationType, String> mapHandler =
+      new MapHandler<String, ValidationType, String>();
+
   @Requirement
   private IWebUtilsService webUtils;
 
@@ -37,51 +43,39 @@ IFieldValidationRuleRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  public Map<String, Set<String>> validateRequest(Map<RequestParameter,
-      String[]> requestMap) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("validateRequest() called with requestMap: " + requestMap);
-    }
-    Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
+  public Map<String, Map<ValidationType, Set<String>>> validateRequest(
+      Map<RequestParameter, String[]> requestMap) {
+    Map<String, Map<ValidationType, Set<String>>> ret =
+        new HashMap<String, Map<ValidationType, Set<String>>>();
     for (RequestParameter param : requestMap.keySet()) {
-      Set<String> resultSet = new HashSet<String>();
       for (String value : requestMap.get(param)) {
-        resultSet.addAll(validateField(param.getClassName(), param.getFieldName(), value));
-      }
-      if (!resultSet.isEmpty()) {
-        validationMap.put(param.getParameterName(), resultSet);
+        mapHandler.put(param.getParameterName(), validateField(param.getClassName(),
+            param.getFieldName(), value), ret);
       }
     }
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Returning validation map: " + validationMap);
+      LOGGER.trace("Returning validation map: " + ret);
     }
-    return validationMap;
+    return ret;
   }
 
-  public Set<String> validateField(String className, String fieldName, String value) {
-    Set<String> validationSet = new HashSet<String>();
+  public Map<ValidationType, Set<String>> validateField(String className,
+      String fieldName, String value) {
+    Map<ValidationType, Set<String>> ret = null;
     BaseClass bclass = getBaseClass(className);
     if(bclass != null) {
       PropertyClass propertyClass = (PropertyClass) bclass.getField(fieldName);
-      String regex = getFieldFromProperty(propertyClass, "validationRegExp");
-      String validationMsg = getFieldFromProperty(propertyClass, "validationMessage");
-      try {
-        if (!regex.isEmpty() && !matchesRegex(regex, value)) {
-          validationSet.add(validationMsg);
-          LOGGER.trace("For field '" + className + "_" + fieldName + "', value '" + value
-              + "' didn't match regex '" + regex + "'. validationMsg: " + validationMsg);
-        }
-      } catch (MalformedPerl5PatternException exc) {
-        LOGGER.error("Failed to execute validation regex for field '" + fieldName
-            + "' in class '" + className + "'", exc);
-        validationSet.add(validationMsg);
+      String regex = getFieldFromProperty(propertyClass, PROPERTY_FIELD_VAL_REGEX);
+      String validationMsg = getFieldFromProperty(propertyClass, PROPERTY_FIELD_VAL_MSG);
+      if (!regex.isEmpty() && !matchesRegex(regex, value)) {
+        ret = getStringAsMap(validationMsg);
       }
     }
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Returning validation set for field '" + className + "_" + fieldName
-          + "' and value '" + value + "': " + validationSet);
+      LOGGER.trace("Returning validation map for field '" + className + "_" + fieldName
+          + "' and value '" + value + "': " + ret);
     }
-    return validationSet;
+    return ret;
   }
 
   private BaseClass getBaseClass(String className) {
@@ -104,12 +98,24 @@ IFieldValidationRuleRole {
     return field;
   }
 
-  private boolean matchesRegex(String regex, String str)
-      throws MalformedPerl5PatternException {
+  private boolean matchesRegex(String regex, String str) {
     if ((regex != null) && !regex.trim().equals("")) {
-      return getContext().getUtil().match(regex, str);
+      try {
+        return getContext().getUtil().match(regex, str);
+      } catch (MalformedPerl5PatternException exc) {
+        LOGGER.error("Failed to execute validation regex for string '" + str
+            + "' and regex '" + regex + "'", exc);
+      }
     }
     return false;
+  }
+
+  private Map<ValidationType, Set<String>> getStringAsMap(String str) {
+    Map<ValidationType, Set<String>> map = new HashMap<ValidationType, Set<String>>();
+    Set<String> validationSet = new HashSet<String>();
+    validationSet.add(str);
+    map.put(ValidationType.ERROR, validationSet);
+    return map;
   }
 
 }

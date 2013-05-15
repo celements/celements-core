@@ -53,6 +53,7 @@ import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.RTEConfig;
 import com.celements.sajson.Builder;
+import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
@@ -986,15 +987,16 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> validateRequest() {
-    Map<String, String> validateMap = new HashMap<String, String>();
-    Map<String, Set<String>> validateSetMap = getService().validateRequest();
-    for (String key : validateSetMap.keySet()) {
-      Iterator<String> iter = validateSetMap.get(key).iterator();
+    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, Map<ValidationType, Set<String>>> validateMap = getService(
+        ).validateRequest();
+    for (String key : validateMap.keySet()) {
+      Iterator<String> iter = validateMap.get(key).get(ValidationType.ERROR).iterator();
       if (iter.hasNext()) {
-        validateMap.put(key, iter.next());
+        ret.put(key, iter.next());
       }
     }
-    return validateMap;
+    return ret;
   }
 
   private PageLayoutCommand getPageLayoutCmd() {
