@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin;
+package com.celements.rteConfig;
 
 import static junit.framework.Assert.*;
 import static org.easymock.EasyMock.*;
@@ -45,7 +45,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     context = getContext();
     wiki = createMock(XWiki.class);
     context.setWiki(wiki);
-    config = RTEConfig.getInstance(context);
+    config = new RTEConfig();
     config.injectPageTypeInstance(pagetype);
   }
 
@@ -57,7 +57,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument();
     doc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
     context.setDoc(doc);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
   }
   
   @Test
@@ -82,7 +82,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     expect(wiki.exists(eq(pageTypeName), same(context))).andReturn(true);
     expect(pagetype.getPageTypeDocFN(same(doc), same(context))).andReturn(pageTypeName);
     replay(wiki, pagetype);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
     verify(wiki, pagetype);
   }
 
@@ -100,7 +100,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(
         prefDoc).once();
     replay(wiki);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
     verify(wiki);
   }
   
@@ -130,7 +130,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getDocument(eq("TestSpace.WebPreferences"), same(context))
         ).andReturn(prefDoc).once();
     replay(wiki, pagetype);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
     verify(wiki, pagetype);
   }
   
@@ -148,7 +148,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getDocument(eq("Test.WebPreferences"), same(context))).andReturn(
         prefDoc).once();
     replay(wiki);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
     verify(wiki);
   }
   
@@ -168,7 +168,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     prefDoc.addObject(RTEConfig.PROP_CLASS_NAME, obj);
     expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(prefDoc).once();
     replay(wiki);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
     verify(wiki);
   }
   
@@ -188,7 +188,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     prefDoc.addObject("XWiki.XWikiPreferences", obj);
     expect(wiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(prefDoc).once();
     replay(wiki);
-    assertEquals(objValue, config.getRTEConfigField("styles", context));
+    assertEquals(objValue, config.getRTEConfigField("styles"));
     verify(wiki);
   }
   
@@ -206,7 +206,7 @@ public class RTEConfigTest extends AbstractBridgedComponentTestCase {
     confDoc.addObject(RTEConfig.PROP_CLASS_NAME, confObj);
     expect(wiki.getDocument(eq(confDocName), same(context))).andReturn(confDoc).once();
     replay(wiki);
-    assertEquals("testvalue", config.getPreferenceFromConfigObject("testprop", doc, context));
+    assertEquals("testvalue", config.getPreferenceFromConfigObject("testprop", doc));
     verify(wiki);
   }
   

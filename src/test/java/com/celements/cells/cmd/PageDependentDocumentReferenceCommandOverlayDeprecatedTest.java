@@ -25,7 +25,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class PageDependentDocumentReferenceCommandOverlayTest
+@Deprecated
+public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest
     extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
@@ -71,7 +72,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   @Test
   public void testIsInheritable() throws Exception {
     replayDefault();
-    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -79,7 +81,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   public void testIsInheritable_noValue() throws Exception {
     setDependentDocSpace("leftColumn", null);
     replayDefault();
-    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -87,7 +90,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   public void testIsInheritable_zero() throws Exception {
     setDependentDocSpace("leftColumn", 0);
     replayDefault();
-    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertFalse("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -95,7 +99,8 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   public void testIsInheritable_one() throws Exception {
     setDependentDocSpace("leftColumn", 1);
     replayDefault();
-    assertTrue("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef));
+    assertTrue("default expected false", pageDepDocRefCmd.isInheritable(cellDocRef,
+        context));
     verifyDefault();
   }
 
@@ -350,68 +355,6 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   }
 
   @Test
-  public void testGetDependentDocumentReference_defaultContent_overwrite_layout(
-      ) throws Exception {
-    setDependentDocSpace("leftColumn", 1);
-    DocumentReference pdcWikiDefaultDocRef = new DocumentReference(
-        context.getDatabase(),
-        PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn",
-        PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
-    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "MyDoc");
-    XWikiDocument myCurrDoc = new XWikiDocument(myDocRef);
-    context.setDoc(myCurrDoc);
-    DocumentReference parentDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace", "MyParentDoc");
-    List<DocumentReference> docParentList = Arrays.asList(myDocRef, parentDocRef);
-    expect(webUtilsMock.getDocumentParentsList(eq(myDocRef), eq(true))
-        ).andReturn(docParentList);
-    DocumentReference spaceDepDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace_leftColumn",
-        PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
-    expect(xwiki.exists(eq("mySpace_leftColumn.MyDoc"), same(context))).andReturn(
-        false).atLeastOnce();
-    String leftParentFullName = "mySpace_leftColumn.MyParentDoc";
-    expect(xwiki.exists(eq(leftParentFullName), same(context))).andReturn(
-        false).atLeastOnce();
-    String mySpaceLeftColumnDefaultFN = "mySpace_leftColumn."
-        + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refLocalSerializerMock.serialize(eq(spaceDepDocRef))).andReturn(
-        mySpaceLeftColumnDefaultFN);
-    expect(xwiki.exists(eq(mySpaceLeftColumnDefaultFN), same(context))).andReturn(
-        false).atLeastOnce();
-    String wikiLeftColumnDefaultFN =
-        PageDependentDocumentReferenceCommand.PDC_WIKIDEFAULT_SPACE_NAME + "_leftColumn"
-            + "." + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refLocalSerializerMock.serialize(eq(pdcWikiDefaultDocRef))).andReturn(
-        wikiLeftColumnDefaultFN);
-    expect(xwiki.exists(eq(wikiLeftColumnDefaultFN), same(context))).andReturn(
-        false).atLeastOnce();
-    String overwriteLayoutSpaceName = "myOverwriteLayout";
-    DocumentReference expectedLayoutDefaultRef = new DocumentReference(
-        context.getDatabase(), overwriteLayoutSpaceName, "leftColumn-"
-            + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME);
-    SpaceReference overwriteLayoutRef = new SpaceReference(overwriteLayoutSpaceName,
-        new WikiReference(context.getDatabase()));
-    pageDepDocRefCmd.setCurrentLayoutRef(overwriteLayoutRef);
-    String layoutDefaultFN = overwriteLayoutSpaceName + "." + "leftColumn-"
-        + PageDependentDocumentReferenceCommand.PDC_DEFAULT_CONTENT_NAME;
-    expect(refLocalSerializerMock.serialize(eq(expectedLayoutDefaultRef))).andReturn(
-        layoutDefaultFN);
-    expect(xwiki.exists(eq(layoutDefaultFN), same(context))).andReturn(true
-        ).atLeastOnce();
-    XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
-    layoutDefaultDocument.setContent("no empty content");
-    expect(xwiki.getDocument(eq(layoutDefaultFN), same(context))).andReturn(
-        layoutDefaultDocument);
-    replayDefault();
-    DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
-        cellDocRef);
-    assertEquals(expectedLayoutDefaultRef, depDocRef);
-    verifyDefault();
-  }
-
-  @Test
   public void testGetDependentDocumentReference_defaultContent_centrallayout(
       ) throws Exception {
     setDependentDocSpace("leftColumn", 1);
@@ -484,8 +427,9 @@ public class PageDependentDocumentReferenceCommandOverlayTest
       cellConfig.setIntValue(
           PageDependentDocumentReferenceCommand.PROPNAME_IS_INHERITABLE, isInheritable);
     }
-    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef());
-    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(),
+    cellConfig.setDocumentReference(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(
+        context));
+    cellDoc.setXObjects(pageDepDocRefCmd.getPageDepCellConfigClassDocRef(context),
         Arrays.asList(cellConfig));
   }
 

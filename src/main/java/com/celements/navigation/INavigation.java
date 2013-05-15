@@ -99,6 +99,10 @@ public interface INavigation {
 
   public String getCMcssClass();
 
+  public void setEmptyDictKeySuffix(String emptyDictKeySuffix);
+
+  public String getEmptyDictKey();
+
   public String getNextMenuItemFullName(String name, XWikiContext context);
 
   public String getUniqueId(DocumentReference docRef);

@@ -49,6 +49,7 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
   private XWiki mockWiki;
   private XWikiRequest request;
   private PageType pageType;
+  private DocumentReference testPageTypeDocRef;
 
   @Before
   public void setUp_PageTypeTest() throws Exception {
@@ -57,7 +58,34 @@ public class PageTypeTest extends AbstractBridgedComponentTestCase {
     context.setWiki(mockWiki);
     request = createMock(XWikiRequest.class);
     context.setRequest(request);
-    pageType = new PageType(TEST_PAGE_TYPE_FN);
+    testPageTypeDocRef = new DocumentReference(context.getDatabase(),
+        TEST_PAGE_TYPE_SPACE, TEST_PAGE_TYPE_DOC);
+    pageType = new PageType(testPageTypeDocRef);
+  }
+
+  @Test
+  @Deprecated
+  public void testDeprecatedConstructor() {
+    PageType testPageType = new PageType(TEST_PAGE_TYPE_FN);
+    replayAll();
+    assertEquals(TEST_PAGE_TYPE_FN, testPageType.getFullName());
+    assertEquals(testPageTypeDocRef, testPageType.getDocumentReference());
+    verifyAll();
+  }
+
+  @Test
+  @Deprecated
+  public void testGetFullName() {
+    replayAll();
+    assertEquals(TEST_PAGE_TYPE_FN, pageType.getFullName());
+    verifyAll();
+  }
+
+  @Test
+  public void testGetDocumentReference() {
+    replayAll();
+    assertEquals(testPageTypeDocRef, pageType.getDocumentReference());
+    verifyAll();
   }
 
   @Test

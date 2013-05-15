@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin.cmd;
+package com.celements.emptycheck.internal;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -40,12 +40,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Deprecated
-public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
+public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private XWiki xwiki;
-  private EmptyCheckCommand emptyChildCheckCmd;
+  private NextNonEmptyChildrenCommand nextNonEmptChildCmd;
   private ITreeNodeService treeNodeService;
   private ComponentDescriptor<ITreeNodeService> treeNodeServiceDesc;
   private ITreeNodeService savedTreeNodeServiceDesc;
@@ -54,13 +53,14 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   public void setUp_EmptyCheckCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    emptyChildCheckCmd = new EmptyCheckCommand();
+    nextNonEmptChildCmd = new NextNonEmptyChildrenCommand();
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
     savedTreeNodeServiceDesc = getComponentManager().lookup(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
+    context.setLanguage("de");
   }
 
   @After
@@ -71,84 +71,6 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_empty() {
-    assertTrue(emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("")));
-  }
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp;</p>")));
-  }
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Break() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p><br /></p>")));
-  }
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_manualizer_example() {
-    assertTrue("Paragraph with span surrounding break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-        "<p><span style=\"line-height: normal; font-size: 10px;\"><br /></span></p>")));
-  }
-  
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_2Space1Break() {
-    assertTrue("Lonly non breaking spaces (2) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp; <br /></p>")));
-  }
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_3Space1Break() {
-    assertTrue("Lonly non breaking spaces (3) with break should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;&nbsp;&nbsp;<br /></p>")));
-  }
-
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_1Space2Break() {
-    assertTrue("Lonly non breaking spaces with break (2) should be"
-        + " treated as empty", emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>&nbsp;<br /><br /></p>")));
-  }
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_cel2_standard_oldRTE_REGULAR_TEXT() {
-    assertFalse("Regular Text (2) should not be treated as empty.",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc(
-            "<p>adsf  &nbsp; <br />sadf</p>")));
-  }
-
-  @Test
-  @Deprecated
-  public void testIsEmptyRTEDocument_nbsp() {
-    assertTrue("Lonly non breaking spaces should be treated as empty",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("&nbsp;")));
-    assertTrue("Non breaking spaces in a paragraph should be treated as empty",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>&nbsp;</p>")));
-    assertTrue("Non breaking spaces in a paragraph with white spaces"
-        + " should be treated as empty",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>  &nbsp; </p>")));
-    assertFalse("Regular Text should not be treated as empty.",
-        emptyChildCheckCmd.isEmptyRTEDocument(getTestDoc("<p>adsf  &nbsp; </p>")));
-  }
-
-  @Test
-  @Deprecated
   public void testGetNextNonEmptyChildren_notEmpty() throws Exception {
     DocumentReference documentRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyDoc");
@@ -159,29 +81,26 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
-    assertEquals(documentRef, emptyChildCheckCmd.getNextNonEmptyChildren(documentRef));
+    assertEquals(documentRef, nextNonEmptChildCmd.getNextNonEmptyChildren(documentRef));
     verifyDefault();
   }
 
   @Test
-  @Deprecated
   public void testGetNextNonEmptyChildren_empty_but_noChildren() throws Exception {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
-    List<TreeNode> noChildrenList = Collections.emptyList();
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
-        ).andReturn(noChildrenList).once();
+        ).andReturn(Collections.<TreeNode>emptyList()).once();
     expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
-    assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
+    assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
   }
 
   @Test
-  @Deprecated
   public void testGetNextNonEmptyChildren_empty_with_nonEmptyChildren() throws Exception {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
         "mySpace", "MyEmptyDoc");
@@ -202,13 +121,51 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
-    assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
     verifyDefault();
   }
 
   @Test
-  @Deprecated
+  public void testGetNextNonEmptyChildren_empty_with_nonEmptyChildren_notFirstChildren(
+      ) throws Exception {
+    context.setLanguage("fr");
+    DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "MyEmptyDoc");
+    createEmptyDoc(emptyDocRef);
+    DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myChild2");
+    DocumentReference emptyChildDocRef = new DocumentReference(context.getDatabase(),
+        "mySpace", "myChild");
+    List<TreeNode> childrenList = Arrays.asList(new TreeNode(emptyChildDocRef,
+        "mySpace.MyEmptyDoc", 0), new TreeNode(expectedChildDocRef, "mySpace.MyEmptyDoc",
+            1));
+    expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
+        ).andReturn(childrenList).once();
+    expect(treeNodeService.getSubNodesForParent(eq(emptyChildDocRef), eq(""))
+        ).andReturn(Collections.<TreeNode>emptyList()).once();
+    XWikiDocument childEmptyXdoc = createMockAndAddToDefault(XWikiDocument.class);
+    expect(childEmptyXdoc.getContent()).andReturn("").once();
+    expect(xwiki.getDocument(eq(emptyChildDocRef), same(context))).andReturn(
+        childEmptyXdoc).times(2);
+    XWikiDocument childEmptyXTdoc = new XWikiDocument(emptyChildDocRef);
+    childEmptyXTdoc.setContent("");
+    expect(childEmptyXdoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(
+        childEmptyXTdoc).once();
+    XWikiDocument childXdoc = new XWikiDocument(expectedChildDocRef);
+    childXdoc.setContent("non empty child content");
+    expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc
+        ).once();
+    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+            "default").anyTimes();
+    replayDefault();
+    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
+        emptyDocRef));
+    verifyDefault();
+  }
+
+  @Test
   public void testGetNextNonEmptyChildren_empty_recurse_on_EmptyChildren(
       ) throws Exception {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
@@ -239,13 +196,12 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
-    assertEquals(expectedChildDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(
+    assertEquals(expectedChildDocRef, nextNonEmptChildCmd.getNextNonEmptyChildren(
         emptyDocRef));
     verifyDefault();
   }
 
   @Test
-  @Deprecated
   public void testGetNextNonEmptyChildren_empty_recurse_on_EmptyChildren_reconize_loop(
       ) throws Exception {
     DocumentReference emptyDocRef = new DocumentReference(context.getDatabase(),
@@ -285,7 +241,7 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
-    assertEquals(emptyDocRef, emptyChildCheckCmd.getNextNonEmptyChildren(emptyDocRef));
+    assertNull(nextNonEmptChildCmd.getNextNonEmptyChildren(emptyDocRef));
     verifyDefault();
   }
 
@@ -311,13 +267,6 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(emptyDocRef), same(context))).andReturn(myXdoc
         ).atLeastOnce();
     return myXdoc;
-  }
-
-  private XWikiDocument getTestDoc(String inStr) {
-    DocumentReference testDocRef = new DocumentReference("xwiki", "testSpace", "testDoc");
-    XWikiDocument doc = new XWikiDocument(testDocRef );
-    doc.setContent(inStr);
-    return doc;
   }
 
 }

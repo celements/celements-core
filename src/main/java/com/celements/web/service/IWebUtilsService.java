@@ -144,4 +144,11 @@ public interface IWebUtilsService {
   
   public Map<String, String[]> getRequestParameterMap();
 
+  public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
+
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException;
+
+  public void deleteAllDocuments(XWikiDocument doc, boolean totrash
+      ) throws XWikiException;
+
 }

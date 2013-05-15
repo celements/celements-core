@@ -1,7 +1,5 @@
 package com.celements.web.service;
 
-import groovy.lang.Singleton;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +7,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
@@ -21,8 +20,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.pagetype.PageTypeApi;
+import com.celements.pagetype.PageType;
+import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +62,12 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
   @Requirement
   IWebUtilsService webUtilsService;
+
+  @Requirement
+  IPageTypeResolverRole pageTypeResolver;
+
+  @Requirement
+  IPageTypeRole pageTypeService;
 
   private XWikiContext getContext() {
     return (XWikiContext)getExecContext().getProperty("xwikicontext");
@@ -126,8 +134,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   void initCelementsVelocity(VelocityContext vcontext) {
     if ((vcontext != null) && (getContext().getWiki() != null)) {
       if (!vcontext.containsKey(getVelocityName())) {
-        vcontext.put(getVelocityName(), getContext().getWiki().getPluginApi(getVelocityName(),
-            getContext()));
+        vcontext.put(getVelocityName(), getContext().getWiki().getPluginApi(
+            getVelocityName(), getContext()));
       }
       if (!vcontext.containsKey("default_language")) {
         vcontext.put("default_language", webUtilsService.getDefaultLanguage());
@@ -188,8 +196,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         }
       }
       if (!vcontext.containsKey("page_type")) {
-        vcontext.put("page_type", new PageTypeCommand().getPageType(getContext().getDoc(),
-            getContext()));
+        PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
+        if (pageTypeRef != null) {
+          vcontext.put("page_type", pageTypeRef.getConfigName());
+        }
       }
       if (!vcontext.containsKey("user")) {
         vcontext.put("user", getContext().getUser());
@@ -289,8 +299,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     }
   }
 
-  private boolean showPanelByConfigName(XWikiContext context,
-      String configName) {
+  boolean showPanelByConfigName(XWikiContext context, String configName) {
     if (isPageShowPanelOverwrite(configName, context.getDoc())) {
       return (1 == getPagePanelObj(configName, context.getDoc()
           ).getIntValue("show_panels"));
@@ -323,12 +332,11 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private XWikiDocument getPageTypeDoc(XWikiContext context) {
     if(context.getDoc() != null) {
       try {
-        Document templateDocument = new PageTypeApi(
-        context.getDoc().getFullName(), context).getTemplateDocument();
-        XWikiDocument pageTypeDoc = context.getWiki().getDocument(
-            templateDocument.getFullName(), context);
-        LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc + " , "
-            + templateDocument);
+        XWikiDocument pageTypeDoc = new PageType(new DocumentReference(
+            context.getDatabase(), "PageTypes",
+            pageTypeResolver.getPageTypeRefForCurrentDoc().getConfigName())
+            ).getTemplateDocument(getContext());
+        LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
         return pageTypeDoc;
       } catch (XWikiException exp) {
         LOGGER.error("Failed to getPageTypeDoc.", exp);
@@ -656,6 +664,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   void fixTdocForInvalidLanguage(VelocityContext vcontext) {
+    //FIXME should be executed only once per vcontext right?
     XWikiDocument doc = getContext().getDoc();
     if ((doc != null) && (vcontext != null)) {
       Document vTdocBefore = (Document) vcontext.get("tdoc");

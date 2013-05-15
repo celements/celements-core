@@ -105,6 +105,8 @@ public class Navigation implements INavigation {
 
   private String mainUlCssClasses;
 
+  private String emptyDictKeySuffix;
+
   private String dataType;
 
   private IPresentationTypeRole presentationType = null;
@@ -391,8 +393,7 @@ public class Navigation implements INavigation {
         openMenuItemOut(outStream, null, true, true, false, 1);
         outStream.append("<span " + addUniqueElementId(null)
             + " " + addCssClasses(null, true, true, true, false, 1)
-            + ">" + getWebUtilsService().getAdminMessageTool().get(getPresentationType(
-                ).getEmptyDictionaryKey())
+            + ">" + getWebUtilsService().getAdminMessageTool().get(getEmptyDictKey())
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
@@ -402,6 +403,21 @@ public class Navigation implements INavigation {
                 numMoreLevels) + "], hasEdit [" + hasedit() + "].");
       }
     }
+  }
+
+  public String getEmptyDictKey() {
+    return getPresentationType().getEmptyDictionaryKey() + getEmptyDictKeySuffix();
+  }
+
+  public void setEmptyDictKeySuffix(String emptyDictKeySuffix) {
+    this.emptyDictKeySuffix = emptyDictKeySuffix;
+  }
+
+  private String getEmptyDictKeySuffix() {
+    if (emptyDictKeySuffix != null) {
+      return emptyDictKeySuffix;
+    }
+    return "";
   }
 
   private int getCurrentLevel(int numMoreLevels) {

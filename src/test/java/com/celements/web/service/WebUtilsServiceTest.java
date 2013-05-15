@@ -1062,6 +1062,85 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals("3", arr2[1]);
   }
 
+  @Test
+  public void testGetInheritedTemplatedPath_null() {
+    replayAll();
+    assertNull(webUtilsService.getInheritedTemplatedPath(null));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetInheritedTemplatedPath_local_exists() {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    replayAll();
+    assertEquals("Templates.myView", webUtilsService.getInheritedTemplatedPath(
+        localTemplateRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetInheritedTemplatedPath_central_exists() {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    replayAll();
+    assertEquals("celements2web:Templates.myView",
+        webUtilsService.getInheritedTemplatedPath(localTemplateRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetInheritedTemplatedPath_inital_central_exists() {
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    replayAll();
+    assertEquals("celements2web:Templates.myView",
+        webUtilsService.getInheritedTemplatedPath(centralTemplateRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetInheritedTemplatedPath_inital_central_notExists() {
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    replayAll();
+    assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
+        centralTemplateRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetInheritedTemplatedPath_disk_no_local_no_central() {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    replayAll();
+    assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
+        localTemplateRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testGetInheritedTemplatedPath_disk_inital_central() {
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    replayAll();
+    assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
+        centralTemplateRef));
+    verifyAll();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/

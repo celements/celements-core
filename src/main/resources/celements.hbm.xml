@@ -112,6 +112,9 @@
   <property name="lang" type="string">
     <column name="CMT_LANGUAGE" />
   </property>
+  <property name="source" type="string">
+    <column name="CMT_SOURCE" />
+  </property>
   </class>
   
   <class entity-name="Classes.ImageMapConfigClass" table="cel_img_map">

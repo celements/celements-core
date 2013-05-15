@@ -37,7 +37,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class RenameCommandTest  extends AbstractBridgedComponentTestCase {
+public class RenameCommandTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private XWiki xwiki;

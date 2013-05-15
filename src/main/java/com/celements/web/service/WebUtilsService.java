@@ -743,4 +743,57 @@ public class WebUtilsService implements IWebUtilsService {
     }
   }
 
+  public String getInheritedTemplatedPath(DocumentReference localTemplateRef) {
+    if (localTemplateRef != null) {
+      String templatePath = getRefDefaultSerializer().serialize(localTemplateRef);
+      if (!getContext().getWiki().exists(localTemplateRef, getContext())) {
+        if (!"celements2web".equals(localTemplateRef.getLastSpaceReference().getParent(
+          ).getName())
+          && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef),
+              getContext())) {
+          templatePath = "celements2web:" + templatePath;
+        } else {
+          templatePath = ":" + templatePath.replaceAll("celements2web:", "");
+        }
+      }
+      return templatePath.replaceAll(getContext().getDatabase() + ":", "");
+    }
+    return null;
+  }
+
+  private DocumentReference getCentralTemplateRef(DocumentReference localTemplateRef) {
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        localTemplateRef.getLastSpaceReference().getName(), localTemplateRef.getName());
+    return centralTemplateRef;
+  }
+
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
+    /** deleteDocument in XWiki does NOT set context and store database to doc database
+     * Thus deleting the doc fails if it is not in the current context database. Hence we
+     * need to fix the context database before deleting.
+     */
+    String dbBefore = getContext().getDatabase();
+    try {
+      getContext().setDatabase(doc.getDocumentReference().getLastSpaceReference().getParent(
+          ).getName());
+      LOGGER.debug("deleteDocument: doc [" + getRefDefaultSerializer().serialize(
+          doc.getDocumentReference()) + "," + doc.getLanguage() + "] totrash [" + totrash
+          + "] dbBefore [" + dbBefore + "] db now [" + getContext().getDatabase() + "].");
+      getContext().getWiki().deleteDocument(doc, totrash, getContext());
+    } finally {
+      getContext().setDatabase(dbBefore);
+    }
+  }
+
+  public void deleteAllDocuments(XWikiDocument doc, boolean totrash
+      ) throws XWikiException {
+    // Delete all documents
+    for (String lang : doc.getTranslationList(getContext())) {
+      XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
+      deleteDocument(tdoc, totrash);
+    }
+
+    deleteDocument(doc, totrash);
+  }
+
 }

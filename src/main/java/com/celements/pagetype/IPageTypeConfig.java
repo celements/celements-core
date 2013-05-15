@@ -21,6 +21,9 @@ package com.celements.pagetype;
 
 import java.util.List;
 
+/**
+ * Implementations of IPageTypeConfig may be exposed to non privileged code (e.g. scripts)
+ */
 public interface IPageTypeConfig {
 
   public String getName();
