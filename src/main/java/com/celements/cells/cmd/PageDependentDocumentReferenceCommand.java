@@ -270,23 +270,27 @@ public class PageDependentDocumentReferenceCommand {
 
   public SpaceReference getDependentDocumentSpaceRef(DocumentReference docRef,
       DocumentReference cellDocRef) {
-    SpaceReference spaceName;
+    SpaceReference spaceRef;
     try {
       if (!"".equals(getDepCellSpace(cellDocRef))) {
-        spaceName = (SpaceReference) getCurrentDocumentSpaceRef(docRef).clone();
-        spaceName.setName(spaceName.getName() + "_" + getDepCellSpace(cellDocRef));
+        SpaceReference curSpaceRef = (SpaceReference) getCurrentDocumentSpaceRef(docRef);
+        /* IMPORTANT: do not use .clone() on any reference it will not be available
+         * on unstable branch
+         */
+        spaceRef = new SpaceReference(curSpaceRef.getName() + "_" + getDepCellSpace(
+            cellDocRef), (WikiReference)curSpaceRef.getParent());
       } else {
         LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
             + " check with isCurrentDocument method before calling"
             + " getDependentDocumentSpace!");
-        spaceName = getCurrentDocumentSpaceRef(docRef);
+        spaceRef = getCurrentDocumentSpaceRef(docRef);
       }
     } catch (XWikiException exp) {
-      spaceName = getCurrentDocumentSpaceRef(docRef);
+      spaceRef = getCurrentDocumentSpaceRef(docRef);
       LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from ["
-          + cellDocRef + "] assuming" + " [" + spaceName + "] for document space.", exp);
+          + cellDocRef + "] assuming" + " [" + spaceRef + "] for document space.", exp);
     }
-    return spaceName;
+    return spaceRef;
   }
 
   public SpaceReference getDependentWikiSpaceRef(DocumentReference docRef,
