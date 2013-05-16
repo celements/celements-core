@@ -52,7 +52,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     webUtilsServiceDesc = getComponentManager().getComponentDescriptor(
         IWebUtilsService.class, "default");
-    savedWebUtilsService = getComponentManager().lookup(IWebUtilsService.class);
+    savedWebUtilsService = getComponentManager().getInstance(IWebUtilsService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(webUtilsServiceDesc, webUtilsMock);
     refLocalSerializerMock = createMockAndAddToDefault(EntityReferenceSerializer.class);

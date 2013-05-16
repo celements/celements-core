@@ -57,7 +57,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
-    savedTreeNodeServiceDesc = getComponentManager().lookup(ITreeNodeService.class);
+    savedTreeNodeServiceDesc = getComponentManager().getInstance(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
     context.setLanguage("de");

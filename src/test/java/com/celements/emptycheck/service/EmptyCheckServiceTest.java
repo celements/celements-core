@@ -34,8 +34,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.emptycheck.service.EmptyCheckService;
-import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;
@@ -56,12 +54,12 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
   public void setUp_EmptyCheckCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    emptyCheckService = (EmptyCheckService) getComponentManager().lookup(
+    emptyCheckService = (EmptyCheckService) getComponentManager().getInstance(
         IEmptyCheckRole.class);
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
-    savedTreeNodeService = getComponentManager().lookup(ITreeNodeService.class);
+    savedTreeNodeService = getComponentManager().getInstance(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
   }

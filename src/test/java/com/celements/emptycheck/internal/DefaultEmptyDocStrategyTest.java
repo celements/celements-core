@@ -23,7 +23,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void setUp_DefaultEmptyDocStrategyTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    defEmptyDocStrategy = (DefaultEmptyDocStrategy) getComponentManager().lookup(
+    defEmptyDocStrategy = (DefaultEmptyDocStrategy) getComponentManager().getInstance(
         IDefaultEmptyDocStrategyRole.class, "default");
   }
 

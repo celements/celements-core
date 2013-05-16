@@ -51,7 +51,7 @@ public class PageDependentDocumentReferenceCommandTest
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
     defaultValueProviderDesc = getComponentManager().getComponentDescriptor(
         EntityReferenceValueProvider.class, "default");
-    savedDefaultValueProviderService = getComponentManager().lookup(
+    savedDefaultValueProviderService = getComponentManager().getInstance(
         EntityReferenceValueProvider.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     defValueProviderMock = createMockAndAddToDefault(EntityReferenceValueProvider.class);
