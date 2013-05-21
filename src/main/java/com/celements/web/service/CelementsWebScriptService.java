@@ -381,9 +381,14 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public List<String> getDeletedDocuments() {
+    return getDeletedDocuments("", true);
+  }
+
+  public List<String> getDeletedDocuments(String orderby, boolean hideOverwritten) {
     List<String> resultList = Collections.emptyList();
     try {
-      Query query = queryManager.createQuery(getDeletedDocsHql(), Query.HQL);
+      Query query = queryManager.createQuery(getDeletedDocsHql(orderby, hideOverwritten),
+          Query.HQL);
       resultList = query.execute();
     } catch (QueryException queryExp) {
       LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
@@ -391,10 +396,17 @@ public class CelementsWebScriptService implements ScriptService {
     return resultList;
   }
 
-  private String getDeletedDocsHql() {
-    return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
-        + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
-        + " order by 1 asc";
+  private String getDeletedDocsHql(String orderby, boolean hideOverwritten) {
+    String deletedDocsHql = "select distinct ddoc.fullName"
+        + " from XWikiDeletedDocument as ddoc";
+    if (hideOverwritten) {
+      deletedDocsHql += " where ddoc.fullName not in (select doc.fullName from"
+          + " XWikiDocument as doc)";
+    }
+    if (!"".equals(orderby)) {
+      deletedDocsHql += " order by " + orderby;
+    }
+    return deletedDocsHql;
   }
 
   public double getWaitDaysBeforeDelete() {
