@@ -70,10 +70,7 @@ public class DocFormCommand {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     String template = context.getRequest().getParameter("template");
     if(doc.isNew() && !"".equals(template.trim())) {
-      String templSpace = template.split("\\.")[0];
-      String templName = template.split("\\.")[1];
-      DocumentReference templRef = new DocumentReference(context.getDatabase(),
-          templSpace, templName);
+      DocumentReference templRef = getWebUtilsService().resolveDocumentReference(template);
       try {
         doc.readFromTemplate(templRef, context);
       } catch (XWikiException e) {
