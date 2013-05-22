@@ -269,7 +269,12 @@ public class PageLayoutCommand {
   private void setRenderLayoutInVelocityContext(SpaceReference layoutSpaceRef) {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     if (layoutSpaceRef != null) {
-      vcontext.put(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, layoutSpaceRef.clone());
+      /* IMPORTANT: do not use .clone() on any reference it will not be available
+       * on unstable branch
+       */
+      SpaceReference copyOfLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
+          (WikiReference)layoutSpaceRef.getParent());
+      vcontext.put(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, copyOfLayoutSpaceRef);
     } else {
       vcontext.remove(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY);
     }
