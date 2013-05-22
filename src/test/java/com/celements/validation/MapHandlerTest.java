@@ -1,6 +1,8 @@
 package com.celements.validation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +19,26 @@ public class MapHandlerTest {
   @Before
   public void setUp_MapHandlerTest() throws Exception {
     mapHandler = new MapHandler<String, Integer, String>();
+  }
+
+  @Test
+  public void testPut_Value() {
+    int key = 0;
+    Map<Integer, Set<String>> toMap = new HashMap<Integer, Set<String>>();
+    Set<String> set = new HashSet<String>();
+    set.add("old");
+    toMap.put(key, set);
+
+    mapHandler.put(key, "new1", toMap);
+    mapHandler.put(key, "new2", toMap);
+
+    assertEquals(1, toMap.size());
+    set = toMap.get(key);
+    assertNotNull(set);
+    assertEquals(3, set.size());
+    assertTrue(set.contains("old"));
+    assertTrue(set.contains("new1"));
+    assertTrue(set.contains("new2"));
   }
 
   @Test
@@ -69,6 +91,39 @@ public class MapHandlerTest {
     assertTrue(set.contains("new1"));
     set = toMap.get(key + 1);
     assertNotNull(set);
+    assertEquals(1, set.size());
+    assertTrue(set.contains("new2"));
+  }
+
+  @Test
+  public void testPut_Value_2() {
+    String key1 = "asdf";
+    String key2 = "fdsa";
+    Map<String, Map<Integer, Set<String>>> toMap =
+        new HashMap<String, Map<Integer,Set<String>>>();
+    Map<Integer, Set<String>> innerMap = new HashMap<Integer, Set<String>>();
+    Set<String> set = new HashSet<String>();
+    set.add("old");
+    innerMap.put(0, set);
+    toMap.put(key1, innerMap);
+
+    mapHandler.put(key1, 1, "new1", toMap);
+    mapHandler.put(key2, 0, "new2", toMap);
+
+    assertEquals(2, toMap.size());
+    innerMap = toMap.get(key1);
+    assertNotNull(innerMap);
+    assertEquals(2, innerMap.size());
+    set = innerMap.get(0);
+    assertEquals(1, set.size());
+    assertTrue(set.contains("old"));
+    set = innerMap.get(1);
+    assertEquals(1, set.size());
+    assertTrue(set.contains("new1"));
+    innerMap = toMap.get(key2);
+    assertNotNull(innerMap);
+    assertEquals(1, innerMap.size());
+    set = innerMap.get(0);
     assertEquals(1, set.size());
     assertTrue(set.contains("new2"));
   }

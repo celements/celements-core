@@ -17,7 +17,7 @@ public class FormValidationService implements IFormValidationServiceRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       FormValidationService.class);
 
-  private static final MapHandler<String, ValidationType, String> mapHandler =
+  private static final MapHandler<String, ValidationType, String> MAPHANDLER =
       new MapHandler<String, ValidationType, String>();
 
   @Requirement
@@ -49,7 +49,7 @@ public class FormValidationService implements IFormValidationServiceRole {
     Map<RequestParameter, String[]> convertedRequestMap = convertMapKeys(requestMap);
     for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
       LOGGER.trace("Calling validateRequest() for rule '" + validationRule + "'");
-      mapHandler.mergeMultiMaps(validationRule.validateRequest(convertedRequestMap), ret);
+      MAPHANDLER.mergeMultiMaps(validationRule.validateRequest(convertedRequestMap), ret);
     }
     return ret;
   }
@@ -70,7 +70,7 @@ public class FormValidationService implements IFormValidationServiceRole {
     Map<ValidationType, Set<String>> ret = new HashMap<ValidationType, Set<String>>();
     for (IFieldValidationRuleRole validationRule : fieldValidationRules.values()) {
       LOGGER.trace("Calling validateField() for rule '" + validationRule + "'");
-      mapHandler.mergeMaps(validationRule.validateField(className, fieldName, value), ret);
+      MAPHANDLER.mergeMaps(validationRule.validateField(className, fieldName, value), ret);
     }
     return ret;
   }
