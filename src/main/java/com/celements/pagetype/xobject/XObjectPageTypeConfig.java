@@ -30,6 +30,7 @@ import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageType;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectPageTypeConfig implements IPageTypeConfig {
@@ -92,7 +93,11 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   }
 
   public boolean isVisible() {
-    return (pageType.getPageTypeProperties(getContext()).getIntValue("visible", 0) > 0);
+    BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
+    if (pageTypePropertiesObj != null) {
+      return (pageTypePropertiesObj.getIntValue("visible", 0) > 0);
+    }
+    return false;
   }
 
 }

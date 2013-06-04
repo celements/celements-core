@@ -155,6 +155,13 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     verifyAll();
   }
 
+  @Test
+  public void testIsVisible_NPE_no_object() {
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(null);
+    replayAll();
+    assertFalse(xObjPTconfig.isVisible());
+    verifyAll();
+  }
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, pageTypeMock);
