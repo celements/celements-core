@@ -241,8 +241,13 @@ public class RenderCommand {
   }
 
   String getTemplatePathOnDisk(String renderTemplatePath) {
-    return renderTemplatePath.replaceAll("^:(Templates\\.)?", "/templates/celTemplates/"
-        ) + ".vm";
+    String templateOnDiskPath = getWebUtilsService().getTemplatePathOnDisk(
+        renderTemplatePath);
+    if (templateOnDiskPath.startsWith(":")) {
+      templateOnDiskPath = renderTemplatePath.replaceAll("^:", "/templates/celTemplates/")
+          + ".vm";
+    }
+    return templateOnDiskPath;
   }
 
   String getRenderTemplatePath(IPageTypeConfig cellType, String cellDocFN,
