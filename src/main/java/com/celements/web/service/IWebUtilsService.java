@@ -151,4 +151,6 @@ public interface IWebUtilsService {
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash
       ) throws XWikiException;
 
+  public String getTemplatePathOnDisk(String renderTemplatePath);
+
 }

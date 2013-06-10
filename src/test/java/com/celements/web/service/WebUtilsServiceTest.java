@@ -1126,7 +1126,19 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
-  //*****************************************************************
+  @Test
+  public void testGetTemplatePathOnDisk_Template() {
+    assertEquals("/templates/celTemplates/myScript.vm",
+        webUtilsService.getTemplatePathOnDisk(":Templates.myScript"));
+  }
+
+  @Test
+  public void testGetTemplatePathOnDisk_Ajax() {
+    assertEquals("/templates/celAjax/myScript.vm",
+        webUtilsService.getTemplatePathOnDisk(":Ajax.myScript"));
+  }
+
+ //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
 
@@ -1178,7 +1190,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     objs.add(obj);
     return objs;
   }
-
 
   private void replayAll(Object ... mocks) {
     replay(xwiki);
