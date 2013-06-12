@@ -30,7 +30,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>  
   <artifactId>celements-core</artifactId>
-  <version>1.59-SNAPSHOT</version>
+  <version>1.60-SNAPSHOT</version>
   <description>Celements Core</description> 
   <dependencies>    
     <!-- Add here all your dependencies -->
