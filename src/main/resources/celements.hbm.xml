@@ -143,7 +143,7 @@
     </property>
   </class>
 
-  <class name="Classes.DocumentPublication" table="cel_doc_publication">
+  <class entity-name="Classes.DocumentPublication" table="cel_doc_publication">
     <id name="id" type="integer" unsaved-value="undefined">
       <column name="CDP_ID" not-null="true" />
       <generator class="assigned" />
@@ -156,7 +156,7 @@
     </property>
   </class>
 
-  <class name="Classes.DocumentExtract" table="cel_doc_Extract">
+  <class entity-name="Classes.DocumentExtract" table="cel_doc_Extract">
     <id name="id" type="integer" unsaved-value="undefined">
       <column name="CDS_ID" not-null="true" />
       <generator class="assigned" />
