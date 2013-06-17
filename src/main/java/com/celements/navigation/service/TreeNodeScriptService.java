@@ -2,35 +2,25 @@ package com.celements.navigation.service;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("treeNode")
 public class TreeNodeScriptService implements ScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      TreeNodeScriptService.class);
-
-  @Requirement("local")
-  EntityReferenceSerializer<String> modelSerializer;
-
-  @Requirement
-  IWebUtilsService webUtilsService;
-
   @Requirement
   ITreeNodeService treeNodeService;
+
+  @Requirement
+  ITreeNodeCache treeNodeCache;
 
   @Requirement
   Execution execution;
@@ -50,7 +40,7 @@ public class TreeNodeScriptService implements ScriptService {
   public int getMaxConfiguredNavigationLevel() {
     return treeNodeService.getMaxConfiguredNavigationLevel();
   }
-  
+
   public boolean isTreeNode(DocumentReference docRef) {
     return treeNodeService.isTreeNode(docRef);
   }
@@ -77,6 +67,10 @@ public class TreeNodeScriptService implements ScriptService {
 
   public List<TreeNode> getSubNodesForParent(EntityReference parentRef, String menuPart) {
     return treeNodeService.getSubNodesForParent(parentRef, menuPart);
+  }
+
+  public int queryCount() {
+    return treeNodeCache.queryCount();
   }
 
 }

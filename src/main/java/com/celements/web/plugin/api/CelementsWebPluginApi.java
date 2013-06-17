@@ -64,12 +64,10 @@ import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.CssCommand;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
-import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
-import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
@@ -83,6 +81,7 @@ import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.service.WebUtilsScriptService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
@@ -133,7 +132,7 @@ public class CelementsWebPluginApi extends Api {
   public void setPlugin(CelementsWebPlugin plugin) {
     this.plugin = plugin;
   }
-  
+
   /**
    * @deprecated since 2.2 instead use TreeNodeCache
    */
@@ -147,7 +146,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getLastStartupTimeStamp(){
-    return new LastStartupTimeStamp().getLastStartupTimeStamp();
+    return getScriptService().getLastStartupTimeStamp();
   }
 
   /**
@@ -155,7 +154,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public ContextMenuBuilderApi getContextMenuBuilder() {
-    return getCMService().getContextMenuBuilder();
+    return getContextMenuScriptService().getContextMenuBuilder();
   }
 
   /**
@@ -163,9 +162,13 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getAllContextMenuCSSClassesAsJSON() {
-    return getCMService().getAllContextMenuCSSClassesAsJSON();
+    return getContextMenuScriptService().getAllContextMenuCSSClassesAsJSON();
   }
 
+  /**
+   * @deprecated since 2.33.0
+   */
+  @Deprecated
   public ContextMenuItemApi getWrapper(com.xpn.xwiki.api.Object menuItem,
       String elemId) {
     return new ContextMenuItemApi(menuItem, elemId, context);
@@ -227,12 +230,18 @@ public class CelementsWebPluginApi extends Api {
     return getTreeNodeScriptService().includeNavigation(configName);
   }
 
+  /**
+   * @deprecated since 2.2 use getSubNodesForParentRef in treeNode script service instead
+   */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
       String parent, String menuSpace) {
     return plugin.getSubMenuItemsForParent(parent, menuSpace, "", context);
   }
 
+  /**
+   * @deprecated since 2.2 use getSubNodesForParentRef in treeNode script service instead
+   */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
       String parent, String menuSpace, String menuPart) {
@@ -240,18 +249,13 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * getSubNodesForParent
-   * @param parent
-   * @param menuSpace
-   * @return
-   * 
    * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference)
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, "", context);
   }
-  
+
   /**
    * @deprecated since 2.2 use treeNode script service instead
    */
@@ -261,12 +265,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * 
-   * @param parent
-   * @param menuSpace
-   * @param menuPart
-   * @return
-   * 
    * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference, String)
    */
   @Deprecated
@@ -275,7 +273,7 @@ public class CelementsWebPluginApi extends Api {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, menuPart,
         context);
   }
-  
+
   /**
    * @deprecated since 2.2 use treeNode script service instead
    */
@@ -284,34 +282,58 @@ public class CelementsWebPluginApi extends Api {
     return getTreeNodeScriptService().getSubNodesForParent(parentRef, menuPart);
   }
 
+  /**
+   * @deprecated since 2.33.0 use treeNode script service instead
+   */
+  @Deprecated
   public int queryCount() {
-    return plugin.queryCount();
+    return getTreeNodeScriptService().queryCount();
   }
 
-  public Map<String, String> getDocMetaTags(String language,
-      String defaultLanguage) {
-    return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, context);
+  /**
+   * @deprecated since 2.33.0 use CelementsWebScriptService
+   */
+  @Deprecated
+  public Map<String, String> getDocMetaTags(String language, String defaultLanguage) {
+    return getScriptService().getDocMetaTags(language, defaultLanguage);
   }
 
+  /**
+   * @deprecated since 2.33.0 use WebUtilsScriptService
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSorted(doc, comparator);
+    return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator);
   }
 
+  /**
+   * @deprecated since 2.33.0 use WebUtilsScriptService
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
+    return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator, imagesOnly,
         start, nb);
   }
 
+  /**
+   * @deprecated since 2.33.0 use WebUtilsScriptService
+   */
+  @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly) throws ClassNotFoundException{
-    return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
+    return getWebUtilsScriptService().getAttachmentListSortedAsJSON(doc, comparator,
+        imagesOnly);
   }
 
+  /**
+   * @deprecated since 2.33.0 use WebUtilsScriptService
+   */
+  @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
+    return getWebUtilsScriptService().getAttachmentListSortedAsJSON(doc, comparator,
         imagesOnly, start, nb);
   }
 
@@ -345,7 +367,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public void addImageMapConfig(String configName) {
-    getService().addImageMapConfig(configName);
+    getScriptService().addImageMapConfig(configName);
   }
 
   /**
@@ -353,7 +375,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String displayImageMapConfigs() {
-    return getService().displayImageMapConfigs();
+    return getScriptService().displayImageMapConfigs();
   }
 
   public String addExtJSfileOnce(String jsFile) {
@@ -615,7 +637,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    return getService().getSkinConfigObj();
+    return getScriptService().getSkinConfigObj();
   }
 
   public int sendMail(
@@ -1014,7 +1036,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public Map<String, String> validateRequest() {
     Map<String, String> ret = new HashMap<String, String>();
-    Map<String, Map<ValidationType, Set<String>>> validateMap = getService(
+    Map<String, Map<ValidationType, Set<String>>> validateMap = getScriptService(
         ).validateRequest();
     for (String key : validateMap.keySet()) {
       Iterator<String> iter = validateMap.get(key).get(ValidationType.ERROR).iterator();
@@ -1324,7 +1346,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef) {
-    return getService().renderCelementsDocument(elementDocRef);
+    return getScriptService().renderCelementsDocument(elementDocRef);
   }
 
   /**
@@ -1333,7 +1355,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef,
       String renderMode) {
-    return getService().renderCelementsDocument(elementDocRef, renderMode);
+    return getScriptService().renderCelementsDocument(elementDocRef, renderMode);
   }
 
   /**
@@ -1342,7 +1364,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String renderDocument(Document renderDoc) {
-    return getService().renderDocument(renderDoc);
+    return getScriptService().renderDocument(renderDoc);
   }
 
   /**
@@ -1352,7 +1374,7 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public String renderDocument(Document renderDoc, boolean removePre,
       List<String> rendererNameList) {
-    return getService().renderDocument(renderDoc, removePre, rendererNameList);
+    return getScriptService().renderDocument(renderDoc, removePre, rendererNameList);
   }
 
   private RenderCommand getCelementsRenderCmd() {
@@ -1376,7 +1398,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
-    return getService().renderCelementsDocument(renderDoc, renderMode);
+    return getScriptService().renderCelementsDocument(renderDoc, renderMode);
   }
 
   public String getEditURL(Document doc) {
@@ -1555,7 +1577,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getSkinFile(String fileName) {
-    return getService().getSkinFile(fileName);
+    return getScriptService().getSkinFile(fileName);
   }
 
   /**
@@ -1563,7 +1585,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getSkinFile(String fileName, String action) {
-    return getService().getSkinFile(fileName, action);
+    return getScriptService().getSkinFile(fileName, action);
   }
 
   public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference,
@@ -1605,7 +1627,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getAppScriptURL(String scriptName) {
-    return getService().getAppScriptURL(scriptName);
+    return getScriptService().getAppScriptURL(scriptName);
   }
 
   /**
@@ -1613,7 +1635,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getAppScriptURL(String scriptName, String queryString) {
-    return getService().getAppScriptURL(scriptName, queryString);
+    return getScriptService().getAppScriptURL(scriptName, queryString);
   }
 
   /**
@@ -1621,7 +1643,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean isAppScriptCurrentPage(String scriptName) {
-    return getService().isAppScriptCurrentPage(scriptName);
+    return getScriptService().isAppScriptCurrentPage(scriptName);
   }
 
   /**
@@ -1629,7 +1651,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getScriptNameFromURL() {
-    return getService().getScriptNameFromURL();
+    return getScriptService().getScriptNameFromURL();
   }
 
   /**
@@ -1637,7 +1659,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean isAppScriptRequest() {
-    return getService().isAppScriptRequest();
+    return getScriptService().isAppScriptRequest();
   }
 
   /**
@@ -1645,7 +1667,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getCurrentPageURL(String queryString) {
-    return getService().getCurrentPageURL(queryString);
+    return getScriptService().getCurrentPageURL(queryString);
   }
 
   /**
@@ -1653,7 +1675,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String convertToPlainText(String htmlContent) {
-    return getService().convertToPlainText(htmlContent);
+    return getScriptService().convertToPlainText(htmlContent);
   }
 
   /**
@@ -1661,15 +1683,19 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Builder getNewJSONBuilder() {
-    return getService().getNewJSONBuilder();
+    return getScriptService().getNewJSONBuilder();
   }
 
-  private CelementsWebScriptService getService() {
+  private CelementsWebScriptService getScriptService() {
     return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
         "celementsweb");
   }
 
-  private ContextMenuScriptService getCMService() {
+  private WebUtilsScriptService getWebUtilsScriptService() {
+    return (WebUtilsScriptService) Utils.getComponent(ScriptService.class, "webUtils");
+  }
+
+  private ContextMenuScriptService getContextMenuScriptService() {
     return (ContextMenuScriptService) Utils.getComponent(ScriptService.class,
         "contextMenu");
   }

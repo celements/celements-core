@@ -48,6 +48,7 @@ import com.celements.validation.IFormValidationServiceRole;
 import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
+import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.PlainTextCommand;
@@ -374,10 +375,18 @@ public class CelementsWebScriptService implements ScriptService {
         "celements.usenewbuttons", 0, getContext()) == 1;
   }
 
+  /**
+   * @deprecated since 2.33.0 use WebUtilsScriptService
+   */
+  @Deprecated
   public String getDefaultLanguage() {
     return webUtilsService.getDefaultLanguage();
   }
 
+  /**
+   * @deprecated since 2.33.0 use WebUtilsScriptService
+   */
+  @Deprecated
   public String getDefaultLanguage(String spaceName) {
     return webUtilsService.getDefaultLanguage(spaceName);
   }
@@ -415,9 +424,9 @@ public class CelementsWebScriptService implements ScriptService {
     String waitdays;
     XWikiConfig config = getContext().getWiki().getConfig();
     if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
-        waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+      waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
     } else {
-        waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+      waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
     }
     return Double.parseDouble(waitdays);
   }
@@ -436,7 +445,7 @@ public class CelementsWebScriptService implements ScriptService {
         try {
           for (XWikiDeletedDocument delDoc : getContext().getWiki().getDeletedDocuments(
               fullName, "", getContext())) {
-            int seconds = (int) (getWaitDaysBeforeDelete() * 24 * 60 * 60 + 0.5);
+            int seconds = (int) ((getWaitDaysBeforeDelete() * 24 * 60 * 60) + 0.5);
             Calendar cal = Calendar.getInstance();
             cal.setTime(delDoc.getDate());
             cal.add(Calendar.SECOND, seconds);
@@ -484,7 +493,7 @@ public class CelementsWebScriptService implements ScriptService {
   public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
     return formValidationService.validateRequest();
   }
-  
+
   /**
    * getLastStartupTimeStamp
    * 
@@ -493,6 +502,10 @@ public class CelementsWebScriptService implements ScriptService {
    */
   public String getLastStartupTimeStamp(){
     return new LastStartupTimeStamp().getLastStartupTimeStamp();
+  }
+
+  public Map<String, String> getDocMetaTags(String language, String defaultLanguage) {
+    return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, getContext());
   }
 
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
