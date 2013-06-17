@@ -53,6 +53,13 @@ public class PageTypeServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetPageTypeConfig_NPE() {
+    replayAll();
+    assertNull(ptService.getPageTypeConfig(null));
+    verifyAll();
+  }
+
+  @Test
   public void testGetPageTypeConfig() {
     PageTypeReference testPageTypeRef = new PageTypeReference("TestPageType",
         X_OBJECT_PROVIDER, Arrays.asList(""));

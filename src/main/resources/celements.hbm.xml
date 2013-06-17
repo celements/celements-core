@@ -112,6 +112,9 @@
   <property name="lang" type="string">
     <column name="CMT_LANGUAGE" />
   </property>
+  <property name="source" type="string">
+    <column name="CMT_SOURCE" />
+  </property>
   </class>
   
   <class entity-name="Classes.ImageMapConfigClass" table="cel_img_map">
@@ -130,14 +133,40 @@
   </property>
   </class>
 
-	<class name="com.celements.migrations.SubSystemDBVersion" table="celsubsysdbversion">
-		<id name="subSystemName" type="string" unsaved-value="undefined">
-			<column name="CSSDBV_SUBSYSTEM_NAME" not-null="true" />
-			<generator class="assigned" />
-		</id>
-		<property name="version" type="integer">
-			<column name="CSSDBV_VERSION" />
-		</property>
-	</class>
+  <class name="com.celements.migrations.SubSystemDBVersion" table="celsubsysdbversion">
+    <id name="subSystemName" type="string" unsaved-value="undefined">
+      <column name="CSSDBV_SUBSYSTEM_NAME" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="version" type="integer">
+      <column name="CSSDBV_VERSION" />
+    </property>
+  </class>
+
+  <class entity-name="Classes.DocumentPublication" table="cel_doc_publication">
+    <id name="id" type="integer" unsaved-value="undefined">
+      <column name="CDP_ID" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="publishDate" type="timestamp">
+      <column name="CDP_PUBLISH" />
+    </property>
+    <property name="unpublishDate" type="timestamp">
+      <column name="CDP_UNPUBLISH" />
+    </property>
+  </class>
+
+  <class entity-name="Classes.DocumentExtract" table="cel_doc_Extract">
+    <id name="id" type="integer" unsaved-value="undefined">
+      <column name="CDS_ID" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="language" type="string">
+      <column name="CDS_LANGUAGE" length="16"/>
+    </property>
+    <property name="extract" type="text">
+      <column name="CDS_EXTRACT" />
+    </property>
+  </class>
 
 </hibernate-mapping>

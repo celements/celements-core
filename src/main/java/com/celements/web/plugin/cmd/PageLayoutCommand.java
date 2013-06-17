@@ -22,10 +22,13 @@ package com.celements.web.plugin.cmd;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -70,6 +73,12 @@ public class PageLayoutCommand {
 
   public static final String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
 
+  private static final String CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY =
+      "celRenderingLayout";
+
+  private static final String CEL_RENDERING_LAYOUT_STACK_PROPERTY =
+      "celRenderingLayoutStack";
+  
   /**
    * The name of the internal packaging plugin.
    */
@@ -241,9 +250,45 @@ public class PageLayoutCommand {
     LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
     IRenderStrategy cellRenderer = new CellRenderStrategy(getContext()).setOutputWriter(
         new DivWriter());
-   RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
+    getRenderingLayoutStack().push(layoutSpaceRef);
+    setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
+    RenderingEngine renderEngine = new RenderingEngine().setRenderStrategy(cellRenderer);
     renderEngine.renderPageLayout(layoutSpaceRef);
-   return cellRenderer.getAsString();
+    getRenderingLayoutStack().pop();
+    setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
+    return cellRenderer.getAsString();
+  }
+
+  public SpaceReference getCurrentRenderingLayout() {
+    if (!getRenderingLayoutStack().isEmpty()) {
+      return getRenderingLayoutStack().peek();
+    }
+    return null;
+  }
+
+  private void setRenderLayoutInVelocityContext(SpaceReference layoutSpaceRef) {
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    if (layoutSpaceRef != null) {
+      /* IMPORTANT: do not use .clone() on any reference it will not be available
+       * on unstable branch
+       */
+      SpaceReference copyOfLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
+          (WikiReference)layoutSpaceRef.getParent());
+      vcontext.put(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, copyOfLayoutSpaceRef);
+    } else {
+      vcontext.remove(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Stack<SpaceReference> getRenderingLayoutStack() {
+    ExecutionContext execContext = getExecution().getContext();
+    if (execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY) == null) {
+      execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY,
+          new Stack<SpaceReference>());
+    }
+    return (Stack<SpaceReference>) execContext.getProperty(
+        CEL_RENDERING_LAYOUT_STACK_PROPERTY);
   }
  
   /**
@@ -440,8 +485,11 @@ public class PageLayoutCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
   }
 
   IWebUtilsService getWebUtilsService() {

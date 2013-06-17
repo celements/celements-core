@@ -20,23 +20,19 @@
 package com.celements.web.token;
 
 import java.security.Principal;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.celements.web.service.WebUtilsService;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -45,8 +41,6 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
-  EntityReferenceSerializer injected_refSerializer;
-
   QueryManager injected_queryManager;
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(
@@ -109,7 +103,7 @@ public class NewCelementsTokenForUserCommand {
       DocumentReference docRef = userDoc.getDocumentReference();
       Query query = getQueryManagerComponent().createQuery(xwql, Query.XWQL);
       query.bindValue("now", new Date());
-      query.bindValue("doc", getSerializerComponent().serialize(docRef));
+      query.bindValue("doc", getWebUtilsService().getRefLocalSerializer().serialize(docRef));
       query.setWiki(docRef.getLastSpaceReference().getParent().getName());
       List<Object> tokenResults = query.execute();
       LOGGER.trace("userDoc: " + userDoc);
@@ -140,11 +134,8 @@ public class NewCelementsTokenForUserCommand {
     return Utils.getComponent(QueryManager.class);
   }
   
-  EntityReferenceSerializer<String> getSerializerComponent() {
-    if(injected_refSerializer != null) {
-      return injected_refSerializer;
-    }
-    return Utils.getComponent(EntityReferenceSerializer.class, "local");
+  IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   public String getUniqueValidationKey(XWikiContext context)

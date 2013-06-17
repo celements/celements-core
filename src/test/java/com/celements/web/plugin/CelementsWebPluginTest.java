@@ -20,6 +20,8 @@
 package com.celements.web.plugin;
 
 import static org.easymock.EasyMock.*;
+
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -54,6 +56,8 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     plugin = new CelementsWebPlugin("celementsweb", "CelementsWebPlugin", context);
   }
   
@@ -69,7 +73,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams), same(context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", plugin.getUsernameForToken(userToken, context));
     assertTrue(captHQL.getValue().contains("token.tokenvalue=?"));
@@ -93,9 +97,9 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL2 = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(new ArrayList<String>()).once();
+        capture(captParams), same(context))).andReturn(new ArrayList<String>()).once();
     expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams), same(context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("xwiki:Doc.Fullname", plugin.getUsernameForToken(userToken, context));
     assertTrue(captHQL2.getValue().contains("token.tokenvalue=?"));
@@ -117,15 +121,13 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).times(2);
+        capture(captParams), same(context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
     assertNull(plugin.checkAuthByToken(userToken, context));
   }
   
   @Test
   public void testCheckAuthByToken() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     String userToken = "123456789012345678901234";
     List<String> userDocs = new Vector<String>();
@@ -134,7 +136,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams ), same(context))).andReturn(userDocs).once();
+        capture(captParams), same(context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", plugin.checkAuthByToken(userToken, context).getUser());
     assertEquals("Doc.Fullname", context.getXWikiUser().getUser());

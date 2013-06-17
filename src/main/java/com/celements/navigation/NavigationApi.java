@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.web.service.IWebUtilsService;
@@ -225,6 +226,22 @@ public class NavigationApi extends Api {
     navigation.setCMcssClass(cmCssClass);
   }
 
+  public String getEmptyDictKey() {
+    return navigation.getEmptyDictKey();
+  }
+
+  public void setEmptyDictKeySuffix(String emptyDictKeySuffix) {
+    navigation.setEmptyDictKeySuffix(emptyDictKeySuffix);
+  }
+
+  public SpaceReference getNodeSpaceRef() {
+    return navigation.getNodeSpaceRef();
+  }
+
+  /**
+   * @deprecated since 2.30.0 instead use getNodeSpaceRef()
+   */
+  @Deprecated
   public String getMenuSpace() {
     return navigation.getMenuSpace(context);
   }
@@ -268,6 +285,12 @@ public class NavigationApi extends Api {
 
   public boolean isEmptyMainMenu() {
     return navigation.isEmptyMainMenu();
+  }
+
+  public boolean isEmpty() {
+    boolean isEmpty = navigation.isEmpty();
+    LOGGER.debug("isEmpty api: returning [" + isEmpty + "].");
+    return isEmpty;
   }
 
 }

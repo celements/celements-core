@@ -21,7 +21,9 @@ package com.celements.web.service;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,7 +35,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -43,16 +44,22 @@ import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
-import com.celements.validation.IFormValidationRole;
+import com.celements.validation.IFormValidationServiceRole;
+import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.PlainTextCommand;
+import com.celements.web.plugin.cmd.SkinConfigObjCommand;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -61,9 +68,6 @@ public class CelementsWebScriptService implements ScriptService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebScriptService.class);
-
-  @Requirement("local")
-  EntityReferenceSerializer<String> modelSerializer;
 
   @Requirement
   QueryManager queryManager;
@@ -75,7 +79,7 @@ public class CelementsWebScriptService implements ScriptService {
   IWebUtilsService webUtilsService;
 
   @Requirement
-  IFormValidationRole formValidationService;
+  IFormValidationServiceRole formValidationService;
 
   @Requirement
   Execution execution;
@@ -108,8 +112,16 @@ public class CelementsWebScriptService implements ScriptService {
     return appScriptService.getCentralAppScriptDocRef(scriptName);
   }
 
+  public String getScriptNameFromDocRef(DocumentReference docRef) {
+    return appScriptService.getScriptNameFromDocRef(docRef);
+  }
+
   public String getAppScriptTemplatePath(String scriptName) {
     return appScriptService.getAppScriptTemplatePath(scriptName);
+  }
+
+  public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
+    return appScriptService.isAppScriptOverwriteDocRef(docRef);
   }
 
   public boolean isAppScriptAvailable(String scriptName) {
@@ -155,7 +167,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean deleteMenuItem(DocumentReference docRef) {
-    String docFN = modelSerializer.serialize(docRef);
+    String docFN = webUtilsService.getRefLocalSerializer().serialize(docRef);
     try {
       if (getContext().getWiki().getRightService().hasAccessLevel("edit",
           getContext().getUser(), docFN, getContext())) {
@@ -201,7 +213,15 @@ public class CelementsWebScriptService implements ScriptService {
     return getHumanReadableSize(bytes, si, getLocal(language));
   }
 
-  public String getHumanReadableSize(int bytes, boolean si, Locale locale) {
+  public String getHumanReadableSize(long bytes, boolean si) {
+    return getHumanReadableSize(bytes, si, getContext().getLanguage());
+  }
+
+  public String getHumanReadableSize(long bytes, boolean si, String language) {
+    return getHumanReadableSize(bytes, si, getLocal(language));
+  }
+
+  public String getHumanReadableSize(long bytes, boolean si, Locale locale) {
     int unit = si ? 1000 : 1024;
     if (bytes < unit) {
       return bytes + " B";
@@ -362,10 +382,15 @@ public class CelementsWebScriptService implements ScriptService {
     return webUtilsService.getDefaultLanguage(spaceName);
   }
 
-  public List<Object> getDeletedDocuments() {
-    List<Object> resultList = Collections.emptyList();
+  public List<String> getDeletedDocuments() {
+    return getDeletedDocuments("", true);
+  }
+
+  public List<String> getDeletedDocuments(String orderby, boolean hideOverwritten) {
+    List<String> resultList = Collections.emptyList();
     try {
-      Query query = queryManager.createQuery(getDeletedDocsHql(), Query.HQL);
+      Query query = queryManager.createQuery(getDeletedDocsHql(orderby, hideOverwritten),
+          Query.HQL);
       resultList = query.execute();
     } catch (QueryException queryExp) {
       LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
@@ -373,10 +398,82 @@ public class CelementsWebScriptService implements ScriptService {
     return resultList;
   }
 
-  private String getDeletedDocsHql() {
-    return "select distinct ddoc.fullName from XWikiDeletedDocument as ddoc"
-        + " where ddoc.fullName not in (select doc.fullName from XWikiDocument as doc)"
-        + " order by 1 asc";
+  private String getDeletedDocsHql(String orderby, boolean hideOverwritten) {
+    String deletedDocsHql = "select distinct ddoc.fullName"
+        + " from XWikiDeletedDocument as ddoc";
+    if (hideOverwritten) {
+      deletedDocsHql += " where ddoc.fullName not in (select doc.fullName from"
+          + " XWikiDocument as doc)";
+    }
+    if (!"".equals(orderby)) {
+      deletedDocsHql += " order by " + orderby;
+    }
+    return deletedDocsHql;
+  }
+
+  public double getWaitDaysBeforeDelete() {
+    String waitdays;
+    XWikiConfig config = getContext().getWiki().getConfig();
+    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
+        waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+    } else {
+        waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+    }
+    return Double.parseDouble(waitdays);
+  }
+
+  /**
+   * permanentlyEmptyTrash delete all documents after waitDays and minWaitDays
+   * @return
+   */
+  public Integer permanentlyEmptyTrash(int waitDays) {
+    Calendar beforeWaiteDaysCal = Calendar.getInstance();
+    beforeWaiteDaysCal.add(Calendar.DATE, -waitDays);
+    Date delBeforeDate = beforeWaiteDaysCal.getTime();
+    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
+      int countDeleted = 0;
+      for (String fullName : getDeletedDocuments()) {
+        try {
+          for (XWikiDeletedDocument delDoc : getContext().getWiki().getDeletedDocuments(
+              fullName, "", getContext())) {
+            int seconds = (int) (getWaitDaysBeforeDelete() * 24 * 60 * 60 + 0.5);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(delDoc.getDate());
+            cal.add(Calendar.SECOND, seconds);
+            boolean isAfterMinWaitDays = cal.before(Calendar.getInstance());
+            if (isAfterMinWaitDays && delDoc.getDate().before(delBeforeDate)) {
+              XWikiDocument doc = getContext().getWiki().getDocument(
+                  webUtilsService.resolveDocumentReference(fullName), getContext());
+              getContext().getWiki().getRecycleBinStore().deleteFromRecycleBin(doc,
+                  delDoc.getId(), getContext(), true);
+              countDeleted++;
+            }
+          }
+        } catch (XWikiException exp) {
+          LOGGER.error("Failed to delete document [" + fullName + "] in wiki ["
+              + getContext().getDatabase() + "].", exp);
+        }
+      }
+      return countDeleted;
+    } else {
+      LOGGER.error("deleting document trash needs admin rights.");
+    }
+    return null;
+  }
+
+  public List<Object> getDeletedAttachments() {
+    List<Object> resultList = Collections.emptyList();
+    try {
+      Query query = queryManager.createQuery(getDeletedAttachmentsHql(), Query.HQL);
+      resultList = query.execute();
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to parse or execute deletedAttachments hql query.", queryExp);
+    }
+    return resultList;
+  }
+
+  private String getDeletedAttachmentsHql() {
+    return "select datt.id from DeletedAttachment as datt order by datt.filename asc";
   }
 
   /**
@@ -384,7 +481,7 @@ public class CelementsWebScriptService implements ScriptService {
    * @return empty map means the validation has been successful. Otherwise validation
    *          messages are returned for invalid fields.
    */
-  public Map<String, Set<String>> validateRequest() {
+  public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
     return formValidationService.validateRequest();
   }
   
@@ -396,6 +493,37 @@ public class CelementsWebScriptService implements ScriptService {
    */
   public String getLastStartupTimeStamp(){
     return new LastStartupTimeStamp().getLastStartupTimeStamp();
+  }
+
+  public com.xpn.xwiki.api.Object getSkinConfigObj() {
+    BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj();
+    if (skinConfigObj != null) {
+      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
+    } else {
+      return null;
+    }
+  }
+
+  public com.xpn.xwiki.api.Object getSkinConfigObj(String fallbackClassName) {
+    BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj(
+        fallbackClassName);
+    if (skinConfigObj != null) {
+      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
+    } else {
+      return null;
+    }
+  }
+
+  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName,
+      String key) {
+    BaseCollection skinConfigBaseColl = new SkinConfigObjCommand(
+        ).getSkinConfigFieldInheritor(fallbackClassName).getObject(key);
+    if ((skinConfigBaseColl != null) && (skinConfigBaseColl instanceof BaseObject)) {
+      BaseObject skinConfigObj = (BaseObject)skinConfigBaseColl;
+      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
+    } else {
+      return null;
+    }
   }
 
 }

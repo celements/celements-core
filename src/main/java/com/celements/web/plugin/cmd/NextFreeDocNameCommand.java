@@ -28,11 +28,10 @@ import com.xpn.xwiki.XWikiException;
 
 public class NextFreeDocNameCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       NextFreeDocNameCommand.class);
 
-  public String getNextUntitledPageFullName(String space,
-      XWikiContext context) {
+  public String getNextUntitledPageFullName(String space, XWikiContext context) {
     return createUntitledPageFullName(
         getNextTitledPageNum(space, "untitled", context), space, "untitled");
   }
@@ -64,7 +63,7 @@ public class NextFreeDocNameCommand {
           && (context.getWiki().getDocument(newDocRef, context).getLock(context) == null)
           );
     } catch (XWikiException exp) {
-      mLogger.info("Failed to check new document reference [" + newDocRef + "].", exp);
+      LOGGER.info("Failed to check new document reference [" + newDocRef + "].", exp);
     }
     return false;
   }

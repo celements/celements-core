@@ -28,9 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
@@ -127,7 +125,8 @@ public class RenderCommand {
       String renderMode) throws XWikiException {
     LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
-    String cellDocFN = getRefSerializer().serialize(cellDoc.getDocumentReference());
+    String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(
+        cellDoc.getDocumentReference());
     if (getContext().getWiki().getRightService().hasAccessLevel(renderMode,
         getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
@@ -138,29 +137,33 @@ public class RenderCommand {
       if (cellTypeRef != null) {
         cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
       }
-      String renderTemplatePath = getRenderTemplatePath(cellType, cellDocFN,
-          renderMode);
-      String templateContent;
-      XWikiDocument templateDoc = getContext().getDoc();
-      if (renderTemplatePath.startsWith(":")) {
-        String templatePath = getTemplatePathOnDisk(renderTemplatePath);
-        try {
-          templateContent = getContext().getWiki().getResourceContent(templatePath);
-        } catch (IOException exp) {
-          LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-          return "";
-        }
-      } else {
-        DocumentReference renderTemplateDocRef = getWebUtilsService(
-            ).resolveDocumentReference(renderTemplatePath);
-        templateDoc = getTemplateDoc(renderTemplateDocRef);
-        templateContent = getTranslatedContent(templateDoc, lang);
-      }
-      return getRenderingEngine().renderText(templateContent,
-          templateDoc, getContext().getDoc(), getContext());
+      return renderTemplatePath(getRenderTemplatePath(cellType, cellDocFN, renderMode),
+          lang);
     } else {
       return "";
     }
+  }
+
+  public String renderTemplatePath(String renderTemplatePath, String lang
+      ) throws XWikiException {
+    String templateContent;
+    XWikiDocument templateDoc = getContext().getDoc();
+    if (renderTemplatePath.startsWith(":")) {
+      String templatePath = getTemplatePathOnDisk(renderTemplatePath);
+      try {
+        templateContent = getContext().getWiki().getResourceContent(templatePath);
+      } catch (IOException exp) {
+        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
+        return "";
+      }
+    } else {
+      DocumentReference renderTemplateDocRef = getWebUtilsService(
+          ).resolveDocumentReference(renderTemplatePath);
+      templateDoc = getTemplateDoc(renderTemplateDocRef);
+      templateContent = getTranslatedContent(templateDoc, lang);
+    }
+    return getRenderingEngine().renderText(templateContent,
+        templateDoc, getContext().getDoc(), getContext());
   }
 
   public String renderDocument(DocumentReference docRef) {
@@ -238,8 +241,13 @@ public class RenderCommand {
   }
 
   String getTemplatePathOnDisk(String renderTemplatePath) {
-    return renderTemplatePath.replaceAll("^:(Templates\\.)?", "/templates/celTemplates/"
-        ) + ".vm";
+    String templateOnDiskPath = getWebUtilsService().getTemplatePathOnDisk(
+        renderTemplatePath);
+    if (templateOnDiskPath.startsWith(":")) {
+      templateOnDiskPath = renderTemplatePath.replaceAll("^:", "/templates/celTemplates/")
+          + ".vm";
+    }
+    return templateOnDiskPath;
   }
 
   String getRenderTemplatePath(IPageTypeConfig cellType, String cellDocFN,
@@ -251,8 +259,8 @@ public class RenderCommand {
       String renderTemplateFullName = cellType.getRenderTemplateForRenderMode(renderMode);
       if ((renderTemplateFullName != null) && !"".equals(renderTemplateFullName)) {
         LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
-            + cellType.getName() + "] and renderTemplate ["
-            + renderTemplateFullName + "].");
+            + cellType.getName() + "] and renderTemplate ["+ renderTemplateFullName
+            + "].");
         return renderTemplateFullName;
       }
       LOGGER.debug("getRenderTemplatePath for [" + cellDocFN + "] with cellType ["
@@ -277,11 +285,6 @@ public class RenderCommand {
       return injectedPageTypeService;
     }
     return Utils.getComponent(IPageTypeRole.class);
-  }
-
-  private DefaultStringEntityReferenceSerializer getRefSerializer() {
-    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
-        EntityReferenceSerializer.class);
   }
 
 }

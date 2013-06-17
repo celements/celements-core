@@ -1,14 +1,7 @@
 package com.celements.validation;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.same;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +42,8 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
 
     replayAll();
-    Map<String, Set<String>> result = xClassRegexRule.validateRequest(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> result =
+        xClassRegexRule.validateRequest(requestMap);
     verifyAll();
 
     assertTrue("Successful validation should result in an empty map",
@@ -78,7 +72,8 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(bclassDocRef2), same(context))).andReturn(doc2).times(2);
 
     replayAll();
-    Map<String, Set<String>> result = xClassRegexRule.validateRequest(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> result =
+        xClassRegexRule.validateRequest(requestMap);
     verifyAll();
 
     assertTrue("Successful validation should result in an empty map",
@@ -107,16 +102,17 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(bclassDocRef2), same(context))).andReturn(doc2).times(2);
 
     replayAll();
-    Map<String, Set<String>> result = xClassRegexRule.validateRequest(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> result =
+        xClassRegexRule.validateRequest(requestMap);
     verifyAll();
 
     assertNotNull(result);
     assertEquals(2, result.size());
-    Set<String> set1 = result.get(param1);
+    Set<String> set1 = result.get(param1).get(ValidationType.ERROR);
     assertNotNull(set1);
     assertEquals(1, set1.size());
     assertTrue(set1.contains("is empty"));
-    Set<String> set2 = result.get(param1);
+    Set<String> set2 = result.get(param1).get(ValidationType.ERROR);
     assertNotNull(set2);
     assertEquals(1, set2.size());
     assertTrue(set2.contains("is empty"));
@@ -133,12 +129,11 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(bclassDocRef), same(context))).andReturn(doc).once();
 
     replayAll();
-    Set<String> result = xClassRegexRule.validateField("Test.TestClass", "testField",
-        "value");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
+        "Test.TestClass", "testField", "value");
     verifyAll();
 
-    assertTrue("Successful validation should result in an empty set",
-        (result != null) && result.isEmpty());
+    assertTrue("Successful validation should result in null", result == null);
   }
 
   @Test
@@ -152,13 +147,13 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(bclassDocRef), same(context))).andReturn(doc).once();
 
     replayAll();
-    Set<String> result = xClassRegexRule.validateField("Test.TestClass", "testField",
-        "");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
+        "Test.TestClass", "testField", "");
     verifyAll();
 
     assertNotNull(result);
     assertEquals(1, result.size());
-    assertEquals("is empty", result.iterator().next());
+    assertEquals("is empty", result.get(ValidationType.ERROR).iterator().next());
   }
 
   private BaseClass getBaseClass(String fieldName) {

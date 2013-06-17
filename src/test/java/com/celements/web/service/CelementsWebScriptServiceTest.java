@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
@@ -27,7 +26,6 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   private CelementsWebScriptService celWebService;
   private XWikiRightService mockRightService;
 
-  @SuppressWarnings("unchecked")
   @Before
   public void setUp_CelementsWebScriptServiceTest() throws Exception {
     context = getContext();
@@ -36,9 +34,8 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     mockRightService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
     celWebService = new CelementsWebScriptService();
+    celWebService.webUtilsService = Utils.getComponent(IWebUtilsService.class);
     celWebService.execution = Utils.getComponent(Execution.class);
-    celWebService.modelSerializer = Utils.getComponent(EntityReferenceSerializer.class,
-        "local");
     celWebService.appScriptService = Utils.getComponent(IAppScriptService.class);
   }
 

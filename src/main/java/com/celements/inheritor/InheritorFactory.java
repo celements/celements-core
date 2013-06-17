@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.context.Execution;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -32,6 +31,7 @@ import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
 import com.celements.iterator.XObjectIterator;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
@@ -41,6 +41,7 @@ public class InheritorFactory {
 
   private IWebUtils _injectedWebUtils;
   private PageLayoutCommand injectedPageLayoutCmd;
+  IWebUtilsService _webUtilsService;
 
   public FieldInheritor getFieldInheritor(final String className,
       final List<String> docList, XWikiContext context) {
@@ -146,9 +147,15 @@ public class InheritorFactory {
         "xwikicontext");
   }
 
-  private DefaultStringEntityReferenceSerializer getRefSerializer() {
-    return (DefaultStringEntityReferenceSerializer) Utils.getComponent(
-        EntityReferenceSerializer.class);
+  IWebUtilsService getWebUtilsService() {
+    if (_webUtilsService == null) {
+      _webUtilsService = Utils.getComponent(IWebUtilsService.class);
+    }
+    return _webUtilsService;
+  }
+
+  private EntityReferenceSerializer<String> getRefSerializer() {
+    return getWebUtilsService().getRefDefaultSerializer();
   }
 
 }

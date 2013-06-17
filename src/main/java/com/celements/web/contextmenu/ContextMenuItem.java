@@ -26,10 +26,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.context.Execution;
 
 import com.celements.sajson.Builder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class ContextMenuItem {
   
@@ -44,40 +46,57 @@ public class ContextMenuItem {
 
   private String elemId;
 
+  private String[] elemIdParts;
+
+  /**
+   * @deprecated since 2.29 instead use new ContextmenuItem(BaseObject, String)
+   */
+  @Deprecated
   public ContextMenuItem(BaseObject menuItem, String elemId, XWikiContext context) {
-    String[] elemIdParts = elemId.split(":", -1);
+    this(menuItem, elemId);
+  }
+
+  public ContextMenuItem(BaseObject menuItem, String elemId) {
+    elemIdParts = elemId.split(":", -1);
     elemId = elemIdParts[elemIdParts.length - 1];
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-    vcontext.put("elemId", elemId);
     this.elemId = elemId;
-    List<String> elemParams = Arrays.asList(elemIdParts).subList(0,
-          elemIdParts.length - 1);
-    vcontext.put("elemParams", elemParams);
-    context.put("vcontext", vcontext.clone());
-    cmiLink = renderText(menuItem.getLargeStringValue("cmi_link"), context);
-    cmiText = renderText(menuItem.getStringValue("cmi_text"), context);
-    cmiIcon = renderText(menuItem.getStringValue("cmi_icon"), context);
-    shortcut = renderText(menuItem.getStringValue("cmi_shortcut"), context);
+    cmiLink = menuItem.getLargeStringValue("cmi_link");
+    cmiText = menuItem.getStringValue("cmi_text");
+    cmiIcon = menuItem.getStringValue("cmi_icon");
+    shortcut = menuItem.getStringValue("cmi_shortcut");
     LOGGER.trace("ContextMenuItem created for [" + menuItem.getDocumentReference() + ","
         + menuItem.getNumber() + "]: cmiLink = [" + cmiLink + "], cmiText = [" + cmiText
         + "], cmiIcon = [" + cmiIcon + "], shortcut = [" + shortcut + "].");
-    context.put("vcontext", vcontext);
   }
 
-  private String renderText(String velocityText, XWikiContext context) {
-    if (context.getWiki() != null) {
-      return context.getWiki().getRenderingEngine().interpretText(velocityText,
-          context.getDoc(), context);
-    } else {
-      return velocityText;
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
+  }
+
+  private String renderText(String velocityText) {
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    vcontext.put("elemId", elemId);
+    List<String> elemParams = Arrays.asList(elemIdParts).subList(0,
+          elemIdParts.length - 1);
+    vcontext.put("elemParams", elemParams);
+    try {
+      getContext().put("vcontext", vcontext.clone());
+      return getContext().getWiki().getRenderingEngine().interpretText(velocityText,
+          getContext().getDoc(), getContext());
+    } finally {
+      getContext().put("vcontext", vcontext);
     }
   }
 
   public void generateJSON(Builder builder) {
     builder.openDictionary();
-    builder.addStringProperty("link", cmiLink);
-    builder.addStringProperty("text", cmiText);
-    builder.addStringProperty("icon", cmiIcon);
+    builder.addStringProperty("link", getLink());
+    builder.addStringProperty("text", getText());
+    builder.addStringProperty("icon", getCmiIcon());
     addShortCutDictionary(builder);
     builder.closeDictionary();
   }
@@ -85,7 +104,7 @@ public class ContextMenuItem {
   private void addShortCutDictionary(Builder builder) {
     builder.openProperty("shortcut");
     builder.openDictionary();
-    for (String sc_condition: shortcut.split("\\|")) {
+    for (String sc_condition: getShortcut().split("\\|")) {
       if (sc_condition.startsWith("keyCode")
           && (sc_condition.indexOf(':') > 0)) {
         String[] parts = sc_condition.split(":");
@@ -108,11 +127,19 @@ public class ContextMenuItem {
   }
 
   public String getLink() {
-    return cmiLink;
+    return renderText(cmiLink);
   }
 
   public String getText() {
-    return cmiText;
+    return renderText(cmiText);
+  }
+
+  public String getCmiIcon() {
+    return renderText(cmiIcon);
+  }
+
+  public String getShortcut() {
+    return renderText(shortcut);
   }
 
 }

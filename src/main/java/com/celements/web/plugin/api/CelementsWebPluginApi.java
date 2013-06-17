@@ -40,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
@@ -49,12 +50,13 @@ import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.celements.rendering.RenderCommand;
+import com.celements.rteConfig.RTEConfig;
 import com.celements.sajson.Builder;
+import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
-import com.celements.web.plugin.RTEConfig;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CaptchaCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
@@ -114,8 +116,6 @@ public class CelementsWebPluginApi extends Api {
       CelementsWebPluginApi.class);
 
   private CelementsWebPlugin plugin;
-
-  private final EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
 
   public CelementsWebPluginApi(
       CelementsWebPlugin plugin,
@@ -551,11 +551,11 @@ public class CelementsWebPluginApi extends Api {
     LOGGER.warn("usage of deprecated isEmptyRTEDocument(String) on ["
         + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
         + docRef.getName() + "].");
-    return emptyCheckCmd.isEmptyRTEDocument(fullName, context);
+    return new EmptyCheckCommand().isEmptyRTEDocument(fullName, context);
   }
 
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
-    return emptyCheckCmd.isEmptyRTEDocument(documentRef);
+    return getEmptyCheckService().isEmptyRTEDocument(documentRef);
   }
 
   public String getEmailAdressForCurrentUser() {
@@ -609,13 +609,13 @@ public class CelementsWebPluginApi extends Api {
     return new PageTypeApi(fullName, context);
   }
 
+  /**
+   * 
+   * @deprecated since 2.29.0 instead use celementsweb script service
+   */
+  @Deprecated
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    BaseObject skinConfigObj = plugin.getSkinConfigObj(context);
-    if (skinConfigObj != null) {
-      return skinConfigObj.newObjectApi(skinConfigObj, context);
-    } else {
-      return null;
-    }
+    return getService().getSkinConfigObj();
   }
 
   public int sendMail(
@@ -654,16 +654,38 @@ public class CelementsWebPluginApi extends Api {
         attachments, others, true, context);
   }
 
-  public String getNextTitledPageFullName(String space, String title){
-    return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title, context);
+  public DocumentReference getNextTitledPageDocRef(String space, String title) {
+    if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
+      return new NextFreeDocNameCommand().getNextTitledPageDocRef(space, title, context);
+    }
+    return null;
+  }
+
+  /**
+   * @deprecated since 2.30.0 instead use
+   *             DocumentReference getNextTitledPageDocRef(String, String)
+   */
+  @Deprecated
+  public String getNextTitledPageFullName(String space, String title) {
+    if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
+      return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title,
+          context);
+    }
+    return "";
   }
 
   public String getNextUntitledPageFullName(String space) {
-    return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, context);
+    if ((space != null) && !"".equals(space)) {
+      return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, context);
+    }
+    return "";
   }
 
   public String getNextUntitledPageName(String space) {
-    return new NextFreeDocNameCommand().getNextUntitledPageName(space, context);
+    if ((space != null) && !"".equals(space)) {
+      return new NextFreeDocNameCommand().getNextUntitledPageName(space, context);
+    }
+    return "";
   }
 
   public int showRightPanels() {
@@ -793,8 +815,17 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsService().getParentSpace();
   }
 
-  public String getRTEConfigField(String name) throws XWikiException {
-    return RTEConfig.getInstance(context).getRTEConfigField(name, context);
+  public List<DocumentReference> getRTEConfigsList() {
+    return new RTEConfig().getRTEConfigsList();
+  }
+
+  public String getRTEConfigField(String name) {
+    try {
+      return new RTEConfig().getRTEConfigField(name);
+    } catch (XWikiException exp) {
+      LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
+    }
+    return "";
   }
 
   public String getJSONContent(Document contentDoc) {
@@ -896,7 +927,7 @@ public class CelementsWebPluginApi extends Api {
     try {
       return plugin.tokenBasedUpload(attachToDoc, fieldName, userToken, context);
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }
@@ -911,7 +942,7 @@ public class CelementsWebPluginApi extends Api {
       return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken,
           createIfNotExists, context);
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: " + exp);
+      LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }
@@ -947,8 +978,25 @@ public class CelementsWebPluginApi extends Api {
    */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
-    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
+    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins, null,
         context);
+  }
+
+  /**
+   * Check authentication from logincredential and password and set according persitent
+   * login information If it fails user is unlogged
+   * 
+   * @param username logincredential to check
+   * @param password password to check
+   * @param rememberme "1" if you want to remember the login accross navigator restart
+   * @param noRedirect supress auto redirect to xredirect parameter
+   * @return null if failed, non null XWikiUser if sucess
+   * @throws XWikiException
+   */
+  public XWikiUser checkAuth(String logincredential, String password, String rememberme,
+      String possibleLogins, boolean noRedirect) throws XWikiException {
+    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
+        noRedirect, context);
   }
 
   /**
@@ -965,15 +1013,16 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> validateRequest() {
-    Map<String, String> validateMap = new HashMap<String, String>();
-    Map<String, Set<String>> validateSetMap = getService().validateRequest();
-    for (String key : validateSetMap.keySet()) {
-      Iterator<String> iter = validateSetMap.get(key).iterator();
+    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, Map<ValidationType, Set<String>>> validateMap = getService(
+        ).validateRequest();
+    for (String key : validateMap.keySet()) {
+      Iterator<String> iter = validateMap.get(key).get(ValidationType.ERROR).iterator();
       if (iter.hasNext()) {
-        validateMap.put(key, iter.next());
+        ret.put(key, iter.next());
       }
     }
-    return validateMap;
+    return ret;
   }
 
   private PageLayoutCommand getPageLayoutCmd() {
@@ -985,6 +1034,10 @@ public class CelementsWebPluginApi extends Api {
 
   public String renderPageLayout(SpaceReference spaceRef) {
     return getPageLayoutCmd().renderPageLayout(spaceRef);
+  }
+
+  public SpaceReference getCurrentRenderingLayout() {
+    return getPageLayoutCmd().getCurrentRenderingLayout();
   }
 
   /**
@@ -1539,7 +1592,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return emptyCheckCmd.getNextNonEmptyChildren(documentRef);
+    return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
   }
 
   public boolean useImageAnimations() {
@@ -1636,6 +1689,10 @@ public class CelementsWebPluginApi extends Api {
   private DefaultStringEntityReferenceSerializer getEntitySerializer() {
     return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
         EntityReferenceSerializer.class));
+  }
+
+  private IEmptyCheckRole getEmptyCheckService() {
+    return Utils.getComponent(IEmptyCheckRole.class);
   }
 
 }

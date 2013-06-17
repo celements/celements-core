@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.pagetype.IPageTypeConfig;
@@ -36,6 +37,9 @@ public class PageTypeScriptService implements ScriptService {
 
   @Requirement
   IPageTypeRole pageTypeService;
+
+  @Requirement
+  IPageTypeResolverRole pageTypeResolver;
 
   public List<String> getAllPageTypes() {
     return getPageTypesByCategories(Arrays.asList("", "pageType"), false);
@@ -63,9 +67,17 @@ public class PageTypeScriptService implements ScriptService {
     return pageTypeService.getPageTypeConfig(pageTypeName);
   }
 
+  public IPageTypeConfig getPageTypeConfig(PageTypeReference pageTypeRef) {
+    return pageTypeService.getPageTypeConfigForPageTypeRef(pageTypeRef);
+  }
+
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible) {
     return pageTypeService.getPageTypeRefsForCategories(catList, onlyVisible);
+  }
+
+  public PageTypeReference getPageTypeRef(DocumentReference docRef) {
+    return pageTypeResolver.getPageTypeRefForDocWithDefault(docRef);
   }
 
 }

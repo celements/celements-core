@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
 public interface IWebUtilsService {
-  
+
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
    * corresponding DocumentReference or throws IndexOutOfBoundsException
@@ -47,14 +47,14 @@ public interface IWebUtilsService {
    * @throws IndexOutOfBoundsException - if level above root or below lowest
    */
   public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
-  
+
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc);
-  
-  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section 
+
+  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section
       ) throws XWikiException;
-  
-  public String getDocSection(String regex, DocumentReference docRef, int section 
+
+  public String getDocSection(String regex, DocumentReference docRef, int section
       ) throws XWikiException;
 
   public int countSections(String regex, DocumentReference docRef) throws XWikiException;
@@ -62,7 +62,7 @@ public interface IWebUtilsService {
   public List<String> getAllowedLanguages();
 
   public Date parseDate(String date, String format);
-  
+
   public XWikiMessageTool getMessageTool(String adminLanguage);
 
   public XWikiMessageTool getAdminMessageTool();
@@ -74,7 +74,7 @@ public interface IWebUtilsService {
   public String getDefaultLanguage();
 
   public String getDefaultLanguage(String spaceName);
-  
+
   public boolean hasParentSpace();
 
   public boolean hasParentSpace(String spaceName);
@@ -90,34 +90,44 @@ public interface IWebUtilsService {
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
-  
+
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException;
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly);
 
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly);
 
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
 
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
-  
+
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2);
 
   public String[] splitStringByLength(String inStr, int maxLength);
-  
+
   public String getJSONContent(XWikiDocument cdoc);
-  
+
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
-  
+
   public String getMajorVersion(XWikiDocument doc);
 
   public WikiReference getWikiRef(DocumentReference docRef);
@@ -131,7 +141,16 @@ public interface IWebUtilsService {
   public EntityReferenceSerializer<String> getRefDefaultSerializer();
 
   public EntityReferenceSerializer<String> getRefLocalSerializer();
-  
+
   public Map<String, String[]> getRequestParameterMap();
+
+  public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
+
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException;
+
+  public void deleteAllDocuments(XWikiDocument doc, boolean totrash
+      ) throws XWikiException;
+
+  public String getTemplatePathOnDisk(String renderTemplatePath);
 
 }

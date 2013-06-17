@@ -28,7 +28,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -105,6 +104,8 @@ public class Navigation implements INavigation {
   private String cmCssClass;
 
   private String mainUlCssClasses;
+
+  private String emptyDictKeySuffix;
 
   private String dataType;
 
@@ -289,7 +290,7 @@ public class Navigation implements INavigation {
    */
   @Deprecated
   public String getMenuSpace(XWikiContext context) {
-    return getSerializer().serialize(getNodeSpaceRef());
+    return getWebUtilsService().getRefLocalSerializer().serialize(getNodeSpaceRef());
   }
 
   public SpaceReference getNodeSpaceRef() {
@@ -322,6 +323,23 @@ public class Navigation implements INavigation {
         ).size() == 0;
   }
 
+  public boolean isEmpty() {
+    getNavFilter().setMenuPart(getMenuPartForLevel(fromHierarchyLevel));
+    EntityReference parentRef = getWebUtilsService().getParentForLevel(
+        fromHierarchyLevel);
+    LOGGER.debug("isEmpty: parentRef [" + parentRef + "] for level [" + fromHierarchyLevel
+        + "]");
+    if (parentRef == null) {
+      LOGGER.info("isEmpty: no subnode for level [" + fromHierarchyLevel + "] found.");
+      return true;
+    }
+    List<TreeNode> subNodeList = getTreeNodeService().getSubNodesForParent(parentRef,
+        getNavFilter());
+    LOGGER.info("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef ["
+        + parentRef + "] -> [" + subNodeList.isEmpty() + "].");
+    return subNodeList.isEmpty();
+  }
+
   INavFilter<BaseObject> getNavFilter() {
     if (navFilter == null) {
       navFilter = new InternalRightsFilter();
@@ -345,7 +363,7 @@ public class Navigation implements INavigation {
       getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
       String parent = "";
       if (parentRef != null) {
-        parent = getSerializer().serialize(parentRef);
+        parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
       }
       List<TreeNode> currentMenuItems =
         getTreeNodeService().getSubNodesForParent(parent, getMenuSpace(getContext()),
@@ -374,8 +392,7 @@ public class Navigation implements INavigation {
         openMenuItemOut(outStream, null, true, true, false, 1);
         outStream.append("<span " + addUniqueElementId(null)
             + " " + addCssClasses(null, true, true, true, false, 1)
-            + ">" + getWebUtilsService().getAdminMessageTool().get(getPresentationType(
-                ).getEmptyDictionaryKey())
+            + ">" + getWebUtilsService().getAdminMessageTool().get(getEmptyDictKey())
             + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
@@ -385,6 +402,21 @@ public class Navigation implements INavigation {
                 numMoreLevels) + "], hasEdit [" + hasedit() + "].");
       }
     }
+  }
+
+  public String getEmptyDictKey() {
+    return getPresentationType().getEmptyDictionaryKey() + getEmptyDictKeySuffix();
+  }
+
+  public void setEmptyDictKeySuffix(String emptyDictKeySuffix) {
+    this.emptyDictKeySuffix = emptyDictKeySuffix;
+  }
+
+  private String getEmptyDictKeySuffix() {
+    if (emptyDictKeySuffix != null) {
+      return emptyDictKeySuffix;
+    }
+    return "";
   }
 
   private int getCurrentLevel(int numMoreLevels) {
@@ -429,7 +461,7 @@ public class Navigation implements INavigation {
       boolean isLastItem, int numItem) throws XWikiException {
     boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels
         ), getContext());
-    String fullName = getSerializer().serialize(docRef);
+    String fullName = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
     boolean isLeaf = isLeaf(fullName, getContext());
     openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf, numItem);
     writeMenuItemContent(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem);
@@ -496,7 +528,7 @@ public class Navigation implements INavigation {
   public String getUniqueId(DocumentReference docRef) {
     String fullName = null;
     if (docRef != null) {
-      fullName = getSerializer().serialize(docRef);
+      fullName = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
     }
     return getUniqueId(fullName);
   }
@@ -831,11 +863,6 @@ public class Navigation implements INavigation {
       return injected_TreeNodeService;
     }
     return Utils.getComponent(ITreeNodeService.class);
-  }
-
-  @SuppressWarnings("unchecked")
-  private EntityReferenceSerializer<String> getSerializer() {
-    return Utils.getComponent(EntityReferenceSerializer.class, "local");
   }
 
   IPageTypeResolverRole getPageTypeResolverService() {

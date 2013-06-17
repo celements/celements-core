@@ -89,6 +89,8 @@ public interface INavigation {
 
   public boolean isEmptyMainMenu();
 
+  public boolean isEmpty();
+
   public boolean isNavigationEnabled();
 
   public void loadConfigByName(String configName, XWikiContext context);
@@ -96,6 +98,10 @@ public interface INavigation {
   public void setCMcssClass(String cmCssClass);
 
   public String getCMcssClass();
+
+  public void setEmptyDictKeySuffix(String emptyDictKeySuffix);
+
+  public String getEmptyDictKey();
 
   public String getNextMenuItemFullName(String name, XWikiContext context);
 

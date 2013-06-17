@@ -42,13 +42,14 @@ import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
+import com.celements.web.plugin.cmd.SkinConfigObjCommand;
+import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -361,21 +362,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         ).renderDocument(viewTemplate, doc, context);
   }
 
+  /**
+   * @deprecated since 2.29.0 use SkinConfigObjCommand instead.
+   */
+  @Deprecated
   public BaseObject getSkinConfigObj(XWikiContext context) {
-    XWikiDocument doc = context.getDoc();
-    try {
-      XWiki xwiki = context.getWiki();
-      XWikiDocument skinDoc = xwiki.getDocument(
-          xwiki.getSpacePreference("skin", context), context);
-      String className = skinDoc.getObject("XWiki.XWikiSkins").getStringValue(
-          "skin_config_class_name");
-      BaseObject configObj = util.getConfigDocByInheritance(doc, className,
-          context).getObject(className);
-      return configObj;
-    } catch(XWikiException e){
-      LOGGER.error(e);
-    }
-    return null;
+    return new SkinConfigObjCommand().getSkinConfigObj();
   }
 
   @Override
@@ -538,37 +530,41 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return new NewCelementsTokenForUserCommand().getUniqueValidationKey(context);
   }
 
+  /**
+   * 
+   * @param attachToDoc
+   * @param fieldName
+   * @param userToken
+   * @param context
+   * @return
+   * @throws XWikiException
+   * 
+   * @deprecated since 2.28.0 use TokenBasedUploadCommand instead
+   */
   @Deprecated
   public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken,
       XWikiContext context) throws XWikiException {
-    String username = getUsernameForToken(userToken, context);
-    if((username != null) && !username.equals("")){
-      LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
-      context.setUser(username);
-      return attachToDoc.addAttachments(fieldName);
-    } else {
-      LOGGER.warn("tokenBasedUpload: username could not be identified by token");
-    }
-    return 0;
+    return new TokenBasedUploadCommand().tokenBasedUpload(attachToDoc, fieldName,
+        userToken, context);
   }
   
+  /**
+   * 
+   * @param attachToDocFN
+   * @param fieldName
+   * @param userToken
+   * @param createIfNotExists
+   * @param context
+   * @return
+   * @throws XWikiException
+   * 
+   * @deprecated since 2.28.0 use TokenBasedUploadCommand instead
+   */
+  @Deprecated
   public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken, 
       Boolean createIfNotExists, XWikiContext context) throws XWikiException {
-    String username = getUsernameForToken(userToken, context);
-    if((username != null) && !username.equals("")){
-      LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
-      context.setUser(username);
-      XWikiDocument doc = context.getWiki().getDocument(attachToDocFN, context);
-      if (createIfNotExists || context.getWiki().exists(attachToDocFN, context)) {
-        LOGGER.info("tokenBasedUpload: add attachment.");
-        return doc.newDocument(context).addAttachments(fieldName);
-      } else {
-        LOGGER.warn("tokenBasedUpload: document " + attachToDocFN + " does not exist.");
-      }
-    } else {
-      LOGGER.warn("tokenBasedUpload: username could not be identified by token");
-    }
-    return 0;
+    return new TokenBasedUploadCommand().tokenBasedUpload(attachToDocFN, fieldName,
+        userToken, createIfNotExists, context);
   }
 
   /**
@@ -595,11 +591,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public XWikiUser checkAuth(String logincredential, String password,
-        String rememberme, String possibleLogins, XWikiContext context
+        String rememberme, String possibleLogins, Boolean noRedirect, XWikiContext context
       ) throws XWikiException {
     String loginname = getUsernameForUserData(logincredential, possibleLogins, context);
     if ("".equals(loginname) && possibleLogins.matches("(.*,)?loginname(,.*)?")) {
         loginname = logincredential;
+    }
+    if (noRedirect != null) {
+      context.put("ajax", noRedirect);
     }
     return context.getWiki().getAuthService().checkAuth(loginname, password, rememberme,
         context);

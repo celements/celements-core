@@ -47,6 +47,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
@@ -67,12 +68,18 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement("default")
   EntityReferenceSerializer<String> serializer_default;
-  
+
   @Requirement("local")
   EntityReferenceSerializer<String> serializer_local;
-  
+
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
+
+  /**
+   * Used to get the template path mapping information.
+   */
+  @Requirement
+  private TemplatePathTransformationConfiguration tempPathConfig;
 
   /**
    * TODO change access to wiki-configuration "default" and check access to e.g.
@@ -89,11 +96,9 @@ public class WebUtilsService implements IWebUtilsService {
    *              defined configuration properties in the xwiki.propertieds file
    *              and to override them in the running wiki (globally or per
    *              space).
-   *  
+   * 
    *  Source: http://extensions.xwiki.org/xwiki/bin/view/Extension/Configuration+Module
    */
-
-
 
   @Requirement
   Execution execution;
@@ -101,19 +106,20 @@ public class WebUtilsService implements IWebUtilsService {
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
-  
+
   public DocumentReference getParentForLevel(int level) {
-    LOGGER.debug("getParentForLevel: " + level);
+    LOGGER.trace("getParentForLevel: start for level " + level);
     DocumentReference parent = null;
     List<DocumentReference> parentList = getDocumentParentsList(
         getContext().getDoc().getDocumentReference(), true);
-    int startAtItem = parentList.size() - level + 1;
+    int startAtItem = (parentList.size() - level) + 1;
     if ((startAtItem > -1) && (startAtItem < parentList.size())) {
       parent = parentList.get(startAtItem);
     }
+    LOGGER.debug("getParentForLevel: level [" + level + "] returning [" + parent + "]");
     return parent;
   }
-  
+
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
     ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
@@ -135,11 +141,11 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return docParents;
   }
-  
+
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
     return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
   }
-  
+
   public String getDocSectionAsJSON(String regex, DocumentReference docRef,
       int section) throws XWikiException {
     Builder jsonBuilder = new Builder();
@@ -201,18 +207,18 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return parts;
   }
-  
+
   int getSectionNr(int section, int sectionNr) {
     if(section <= 0){ section = 1; }
     if(section > sectionNr){ section = sectionNr; }
     return section;
   }
-  
+
   private String renderText(String velocityText) {
     return getContext().getWiki().getRenderingEngine().renderText(
         "{pre}" + velocityText + "{/pre}", getContext().getDoc(), getContext());
   }
-  
+
   private boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
@@ -228,7 +234,7 @@ public class WebUtilsService implements IWebUtilsService {
   public List<String> getAllowedLanguages(String spaceName) {
     List<String> languages = new ArrayList<String>();
     languages.addAll(Arrays.asList(getContext().getWiki(
-      ).getSpacePreference("languages", spaceName, "", getContext()).split("[ ,]")));
+        ).getSpacePreference("languages", spaceName, "", getContext()).split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
       return languages;
@@ -236,7 +242,7 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.warn("Deprecated usage of Preferences field 'language'."
         + " Instead use 'languages'.");
     return Arrays.asList(getContext().getWiki(
-      ).getSpacePreference("language", spaceName, "", getContext()).split("[ ,]"));
+        ).getSpacePreference("language", spaceName, "", getContext()).split("[ ,]"));
   }
 
   public Date parseDate(String date, String format){
@@ -258,7 +264,7 @@ public class WebUtilsService implements IWebUtilsService {
         ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources",
             locale);
         if (bundle == null) {
-            bundle = ResourceBundle.getBundle("ApplicationResources");
+          bundle = ResourceBundle.getBundle("ApplicationResources");
         }
         XWikiContext adminContext = (XWikiContext) getContext().clone();
         adminContext.putAll(getContext());
@@ -273,7 +279,7 @@ public class WebUtilsService implements IWebUtilsService {
   public XWikiMessageTool getAdminMessageTool() {
     return getMessageTool(getAdminLanguage());
   }
-  
+
   public String getAdminLanguage() {
     return getAdminLanguage(getContext().getUser());
   }
@@ -296,9 +302,15 @@ public class WebUtilsService implements IWebUtilsService {
       adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
           getContext().getLanguage(), getContext());
     }
+    if ((adminLanguage == null) || ("".equals(adminLanguage))) {
+      adminLanguage = getContext().getWiki().Param("celements.admin_language");
+      if ((adminLanguage == null) || ("".equals(adminLanguage))) {
+        adminLanguage = "en";
+      }
+    }
     return adminLanguage;
   }
-  
+
   public String getDefaultLanguage() {
     return getContext().getWiki().getSpacePreference("default_language", getContext());
   }
@@ -351,14 +363,14 @@ public class WebUtilsService implements IWebUtilsService {
           && (getContext().getWiki().getRightService() != null)
           && (getContext().getDoc() != null)) {
         return (getContext().getWiki().getRightService().hasAdminRights(getContext())
-          || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup",
-              getContext()));
+            || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup",
+                getContext()));
       } else {
         return false;
       }
     } catch (XWikiException e) {
       LOGGER.error("Cannot determin if user has Admin Rights therefore guess"
-        + " no (false).", e);
+          + " no (false).", e);
       return false;
     }
   }
@@ -377,8 +389,8 @@ public class WebUtilsService implements IWebUtilsService {
               ))));
       LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user ["
           + user.startsWith("xwiki:") + "] usertype [" + ((userObj != null
-          ) ? userObj.getStringValue("usertype") : "null") + "] returning ["
-          + isAdvancedAdmin + "] db [" + getContext().getDatabase() + "].");
+              ) ? userObj.getStringValue("usertype") : "null") + "] returning ["
+              + isAdvancedAdmin + "] db [" + getContext().getDatabase() + "].");
       return isAdvancedAdmin;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
@@ -390,9 +402,9 @@ public class WebUtilsService implements IWebUtilsService {
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException {
     List<Attachment> attachments = doc.getAttachmentList();
-    
-      try {
-        Comparator<Attachment> comparatorClass = 
+
+    try {
+      Comparator<Attachment> comparatorClass =
           (Comparator<Attachment>) Class.forName(
               "com.celements.web.comparators." + comparator).newInstance();
       Collections.sort(attachments, comparatorClass);
@@ -403,27 +415,27 @@ public class WebUtilsService implements IWebUtilsService {
     } catch (ClassNotFoundException e) {
       throw e;
     }
-    
+
     return attachments;
   }
-  
+
   List<Attachment> reduceListToSize(List<Attachment> attachments, int start, int nb) {
     List<Attachment> countedAtts = new ArrayList<Attachment>();
     if((start <= 0) && ((nb <= 0) || (nb >= attachments.size()))) {
       countedAtts = attachments;
     } else if(start < attachments.size()) {
-      countedAtts = attachments.subList(Math.max(0, start), Math.min(Math.max(0, start) 
+      countedAtts = attachments.subList(Math.max(0, start), Math.min(Math.max(0, start)
           + Math.max(0, nb), attachments.size()));
     }
     return countedAtts;
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly) {
     return getAttachmentListSorted(doc, comparator, imagesOnly, 0, 0);
   }
 
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) {
     try {
       List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
@@ -508,34 +520,34 @@ public class WebUtilsService implements IWebUtilsService {
     }**/
 
     if (bWithObjects) {
-//        // Add Class
-//        BaseClass bclass = xwikiDoc.getxWikiClass();
-//        if (bclass.getFieldList().size() > 0) {
-//            // If the class has fields, add class definition and field information to XML
-//            docel.add(bclass.toXML(null));
-//        }
-//
-//        // Add Objects (THEIR ORDER IS MOLDED IN STONE!)
-//        for (Vector<BaseObject> objects : getxWikiObjects().values()) {
-//            for (BaseObject obj : objects) {
-//                if (obj != null) {
-//                    BaseClass objclass = null;
-//                    if (StringUtils.equals(getFullName(), obj.getClassName())) {
-//                        objclass = bclass;
-//                    } else {
-//                        objclass = obj.getxWikiClass(context);
-//                    }
-//                    docel.add(obj.toXML(objclass));
-//                }
-//            }
-//        }
+      //        // Add Class
+      //        BaseClass bclass = xwikiDoc.getxWikiClass();
+      //        if (bclass.getFieldList().size() > 0) {
+      //            // If the class has fields, add class definition and field information to XML
+      //            docel.add(bclass.toXML(null));
+      //        }
+      //
+      //        // Add Objects (THEIR ORDER IS MOLDED IN STONE!)
+      //        for (Vector<BaseObject> objects : getxWikiObjects().values()) {
+      //            for (BaseObject obj : objects) {
+      //                if (obj != null) {
+      //                    BaseClass objclass = null;
+      //                    if (StringUtils.equals(getFullName(), obj.getClassName())) {
+      //                        objclass = bclass;
+      //                    } else {
+      //                        objclass = obj.getxWikiClass(context);
+      //                    }
+      //                    docel.add(obj.toXML(objclass));
+      //                }
+      //            }
+      //        }
       throw new NotImplementedException();
     }
 
     String host = getContext().getRequest().getHeader("host");
     // Add Content
     docData.put("content", replaceInternalWithExternalLinks(xwikiDoc.getContent(), host));
-    
+
     if (bWithRendering) {
       try {
         docData.put("renderedcontent", replaceInternalWithExternalLinks(
@@ -546,32 +558,32 @@ public class WebUtilsService implements IWebUtilsService {
     }
 
     if (bWithVersions) {
-        try {
-          docData.put("versions", xwikiDoc.getDocumentArchive(getContext()
-              ).getArchive(getContext()));
-        } catch (XWikiException e) {
-            LOGGER.error("Document [" + docRef.getName()
-                + "] has malformed history");
-        }
+      try {
+        docData.put("versions", xwikiDoc.getDocumentArchive(getContext()
+            ).getArchive(getContext()));
+      } catch (XWikiException e) {
+        LOGGER.error("Document [" + docRef.getName()
+            + "] has malformed history");
+      }
     }
 
     return docData;
   }
 
   String replaceInternalWithExternalLinks(String content, String host) {
-    String result = content.replaceAll("src=\\\"(\\.\\./)*/?download/", "src=\"http://" 
-  + host + "/download/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?download/", "href=\"http://" 
-  + host + "/download/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?skin/", "href=\"http://" 
-  + host + "/skin/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?view/", "href=\"http://" 
-  + host + "/view/");
-    result = result.replaceAll("href=\\\"(\\.\\./)*/?edit/", "href=\"http://" 
-  + host + "/edit/");
+    String result = content.replaceAll("src=\\\"(\\.\\./)*/?download/", "src=\"http://"
+        + host + "/download/");
+    result = result.replaceAll("href=\\\"(\\.\\./)*/?download/", "href=\"http://"
+        + host + "/download/");
+    result = result.replaceAll("href=\\\"(\\.\\./)*/?skin/", "href=\"http://"
+        + host + "/skin/");
+    result = result.replaceAll("href=\\\"(\\.\\./)*/?view/", "href=\"http://"
+        + host + "/view/");
+    result = result.replaceAll("href=\\\"(\\.\\./)*/?edit/", "href=\"http://"
+        + host + "/edit/");
     return result;
   }
-  
+
   public String getJSONContent(XWikiDocument cdoc) {
     Map<String, String> data;
     try {
@@ -596,26 +608,26 @@ public class WebUtilsService implements IWebUtilsService {
     XWikiDocument authDoc = getContext().getWiki().getDocument(authDocRef, getContext());
     BaseObject authObj = authDoc.getXObject(getRef("XWiki","XWikiUsers"));
     if(authObj!=null){
-      return authObj.getStringValue("last_name") + ", " 
+      return authObj.getStringValue("last_name") + ", "
           + authObj.getStringValue("first_name");
     } else{
       return getAdminMessageTool().get("cel_ml_unknown_author");
     }
   }
-  
+
   public String getMajorVersion(XWikiDocument doc) {
     String revision = "1";
     if(doc!=null){
       revision = doc.getVersion();
-      if(revision!=null
-          && revision.trim().length()>0
+      if((revision!=null)
+          && (revision.trim().length()>0)
           && revision.contains(".")){
         revision = revision.split("\\.")[0];
       }
     }
     return revision;
   }
-  
+
   private DocumentReference getRef(String spaceName, String pageName){
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
@@ -648,7 +660,7 @@ public class WebUtilsService implements IWebUtilsService {
           }
         }
       }
-      Collections.sort(resultList, new BaseObjectComparator(orderField1, asc1, 
+      Collections.sort(resultList, new BaseObjectComparator(orderField1, asc1,
           orderField2, asc2));
     }
     return resultList;
@@ -705,6 +717,70 @@ public class WebUtilsService implements IWebUtilsService {
     return serializer_local;
   }
 
+  public String getInheritedTemplatedPath(DocumentReference localTemplateRef) {
+    if (localTemplateRef != null) {
+      String templatePath = getRefDefaultSerializer().serialize(localTemplateRef);
+      if (!getContext().getWiki().exists(localTemplateRef, getContext())) {
+        if (!"celements2web".equals(localTemplateRef.getLastSpaceReference().getParent(
+            ).getName())
+            && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef),
+                getContext())) {
+          templatePath = "celements2web:" + templatePath;
+        } else {
+          templatePath = ":" + templatePath.replaceAll("celements2web:", "");
+        }
+      }
+      return templatePath.replaceAll(getContext().getDatabase() + ":", "");
+    }
+    return null;
+  }
+
+  private DocumentReference getCentralTemplateRef(DocumentReference localTemplateRef) {
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        localTemplateRef.getLastSpaceReference().getName(), localTemplateRef.getName());
+    return centralTemplateRef;
+  }
+
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
+    /** deleteDocument in XWiki does NOT set context and store database to doc database
+     * Thus deleting the doc fails if it is not in the current context database. Hence we
+     * need to fix the context database before deleting.
+     */
+    String dbBefore = getContext().getDatabase();
+    try {
+      getContext().setDatabase(doc.getDocumentReference().getLastSpaceReference().getParent(
+          ).getName());
+      LOGGER.debug("deleteDocument: doc [" + getRefDefaultSerializer().serialize(
+          doc.getDocumentReference()) + "," + doc.getLanguage() + "] totrash [" + totrash
+          + "] dbBefore [" + dbBefore + "] db now [" + getContext().getDatabase() + "].");
+      getContext().getWiki().deleteDocument(doc, totrash, getContext());
+    } finally {
+      getContext().setDatabase(dbBefore);
+    }
+  }
+
+  public void deleteAllDocuments(XWikiDocument doc, boolean totrash
+      ) throws XWikiException {
+    // Delete all documents
+    for (String lang : doc.getTranslationList(getContext())) {
+      XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
+      deleteDocument(tdoc, totrash);
+    }
+
+    deleteDocument(doc, totrash);
+  }
+
+  public String getTemplatePathOnDisk(String renderTemplatePath) {
+    for (Map.Entry<Object, Object> entry : tempPathConfig.getMappings().entrySet()) {
+      String pathName = (String) entry.getKey();
+      if (renderTemplatePath.startsWith(":" + pathName)) {
+        return renderTemplatePath.replaceAll("^:(" + pathName + "\\.)?", "/templates/"
+            + ((String) entry.getValue()) + "/") + ".vm";
+      }
+    }
+    return renderTemplatePath;
+  }
+
   public Map<String, String[]> getRequestParameterMap() {
     XWikiRequest request = getContext().getRequest();
     if (request != null) {
@@ -729,6 +805,6 @@ public class WebUtilsService implements IWebUtilsService {
     } else {
       throw new IllegalArgumentException("Invalid requestMap value type");
     }
-  }  
+  }
 
 }

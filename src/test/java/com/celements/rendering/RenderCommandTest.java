@@ -61,21 +61,20 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_RenderCommandTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     velocityContext = new VelocityContext();
     context.put("vcontext", velocityContext);
     currentDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "Content",
         "MyPage"));
     context.setDoc(currentDoc);
     renderCmd = new RenderCommand();
-    mockPageTypeService = createMock(IPageTypeRole.class);
+    mockPageTypeService = createMockAndAddToDefault(IPageTypeRole.class);
     renderCmd.injectedPageTypeService = mockPageTypeService;
-    mockPageTypeResolver = createMock(IPageTypeResolverRole.class);
+    mockPageTypeResolver = createMockAndAddToDefault(IPageTypeResolverRole.class);
     renderCmd.injectedPageTypeResolver = mockPageTypeResolver;
-    renderingEngineMock = createMock(XWikiRenderingEngine.class);
+    renderingEngineMock = createMockAndAddToDefault(XWikiRenderingEngine.class);
     renderCmd.setRenderingEngine(renderingEngineMock);
-    mockRightService = createMock(XWikiRightService.class);
+    mockRightService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightService).anyTimes();
   }
 
@@ -128,7 +127,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getCacheFactory()).andReturn(cacheFactory);
     XWikiConfig conf = new XWikiConfig();
     expect(xwiki.getConfig()).andReturn(conf);
-    replayAll();
+    replayDefault();
     renderCmd.setRenderingEngine(null);
     assertNotNull(renderCmd.getRenderingEngine());
     assertSame("Expecting singleton.", renderCmd.getRenderingEngine(), 
@@ -140,54 +139,54 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         rendererNames.contains("groovy"));
     assertEquals("expecting only groovy and velocity renderer by default", 2,
         rendererNames.size());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testSetRenderingEngine() throws Exception {
-    replayAll();
+    replayDefault();
     renderCmd.setRenderingEngine(renderingEngineMock);
     assertNotNull(renderCmd.getRenderingEngine());
     assertSame("Expecting injected mock object.", renderingEngineMock,
         renderCmd.getRenderingEngine());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetRenderTemplatePath_NoCellType() throws Exception {
     String cellDocFN = "MyLayout.Cell12";
-    replayAll();
+    replayDefault();
     assertEquals(cellDocFN, renderCmd.getRenderTemplatePath(null, cellDocFN, "view"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetRenderTemplatePath_NoViewTemplate_empty() throws Exception {
     String cellDocFN = "MyLayout.Cell12";
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn("").anyTimes();
     expect(ptMock.getName()).andReturn("CelementsCell").anyTimes();
-    replayAll(ptMock);
+    replayDefault();
     assertEquals(cellDocFN, renderCmd.getRenderTemplatePath(ptMock, cellDocFN, "view"));
-    verifyAll(ptMock);
+    verifyDefault();
   }
 
   @Test
   public void testGetRenderTemplatePath_NoViewTemplate_null() throws Exception {
     String cellDocFN = "MyLayout.Cell12";
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(null).anyTimes();
     expect(ptMock.getName()).andReturn("CelementsCell").anyTimes();
-    replayAll(ptMock);
+    replayDefault();
     assertEquals(cellDocFN, renderCmd.getRenderTemplatePath(ptMock, cellDocFN, "view"));
-    verifyAll(ptMock);
+    verifyDefault();
   }
 
   @Test
   public void testGetTemplateDoc() throws Exception {
     DocumentReference templateDocRef = new DocumentReference(context.getDatabase(),
         "Templates", "CelementsPageContentView");
-    XWikiDocument templateDoc = createMock(XWikiDocument.class);
+    XWikiDocument templateDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(templateDocRef), same(context))).andReturn(templateDoc
         ).once();
     replay(xwiki, templateDoc);
@@ -198,7 +197,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetTranslatedContent() throws Exception {
-    XWikiDocument templateDoc = createMock(XWikiDocument.class);
+    XWikiDocument templateDoc = createMockAndAddToDefault(XWikiDocument.class);
     String expectedContent = "do something and velocity macro...\n";
     String transContent = "{pre}\n"
       + expectedContent
@@ -217,7 +216,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetTranslatedContent_wikiRenderer() throws Exception {
-    XWikiDocument templateDoc = createMock(XWikiDocument.class);
+    XWikiDocument templateDoc = createMockAndAddToDefault(XWikiDocument.class);
     String expectedContent = "do something and velocity macro...\n";
     String transContent = "{pre}\n"
       + expectedContent
@@ -237,7 +236,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testRenderCelementsDocument_elemDocRef_renderMode() throws Exception {
     String expectedRenderedContent = "Expected rendered content";
-    XWikiDocument myDoc = createMock(XWikiDocument.class);
+    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
@@ -254,20 +253,20 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
       "groovy"));
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
-    replayAll(myDoc);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDocRef,
         "view"));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         myDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(myDoc);
+    verifyDefault();
   }
 
   @Test
   public void testRenderCelementsDocument_noCellType_default() throws Exception {
     String expectedRenderedContent = "Expected rendered content";
-    XWikiDocument myDoc = createMock(XWikiDocument.class);
+    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
@@ -284,21 +283,21 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
       "groovy"));
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
-    replayAll(myDoc);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDoc,
         "view"));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         myDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(myDoc);
+    verifyDefault();
   }
 
   @Test
   public void testRenderCelementsDocument_noCellType_setDefault_null() throws Exception {
     renderCmd.setDefaultPageTypeReference(null);
     String expectedRenderedContent = "Expected rendered content";
-    XWikiDocument myDoc = createMock(XWikiDocument.class);
+    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).atLeastOnce();
@@ -315,20 +314,20 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
       "groovy"));
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
-    replayAll(myDoc);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsDocument(myDoc,
         "view"));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         myDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(myDoc);
+    verifyDefault();
   }
 
   @Test
   public void testRenderCelementsDocument_access_denied() throws Exception {
     renderCmd.setDefaultPageTypeReference(null);
-    XWikiDocument myDoc = createMock(XWikiDocument.class);
+    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
         "myPage");
     expect(myDoc.getDocumentReference()).andReturn(myDocRef).anyTimes();
@@ -347,10 +346,10 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
       "groovy")).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:Content.myPage"), same(context))).andReturn(false).once();
-    replayAll(myDoc);
+    replayDefault();
     assertEquals("expecting empty because no access rights to template", "",
         renderCmd.renderCelementsDocument(myDoc, "de", "view"));
-    verifyAll(myDoc);
+    verifyDefault();
   }
 
   @Test
@@ -363,8 +362,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         eq(defaultPTRef))).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -375,7 +374,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         "Templates", "CellTypeView");
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplateFN).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(renderTemplateDocRef), same(context))).andReturn(
         templMock);
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
@@ -391,14 +390,14 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementFullName));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementFullName, ((Document)velocityContext.get("celldoc")).getFullName());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   @Test
@@ -410,8 +409,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         eq(defaultPTRef))).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -422,7 +421,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         "Templates", "CellTypeView");
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplateFN).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(renderTemplateDocRef), same(context))).andReturn(
         templMock);
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
@@ -438,14 +437,14 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementDocRef));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   @Test
@@ -454,8 +453,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         (PageTypeReference)isNull())).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -466,7 +465,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         "Templates", "CellTypeView");
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplateFN).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(renderTemplateDocRef), same(context))).andReturn(
         templMock);
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
@@ -482,14 +481,14 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementFullName));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementFullName, ((Document)velocityContext.get("celldoc")).getFullName());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   @Test
@@ -497,8 +496,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         (PageTypeReference)isNull())).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -509,7 +508,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         "Templates", "CellTypeView");
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplateFN).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.getDocument(eq(renderTemplateDocRef), same(context))).andReturn(
         templMock);
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
@@ -525,14 +524,14 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         context.getDatabase(), "MySpace", "myDoc")).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementDocRef));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   /**
@@ -545,8 +544,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         (PageTypeReference)isNull())).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -555,7 +554,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
@@ -566,14 +565,14 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementFullName));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementFullName, ((Document)velocityContext.get("celldoc")).getFullName());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   /**
@@ -585,8 +584,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         (PageTypeReference)isNull())).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -595,7 +594,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
@@ -606,14 +605,14 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
         elementDocRef));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   @Test
@@ -623,8 +622,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         (PageTypeReference)isNull())).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -633,20 +632,20 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
         new IOException());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals("", renderCmd.renderCelementsCell(elementFullName));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementFullName, ((Document)velocityContext.get("celldoc")).getFullName());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   @Test
@@ -654,8 +653,8 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
         "MyLayout", "Cell15");
     XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
-    IPageTypeConfig ptMock = createMock(IPageTypeConfig.class);
-    PageTypeReference ptRefMock = createMock(PageTypeReference.class);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
     expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
         (PageTypeReference)isNull())).andReturn(ptRefMock);
     expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
@@ -664,20 +663,20 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMock(XWikiDocument.class);
+    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
         new IOException());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
-    replayAll(ptMock, templMock);
+    replayDefault();
     assertEquals("", renderCmd.renderCelementsCell(elementDocRef));
     assertEquals("Document object in velocity space musst be a Document api object.",
         Document.class, velocityContext.get("celldoc").getClass());
     assertEquals("expecting celldoc to be set to the rendered cell document.",
         elementDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
-    verifyAll(ptMock, templMock);
+    verifyDefault();
   }
 
   @Test
@@ -688,16 +687,4 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         renderCmd.getTemplatePathOnDisk(":CellPageContentView"));
   }
 
-
-  private void replayAll(Object ... mocks) {
-    replay(xwiki, mockPageTypeService, renderingEngineMock, mockRightService,
-        mockPageTypeResolver);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object ... mocks) {
-    verify(xwiki, mockPageTypeService, renderingEngineMock, mockRightService,
-        mockPageTypeResolver);
-    verify(mocks);
-  }
 }
