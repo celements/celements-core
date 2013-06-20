@@ -37,9 +37,12 @@ public class FormValidationService implements IFormValidationServiceRole {
   }
 
   public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
-    LOGGER.trace("validateRequest() called");
+    LOGGER.trace("validateRequest called");
     Map<String, String[]> requestMap = webUtils.getRequestParameterMap();
-    return validateMap(requestMap);
+    LOGGER.debug("validateRequest: requestMap '" + requestMap + "'");
+    Map<String, Map<ValidationType, Set<String>>> validatedMap = validateMap(requestMap);
+    LOGGER.debug("validateRequest: validatedMap '" + validatedMap + "'");
+    return validatedMap;
   }
 
   public Map<String, Map<ValidationType, Set<String>>> validateMap(

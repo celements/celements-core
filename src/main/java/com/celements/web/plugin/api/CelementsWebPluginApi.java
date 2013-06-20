@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -991,9 +990,9 @@ public class CelementsWebPluginApi extends Api {
     Map<String, Map<ValidationType, Set<String>>> validateMap = getService(
         ).validateRequest();
     for (String key : validateMap.keySet()) {
-      Iterator<String> iter = validateMap.get(key).get(ValidationType.ERROR).iterator();
-      if (iter.hasNext()) {
-        ret.put(key, iter.next());
+      Set<String> set = validateMap.get(key).get(ValidationType.ERROR);
+      if ((set != null) && (set.size() > 0)) {
+        ret.put(key, set.iterator().next());
       }
     }
     return ret;
