@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.rights;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.rights.CelementsRightServiceImpl;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;

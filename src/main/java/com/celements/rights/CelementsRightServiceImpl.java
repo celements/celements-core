@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.rights;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
