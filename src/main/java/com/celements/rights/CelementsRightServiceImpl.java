@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.service.IWebUtilsService;
@@ -16,6 +18,9 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      CelementsRightServiceImpl.class);
+  
   /* Adds an optional check for publish and unpublish dates to determine whether or not a 
    * page can be viewed. */
   @Override
@@ -26,11 +31,19 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
       //default behaviour: no object -> published
       BaseObject obj = getPublishObject(doc);
       if((obj == null) || (isAfterStart(obj) && isBeforeEnd(obj))){
+        LOGGER.info("Document published or not publish controlled.");
         return super.checkRight(userOrGroupName, doc, accessLevel, user, allow, global, 
             context);
       } else {
-        return super.checkRight(userOrGroupName, doc, "edit", user, allow, global, 
-            context);
+        LOGGER.info("Document not published, checking edit rights.");
+        try {
+          return super.checkRight(userOrGroupName, doc, "edit", user, allow, global, 
+              context);
+        } catch(XWikiRightNotFoundException xwrnfe) {
+          LOGGER.info("Rights could not be determined.");
+          //If rights can not be determined default to no rights.
+          return false;
+        }
       }
     } else {
       return super.checkRight(userOrGroupName, doc, accessLevel, user, allow, global, 

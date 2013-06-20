@@ -133,11 +133,8 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
     obj.setXClassReference(rightService.getPublicationClassReference());
     doc.addXObject(obj);
     replay(gs, xwiki);
-    try {
-      rightService.checkRight("XWiki.user", doc, "view", true, true, false, 
-          getContext());
-      fail("Exception expected.");
-    } catch(XWikiRightNotFoundException xwrnfe) { }
+    assertFalse(rightService.checkRight("XWiki.user", doc, "view", true, true, false, 
+          getContext()));
     verify(gs, xwiki);
   }
 
