@@ -49,7 +49,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(0), same(getContext(
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
         )))).andReturn(0).anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
@@ -82,7 +82,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(0), same(getContext(
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
         )))).andReturn(1).anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
@@ -115,7 +115,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(0), same(getContext(
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
         )))).andReturn(1).anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
@@ -154,7 +154,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(0), same(getContext(
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
         )))).andReturn(1).anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
@@ -198,8 +198,20 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
   }
 
   @Test
+  public void testIsPublishActive_notSet() {
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
+        )))).andReturn(-1).once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("publishdate_active"), 
+        eq("celements.publishdate.active"), eq(0), same(getContext()))).andReturn(0
+        ).once();
+    replay(xwiki);
+    assertEquals(false, rightService.isPublishActive(getContext()));
+    verify(xwiki);
+  }
+
+  @Test
   public void testIsPublishActive_false() {
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(0), same(getContext(
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
         )))).andReturn(0).once();
     replay(xwiki);
     assertEquals(false, rightService.isPublishActive(getContext()));
@@ -208,7 +220,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsPublishActive_true() {
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(0), same(getContext(
+    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
         )))).andReturn(1).once();
     replay(xwiki);
     assertEquals(true, rightService.isPublishActive(getContext()));
