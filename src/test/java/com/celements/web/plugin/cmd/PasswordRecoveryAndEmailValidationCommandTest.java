@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 
 public class PasswordRecoveryAndEmailValidationCommandTest 
@@ -111,6 +112,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     expect(doc.getTranslatedDocument(same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
     expect(doc.getTitle()).andReturn(title);
+    expect(doc.getXObject(eq(new DocumentReference(context.getDatabase(), "Celements2", 
+        "FormMailClass")))).andReturn(null);
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(xwiki.getRenderingEngine()).andReturn(renderer);
     expect(renderer.interpretText(eq(title), same(doc), same(context))).andReturn(title);
@@ -174,6 +177,73 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     expect(doc.getTranslatedDocument(same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
     expect(doc.getTitle()).andReturn(title);
+    expect(doc.getXObject(eq(new DocumentReference(context.getDatabase(), "Celements2", 
+        "FormMailClass")))).andReturn(null);
+    XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
+    expect(xwiki.getRenderingEngine()).andReturn(renderer);
+    expect(renderer.interpretText(eq(title), same(doc), same(context))).andReturn(title);
+    CelSendMail celSendMail = createMock(CelSendMail.class);
+    celSendMail.setFrom(eq(from));
+    expectLastCall();
+    celSendMail.setTo(eq(to));
+    expectLastCall();
+    celSendMail.setHtmlContent(eq(content), eq(false));
+    expectLastCall();
+    celSendMail.setTextContent(eq(noHTML));
+    expectLastCall();
+    celSendMail.setSubject(eq(title));
+    expectLastCall();
+    celSendMail.setReplyTo((String)isNull());
+    expectLastCall();
+    celSendMail.setCc((String)isNull());
+    expectLastCall();
+    celSendMail.setBcc((String)isNull());
+    expectLastCall();
+    celSendMail.setAttachments((List<Attachment>)isNull());
+    expectLastCall();
+    celSendMail.setOthers((Map<String, String>)isNull());
+    expectLastCall();
+    expect(celSendMail.sendMail()).andReturn(1);
+    passwdRecValidCmd.injectCelSendMail(celSendMail);
+    String expectedLink = "http://myserver.ch/login?email=to%40mail.com&ac="
+      + validkey;
+    expect(xwiki.getExternalURL(eq("Content.login"), eq("view"),
+        eq("email=to%40mail.com&ac=" + validkey), same(context))
+        ).andReturn(expectedLink).once();
+    replay(doc, celSendMail, renderer, xwiki);
+    passwdRecValidCmd.sendValidationMessage(to, validkey, contentDoc, context);
+    verify(doc, celSendMail, renderer, xwiki);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testSendValidationMessage_fallbackToCelements2web_overwrittenSender(
+      ) throws XWikiException {
+    String from = "sender@mail.com";
+    String to = "to@mail.com";
+    String validkey = "validkey123";
+    String contentDoc = "Tools.ActivationMail";
+    DocumentReference contentDocRef = new DocumentReference(context.getDatabase(),
+        "Tools", "ActivationMail");
+    DocumentReference contentCel2WebDocRef = new DocumentReference("celements2web",
+        "Tools", "ActivationMail");
+    String content = "This is the mail content.";
+    String noHTML = "";
+    String title = "the title";
+    context.put("vcontext", new VelocityContext());
+    XWiki xwiki = createMock(XWiki.class);
+    context.setWiki(xwiki);
+    expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(false);
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(contentCel2WebDocRef), same(context))).andReturn(doc);
+    expect(doc.getTranslatedDocument(same(context))).andReturn(doc).anyTimes();
+    expect(doc.getRenderedContent(same(context))).andReturn(content);
+    expect(doc.getTitle()).andReturn(title);
+    BaseObject sendObj = new BaseObject();
+    DocumentReference sendRef = new DocumentReference(context.getDatabase(), "Celements2",
+        "FormMailClass");
+    sendObj.setStringValue("emailFrom", from);
+    expect(doc.getXObject(eq(sendRef))).andReturn(sendObj);
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(xwiki.getRenderingEngine()).andReturn(renderer);
     expect(renderer.interpretText(eq(title), same(doc), same(context))).andReturn(title);
