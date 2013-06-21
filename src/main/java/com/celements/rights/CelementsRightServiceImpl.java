@@ -65,7 +65,13 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
   }
 
   boolean isPublishActive(XWikiContext context) {
-    return context.getWiki().getWebPreferenceAsInt("publishdate_active", 0, context) == 1;
+    int isActive = context.getWiki().getWebPreferenceAsInt("publishdate_active", -1, 
+        context);
+    if(isActive < 0) {
+      isActive = context.getWiki().getXWikiPreferenceAsInt("publishdate_active", 
+          "celements.publishdate.active", 0, context);
+    }
+    return isActive == 1;
   }
 
   boolean isAfterStart(BaseObject obj) {
