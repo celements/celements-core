@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -187,7 +188,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
   public void testGetPublishObject_null() {
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "Space", "Doc"));
-    assertNull(rightService.getPublishObject(doc));
+    assertNull(rightService.getPublishObjects(doc));
   }
 
   @Test
@@ -197,7 +198,64 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
     BaseObject obj = new BaseObject();
     obj.setXClassReference(rightService.getPublicationClassReference());
     doc.addXObject(obj);
-    assertEquals(obj, rightService.getPublishObject(doc));
+    assertEquals(obj, rightService.getPublishObjects(doc).get(0));
+  }
+
+  @Test
+  public void testGetPublishObject_hasObjs() {
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "Space", "Doc"));
+    BaseObject obj1 = new BaseObject();
+    obj1.setXClassReference(rightService.getPublicationClassReference());
+    doc.addXObject(obj1);
+    BaseObject obj2 = new BaseObject();
+    obj2.setXClassReference(rightService.getPublicationClassReference());
+    doc.addXObject(obj2);
+    assertEquals(2, rightService.getPublishObjects(doc).size());
+  }
+
+  @Test
+  public void testIsPublished_noLimits() {
+    assertTrue(rightService.isPublished(null));
+    assertTrue(rightService.isPublished(new ArrayList<BaseObject>()));
+  }
+
+  @Test
+  public void testIsPublished_noLimits_umpublished() {
+    BaseObject obj1 = new BaseObject();
+    Calendar gc = GregorianCalendar.getInstance();
+    gc.add(GregorianCalendar.HOUR, 1);
+    obj1.setDateValue("publishDate", gc.getTime());
+    BaseObject obj2 = new BaseObject();
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("unpublishDate", gc.getTime());
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("publishDate", gc.getTime());
+    List<BaseObject> objs = new ArrayList<BaseObject>();
+    objs.add(obj1);
+    objs.add(obj2);
+    assertFalse(rightService.isPublished(objs));
+  }
+
+  @Test
+  public void testIsPublished_noLimits_published() {
+    BaseObject obj1 = new BaseObject();
+    BaseObject obj3 = new BaseObject();
+    Calendar gc = GregorianCalendar.getInstance();
+    gc.add(GregorianCalendar.HOUR, 1);
+    obj3.setDateValue("unpublishDate", gc.getTime());
+    obj1.setDateValue("publishDate", gc.getTime());
+    BaseObject obj2 = new BaseObject();
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("unpublishDate", gc.getTime());
+    obj3.setDateValue("publishDate", gc.getTime());
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("publishDate", gc.getTime());
+    List<BaseObject> objs = new ArrayList<BaseObject>();
+    objs.add(obj1);
+    objs.add(obj2);
+    objs.add(obj3);
+    assertTrue(rightService.isPublished(objs));
   }
 
   @Test

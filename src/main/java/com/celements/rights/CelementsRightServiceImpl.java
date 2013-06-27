@@ -3,6 +3,7 @@ package com.celements.rights;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,9 +33,8 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
       ) throws XWikiRightNotFoundException, XWikiException {
     if(isPublishActive(context) && isRestrictedRightsAction(accessLevel)) {
       //default behaviour: no object -> published
-      BaseObject obj = getPublishObject(doc);
-      if(!isPubOverride(context) && (isUnpubOverride(context) || (obj == null) 
-          || isPublished(obj))) {
+      List<BaseObject> objs = getPublishObjects(doc);
+      if(!isPubOverride(context) && (isUnpubOverride(context) || isPublished(objs))) {
         LOGGER.info("Document published or not publish controlled.");
         return super.checkRight(userOrGroupName, doc, accessLevel, user, allow, global, 
             context);
@@ -83,8 +83,8 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
     return (Integer.toString(UNPUBLISHED).equals(val));
   }
 
-  BaseObject getPublishObject(XWikiDocument doc) {
-    return doc.getXObject(getPublicationClassReference());
+  List<BaseObject> getPublishObjects(XWikiDocument doc) {
+    return doc.getXObjects(getPublicationClassReference());
   }
 
   DocumentReference getPublicationClassReference() {
@@ -110,9 +110,18 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
     return "1".equals(isActive);
   }
 
-  //TODO test and implement for List<BaseObject> for multiple 
-  boolean isPublished(BaseObject obj) {
-    return isAfterStart(obj) && isBeforeEnd(obj);
+  boolean isPublished(List<BaseObject> objs) {
+    boolean isPublished = false;
+    if((objs != null) && (!objs.isEmpty())) {
+      for(BaseObject obj : objs) {
+        if(obj != null) {
+          isPublished |= isAfterStart(obj) && isBeforeEnd(obj);
+        }
+      }
+    } else {
+      isPublished = true; //no limits set mean always published
+    }
+    return isPublished;
   }
   
   boolean isAfterStart(BaseObject obj) {
