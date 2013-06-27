@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CheckClassesCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       CheckClassesCommand.class);
 
   public static final String CLASS_PANEL_CONFIG_CLASS = "Class.PanelConfigClass";
@@ -73,7 +73,7 @@ public class CheckClassesCommand {
       getTokenClass(context);
       getOverlayConfigClass(context);
     } catch (XWikiException e) {
-      mLogger.fatal(e);
+      LOGGER.fatal(e);
     }
     
     CompositorComponent compComponent = (CompositorComponent) Utils.getComponent(
@@ -92,7 +92,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.ContextMenuItemClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("ContextMenuItemClass");
@@ -120,7 +120,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument(CLASS_PANEL_CONFIG_CLASS, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       String[] classNameParts = CLASS_PANEL_CONFIG_CLASS.split("\\.");
       doc = new XWikiDocument();
       doc.setSpace(classNameParts[0]);
@@ -149,7 +149,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("XWiki.XWikiPreferences", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("XWiki");
       doc.setName("XWikiPreferences");
@@ -196,7 +196,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("XWiki.XWikiSkins", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("XWiki");
       doc.setName("XWikiSkins");
@@ -221,7 +221,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("XWiki.XWikiUsers", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("XWiki");
       doc.setName("XWikiUsers");
@@ -235,7 +235,7 @@ public class CheckClassesCommand {
     needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language",
         4);
 
-    mLogger.debug("checking XWikiUsers Class for " + context.getDatabase()
+    LOGGER.debug("checking XWikiUsers Class for " + context.getDatabase()
         + " update needed: " + needsUpdate);
 
     setContentAndSaveClassDocument(doc, needsUpdate, context);
@@ -250,7 +250,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.FormMailClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("FormMailClass");
@@ -276,7 +276,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("XWiki.PhotoAlbumClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("XWiki");
       doc.setName("PhotoAlbumClass");
@@ -308,7 +308,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.FilebaseTag", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("FilebaseTag");
@@ -331,7 +331,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.ImportClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("ImportClass");
@@ -360,7 +360,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Tools.Banner", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Tools");
       doc.setName("Banner");
@@ -384,7 +384,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Tools.FlashBanner", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Tools");
       doc.setName("FlashBanner");
@@ -411,7 +411,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Skins.UserCSS", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Skins");
       doc.setName("UserCSS");
@@ -437,7 +437,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.FormActionClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("FormActionClass");
@@ -462,7 +462,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.FormConfigClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("FormConfigClass");
@@ -488,7 +488,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.ActionTypeClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("ActionTypeClass");
@@ -511,7 +511,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.FormStorageClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("FormStorageClass");
@@ -537,7 +537,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Celements2.ReceiverEMail", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Celements2");
       doc.setName("ReceiverEMail");
@@ -561,7 +561,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("JavaScript.ExternalFiles", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("JavaScript");
       doc.setName("ExternalFiles");
@@ -584,7 +584,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.RTEConfigTypeClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("RTEConfigTypeClass");
@@ -613,7 +613,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.RTEConfigTypePropertiesClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("RTEConfigTypePropertiesClass");
@@ -652,7 +652,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument(MEDIALIB_CONFIG_CLASS, context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace(MEDIALIB_CONFIG_CLASS_SPACE);
       doc.setName(MEDIALIB_CONFIG_CLASS_NAME);
@@ -679,7 +679,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.DocLibConfigClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("DocLibConfigClass");
@@ -704,7 +704,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.KeyValueClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("KeyValueClass");
@@ -733,7 +733,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.TokenClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("TokenClass");
@@ -762,7 +762,7 @@ public class CheckClassesCommand {
     try {
       doc = xwiki.getDocument("Classes.OverlayConfigClass", context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
       doc = new XWikiDocument();
       doc.setSpace("Classes");
       doc.setName("OverlayConfigClass");
