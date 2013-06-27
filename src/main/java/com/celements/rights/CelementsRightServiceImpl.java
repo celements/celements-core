@@ -110,7 +110,6 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
     return "1".equals(isActive);
   }
 
-  //TODO test and implement for List<BaseObject> for multiple 
   boolean isPublished(BaseObject obj) {
     return isAfterStart(obj) && isBeforeEnd(obj);
   }

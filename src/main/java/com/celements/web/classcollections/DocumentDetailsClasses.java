@@ -63,7 +63,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addDateField("publishDate", "Publish Date (dd.MM.yyyy HH:mm)", 
-        "dd.MM.yyyy HH:mm", 1);
+        "dd.MM.yyyy HH:mm", 0);
     needsUpdate |= bclass.addDateField("unpublishDate", "Unpublish Date (dd.MM.yyyy " +
         "HH:mm)", "dd.MM.yyyy HH:mm", 0);
 
