@@ -20,7 +20,9 @@
 package com.celements.rteConfig;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +42,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class RTEConfig {
 
+  private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfig.class);
+
   private static final String RTE_CONFIG_TYPE_PROP_CLASS_NAME =
         "RTEConfigTypePropertiesClass";
   public static final String RTE_CONFIG_TYPE_PROP_CLASS_SPACE = "Classes";
@@ -51,7 +55,11 @@ public class RTEConfig {
   public static final String PROP_CLASS_NAME = RTE_CONFIG_TYPE_PROP_CLASS_SPACE + "."
         + RTE_CONFIG_TYPE_PROP_CLASS_NAME;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfig.class);
+  private final static Map<String, String> rteConfigFieldDefaults =
+      new HashMap<String, String>();
+      static {
+        rteConfigFieldDefaults.put("blockformats", "rte_heading1=h1,rte_text=p");
+      };
 
   private PageTypeCommand injectedPageTypeInstance;
 
@@ -92,6 +100,12 @@ public class RTEConfig {
     // XWikiPreferences
     if("".equals(resultConfig.trim())) {
       resultConfig = getRTEConfigFieldFromPreferenceDoc(name, "XWiki.XWikiPreferences");
+    }
+
+    // xwiki.cfg
+    if("".equals(resultConfig.trim())) {
+      resultConfig = getContext().getWiki().Param("celements.rteconfig." + name,
+          rteConfigFieldDefaults.get(name));
     }
     return resultConfig;
   }
