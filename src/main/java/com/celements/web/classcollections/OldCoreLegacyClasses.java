@@ -31,15 +31,20 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
   public static final String TOOLS_FLASH_BANNER_CLASS = TOOLS_FLASH_BANNER_CLASS_SPACE
       + "." + TOOLS_FLASH_BANNER_CLASS_DOC;
 
-  public static final String MEDIALIB_CONFIG_CLASS_SPACE = "Classes";
   public static final String MEDIALIB_CONFIG_CLASS_DOC = "MediaLibConfigClass";
+  public static final String MEDIALIB_CONFIG_CLASS_SPACE = "Classes";
   public static final String MEDIALIB_CONFIG_CLASS = MEDIALIB_CONFIG_CLASS_SPACE + "."
       + MEDIALIB_CONFIG_CLASS_DOC;
 
-  public static final String DOCLIB_CONFIG_CLASS_SPACE = "Classes";
   public static final String DOCLIB_CONFIG_CLASS_DOC = "DocLibConfigClass";
+  public static final String DOCLIB_CONFIG_CLASS_SPACE = "Classes";
   public static final String DOCLIB_CONFIG_CLASS = DOCLIB_CONFIG_CLASS_SPACE + "."
       + DOCLIB_CONFIG_CLASS_DOC;
+
+  public static final String FORM_FIELD_CLASS_DOC = "FormFieldClass";
+  public static final String FORM_FIELD_CLASS_SPACE = "Celements2";
+  public static final String FORM_FIELD_CLASS = FORM_FIELD_CLASS_SPACE + "."
+      + FORM_FIELD_CLASS_DOC;
 
   @Override
   protected Log getLogger() {
@@ -53,6 +58,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
   @Override
   protected void initClasses() throws XWikiException {
     getExtended_XWikiSkinsClass();
+    getFormFieldClass();
     getBannerClass();
     getFlashBannerClass();
     getMediaLibConfigClass();
@@ -82,6 +88,35 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("menu_elements", "Available Menu Elements", 30);
     needsUpdate |= bclass.addTextField("skin_config_class_name",
         "Skin Config Class Name", 30);
+
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+
+  public DocumentReference getFormFieldClassRef(String wikiName) {
+    return new DocumentReference(wikiName, FORM_FIELD_CLASS_SPACE,
+        FORM_FIELD_CLASS_DOC);
+  }
+
+  private BaseClass getFormFieldClass() throws XWikiException {
+    XWikiDocument doc;
+    boolean needsUpdate = false;
+    DocumentReference classRef = getFormFieldClassRef(getContext().getDatabase());
+
+    try {
+      doc = getContext().getWiki().getDocument(classRef, getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get " + FORM_FIELD_CLASS + " class document. ", exp);
+      doc = new XWikiDocument(classRef);
+      needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
+    needsUpdate |= bclass.addTextField("fieldname", "fieldname", 30);
+    needsUpdate |= addBooleanField(bclass, "isRequired", "is Required", "yesno", 0);
+    needsUpdate |= addBooleanField(bclass, "ruleSnippet", "Rule velocity Snippet",
+        "yesno", 0);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
