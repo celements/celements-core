@@ -91,6 +91,11 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String ACTION_TYPE_CLASS = ACTION_TYPE_CLASS_SPACE + "."
         + ACTION_TYPE_CLASS_DOC;
 
+  public static final String ACTION_TYPE_PROP_CLASS_DOC = "ActionTypeProperties";
+  public static final String ACTION_TYPE_PROP_CLASS_SPACE = "Celements2";
+  public static final String ACTION_TYPE_PROP_CLASS = ACTION_TYPE_PROP_CLASS_SPACE + "."
+        + ACTION_TYPE_PROP_CLASS_DOC;
+
   public static final String FORM_STORAGE_CLASS_DOC = "FormStorageClass";
   public static final String FORM_STORAGE_CLASS_SPACE = "Celements2";
   public static final String FORM_STORAGE_CLASS = FORM_STORAGE_CLASS_SPACE + "."
@@ -133,6 +138,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     getFormActionClass();
     getFormConfigClass();
     getActionTypeClass();
+    getActionTypePropertiesClass();
     getFormStorageClass();
     getReceiverEMailClass();
     getJavaScriptExternalFilesClass();
@@ -546,6 +552,35 @@ public class OldCoreClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("action_type", "Action Type", 30);
+
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+
+  public DocumentReference getActionTypePropertiesClassRef(String wikiName) {
+    return new DocumentReference(wikiName, ACTION_TYPE_PROP_CLASS_SPACE,
+        ACTION_TYPE_PROP_CLASS_DOC);
+  }
+
+  private BaseClass getActionTypePropertiesClass() throws XWikiException {
+    XWikiDocument doc;
+    boolean needsUpdate = false;
+    DocumentReference classRef = getActionTypePropertiesClassRef(
+        getContext().getDatabase());
+
+    try {
+      doc = getContext().getWiki().getDocument(classRef, getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get " + ACTION_TYPE_PROP_CLASS + " class document. ", exp);
+      doc = new XWikiDocument(classRef);
+      needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
+    needsUpdate |= bclass.addTextField("action_exec", "Action Exec Template", 30);
+    needsUpdate |= bclass.addTextField("action_name", "Action Pretty Name", 30);
+    needsUpdate |= bclass.addTextField("action_edit", "Action Edit Template", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
