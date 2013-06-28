@@ -23,6 +23,7 @@ import org.xwiki.observation.EventListener;
 
 import com.celements.common.classes.CompositorComponent;
 import com.celements.web.classcollections.OldCoreClasses;
+import com.celements.web.classcollections.OldCoreLegacyClasses;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -33,11 +34,16 @@ public class CheckClassesCommand {
 
   @Deprecated
   public static final String CLASS_PANEL_CONFIG_CLASS = OldCoreClasses.PANEL_CONFIG_CLASS;
-  public static final String MEDIALIB_CONFIG_CLASS_SPACE = "Classes";
-  public static final String MEDIALIB_CONFIG_CLASS_NAME = "MediaLibConfigClass";
 
-  public static final String MEDIALIB_CONFIG_CLASS = MEDIALIB_CONFIG_CLASS_SPACE + "."
-      + MEDIALIB_CONFIG_CLASS_NAME;
+  @Deprecated
+  public static final String MEDIALIB_CONFIG_CLASS_SPACE =
+      OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS_SPACE;
+  @Deprecated
+  public static final String MEDIALIB_CONFIG_CLASS_NAME =
+      OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS_DOC;
+  @Deprecated
+  public static final String MEDIALIB_CONFIG_CLASS =
+      OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
   public void checkClasses(XWikiContext context) {
     CompositorComponent compComponent = (CompositorComponent) Utils.getComponent(

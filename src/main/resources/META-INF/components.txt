@@ -34,3 +34,4 @@ com.celements.emptycheck.internal.DefaultEmptyDocStrategy
 com.celements.inheritor.DefaultTemplatePathTransformationConfiguration
 com.celements.web.classcollections.DocumentDetailsClasses
 com.celements.web.classcollections.OldCoreClasses
+com.celements.web.classcollections.OldCoreLegacyClasses
