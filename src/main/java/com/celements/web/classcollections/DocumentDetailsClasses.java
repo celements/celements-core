@@ -29,13 +29,12 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-@Component("celements.imageMap.classes")
-public class ImageMapClasses extends AbstractClassCollection {
+@Component("celements.documentDetails")
+public class DocumentDetailsClasses extends AbstractClassCollection {
   
-  private static Log LOGGER = LogFactory.getFactory().getInstance(ImageMapClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      DocumentDetailsClasses.class);
 
-  public ImageMapClasses() { }
-  
   @Override
   protected Log getLogger() {
     return LOGGER;
@@ -43,63 +42,71 @@ public class ImageMapClasses extends AbstractClassCollection {
 
   @Override
   protected void initClasses() throws XWikiException {
-    getImageMapConfigClass();
-    getImageMapClass();
+    getDocumentPublicationClass();
+    getDocumentExtractClass();
   }
   
-  private BaseClass getImageMapConfigClass() throws XWikiException {
+  BaseClass getDocumentPublicationClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "ImageMapConfigClass");
+        "Classes", "DocumentPublication");
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get ImageMapConfigClass document. ", exp);
+      LOGGER.error(exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
-    needsUpdate |= bclass.addTextField("lang", "Language", 30);
-    needsUpdate |= bclass.addTextAreaField("map", "Map Code", 80, 15);
-    
-    if(!"internal".equals(bclass.getCustomMapping())){
+    needsUpdate |= bclass.addDateField("publishDate", "Publish Date (dd.MM.yyyy HH:mm)", 
+        "dd.MM.yyyy HH:mm", 0);
+    needsUpdate |= bclass.addDateField("unpublishDate", "Unpublish Date (dd.MM.yyyy " +
+        "HH:mm)", "dd.MM.yyyy HH:mm", 0);
+
+    if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
       bclass.setCustomMapping("internal");
     }
-    
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
-  }
-  
-  protected BaseClass getImageMapClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "ImageMapClass");
-    
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get ImageMapClass document. ", exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-    
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
+  BaseClass getDocumentExtractClass() throws XWikiException {
+    XWikiDocument doc;
+    boolean needsUpdate = false;
+    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
+        "Classes", "DocumentExtract");
+
+    try {
+      doc = getContext().getWiki().getDocument(classRef, getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error(exp);
+      doc = new XWikiDocument(classRef);
+      needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getXClass();
+    bclass.setDocumentReference(classRef);
+    needsUpdate |= bclass.addTextField("language", "Language", 30);
+    needsUpdate |= bclass.addTextAreaField("extract", "Extract", 80, 7);
+
+    if (!"internal".equals(bclass.getCustomMapping())) {
+      needsUpdate = true;
+      bclass.setCustomMapping("internal");
+    }
+
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+
+
   public String getConfigName() {
-    return "imageMap";
+    return "documentDetails";
   }
 
 }

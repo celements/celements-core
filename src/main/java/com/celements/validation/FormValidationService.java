@@ -1,7 +1,6 @@
 package com.celements.validation;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,10 +12,13 @@ import org.xwiki.component.annotation.Requirement;
 import com.celements.web.service.IWebUtilsService;
 
 @Component
-public class FormValidationService implements IFormValidationRole {
+public class FormValidationService implements IFormValidationServiceRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       FormValidationService.class);
+
+  private static final MapHandler<String, ValidationType, String> MAPHANDLER =
+      new MapHandler<String, ValidationType, String>();
 
   @Requirement
   private IWebUtilsService webUtils;
@@ -27,57 +29,53 @@ public class FormValidationService implements IFormValidationRole {
   @Requirement
   private Map<String, IFieldValidationRuleRole> fieldValidationRules;
 
-  void injectValidationRules(Map<String, IRequestValidationRuleRole> requestValidationRules,
+  void injectValidationRules(
+      Map<String, IRequestValidationRuleRole> requestValidationRules,
       Map<String, IFieldValidationRuleRole> fieldValidationRules) {
     this.requestValidationRules = requestValidationRules;
     this.fieldValidationRules = fieldValidationRules;
   }
 
-  public Map<String, Set<String>> validateRequest() {
-    LOGGER.trace("validateRequest() called");
+  public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
+    LOGGER.trace("validateRequest called");
     Map<String, String[]> requestMap = webUtils.getRequestParameterMap();
-    return validateMap(requestMap);
+    LOGGER.debug("validateRequest: requestMap '" + requestMap + "'");
+    Map<String, Map<ValidationType, Set<String>>> validatedMap = validateMap(requestMap);
+    LOGGER.debug("validateRequest: validatedMap '" + validatedMap + "'");
+    return validatedMap;
   }
 
-  public Map<String, Set<String>> validateMap(Map<String, String[]> requestMap) {
-    Map<String, Set<String>> validationMap = new HashMap<String, Set<String>>();
-    Map<RequestParameter, String[]> convertedMap = convertMapKeys(requestMap);
+  public Map<String, Map<ValidationType, Set<String>>> validateMap(
+      Map<String, String[]> requestMap) {
+    Map<String, Map<ValidationType, Set<String>>> ret =
+        new HashMap<String, Map<ValidationType, Set<String>>>();
+    Map<RequestParameter, String[]> convertedRequestMap = convertMapKeys(requestMap);
     for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
       LOGGER.trace("Calling validateRequest() for rule '" + validationRule + "'");
-      mergeMaps(validationRule.validateRequest(convertedMap), validationMap);
+      MAPHANDLER.mergeMultiMaps(validationRule.validateRequest(convertedRequestMap), ret);
     }
-    return validationMap;
+    return ret;
   }
 
   Map<RequestParameter, String[]> convertMapKeys(Map<String, String[]> requestMap) {
-    Map<RequestParameter, String[]> retMap = new HashMap<RequestParameter, String[]>();
+    Map<RequestParameter, String[]> convMap = new HashMap<RequestParameter, String[]>();
     for (String key : requestMap.keySet()) {
       RequestParameter requestparam = RequestParameter.create(key);
       if (requestparam != null) {
-        retMap.put(requestparam, requestMap.get(key));
+        convMap.put(requestparam, requestMap.get(key));
       }
     }
-    return retMap;
+    return convMap;
   }
 
-  void mergeMaps(Map<String, Set<String>> merge, Map<String, Set<String>> to) {
-    for (String key : merge.keySet()) {
-      Set<String> set = merge.get(key);
-      Set<String> toSet = to.get(key);
-      if (toSet == null) {
-        to.put(key, new HashSet<String>(set));
-      } else {
-        toSet.addAll(set);
-      }
-    }
-  }
-
-  public Set<String> validateField(String className, String fieldName, String value) {
-    Set<String> validationSet = new HashSet<String>();
+  public Map<ValidationType, Set<String>> validateField(String className,
+      String fieldName, String value) {
+    Map<ValidationType, Set<String>> ret = new HashMap<ValidationType, Set<String>>();
     for (IFieldValidationRuleRole validationRule : fieldValidationRules.values()) {
-      validationSet.addAll(validationRule.validateField(className, fieldName, value));
+      LOGGER.trace("Calling validateField() for rule '" + validationRule + "'");
+      MAPHANDLER.mergeMaps(validationRule.validateField(className, fieldName, value), ret);
     }
-    return validationSet;
+    return ret;
   }
 
 }

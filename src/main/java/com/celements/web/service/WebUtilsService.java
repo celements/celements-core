@@ -50,6 +50,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
@@ -80,6 +81,12 @@ public class WebUtilsService implements IWebUtilsService {
   EntityReferenceResolver<String> referenceResolver;
 
   /**
+   * Used to get the template path mapping information.
+   */
+  @Requirement
+  private TemplatePathTransformationConfiguration tempPathConfig;
+
+  /**
    * TODO change access to wiki-configuration "default" and check access to e.g.
    * 'languages' property
    * 
@@ -97,8 +104,6 @@ public class WebUtilsService implements IWebUtilsService {
    *  
    *  Source: http://extensions.xwiki.org/xwiki/bin/view/Extension/Configuration+Module
    */
-
-
 
   @Requirement
   Execution execution;
@@ -794,6 +799,17 @@ public class WebUtilsService implements IWebUtilsService {
     }
 
     deleteDocument(doc, totrash);
+  }
+
+  public String getTemplatePathOnDisk(String renderTemplatePath) {
+    for (Map.Entry<Object, Object> entry : tempPathConfig.getMappings().entrySet()) {
+      String pathName = (String) entry.getKey();
+      if (renderTemplatePath.startsWith(":" + pathName)) {
+        return renderTemplatePath.replaceAll("^:(" + pathName + "\\.)?", "/templates/"
+              + ((String) entry.getValue()) + "/") + ".vm";
+      }
+    }
+    return renderTemplatePath;
   }
 
 }

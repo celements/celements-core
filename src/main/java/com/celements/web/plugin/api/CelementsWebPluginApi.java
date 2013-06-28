@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +52,7 @@ import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.RTEConfig;
 import com.celements.sajson.Builder;
+import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
@@ -986,15 +986,16 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> validateRequest() {
-    Map<String, String> validateMap = new HashMap<String, String>();
-    Map<String, Set<String>> validateSetMap = getService().validateRequest();
-    for (String key : validateSetMap.keySet()) {
-      Iterator<String> iter = validateSetMap.get(key).iterator();
-      if (iter.hasNext()) {
-        validateMap.put(key, iter.next());
+    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, Map<ValidationType, Set<String>>> validateMap = getService(
+        ).validateRequest();
+    for (String key : validateMap.keySet()) {
+      Set<String> set = validateMap.get(key).get(ValidationType.ERROR);
+      if ((set != null) && (set.size() > 0)) {
+        ret.put(key, set.iterator().next());
       }
     }
-    return validateMap;
+    return ret;
   }
 
   private PageLayoutCommand getPageLayoutCmd() {

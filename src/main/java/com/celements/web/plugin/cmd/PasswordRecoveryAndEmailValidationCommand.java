@@ -328,7 +328,6 @@ public class PasswordRecoveryAndEmailValidationCommand {
     String sender = "";
     String subject = "";
     String content = "";
-    sender = getContext().getWiki().getXWikiPreference("admin_email", getContext());
     XWikiDocument contentDoc = null;
     if(getContext().getWiki().exists(contentDocRef, getContext())) {
       contentDoc = getContext().getWiki().getDocument(contentDocRef, getContext());
@@ -336,6 +335,15 @@ public class PasswordRecoveryAndEmailValidationCommand {
       DocumentReference contentCentralDocRef = new DocumentReference("celements2web",
           contentDocRef.getLastSpaceReference().getName(), contentDocRef.getName());
       contentDoc = getContext().getWiki().getDocument(contentCentralDocRef, getContext());
+    }
+    DocumentReference mailSenderClassRef = new DocumentReference(getContext(
+        ).getDatabase(), "Celements2", "FormMailClass");
+    BaseObject senderObj = contentDoc.getXObject(mailSenderClassRef);
+    if(senderObj != null) {
+      sender = senderObj.getStringValue("emailFrom");
+    }
+    if("".equals(sender.trim())) {
+      sender = getContext().getWiki().getXWikiPreference("admin_email", getContext());
     }
     setValidationInfoInContext(to, validkey);
     content = contentDoc.getTranslatedDocument(getContext()).getRenderedContent(
