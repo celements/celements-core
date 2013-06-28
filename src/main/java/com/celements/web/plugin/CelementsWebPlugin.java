@@ -37,6 +37,7 @@ import org.apache.velocity.VelocityContext;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.pagetype.IPageType;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
@@ -418,11 +419,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public String getPossibleLogins(XWikiContext context) {
-    String possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
+    String possibleLogins = context.getWiki().getXWikiPreference(
+        OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, context);
     if((possibleLogins == null) || "".equals(possibleLogins.trim())) {
       String db = context.getDatabase();
       context.setDatabase("celements2web");
-      possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
+      possibleLogins = context.getWiki().getXWikiPreference(
+          OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, context);
       context.setDatabase(db);
       if((possibleLogins == null) || "".equals(possibleLogins)) {
         possibleLogins = "loginname";

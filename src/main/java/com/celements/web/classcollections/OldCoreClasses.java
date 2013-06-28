@@ -30,6 +30,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String XWIKI_PREFERENCES_CLASS_SPACE = "XWiki";
   public static final String XWIKI_PREFERENCES_CLASS = XWIKI_PREFERENCES_CLASS_SPACE + "."
         + XWIKI_PREFERENCES_CLASS_DOC;
+  public static final String XWIKI_PREFERENCES_CELLOGIN_PROPERTY = "cellogin";
 
   public static final String IMPORT_CLASS_DOC = "ImportClass";
   public static final String IMPORT_CLASS_SPACE = "Classes";
@@ -263,7 +264,8 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addStaticListField("celements_version",
         "Celements Version Mode", 1, false, "---|celements2|celements3", "select");
     needsUpdate |= bclass.addTextField("cel_edittabs_config", "Tab Config", 30);
-    needsUpdate |= bclass.addTextField("cellogin", "cellogin", 30);
+    needsUpdate |= bclass.addTextField(XWIKI_PREFERENCES_CELLOGIN_PROPERTY,
+        "login data fields for usercredntials", 30);
     needsUpdate |= bclass.addTextField("admin_language", "Admin Language", 30);
     // plugins property works only for the main wiki.
     // needsUpdate |= bclass.addTextField("plugins" , "Additional Plugins", 30);

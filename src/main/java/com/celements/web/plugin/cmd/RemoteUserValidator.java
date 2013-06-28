@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.celements.sajson.Builder;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.CelementsWebPlugin;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,7 +46,9 @@ public class RemoteUserValidator {
       Principal principal = null;
       try {
         String login = getCelementsweb(context).getUsernameForUserData(username, 
-            context.getWiki().getXWikiPreference("cellogin", "loginname", context), context);
+            context.getWiki().getXWikiPreference(
+                OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "loginname", context),
+                context);
         principal = context.getWiki().getAuthService().authenticate(login, password, 
             context);
       } catch (XWikiException e) {
@@ -129,7 +132,8 @@ public class RemoteUserValidator {
     if((group != null) && !group.contains(":") && !group.equals("XWiki.XWikiAllGroup")) {
       try {
          userDocName = getCelementsweb(context).getUsernameForUserData(username, 
-            context.getWiki().getXWikiPreference("cellogin", "loginname", context), 
+            context.getWiki().getXWikiPreference(
+                OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "loginname", context), 
             context);
       } catch (XWikiException e) {
         mLogger.error("Could not get user for username '" + username + "'.");
