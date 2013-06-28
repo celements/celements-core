@@ -24,41 +24,39 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.CelementsClassCollection;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.imageMap.classes")
-public class ImageMapClasses extends CelementsClassCollection {
+public class ImageMapClasses extends AbstractClassCollection {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ImageMapClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(ImageMapClasses.class);
 
   public ImageMapClasses() { }
   
   @Override
   protected Log getLogger() {
-    return mLogger;
+    return LOGGER;
   }
 
   @Override
-  protected void initClasses(XWikiContext context) throws XWikiException {
-    getImageMapConfigClass(context);
-    getImageMapClass(context);
+  protected void initClasses() throws XWikiException {
+    getImageMapConfigClass();
+    getImageMapClass();
   }
   
-  protected BaseClass getImageMapConfigClass(XWikiContext context) throws XWikiException {
+  private BaseClass getImageMapConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
-      "ImageMapConfigClass");
+    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
+        "Classes", "ImageMapConfigClass");
 
     try {
-      doc = context.getWiki().getDocument(classRef, context);
-    } catch (XWikiException e) {
-      mLogger.error(e);
+      doc = getContext().getWiki().getDocument(classRef, getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get ImageMapConfigClass document. ", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -74,20 +72,20 @@ public class ImageMapClasses extends CelementsClassCollection {
       bclass.setCustomMapping("internal");
     }
     
-    setContentAndSaveClassDocument(doc, needsUpdate, context);
+    setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
   
-  protected BaseClass getImageMapClass(XWikiContext context) throws XWikiException {
+  protected BaseClass getImageMapClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
-      "ImageMapClass");
+    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
+        "Classes", "ImageMapClass");
     
     try {
-      doc = context.getWiki().getDocument(classRef, context);
-    } catch (XWikiException e) {
-      mLogger.error(e);
+      doc = getContext().getWiki().getDocument(classRef, getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get ImageMapClass document. ", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -96,7 +94,7 @@ public class ImageMapClasses extends CelementsClassCollection {
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
     
-    setContentAndSaveClassDocument(doc, needsUpdate, context);
+    setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
