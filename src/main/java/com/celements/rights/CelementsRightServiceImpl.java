@@ -95,12 +95,20 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
   }
   
   boolean isPublishActive(XWikiContext context) {
-    return isPublishActive(context.getDoc().getDocumentReference(), context);
+    DocumentReference forDocRef = null;
+    if(context.getDoc() != null) {
+      forDocRef = context.getDoc().getDocumentReference();
+    }
+    return isPublishActive(forDocRef, context);
   }
 
-  boolean isPublishActive(DocumentReference forDoc, XWikiContext context) {
-    String isActive = context.getWiki().getSpacePreference("publishdate_active", 
-        forDoc.getLastSpaceReference().getName(), "-1", context);
+  boolean isPublishActive(DocumentReference forDocRef, XWikiContext context) {
+    String space = null;
+    if(forDocRef != null) {
+      space = forDocRef.getLastSpaceReference().getName();
+    }
+    String isActive = context.getWiki().getSpacePreference("publishdate_active", space, 
+        "-1", context);
     if("-1".equals(isActive)) {
       isActive = context.getWiki().getXWikiPreference("publishdate_active", 
           "celements.publishdate.active", "0", context);
