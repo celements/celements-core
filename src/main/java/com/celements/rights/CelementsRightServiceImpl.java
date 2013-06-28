@@ -3,6 +3,7 @@ package com.celements.rights;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +19,10 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
+  public static enum PubUnpub {
+    PUBLISHED, UNPUBLISHED;
+  }
+  
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsRightServiceImpl.class);
   
@@ -29,8 +34,8 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
       ) throws XWikiRightNotFoundException, XWikiException {
     if(isPublishActive(context) && isRestrictedRightsAction(accessLevel)) {
       //default behaviour: no object -> published
-      BaseObject obj = getPublishObject(doc);
-      if((obj == null) || (isAfterStart(obj) && isBeforeEnd(obj))){
+      List<BaseObject> objs = getPublishObjects(doc);
+      if(!isPubOverride(context) && (isUnpubOverride(context) || isPublished(objs))) {
         LOGGER.info("Document published or not publish controlled.");
         return super.checkRight(userOrGroupName, doc, accessLevel, user, allow, global, 
             context);
@@ -46,13 +51,38 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
         }
       }
     } else {
+      if(isPubUnpubOverride(context)) {
+        LOGGER.warn("Needs CelementsRightServiceImpl for publish / unpublish to work");
+      }
       return super.checkRight(userOrGroupName, doc, accessLevel, user, allow, global, 
           context);
     }
   }
+  
+  boolean isPubUnpubOverride(XWikiContext context) {
+    PubUnpub val = getPubUnpubFromContext(context);
+    return PubUnpub.PUBLISHED == val || PubUnpub.UNPUBLISHED == val;
+  }
+  
+  boolean isPubOverride(XWikiContext context) {
+    return PubUnpub.PUBLISHED == getPubUnpubFromContext(context);
+  }
+  
+  boolean isUnpubOverride(XWikiContext context) {
+    return PubUnpub.UNPUBLISHED == getPubUnpubFromContext(context);
+  }
+  
+  PubUnpub getPubUnpubFromContext(XWikiContext context) {
+    PubUnpub val = null;
+    Object valObj = context.get("overridePubCheck");
+    if((valObj != null) && (valObj instanceof PubUnpub)) {
+      val = (PubUnpub)context.get("overridePubCheck");
+    }
+    return val;
+  }
 
-  BaseObject getPublishObject(XWikiDocument doc) {
-    return doc.getXObject(getPublicationClassReference());
+  List<BaseObject> getPublishObjects(XWikiDocument doc) {
+    return doc.getXObjects(getPublicationClassReference());
   }
 
   DocumentReference getPublicationClassReference() {
@@ -63,17 +93,35 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
   boolean isRestrictedRightsAction(String accessLevel) {
     return "view".equals(accessLevel) || "comment".equals(accessLevel);
   }
-
+  
   boolean isPublishActive(XWikiContext context) {
-    int isActive = context.getWiki().getWebPreferenceAsInt("publishdate_active", -1, 
-        context);
-    if(isActive < 0) {
-      isActive = context.getWiki().getXWikiPreferenceAsInt("publishdate_active", 
-          "celements.publishdate.active", 0, context);
-    }
-    return isActive == 1;
+    return isPublishActive(context.getDoc().getDocumentReference(), context);
   }
 
+  boolean isPublishActive(DocumentReference forDoc, XWikiContext context) {
+    String isActive = context.getWiki().getSpacePreference("publishdate_active", 
+        forDoc.getLastSpaceReference().getName(), "-1", context);
+    if("-1".equals(isActive)) {
+      isActive = context.getWiki().getXWikiPreference("publishdate_active", 
+          "celements.publishdate.active", "0", context);
+    }
+    return "1".equals(isActive);
+  }
+
+  boolean isPublished(List<BaseObject> objs) {
+    boolean isPublished = false;
+    if((objs != null) && (!objs.isEmpty())) {
+      for(BaseObject obj : objs) {
+        if(obj != null) {
+          isPublished |= isAfterStart(obj) && isBeforeEnd(obj);
+        }
+      }
+    } else {
+      isPublished = true; //no limits set mean always published
+    }
+    return isPublished;
+  }
+  
   boolean isAfterStart(BaseObject obj) {
     Calendar cal = GregorianCalendar.getInstance();
     Date pubDate = obj.getDateValue("publishDate");

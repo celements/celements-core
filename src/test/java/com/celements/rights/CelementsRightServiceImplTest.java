@@ -8,13 +8,13 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.rights.CelementsRightServiceImpl;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,10 +49,11 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(0).anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), 
+        eq("-1"), same(getContext()))).andReturn("0").anyTimes();
     BaseObject rightObj = new BaseObject();
     rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiRights"));
@@ -82,10 +83,11 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(1).anyTimes();
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
+        same(getContext()))).andReturn("1").anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
     BaseObject rightObj = new BaseObject();
     rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiRights"));
@@ -115,10 +117,11 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(1).anyTimes();
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
+        same(getContext()))).andReturn("1").anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
     BaseObject rightObj = new BaseObject();
     rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiRights"));
@@ -154,10 +157,11 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
         ).getDatabase(), "XWiki", "XWikiAllGroup")), eq(0), eq(0), same(getContext()))
         ).andReturn(emptyGroupsList).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(1).anyTimes();
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
+        same(getContext()))).andReturn("1").anyTimes();
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
     BaseObject rightObj = new BaseObject();
     rightObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiRights"));
@@ -184,7 +188,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
   public void testGetPublishObject_null() {
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
         ), "Space", "Doc"));
-    assertNull(rightService.getPublishObject(doc));
+    assertNull(rightService.getPublishObjects(doc));
   }
 
   @Test
@@ -194,16 +198,76 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
     BaseObject obj = new BaseObject();
     obj.setXClassReference(rightService.getPublicationClassReference());
     doc.addXObject(obj);
-    assertEquals(obj, rightService.getPublishObject(doc));
+    assertEquals(obj, rightService.getPublishObjects(doc).get(0));
+  }
+
+  @Test
+  public void testGetPublishObject_hasObjs() {
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "Space", "Doc"));
+    BaseObject obj1 = new BaseObject();
+    obj1.setXClassReference(rightService.getPublicationClassReference());
+    doc.addXObject(obj1);
+    BaseObject obj2 = new BaseObject();
+    obj2.setXClassReference(rightService.getPublicationClassReference());
+    doc.addXObject(obj2);
+    assertEquals(2, rightService.getPublishObjects(doc).size());
+  }
+
+  @Test
+  public void testIsPublished_noLimits() {
+    assertTrue(rightService.isPublished(null));
+    assertTrue(rightService.isPublished(new ArrayList<BaseObject>()));
+  }
+
+  @Test
+  public void testIsPublished_noLimits_umpublished() {
+    BaseObject obj1 = new BaseObject();
+    Calendar gc = GregorianCalendar.getInstance();
+    gc.add(GregorianCalendar.HOUR, 1);
+    obj1.setDateValue("publishDate", gc.getTime());
+    BaseObject obj2 = new BaseObject();
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("unpublishDate", gc.getTime());
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("publishDate", gc.getTime());
+    List<BaseObject> objs = new ArrayList<BaseObject>();
+    objs.add(obj1);
+    objs.add(obj2);
+    assertFalse(rightService.isPublished(objs));
+  }
+
+  @Test
+  public void testIsPublished_noLimits_published() {
+    BaseObject obj1 = new BaseObject();
+    BaseObject obj3 = new BaseObject();
+    Calendar gc = GregorianCalendar.getInstance();
+    gc.add(GregorianCalendar.HOUR, 1);
+    obj3.setDateValue("unpublishDate", gc.getTime());
+    obj1.setDateValue("publishDate", gc.getTime());
+    BaseObject obj2 = new BaseObject();
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("unpublishDate", gc.getTime());
+    obj3.setDateValue("publishDate", gc.getTime());
+    gc.add(GregorianCalendar.HOUR, -2);
+    obj2.setDateValue("publishDate", gc.getTime());
+    List<BaseObject> objs = new ArrayList<BaseObject>();
+    objs.add(obj1);
+    objs.add(obj2);
+    objs.add(obj3);
+    assertTrue(rightService.isPublished(objs));
   }
 
   @Test
   public void testIsPublishActive_notSet() {
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(-1).once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("publishdate_active"), 
-        eq("celements.publishdate.active"), eq(0), same(getContext()))).andReturn(0
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
+        same(getContext()))).andReturn("-1").once();
+    expect(xwiki.getXWikiPreference(eq("publishdate_active"), 
+        eq("celements.publishdate.active"), eq("0"), same(getContext()))).andReturn("0"
         ).once();
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
     replay(xwiki);
     assertEquals(false, rightService.isPublishActive(getContext()));
     verify(xwiki);
@@ -211,8 +275,11 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsPublishActive_false() {
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(0).once();
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
+        same(getContext()))).andReturn("0").once();
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
     replay(xwiki);
     assertEquals(false, rightService.isPublishActive(getContext()));
     verify(xwiki);
@@ -220,8 +287,11 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsPublishActive_true() {
-    expect(xwiki.getWebPreferenceAsInt(eq("publishdate_active"), eq(-1), same(getContext(
-        )))).andReturn(1).once();
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
+        same(getContext()))).andReturn("1").once();
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(
+        ), "TestSpace", "TestDoc"));
+    getContext().setDoc(doc);
     replay(xwiki);
     assertEquals(true, rightService.isPublishActive(getContext()));
     verify(xwiki);
@@ -286,5 +356,62 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
     gc.add(GregorianCalendar.HOUR, -1);
     obj.setDateValue("unpublishDate", gc.getTime());
     assertFalse(rightService.isBeforeEnd(obj));
+  }
+
+  @Test
+  public void testIsPubUnpubOverride_nothingSet() {
+    assertFalse(rightService.isPubUnpubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsPubUnpubOverride_wrongSet() {
+    getContext().put("overridePubCheck", "test wrong type");
+    assertFalse(rightService.isPubUnpubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsPubUnpubOverride_pub() {
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.PUBLISHED);
+    assertTrue(rightService.isPubUnpubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsPubUnpubOverride_unpub() {
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
+    assertTrue(rightService.isPubUnpubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsPubOverride_nothing() {
+    assertFalse(rightService.isPubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsPubOverride_unpub() {
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
+    assertFalse(rightService.isPubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsPubOverride_pub() {
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.PUBLISHED);
+    assertTrue(rightService.isPubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsUnpubOverride_nothing() {
+    assertFalse(rightService.isUnpubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsUnpubOverride_unpub() {
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
+    assertTrue(rightService.isUnpubOverride(getContext()));
+  }
+
+  @Test
+  public void testIsUnpubOverride_pub() {
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.PUBLISHED);
+    assertFalse(rightService.isUnpubOverride(getContext()));
   }
 }
