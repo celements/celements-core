@@ -19,8 +19,9 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
-  public static int PUBLISHED = 1;
-  public static int UNPUBLISHED = 2;
+  public static enum PubUnpub {
+    PUBLISHED, UNPUBLISHED;
+  }
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsRightServiceImpl.class);
@@ -59,28 +60,25 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
   }
   
   boolean isPubUnpubOverride(XWikiContext context) {
-    String val = "";
-    if(context.get("overridePubCheck") != null) {
-      val = context.get("overridePubCheck").toString();
-    }
-    return (Integer.toString(PUBLISHED).equals(val)) 
-        || (Integer.toString(UNPUBLISHED).equals(val));
+    PubUnpub val = getPubUnpubFromContext(context);
+    return PubUnpub.PUBLISHED == val || PubUnpub.UNPUBLISHED == val;
   }
   
   boolean isPubOverride(XWikiContext context) {
-    String val = "";
-    if(context.get("overridePubCheck") != null) {
-      val = context.get("overridePubCheck").toString();
-    }
-    return (Integer.toString(PUBLISHED).equals(val));
+    return PubUnpub.PUBLISHED == getPubUnpubFromContext(context);
   }
   
   boolean isUnpubOverride(XWikiContext context) {
-    String val = "";
-    if(context.get("overridePubCheck") != null) {
-      val = context.get("overridePubCheck").toString();
+    return PubUnpub.UNPUBLISHED == getPubUnpubFromContext(context);
+  }
+  
+  PubUnpub getPubUnpubFromContext(XWikiContext context) {
+    PubUnpub val = null;
+    Object valObj = context.get("overridePubCheck");
+    if((valObj != null) && (valObj instanceof PubUnpub)) {
+      val = (PubUnpub)context.get("overridePubCheck");
     }
-    return (Integer.toString(UNPUBLISHED).equals(val));
+    return val;
   }
 
   List<BaseObject> getPublishObjects(XWikiDocument doc) {

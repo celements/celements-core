@@ -365,19 +365,19 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsPubUnpubOverride_wrongSet() {
-    getContext().put("overridePubCheck", -13);
+    getContext().put("overridePubCheck", "test wrong type");
     assertFalse(rightService.isPubUnpubOverride(getContext()));
   }
 
   @Test
   public void testIsPubUnpubOverride_pub() {
-    getContext().put("overridePubCheck", CelementsRightServiceImpl.PUBLISHED);
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.PUBLISHED);
     assertTrue(rightService.isPubUnpubOverride(getContext()));
   }
 
   @Test
   public void testIsPubUnpubOverride_unpub() {
-    getContext().put("overridePubCheck", CelementsRightServiceImpl.UNPUBLISHED);
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
     assertTrue(rightService.isPubUnpubOverride(getContext()));
   }
 
@@ -388,13 +388,13 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsPubOverride_unpub() {
-    getContext().put("overridePubCheck", CelementsRightServiceImpl.UNPUBLISHED);
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
     assertFalse(rightService.isPubOverride(getContext()));
   }
 
   @Test
   public void testIsPubOverride_pub() {
-    getContext().put("overridePubCheck", CelementsRightServiceImpl.PUBLISHED);
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.PUBLISHED);
     assertTrue(rightService.isPubOverride(getContext()));
   }
 
@@ -405,13 +405,13 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsUnpubOverride_unpub() {
-    getContext().put("overridePubCheck", CelementsRightServiceImpl.UNPUBLISHED);
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
     assertTrue(rightService.isUnpubOverride(getContext()));
   }
 
   @Test
   public void testIsUnpubOverride_pub() {
-    getContext().put("overridePubCheck", CelementsRightServiceImpl.PUBLISHED);
+    getContext().put("overridePubCheck", CelementsRightServiceImpl.PubUnpub.PUBLISHED);
     assertFalse(rightService.isUnpubOverride(getContext()));
   }
 }

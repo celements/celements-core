@@ -8,6 +8,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.rights.CelementsRightServiceImpl.PubUnpub;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,19 +38,20 @@ public class CelementsRightScriptService implements ScriptService {
   public boolean hasAccessLevelPublished(String right, String username, 
       DocumentReference docname) {
     return hasAccessLevel(right, username, getWebUtils().getRefLocalSerializer(
-        ).serialize(docname), CelementsRightServiceImpl.PUBLISHED);
+        ).serialize(docname), CelementsRightServiceImpl.PubUnpub.PUBLISHED);
   }
   
   public boolean hasAccessLevelUnpublished(String right, String username, 
       DocumentReference docname) {
     return hasAccessLevel(right, username, getWebUtils().getRefLocalSerializer(
-        ).serialize(docname), CelementsRightServiceImpl.UNPUBLISHED);
+        ).serialize(docname), CelementsRightServiceImpl.PubUnpub.UNPUBLISHED);
   }
   
-  boolean hasAccessLevel(String right, String username, String docname, int pubOrUnpub) {
+  boolean hasAccessLevel(String right, String username, String docname, 
+      PubUnpub unpublished) {
     XWikiRightService rightService = getContext().getWiki().getRightService();
     if(rightService instanceof CelementsRightServiceImpl) {
-      getContext().put("overridePubCheck", pubOrUnpub);
+      getContext().put("overridePubCheck", unpublished);
     } else {
       LOGGER.warn("Needs CelementsRightServiceImpl for publish / unpublish to work");
     }
