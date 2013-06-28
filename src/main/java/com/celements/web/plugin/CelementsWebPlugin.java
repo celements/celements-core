@@ -37,12 +37,12 @@ import org.apache.velocity.VelocityContext;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.pagetype.IPageType;
 import com.celements.rendering.RenderCommand;
-import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
+import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -418,20 +418,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
   }
 
+  /**
+   * @deprecated since 2.33.0 instead use PossibleLoginsCommand
+   */
+  @Deprecated
   public String getPossibleLogins(XWikiContext context) {
-    String possibleLogins = context.getWiki().getXWikiPreference(
-        OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, context);
-    if((possibleLogins == null) || "".equals(possibleLogins.trim())) {
-      String db = context.getDatabase();
-      context.setDatabase("celements2web");
-      possibleLogins = context.getWiki().getXWikiPreference(
-          OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, context);
-      context.setDatabase(db);
-      if((possibleLogins == null) || "".equals(possibleLogins)) {
-        possibleLogins = "loginname";
-      }
-    }
-    return possibleLogins;
+    return new PossibleLoginsCommand().getPossibleLogins();
   }
   
   @SuppressWarnings("deprecation")
