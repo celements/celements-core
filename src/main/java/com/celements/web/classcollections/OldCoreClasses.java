@@ -174,7 +174,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("redirect", "Redirect", 30);
     needsUpdate |= bclass.addTextField("querystr", "Query String", 30);
-    needsUpdate |= addBooleanField(bclass, "show_included", "Query String", "yesno", 0);
+    needsUpdate |= addBooleanField(bclass, "show_included", "Show Included", "yesno", 0);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
