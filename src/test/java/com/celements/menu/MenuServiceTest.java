@@ -51,7 +51,7 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_DataProviderTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
+    xwiki = getWikiMock();
     context.setWiki(xwiki);
     rightsMock = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightsMock).anyTimes();
@@ -67,18 +67,35 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testHasview_notLocal_central_hasAccess() throws Exception {
+  public void testHasview_notLocal_central_hasAccess_XWikiGuest() throws Exception {
     DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
         "Celements", "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
-
     DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
         "Celements", "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
-    expect(
-        rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
             eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar"),
+        eq("celements.menubar.guestview.Celements.MenuBar"), eq(0), same(context))
+        ).andReturn(0);
+    replayAll();
+    assertFalse(menuService.hasview(menuBarDocRef));
+    verifyAll();
+  }
 
+  @Test
+  public void testHasview_notLocal_central_hasAccess_user() throws Exception {
+    String myUserName = "XWiki.myUser";
+    context.setUser(myUserName);
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
+        "Celements", "MenuBar");
+    expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
+        "Celements", "MenuBar");
+    expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq(myUserName),
+            eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
     replayAll();
     assertTrue(menuService.hasview(menuBarDocRef));
     verifyAll();
@@ -151,7 +168,9 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
         "Celements", "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
-
+    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar"),
+        eq("celements.menubar.guestview.Celements.MenuBar"), eq(0), same(context))
+        ).andReturn(1);
     replayAll();
     assertFalse(menuService.hasview(menuBarDocRef));
     verifyAll();
@@ -382,6 +401,9 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
         ).anyTimes();
     expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
       eq("celements2web:Celements.MenuBar2"), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar2"),
+        eq("celements.menubar.guestview.Celements.MenuBar2"), eq(0), same(context))
+        ).andReturn(1);
     
     replayAll(mockQuery, mockQuery2);
     List<BaseObject> menuHeaders = menuService.getMenuHeaders();
@@ -421,12 +443,12 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki, queryManagerMock, rightsMock);
+    replayDefault(queryManagerMock, rightsMock);
     replay(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki, queryManagerMock, rightsMock);
+    verifyDefault(queryManagerMock, rightsMock);
     verify(mocks);
   }
 }

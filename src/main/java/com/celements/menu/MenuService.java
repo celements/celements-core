@@ -40,6 +40,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 @Component
 public class MenuService implements IMenuService {
@@ -85,6 +86,13 @@ public class MenuService implements IMenuService {
           + webUtilsService.isAdvancedAdmin() + "].");
       return webUtilsService.isAdvancedAdmin();
     }
+    getContext().setDatabase(database);
+    return hasCentralAndLocalView(menuBarDocRef);
+  }
+
+  private boolean hasCentralAndLocalView(DocumentReference menuBarDocRef)
+      throws XWikiException {
+    String database = getContext().getDatabase();
     getContext().setDatabase("celements2web");
     DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
         menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
@@ -100,16 +108,30 @@ public class MenuService implements IMenuService {
     DocumentReference menuBarLocalDocRef = new DocumentReference(getContext(
         ).getOriginalDatabase(), menuBarDocRef.getLastSpaceReference().getName(),
         menuBarDocRef.getName());
-    String menuBarFullName = webUtilsService.getRefDefaultSerializer(
-        ).serialize(menuBarLocalDocRef);
-    boolean localView = !getContext().getWiki().exists(menuBarLocalDocRef, getContext())
-      || getContext().getWiki().getRightService().hasAccessLevel("view",
-          getContext().getUser(), menuBarFullName, getContext());
+    String menuBarFullName = webUtilsService.getRefDefaultSerializer().serialize(
+        menuBarLocalDocRef);
+    boolean localView = true;
+    if (getContext().getWiki().exists(menuBarLocalDocRef, getContext())) {
+      localView = getContext().getWiki().getRightService().hasAccessLevel("view",
+            getContext().getUser(), menuBarFullName, getContext());
+    } else if (XWikiRightService.GUEST_USER_FULLNAME.equals(getContext().getUser())) {
+      String menuBarLocalFullName = webUtilsService.getRefLocalSerializer().serialize(
+          menuBarLocalDocRef);
+      String prefParamName = "CelMenuBar-" + menuBarLocalFullName;
+      String cfgFallbackName = "celements.menubar.guestview." + menuBarLocalFullName;
+      localView = (getContext().getWiki().getXWikiPreferenceAsInt(prefParamName,
+          cfgFallbackName, 0, getContext()) == 1);
+      LOGGER.info("hasview: localView default for quest on [" + menuBarFullName + "] -> ["
+          + localView + "] on database [" + getContext().getDatabase()
+          + "]. Checked prefParamName [" + prefParamName + "] and cfgFallbackName ["
+          + cfgFallbackName + "].");
+    }
     LOGGER.debug("hasview: localView [" + menuBarFullName + "] for ["
         + getContext().getUser() + "] -> [" + localView + "] on database ["
         + getContext().getDatabase() + "].");
     getContext().setDatabase(database);
-    return centralView && localView;
+    boolean centralAndLocalView = centralView && localView;
+    return centralAndLocalView;
   }
 
   void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap) {
