@@ -37,6 +37,10 @@ public class NavigationClasses extends AbstractClassCollection {
   public static final String MENU_NAME_CLASS_SPACE = "Celements2";
   public static final String MENU_NAME_CLASS = MENU_NAME_CLASS_SPACE + "."
       + MENU_NAME_CLASS_DOC;
+  public static final String MENU_NAME_FIELD = "menu_name";
+  public static final String MENU_NAME_IMAGE_FIELD = "image";
+  public static final String MENU_NAME_TOOLTIP_FIELD = "tooltip";
+  public static final String MENU_NAME_LANG_FIELD = "lang";
 
   public static final String MAPPED_MENU_ITEM_CLASS_SPACE = "Classes";
   public static final String MAPPED_MENU_ITEM_CLASS_DOC = "MenuItemClass";
@@ -102,10 +106,10 @@ public class NavigationClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("menu_name", "Multilingual MenuName", 30);
-    needsUpdate |= bclass.addTextField("lang", "Language", 5);
-    needsUpdate |= bclass.addTextField("tooltip", "Tool Tip", 30);
-    needsUpdate |= bclass.addTextField("image", "Background Image", 30);
+    needsUpdate |= bclass.addTextField(MENU_NAME_FIELD, "Multilingual MenuName", 30);
+    needsUpdate |= bclass.addTextField(MENU_NAME_LANG_FIELD, "Language", 5);
+    needsUpdate |= bclass.addTextField(MENU_NAME_TOOLTIP_FIELD, "Tool Tip", 30);
+    needsUpdate |= bclass.addTextField(MENU_NAME_IMAGE_FIELD, "Background Image", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
