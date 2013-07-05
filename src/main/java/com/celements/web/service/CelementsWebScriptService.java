@@ -515,4 +515,11 @@ public class CelementsWebScriptService implements ScriptService {
     }
   }
 
+  public boolean getUserAdminShowLoginName() {
+    boolean showLoginName = (getContext().getWiki().getXWikiPreferenceAsInt(
+        "celUserAdminShowLoginName", "celements.administration.showloginname", 0,
+        getContext()) != 0);
+    return (webUtilsService.isAdvancedAdmin() || showLoginName);
+  }
+
 }

@@ -173,8 +173,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         vcontext.put("isAdmin", webUtilsService.isAdminUser());
       }
       if (!vcontext.containsKey("isSuperAdmin")) {
-        vcontext.put("isSuperAdmin", (webUtilsService.isAdminUser()
-            && getContext().getUser().startsWith("xwiki:")));
+        vcontext.put("isSuperAdmin", webUtilsService.isSuperAdminUser());
       }
       if (!vcontext.containsKey("admin_language")) {
         vcontext.put("admin_language", webUtilsService.getAdminLanguage());

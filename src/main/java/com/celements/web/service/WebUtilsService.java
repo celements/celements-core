@@ -375,6 +375,13 @@ public class WebUtilsService implements IWebUtilsService {
     }
   }
 
+  public boolean isSuperAdminUser() {
+    String user = getContext().getUser();
+    LOGGER.trace("isSuperAdminUser: user [" + user + "] db [" + getContext().getDatabase()
+        + "].");
+    return (isAdminUser() && user.startsWith("xwiki:"));
+  }
+
   public boolean isAdvancedAdmin() {
     String user = getContext().getUser();
     LOGGER.trace("isAdvancedAdmin: user [" + user + "] db [" + getContext().getDatabase()
