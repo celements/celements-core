@@ -285,6 +285,10 @@ public class CelementsWebScriptService implements ScriptService {
     return new AttachmentURLCommand().getAttachmentURL(fileName, action, getContext());
   }
 
+  public String getAttachmentURLPrefix() {
+    return new AttachmentURLCommand().getAttachmentURLPrefix();
+  }
+
   public String getSkinFileExternal(String fileName, String action) {
     return new AttachmentURLCommand().getExternalAttachmentURL(fileName, action,
         getContext());

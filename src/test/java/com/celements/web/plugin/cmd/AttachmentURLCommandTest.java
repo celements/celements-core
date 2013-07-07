@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -49,10 +50,9 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_AttachmentURLCommandTest() throws Exception {
     context = getContext();
-    wiki = createMock(XWiki.class);
-    context.setWiki(wiki);
+    wiki = getWikiMock();
     attUrlCmd = new AttachmentURLCommand();
-    mockURLFactory = createMock(XWikiURLFactory.class);
+    mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
     context.setURLFactory(mockURLFactory);
   }
 
@@ -70,19 +70,25 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetAttachmentURL_dynamicParamURL() throws MalformedURLException {
-    XWikiDocument doc = new XWikiDocument();
-    doc.setFullName("mySpace.myDoc");
+    String mySpaceName = "mySpace";
+    String myDocName = "myDoc";
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), mySpaceName,
+        myDocName);
+    XWikiDocument doc = new XWikiDocument(myDocRef);
     context.setDoc(doc);
     URL viewURL = new URL("http://localhost/mySpace/myDoc");
-    expect(context.getURLFactory().createURL(eq(doc.getSpace()), eq(doc.getName()),
-        eq("view"), (String)isNull(), (String)isNull(), eq(context.getDatabase()),
+    expect(mockURLFactory.createURL(eq(mySpaceName), eq(myDocName), eq("view"),
+        (String)isNull(), (String)isNull(), eq(context.getDatabase()),
         same(context))).andReturn(viewURL);
-    expect(context.getURLFactory().getURL(eq(viewURL), same(context))
-        ).andReturn(viewURL.getPath());
-    replay(context.getURLFactory());
+    expect(mockURLFactory.getURL(eq(viewURL), same(context))).andReturn(
+        viewURL.getPath());
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"),
+        eq("celements.attachmenturl.defaultaction"), eq("file"), same(context))
+        ).andReturn("file");
+    replayDefault();
     assertEquals("/mySpace/myDoc?xpage=bla&bli=blu", attUrlCmd.getAttachmentURL(
         "?xpage=bla&bli=blu", context));
-    verify(context.getURLFactory());
+    verifyDefault();
   }
   
   @Test
@@ -109,11 +115,11 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
         "celements.attachmenturl.defaultaction"), eq("file"), same(context))
         ).andReturn("file");
-    replay(mockURLFactory, wiki);
+    replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL(
         "celements2web:A.B;bla.txt", context);
     assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
-    verify(mockURLFactory, wiki);
+    verifyDefault();
   }
   
   @Test
@@ -138,10 +144,10 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
     "celements.attachmenturl.defaultaction"), eq("file"), same(context))
     ).andReturn("file");
-    replay(mockURLFactory, wiki);
+    replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("A.B;bla.txt", context);
     assertTrue(attachmentURL, attachmentURL.matches(resultURL + "\\?version=\\d{14}"));
-    verify(mockURLFactory, wiki);
+    verifyDefault();
   }
   
   @Test
@@ -153,9 +159,9 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
     "celements.attachmenturl.defaultaction"), eq("file"), same(context))
     ).andReturn("file");
-    replay(mockURLFactory, wiki);
+    replayDefault();
     assertNull(attUrlCmd.getAttachmentURL("A.B;bla.txt", context));
-    verify(mockURLFactory, wiki);
+    verifyDefault();
   }
   
   @Test
@@ -169,12 +175,12 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getXWikiPreference(eq("celdefaultAttAction"), eq(
       "celements.attachmenturl.defaultaction"), eq("file"), same(context))
       ).andReturn("download");
-    replay(wiki);
+    replayDefault();
     String attachmentURL = attUrlCmd.getAttachmentURL("  :celJS/bla.js",
         context);
     String expectedURL = "/appname/download/resources/celJS/bla.js";
     assertTrue(attachmentURL, attachmentURL.matches(expectedURL + "\\?version=\\d{14}"));
-    verify(wiki);
+    verifyDefault();
   }
   
   @Test
@@ -221,5 +227,17 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     assertFalse(attUrlCmd.isOnDiskLink("x:A.B;bla.js"));
   }
   
+  @Test
+  public void testGetAttachmentURLPrefix() throws Exception {
+    expect(wiki.getXWikiPreference(eq("celdefaultAttAction"),
+        eq("celements.attachmenturl.defaultaction"), eq("file"), same(context))
+        ).andReturn("file");
+    expect(mockURLFactory.createResourceURL(eq(""), eq(true), same(context))).andReturn(
+        new URL("http://test.fabian.dev:10080/skin/resources/"));
+    replayDefault();
+    assertEquals("http://test.fabian.dev:10080/file/resources/",
+        attUrlCmd.getAttachmentURLPrefix());
+    verifyDefault();
+  }
 
 }
