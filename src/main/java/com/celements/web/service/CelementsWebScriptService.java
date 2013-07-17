@@ -372,6 +372,20 @@ public class CelementsWebScriptService implements ScriptService {
         removePre, rendererNameList);
   }
 
+  public String renderInheritableDocument(DocumentReference docRef) {
+    return renderInheritableDocument(docRef, getContext().getLanguage());
+  }
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang) {
+    try {
+      return webUtilsService.renderInheritableDocument(docRef, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("renderInheritableDocument: Failed to render inheritable [" + docRef
+          + "] in lang [" + lang + "].");
+    }
+    return "";
+  }
+
   public boolean useNewButtons() {
     return getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
         "celements.usenewbuttons", 0, getContext()) == 1;

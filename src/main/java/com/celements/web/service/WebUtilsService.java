@@ -49,6 +49,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
@@ -818,6 +819,12 @@ public class WebUtilsService implements IWebUtilsService {
       }
     }
     return renderTemplatePath;
+  }
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang
+      ) throws XWikiException {
+    return new RenderCommand().renderTemplatePath(getInheritedTemplatedPath(docRef),
+        lang);
   }
 
 }

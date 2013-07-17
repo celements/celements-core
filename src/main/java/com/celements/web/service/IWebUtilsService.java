@@ -157,4 +157,7 @@ public interface IWebUtilsService {
 
   public String getTemplatePathOnDisk(String renderTemplatePath);
 
+  public String renderInheritableDocument(DocumentReference docRef, String lang
+      ) throws XWikiException;
+
 }
