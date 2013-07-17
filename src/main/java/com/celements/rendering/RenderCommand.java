@@ -20,6 +20,7 @@
 package com.celements.rendering;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -146,15 +147,40 @@ public class RenderCommand {
 
   public String renderTemplatePath(String renderTemplatePath, String lang
       ) throws XWikiException {
+    return renderTemplatePath(renderTemplatePath, lang, null);
+  }
+
+  public String renderTemplatePath(String renderTemplatePath, String lang, String defLang
+      ) throws XWikiException {
     String templateContent;
     XWikiDocument templateDoc = getContext().getDoc();
     if (renderTemplatePath.startsWith(":")) {
-      String templatePath = getTemplatePathOnDisk(renderTemplatePath);
-      try {
-        templateContent = getContext().getWiki().getResourceContent(templatePath);
-      } catch (IOException exp) {
-        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-        return "";
+      List<String> langList = new ArrayList<String>();
+      if (lang != null) {
+        langList.add(lang);
+      }
+      if ((defLang != null) && !defLang.equals(lang)) {
+        langList.add(defLang);
+      }
+      templateContent = "";
+      for(String theLang : langList) {
+        String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
+        try {
+          templateContent = getContext().getWiki().getResourceContent(templatePath);
+        } catch (IOException exp) {
+          LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
+          templateContent = "";
+        }
+      }
+      if ("".equals(templateContent)) {
+        String templatePathDef = getTemplatePathOnDisk(renderTemplatePath);
+        try {
+          templateContent = getContext().getWiki().getResourceContent(templatePathDef);
+        } catch (IOException exp) {
+          LOGGER.debug("Exception while parsing template [" + templatePathDef + "].",
+              exp);
+          return "";
+        }
       }
     } else {
       DocumentReference renderTemplateDocRef = getWebUtilsService(
@@ -241,8 +267,12 @@ public class RenderCommand {
   }
 
   String getTemplatePathOnDisk(String renderTemplatePath) {
+    return getTemplatePathOnDisk(renderTemplatePath, null);
+  }
+
+  String getTemplatePathOnDisk(String renderTemplatePath, String lang) {
     String templateOnDiskPath = getWebUtilsService().getTemplatePathOnDisk(
-        renderTemplatePath);
+        renderTemplatePath, lang);
     if (templateOnDiskPath.startsWith(":")) {
       templateOnDiskPath = renderTemplatePath.replaceAll("^:", "/templates/celTemplates/")
           + ".vm";

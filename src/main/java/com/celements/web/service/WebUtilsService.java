@@ -59,6 +59,7 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -103,6 +104,8 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement
   Execution execution;
+
+  XWikiRenderingEngine injectedRenderingEngine;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -811,20 +814,35 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public String getTemplatePathOnDisk(String renderTemplatePath) {
+    return getTemplatePathOnDisk(renderTemplatePath, null);
+  }
+
+  public String getTemplatePathOnDisk(String renderTemplatePath, String lang) {
     for (Map.Entry<Object, Object> entry : tempPathConfig.getMappings().entrySet()) {
       String pathName = (String) entry.getKey();
       if (renderTemplatePath.startsWith(":" + pathName)) {
         return renderTemplatePath.replaceAll("^:(" + pathName + "\\.)?", "/templates/"
-              + ((String) entry.getValue()) + "/") + ".vm";
+              + ((String) entry.getValue()) + "/") + getTemplatePathLangSuffix(lang)
+              + ".vm";
       }
     }
     return renderTemplatePath;
   }
 
+  private String getTemplatePathLangSuffix(String lang) {
+    if (lang != null) {
+      return "_" + lang;
+    }
+    return "";
+  }
+
   public String renderInheritableDocument(DocumentReference docRef, String lang
       ) throws XWikiException {
-    return new RenderCommand().renderTemplatePath(getInheritedTemplatedPath(docRef),
-        lang);
+    RenderCommand renderCommand = new RenderCommand();
+    if (this.injectedRenderingEngine != null) {
+      renderCommand.setRenderingEngine(this.injectedRenderingEngine);
+    }
+    return renderCommand.renderTemplatePath(getInheritedTemplatedPath(docRef), lang);
   }
 
 }

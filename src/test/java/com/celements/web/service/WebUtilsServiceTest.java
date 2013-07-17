@@ -3,6 +3,7 @@ package com.celements.web.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1135,6 +1136,115 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetTemplatePathOnDisk_Ajax() {
     assertEquals("/templates/celAjax/myScript.vm",
         webUtilsService.getTemplatePathOnDisk(":Ajax.myScript"));
+  }
+
+  @Test
+  public void testRenderInheritableDocument_local_exists() throws Exception {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    XWikiDocument localTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
+    expect(localTemplateDocDef.getDocumentReference()).andReturn(localTemplateRef
+        ).anyTimes();
+    expect(xwiki.getDocument(eq(localTemplateRef), same(context))).andReturn(
+        localTemplateDocDef).once();
+    String localScriptText = "my expected local script";
+    expect(localTemplateDocDef.getTranslatedContent(eq("de"), same(context))).andReturn(
+        localScriptText);
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy")).anyTimes();
+    String expectedRenderedText = "my expected rendered local script";
+    expect(mockRenderingEngine.renderText(eq(localScriptText), same(localTemplateDocDef),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "de"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_central_exists() throws Exception {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    XWikiDocument centralTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
+    expect(centralTemplateDocDef.getDocumentReference()).andReturn(centralTemplateRef
+        ).anyTimes();
+    expect(xwiki.getDocument(eq(centralTemplateRef), same(context))).andReturn(
+        centralTemplateDocDef).once();
+    String centralScriptText = "my expected central script";
+    expect(centralTemplateDocDef.getTranslatedContent(eq("en"), same(context))).andReturn(
+        centralScriptText);
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy")).anyTimes();
+    String expectedRenderedText = "my expected rendered central script";
+    expect(mockRenderingEngine.renderText(eq(centralScriptText), same(
+        centralTemplateDocDef), (XWikiDocument) isNull(), same(context))).andReturn(
+            expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText,webUtilsService.renderInheritableDocument(
+        localTemplateRef, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_disk_langSpecific_no_local_no_central(
+      ) throws Exception {
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    String diskScriptText = "my expected disk script fr";
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))
+        ).andReturn(diskScriptText).once();
+    String expectedRenderedText = "my expected rendered disk script";
+    expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    //TODO check for language doc on disc
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "fr"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_disk_noLang_no_local_no_central(
+      ) throws Exception {
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
+        new IOException()).once();
+    String diskScriptText = "my expected disk script";
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView.vm"))).andReturn(
+        diskScriptText).once();
+    String expectedRenderedText = "my expected rendered disk script";
+    expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "fr"));
+    verifyDefault();
   }
 
  //*****************************************************************

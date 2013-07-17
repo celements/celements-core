@@ -353,6 +353,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testRenderCelementsDocument_noCellType_setDefault_RichText_deprecated(
       ) throws Exception {
     PageTypeReference defaultPTRef = new PageTypeReference("RichText", "xObjectProvider",
@@ -448,6 +449,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testRenderCelementsCell_databaseDoc_deprecated() throws XWikiException {
     String elementFullName = "MyLayout.Cell15";
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
@@ -539,6 +541,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
    * @throws Exception
    */
   @Test
+  @Deprecated
   public void testRenderCelementsCell_templateDoc_deprecated() throws Exception {
     String elementFullName = "MyLayout.Cell15";
     DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
@@ -554,7 +557,9 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
@@ -594,7 +599,9 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     String expectedContent = "Expected Template Content Content.MyPage";
@@ -615,7 +622,47 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  /**
+   * if the sdoc passed to renderText is null a NPE will occur.
+   * @throws Exception
+   */
   @Test
+  public void testRenderCelementsCell_templateDoc_lang() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = new XWikiDocument(elementDocRef);
+    IPageTypeConfig ptMock = createMockAndAddToDefault(IPageTypeConfig.class);
+    PageTypeReference ptRefMock = createMockAndAddToDefault(PageTypeReference.class);
+    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(cellDoc),
+        (PageTypeReference)isNull())).andReturn(ptRefMock);
+    expect(mockPageTypeService.getPageTypeConfigForPageTypeRef(same(ptRefMock))
+        ).andReturn(ptMock);
+    expect(xwiki.getDocument(eq(elementDocRef), same(context))).andReturn(cellDoc);
+    String renderTemplatePath = ":Templates.CellTypeView";
+    expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
+        renderTemplatePath).anyTimes();
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
+    String expectedContent = "Expected Template Content Content.MyPage";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andReturn(
+        expectedContent);
+    String expectedRenderedContent = "Expected Template Content Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderCelementsCell(
+        elementDocRef));
+    assertEquals("Document object in velocity space musst be a Document api object.",
+        Document.class, velocityContext.get("celldoc").getClass());
+    assertEquals("expecting celldoc to be set to the rendered cell document.",
+        elementDocRef, ((Document)velocityContext.get("celldoc")).getDocumentReference());
+    verifyDefault();
+  }
+
+  @Test
+  @Deprecated
   public void testRenderCelementsCell_templateDoc_ioException_deprecated(
       ) throws Exception {
     String elementFullName = "MyLayout.Cell15";
@@ -632,11 +679,13 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
-        new IOException());
+        new IOException()).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
@@ -663,11 +712,13 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     String renderTemplatePath = ":Templates.CellTypeView";
     expect(ptMock.getRenderTemplateForRenderMode(eq("view"))).andReturn(
         renderTemplatePath).anyTimes();
-    XWikiDocument templMock = createMockAndAddToDefault(XWikiDocument.class);
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException());
     String templatePath = "celTemplates/CellTypeView.vm";
     expect(ptMock.getName()).andReturn("CelementsContentPageCell").anyTimes();
     expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
-        new IOException());
+        new IOException()).anyTimes();
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq("xwikidb:MyLayout.Cell15"), same(context))).andReturn(true).once();
     replayDefault();
@@ -685,6 +736,120 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
         renderCmd.getTemplatePathOnDisk(":Templates.CellPageContentView"));
     assertEquals("/templates/celTemplates/CellPageContentView.vm",
         renderCmd.getTemplatePathOnDisk(":CellPageContentView"));
+  }
+
+  @Test
+  public void testRenderTemplatePath_null_lang() throws Exception {
+    String renderTemplatePath = ":Templates.CellTypeView";
+    String templatePath = "celTemplates/CellTypeView.vm";
+    String expectedContent = "Expected Template Content Content.MyPage";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(
+        expectedContent).once();
+    String expectedRenderedContent = "Expected Template Content Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath,
+        null));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderTemplatePath_lang() throws Exception {
+    String renderTemplatePath = ":Templates.CellTypeView";
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    String expectedContent = "Expected Template Content Content.MyPage";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andReturn(
+        expectedContent).once();
+    String expectedRenderedContent = "Expected Template Content Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath,
+        "de"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderTemplatePath_langNotFound_deflang() throws Exception {
+    String renderTemplatePath = ":Templates.CellTypeView";
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException()).once();
+    String templatePath_deflang = "celTemplates/CellTypeView_en.vm";
+    String expectedContent = "Expected Template Content Content.MyPage";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang))).andReturn(
+        expectedContent).once();
+    String expectedRenderedContent = "Expected Template Content Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath,
+        "de", "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderTemplatePath_langNotFound_deflangNotFound() throws Exception {
+    String renderTemplatePath = ":Templates.CellTypeView";
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException()).once();
+    String templatePath_deflang = "celTemplates/CellTypeView_en.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang))).andThrow(
+        new IOException()).once();
+    String templatePath = "celTemplates/CellTypeView.vm";
+    String expectedContent = "Expected Template Content Content.MyPage";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(
+        expectedContent).once();
+    String expectedRenderedContent = "Expected Template Content Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath,
+        "de", "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderTemplatePath_langNotFound_deflangNotFound_defaultNotFound(
+      ) throws Exception {
+    String renderTemplatePath = ":Templates.CellTypeView";
+    String templatePath_lang = "celTemplates/CellTypeView_de.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException()).once();
+    String templatePath_deflang = "celTemplates/CellTypeView_en.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_deflang))).andThrow(
+        new IOException()).once();
+    String templatePath = "celTemplates/CellTypeView.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andThrow(
+        new IOException()).once();
+    replayDefault();
+    assertEquals("", renderCmd.renderTemplatePath(renderTemplatePath, "de", "en"));
+    verifyDefault();
+  }
+
+  /**
+   * try to read _en file only once!
+   * @throws Exception
+   */
+  @Test
+  public void testRenderTemplatePath_deflang_equals_lang_notFound() throws Exception {
+    String renderTemplatePath = ":Templates.CellTypeView";
+    String templatePath_lang = "celTemplates/CellTypeView_en.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath_lang))).andThrow(
+        new IOException()).once();
+    String expectedContent = "Expected Template Content Content.MyPage";
+    String templatePath = "celTemplates/CellTypeView.vm";
+    expect(xwiki.getResourceContent(eq("/templates/" + templatePath))).andReturn(
+        expectedContent).once();
+    String expectedRenderedContent = "Expected Template Content Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(currentDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderTemplatePath(renderTemplatePath,
+        "en", "en"));
+    verifyDefault();
   }
 
 }
