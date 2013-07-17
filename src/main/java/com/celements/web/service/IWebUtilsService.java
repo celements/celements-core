@@ -162,4 +162,7 @@ public interface IWebUtilsService {
   public String renderInheritableDocument(DocumentReference docRef, String lang
       ) throws XWikiException;
 
+  public String renderInheritableDocument(DocumentReference docRef, String lang,
+      String defLang) throws XWikiException;
+
 }

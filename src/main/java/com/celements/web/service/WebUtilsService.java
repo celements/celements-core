@@ -838,11 +838,17 @@ public class WebUtilsService implements IWebUtilsService {
 
   public String renderInheritableDocument(DocumentReference docRef, String lang
       ) throws XWikiException {
+    return renderInheritableDocument(docRef, lang, null);
+  }
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang,
+      String defLang) throws XWikiException {
     RenderCommand renderCommand = new RenderCommand();
     if (this.injectedRenderingEngine != null) {
       renderCommand.setRenderingEngine(this.injectedRenderingEngine);
     }
-    return renderCommand.renderTemplatePath(getInheritedTemplatedPath(docRef), lang);
+    return renderCommand.renderTemplatePath(getInheritedTemplatedPath(docRef), lang,
+        defLang);
   }
 
 }

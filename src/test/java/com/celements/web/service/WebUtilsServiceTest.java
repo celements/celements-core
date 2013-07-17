@@ -1247,6 +1247,32 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testRenderInheritableDocument_disk_defLang_no_local_no_central(
+      ) throws Exception {
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
+        new IOException()).once();
+    String diskScriptText = "my expected disk script";
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_en.vm"))
+        ).andReturn(diskScriptText).once();
+    String expectedRenderedText = "my expected rendered disk script";
+    expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "fr", "en"));
+    verifyDefault();
+  }
+
  //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
