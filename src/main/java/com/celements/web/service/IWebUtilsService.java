@@ -67,6 +67,8 @@ public interface IWebUtilsService {
 
   public XWikiMessageTool getAdminMessageTool();
 
+  public String getDefaultAdminLanguage();
+
   public String getAdminLanguage();
 
   public String getAdminLanguage(String userFullName);

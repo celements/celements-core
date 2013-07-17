@@ -299,9 +299,15 @@ public class WebUtilsService implements IWebUtilsService {
       LOGGER.error("failed to get UserObject for " + getContext().getUser());
     }
     if ((adminLanguage == null) || ("".equals(adminLanguage))) {
-      adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
-          getContext().getLanguage(), getContext());
+      adminLanguage = getDefaultAdminLanguage();
     }
+    return adminLanguage;
+  }
+
+  public String getDefaultAdminLanguage() {
+    String adminLanguage;
+    adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
+        getContext().getLanguage(), getContext());
     if ((adminLanguage == null) || ("".equals(adminLanguage))) {
       adminLanguage = getContext().getWiki().Param("celements.admin_language");
       if ((adminLanguage == null) || ("".equals(adminLanguage))) {

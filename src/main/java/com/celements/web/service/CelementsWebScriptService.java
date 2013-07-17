@@ -377,6 +377,10 @@ public class CelementsWebScriptService implements ScriptService {
         "celements.usenewbuttons", 0, getContext()) == 1;
   }
 
+  public String getDefaultAdminLanguage() {
+    return webUtilsService.getDefaultAdminLanguage();
+  }
+
   public String getDefaultLanguage() {
     return webUtilsService.getDefaultLanguage();
   }
