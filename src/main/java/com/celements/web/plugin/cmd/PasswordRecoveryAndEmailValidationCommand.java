@@ -32,6 +32,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -45,8 +46,12 @@ public class PasswordRecoveryAndEmailValidationCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PasswordRecoveryAndEmailValidationCommand.class);
+
+  static final String CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY =
+      "cel_register_acount_activation_mail_subject";
+
   private CelSendMail injectedCelSendMail;
-  IWebUtilsService webUtilsService;
+  IWebUtilsService injected_webUtilsService;
 
   public String recoverPassword() {
     String email = getContext().getRequest().get("j_username");
@@ -205,9 +210,10 @@ public class PasswordRecoveryAndEmailValidationCommand {
     XWikiDocument doc = null;
     DocumentReference templateCentralDocRef = new DocumentReference("celements2web",
         templateDocRef.getLastSpaceReference().getName(), templateDocRef.getName());
-    if(!new EmptyCheckCommand().isEmptyRTEDocument(templateDocRef)) {
+    if(!getDefaultEmptyDocStrategy().isEmptyDocumentTranslated(templateDocRef)) {
       doc = getContext().getWiki().getDocument(templateDocRef, getContext());
-    } else if(!new EmptyCheckCommand().isEmptyRTEDocument(templateCentralDocRef)) {
+    } else if(!getDefaultEmptyDocStrategy().isEmptyDocumentTranslated(
+        templateCentralDocRef)) {
       doc = getContext().getWiki().getDocument(templateCentralDocRef, getContext());
     }
     return doc;
@@ -323,36 +329,102 @@ public class PasswordRecoveryAndEmailValidationCommand {
     sendValidationMessage(to, validkey, contentDocRef);
   }
 
+  /**
+   * 
+   * @param to
+   * @param validkey
+   * @param contentDocRef
+   * @throws XWikiException
+   * 
+   * @Deprecated since 2.34.0 instead use sendValidationMessage(String, String,
+   *             DocumentReference, String)
+   */
+  @Deprecated
   public void sendValidationMessage(String to, String validkey,
       DocumentReference contentDocRef) throws XWikiException {
+    sendValidationMessage(to, validkey, contentDocRef,
+        getWebUtilsService().getDefaultAdminLanguage());
+  }
+
+  public void sendValidationMessage(String to, String validkey,
+      DocumentReference contentDocRef, String lang) throws XWikiException {
+    sendValidationMessage(to, validkey, contentDocRef, lang, null);
+  }
+
+  public void sendValidationMessage(String to, String validkey,
+      DocumentReference contentDocRef, String lang, String defLang
+      ) throws XWikiException {
     String sender = "";
     String subject = "";
     String content = "";
     XWikiDocument contentDoc = null;
-    if(getContext().getWiki().exists(contentDocRef, getContext())) {
+    DocumentReference contentCentralDocRef = new DocumentReference("celements2web",
+        contentDocRef.getLastSpaceReference().getName(), contentDocRef.getName());
+    if (getContext().getWiki().exists(contentDocRef, getContext())) {
       contentDoc = getContext().getWiki().getDocument(contentDocRef, getContext());
-    } else {
-      DocumentReference contentCentralDocRef = new DocumentReference("celements2web",
-          contentDocRef.getLastSpaceReference().getName(), contentDocRef.getName());
+    } else if (getContext().getWiki().exists(contentCentralDocRef, getContext())) {
       contentDoc = getContext().getWiki().getDocument(contentCentralDocRef, getContext());
     }
-    DocumentReference mailSenderClassRef = new DocumentReference(getContext(
-        ).getDatabase(), "Celements2", "FormMailClass");
-    BaseObject senderObj = contentDoc.getXObject(mailSenderClassRef);
-    if(senderObj != null) {
-      sender = senderObj.getStringValue("emailFrom");
+    sender = getFromEmailAdr(sender, contentDoc);
+    setValidationInfoInContext(to, validkey);
+    content = getValidationEmailContent(contentDoc, lang, defLang);
+    subject = getValidationEmailSubject(contentDoc, lang, defLang);
+    sendMail(sender, null, to, null, null, subject, content, "", null, null);
+  }
+
+  public String getValidationEmailSubject(XWikiDocument contentDoc, String lang,
+      String defLang) throws XWikiException {
+    String subject = "";
+    if (contentDoc != null) {
+      //For syntaxes other than xwiki/1.0: set output syntax for renderedTitle
+      subject = contentDoc.getTranslatedDocument(lang, getContext()).getTitle();
+      subject = getContext().getWiki().getRenderingEngine().interpretText(subject,
+          contentDoc, getContext());
+    }
+    if (getDefaultEmptyDocStrategy().isEmptyRTEString(subject)) {
+      subject = getWebUtilsService().getMessageTool(lang).get(
+          CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY);
+      if (CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY.equals(subject)) {
+        subject = getWebUtilsService().getMessageTool(defLang).get(
+            CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY);
+      }
+    }
+    return subject;
+  }
+
+  public String getValidationEmailContent(XWikiDocument contentDoc, String lang,
+      String defLang) throws XWikiException {
+    String content = "";
+    if (contentDoc != null) {
+      content = contentDoc.getTranslatedDocument(lang, getContext()).getRenderedContent(
+          getContext());
+    }
+    if (getDefaultEmptyDocStrategy().isEmptyRTEString(content)) {
+      content = getWebUtilsService().renderInheritableDocument(getDefaultMailDocRef(),
+          lang, defLang);
+    }
+    return content;
+  }
+
+  DocumentReference getDefaultMailDocRef() {
+    return new DocumentReference(getContext().getDatabase(), "Mails",
+        "AccountActivationMail");
+  }
+
+  public String getFromEmailAdr(String sender, XWikiDocument contentDoc) {
+    if (contentDoc != null) {
+      DocumentReference mailSenderClassRef = new DocumentReference(getContext(
+          ).getDatabase(), "Celements2", "FormMailClass");
+      BaseObject senderObj = contentDoc.getXObject(mailSenderClassRef);
+      if(senderObj != null) {
+        sender = senderObj.getStringValue("emailFrom");
+      }
     }
     if("".equals(sender.trim())) {
-      sender = getContext().getWiki().getXWikiPreference("admin_email", getContext());
+      sender = getContext().getWiki().getXWikiPreference("admin_email",
+          "celements.default.admin_email", "", getContext());
     }
-    setValidationInfoInContext(to, validkey);
-    content = contentDoc.getTranslatedDocument(getContext()).getRenderedContent(
-        getContext());
-    //For syntaxes other than xwiki/1.0: set output syntax for renderedTitle
-    subject = contentDoc.getTranslatedDocument(getContext()).getTitle();
-    subject = getContext().getWiki().getRenderingEngine().interpretText(subject,
-        contentDoc, getContext());
-    sendMail(sender, null, to, null, null, subject, content, "", null, null);
+    return sender;
   }
 
   void setValidationInfoInContext(String to, String validkey) throws XWikiException {
@@ -404,10 +476,14 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   IWebUtilsService getWebUtilsService() {
-    if (webUtilsService != null) {
-      return webUtilsService;
+    if (injected_webUtilsService != null) {
+      return injected_webUtilsService;
     }
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private IDefaultEmptyDocStrategyRole getDefaultEmptyDocStrategy() {
+    return Utils.getComponent(IDefaultEmptyDocStrategyRole.class);
   }
 
 }
