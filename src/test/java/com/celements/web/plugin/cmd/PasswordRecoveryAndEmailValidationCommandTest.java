@@ -114,6 +114,21 @@ public class PasswordRecoveryAndEmailValidationCommandTest
   }
 
   @Test
+  public void testGetValidationEmailSubject_defLang_null() throws Exception {
+    String dicMailSubjectKey =
+        PasswordRecoveryAndEmailValidationCommand.CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY;
+    XWikiMessageTool mockMessageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    expect(mockWebUtilsService.getMessageTool(eq("de"))).andReturn(mockMessageTool);
+    expect(mockMessageTool.get(dicMailSubjectKey)).andReturn(dicMailSubjectKey);
+    expect(mockWebUtilsService.getMessageTool((String)isNull())).andReturn(null
+        ).anyTimes();
+    replayDefault();
+    assertEquals(dicMailSubjectKey, passwdRecValidCmd.getValidationEmailSubject(
+        null, "de", null));
+    verifyDefault();
+  }
+
+  @Test
   public void testGetFromEmailAdr_null() {
     String sender = "";
     String from = "from@mail.com";

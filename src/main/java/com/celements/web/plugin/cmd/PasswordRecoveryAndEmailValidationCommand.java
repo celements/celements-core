@@ -384,7 +384,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
     if (getDefaultEmptyDocStrategy().isEmptyRTEString(subject)) {
       subject = getWebUtilsService().getMessageTool(lang).get(
           CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY);
-      if (CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY.equals(subject)) {
+      if (CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY.equals(subject) && (defLang != null)) {
         subject = getWebUtilsService().getMessageTool(defLang).get(
             CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY);
       }
