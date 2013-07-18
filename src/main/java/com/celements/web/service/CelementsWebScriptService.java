@@ -50,6 +50,7 @@ import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
+import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -542,6 +543,10 @@ public class CelementsWebScriptService implements ScriptService {
         "celUserAdminShowLoginName", "celements.administration.showloginname", 0,
         getContext()) != 0);
     return (webUtilsService.isAdvancedAdmin() || showLoginName);
+  }
+
+  public String getPossibleLogins() {
+    return new PossibleLoginsCommand().getPossibleLogins();
   }
 
 }
