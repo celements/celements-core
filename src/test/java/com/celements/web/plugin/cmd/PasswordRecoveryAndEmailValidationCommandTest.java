@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class PasswordRecoveryAndEmailValidationCommandTest 
     extends AbstractBridgedComponentTestCase {
@@ -48,6 +49,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest
   private XWiki xwiki;
   private PasswordRecoveryAndEmailValidationCommand passwdRecValidCmd;
   private IWebUtilsService mockWebUtilsService;
+  private XWikiRequest request;
 
   @Before
   public void setUp_PasswordRecoveryAndEmailValidationCommandTest() throws Exception {
@@ -56,6 +58,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     passwdRecValidCmd = new PasswordRecoveryAndEmailValidationCommand();
     mockWebUtilsService = createMockAndAddToDefault(
         IWebUtilsService.class);
+    request = createMockAndAddToDefault(XWikiRequest.class);
+    context.setRequest(request);
     passwdRecValidCmd.injected_webUtilsService = mockWebUtilsService;
   }
 
@@ -83,12 +87,14 @@ public class PasswordRecoveryAndEmailValidationCommandTest
 
   @Test
   public void testGetValidationEmailSubject() throws Exception {
-    String expectedRenderedSubject = "expectedRenderedSubject";
+    String dictSubjectValue = "expected Rendered Subject {0}";
+    String expectedRenderedSubject = "expected Rendered Subject www.unit.test";
     ((TestMessageTool)context.getMessageTool()).injectMessage(
         PasswordRecoveryAndEmailValidationCommand.CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY,
-        expectedRenderedSubject);
+        dictSubjectValue);
     expect(mockWebUtilsService.getMessageTool(eq("de"))).andReturn(
         context.getMessageTool());
+    expect(request.getHeader(eq("host"))).andReturn("www.unit.test").anyTimes();
     replayDefault();
     assertEquals(expectedRenderedSubject, passwdRecValidCmd.getValidationEmailSubject(
         null, "de", "en"));
@@ -97,16 +103,19 @@ public class PasswordRecoveryAndEmailValidationCommandTest
 
   @Test
   public void testGetValidationEmailSubject_defLang() throws Exception {
-    String expectedRenderedSubject = "expectedRenderedSubject";
+    String dictSubjectValue = "expected Rendered Subject {0}";
+    String expectedRenderedSubject = "expected Rendered Subject www.unit.test";
     String dicMailSubjectKey =
         PasswordRecoveryAndEmailValidationCommand.CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY;
     ((TestMessageTool)context.getMessageTool()).injectMessage(dicMailSubjectKey,
-        expectedRenderedSubject);
+        dictSubjectValue);
     XWikiMessageTool mockMessageTool = createMockAndAddToDefault(XWikiMessageTool.class);
     expect(mockWebUtilsService.getMessageTool(eq("de"))).andReturn(mockMessageTool);
-    expect(mockMessageTool.get(dicMailSubjectKey)).andReturn(dicMailSubjectKey);
+    expect(mockMessageTool.get(eq(dicMailSubjectKey), isA(List.class))).andReturn(
+        dicMailSubjectKey);
     expect(mockWebUtilsService.getMessageTool(eq("en"))).andReturn(
         context.getMessageTool());
+    expect(request.getHeader(eq("host"))).andReturn("www.unit.test").anyTimes();
     replayDefault();
     assertEquals(expectedRenderedSubject, passwdRecValidCmd.getValidationEmailSubject(
         null, "de", "en"));
@@ -119,9 +128,11 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         PasswordRecoveryAndEmailValidationCommand.CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY;
     XWikiMessageTool mockMessageTool = createMockAndAddToDefault(XWikiMessageTool.class);
     expect(mockWebUtilsService.getMessageTool(eq("de"))).andReturn(mockMessageTool);
-    expect(mockMessageTool.get(dicMailSubjectKey)).andReturn(dicMailSubjectKey);
+    expect(mockMessageTool.get(eq(dicMailSubjectKey), isA(List.class))).andReturn(
+        dicMailSubjectKey);
     expect(mockWebUtilsService.getMessageTool((String)isNull())).andReturn(null
         ).anyTimes();
+    expect(request.getHeader(eq("host"))).andReturn("www.unit.test").anyTimes();
     replayDefault();
     assertEquals(dicMailSubjectKey, passwdRecValidCmd.getValidationEmailSubject(
         null, "de", null));
@@ -504,6 +515,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         title);
     expect(mockWebUtilsService.getMessageTool(eq("de"))).andReturn(
         context.getMessageTool());
+    expect(request.getHeader(eq("host"))).andReturn("www.unit.test").anyTimes();
     replayDefault(celSendMail);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDocRef, "de");
     verifyDefault(celSendMail);

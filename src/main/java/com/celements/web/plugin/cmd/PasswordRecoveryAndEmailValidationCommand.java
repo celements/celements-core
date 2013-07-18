@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -382,11 +383,12 @@ public class PasswordRecoveryAndEmailValidationCommand {
           contentDoc, getContext());
     }
     if (getDefaultEmptyDocStrategy().isEmptyRTEString(subject)) {
+      List<String> params = Arrays.asList(getContext().getRequest().getHeader("host"));
       subject = getWebUtilsService().getMessageTool(lang).get(
-          CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY);
+          CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY, params);
       if (CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY.equals(subject) && (defLang != null)) {
         subject = getWebUtilsService().getMessageTool(defLang).get(
-            CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY);
+            CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY, params);
       }
     }
     return subject;
