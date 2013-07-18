@@ -20,7 +20,6 @@
 package com.celements.web.plugin.cmd;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -37,16 +36,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class CelSendMailTest extends AbstractBridgedComponentTestCase {
-  XWikiContext context = null;
-  CelSendMail sendMail = null;
+  XWikiContext context;
+  CelSendMail sendMail;
   
   @Before
   public void setUp_CelSendMailTest() throws Exception {
     context = getContext();
-    sendMail = new CelSendMail(context);
+    sendMail = new CelSendMail();
   }
 
   @Test
@@ -104,17 +102,30 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testSetHtmlContent() {
-    XWikiContext context = createMock(XWikiContext.class);
+  @Deprecated
+  public void testSetHtmlContent_deprecated() {
     CelSendMail sendMail = new CelSendMail(context);
     String html = "<h2>HTML Content!</h2>";
     String text = "It's plain.\r\n\r\nHTML Content!";
-    XWikiMessageTool msgTool = createMock(XWikiMessageTool.class);
-    expect(context.getMessageTool()).andReturn(msgTool);
-    expect(msgTool.get(eq("cel_plain_text_mail"))).andReturn("It's plain.");
-    replay(context, msgTool);
+    TestMessageTool msgTool = (TestMessageTool) context.getMessageTool();
+    msgTool.injectMessage("cel_plain_text_mail", "It's plain.");
+    replayDefault();
     sendMail.setHtmlContent(html, false);
-    verify(context, msgTool);
+    verifyDefault();
+    assertEquals(html, sendMail.getMailObject().getHtmlPart());
+    assertEquals(text, sendMail.getMailObject().getTextPart());
+  }
+
+  @Test
+  public void testSetHtmlContent() {
+    CelSendMail sendMail = new CelSendMail();
+    String html = "<h2>HTML Content!</h2>";
+    String text = "It's plain.\r\n\r\nHTML Content!";
+    TestMessageTool msgTool = (TestMessageTool) context.getMessageTool();
+    msgTool.injectMessage("cel_plain_text_mail", "It's plain.");
+    replayDefault();
+    sendMail.setHtmlContent(html, false);
+    verifyDefault();
     assertEquals(html, sendMail.getMailObject().getHtmlPart());
     assertEquals(text, sendMail.getMailObject().getTextPart());
   }
@@ -158,15 +169,33 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testSendMail() {
-    XWiki xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    MailSenderPluginApi mailPlugin = createMock(MailSenderPluginApi.class);
+    XWiki xwiki = getWikiMock();
+    MailSenderPluginApi mailPlugin = createMockAndAddToDefault(MailSenderPluginApi.class);
     expect(xwiki.getPluginApi(eq("mailsender"), same(context))).andReturn(mailPlugin);
-    expect(mailPlugin.sendMail((Mail)anyObject())).andReturn(1);
+    expect(mailPlugin.sendMail(isA(Mail.class), isA(CelMailConfiguration.class))
+        ).andReturn(1);
     sendMail.injectMail(new Mail());
-    replay(mailPlugin, xwiki);
-    sendMail.sendMail();
-    verify(mailPlugin, xwiki);
+    expect(xwiki.getXWikiPreference(eq("smtp_server"),
+        eq("celements.mail.default.smtp_server"), eq(""), same(context))).andReturn(""
+            ).anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"),
+        eq("celements.mail.default.smtp_port"), eq(25), same(context))).andReturn(25
+            ).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("admin_email"),
+        eq("celements.mail.default.admin_email"), eq(""), same(context))).andReturn(""
+            ).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"),
+        eq("celements.mail.default.smtp_server_username"), eq(""), same(context))
+        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"),
+        eq("celements.mail.default.smtp_server_password"), eq(""), same(context))
+        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"),
+        eq("celements.mail.default.javamail_extra_props"), eq(""), same(context))
+        ).andReturn("").anyTimes();
+    replayDefault();
+    assertEquals(1, sendMail.sendMail());
+    verifyDefault();
   }
   
   @Test

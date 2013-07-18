@@ -469,7 +469,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
     if(injectedCelSendMail != null) {
       return injectedCelSendMail;
     }
-    return new CelSendMail(getContext());
+    return new CelSendMail();
   }
 
   private XWikiContext getContext() {

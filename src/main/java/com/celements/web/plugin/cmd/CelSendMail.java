@@ -27,24 +27,31 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
+import com.xpn.xwiki.web.Utils;
 
 public class CelSendMail {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(CelSendMail.class);
   
   private Mail mail;
-  private XWikiContext context;
+  private CelMailConfiguration mailConfiguration;
 
   private PlainTextCommand plainTextCmd = new PlainTextCommand();
 
+  /**
+   * @deprecated since 2.34.0 instead use new CelSendMail()
+   */
+  @Deprecated
   public CelSendMail(XWikiContext context) {
-    this.context = context;
   }
+  
+  public CelSendMail() {}
   
   public void setFrom(String from) {
     getMailObject().setFrom(from);
@@ -71,7 +78,14 @@ public class CelSendMail {
   public void setSubject(String subject) {
     getMailObject().setSubject(subject);
   }
-  
+
+  public CelMailConfiguration getMailConfiguration() {
+    if (mailConfiguration == null) {
+      mailConfiguration = new CelMailConfiguration();
+    }
+    return mailConfiguration;
+  }
+
   public void setHtmlContent(String htmlContent, boolean isLatin1) {
     // TODO Probabely can be removed as soon as all installations are on xwiki 2+
     if(isLatin1) {
@@ -85,7 +99,7 @@ public class CelSendMail {
     }
     if((getMailObject().getTextPart() == null)
         || "".equals(getMailObject().getTextPart().trim())) {
-      String textContent = context.getMessageTool().get("cel_plain_text_mail") + "\r\n\r\n";
+      String textContent = getContext().getMessageTool().get("cel_plain_text_mail") + "\r\n\r\n";
       textContent += plainTextCmd.convertToPlainText(htmlContent);
       getMailObject().setTextPart(textContent);
     }
@@ -113,14 +127,14 @@ public class CelSendMail {
   }
   
   //TODO check if minimum required fields are set?
-  public int sendMail(){
+  public int sendMail() {
     int sendResult = -999;
     if(mail != null) {
       LOGGER.trace("Sending Mail: \nfrom = '" + mail.getFrom() + "'\n" +
           "replyTo='" + mail.getTo() + "'\n" + "\n" + mail);
-      MailSenderPluginApi mailPlugin = (MailSenderPluginApi)context.getWiki(
-          ).getPluginApi("mailsender", context);
-      sendResult = mailPlugin.sendMail(mail);
+      MailSenderPluginApi mailPlugin = (MailSenderPluginApi)getContext().getWiki(
+          ).getPluginApi("mailsender", getContext());
+      sendResult = mailPlugin.sendMail(mail, getMailConfiguration());
       LOGGER.info("Sent Mail from '" + mail.getFrom() + "' to '" + mail.getTo() + 
           "'. Result was '" + sendResult + "'. Time: " + 
           Calendar.getInstance().getTimeInMillis());
@@ -141,4 +155,10 @@ public class CelSendMail {
   void injectMail(Mail mail) {
     this.mail = mail;
   }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
+  }
+
 }
