@@ -423,8 +423,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
       }
     }
     if("".equals(sender.trim())) {
-      sender = getContext().getWiki().getXWikiPreference("admin_email",
-          "celements.default.admin_email", "", getContext());
+      sender = new CelMailConfiguration().getDefaultAdminSenderAddress();
     }
     return sender;
   }

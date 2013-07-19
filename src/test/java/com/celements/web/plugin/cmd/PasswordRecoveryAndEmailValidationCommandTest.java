@@ -144,7 +144,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     String sender = "";
     String from = "from@mail.com";
     expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq("celements.default.admin_email"), eq(""), same(context))).andReturn(from);
+        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
+        ).andReturn(from);
     replayDefault();
     sender = passwdRecValidCmd.getFromEmailAdr(sender, null);
     assertEquals(from, sender);
@@ -213,7 +214,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     VelocityContext vcontext = new VelocityContext();
     context.put("vcontext", vcontext);
     expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq("celements.default.admin_email"), eq(""), same(context))).andReturn(from);
+        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
+        ).andReturn(from);
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(true);
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(contentDocRef), same(context))).andReturn(doc);
@@ -278,7 +280,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     VelocityContext vcontext = new VelocityContext();
     context.put("vcontext", vcontext);
     expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq("celements.default.admin_email"), eq(""), same(context))).andReturn(from);
+        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
+        ).andReturn(from);
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(true);
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(contentDocRef), same(context))).andReturn(doc);
@@ -346,7 +349,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     String title = "the title";
     context.put("vcontext", new VelocityContext());
     expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq("celements.default.admin_email"), eq(""), same(context))).andReturn(from);
+        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
+        ).andReturn(from);
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(false);
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(true);
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -411,7 +415,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     String title = "the title";
     context.put("vcontext", new VelocityContext());
     expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq("celements.default.admin_email"), eq(""), same(context))).andReturn(from);
+        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
+        ).andReturn(from);
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(false);
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(true);
     XWikiDocument doc = createMock(XWikiDocument.class);
@@ -474,7 +479,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     String title = "the title";
     context.put("vcontext", new VelocityContext());
     expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq("celements.default.admin_email"), eq(""), same(context))).andReturn(from);
+        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
+        ).andReturn(from);
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(false);
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(false);
     CelSendMail celSendMail = createMock(CelSendMail.class);
