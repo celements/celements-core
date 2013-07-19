@@ -683,8 +683,9 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
         ).andReturn("").anyTimes();
     replayDefault();
-    assertEquals("", celMailConfiguration.getHost());
-    assertEquals("multiple reads must not lead to multiple config reads.", "",
+    assertEquals("empty string defaults to 'localhost' in javamail!", "-",
+        celMailConfiguration.getHost());
+    assertEquals("multiple reads must not lead to multiple config reads.", "-",
         celMailConfiguration.getHost());
     verifyDefault();
   }

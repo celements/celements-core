@@ -134,7 +134,7 @@ public class CelMailConfiguration extends MailConfiguration {
   @Override
   public String getHost() {
     checkHostConfiguration();
-    if (!StringUtils.isEmpty(getHost_internal()) && !"-".equals(getHost_internal())) {
+    if (!StringUtils.isEmpty(getHost_internal())) {
       return getHost_internal();
     } else if (noHostConfig()) {
       return "localhost";
