@@ -1,12 +1,12 @@
-package com.celements.web.plugin.cmd;
+package com.celements.mandatory;
 
 import com.xpn.xwiki.web.Utils;
 
 public class CheckMandatoryDocuments {
 
   public void checkMandatoryDocuments() {
-    IMandatoryDocumentComponentRole mandatoryDocCmp = Utils.getComponent(
-        IMandatoryDocumentComponentRole.class);
+    IMandatoryDocumentCompositorRole mandatoryDocCmp = Utils.getComponent(
+        IMandatoryDocumentCompositorRole.class);
     if(mandatoryDocCmp != null) {
       mandatoryDocCmp.checkAllMandatoryDocuments();
     }

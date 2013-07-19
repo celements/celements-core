@@ -52,7 +52,6 @@ public class CompositorComponent implements EventListener {
   @Requirement
   private Execution execution;
 
-
   protected XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }

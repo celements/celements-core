@@ -36,4 +36,4 @@ com.celements.web.classcollections.DocumentDetailsClasses
 com.celements.rights.CelementsRightScriptService
 com.celements.web.classcollections.OldCoreClasses
 com.celements.web.classcollections.OldCoreLegacyClasses
-com.celements.web.plugin.cmd.MandatoryDocumentComponent
+com.celements.mandatory.MandatoryDocumentCompositor

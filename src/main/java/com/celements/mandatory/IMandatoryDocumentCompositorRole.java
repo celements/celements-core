@@ -1,9 +1,9 @@
-package com.celements.web.plugin.cmd;
+package com.celements.mandatory;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface IMandatoryDocumentComponentRole {
+public interface IMandatoryDocumentCompositorRole {
 
   public void checkAllMandatoryDocuments();
 

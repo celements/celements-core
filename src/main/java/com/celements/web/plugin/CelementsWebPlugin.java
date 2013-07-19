@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
+import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.pagetype.IPageType;
 import com.celements.rendering.RenderCommand;
@@ -41,7 +42,6 @@ import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.CheckMandatoryDocuments;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
