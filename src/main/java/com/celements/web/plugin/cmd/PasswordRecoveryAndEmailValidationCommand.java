@@ -264,7 +264,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
           + "] now using default.");
       activationMailDocRef = getDefaultAccountActivationMailDocRef();
     }
-    sendValidationMessage(obj.getStringValue("email"), validkey, activationMailDocRef);
+    sendValidationMessage(obj.getStringValue("email"), validkey, activationMailDocRef,
+        newAdminLanguage, getWebUtilsService().getDefaultAdminLanguage());
     getContext().setLanguage(oldLanguage);
     vcontext.put("admin_language", oldAdminLanguage); 
     vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
