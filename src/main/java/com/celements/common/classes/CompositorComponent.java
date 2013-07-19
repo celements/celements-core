@@ -71,7 +71,12 @@ public class CompositorComponent implements EventListener {
     DocumentReference xwikiPrefDoc = new DocumentReference(document.getDocumentReference(
         ).getWikiReference().getName(), "XWiki", "XWikiPreferences");
     if(document.getDocumentReference().equals(xwikiPrefDoc)) {
+      LOGGER.debug("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
+          + "Collections");
       checkAllClassCollections();
+    } else {
+      LOGGER.trace("changes on [" + xwikiPrefDoc + "] saved. NOT checking all Class "
+          + "Collections");
     }
   }
 
