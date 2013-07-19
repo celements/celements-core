@@ -220,11 +220,11 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return doc;
   }
 
-  public void sendNewValidation(String login, String possibleFields
+  public boolean sendNewValidation(String login, String possibleFields
       ) throws XWikiException {
     String user = new UserNameForUserDataCommand().getUsernameForUserData(login,
         possibleFields, getContext());
-    sendNewValidation(user);
+    return sendNewValidation(user);
   }
 
   public void sendNewValidation(String login, String possibleFields,
@@ -234,11 +234,11 @@ public class PasswordRecoveryAndEmailValidationCommand {
     sendNewValidation(user, activationMailDocRef);
   }
 
-  public void sendNewValidation(String accountName) throws XWikiException {
-    sendNewValidation(accountName, (DocumentReference)null);
+  public boolean sendNewValidation(String accountName) throws XWikiException {
+    return sendNewValidation(accountName, (DocumentReference)null);
   }
 
-  public void sendNewValidation(String accountName, DocumentReference activationMailDocRef
+  public boolean sendNewValidation(String accountName, DocumentReference activationMailDocRef
       ) throws XWikiException {
     accountName = completeAccountFN(accountName);
     DocumentReference accountDocRef = getWebUtilsService().resolveDocumentReference(
@@ -264,11 +264,17 @@ public class PasswordRecoveryAndEmailValidationCommand {
           + "] now using default.");
       activationMailDocRef = getDefaultAccountActivationMailDocRef();
     }
-    sendValidationMessage(obj.getStringValue("email"), validkey, activationMailDocRef,
-        newAdminLanguage, getWebUtilsService().getDefaultAdminLanguage());
-    getContext().setLanguage(oldLanguage);
-    vcontext.put("admin_language", oldAdminLanguage); 
-    vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
+    boolean sentSuccessful = false;
+    try {
+      sentSuccessful = sendValidationMessage(obj.getStringValue("email"), validkey,
+          activationMailDocRef, newAdminLanguage, getWebUtilsService(
+              ).getDefaultAdminLanguage());
+    } finally {
+      getContext().setLanguage(oldLanguage);
+      vcontext.put("admin_language", oldAdminLanguage); 
+      vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
+    }
+    return sentSuccessful;
   }
 
   private DocumentReference getDefaultAccountActivationMailDocRef() {
@@ -353,7 +359,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
     sendValidationMessage(to, validkey, contentDocRef, lang, null);
   }
 
-  public void sendValidationMessage(String to, String validkey,
+  public boolean sendValidationMessage(String to, String validkey,
       DocumentReference contentDocRef, String lang, String defLang
       ) throws XWikiException {
     String sender = "";
@@ -371,7 +377,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
     setValidationInfoInContext(to, validkey);
     content = getValidationEmailContent(contentDoc, lang, defLang);
     subject = getValidationEmailSubject(contentDoc, lang, defLang);
-    sendMail(sender, null, to, null, null, subject, content, "", null, null);
+    return sendMail(sender, null, to, null, null, subject, content, "", null, null) == 0;
   }
 
   public String getValidationEmailSubject(XWikiDocument contentDoc, String lang,

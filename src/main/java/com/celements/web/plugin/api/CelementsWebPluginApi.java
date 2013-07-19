@@ -394,17 +394,18 @@ public class CelementsWebPluginApi extends Api {
     return encryptString("hash:SHA-512:", str);
   }
 
-  public void sendNewValidation(String user, String possibleFields) {
+  public boolean sendNewValidation(String user, String possibleFields) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "].");
       try {
-        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
+        return new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
             possibleFields);
       } catch (XWikiException exp) {
         LOGGER.error("sendNewValidation: failed.", exp);
       }
     }
+    return false;
   }
 
   public void sendNewValidation(String user, String possibleFields,
