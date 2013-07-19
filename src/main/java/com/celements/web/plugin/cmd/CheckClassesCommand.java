@@ -24,7 +24,6 @@ import org.xwiki.observation.EventListener;
 import com.celements.common.classes.CompositorComponent;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.classcollections.OldCoreLegacyClasses;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 public class CheckClassesCommand {
@@ -45,7 +44,7 @@ public class CheckClassesCommand {
   public static final String MEDIALIB_CONFIG_CLASS =
       OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
-  public void checkClasses(XWikiContext context) {
+  public void checkClasses() {
     CompositorComponent compComponent = (CompositorComponent) Utils.getComponent(
         EventListener.class, "CompositerComponent");
     if(compComponent != null) {

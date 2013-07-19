@@ -1556,7 +1556,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public void checkClasses()  {
-    new CheckClassesCommand().checkClasses(context);
+    new CheckClassesCommand().checkClasses();
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {

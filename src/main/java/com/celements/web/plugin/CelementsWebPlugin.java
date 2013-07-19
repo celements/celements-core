@@ -41,6 +41,7 @@ import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
+import com.celements.web.plugin.cmd.CheckMandatoryDocuments;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
@@ -110,13 +111,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   public void init(XWikiContext context) {
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
-    new CheckClassesCommand().checkClasses(context);
+    new CheckClassesCommand().checkClasses();
     super.init(context);
   }
 
   public void virtualInit(XWikiContext context) {
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
-    new CheckClassesCommand().checkClasses(context);
+    new CheckClassesCommand().checkClasses();
+    new CheckMandatoryDocuments().checkMandatoryDocuments();
     super.virtualInit(context);
   }
 
