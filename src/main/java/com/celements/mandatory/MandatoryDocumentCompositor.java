@@ -10,6 +10,7 @@ import org.xwiki.context.Execution;
 
 import com.celements.common.classes.CompositorComponent;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 @Component
 public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositorRole {
@@ -18,7 +19,7 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
       CompositorComponent.class);
   
   @Requirement
-  private Map<String, IMandatoryDocumentRole> classCollectionMap;
+  private Map<String, IMandatoryDocumentRole> mandatoryDocuemntsMap;
 
   @Requirement
   private Execution execution;
@@ -29,6 +30,14 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
 
   public void checkAllMandatoryDocuments() {
     LOGGER.debug("checkAllMandatoryDocuments for wiki [" + "].");
+    for (IMandatoryDocumentRole mandatoryDoc : mandatoryDocuemntsMap.values()) {
+      try {
+        mandatoryDoc.checkDocuments();
+      } catch (XWikiException exp) {
+        LOGGER.error("Exception checking mandatory documents for component "
+            + mandatoryDoc.getClass(), exp);
+      }
+    }
   }
 
 }
