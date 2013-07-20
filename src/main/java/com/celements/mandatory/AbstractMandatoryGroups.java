@@ -24,6 +24,8 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
+  protected abstract String commitName();
+
   protected void checkGroup(DocumentReference groupRef) throws XWikiException {
     if (!getContext().getWiki().exists(groupRef, getContext())) {
       XWikiDocument editorGroupDoc = new CreateDocumentCommand().createDocument(groupRef,
@@ -31,8 +33,8 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
       if (editorGroupDoc != null) {
         editorGroupDoc.newXObject(getGroupClassRef(getContext().getDatabase()),
             getContext());
-        getContext().getWiki().saveDocument(editorGroupDoc, "autocreate mandatory"
-            + " celements group.", getContext());
+        getContext().getWiki().saveDocument(editorGroupDoc, "autocreate " + commitName()
+            + " group.", getContext());
       }
     }
   }

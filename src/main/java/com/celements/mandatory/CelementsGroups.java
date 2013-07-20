@@ -9,6 +9,11 @@ import com.xpn.xwiki.XWikiException;
 public class CelementsGroups extends AbstractMandatoryGroups {
 
   @Override
+  protected String commitName() {
+    return "mandatory celements";
+  }
+
+  @Override
   public void checkDocuments() throws XWikiException {
     checkGroup(getContentEditorGroupRef(getContext().getDatabase()));
     checkGroup(getAdminGroupRef(getContext().getDatabase()));
