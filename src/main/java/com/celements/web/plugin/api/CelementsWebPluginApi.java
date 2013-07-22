@@ -39,6 +39,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavContextMenuApi;
@@ -782,7 +783,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean isEmptyRTEString(String rteContent) {
-    return new EmptyCheckCommand().isEmptyRTEString(rteContent);
+    return getDefaultEmptyCheckService().isEmptyRTEString(rteContent);
   }
 
   public String getParentSpace() {
@@ -1662,6 +1663,10 @@ public class CelementsWebPluginApi extends Api {
 
   private IEmptyCheckRole getEmptyCheckService() {
     return Utils.getComponent(IEmptyCheckRole.class);
+  }
+
+  private IDefaultEmptyDocStrategyRole getDefaultEmptyCheckService() {
+    return Utils.getComponent(IDefaultEmptyDocStrategyRole.class);
   }
 
 }
