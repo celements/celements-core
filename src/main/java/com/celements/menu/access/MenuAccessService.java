@@ -10,6 +10,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 @Component
 public class MenuAccessService implements IMenuAccessServiceRole {
@@ -48,7 +49,7 @@ public class MenuAccessService implements IMenuAccessServiceRole {
         } catch (NoAccessDefinedException noAccExp) {
           LOGGER.debug("skip Access Provider [" + accessProvider.getClass() + "] because"
               + " of NoAccessDefinedException on [" + menuBarDocRef + "].", noAccExp);
-        } catch (Exception exp) {
+        } catch (XWikiException exp) {
           LOGGER.error("Access Provider [" + accessProvider.getClass() + "] failed for"
               + " hasview on [" + menuBarDocRef + "].", exp);
         }
