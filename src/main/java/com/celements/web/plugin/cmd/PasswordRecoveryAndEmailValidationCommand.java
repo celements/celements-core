@@ -19,7 +19,6 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -44,6 +43,8 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class PasswordRecoveryAndEmailValidationCommand {
+
+  private static final String CEL_PASSWORD_RECOVERY_SUBJECT_KEY = "cel_password_recovery_default_subject";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PasswordRecoveryAndEmailValidationCommand.class);
@@ -131,7 +132,9 @@ public class PasswordRecoveryAndEmailValidationCommand {
         vcontext.put("email", email);
         vcontext.put("validkey", validkey);
         
-        int sendRecoveryMail = sendRecoveryMail(email);
+        int sendRecoveryMail = sendRecoveryMail(email, getWebUtilsService(
+            ).getAdminLanguage(userDoc.getDocumentReference()), getWebUtilsService(
+                ).getDefaultAdminLanguage());
         LOGGER.debug("sendRecoveryMail: '" + sendRecoveryMail + "'");
         if(sendRecoveryMail == 0) { // successfully sent == 0
           result = "cel_password_recovery_success";
@@ -152,12 +155,15 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return validkey;
   }
 
-  private int sendRecoveryMail(String email) throws XWikiException {
+  private int sendRecoveryMail(String email, String lang, String defLang
+      ) throws XWikiException {
     String sender = getContext().getWiki().getXWikiPreference("admin_email",
         getContext());
-    String subject = getPasswordRecoverySubject();
-    String textContent = getPasswordRecoveryMailContent("PasswordRecoverMailTextContent");
-    String htmlContent = getPasswordRecoveryMailContent("PasswordRecoverMailHtmlContent");
+    String subject = getPasswordRecoverySubject(lang, defLang);
+    String textContent = getPasswordRecoveryMailContent("PasswordRecoverMailTextContent",
+        lang, defLang);
+    String htmlContent = getPasswordRecoveryMailContent("PasswordRecoverMailHtmlContent",
+        lang, defLang);
     if((htmlContent != null) || (textContent != null)) {
       return sendMail(sender, null, email, null, null, subject, htmlContent, textContent,
           null, null);
@@ -165,8 +171,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return -1;
   }
 
-  private String getPasswordRecoveryMailContent(String template)
-      throws XWikiException {
+  private String getPasswordRecoveryMailContent(String template, String lang,
+      String defLang) throws XWikiException {
     String mailContent = null;
     String newContent = "";
     XWikiDocument doc = getRTEDocWithCelementswebFallback(new DocumentReference(
@@ -176,13 +182,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
           doc.getTranslatedContent(getContext()), getContext().getDoc(), getContext());
     }
     if ("".equals(newContent)) {
-      template = template + "_" + getContext().getLanguage() + ".vm";
-      try {
-        newContent = getContext().getWiki().evaluateTemplate("celMails/" + template,
-            getContext());
-      } catch (IOException exp) {
-        LOGGER.info("failed to get mail template [" + template + "].", exp);
-      }
+      newContent = getWebUtilsService().renderInheritableDocument(new DocumentReference(
+          getContext().getDatabase(), "Mails", template), lang, defLang);
     }
     if (!"".equals(newContent)) {
       mailContent = newContent;
@@ -190,8 +191,9 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return mailContent;
   }
 
-  private String getPasswordRecoverySubject() throws XWikiException {
-    String subject = "$msg.get('cel_password_recovery_default_subject')";
+  private String getPasswordRecoverySubject(String lang, String defLang
+      ) throws XWikiException {
+    String subject = "";
     XWikiDocument doc = getRTEDocWithCelementswebFallback(new DocumentReference(
         getContext().getDatabase(), "Tools", "PasswordRecoverMailTextContent"));
     if(doc == null) {
@@ -203,6 +205,15 @@ public class PasswordRecoveryAndEmailValidationCommand {
     }
     subject = getContext().getWiki().getRenderingEngine().renderText(subject,
         getContext().getDoc(), getContext());
+    if (getDefaultEmptyDocStrategy().isEmptyRTEString(subject)) {
+      List<String> params = Arrays.asList(getContext().getRequest().getHeader("host"));
+      subject = getWebUtilsService().getMessageTool(lang).get(
+          CEL_PASSWORD_RECOVERY_SUBJECT_KEY, params);
+      if (CEL_PASSWORD_RECOVERY_SUBJECT_KEY.equals(subject) && (defLang != null)) {
+        subject = getWebUtilsService().getMessageTool(defLang).get(
+            CEL_PASSWORD_RECOVERY_SUBJECT_KEY, params);
+      }
+    }
     return subject;
   }
 
