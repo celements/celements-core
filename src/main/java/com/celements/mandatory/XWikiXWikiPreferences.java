@@ -42,7 +42,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
 
   private boolean skipCelementsWikiPreferences() {
     return (getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiPreferences"
-        ) != 1L);
+        ) == 1L);
   }
 
   boolean noMainWiki() {
