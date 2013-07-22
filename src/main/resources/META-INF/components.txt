@@ -39,3 +39,5 @@ com.celements.web.classcollections.OldCoreLegacyClasses
 com.celements.mandatory.MandatoryDocumentCompositor
 com.celements.mandatory.CelementsGroups
 com.celements.mandatory.XWikiXWikiPreferences
+com.celements.menu.access.MenuAccessService
+com.celements.menu.access.DefaultMenuAccessProvider

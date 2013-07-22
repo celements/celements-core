@@ -36,11 +36,11 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.menu.access.IMenuAccessServiceRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 @Component
 public class MenuService implements IMenuService {
@@ -52,6 +52,9 @@ public class MenuService implements IMenuService {
 
   @Requirement
   QueryManager queryManager;
+
+  @Requirement
+  IMenuAccessServiceRole accessService;
 
   @Requirement
   Execution execution;
@@ -77,63 +80,6 @@ public class MenuService implements IMenuService {
     return resultList;
   }
 
-  boolean hasview(DocumentReference menuBarDocRef) throws XWikiException {
-    String database = getContext().getDatabase();
-    getContext().setDatabase(getContext().getOriginalDatabase());
-    if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
-        ).endsWith("Celements2.AdminMenu")) {
-      LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
-          + webUtilsService.isAdvancedAdmin() + "].");
-      return webUtilsService.isAdvancedAdmin();
-    }
-    getContext().setDatabase(database);
-    return hasCentralAndLocalView(menuBarDocRef);
-  }
-
-  private boolean hasCentralAndLocalView(DocumentReference menuBarDocRef)
-      throws XWikiException {
-    String database = getContext().getDatabase();
-    getContext().setDatabase("celements2web");
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
-    String menuBar2webFullName = webUtilsService.getRefDefaultSerializer(
-        ).serialize(menuBar2webDocRef);
-    boolean centralView = !getContext().getWiki().exists(menuBar2webDocRef, getContext())
-      || getContext().getWiki().getRightService().hasAccessLevel("view",
-          getContext().getUser(), menuBar2webFullName, getContext());
-    LOGGER.debug("hasview: centralView [" + menuBar2webFullName + "] for ["
-        + getContext().getUser() + "] -> [" + centralView + "] on database ["
-        + getContext().getDatabase() + "].");
-    getContext().setDatabase(getContext().getOriginalDatabase());
-    DocumentReference menuBarLocalDocRef = new DocumentReference(getContext(
-        ).getOriginalDatabase(), menuBarDocRef.getLastSpaceReference().getName(),
-        menuBarDocRef.getName());
-    String menuBarFullName = webUtilsService.getRefDefaultSerializer().serialize(
-        menuBarLocalDocRef);
-    boolean localView = true;
-    if (getContext().getWiki().exists(menuBarLocalDocRef, getContext())) {
-      localView = getContext().getWiki().getRightService().hasAccessLevel("view",
-            getContext().getUser(), menuBarFullName, getContext());
-    } else if (XWikiRightService.GUEST_USER_FULLNAME.equals(getContext().getUser())) {
-      String menuBarLocalFullName = webUtilsService.getRefLocalSerializer().serialize(
-          menuBarLocalDocRef);
-      String prefParamName = "CelMenuBar-" + menuBarLocalFullName;
-      String cfgFallbackName = "celements.menubar.guestview." + menuBarLocalFullName;
-      localView = (getContext().getWiki().getXWikiPreferenceAsInt(prefParamName,
-          cfgFallbackName, 0, getContext()) == 1);
-      LOGGER.info("hasview: localView default for quest on [" + menuBarFullName + "] -> ["
-          + localView + "] on database [" + getContext().getDatabase()
-          + "]. Checked prefParamName [" + prefParamName + "] and cfgFallbackName ["
-          + cfgFallbackName + "].");
-    }
-    LOGGER.debug("hasview: localView [" + menuBarFullName + "] for ["
-        + getContext().getUser() + "] -> [" + localView + "] on database ["
-        + getContext().getDatabase() + "].");
-    getContext().setDatabase(database);
-    boolean centralAndLocalView = centralView && localView;
-    return centralAndLocalView;
-  }
-
   void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap) {
     try {
       List<String> result = queryManager.createQuery(getHeadersXWQL(), Query.XWQL
@@ -145,7 +91,7 @@ public class MenuService implements IMenuService {
       for(String fullName : new HashSet<String>(result)) {
         DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(
             fullName);
-        if (hasview(menuBarDocRef)) {
+        if (accessService.hasview(menuBarDocRef)) {
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(
               menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef(
                   menuBarDocRef.getWikiReference().getName()));
