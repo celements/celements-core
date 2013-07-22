@@ -14,7 +14,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("progon.mandatory.wikipreferences")
+@Component("celements.mandatory.wikipreferences")
 public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
 
   @Requirement
