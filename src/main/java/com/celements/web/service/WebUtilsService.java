@@ -854,8 +854,10 @@ public class WebUtilsService implements IWebUtilsService {
     if (this.injectedRenderingEngine != null) {
       renderCommand.setRenderingEngine(this.injectedRenderingEngine);
     }
-    return renderCommand.renderTemplatePath(getInheritedTemplatedPath(docRef), lang,
-        defLang);
+    String templatePath = getInheritedTemplatedPath(docRef);
+    LOGGER.debug("renderInheritableDocument: call renderTemplatePath for ["
+        + templatePath + "] and lang [" + lang + "] and defLang [" + defLang + "].");
+    return renderCommand.renderTemplatePath(templatePath, lang, defLang);
   }
 
 }
