@@ -33,6 +33,9 @@ public class MenuAccessService implements IMenuAccessServiceRole {
       boolean hasview = false;
       boolean allowForDeny = true;
       for (IMenuAccessProviderRole accessProvider : accessProviderMap.values()) {
+        LOGGER.trace("start accessProvider [" + accessProvider.getClass()
+            + "] check for menuBarDocRef [" + menuBarDocRef + "] current database ["
+            + getContext().getDatabase() + "].");
         try {
           boolean newHasView = accessProvider.hasview(menuBarDocRef);
           LOGGER.debug("check has view for [" + getContext().getUser() + "] on ["
