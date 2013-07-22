@@ -71,7 +71,13 @@ public interface IWebUtilsService {
 
   public String getAdminLanguage();
 
+  /**
+   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
+   */
+  @Deprecated
   public String getAdminLanguage(String userFullName);
+
+  public String getAdminLanguage(DocumentReference userRef);
 
   public String getDefaultLanguage();
 

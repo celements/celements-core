@@ -288,13 +288,20 @@ public class WebUtilsService implements IWebUtilsService {
     return getAdminLanguage(getContext().getUser());
   }
 
+  /**
+   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
+   */
+  @Deprecated
   public String getAdminLanguage(String userFullName) {
+    return getAdminLanguage(resolveDocumentReference(userFullName));
+  }
+
+  public String getAdminLanguage(DocumentReference userRef) {
     String adminLanguage = null;
     try {
-      DocumentReference userDocRef = resolveDocumentReference(userFullName);
       DocumentReference xwikiUsersClassRef = new DocumentReference(
-          userDocRef.getWikiReference().getName(), "XWiki", "XWikiUsers");
-      BaseObject userObj = getContext().getWiki().getDocument(userDocRef, getContext()
+          userRef.getWikiReference().getName(), "XWiki", "XWikiUsers");
+      BaseObject userObj = getContext().getWiki().getDocument(userRef, getContext()
           ).getXObject(xwikiUsersClassRef);
       if (userObj != null) {
         adminLanguage = userObj.getStringValue("admin_language");
