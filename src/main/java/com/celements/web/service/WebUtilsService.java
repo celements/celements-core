@@ -828,9 +828,12 @@ public class WebUtilsService implements IWebUtilsService {
     for (Map.Entry<Object, Object> entry : tempPathConfig.getMappings().entrySet()) {
       String pathName = (String) entry.getKey();
       if (renderTemplatePath.startsWith(":" + pathName)) {
-        return renderTemplatePath.replaceAll("^:(" + pathName + "\\.)?", "/templates/"
-              + ((String) entry.getValue()) + "/") + getTemplatePathLangSuffix(lang)
-              + ".vm";
+        String newRenderTemplatePath = renderTemplatePath.replaceAll("^:(" + pathName
+            + "\\.)?", "/templates/" + ((String) entry.getValue()) + "/")
+            + getTemplatePathLangSuffix(lang) + ".vm";
+        LOGGER.debug("getTemplatePathOnDisk: for [" + renderTemplatePath + "] and lang ["
+            + lang + "] returning [" + newRenderTemplatePath + "].");
+        return newRenderTemplatePath;
       }
     }
     return renderTemplatePath;
