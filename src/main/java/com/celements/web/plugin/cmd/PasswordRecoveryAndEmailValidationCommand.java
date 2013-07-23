@@ -157,8 +157,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
 
   private int sendRecoveryMail(String email, String lang, String defLang
       ) throws XWikiException {
-    String sender = getContext().getWiki().getXWikiPreference("admin_email",
-        getContext());
+    String sender = new CelMailConfiguration().getDefaultAdminSenderAddress();
     String subject = getPasswordRecoverySubject(lang, defLang);
     String textContent = getPasswordRecoveryMailContent("PasswordRecoverMailTextContent",
         lang, defLang);
