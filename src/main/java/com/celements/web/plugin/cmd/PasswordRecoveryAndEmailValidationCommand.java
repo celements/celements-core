@@ -450,13 +450,25 @@ public class PasswordRecoveryAndEmailValidationCommand {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     vcontext.put("email", to);
     vcontext.put("validkey", validkey);
+    vcontext.put("activationLink", getActivationLink(to, validkey));
+  }
+
+  String getActivationLink(String to, String validkey) throws XWikiException {
     try {
-      vcontext.put("activationLink", getContext().getWiki().getExternalURL(
-          "Content.login", "view", "email=" + URLEncoder.encode(to, "UTF-8") + "&ac="
-          + validkey, getContext()));
+      if (getContext().getWiki().getRightService().hasAccessLevel("view",
+          "XWiki.XWikiGuest", "Content.login", getContext())) {
+        return getContext().getWiki().getExternalURL(
+            "Content.login", "view", "email=" + URLEncoder.encode(to, "UTF-8") + "&ac="
+            + validkey, getContext());
+      } else {
+        return getContext().getWiki().getExternalURL(
+            "XWiki.XWikiLogin", "login", "email=" + URLEncoder.encode(to, "UTF-8")
+            + "&ac=" + validkey, getContext());
+      }
     } catch (UnsupportedEncodingException exp) {
       LOGGER.error("Failed to encode [" + to + "] for activation link.", exp);
     }
+    return null;
   }
   
   int sendMail(

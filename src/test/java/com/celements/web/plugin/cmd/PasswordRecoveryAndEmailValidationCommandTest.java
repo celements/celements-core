@@ -39,6 +39,7 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -50,6 +51,7 @@ public class PasswordRecoveryAndEmailValidationCommandTest
   private PasswordRecoveryAndEmailValidationCommand passwdRecValidCmd;
   private IWebUtilsService mockWebUtilsService;
   private XWikiRequest request;
+  private XWikiRightService rightServiceMock;
 
   @Before
   public void setUp_PasswordRecoveryAndEmailValidationCommandTest() throws Exception {
@@ -58,6 +60,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     passwdRecValidCmd = new PasswordRecoveryAndEmailValidationCommand();
     mockWebUtilsService = createMockAndAddToDefault(
         IWebUtilsService.class);
+    rightServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(rightServiceMock).anyTimes();
     request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
     passwdRecValidCmd.injected_webUtilsService = mockWebUtilsService;
@@ -82,6 +86,40 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     replayDefault();
     assertEquals(expectedRenderedContent, passwdRecValidCmd.getValidationEmailContent(
         null, "de", "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetActivationLink_Contentlogin_notRestricted() throws Exception {
+    String toAdr = "mytest@unit.test";
+    String validkey = "1j392k347";
+    String expectedActivationLink = "http://www.unit-test.test/login"
+        + "?email=mytest%40unit.test&ac=" + validkey;
+    expect(xwiki.getExternalURL(eq("Content.login"), eq("view"), eq(
+        "email=mytest%40unit.test&ac=" + validkey), same(context))).andReturn(
+            expectedActivationLink);
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedActivationLink, passwdRecValidCmd.getActivationLink(toAdr,
+        validkey));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetActivationLink_Contentlogin_restricted() throws Exception {
+    String toAdr = "mytest@unit.test";
+    String validkey = "1j392k347";
+    String expectedActivationLink = "http://www.unit-test.test/login/XWiki/XWikiLogin"
+        + "?email=mytest%40unit.test&ac=" + validkey;
+    expect(xwiki.getExternalURL(eq("XWiki.XWikiLogin"), eq("login"), eq(
+        "email=mytest%40unit.test&ac=" + validkey), same(context))).andReturn(
+            expectedActivationLink);
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(false).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedActivationLink, passwdRecValidCmd.getActivationLink(toAdr,
+        validkey));
     verifyDefault();
   }
 
@@ -163,6 +201,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     expect(xwiki.getExternalURL(eq("Content.login"), eq("view"),
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault();
     passwdRecValidCmd.setValidationInfoInContext(to, validkey);
     assertNotNull(context.get("vcontext"));
@@ -258,6 +298,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
     expect(mockWebUtilsService.getDefaultAdminLanguage()).andReturn(adminLang).anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(doc, celSendMail, renderer);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDoc, context);
     verifyDefault(doc, celSendMail, renderer);
@@ -322,6 +364,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
     expect(mockWebUtilsService.getDefaultAdminLanguage()).andReturn(adminLang).anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(doc, celSendMail, renderer);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDocRef, "de");
     verifyDefault(doc, celSendMail, renderer);
@@ -394,6 +438,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
     expect(mockWebUtilsService.getDefaultAdminLanguage()).andReturn(adminLang).anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(doc, celSendMail, renderer);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDoc, context);
     verifyDefault(doc, celSendMail, renderer);
@@ -458,6 +504,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
     expect(mockWebUtilsService.getDefaultAdminLanguage()).andReturn(adminLang).anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(doc, celSendMail, renderer);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDocRef, "de");
     verifyDefault(doc, celSendMail, renderer);
@@ -522,6 +570,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
     expect(mockWebUtilsService.getMessageTool(eq("de"))).andReturn(
         context.getMessageTool());
     expect(request.getHeader(eq("host"))).andReturn("www.unit.test").anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(celSendMail);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDocRef, "de");
     verifyDefault(celSendMail);
@@ -592,6 +642,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
     expect(mockWebUtilsService.getDefaultAdminLanguage()).andReturn(adminLang).anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(doc, celSendMail, renderer);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDoc, context);
     verifyDefault(doc, celSendMail, renderer);
@@ -657,6 +709,8 @@ public class PasswordRecoveryAndEmailValidationCommandTest
         eq("email=to%40mail.com&ac=" + validkey), same(context))
         ).andReturn(expectedLink).once();
     expect(mockWebUtilsService.getDefaultAdminLanguage()).andReturn(adminLang).anyTimes();
+    expect(rightServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("Content.login"), same(context))).andReturn(true).atLeastOnce();
     replayDefault(doc, celSendMail, renderer);
     passwdRecValidCmd.sendValidationMessage(to, validkey, contentDocRef, "de");
     verifyDefault(doc, celSendMail, renderer);
