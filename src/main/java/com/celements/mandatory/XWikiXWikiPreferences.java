@@ -43,6 +43,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     LOGGER.trace("Start checkDocuments in XWikiXWikiPreferences for databse ["
           + getContext().getDatabase() + "].");
     if (noMainWiki() && !skipCelementsWikiPreferences()) {
+      LOGGER.trace("before checkXWikiPreferences for databse ["
+          + getContext().getDatabase() + "].");
       checkXWikiPreferences();
     } else {
       LOGGER.info("skip mandatory checkXWikiPreferences for database ["
@@ -84,7 +86,13 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
             + "].");
         getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate"
             + " XWiki.XWikiPreferences.", getContext());
+      } else {
+        LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodat. ["
+            + getContext().getDatabase() + "].");
       }
+    } else {
+      LOGGER.trace("skip checkXWikiPreferences because wikiPrefDoc is null! ["
+          + getContext().getDatabase() + "]");
     }
   }
 
