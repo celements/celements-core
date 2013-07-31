@@ -56,7 +56,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   private boolean skipCelementsWikiPreferences() {
-    LOGGER.trace("noMainWiki for databse [" + getContext().getDatabase() + "].");
+    LOGGER.trace("skipCelementsWikiPreferences for databse ["
+        + getContext().getDatabase() + "].");
     return (getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiPreferences"
         ) == 1L);
   }
