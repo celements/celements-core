@@ -40,6 +40,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   public void checkDocuments() throws XWikiException {
+    LOGGER.trace("Start checkDocuments in XWikiXWikiPreferences for databse ["
+          + getContext().getDatabase() + "].");
     if (noMainWiki() && !skipCelementsWikiPreferences()) {
       checkXWikiPreferences();
     } else {
