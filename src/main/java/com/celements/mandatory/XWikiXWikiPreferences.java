@@ -1,5 +1,7 @@
 package com.celements.mandatory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -16,6 +18,9 @@ import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celements.mandatory.wikipreferences")
 public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      XWikiXWikiPreferences.class);
 
   @Requirement
   IWebUtilsService webUtils;
@@ -37,6 +42,10 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   public void checkDocuments() throws XWikiException {
     if (noMainWiki() && !skipCelementsWikiPreferences()) {
       checkXWikiPreferences();
+    } else {
+      LOGGER.info("skip mandatory checkXWikiPreferences for database ["
+          + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
+          + "], skipCelementsParam [" + skipCelementsWikiPreferences() + "].");
     }
   }
 
@@ -55,16 +64,22 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
         getContext().getDatabase());
     XWikiDocument wikiPrefDoc;
     if (!getContext().getWiki().exists(xWikiPreferencesRef, getContext())) {
+      LOGGER.debug("XWikiPreferencesDocument is missing that we create it. ["
+          + getContext().getDatabase() + "]");
       wikiPrefDoc = new CreateDocumentCommand().createDocument(xWikiPreferencesRef,
           "WikiPreference");
     } else {
       wikiPrefDoc = getContext().getWiki().getDocument(xWikiPreferencesRef, getContext());
+      LOGGER.trace("XWikiPreferencesDocument already exists. ["
+          + getContext().getDatabase() + "]");
     }
     if (wikiPrefDoc != null) {
       boolean dirty = checkPageType(wikiPrefDoc);
       dirty |= checkAccessRights(wikiPrefDoc);
       dirty |= checkWikiPreferences(wikiPrefDoc);
       if (dirty) {
+        LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
+            + "].");
         getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate"
             + " XWiki.XWikiPreferences.", getContext());
       }
@@ -88,6 +103,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
           getContext());
       prefsObj.set("cel_centralfilebase", "Content_attachments.FileBaseDoc",
           getContext());
+      LOGGER.debug("XWikiPreferences missing fields in wiki preferences object fixed for"
+          + " database [" + getContext().getDatabase() + "].");
       return true;
     }
     return false;
@@ -111,6 +128,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
           getContext());
       adminRightsObj.set("users", "", getContext());
       adminRightsObj.set("allow", 1, getContext());
+      LOGGER.debug("XWikiPreferences missing access rights fixed for database ["
+          + getContext().getDatabase() + "].");
       return true;
     }
     return false;
@@ -124,6 +143,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     if (pageTypeObj == null) {
       pageTypeObj = wikiPrefDoc.newXObject(pageTypeClassRef, getContext());
       pageTypeObj.setStringValue("page_type", "WikiPreference");
+      LOGGER.debug("XWikiPreferences missing page type object fixed for database ["
+          + getContext().getDatabase() + "].");
       return true;
     }
     return false;
