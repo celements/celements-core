@@ -51,15 +51,19 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
           + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
           + "], skipCelementsParam [" + skipCelementsWikiPreferences() + "].");
     }
+    LOGGER.trace("end checkDocuments in XWikiXWikiPreferences for databse ["
+        + getContext().getDatabase() + "].");
   }
 
   private boolean skipCelementsWikiPreferences() {
+    LOGGER.trace("noMainWiki for databse [" + getContext().getDatabase() + "].");
     return (getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiPreferences"
         ) == 1L);
   }
 
   boolean noMainWiki() {
     String wikiName = getContext().getDatabase();
+    LOGGER.trace("noMainWiki for databse [" + wikiName + "].");
     return (wikiName != null) && !wikiName.equals(getContext().getMainXWiki());
   }
 
