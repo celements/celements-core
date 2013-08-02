@@ -56,13 +56,18 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   private boolean skipCelementsWikiPreferences() {
-    LOGGER.trace("skipCelementsWikiPreferences for database ["
-        + getContext().getDatabase() + "].");
-    boolean isSkip = getContext().getWiki().ParamAsLong(
-        "celements.mandatory.skipWikiPreferences") == 1L;
-    LOGGER.trace("skipCelementsWikiPreferences for database ["
-        + getContext().getDatabase() + "] returning [" + isSkip + "].");
-    return isSkip;
+    try {
+      LOGGER.trace("skipCelementsWikiPreferences for database ["
+          + getContext().getDatabase() + "].");
+      boolean isSkip = getContext().getWiki().ParamAsLong(
+          "celements.mandatory.skipWikiPreferences") == 1L;
+      LOGGER.trace("skipCelementsWikiPreferences for database ["
+          + getContext().getDatabase() + "] returning [" + isSkip + "].");
+      return isSkip;
+    } catch (Exception exp) {
+      LOGGER.error("skipCelementsWikiPreferences failed. Now assuming false.", exp);
+    }
+    return false;
   }
 
   boolean noMainWiki() {
