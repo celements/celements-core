@@ -42,32 +42,25 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   public void checkDocuments() throws XWikiException {
     LOGGER.trace("Start checkDocuments in XWikiXWikiPreferences for database ["
           + getContext().getDatabase() + "].");
-    if (noMainWiki() && !skipCelementsWikiPreferences()) {
+    if (noMainWiki() && !isSkipCelementsWikiPreferences()) {
       LOGGER.trace("before checkXWikiPreferences for database ["
           + getContext().getDatabase() + "].");
       checkXWikiPreferences();
     } else {
       LOGGER.info("skip mandatory checkXWikiPreferences for database ["
           + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
-          + "], skipCelementsParam [" + skipCelementsWikiPreferences() + "].");
+          + "], skipCelementsParam [" + isSkipCelementsWikiPreferences() + "].");
     }
     LOGGER.trace("end checkDocuments in XWikiXWikiPreferences for database ["
         + getContext().getDatabase() + "].");
   }
 
-  private boolean skipCelementsWikiPreferences() {
-    try {
-      LOGGER.trace("skipCelementsWikiPreferences for database ["
-          + getContext().getDatabase() + "].");
-      boolean isSkip = getContext().getWiki().ParamAsLong(
-          "celements.mandatory.skipWikiPreferences") == 1L;
-      LOGGER.trace("skipCelementsWikiPreferences for database ["
-          + getContext().getDatabase() + "] returning [" + isSkip + "].");
-      return isSkip;
-    } catch (Exception exp) {
-      LOGGER.error("skipCelementsWikiPreferences failed. Now assuming false.", exp);
-    }
-    return false;
+  boolean isSkipCelementsWikiPreferences() {
+    boolean isSkip = getContext().getWiki().ParamAsLong(
+        "celements.mandatory.skipWikiPreferences", 0) == 1L;
+    LOGGER.trace("skipCelementsWikiPreferences for database ["
+        + getContext().getDatabase() + "] returning [" + isSkip + "].");
+    return isSkip;
   }
 
   boolean noMainWiki() {
