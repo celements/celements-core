@@ -93,7 +93,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
         getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate"
             + " XWiki.XWikiPreferences.", getContext());
       } else {
-        LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodat. ["
+        LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodate. ["
             + getContext().getDatabase() + "].");
       }
     } else {
