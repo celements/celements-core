@@ -72,8 +72,8 @@ public class CellsClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(cellClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get cell class document.", exp);
       doc = new XWikiDocument(cellClassRef);
       needsUpdate = true;
     }
@@ -106,8 +106,8 @@ public class CellsClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(pageLayoutPropertiesClassRef,
           getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get pageLayoutProperties class document.", exp);
       doc = new XWikiDocument(pageLayoutPropertiesClassRef);
       needsUpdate = true;
     }
@@ -141,8 +141,8 @@ public class CellsClasses extends AbstractClassCollection {
     
     try {
       doc = getContext().getWiki().getDocument(groupCellClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get groupCell class document.", exp);
       doc = new XWikiDocument(groupCellClassRef);
       needsUpdate = true;
     }
@@ -167,8 +167,8 @@ public class CellsClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(pageDepCellConfigClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get pageDepCellConfig class document.", exp);
       doc = new XWikiDocument(pageDepCellConfigClassRef);
       needsUpdate = true;
     }
