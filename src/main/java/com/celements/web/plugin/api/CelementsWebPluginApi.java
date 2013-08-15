@@ -1207,9 +1207,17 @@ public class CelementsWebPluginApi extends Api {
     return new ReorderSaveCommand().reorderSave(fullName, structureJSON, context);
   }
 
+  /**
+   * @deprecated since 2.34.0 instad use layoutExists(SpaceReference)
+   */
+  @Deprecated
   public boolean layoutExists(String layoutSpaceName) {
     return getPageLayoutCmd().layoutExists(getWebUtilsService().resolveSpaceReference(
         layoutSpaceName));
+  }
+
+  public boolean layoutExists(SpaceReference layoutSpaceRef) {
+    return getPageLayoutCmd().layoutExists(layoutSpaceRef);
   }
 
   public boolean layoutEditorAvailable() {
