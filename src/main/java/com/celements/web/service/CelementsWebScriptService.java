@@ -388,8 +388,10 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public boolean useNewButtons() {
-    return getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
-        "celements.usenewbuttons", 0, getContext()) == 1;
+    int wikiConfig = getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
+        "celements.usenewbuttons", 0, getContext());
+    return getContext().getWiki().getSpacePreferenceAsInt("useNewButtons", wikiConfig,
+        getContext()) == 1;
   }
 
   public String getDefaultAdminLanguage() {
