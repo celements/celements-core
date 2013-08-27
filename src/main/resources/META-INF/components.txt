@@ -42,3 +42,4 @@ com.celements.mandatory.XWikiXWikiPreferences
 com.celements.menu.access.MenuAccessService
 com.celements.menu.access.DefaultMenuAccessProvider
 com.celements.navigation.service.TreeNodeDocumentCreatedListener
+com.celements.mandatory.WikiCreatedEventListener

@@ -26,6 +26,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.bridge.event.WikiEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -58,7 +60,7 @@ public class CompositorComponent implements EventListener {
 
   public List<Event> getEvents() {
     LOGGER.info("getEvents: registering for update, save and delete events.");
-    return Arrays.<Event> asList(new DocumentUpdatedEvent());
+    return Arrays.<Event>asList(new DocumentUpdatedEvent(), new WikiCreatedEvent());
   }
 
   public String getName() {
@@ -66,16 +68,34 @@ public class CompositorComponent implements EventListener {
   }
 
   public void onEvent(Event event, Object source, Object data) {
-    XWikiDocument document = (XWikiDocument) source;
-    DocumentReference xwikiPrefDoc = new DocumentReference(document.getDocumentReference(
-        ).getWikiReference().getName(), "XWiki", "XWikiPreferences");
-    if(document.getDocumentReference().equals(xwikiPrefDoc)) {
-      LOGGER.debug("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
-          + "Collections");
-      checkAllClassCollections();
+    if (source instanceof XWikiDocument) {
+      XWikiDocument document = (XWikiDocument) source;
+      DocumentReference xwikiPrefDoc = new DocumentReference(
+          document.getDocumentReference().getLastSpaceReference().getParent().getName(),
+          "XWiki", "XWikiPreferences");
+      if(document.getDocumentReference().equals(xwikiPrefDoc)) {
+        LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
+            + "Collections.");
+        checkAllClassCollections();
+      } else {
+        LOGGER.trace("changes on [" + xwikiPrefDoc + "] saved. NOT checking all Class "
+            + "Collections.");
+      }
+    } else if (event instanceof WikiCreatedEvent) {
+      String saveDbName = getContext().getDatabase();
+      try {
+        WikiEvent wikiEvent = (WikiEvent) event;
+        String newDbName = wikiEvent.getWikiId();
+        LOGGER.info("new wiki created [" + newDbName + "]. Checking all Class"
+            + " Collections.");
+        getContext().setDatabase(newDbName);
+        checkAllClassCollections();
+      } finally {
+        getContext().setDatabase(saveDbName);
+      }
     } else {
-      LOGGER.trace("changes on [" + xwikiPrefDoc + "] saved. NOT checking all Class "
-          + "Collections");
+      LOGGER.warn("unrecognised event [" + event.getClass()
+          + "] in classes.CompositorComonent.");
     }
   }
 
