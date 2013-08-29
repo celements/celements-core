@@ -16,7 +16,7 @@ import com.xpn.xwiki.XWikiException;
 public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositorRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CompositorComponent.class);
+      MandatoryDocumentCompositor.class);
   
   @Requirement
   private Map<String, IMandatoryDocumentRole> mandatoryDocuemntsMap;

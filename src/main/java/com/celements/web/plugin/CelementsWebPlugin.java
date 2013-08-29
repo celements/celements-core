@@ -124,8 +124,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         "1"))) {
       new CheckClassesCommand().checkClasses();
     }
-    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart",
-        "1"))) {
+    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
       new CheckMandatoryDocuments().checkMandatoryDocuments();
     }
     super.virtualInit(context);
