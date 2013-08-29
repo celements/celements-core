@@ -3,6 +3,8 @@ package com.celements.mandatory;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiEvent;
 import org.xwiki.component.annotation.Component;
@@ -15,6 +17,9 @@ import com.xpn.xwiki.XWikiContext;
 
 @Component("celements.mandatory.WikiCreatedEventListener")
 public class WikiCreatedEventListener implements EventListener {
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      WikiCreatedEventListener.class);
 
   @Requirement
   IMandatoryDocumentCompositorRole mandatoryDocCmp;
@@ -40,8 +45,12 @@ public class WikiCreatedEventListener implements EventListener {
       WikiEvent wikiEvent = (WikiEvent) event;
       String newDbName = wikiEvent.getWikiId();
       getContext().setDatabase(newDbName);
+      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+          + newDbName + "] now executing checkAllMandatoryDocuments.");
       mandatoryDocCmp.checkAllMandatoryDocuments();
     } finally {
+      LOGGER.debug("finishing onEvent in WikiCreatedEventListener for wikiId ["
+          + getContext().getDatabase() + "].");
       getContext().setDatabase(saveDbName);
     }
   }
