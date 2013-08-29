@@ -29,7 +29,8 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
   }
 
   public void checkAllMandatoryDocuments() {
-    LOGGER.info("checkAllMandatoryDocuments for wiki [" + "].");
+    LOGGER.info("checkAllMandatoryDocuments for wiki [" + getContext().getDatabase()
+        + "].");
     for (IMandatoryDocumentRole mandatoryDoc : mandatoryDocuemntsMap.values()) {
       try {
         mandatoryDoc.checkDocuments();
