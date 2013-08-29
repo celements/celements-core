@@ -111,14 +111,23 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   public void init(XWikiContext context) {
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
-    new CheckClassesCommand().checkClasses();
+    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
+        "1"))) {
+      new CheckClassesCommand().checkClasses();
+    }
     super.init(context);
   }
 
   public void virtualInit(XWikiContext context) {
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
-    new CheckClassesCommand().checkClasses();
-    new CheckMandatoryDocuments().checkMandatoryDocuments();
+    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
+        "1"))) {
+      new CheckClassesCommand().checkClasses();
+    }
+    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart",
+        "1"))) {
+      new CheckMandatoryDocuments().checkMandatoryDocuments();
+    }
     super.virtualInit(context);
   }
 
