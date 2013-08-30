@@ -32,6 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("celements.mandatory.WikiCreatedEventListener")
@@ -63,10 +64,16 @@ public class WikiCreatedEventListener implements EventListener {
     try {
       WikiEvent wikiEvent = (WikiEvent) event;
       String newDbName = wikiEvent.getWikiId();
-      getContext().setDatabase(newDbName);
-      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-          + newDbName + "] now executing checkAllMandatoryDocuments.");
-      mandatoryDocCmp.checkAllMandatoryDocuments();
+      if (!"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
+        getContext().setDatabase(newDbName);
+        LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+            + newDbName + "] now executing checkAllMandatoryDocuments.");
+        mandatoryDocCmp.checkAllMandatoryDocuments();
+      } else {
+        LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+            + newDbName + "] yet skipping checkAllMandatoryDocuments. It will be done"
+            + " on virtualInit.");
+      }
     } finally {
       LOGGER.debug("finishing onEvent in WikiCreatedEventListener for wikiId ["
           + getContext().getDatabase() + "].");
