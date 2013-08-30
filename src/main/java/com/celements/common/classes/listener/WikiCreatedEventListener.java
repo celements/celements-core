@@ -61,21 +61,23 @@ public class WikiCreatedEventListener implements EventListener {
   }
 
   public void onEvent(Event event, Object source, Object data) {
-    if (event instanceof WikiCreatedEvent) {
-      String saveDbName = getContext().getDatabase();
+    String saveDbName = getContext().getDatabase();
+    WikiEvent wikiEvent = (WikiEvent) event;
+    String newDbName = wikiEvent.getWikiId();
+    if (!"1".equals(getContext().getWiki().Param(
+        "celements.classCollections.checkOnStart", "1"))) {
       try {
-        WikiEvent wikiEvent = (WikiEvent) event;
-        String newDbName = wikiEvent.getWikiId();
-        LOGGER.info("new wiki created [" + newDbName + "]. Checking all Class"
-            + " Collections.");
-        getContext().setDatabase(newDbName);
-        classesCompositor.checkAllClassCollections();
+          LOGGER.info("new wiki created [" + newDbName + "]. Checking all Class"
+              + " Collections.");
+          getContext().setDatabase(newDbName);
+          classesCompositor.checkAllClassCollections();
       } finally {
         getContext().setDatabase(saveDbName);
       }
     } else {
-      LOGGER.warn("unrecognised event [" + event.getClass()
-          + "] in classes.CompositorComonent.");
+      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+          + newDbName + "] yet skipping checkAllClassCollections. It will be done"
+          + " on virtualInit.");
     }
   }
 
