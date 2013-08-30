@@ -61,23 +61,23 @@ public class WikiCreatedEventListener implements EventListener {
 
   public void onEvent(Event event, Object source, Object data) {
     String saveDbName = getContext().getDatabase();
-    try {
-      WikiEvent wikiEvent = (WikiEvent) event;
-      String newDbName = wikiEvent.getWikiId();
-      if (!"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
+    WikiEvent wikiEvent = (WikiEvent) event;
+    String newDbName = wikiEvent.getWikiId();
+    if (!"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
+      try {
         getContext().setDatabase(newDbName);
         LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
             + newDbName + "] now executing checkAllMandatoryDocuments.");
         mandatoryDocCmp.checkAllMandatoryDocuments();
-      } else {
-        LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-            + newDbName + "] yet skipping checkAllMandatoryDocuments. It will be done"
-            + " on virtualInit.");
+      } finally {
+        LOGGER.debug("finishing onEvent in WikiCreatedEventListener for wikiId ["
+            + getContext().getDatabase() + "].");
+        getContext().setDatabase(saveDbName);
       }
-    } finally {
-      LOGGER.debug("finishing onEvent in WikiCreatedEventListener for wikiId ["
-          + getContext().getDatabase() + "].");
-      getContext().setDatabase(saveDbName);
+    } else {
+      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+          + newDbName + "] yet skipping checkAllMandatoryDocuments. It will be done"
+          + " on virtualInit.");
     }
   }
 
