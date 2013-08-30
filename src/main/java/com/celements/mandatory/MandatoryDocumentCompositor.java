@@ -51,7 +51,9 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
         + "].");
     for (IMandatoryDocumentRole mandatoryDoc : mandatoryDocuemntsMap.values()) {
       try {
+        LOGGER.trace("checkDocuments with [" + mandatoryDoc.getClass() + "].");
         mandatoryDoc.checkDocuments();
+        LOGGER.trace("end checkDocuments with [" + mandatoryDoc.getClass() + "].");
       } catch (XWikiException exp) {
         LOGGER.error("Exception checking mandatory documents for component "
             + mandatoryDoc.getClass(), exp);
