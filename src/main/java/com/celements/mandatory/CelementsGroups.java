@@ -19,6 +19,8 @@
  */
 package com.celements.mandatory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -27,6 +29,8 @@ import com.xpn.xwiki.XWikiException;
 @Component("celements.MandatoryGroups")
 public class CelementsGroups extends AbstractMandatoryGroups {
 
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CelementsGroups.class);
+
   @Override
   protected String commitName() {
     return "mandatory celements";
@@ -34,9 +38,13 @@ public class CelementsGroups extends AbstractMandatoryGroups {
 
   @Override
   public void checkDocuments() throws XWikiException {
+    LOGGER.trace("Start checkDocuments in CelementsGroups for database ["
+        + getContext().getDatabase() + "].");
     checkGroup(getContentEditorGroupRef(getContext().getDatabase()));
     checkGroup(getAdminGroupRef(getContext().getDatabase()));
     checkGroup(getAllGroupRef(getContext().getDatabase()));
+    LOGGER.trace("end checkDocuments in CelementsGroups for database ["
+        + getContext().getDatabase() + "].");
   }
 
   public DocumentReference getAdminGroupRef(String wikiName) {
