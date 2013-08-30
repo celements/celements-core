@@ -17,17 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.common.classes;
+package com.celements.common.classes.listener;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.bridge.event.WikiCreatedEvent;
-import org.xwiki.bridge.event.WikiEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -35,22 +32,19 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.celements.common.classes.IClassesCompositorComponent;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component("CompositerComponent")
-public class CompositorComponent implements EventListener {
+@Component("celements.classes.DocumentUpdatedEventListener")
+public class DocumentUpdatedEventListener implements EventListener {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CompositorComponent.class);
-  
+      DocumentUpdatedEventListener.class);
+
   @Requirement
-  private Map<String, IClassCollectionRole> classCollectionMap;
-  
-  @Requirement
-  private Map<String, ICelementsClassCollection> classCollectionMap_old;
-  
+  IClassesCompositorComponent classesCompositor;
+
   @Requirement
   private Execution execution;
 
@@ -59,12 +53,12 @@ public class CompositorComponent implements EventListener {
   }
 
   public List<Event> getEvents() {
-    LOGGER.info("getEvents: registering for update, save and delete events.");
-    return Arrays.<Event>asList(new DocumentUpdatedEvent(), new WikiCreatedEvent());
+    LOGGER.info("getEvents: registering for document update events.");
+    return Arrays.<Event>asList(new DocumentUpdatedEvent());
   }
 
   public String getName() {
-    return "CompositerComponent";
+    return "celements.classes.DocumentUpdatedEventListener";
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -76,54 +70,14 @@ public class CompositorComponent implements EventListener {
       if(document.getDocumentReference().equals(xwikiPrefDoc)) {
         LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
             + "Collections.");
-        checkAllClassCollections();
+        classesCompositor.checkAllClassCollections();
       } else {
         LOGGER.trace("changes on [" + xwikiPrefDoc + "] saved. NOT checking all Class "
             + "Collections.");
       }
-    } else if (event instanceof WikiCreatedEvent) {
-      String saveDbName = getContext().getDatabase();
-      try {
-        WikiEvent wikiEvent = (WikiEvent) event;
-        String newDbName = wikiEvent.getWikiId();
-        LOGGER.info("new wiki created [" + newDbName + "]. Checking all Class"
-            + " Collections.");
-        getContext().setDatabase(newDbName);
-        checkAllClassCollections();
-      } finally {
-        getContext().setDatabase(saveDbName);
-      }
     } else {
       LOGGER.warn("unrecognised event [" + event.getClass()
           + "] in classes.CompositorComonent.");
-    }
-  }
-
-  public void checkAllClassCollections() {
-    checkClassCollections();
-    checkOldClassCollections();
-  }
-
-  @Deprecated
-  void checkOldClassCollections() {
-    for (ICelementsClassCollection classCollection : classCollectionMap_old.values()) {
-      try {
-        classCollection.runUpdate(getContext());
-      } catch (XWikiException e) {
-        LOGGER.error("Exception checking class collection " 
-            + classCollection.getConfigName(), e);
-      }
-    }
-  }
-
-  void checkClassCollections() {
-    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
-      try {
-        classCollection.runUpdate();
-      } catch (XWikiException e) {
-        LOGGER.error("Exception checking class collection " 
-            + classCollection.getConfigName(), e);
-      }
     }
   }
 

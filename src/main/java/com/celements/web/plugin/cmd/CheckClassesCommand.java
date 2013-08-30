@@ -19,9 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.xwiki.observation.EventListener;
-
-import com.celements.common.classes.CompositorComponent;
+import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.classcollections.OldCoreLegacyClasses;
 import com.xpn.xwiki.web.Utils;
@@ -45,8 +43,8 @@ public class CheckClassesCommand {
       OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
   public void checkClasses() {
-    CompositorComponent compComponent = (CompositorComponent) Utils.getComponent(
-        EventListener.class, "CompositerComponent");
+    IClassesCompositorComponent compComponent = Utils.getComponent(
+        IClassesCompositorComponent.class);
     if(compComponent != null) {
       compComponent.checkAllClassCollections();
     }
