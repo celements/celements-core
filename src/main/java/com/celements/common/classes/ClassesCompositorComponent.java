@@ -50,8 +50,12 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   }
 
   public void checkAllClassCollections() {
+    LOGGER.info("start checkAllClassCollections for wiki [" + getContext().getDatabase()
+        + "].");
     checkClassCollections();
     checkOldClassCollections();
+    LOGGER.debug("finish checkAllClassCollections for wiki [" + getContext().getDatabase()
+        + "].");
   }
 
   @Deprecated
