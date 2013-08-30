@@ -110,6 +110,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public void init(XWikiContext context) {
+    //TODO check if this is really needed for main-wiki or if we get a virtualInit on the
+    //TODO main wiki to. (if needed move to ApplicationStartedEvent listener)
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
     if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
         "1"))) {
@@ -119,6 +121,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public void virtualInit(XWikiContext context) {
+    //TODO move to WikiReadyEvent listener (after migration to xwiki > 4.1-M1
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
     if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
         "1"))) {
