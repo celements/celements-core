@@ -156,7 +156,7 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
     BaseObject menuNameEN = fileBaseTag0Doc.getXObject(menuNameClassRef, "lang", lang,
         false);
     if (menuNameEN == null) {
-      menuNameEN = fileBaseTag0Doc.newXObject(getFileBaseTag0Ref(wikiName), getContext());
+      menuNameEN = fileBaseTag0Doc.newXObject(menuNameClassRef, getContext());
       menuNameEN.set("lang", lang, getContext());
       menuNameEN.set("menu_name", menuname, getContext());
       LOGGER.debug("FileBaseTag0 missing fields in menu name en object fixed for"
