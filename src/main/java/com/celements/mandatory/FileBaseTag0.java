@@ -124,7 +124,7 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
         LOGGER.info("FileBaseTag0Document updated for [" + getContext().getDatabase()
             + "].");
         getContext().getWiki().saveDocument(fileBaseTag0Doc, "autocreate"
-            + " XWiki.FileBaseTag0.", getContext());
+            + " Content_attachments.FileBaseTag0.", getContext());
         treeNodeCache.flushMenuItemCache();
       } else {
         LOGGER.debug("FileBaseTag0Document not saved. Everything uptodate. ["
