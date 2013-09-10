@@ -133,10 +133,12 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
 
   boolean checkMenuItem(XWikiDocument fileBaseTag0Doc) throws XWikiException {
     String wikiName = getContext().getDatabase();
-    BaseObject menuItemObj = fileBaseTag0Doc.getXObject(getNavigationClasses(
-        ).getMenuItemClassRef(wikiName), false, getContext());
+    DocumentReference menuItemClassRef = getNavigationClasses().getMenuItemClassRef(
+        wikiName);
+    BaseObject menuItemObj = fileBaseTag0Doc.getXObject(menuItemClassRef, false,
+        getContext());
     if (menuItemObj == null) {
-      menuItemObj = fileBaseTag0Doc.newXObject(getFileBaseTag0Ref(wikiName), getContext());
+      menuItemObj = fileBaseTag0Doc.newXObject(menuItemClassRef, getContext());
       menuItemObj.set("link", "tag0", getContext());
       menuItemObj.set("position", 1, getContext());
       LOGGER.debug("FileBaseTag0 missing fields in menu item object fixed for"
@@ -146,10 +148,13 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
     return false;
   }
 
-  boolean checkMenuName(XWikiDocument fileBaseTag0Doc, String lang, String menuname) throws XWikiException {
+  boolean checkMenuName(XWikiDocument fileBaseTag0Doc, String lang, String menuname
+      ) throws XWikiException {
     String wikiName = getContext().getDatabase();
-    BaseObject menuNameEN = fileBaseTag0Doc.getXObject(getNavigationClasses(
-        ).getMenuNameClassRef(wikiName), "lang", lang, false);
+    DocumentReference menuNameClassRef = getNavigationClasses().getMenuNameClassRef(
+        wikiName);
+    BaseObject menuNameEN = fileBaseTag0Doc.getXObject(menuNameClassRef, "lang", lang,
+        false);
     if (menuNameEN == null) {
       menuNameEN = fileBaseTag0Doc.newXObject(getFileBaseTag0Ref(wikiName), getContext());
       menuNameEN.set("lang", lang, getContext());
