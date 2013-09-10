@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.NavigationClasses;
+import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -51,6 +52,9 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
 
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navigationClasses;
+
+  @Requirement
+  ITreeNodeCache treeNodeCache;
 
   @Requirement
   Execution execution;
@@ -121,6 +125,7 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
             + "].");
         getContext().getWiki().saveDocument(fileBaseTag0Doc, "autocreate"
             + " XWiki.FileBaseTag0.", getContext());
+        treeNodeCache.flushMenuItemCache();
       } else {
         LOGGER.debug("FileBaseTag0Document not saved. Everything uptodate. ["
             + getContext().getDatabase() + "].");
