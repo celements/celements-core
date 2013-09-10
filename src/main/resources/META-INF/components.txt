@@ -46,3 +46,5 @@ com.celements.menu.access.DefaultMenuAccessProvider
 com.celements.navigation.service.TreeNodeDocumentCreatedListener
 com.celements.mandatory.WikiCreatedEventListener
 com.celements.mandatory.FileBaseTag0
+com.celements.mandatory.HTMLWebPreferences
+com.celements.mandatory.Robots_TXT
