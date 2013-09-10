@@ -139,7 +139,7 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
         getContext());
     if (menuItemObj == null) {
       menuItemObj = fileBaseTag0Doc.newXObject(menuItemClassRef, getContext());
-      menuItemObj.set("position", 1, getContext());
+      menuItemObj.set("menu_position", 1, getContext());
       LOGGER.debug("FileBaseTag0 missing fields in menu item object fixed for"
           + " database [" + getContext().getDatabase() + "].");
       return true;
