@@ -31,7 +31,6 @@ import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,9 +42,6 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
   private static final String _FILE_BASE_TAG_PAGE_TYPE = "FileBaseTag";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(FileBaseTag0.class);
-
-  @Requirement
-  IWebUtilsService webUtils;
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;
