@@ -217,8 +217,13 @@ public class GetNotMappedMenuItemsForParentCommand {
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   public void flushMenuItemCache(XWikiContext context) {
-    LOGGER.debug("Entered method flushMenuItemCache with context");
-    menuItems.remove(context.getDatabase());
+    if (context != null) {
+      LOGGER.debug("Entered method flushMenuItemCache with context db ["
+          + context.getDatabase() + "].");
+      menuItems.remove(context.getDatabase());
+    } else {
+      LOGGER.warn("skip flushMenuItemCache for context == null].");
+    }
   }
 
   private List<TreeNode> getMenuCacheForParent(
