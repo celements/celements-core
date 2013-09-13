@@ -399,6 +399,23 @@ public class WebUtilsService implements IWebUtilsService {
     return (isAdminUser() && user.startsWith("xwiki:"));
   }
 
+  public boolean isLayoutEditor() {
+    String user = getContext().getUser();
+    LOGGER.trace("isLayoutEditor: user [" + user + "] db [" + getContext().getDatabase()
+        + "].");
+    try {
+      boolean isLayoutEditor = isAdminUser() || getContext().getXWikiUser().isUserInGroup(
+          "XWiki.LayoutEditorsGroup", getContext());
+      LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user ["
+          + user.startsWith("xwiki:") + "] returning [" + isLayoutEditor + "] db ["
+          + getContext().getDatabase() + "].");
+      return isLayoutEditor;
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get user document for [" + user + "].", exp);
+    }
+    return false;
+  }
+
   public boolean isAdvancedAdmin() {
     String user = getContext().getUser();
     LOGGER.trace("isAdvancedAdmin: user [" + user + "] db [" + getContext().getDatabase()
