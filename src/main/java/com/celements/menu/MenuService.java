@@ -101,7 +101,9 @@ public class MenuService implements IMenuService {
               ) + ".");
           if (headerObjList != null) {
             for (BaseObject obj : headerObjList) {
-              menuHeadersMap.put(obj.getIntValue("pos"), obj);
+              if (obj != null) {
+                menuHeadersMap.put(obj.getIntValue("pos"), obj);
+              }
             }
           }
         } else {
