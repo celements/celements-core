@@ -31,21 +31,24 @@ public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
   public boolean hasview(DocumentReference menuBarDocRef
       ) throws NoAccessDefinedException, XWikiException {
     String database = getContext().getDatabase();
-    getContext().setDatabase(getContext().getOriginalDatabase());
-    if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
-        ).endsWith("Celements2.AdminMenu")) {
-      LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
-          + webUtilsService.isAdvancedAdmin() + "].");
-      return webUtilsService.isAdvancedAdmin();
-    } else if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
-        ).endsWith("Celements2.LayoutMenu")) {
-      LOGGER.debug("hasview: LayoutMenu [" + getContext().getUser() + "] isLayoutEditor ["
-          + webUtilsService.isLayoutEditor() + "] isAdvancedAdmin ["
-          + webUtilsService.isAdvancedAdmin() + "].");
-      return webUtilsService.isLayoutEditor() || webUtilsService.isAdvancedAdmin();
+    try {
+      getContext().setDatabase(getContext().getOriginalDatabase());
+      if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
+          ).endsWith("Celements2.AdminMenu")) {
+        LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
+            + webUtilsService.isAdvancedAdmin() + "].");
+        return webUtilsService.isAdvancedAdmin();
+      } else if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
+          ).endsWith("Celements2.LayoutMenu")) {
+        LOGGER.debug("hasview: LayoutMenu [" + getContext().getUser() + "] isLayoutEditor ["
+            + webUtilsService.isLayoutEditor() + "] isAdvancedAdmin ["
+            + webUtilsService.isAdvancedAdmin() + "].");
+        return webUtilsService.isLayoutEditor() || webUtilsService.isAdvancedAdmin();
+      }
+      return hasCentralAndLocalView(menuBarDocRef);
+    } finally {
+      getContext().setDatabase(database);
     }
-    getContext().setDatabase(database);
-    return hasCentralAndLocalView(menuBarDocRef);
   }
 
   public boolean denyView(DocumentReference menuBarDocRef) {
