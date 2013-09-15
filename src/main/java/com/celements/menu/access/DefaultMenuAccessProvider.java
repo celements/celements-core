@@ -41,7 +41,7 @@ public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
         ).endsWith("Celements2.LayoutMenu")) {
       LOGGER.debug("hasview: LayoutMenu [" + getContext().getUser() + "] isLayoutEditor ["
           + webUtilsService.isLayoutEditor() + "].");
-      return webUtilsService.isLayoutEditor();
+      return webUtilsService.isLayoutEditor() || webUtilsService.isAdvancedAdmin();
     }
     getContext().setDatabase(database);
     return hasCentralAndLocalView(menuBarDocRef);
