@@ -40,7 +40,8 @@ public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
     } else if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
         ).endsWith("Celements2.LayoutMenu")) {
       LOGGER.debug("hasview: LayoutMenu [" + getContext().getUser() + "] isLayoutEditor ["
-          + webUtilsService.isLayoutEditor() + "].");
+          + webUtilsService.isLayoutEditor() + "] isAdvancedAdmin ["
+          + webUtilsService.isAdvancedAdmin() + "].");
       return webUtilsService.isLayoutEditor() || webUtilsService.isAdvancedAdmin();
     }
     getContext().setDatabase(database);
