@@ -171,4 +171,6 @@ public interface IWebUtilsService {
   public String renderInheritableDocument(DocumentReference docRef, String lang,
       String defLang) throws XWikiException;
 
+  public boolean isLayoutEditor();
+
 }

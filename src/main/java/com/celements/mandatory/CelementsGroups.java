@@ -41,6 +41,7 @@ public class CelementsGroups extends AbstractMandatoryGroups {
     LOGGER.trace("Start checkDocuments in CelementsGroups for database ["
         + getContext().getDatabase() + "].");
     checkGroup(getContentEditorGroupRef(getContext().getDatabase()));
+    checkGroup(getLayoutEditorGroupRef(getContext().getDatabase()));
     checkGroup(getAdminGroupRef(getContext().getDatabase()));
     checkGroup(getAllGroupRef(getContext().getDatabase()));
     LOGGER.trace("end checkDocuments in CelementsGroups for database ["
@@ -57,6 +58,10 @@ public class CelementsGroups extends AbstractMandatoryGroups {
 
   public DocumentReference getContentEditorGroupRef(String wikiName) {
     return new DocumentReference(wikiName, "XWiki", "ContentEditorsGroup");
+  }
+
+  public DocumentReference getLayoutEditorGroupRef(String wikiName) {
+    return new DocumentReference(wikiName, "XWiki", "LayoutEditorsGroup");
   }
 
 }

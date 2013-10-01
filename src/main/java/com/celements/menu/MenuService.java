@@ -98,10 +98,12 @@ public class MenuService implements IMenuService {
           LOGGER.trace("addMenuHeaders: hasview for [" + 
               webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + 
               "] adding items [" + ((headerObjList != null) ?headerObjList.size() : "null"
-              ) + ".");
+              ) + "].");
           if (headerObjList != null) {
             for (BaseObject obj : headerObjList) {
-              menuHeadersMap.put(obj.getIntValue("pos"), obj);
+              if (obj != null) {
+                menuHeadersMap.put(obj.getIntValue("pos"), obj);
+              }
             }
           }
         } else {
@@ -109,10 +111,10 @@ public class MenuService implements IMenuService {
               webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + "].");
         }
       }
-    } catch (XWikiException e) {
-      LOGGER.error(e);
-    } catch (QueryException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to addMenuHeaders.", exp);
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to execute query in addMenuHeaders.", queryExp);
     }
   }
 
@@ -134,7 +136,8 @@ public class MenuService implements IMenuService {
   }
 
   String getHeadersXWQL() {
-    return "from doc.object(Celements.MenuBarHeaderItemClass) as mHeader";
+    return "from doc.object(Celements.MenuBarHeaderItemClass) as mHeader"
+        + " group by doc.fullName";
   }
 
   public List<BaseObject> getSubMenuItems(Integer headerId) {
