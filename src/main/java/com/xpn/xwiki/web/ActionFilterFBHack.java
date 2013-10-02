@@ -89,7 +89,11 @@ public class ActionFilterFBHack implements Filter {
     String action = parameter.replaceFirst(ACTION_PREFIX, "").trim();
     //TODO find a way to get all valid actions instead
     boolean isValidAction = (action.length() > 0) && !action.endsWith("_map");
-    return parameter.startsWith(ACTION_PREFIX) && isValidAction;
+    if(parameter.startsWith(ACTION_PREFIX) && isValidAction) {
+      LOG.debug("non \"xwiki action\" action parameter found.");
+      return true;
+    }
+    return false;
   }
 
   /**
