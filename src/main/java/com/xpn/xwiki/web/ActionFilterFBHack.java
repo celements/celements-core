@@ -22,7 +22,7 @@ import com.xpn.xwiki.web.XWikiConfigurationService;
 
 public class ActionFilterFBHack implements Filter {
     /** Logging helper. */
-    private static final Log LOG = LogFactory.getLog(ActionFilter.class);
+    private static final Log LOG = LogFactory.getLog(ActionFilterFBHack.class);
 
     /** The query property name prefix that indicates the target action. */
     private static final String ACTION_PREFIX = "action_";
