@@ -48,6 +48,7 @@ public class ActionFilterFBHack implements Filter {
      * @see Filter#init(FilterConfig)
      */
     public void init(FilterConfig filterConfig) throws ServletException {
+      LOG.debug("init ActionFilterFBHack");
       this.servletContext = filterConfig.getServletContext();
     }
 
@@ -60,6 +61,7 @@ public class ActionFilterFBHack implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain
       ) throws IOException, ServletException {
     // Only HTTP requests can be dispatched.
+    LOG.debug("starting doFilter in ActionFilterFBHack");
     if (request instanceof HttpServletRequest
         && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED))) {
       HttpServletRequest hrequest = (HttpServletRequest) request;
