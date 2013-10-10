@@ -193,7 +193,7 @@ public class RTEConfig {
   }
 
   private String getRteConfigsXWQL() {
-    return "from doc.object(" + PROP_CLASS_NAME + ")"
+    return "from doc.object(" + PROP_CLASS_NAME + ") as rteConfig"
         + " where doc.translation = 0";
   }
 
