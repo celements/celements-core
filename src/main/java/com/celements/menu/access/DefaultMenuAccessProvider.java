@@ -43,7 +43,7 @@ public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
         LOGGER.debug("hasview: LayoutMenu [" + getContext().getUser() + "] isLayoutEditor ["
             + webUtilsService.isLayoutEditor() + "] isAdvancedAdmin ["
             + webUtilsService.isAdvancedAdmin() + "].");
-        return webUtilsService.isLayoutEditor() || webUtilsService.isAdvancedAdmin();
+        return webUtilsService.isLayoutEditor();
       }
       return hasCentralAndLocalView(menuBarDocRef);
     } finally {

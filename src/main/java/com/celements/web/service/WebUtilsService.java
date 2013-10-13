@@ -404,8 +404,8 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.trace("isLayoutEditor: user [" + user + "] db [" + getContext().getDatabase()
         + "].");
     try {
-      boolean isLayoutEditor = isAdminUser() || getContext().getXWikiUser().isUserInGroup(
-          "XWiki.LayoutEditorsGroup", getContext());
+      boolean isLayoutEditor = isAdvancedAdmin() || getContext().getXWikiUser(
+          ).isUserInGroup("XWiki.LayoutEditorsGroup", getContext());
       LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user ["
           + user.startsWith("xwiki:") + "] returning [" + isLayoutEditor + "] db ["
           + getContext().getDatabase() + "].");
