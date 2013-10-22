@@ -114,7 +114,10 @@ public class Robots_TXT implements IMandatoryDocumentRole {
 
   boolean checkRobots_txt(XWikiDocument robotsTxtDoc) throws XWikiException {
     if (StringUtils.isEmpty(robotsTxtDoc.getContent())) {
-      robotsTxtDoc.setContent("User-agent: *\n\nCrawl-delay: 120\n");
+      robotsTxtDoc.setContent("User-agent: *\n\nCrawl-delay: 120\n"
+          + "# Angabe der Sitemap ist Agent-unabhaengig\n"
+          + "Sitemap: $doc.getExternalURL('view',"
+          + " 'ajax=1&xpage=celements_ajax&ajax_mode=sitemapxml')");
       LOGGER.debug("Robots_txt missing content fixed for database ["
           + getContext().getDatabase() + "].");
       return true;
