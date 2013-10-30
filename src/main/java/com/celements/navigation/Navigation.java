@@ -758,7 +758,7 @@ public class Navigation implements INavigation {
 
   private void generateLanguageMenu(INavigationBuilder navBuilder,
       XWikiContext context) {
-    List<String> langs = WebUtils.getInstance().getAllowedLanguages(context);
+    List<String> langs = getWebUtilsService().getAllowedLanguages();
     mainUlCssClasses += " language";
     navBuilder.openLevel(mainUlCssClasses);
     for (String language : langs) {
