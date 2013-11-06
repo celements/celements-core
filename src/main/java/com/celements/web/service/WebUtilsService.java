@@ -440,6 +440,35 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @SuppressWarnings("unchecked")
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator) throws ClassNotFoundException {
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    try {
+      for(String docName : getContext().getWiki().getSpaceDocsName(spaceName, getContext())) {
+        DocumentReference docRef = new DocumentReference(null, spaceName, docName);
+        XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+        attachments.addAll(new Document(doc, getContext()).getAttachmentList());
+      }
+    } catch (XWikiException xwe) {
+      LOGGER.error("Could not get all documents in " + spaceName, xwe);
+    }
+    try {
+      Comparator<Attachment> comparatorClass = 
+          (Comparator<Attachment>) Class.forName(
+              "com.celements.web.comparators." + comparator).newInstance();
+      Collections.sort(attachments, comparatorClass);
+    } catch (InstantiationException e) {
+      LOGGER.error(e);
+    } catch (IllegalAccessException e) {
+      LOGGER.error(e);
+    } catch (ClassNotFoundException e) {
+      throw e;
+    }
+    
+    return attachments;
+  }
+
+  @SuppressWarnings("unchecked")
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException {
     List<Attachment> attachments = doc.getAttachmentList();

@@ -267,6 +267,11 @@ public class CelementsWebPluginApi extends Api {
     return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, context);
   }
 
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListSortedSpace(spaceName, comparator);
+  }
+  
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
     return getWebUtilsService().getAttachmentListSorted(doc, comparator);
