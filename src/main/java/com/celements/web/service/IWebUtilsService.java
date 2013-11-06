@@ -102,7 +102,8 @@ public interface IWebUtilsService {
   public boolean isSuperAdminUser();
 
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator) throws ClassNotFoundException;
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
   
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated

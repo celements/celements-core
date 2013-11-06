@@ -441,7 +441,8 @@ public class WebUtilsService implements IWebUtilsService {
 
   @SuppressWarnings("unchecked")
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator) throws ClassNotFoundException {
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
     List<Attachment> attachments = new ArrayList<Attachment>();
     try {
       for(String docName : getContext().getWiki().getSpaceDocsName(spaceName, getContext())) {
@@ -464,8 +465,14 @@ public class WebUtilsService implements IWebUtilsService {
     } catch (ClassNotFoundException e) {
       throw e;
     }
-    
-    return attachments;
+    if (imagesOnly) {
+      for (Attachment att : new ArrayList<Attachment>(attachments)) {
+        if (!att.isImage()) {
+          attachments.remove(att);
+        }
+      }
+    }
+    return reduceListToSize(attachments, start, nb);
   }
 
   @SuppressWarnings("unchecked")

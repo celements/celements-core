@@ -268,8 +268,10 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator) throws ClassNotFoundException {
-    return getWebUtilsService().getAttachmentListSortedSpace(spaceName, comparator);
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListSortedSpace(spaceName, comparator, 
+        imagesOnly, start, nb);
   }
   
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
