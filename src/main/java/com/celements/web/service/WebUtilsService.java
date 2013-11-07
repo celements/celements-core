@@ -446,7 +446,8 @@ public class WebUtilsService implements IWebUtilsService {
     List<Attachment> attachments = new ArrayList<Attachment>();
     try {
       for(String docName : getContext().getWiki().getSpaceDocsName(spaceName, getContext())) {
-        DocumentReference docRef = new DocumentReference(null, spaceName, docName);
+        DocumentReference docRef = new DocumentReference(getContext().getDatabase(), 
+            spaceName, docName);
         XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
         attachments.addAll(new Document(doc, getContext()).getAttachmentList());
       }
