@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -1021,15 +1022,21 @@ public class CelementsWebPluginApi extends Api {
   public String renderCelementsDocumentWithLayout(DocumentReference docRef,
       SpaceReference layoutSpaceRef) {
     XWikiDocument oldContextDoc = context.getDoc();
+    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
+        + "] and layoutSpaceRef [" + layoutSpaceRef + "] overwrite oldContextDoc ["
+        + oldContextDoc.getDocumentReference() + "].");
+    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     try {
       XWikiDocument newContextDoc = context.getWiki().getDocument(docRef, context);
       context.setDoc(newContextDoc);
+      vcontext.put("doc", newContextDoc.newDocument(context));
       return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
           exp);
     } finally {
       context.setDoc(oldContextDoc);
+      vcontext.put("doc", oldContextDoc.newDocument(context));
     }
     return "";
   }
