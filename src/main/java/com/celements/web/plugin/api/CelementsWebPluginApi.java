@@ -1018,6 +1018,22 @@ public class CelementsWebPluginApi extends Api {
     return getPageLayoutCmd().renderPageLayout(spaceRef);
   }
 
+  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
+      SpaceReference layoutSpaceRef) {
+    XWikiDocument oldContextDoc = context.getDoc();
+    try {
+      XWikiDocument newContextDoc = context.getWiki().getDocument(docRef, context);
+      context.setDoc(newContextDoc);
+      return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
+          exp);
+    } finally {
+      context.setDoc(oldContextDoc);
+    }
+    return "";
+  }
+
   public SpaceReference getCurrentRenderingLayout() {
     return getPageLayoutCmd().getCurrentRenderingLayout();
   }
