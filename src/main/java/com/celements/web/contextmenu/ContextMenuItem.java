@@ -45,6 +45,7 @@ public class ContextMenuItem {
   private String shortcut;
 
   private String elemId;
+  private String origElemId;
 
   private String[] elemIdParts;
 
@@ -57,6 +58,7 @@ public class ContextMenuItem {
   }
 
   public ContextMenuItem(BaseObject menuItem, String elemId) {
+    origElemId = elemId;
     elemIdParts = elemId.split(":", -1);
     elemId = elemIdParts[elemIdParts.length - 1];
     this.elemId = elemId;
@@ -80,6 +82,7 @@ public class ContextMenuItem {
   private String renderText(String velocityText) {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     vcontext.put("elemId", elemId);
+    vcontext.put("origElemId", origElemId);
     List<String> elemParams = Arrays.asList(elemIdParts).subList(0,
           elemIdParts.length - 1);
     vcontext.put("elemParams", elemParams);

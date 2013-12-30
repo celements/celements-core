@@ -49,6 +49,7 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
   private VelocityContext velocityContext;
   private XWiki xwiki;
   private XWikiRenderingEngine renderingEngine;
+  private String origElemId;
 
   @Before
   public void setUp_ContextMenuItemTest() {
@@ -61,7 +62,8 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
     context.put("vcontext", velocityContext);
     renderingEngine = createMockAndAddToDefault(XWikiRenderingEngine.class);
     expect(xwiki.getRenderingEngine()).andReturn(renderingEngine).anyTimes();
-    theCMI = createCMI("N1:Content.Agenda");
+    origElemId = "N1:Content.Agenda";
+    theCMI = createCMI(origElemId);
   }
 
   @SuppressWarnings("unchecked")
@@ -80,6 +82,7 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
     Builder builder = new Builder();
     theCMI.generateJSON(builder);
     assertEquals("Content.Agenda", velocityContext.get("elemId"));
+    assertEquals(origElemId, velocityContext.get("origElemId"));
     assertNotNull(velocityContext.get("elemParams"));
     assertEquals(1, ((List<String>)velocityContext.get("elemParams")).size());
     verifyDefault();
@@ -98,7 +101,8 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
     expect(renderingEngine.interpretText(eq(""), same(context.getDoc()), same(context))
         ).andReturn("");
     replayDefault();
-    ContextMenuItem localCMI = createCMI("N1:menuPartTest:");
+    String localOrigElemId = "N1:menuPartTest:";
+    ContextMenuItem localCMI = createCMI(localOrigElemId);
     assertEquals("link", localCMI.getLink());
     assertEquals("Test Menu Item", localCMI.getText());
     assertEquals("shortcut", localCMI.getShortcut());
@@ -106,6 +110,7 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     assertEquals("", localCMI.getElemId());
     assertEquals("", vcontext.get("elemId"));
+    assertEquals(localOrigElemId, vcontext.get("origElemId"));
     assertNotNull(vcontext.get("elemParams"));
     assertEquals(2, ((List<String>)vcontext.get("elemParams")).size());
     assertEquals("menuPartTest", ((List<String>)vcontext.get("elemParams")).get(1));
