@@ -300,12 +300,51 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
     replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
         + " myUltimativePageType\">", outStream.toString());
+    verifyAll(pageTypeRef);
+  }
+
+  @Test
+  public void testIsRestrictedRights() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andThrow(new XWikiException());
+    replayAll();
+    assertFalse(nav.isRestrictedRights(docRef));
+    verifyAll();
+  }
+
+  @Test
+  public void testOpenMenuItemOut_restrictedAccessRights() throws Exception {
+    String pageType = "myUltimativePageType";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMock(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(false).atLeastOnce();
+    replayAll(pageTypeRef);
+    StringBuilder outStream = new StringBuilder();
+    nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
+        2);
+    assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
+        + " myUltimativePageType cel_nav_restricted_rights\">", outStream.toString());
     verifyAll(pageTypeRef);
   }
 
@@ -324,6 +363,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
     replayAll(pageTypeRef);
     StringBuilder outStream = new StringBuilder();
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
@@ -407,6 +448,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
     replayAll(pageTypeRef);
     String cssClasses = nav.getCssClasses(menuItem.getDocumentReference(), false, false,
         false, false, 2);
@@ -431,6 +474,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     BaseObject menuItem = new BaseObject();
     menuItem.setDocumentReference(docRef);
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(null).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
     replayAll(pageTypeRef);
     String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 3);
     verifyAll(pageTypeRef);
@@ -456,6 +501,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
         context.getDatabase()));
     expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
     replayAll(pageTypeRef);
     String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 2);
     verifyAll(pageTypeRef);
@@ -1003,6 +1050,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
         )).andReturn(0);
     expect(xwiki.getDocument(eq("MySpace.Home"), same(context))).andReturn(
         new XWikiDocument(homeDocRef)).atLeastOnce();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.Home"), same(context))).andReturn(true).atLeastOnce();
     replayAll();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
         + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"
