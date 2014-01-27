@@ -598,4 +598,20 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     verifyDefault();
   }
 
+  @Test
+  public void testGetPaeTypeDoc_noContextDoc_NPE() {
+    context.setDoc(null);
+    replayDefault();
+    prepVeloContextService.getPageTypeDoc(context);
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetPaeTypeDoc_noPageTypeRef_NPE() {
+    expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(null).atLeastOnce();
+    replayDefault();
+    prepVeloContextService.getPageTypeDoc(context);
+    verifyDefault();
+  }
+
 }

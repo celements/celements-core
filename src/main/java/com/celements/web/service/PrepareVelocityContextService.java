@@ -328,23 +328,22 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return false;
   }
 
-  private XWikiDocument getPageTypeDoc(XWikiContext context) {
+  XWikiDocument getPageTypeDoc(XWikiContext context) {
     if(context.getDoc() != null) {
-      try {
-        PageTypeReference pTRefForCurrDoc = pageTypeResolver.getPageTypeRefForCurrentDoc(
-            );
-        if (pTRefForCurrDoc != null) {
+      PageTypeReference pTRefForCurrDoc = pageTypeResolver.getPageTypeRefForCurrentDoc();
+      if (pTRefForCurrDoc != null) {
+        try {
           DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
               "PageTypes", pTRefForCurrDoc.getConfigName());
           XWikiDocument pageTypeDoc = new PageType(pageTypeDocRef).getTemplateDocument(
               getContext());
           LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
           return pageTypeDoc;
-        } else {
-          LOGGER.info("no pageType reference for current document found.");
+        } catch (XWikiException exp) {
+          LOGGER.error("Failed to getPageTypeDoc.", exp);
         }
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to getPageTypeDoc.", exp);
+      } else {
+        LOGGER.info("no pageType reference for current document found.");
       }
     }
     return null;
