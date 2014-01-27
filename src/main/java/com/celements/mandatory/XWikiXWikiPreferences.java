@@ -60,12 +60,15 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   public void checkDocuments() throws XWikiException {
-    LOGGER.trace("Start checkDocuments in XWikiXWikiPreferences for database ["
-          + getContext().getDatabase() + "].");
-    if (noMainWiki() && !isSkipCelementsWikiPreferences()) {
-      LOGGER.trace("before checkXWikiPreferences for database ["
-          + getContext().getDatabase() + "].");
-      checkXWikiPreferences();
+    LOGGER.debug("starting mandatory checkXWikiPreferences for database ["
+        + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
+        + "], skipCelementsParam [" + isSkipCelementsWikiPreferences() + "].");
+    if (!isSkipCelementsWikiPreferences()) {
+      if (noMainWiki()) {
+        checkXWikiPreferences();
+      } else {
+        checkXWikiPreferencesMainWiki();
+      }
     } else {
       LOGGER.info("skip mandatory checkXWikiPreferences for database ["
           + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
