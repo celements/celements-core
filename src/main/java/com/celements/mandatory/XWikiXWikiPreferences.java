@@ -122,6 +122,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     if (wikiPrefDoc != null) {
       boolean dirty = checkPageType(wikiPrefDoc);
       dirty |= checkAccessRights(wikiPrefDoc);
+      dirty |= checkWikiPreferencesForMainWiki(wikiPrefDoc);
       if (dirty) {
         LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
             + "].");
@@ -180,7 +181,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_view", -1) < 0) {
-      prefsObj.set("authenticate_view", 1, getContext());
+      prefsObj.set("authenticate_view", 0, getContext());
       LOGGER.debug("XWikiPreferences missing authenticate_view configuration added for"
           + " database [" + getContext().getDatabase() + "].");
       dirty = true;
@@ -209,6 +210,47 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       prefsObj.set("cel_centralfilebase", "Content_attachments.FileBaseDoc",
           getContext());
       LOGGER.debug("XWikiPreferences missing cel_centralfilebase configuration added for"
+          + " database [" + getContext().getDatabase() + "].");
+      dirty = true;
+    }
+    return dirty;
+  }
+
+  boolean checkWikiPreferencesForMainWiki(XWikiDocument wikiPrefDoc) throws XWikiException {
+    String wikiName = getContext().getDatabase();
+    boolean dirty = false;
+    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(wikiName),
+        false, getContext());
+    if (prefsObj == null) {
+      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(wikiName), getContext());
+      prefsObj.set("editor", "Text", getContext());
+      prefsObj.set("renderXWikiRadeoxRenderer", 1, getContext());
+      prefsObj.set("pageWidth", "default", getContext());
+      LOGGER.debug("XWikiPreferences missing wiki preferences object added for"
+          + " database [" + getContext().getDatabase() + "].");
+      dirty = true;
+    }
+    if (prefsObj.getIntValue("multilingual", -1) < 0) {
+      prefsObj.setIntValue("multilingual", 1);
+      LOGGER.debug("XWikiPreferences missing multilingual configuration added for"
+          + " database [" + getContext().getDatabase() + "].");
+      dirty = true;
+    }
+    if (prefsObj.getIntValue("authenticate_edit", -1) < 0) {
+      prefsObj.set("authenticate_edit", 1, getContext());
+      LOGGER.debug("XWikiPreferences missing authenticate_edit configuration added for"
+          + " database [" + getContext().getDatabase() + "].");
+      dirty = true;
+    }
+    if (prefsObj.getIntValue("authenticate_view", -1) < 0) {
+      prefsObj.set("authenticate_view", 1, getContext());
+      LOGGER.debug("XWikiPreferences missing authenticate_view configuration added for"
+          + " database [" + getContext().getDatabase() + "].");
+      dirty = true;
+    }
+    if (prefsObj.getLongValue("upload_maxsize") <= 0) {
+      prefsObj.set("upload_maxsize", 104857600L, getContext());
+      LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for"
           + " database [" + getContext().getDatabase() + "].");
       dirty = true;
     }
