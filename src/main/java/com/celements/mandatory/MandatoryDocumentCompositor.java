@@ -84,6 +84,7 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
       LOGGER.error("Cannot order all mandatory document roles. Thus skipping: "
           + skippedDocElemKey);
     }
+    LOGGER.debug("getMandatoryDocumentsList returning [" + mandatoryDocExecList + "].");
     return mandatoryDocExecList;
   }
 
