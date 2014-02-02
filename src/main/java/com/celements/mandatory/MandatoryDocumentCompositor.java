@@ -19,7 +19,11 @@
  */
 package com.celements.mandatory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,10 +41,10 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
       MandatoryDocumentCompositor.class);
   
   @Requirement
-  private Map<String, IMandatoryDocumentRole> mandatoryDocuemntsMap;
+  Map<String, IMandatoryDocumentRole> mandatoryDocumentsMap;
 
   @Requirement
-  private Execution execution;
+  Execution execution;
 
   protected XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -49,7 +53,8 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
   public void checkAllMandatoryDocuments() {
     LOGGER.info("checkAllMandatoryDocuments for wiki [" + getContext().getDatabase()
         + "].");
-    for (IMandatoryDocumentRole mandatoryDoc : mandatoryDocuemntsMap.values()) {
+    for (String mandatoryDocKey : getMandatoryDocumentsList()) {
+      IMandatoryDocumentRole mandatoryDoc = mandatoryDocumentsMap.get(mandatoryDocKey);
       try {
         LOGGER.trace("checkDocuments with [" + mandatoryDoc.getClass() + "].");
         mandatoryDoc.checkDocuments();
@@ -59,6 +64,27 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
             + mandatoryDoc.getClass(), exp);
       }
     }
+  }
+
+  List<String> getMandatoryDocumentsList() {
+    Collection<String> mandatoryDocElemKeys = new ArrayList<String>(
+        mandatoryDocumentsMap.keySet());
+    List<String> mandatoryDocExecList = new Vector<String>();
+    do {
+      for (String mandatoryDocElemKey : mandatoryDocElemKeys) {
+        if (mandatoryDocExecList.containsAll(
+            mandatoryDocumentsMap.get(mandatoryDocElemKey).dependsOnMandatoryDocuments())
+            ) {
+          mandatoryDocExecList.add(mandatoryDocElemKey);
+        }
+      }
+    } while (mandatoryDocElemKeys.removeAll(mandatoryDocExecList)
+        && !mandatoryDocElemKeys.isEmpty());
+    for (String skippedDocElemKey : mandatoryDocElemKeys) {
+      LOGGER.error("Cannot order all mandatory document roles. Thus skipping: "
+          + skippedDocElemKey);
+    }
+    return mandatoryDocExecList;
   }
 
 }

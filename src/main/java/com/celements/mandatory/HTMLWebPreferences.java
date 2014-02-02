@@ -19,6 +19,9 @@
  */
 package com.celements.mandatory;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -54,6 +57,10 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
 
   private PageTypeClasses getPageTypeClasses() {
     return (PageTypeClasses) pageTypeClasses;
+  }
+
+  public List<String> dependsOnMandatoryDocuments() {
+    return Collections.emptyList();
   }
 
   public void checkDocuments() throws XWikiException {

@@ -19,6 +19,9 @@
  */
 package com.celements.mandatory;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -65,6 +68,10 @@ public class FileBaseTag0 implements IMandatoryDocumentRole {
 
   private NavigationClasses getNavigationClasses() {
     return (NavigationClasses) navigationClasses;
+  }
+
+  public List<String> dependsOnMandatoryDocuments() {
+    return Collections.emptyList();
   }
 
   public void checkDocuments() throws XWikiException {

@@ -19,6 +19,9 @@
  */
 package com.celements.mandatory;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,6 +61,11 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   private PageTypeClasses getPageTypeClasses() {
     return (PageTypeClasses) pageTypeClasses;
   }
+
+  public List<String> dependsOnMandatoryDocuments() {
+    return Arrays.asList("celements.MandatoryGroups");
+  }
+
 
   public void checkDocuments() throws XWikiException {
     LOGGER.debug("starting mandatory checkXWikiPreferences for database ["

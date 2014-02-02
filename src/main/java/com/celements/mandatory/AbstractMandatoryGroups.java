@@ -19,6 +19,9 @@
  */
 package com.celements.mandatory;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,6 +47,10 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
   }
 
   protected abstract String commitName();
+
+  public List<String> dependsOnMandatoryDocuments() {
+    return Collections.emptyList();
+  }
 
   protected void checkGroup(DocumentReference groupRef) throws XWikiException {
     if (!getContext().getWiki().exists(groupRef, getContext())) {
