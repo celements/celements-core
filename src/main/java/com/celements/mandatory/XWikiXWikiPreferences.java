@@ -271,6 +271,11 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(wikiName),
         false, getContext());
     if (editRightsObj == null) {
+      LOGGER.trace("checkAccessRights [" + wikiName + "], global rights class exists: "
+          + getContext().getWiki().exists(getGlobalRightsRef(wikiName), getContext()));
+      LOGGER.trace("checkAccessRights [" + wikiName + "], XWiki.ContentEditorsGroup"
+          + " exists: " + getContext().getWiki().exists(new DocumentReference(wikiName,
+              "XWiki", "ContentEditorsGroup"), getContext()));
       editRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(wikiName), getContext());
       editRightsObj.set("groups", "XWiki.ContentEditorsGroup", getContext());
       editRightsObj.set("levels", "edit,delete,undelete", getContext());
@@ -278,6 +283,9 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       editRightsObj.set("allow", 1, getContext());
       BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(
           wikiName), getContext());
+      LOGGER.trace("checkAccessRights [" + wikiName + "], XWiki.ContentEditorsGroup"
+          + " exists: " + getContext().getWiki().exists(new DocumentReference(wikiName,
+              "XWiki", "XWikiAdminGroup"), getContext()));
       adminRightsObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
       adminRightsObj.set("levels", "admin,edit,comment,delete,undelete,register",
           getContext());
