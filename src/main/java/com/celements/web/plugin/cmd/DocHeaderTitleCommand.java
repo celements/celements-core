@@ -69,10 +69,7 @@ public class DocHeaderTitleCommand {
             ).getSpacePreference("title", docRef.getLastSpaceReference().getName(), "", 
                 context), context);
       }
-      
-//      TODO reset to Exception
-    } catch (com.xpn.xwiki.XWikiException exp) {
-//    } catch (Exception exp) {
+    } catch (Exception exp) {
       mLogger.error(exp);
     }
     return docHeaderTitle;
