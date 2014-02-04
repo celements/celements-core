@@ -587,8 +587,22 @@ public class Navigation implements INavigation {
       if (isActiveMenuItem(docRef)) {
         cssClass += " active";
       }
+      if (isRestrictedRights(docRef)) {
+        cssClass += " cel_nav_restricted_rights";
+      }
     }
     return cssClass.trim();
+  }
+
+  boolean isRestrictedRights(DocumentReference docRef) {
+    try {
+      return !getContext().getWiki().getRightService().hasAccessLevel("view",
+          "XWiki.XWikiGuest", getWebUtilsService().getRefLocalSerializer().serialize(
+              docRef), getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to check isRestrictedRights for [" + docRef + "].", exp);
+    }
+    return false;
   }
 
   String getPageLayoutName(DocumentReference docRef) {

@@ -129,6 +129,17 @@ public class OldCoreClasses extends AbstractClassCollection {
 
   @Override
   protected void initClasses() throws XWikiException {
+    //old core xwiki
+    getContext().getWiki().getPrefsClass(getContext());
+    getContext().getWiki().getUserClass(getContext());
+    getContext().getWiki().getTagClass(getContext());
+    getContext().getWiki().getGroupClass(getContext());
+    getContext().getWiki().getRightsClass(getContext());
+    getContext().getWiki().getCommentsClass(getContext());
+    getContext().getWiki().getSkinClass(getContext());
+    getContext().getWiki().getGlobalRightsClass(getContext());
+    getContext().getWiki().getSheetClass(getContext());
+    // old core celements
     getExtended_XWikiPreferencesClass();
     getXWikiUsersClass();
     getFormMailClass();
@@ -313,8 +324,8 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass
-        .addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
+    needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change",
+        "yesno");
     needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language",
         4);
 

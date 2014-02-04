@@ -1273,7 +1273,30 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
- //*****************************************************************
+  @Test
+  public void testIsSuperAdminUser() throws Exception {
+    context.setUser("XWiki.MyAdmin");
+    context.setMainXWiki("main");
+    context.setDatabase("main");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setParentReference((EntityReference)null);
+    context.setDoc(doc);
+    XWikiRightService mockRightsService = createMockAndAddToDefault(
+        XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    assertNotNull("check precondition", context.getXWikiUser());
+    assertNotNull("check precondition", context.getDoc());
+    assertTrue("check precondition", context.isMainWiki());
+    assertTrue("isSuperAdminUser must be true for admins in Main Wiki.",
+        webUtilsService.isSuperAdminUser());
+    verifyDefault();
+  }
+
+  //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
 

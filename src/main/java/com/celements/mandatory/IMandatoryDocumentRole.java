@@ -19,12 +19,16 @@
  */
 package com.celements.mandatory;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.xpn.xwiki.XWikiException;
 
 @ComponentRole
 public interface IMandatoryDocumentRole {
+
+  public List<String> dependsOnMandatoryDocuments();
 
   public void checkDocuments() throws XWikiException;
 

@@ -151,6 +151,16 @@ public class Builder {
     }
     implicitCloseProperty();
   }
+  
+  public void addFloat(Float value) {
+    checkNoDictionary();
+    if (value != null) {
+      addOpeningPart(value.toString());
+    } else {
+      addNull();
+    }
+    implicitCloseProperty();
+  }
 
   public void addInteger(Integer value) {
     checkNoDictionary();

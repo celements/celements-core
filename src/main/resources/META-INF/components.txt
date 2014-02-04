@@ -48,3 +48,4 @@ com.celements.mandatory.WikiCreatedEventListener
 com.celements.mandatory.FileBaseTag0
 com.celements.mandatory.HTMLWebPreferences
 com.celements.mandatory.Robots_TXT
+com.celements.web.service.MobileLoggingScriptService

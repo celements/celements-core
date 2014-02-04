@@ -396,7 +396,7 @@ public class WebUtilsService implements IWebUtilsService {
     String user = getContext().getUser();
     LOGGER.trace("isSuperAdminUser: user [" + user + "] db [" + getContext().getDatabase()
         + "].");
-    return (isAdminUser() && user.startsWith("xwiki:"));
+    return (isAdminUser() && (user.startsWith("xwiki:") || getContext().isMainWiki()));
   }
 
   public boolean isLayoutEditor() {
