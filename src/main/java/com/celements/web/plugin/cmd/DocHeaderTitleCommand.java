@@ -21,25 +21,35 @@ package com.celements.web.plugin.cmd;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class DocHeaderTitleCommand {
   
   private static Log mLogger = LogFactory.getFactory().getInstance(
       DocHeaderTitleCommand.class);
 
-  private MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
+  MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
+  @Deprecated
   public String getDocHeaderTitle(String fullName, XWikiContext context) {
+    DocumentReference docRef = getWebUtils().resolveDocumentReference(fullName);
+    return getDocHeaderTitle(docRef, context);
+  }
+  
+  public String getDocHeaderTitle(DocumentReference docRef, XWikiContext context) {
     String docHeaderTitle = "";
     try {
-      XWikiDocument theDoc = context.getWiki().getDocument(fullName, context);
+      XWikiDocument theDoc = context.getWiki().getDocument(docRef, context);
       XWikiDocument theTDoc = theDoc.getTranslatedDocument(context);
-      BaseObject docTitelObj = theDoc.getObject("Content.Title");
+      BaseObject docTitelObj = theDoc.getXObject(getWebUtils(
+          ).resolveDocumentReference("Content.Title"));
       if ((theTDoc.getTitle() != null) && !"".equals(theTDoc.getTitle())) {
         docHeaderTitle = theTDoc.getTitle();
       } else if ((theDoc.getTitle() != null) && !"".equals(theDoc.getTitle())) {
@@ -49,17 +59,26 @@ public class DocHeaderTitleCommand {
         docHeaderTitle = context.getWiki().getRenderingEngine().renderText(
             docTitelObj.getStringValue("title"), theDoc, context);
       } else {
-        docHeaderTitle = menuNameCmd.getMultilingualMenuNameOnly(fullName,
+        docHeaderTitle = menuNameCmd.getMultilingualMenuNameOnly(
+            docRef.getLastSpaceReference().getName() + "." + docRef.getName(),
             context.getLanguage(), false, context);
       }
-      if (!"".equals(context.getWiki().getSpacePreference("title", "", context))) {
+      if (!"".equals(context.getWiki().getSpacePreference("title", 
+          docRef.getLastSpaceReference().getName(), "", context))) {
         docHeaderTitle = docHeaderTitle + context.getWiki().parseContent(context.getWiki(
-            ).getSpacePreference("title", "", context), context);
+            ).getSpacePreference("title", docRef.getLastSpaceReference().getName(), "", 
+                context), context);
       }
-    } catch (Exception exp) {
+      
+//      TODO reset to Exception
+    } catch (com.xpn.xwiki.XWikiException exp) {
+//    } catch (Exception exp) {
       mLogger.error(exp);
     }
     return docHeaderTitle;
   }
 
+  IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
 }
