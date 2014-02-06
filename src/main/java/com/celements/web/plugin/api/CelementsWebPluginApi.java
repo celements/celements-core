@@ -1419,8 +1419,17 @@ public class CelementsWebPluginApi extends Api {
     return context.getWiki().clearName(fileName, false, true, context);
   }
 
+  /**
+   * @deprecated since 2.41.0
+   *             instead use getDocHeaderTitle(DocumentReference)
+   */
+  @Deprecated
   public String getDocHeaderTitle(String fullName) {
     return new DocHeaderTitleCommand().getDocHeaderTitle(fullName, context);
+  }
+  
+  public String getDocHeaderTitle(DocumentReference docRef) {
+    return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
   }
 
   public void logDeprecatedVelocityScript(String logMessage) {
