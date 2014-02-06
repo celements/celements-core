@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -44,14 +45,14 @@ public class DocHeaderTitleCommand {
   @Deprecated
   public String getDocHeaderTitle(String fullName, XWikiContext context) {
     DocumentReference docRef = getWebUtils().resolveDocumentReference(fullName);
-    return getDocHeaderTitle(docRef, context);
+    return getDocHeaderTitle(docRef);
   }
   
-  public String getDocHeaderTitle(DocumentReference docRef, XWikiContext context) {
+  public String getDocHeaderTitle(DocumentReference docRef) {
     String docHeaderTitle = "";
     try {
-      XWikiDocument theDoc = context.getWiki().getDocument(docRef, context);
-      XWikiDocument theTDoc = theDoc.getTranslatedDocument(context);
+      XWikiDocument theDoc = getContext().getWiki().getDocument(docRef, getContext());
+      XWikiDocument theTDoc = theDoc.getTranslatedDocument(getContext());
       BaseObject docTitelObj = theDoc.getXObject(getWebUtils(
           ).resolveDocumentReference("Content.Title"));
       if ((theTDoc.getTitle() != null) && !"".equals(theTDoc.getTitle())) {
@@ -60,23 +61,31 @@ public class DocHeaderTitleCommand {
         docHeaderTitle = theDoc.getTitle();
       } else if ((docTitelObj != null) && (docTitelObj.getStringValue("title") != null)
           && (!"".equals(docTitelObj.getStringValue("title")))) {
-        docHeaderTitle = context.getWiki().getRenderingEngine().renderText(
-            docTitelObj.getStringValue("title"), theDoc, context);
+        docHeaderTitle = getContext().getWiki().getRenderingEngine().renderText(
+            docTitelObj.getStringValue("title"), theDoc, getContext());
       } else {
         docHeaderTitle = menuNameCmd.getMultilingualMenuNameOnly(
             docRef.getLastSpaceReference().getName() + "." + docRef.getName(),
-            context.getLanguage(), false, context);
+            getContext().getLanguage(), false, getContext());
       }
-      if (!"".equals(context.getWiki().getSpacePreference("title", 
-          docRef.getLastSpaceReference().getName(), "", context))) {
-        docHeaderTitle = docHeaderTitle + context.getWiki().parseContent(context.getWiki(
-            ).getSpacePreference("title", docRef.getLastSpaceReference().getName(), "", 
-                context), context);
+      if (!"".equals(getContext().getWiki().getSpacePreference("title", 
+          docRef.getLastSpaceReference().getName(), "", getContext()))) {
+        docHeaderTitle = docHeaderTitle + getContext().getWiki().parseContent(getContext(
+            ).getWiki().getSpacePreference("title", docRef.getLastSpaceReference(
+                ).getName(), "", getContext()), getContext());
       }
     } catch (Exception exp) {
       mLogger.error(exp);
     }
     return docHeaderTitle;
+  }
+  
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  Execution getExecution() {
+    return Utils.getComponent(Execution.class);
   }
 
   IWebUtilsService getWebUtils() {

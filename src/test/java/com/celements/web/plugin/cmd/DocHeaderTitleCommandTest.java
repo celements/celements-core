@@ -50,8 +50,7 @@ public class DocHeaderTitleCommandTest extends AbstractBridgedComponentTestCase 
     expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))
         ).andReturn(spacePrefTitle);
     replay(doc, mmnc, wiki);
-    assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle(docRef, 
-        getContext()));
+    assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle(docRef));
     verify(doc, mmnc, wiki);
   }
 
@@ -78,7 +77,7 @@ public class DocHeaderTitleCommandTest extends AbstractBridgedComponentTestCase 
         ).andReturn(spacePrefTitle);
     replay(doc, mmnc, theDoc, wiki);
     assertEquals(theDocRef.getName() + " - TheDocSpace", command.getDocHeaderTitle(
-        theDocRef, getContext()));
+        theDocRef));
     verify(doc, mmnc, theDoc, wiki);
   }
   

@@ -1429,7 +1429,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   public String getDocHeaderTitle(DocumentReference docRef) {
-    return new DocHeaderTitleCommand().getDocHeaderTitle(docRef, context);
+    return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
   }
 
   public void logDeprecatedVelocityScript(String logMessage) {
