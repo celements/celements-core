@@ -37,6 +37,10 @@ public class DocHeaderTitleCommand {
 
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
+  /**
+   * deprecated since 2.41.0
+   *                  use getDocHeaderTitle(DocumentReference docRef) instead
+   */
   @Deprecated
   public String getDocHeaderTitle(String fullName, XWikiContext context) {
     DocumentReference docRef = getWebUtils().resolveDocumentReference(fullName);
