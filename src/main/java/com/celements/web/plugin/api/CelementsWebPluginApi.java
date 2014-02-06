@@ -1420,7 +1420,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated instead use getDocHeaderTitle(DocumentReference)
+   * @deprecated since 2.41.0
+   *             instead use getDocHeaderTitle(DocumentReference)
    */
   @Deprecated
   public String getDocHeaderTitle(String fullName) {
