@@ -568,11 +568,26 @@ public class CelementsWebPluginApi extends Api {
    * @param fullName
    * @param includeDoc
    * @return List of all parents, starting at the specified doc (bottom up)
+   * 
+   * @deprecated since 2.41.0 instead use
+   *             getDocumentParentsDocRefList(DocumentReference, boolean)
    */
-  public List<String> getDocumentParentsList(String fullName,
-      boolean includeDoc) {
+  @Deprecated
+  public List<String> getDocumentParentsList(String fullName, boolean includeDoc) {
     return WebUtils.getInstance().getDocumentParentsList(fullName, includeDoc,
         context);
+  }
+
+  /**
+   * Returns a list of all parent for a specified doc
+   * 
+   * @param fullName
+   * @param includeDoc
+   * @return List of all parents, starting at the specified doc (bottom up)
+   */
+  public List<DocumentReference> getDocumentParentsDocRefList(DocumentReference docRef,
+      boolean includeDoc) {
+    return getWebUtilsService().getDocumentParentsList(docRef, includeDoc);
   }
 
   /**
