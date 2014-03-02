@@ -247,6 +247,7 @@ public class PageLayoutCommand {
    * @return
    */
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    long millisec = System.currentTimeMillis();
     LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
     IRenderStrategy cellRenderer = new CellRenderStrategy(getContext()).setOutputWriter(
         new DivWriter());
@@ -256,6 +257,8 @@ public class PageLayoutCommand {
     renderEngine.renderPageLayout(layoutSpaceRef);
     getRenderingLayoutStack().pop();
     setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
+    LOGGER.info("renderPageLayout finishing. Time used in millisec: "
+        + (millisec - System.currentTimeMillis()));
     return cellRenderer.getAsString();
   }
 
