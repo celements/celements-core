@@ -258,7 +258,7 @@ public class PageLayoutCommand {
     getRenderingLayoutStack().pop();
     setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
     LOGGER.info("renderPageLayout finishing. Time used in millisec: "
-        + (millisec - System.currentTimeMillis()));
+        + (System.currentTimeMillis() - millisec));
     return cellRenderer.getAsString();
   }
 
