@@ -255,6 +255,8 @@ public class RenderCommand {
     LOGGER.debug("getTranslatedContent for lang  [" + lang + "] and templateDoc ["
         + templateDoc.getDocumentReference() + "].");
     String translatedContent = templateDoc.getTranslatedContent(lang, getContext());
+    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + translatedContent + "]");
     if (!getRenderingEngine().getRendererNames().contains("xwiki")) {
       return translatedContent.replaceAll("\\{pre\\}|\\{/pre\\}", "");
     } else {
