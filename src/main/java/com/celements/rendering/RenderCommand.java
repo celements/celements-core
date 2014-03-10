@@ -216,8 +216,14 @@ public class RenderCommand {
       ) throws XWikiException {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and doc ["
         + document.getDocumentReference() + "].");
-    return getRenderingEngine().renderText(getTranslatedContent(document, lang), document,
+    String translatedContent = getTranslatedContent(document, lang);
+    LOGGER.trace("translated content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + translatedContent + "]");
+    String renderedContent = getRenderingEngine().renderText(translatedContent, document, 
         getContext());
+    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + translatedContent + "]");
+    return renderedContent;
   }
 
   XWikiRenderingEngine getRenderingEngine() throws XWikiException {
@@ -255,8 +261,6 @@ public class RenderCommand {
     LOGGER.debug("getTranslatedContent for lang  [" + lang + "] and templateDoc ["
         + templateDoc.getDocumentReference() + "].");
     String translatedContent = templateDoc.getTranslatedContent(lang, getContext());
-    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
-        + getContext().getLanguage() + "] is [" + translatedContent + "]");
     if (!getRenderingEngine().getRendererNames().contains("xwiki")) {
       return translatedContent.replaceAll("\\{pre\\}|\\{/pre\\}", "");
     } else {
