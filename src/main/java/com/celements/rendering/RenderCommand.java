@@ -188,8 +188,13 @@ public class RenderCommand {
       templateDoc = getTemplateDoc(renderTemplateDocRef);
       templateContent = getTranslatedContent(templateDoc, lang);
     }
-    return getRenderingEngine().renderText(templateContent,
+    LOGGER.trace("template content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + templateContent + "]");
+    String renderedContent = getRenderingEngine().renderText(templateContent,
         templateDoc, getContext().getDoc(), getContext());
+    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + renderedContent + "]");
+    return renderedContent;
   }
 
   public String renderDocument(DocumentReference docRef) {
@@ -222,7 +227,7 @@ public class RenderCommand {
     String renderedContent = getRenderingEngine().renderText(translatedContent, document, 
         getContext());
     LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
-        + getContext().getLanguage() + "] is [" + translatedContent + "]");
+        + getContext().getLanguage() + "] is [" + renderedContent + "]");
     return renderedContent;
   }
 
