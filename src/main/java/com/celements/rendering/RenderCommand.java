@@ -188,8 +188,13 @@ public class RenderCommand {
       templateDoc = getTemplateDoc(renderTemplateDocRef);
       templateContent = getTranslatedContent(templateDoc, lang);
     }
-    return getRenderingEngine().renderText(templateContent,
+    LOGGER.trace("template content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + templateContent + "]");
+    String renderedContent = getRenderingEngine().renderText(templateContent,
         templateDoc, getContext().getDoc(), getContext());
+    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + renderedContent + "]");
+    return renderedContent;
   }
 
   public String renderDocument(DocumentReference docRef) {
@@ -216,8 +221,14 @@ public class RenderCommand {
       ) throws XWikiException {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and doc ["
         + document.getDocumentReference() + "].");
-    return getRenderingEngine().renderText(getTranslatedContent(document, lang), document,
+    String translatedContent = getTranslatedContent(document, lang);
+    LOGGER.trace("translated content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + translatedContent + "]");
+    String renderedContent = getRenderingEngine().renderText(translatedContent, document, 
         getContext());
+    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + renderedContent + "]");
+    return renderedContent;
   }
 
   XWikiRenderingEngine getRenderingEngine() throws XWikiException {
