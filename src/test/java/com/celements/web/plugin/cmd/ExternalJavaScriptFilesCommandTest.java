@@ -90,6 +90,15 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     assertEquals("", command.addExtJSfileOnce(file));
     verify(xwiki, attUrlCmd);
   }
+  
+  @Test
+  public void testGetExtStringForJsFile() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(url));
+  }
 
   @Test
   public void testAddExtJSfileOnce_afterGetAll_fileNotFound() throws XWikiException {

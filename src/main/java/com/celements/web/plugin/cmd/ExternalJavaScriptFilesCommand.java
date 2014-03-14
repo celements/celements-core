@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -111,8 +113,9 @@ public class ExternalJavaScriptFilesCommand {
     this.displayedAll = displayedAll;
   }
 
-  private String getExtStringForJsFile(String jsFile) {
-    return "<script type=\"text/javascript\" src=\"" + jsFile + "\"></script>";
+  String getExtStringForJsFile(String jsFile) {
+    return "<script type=\"text/javascript\" src=\"" 
+        + StringEscapeUtils.escapeHtml(jsFile) + "\"></script>";
   }
 
   public String getAllExternalJavaScriptFiles() throws XWikiException {
