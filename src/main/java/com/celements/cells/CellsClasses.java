@@ -120,7 +120,7 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextAreaField("license", "License", 15, 30);
     needsUpdate |= bclass.addTextField("version", "Version", 30);
     needsUpdate |= bclass.addStaticListField("doctype", "Doctype", 1, false, 
-        "HTML 5|XHTML 1.1", "select");
+        "XHTML 1.1|HTML 5", "select");
     
     if(!"internal".equals(bclass.getCustomMapping())){
       needsUpdate = true;
