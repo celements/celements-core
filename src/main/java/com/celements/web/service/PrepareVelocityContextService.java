@@ -38,6 +38,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * TODO implement VelocityContextInitializer role
+ *      --> maybe XWiki overwrites later some vcontext variables ($language, $doc, $tdoc)
  * @author fabian
  *
  */
