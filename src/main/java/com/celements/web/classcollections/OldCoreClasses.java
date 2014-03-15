@@ -14,12 +14,14 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.oldCoreClasses")
 public class OldCoreClasses extends AbstractClassCollection {
 
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreClasses.class);
 
   public static final String PHOTO_ALBUM_CLASS_DOC = "PhotoAlbumClass";
   public static final String PHOTO_ALBUM_CLASS_SPACE = "XWiki";
   public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "."
         + PHOTO_ALBUM_CLASS_DOC;
+  public static final String PHOTO_ALBUM_GALLERY_LAYOUT = "galleryLayout";
 
   public static final String XWIKI_USERS_CLASS_DOC = "XWikiUsers";
   public static final String XWIKI_USERS_CLASS_SPACE = "XWiki";
@@ -395,7 +397,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addBooleanField("hasOverview", "hasOverview", "yesno");
     needsUpdate |= bclass.addStaticListField("theme", "theme",
         "grey|black|red|green|blue|gold|orange");
-    needsUpdate |= bclass.addTextField("galleryLayout", "image gallery slideshow layout",
+    needsUpdate |= bclass.addTextField(GALLERY_LAYOUT, "image gallery slideshow layout",
         30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
