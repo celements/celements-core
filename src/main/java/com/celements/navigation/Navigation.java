@@ -607,7 +607,10 @@ public class Navigation implements INavigation {
   }
 
   String getPageLayoutName(DocumentReference docRef) {
-    SpaceReference pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
+    SpaceReference pageLayoutRef = getPresentationType().getPageLayoutForDoc(docRef);
+    if (pageLayoutRef == null) {
+      pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
+    }
     if (pageLayoutRef != null) {
       return "layout_" + pageLayoutRef.getName();
     }
