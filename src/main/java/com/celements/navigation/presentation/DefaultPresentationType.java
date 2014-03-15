@@ -39,6 +39,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
       INavigation navigation) {
     try {
+      LOGGER.debug("writeNodeContent for [" + docRef + "].");
       appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem,
           navigation);
     } catch (XWikiException exp) {
