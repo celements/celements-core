@@ -397,8 +397,8 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addBooleanField("hasOverview", "hasOverview", "yesno");
     needsUpdate |= bclass.addStaticListField("theme", "theme",
         "grey|black|red|green|blue|gold|orange");
-    needsUpdate |= bclass.addTextField(GALLERY_LAYOUT, "image gallery slideshow layout",
-        30);
+    needsUpdate |= bclass.addTextField(PHOTO_ALBUM_GALLERY_LAYOUT,
+        "image gallery slideshow layout", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
