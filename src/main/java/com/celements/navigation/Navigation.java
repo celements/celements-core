@@ -188,6 +188,7 @@ public class Navigation implements INavigation {
   public void setPresentationType(String presentationTypeHint) {
     if (presentationTypeHint != null) {
       try {
+        LOGGER.info("setPresentationType to [" + presentationTypeHint + "].");
         setPresentationType(Utils.getComponentManager().lookup(
             IPresentationTypeRole.class, presentationTypeHint));
       } catch (ComponentLookupException failedToLoadException) {
