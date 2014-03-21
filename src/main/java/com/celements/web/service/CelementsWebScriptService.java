@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -149,11 +151,16 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String getCurrentPageURL(String queryString) {
+    String ret;
     if(isAppScriptRequest()) {
-      return getAppScriptURL(getScriptNameFromURL(), queryString);
+      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      return "?" + queryString;
+      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      ret = Util.escapeURL("?" + queryString);
     }
+    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    return ret;
   }
 
   public String convertToPlainText(String htmlContent) {
