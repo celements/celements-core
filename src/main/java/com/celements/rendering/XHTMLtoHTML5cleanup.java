@@ -1,13 +1,16 @@
 package com.celements.rendering;
 
-public class XHTMLtoHTML5cleanup {
+import org.xwiki.component.annotation.Component;
+
+@Component
+public class XHTMLtoHTML5cleanup implements IXHTMLtoHTML5cleanup {
   
-  public static String cleanAll(String xhtml) {
+  public String cleanAll(String xhtml) {
     String html5 = removeSelfclosingTags(xhtml);
     return html5;
   }
   
-  public static String removeSelfclosingTags(String xhtml) {
+  public String removeSelfclosingTags(String xhtml) {
     if(xhtml != null) {
       return xhtml.replaceAll("<((\".*?\"|'.*?'|[^>\"]*)*)/>", "<$1>");
     }
