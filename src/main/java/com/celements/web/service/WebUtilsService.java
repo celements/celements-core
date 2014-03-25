@@ -50,9 +50,12 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.rendering.RenderCommand;
+import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
+import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -76,6 +79,9 @@ public class WebUtilsService implements IWebUtilsService {
   
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
+  
+  @Requirement
+  XHTMLtoHTML5cleanup html5Cleaner;
 
   /**
    * Used to get the template path mapping information.
@@ -915,6 +921,34 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.debug("renderInheritableDocument: call renderTemplatePath for ["
         + templatePath + "] and lang [" + lang + "] and defLang [" + defLang + "].");
     return renderCommand.renderTemplatePath(templatePath, lang, defLang);
+  }
+
+  private PageLayoutCommand getPageLayoutCmd() {
+    if (!getContext().containsKey(CelementsWebPluginApi.CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      getContext().put(CelementsWebPluginApi.CELEMENTS_PAGE_LAYOUT_COMMAND, 
+          new PageLayoutCommand());
+    }
+    return (PageLayoutCommand) getContext().get(
+        CelementsWebPluginApi.CELEMENTS_PAGE_LAYOUT_COMMAND);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml) {
+    return cleanupXHTMLtoHTML5(xhtml, getContext().getDoc().getDocumentReference());
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference docRef) {
+    return cleanupXHTMLtoHTML5(xhtml, getPageLayoutCmd().getPageLayoutForDoc(docRef));
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
+    BaseObject layoutObj = getPageLayoutCmd().getLayoutPropertyObj(layoutRef);
+    if((layoutObj != null) && "HTML 5".equals(layoutObj.getStringValue("doctype"))) {
+      return html5Cleaner.cleanAll(xhtml);
+    }
+    return xhtml;
   }
 
 }

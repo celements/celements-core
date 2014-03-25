@@ -29,13 +29,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -558,4 +558,18 @@ public class CelementsWebScriptService implements ScriptService {
     return new PossibleLoginsCommand().getPossibleLogins();
   }
 
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference docRef) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, docRef);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, layoutRef);
+  }
 }
