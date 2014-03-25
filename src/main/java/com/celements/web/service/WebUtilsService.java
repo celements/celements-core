@@ -63,6 +63,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -79,9 +80,6 @@ public class WebUtilsService implements IWebUtilsService {
   
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
-  
-  @Requirement
-  XHTMLtoHTML5cleanup html5Cleaner;
 
   /**
    * Used to get the template path mapping information.
@@ -946,6 +944,7 @@ public class WebUtilsService implements IWebUtilsService {
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
     BaseObject layoutObj = getPageLayoutCmd().getLayoutPropertyObj(layoutRef);
     if((layoutObj != null) && "HTML 5".equals(layoutObj.getStringValue("doctype"))) {
+      XHTMLtoHTML5cleanup html5Cleaner = Utils.getComponent(XHTMLtoHTML5cleanup.class);
       return html5Cleaner.cleanAll(xhtml);
     }
     return xhtml;
