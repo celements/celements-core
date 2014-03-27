@@ -32,6 +32,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celCellsClasses")
 public class CellsClasses extends AbstractClassCollection {
 
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CellsClasses.class);
 
@@ -39,6 +40,7 @@ public class CellsClasses extends AbstractClassCollection {
   public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
   public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
     + CELEMENTS_CELL_CLASS_NAME;
+  public static final String CELLCLASS_IDNAME_FIELD = "idname";
 
   public CellsClasses() {}
 
@@ -80,7 +82,7 @@ public class CellsClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(cellClassRef);
-    needsUpdate |= bclass.addTextField("idname", "id attribute", 30);
+    needsUpdate |= bclass.addTextField(CELLCLASS_IDNAME_FIELD, "id attribute", 30);
     needsUpdate |= bclass.addTextField("css_classes", "CSS Classes", 30);
     needsUpdate |= bclass.addTextAreaField("css_styles", "CSS Styles", 15, 20);
     
