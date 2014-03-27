@@ -177,4 +177,10 @@ public interface IWebUtilsService {
 
   public boolean isLayoutEditor();
 
+  public String cleanupXHTMLtoHTML5(String xhtml);
+  
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
+
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
+
 }

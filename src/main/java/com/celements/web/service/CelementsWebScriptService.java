@@ -35,6 +35,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -60,6 +61,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -149,11 +151,16 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String getCurrentPageURL(String queryString) {
+    String ret;
     if(isAppScriptRequest()) {
-      return getAppScriptURL(getScriptNameFromURL(), queryString);
+      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      return "?" + queryString;
+      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      ret = Util.escapeURL("?" + queryString);
     }
+    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    return ret;
   }
 
   public String convertToPlainText(String htmlContent) {
@@ -551,4 +558,18 @@ public class CelementsWebScriptService implements ScriptService {
     return new PossibleLoginsCommand().getPossibleLogins();
   }
 
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference docRef) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, docRef);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, layoutRef);
+  }
 }

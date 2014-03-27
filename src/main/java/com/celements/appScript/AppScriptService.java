@@ -15,16 +15,18 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.web.plugin.cmd.EmptyCheckCommand;
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.Util;
 
 @Component
 public class AppScriptService implements IAppScriptService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(AppScriptService.class);
-
-  private EmptyCheckCommand emptyCheckCmd = new EmptyCheckCommand();
+  
+  @Requirement
+  IEmptyCheckRole emptyCheck;
 
   @Requirement
   IWebUtilsService webUtils;
@@ -61,7 +63,7 @@ public class AppScriptService implements IAppScriptService {
 
   private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
     return (getContext().getWiki().exists(appScriptDocRef, getContext())
-        && !emptyCheckCmd.isEmptyRTEDocument(appScriptDocRef));
+        && !emptyCheck.isEmptyRTEDocument(appScriptDocRef));
   }
 
   public boolean hasCentralAppScript(String scriptName) {
@@ -113,12 +115,17 @@ public class AppScriptService implements IAppScriptService {
     if (queryString == null) {
       queryString = "";
     }
-    if (!"".equals(queryString)) {
+    if (queryString.length() > 0 && !queryString.startsWith("/&")) {
       queryString = "&" + queryString;
     }
-    return getContext().getDoc().getURL("view", "xpage="
-        + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName + queryString,
-        getContext());
+    queryString = "xpage=" + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName 
+        + queryString;
+    if (scriptName.split("/").length <= 2) {
+      return getContext().getWiki().getURL(webUtils.resolveDocumentReference(
+          scriptName.replaceAll("/", ".")), "view", queryString, null, getContext());
+    } else {
+      return Util.escapeURL("/app/" + scriptName + "?" + queryString);
+    }
   }
 
   public boolean isAppScriptCurrentPage(String scriptName) {
