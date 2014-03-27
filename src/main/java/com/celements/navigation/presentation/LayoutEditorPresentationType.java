@@ -6,7 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.CellsClasses;
 import com.celements.common.classes.IClassCollectionRole;
