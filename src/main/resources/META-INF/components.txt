@@ -50,3 +50,4 @@ com.celements.mandatory.FileBaseTag1
 com.celements.mandatory.HTMLWebPreferences
 com.celements.mandatory.Robots_TXT
 com.celements.web.service.MobileLoggingScriptService
+com.celements.navigation.presentation.LayoutEditorPresentationType
