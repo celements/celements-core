@@ -201,6 +201,11 @@ public class RenderCommand {
     return renderDocument(docRef, getContext().getLanguage());
   }
 
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef) {
+    return renderDocument(docRef, includeDocRef, getContext().getLanguage());
+  }
+
   public String renderDocument(DocumentReference docRef, String lang) {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef + "].");
     try {
@@ -209,6 +214,22 @@ public class RenderCommand {
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get translated document for [" + docRef + "] in [" + lang
           + "].", exp);
+    }
+    return "";
+  }
+
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef, String lang) {
+    LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef
+        + "] and includeDocRef [" + includeDocRef + "].");
+    try {
+      XWikiDocument contentdoc = getContext().getWiki().getDocument(docRef, getContext());
+      XWikiDocument includeDoc = getContext().getWiki().getDocument(includeDocRef,
+          getContext());
+      return renderDocument(contentdoc, includeDoc, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get translated document for [" + docRef
+          + "] or includeDoc [" + includeDocRef + "].", exp);
     }
     return "";
   }
