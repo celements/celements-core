@@ -205,7 +205,7 @@ public class RenderCommand {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef + "].");
     try {
       XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
-      return renderDocument(xwikidoc, lang);
+      return renderDocument(xwikidoc, null, lang);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get translated document for [" + docRef + "] in [" + lang
           + "].", exp);
@@ -214,18 +214,25 @@ public class RenderCommand {
   }
 
   public String renderDocument(XWikiDocument document) throws XWikiException {
-    return renderDocument(document, document.getLanguage());
+    return renderDocument(document, null, document.getLanguage());
   }
 
-  public String renderDocument(XWikiDocument document, String lang
-      ) throws XWikiException {
+  /**
+   * renderDocument renders the given document content for the requested language.
+   * The includingdoc will be $doc in the velocity context during rendering.
+   */
+  public String renderDocument(XWikiDocument document, XWikiDocument includingdoc,
+      String lang) throws XWikiException {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and doc ["
         + document.getDocumentReference() + "].");
     String translatedContent = getTranslatedContent(document, lang);
     LOGGER.trace("translated content for lang [" + lang + "] and context.language [" 
         + getContext().getLanguage() + "] is [" + translatedContent + "]");
-    String renderedContent = getRenderingEngine().renderText(translatedContent, document, 
-        getContext());
+    if (includingdoc == null) {
+      includingdoc = getContext().getDoc();
+    }
+    String renderedContent = getRenderingEngine().renderText(translatedContent,
+        document, includingdoc, getContext());
     LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
         + getContext().getLanguage() + "] is [" + renderedContent + "]");
     return renderedContent;
