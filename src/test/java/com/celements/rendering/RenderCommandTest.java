@@ -938,4 +938,34 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testRenderDocument_docref_exp() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    expect(xwiki.getDocument(elementDocRef, getContext())).andThrow(new XWikiException()
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals("", renderCmd.renderDocument(elementDocRef, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderDocument_docref_docref_exp() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    DocumentReference includeDocRef = new DocumentReference(context.getDatabase(),
+        "Includeing", "TheIncludingDocumentName");
+    expect(xwiki.getDocument(elementDocRef, getContext())).andReturn(cellDoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(includeDocRef, getContext())).andThrow(new XWikiException()
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals("", renderCmd.renderDocument(elementDocRef, includeDocRef, "en"));
+    verifyDefault();
+  }
+
 }
