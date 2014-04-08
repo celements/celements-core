@@ -349,9 +349,23 @@ public class CelementsWebScriptService implements ScriptService {
     return new RenderCommand().renderDocument(docRef);
   }
 
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef) {
+    LOGGER.trace("renderDocument: docRef [" + docRef + "] and includeDocRef ["
+      + includeDocRef +  "].");
+    return new RenderCommand().renderDocument(docRef, includeDocRef);
+  }
+
   public String renderDocument(DocumentReference docRef, String lang) {
     LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
     return new RenderCommand().renderDocument(docRef, lang);
+  }
+
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef, String lang) {
+    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef
+        + "] and includeDocRef [" + includeDocRef + "].");
+    return new RenderCommand().renderDocument(docRef, includeDocRef, lang);
   }
 
   public String renderDocument(Document renderDoc) {

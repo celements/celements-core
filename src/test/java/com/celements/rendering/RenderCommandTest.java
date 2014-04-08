@@ -852,4 +852,120 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testRenderDocument() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    String expectedRenderedContent = "expected Content";
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    String contentEN = "english script $test";
+    expect(cellDoc.getTranslatedContent(eq("en"), same(context))).andReturn(contentEN);
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy"));
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderDocument(cellDoc, null, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderDocument_includingDoc() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    String expectedRenderedContent = "expected Content";
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    String contentEN = "english script $test";
+    expect(cellDoc.getTranslatedContent(eq("en"), same(context))).andReturn(contentEN);
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy"));
+    DocumentReference includeDocRef = new DocumentReference(context.getDatabase(),
+        "Includeing", "TheIncludingDocumentName");
+    XWikiDocument includeDoc = new XWikiDocument(includeDocRef);
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc),
+        same(includeDoc), same(context))).andReturn(expectedRenderedContent);  
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderDocument(cellDoc, includeDoc,
+        "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderDocument_docref() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    String expectedRenderedContent = "expected Content";
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    String contentEN = "english script $test";
+    expect(cellDoc.getTranslatedContent(eq("en"), same(context))).andReturn(contentEN);
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy"));
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc),
+        same(currentDoc), same(context))).andReturn(expectedRenderedContent);
+    expect(xwiki.getDocument(elementDocRef, getContext())).andReturn(cellDoc
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderDocument(elementDocRef, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderDocument_docref_docref() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    String expectedRenderedContent = "expected Content";
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    String contentEN = "english script $test";
+    expect(cellDoc.getTranslatedContent(eq("en"), same(context))).andReturn(contentEN);
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy"));
+    DocumentReference includeDocRef = new DocumentReference(context.getDatabase(),
+        "Includeing", "TheIncludingDocumentName");
+    XWikiDocument includeDoc = new XWikiDocument(includeDocRef);
+    expect(renderingEngineMock.renderText(eq(contentEN), same(cellDoc),
+        same(includeDoc), same(context))).andReturn(expectedRenderedContent);  
+    expect(xwiki.getDocument(elementDocRef, getContext())).andReturn(cellDoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(includeDocRef, getContext())).andReturn(includeDoc
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedRenderedContent, renderCmd.renderDocument(elementDocRef,
+        includeDocRef, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderDocument_docref_exp() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    expect(xwiki.getDocument(elementDocRef, getContext())).andThrow(new XWikiException()
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals("", renderCmd.renderDocument(elementDocRef, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderDocument_docref_docref_exp() throws Exception {
+    DocumentReference elementDocRef = new DocumentReference(context.getDatabase(),
+        "MyLayout", "Cell15");
+    XWikiDocument cellDoc = createMockAndAddToDefault(XWikiDocument.class);
+    expect(cellDoc.getDocumentReference()).andReturn(elementDocRef).anyTimes();
+    DocumentReference includeDocRef = new DocumentReference(context.getDatabase(),
+        "Includeing", "TheIncludingDocumentName");
+    expect(xwiki.getDocument(elementDocRef, getContext())).andReturn(cellDoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(includeDocRef, getContext())).andThrow(new XWikiException()
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals("", renderCmd.renderDocument(elementDocRef, includeDocRef, "en"));
+    verifyDefault();
+  }
+
 }

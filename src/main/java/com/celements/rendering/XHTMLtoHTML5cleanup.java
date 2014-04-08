@@ -2,7 +2,12 @@ package com.celements.rendering;
 
 import org.xwiki.component.annotation.Component;
 
+/**
+ * @author Edoardo Beutler
+ * @deprecated Slef closing tags are allowed as syntactic sugar (hence not required)
+ */
 @Component
+@Deprecated
 public class XHTMLtoHTML5cleanup implements IXHTMLtoHTML5cleanup {
 
   @Deprecated
