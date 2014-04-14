@@ -569,15 +569,16 @@ public class CelementsWebScriptService implements ScriptService {
   
   public boolean addFileToFileBaseTag(String fileDocFullName, String fileName, 
       DocumentReference tagDocRef) {
-    DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
-        "Celements2.PageType");
+    //FIXME not all tag documents have a page type: who cares? deprecated? migration?
+//    DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
+//        "Celements2.PageType");
     DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference(
         "Classes.FilebaseTag");
     String tagValue = fileDocFullName + "/" + fileName;
     try {
       XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
-      if((tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) != null)
-          && (tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
+      if(/*(tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) != null)
+          && */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
         BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
         obj.setStringValue("attachment", tagValue);
         getContext().getWiki().saveDocument(tagDoc, getContext());
