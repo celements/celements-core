@@ -560,6 +560,34 @@ public class CelementsWebScriptService implements ScriptService {
       return null;
     }
   }
+  
+  public boolean addFileToFileBaseTag(DocumentReference fileDocRef, String fileName, 
+      DocumentReference tagDocRef) {
+    return addFileToFileBaseTag(fileDocRef.getLastSpaceReference().getName() + "." 
+        + fileDocRef.getName(), fileName, tagDocRef);
+  }
+  
+  public boolean addFileToFileBaseTag(String fileDocFullName, String fileName, 
+      DocumentReference tagDocRef) {
+    DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
+        "Celements2.PageType");
+    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference(
+        "Classes.FilebaseTag");
+    String tagValue = fileDocFullName + "/" + fileName;
+    try {
+      XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
+      if((tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) != null)
+          && (tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
+        BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
+        obj.setStringValue("attachment", tagValue);
+        getContext().getWiki().saveDocument(tagDoc, getContext());
+        return true;
+      }
+    } catch (XWikiException xwe) {
+      LOGGER.error("Could not get tag Document", xwe);
+    }
+    return false;
+  }
 
   public boolean getUserAdminShowLoginName() {
     boolean showLoginName = (getContext().getWiki().getXWikiPreferenceAsInt(
