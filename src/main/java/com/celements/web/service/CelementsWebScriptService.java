@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -308,6 +309,12 @@ public class CelementsWebScriptService implements ScriptService {
     return renderCommand;
   }
 
+  public String renderCelementsDocument(DocumentReference elementDocRef,
+      boolean preserveVelocityContext) {
+    return renderCelementsDocument(elementDocRef, getContext().getLanguage(), "view",
+        true);
+  }
+
   public String renderCelementsDocument(DocumentReference elementDocRef) {
     return renderCelementsDocument(elementDocRef, getContext().getLanguage(), "view");
   }
@@ -319,11 +326,25 @@ public class CelementsWebScriptService implements ScriptService {
 
   public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
       String renderMode) {
+    return renderCelementsDocument(elementDocRef, lang, renderMode, false);
+  }
+
+  public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
+      String renderMode, boolean preserveVelocityContext) {
+    VelocityContext preservedVcontext = null;
+    if (preserveVelocityContext) {
+      preservedVcontext = (VelocityContext) ((VelocityContext)getContext().get("vcontext"
+          )).clone();
+    }
     try {
       return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang,
           renderMode);
     } catch (XWikiException exp) {
       LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
+    } finally {
+      if (preservedVcontext != null) {
+        getContext().put("vcontext", preservedVcontext);
+      }
     }
     return "";
   }
