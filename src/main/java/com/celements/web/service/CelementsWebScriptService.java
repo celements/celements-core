@@ -333,8 +333,11 @@ public class CelementsWebScriptService implements ScriptService {
       String renderMode, boolean preserveVelocityContext) {
     VelocityContext preservedVcontext = null;
     if (preserveVelocityContext) {
-      preservedVcontext = (VelocityContext) ((VelocityContext)getContext().get("vcontext"
-          )).clone();
+      preservedVcontext = (VelocityContext) execution.getContext().getProperty(
+          "velocityContext");
+      VelocityContext vContext = (VelocityContext) preservedVcontext.clone();
+      getContext().put("vcontext", vContext);
+      execution.getContext().setProperty("velocityContext", vContext);
     }
     try {
       return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang,
@@ -344,6 +347,7 @@ public class CelementsWebScriptService implements ScriptService {
     } finally {
       if (preservedVcontext != null) {
         getContext().put("vcontext", preservedVcontext);
+        execution.getContext().setProperty("velocityContext", preservedVcontext);
       }
     }
     return "";
