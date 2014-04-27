@@ -358,9 +358,13 @@ public class PageDependentDocumentReferenceCommand {
     BaseObject cellConfObj = getDepCellXObject(cellDocRef);
     if (cellConfObj != null) {
       String spaceName = cellConfObj.getStringValue(PROPNAME_SPACE_NAME);
+      LOGGER.debug("getDepCellSpace: spaceName [" + spaceName + "] for ["
+          + cellDocRef + "]");
       if (spaceName != null) {
         return spaceName;
       }
+    } else {
+      LOGGER.debug("getDepCellSpace: no cellConfObj found for [" + cellDocRef + "]");
     }
     return "";
   }
