@@ -113,6 +113,22 @@ public class RenderCommand {
       return renderCelementsDocument(elemDocRef, getContext().getLanguage(), renderMode);
   }
 
+  public String renderCelementsDocumentPreserveVelocityContext(
+      DocumentReference elementDocRef, String lang, String renderMode
+      ) throws XWikiException {
+    VelocityContext preservedVcontext = (VelocityContext) getExecutionContext(
+        ).getProperty("velocityContext");
+    VelocityContext vContext = (VelocityContext) preservedVcontext.clone();
+    getContext().put("vcontext", vContext);
+    getExecutionContext().setProperty("velocityContext", vContext);
+    try {
+      return renderCelementsDocument(elementDocRef, lang, renderMode);
+    } finally {
+      getContext().put("vcontext", preservedVcontext);
+      getExecutionContext().setProperty("velocityContext", preservedVcontext);
+    }
+  }
+
   public String renderCelementsDocument(DocumentReference elemDocRef, String lang,
       String renderMode) throws XWikiException {
     XWikiDocument cellDoc = getContext().getWiki().getDocument(elemDocRef, getContext());

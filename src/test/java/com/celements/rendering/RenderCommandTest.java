@@ -27,9 +27,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
+import org.easymock.IArgumentMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
@@ -45,6 +48,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
@@ -62,7 +66,9 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   public void setUp_RenderCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    velocityContext = new VelocityContext();
+    velocityContext = (VelocityContext) getExecutionContext().getProperty(
+        "velocityContext");
+    assertNotNull(velocityContext);
     context.put("vcontext", velocityContext);
     currentDoc = new XWikiDocument(new DocumentReference(context.getDatabase(), "Content",
         "MyPage"));
@@ -353,8 +359,43 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testRenderCelementsDocumentPreserveVelocityContext() throws Exception {
+    renderCmd.setDefaultPageTypeReference(null);
+    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "myPage");
+    expect(myDoc.getDocumentReference()).andReturn(myDocRef).anyTimes();
+    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
+        (PageTypeReference)isNull())).andReturn(null).anyTimes();
+    expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).anyTimes();
+    String expectedContent = "expected Content $doc.fullName";
+    expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(expectedContent
+        ).anyTimes();
+    String expectedRenderedContent = "expected rendered content of Content.MyPage";
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc),
+       same(currentDoc), notSameVcontext(context))).andReturn(expectedRenderedContent
+           ).atLeastOnce();
+    expect(myDoc.newDocument(same(context))).andReturn(new Document(myDoc, context)
+          ).anyTimes();
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+      "groovy")).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).once();
+    VelocityContext expectedVContext = (VelocityContext) context.get("vcontext");
+    replayDefault();
+    assertNotNull(expectedVContext);
+    assertNotNull(getExecutionContext().getProperty("velocityContext"));
+    assertSame(expectedVContext, getExecutionContext().getProperty("velocityContext"));
+    assertEquals(expectedRenderedContent,
+        renderCmd.renderCelementsDocumentPreserveVelocityContext(myDocRef, "de", "view"));
+    assertSame(expectedVContext, context.get("vcontext"));
+    assertSame(expectedVContext, getExecutionContext().getProperty("velocityContext"));
+    verifyDefault();
+  }
+
+  @Test
   @Deprecated
-  public void testRenderCelementsDocument_noCellType_setDefault_RichText_deprecated(
+  public void testRenderCelementsCell_noCellType_setDefault_RichText_deprecated(
       ) throws Exception {
     PageTypeReference defaultPTRef = new PageTypeReference("RichText", "xObjectProvider",
         Arrays.asList(""));
@@ -402,7 +443,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testRenderCelementsDocument_noCellType_setDefault_RichText(
+  public void testRenderCelementsCell_noCellType_setDefault_RichText(
       ) throws Exception {
     PageTypeReference defaultPTRef = new PageTypeReference("RichText", "xObjectProvider",
         Arrays.asList(""));
@@ -966,6 +1007,37 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     replayDefault();
     assertEquals("", renderCmd.renderDocument(elementDocRef, includeDocRef, "en"));
     verifyDefault();
+  }
+
+  //*****************************************************************
+  //*                  H E L P E R  - M E T H O D S                 *
+  //*****************************************************************/
+
+  private ExecutionContext getExecutionContext() {
+    return Utils.getComponent(Execution.class).getContext();
+  }
+
+  private XWikiContext notSameVcontext(final XWikiContext contextValue) {
+    final VelocityContext initVcontext = (VelocityContext) contextValue.get("vcontext");
+    reportMatcher(new IArgumentMatcher() {
+      public void appendTo(StringBuffer buffer) {
+        buffer.append("notSameVcontext(" + contextValue + ")");
+      }
+   
+      public boolean matches(Object argument) {
+        if (argument instanceof XWikiContext ) {
+          XWikiContext theContext = (XWikiContext)argument;
+          VelocityContext execVcontext = (VelocityContext) getExecutionContext(
+              ).getProperty("velocityContext");
+          if (theContext != null) {
+            VelocityContext vContext = (VelocityContext) theContext.get("vcontext");
+            return (initVcontext != vContext) && (vContext == execVcontext);
+          }
+        }
+        return false;
+      }
+    });
+    return null;
   }
 
 }
