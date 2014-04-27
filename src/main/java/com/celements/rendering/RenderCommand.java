@@ -39,6 +39,7 @@ import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.web.Utils;
@@ -195,12 +196,24 @@ public class RenderCommand {
       templateDoc = getTemplateDoc(renderTemplateDocRef);
       templateContent = getTranslatedContent(templateDoc, lang);
     }
-    LOGGER.trace("template content for lang [" + lang + "] and context.language [" 
-        + getContext().getLanguage() + "] is [" + templateContent + "]");
+    if (LOGGER.isDebugEnabled()) {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      Document cellDoc = (Document) vcontext.get("celldoc");
+      LOGGER.debug("renderTemplatePath: cellDoc before [" + cellDoc + "].");
+    }
+    LOGGER.trace("renderTemplatePath: template content for lang [" + lang
+        + "] and context.language [" + getContext().getLanguage() + "] is ["
+        + templateContent + "]");
     String renderedContent = getRenderingEngine().renderText(templateContent,
         templateDoc, getContext().getDoc(), getContext());
-    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
-        + getContext().getLanguage() + "] is [" + renderedContent + "]");
+    LOGGER.trace("renderTemplatePath: rendered content for lang [" + lang
+        + "] and context.language ["  + getContext().getLanguage() + "] is ["
+        + renderedContent + "]");
+    if (LOGGER.isDebugEnabled()) {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      Document cellDoc = (Document) vcontext.get("celldoc");
+      LOGGER.debug("renderTemplatePath: cellDoc after [" + cellDoc + "].");
+    }
     return renderedContent;
   }
 
