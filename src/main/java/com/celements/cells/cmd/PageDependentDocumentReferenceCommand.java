@@ -74,6 +74,7 @@ public class PageDependentDocumentReferenceCommand {
     if (!isCurrentDocument(cellDocRef)) {
       return getDependentDocumentReference(docRef, cellDocRef);
     }
+    LOGGER.info("getDocumentReference: isCurrentDoc returning " + docRef);
     return docRef;
   }
 
@@ -96,6 +97,7 @@ public class PageDependentDocumentReferenceCommand {
     if (!isCurrentDocument(cellDocRef)) {
       return getDependentDocumentReference(docRef, cellDocRef, isInheritable);
     }
+    LOGGER.info("getDocumentReference: isCurrentDoc returning " + docRef);
     return docRef;
   }
 
