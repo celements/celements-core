@@ -125,7 +125,7 @@ public class RenderCommand {
 
   public String renderCelementsDocument(XWikiDocument cellDoc, String lang,
       String renderMode) throws XWikiException {
-    LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
+    LOGGER.debug("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
     String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(
         cellDoc.getDocumentReference());
