@@ -19,6 +19,7 @@
  */
 package com.celements.rendering;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,6 +168,9 @@ public class RenderCommand {
         String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
         try {
           templateContent = getContext().getWiki().getResourceContent(templatePath);
+        } catch (FileNotFoundException fnfExp) {
+          LOGGER.trace("FileNotFound [" + templatePath + "].");
+          templateContent = "";
         } catch (IOException exp) {
           LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
           templateContent = "";
@@ -176,6 +180,9 @@ public class RenderCommand {
         String templatePathDef = getTemplatePathOnDisk(renderTemplatePath);
         try {
           templateContent = getContext().getWiki().getResourceContent(templatePathDef);
+        } catch (FileNotFoundException fnfExp) {
+          LOGGER.trace("FileNotFound [" + templatePathDef + "].");
+          return "";
         } catch (IOException exp) {
           LOGGER.debug("Exception while parsing template [" + templatePathDef + "].",
               exp);
