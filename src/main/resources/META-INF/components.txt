@@ -44,6 +44,8 @@ com.celements.mandatory.XWikiXWikiPreferences
 com.celements.menu.access.MenuAccessService
 com.celements.menu.access.DefaultMenuAccessProvider
 com.celements.navigation.service.TreeNodeDocumentCreatedListener
+com.celements.navigation.service.TreeNodeDocumentDeletedListener
+com.celements.navigation.service.TreeNodeDocumentUpdatedListener
 com.celements.mandatory.WikiCreatedEventListener
 com.celements.mandatory.FileBaseTag0
 com.celements.mandatory.FileBaseTag1
