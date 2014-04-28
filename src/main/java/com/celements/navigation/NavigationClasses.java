@@ -66,6 +66,8 @@ public class NavigationClasses extends AbstractClassCollection {
   public static final String MENU_ITEM_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
   public static final String MENU_ITEM_CLASS = MENU_ITEM_CLASS_SPACE + "."
         + MENU_ITEM_CLASS_DOC;
+  public static final String MENU_POSITION_FIELD = "menu_position";
+  public static final String PART_NAME_FIELD = "part_name";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NavigationClasses.class);
@@ -182,8 +184,8 @@ public class NavigationClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField("menu_position", "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField("part_name", "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(MENU_POSITION_FIELD, "Position", 30, "integer");
+    needsUpdate |= bclass.addTextField(PART_NAME_FIELD, "Menu Part Name", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -210,8 +212,8 @@ public class NavigationClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField("menu_position", "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField("part_name", "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(MENU_POSITION_FIELD, "Position", 30, "integer");
+    needsUpdate |= bclass.addTextField(PART_NAME_FIELD, "Menu Part Name", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
