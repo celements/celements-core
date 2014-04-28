@@ -59,6 +59,7 @@ public class SitemapPresentationType extends DefaultPresentationType {
         } else {
           cssClasses += " transNotExists";
         }
+        outStream.append("target=\"_blank\" ");
         outStream.append("class=\"" + cssClasses.trim() + "\">");
         outStream.append(lang);
         outStream.append("</a>");
