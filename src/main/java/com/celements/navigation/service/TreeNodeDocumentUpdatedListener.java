@@ -58,6 +58,9 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
       if (checkMenuItemDiffs(document, origDoc)) {
         treeNodeCache.flushMenuItemCache();
       }
+    } else {
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
+          + source + "] and data [" + data + "] -> skip.");
     }
   }
 

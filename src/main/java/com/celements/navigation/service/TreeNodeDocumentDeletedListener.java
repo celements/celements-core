@@ -59,6 +59,9 @@ public class TreeNodeDocumentDeletedListener implements EventListener {
       if (menuItemObj != null) {
         treeNodeCache.flushMenuItemCache();
       }
+    } else {
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
+          + source + "] and data [" + data + "] -> skip.");
     }
   }
 
