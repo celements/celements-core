@@ -9,6 +9,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -75,7 +76,10 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
       if (newPos != oldPos) {
         return true;
       } else {
-        return !document.getParentReference().equals(origDoc.getParentReference());
+        DocumentReference parentRef = document.getParentReference();
+        DocumentReference parentOrigRef = origDoc.getParentReference();
+        return ((parentRef == null) && (parentOrigRef != null))
+            || !document.getParentReference().equals(origDoc.getParentReference());
       }
     } else if ((menuItemObj != null) || (menuItemOrigObj != null)) {
       return true;
