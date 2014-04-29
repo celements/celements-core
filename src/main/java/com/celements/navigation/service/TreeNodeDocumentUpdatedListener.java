@@ -78,8 +78,11 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
       } else {
         DocumentReference parentRef = document.getParentReference();
         DocumentReference parentOrigRef = origDoc.getParentReference();
-        return ((parentRef == null) && (parentOrigRef != null))
-            || !document.getParentReference().equals(origDoc.getParentReference());
+        if ((parentRef != null) && (parentOrigRef != null)) {
+          return !parentRef.equals(parentOrigRef);
+        } else {
+          return ((parentRef != null) || (parentOrigRef != null));
+        }
       }
     } else if ((menuItemObj != null) || (menuItemOrigObj != null)) {
       return true;
