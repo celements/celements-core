@@ -43,20 +43,25 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
   }
 
   public String getName() {
+    LOGGER.trace("TreeNodeDocumentUpdatedListener getName");
     return "TreeNodeDocumentUpdatedListener";
   }
 
   public List<Event> getEvents() {
+    LOGGER.trace("TreeNodeDocumentUpdatedListener getEvents");
     return Arrays.asList((Event)new DocumentUpdatedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
+    LOGGER.trace("TreeNodeDocumentUpdatedListener onEvent: start.");
     XWikiDocument document = (XWikiDocument) source;
     XWikiDocument origDoc = getOrginialDocument(source);
     if ((document != null) && (origDoc != null)) {
-      LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
-          + document.getDocumentReference() + "].");
+      LOGGER.debug("TreeNodeDocumentUpdatedListener onEvent: got event for ["
+          + event.getClass() + "] on document [" + document.getDocumentReference()
+          + "].");
       if (checkMenuItemDiffs(document, origDoc)) {
+        LOGGER.trace("TreeNodeDocumentUpdatedListener flush menu item cache.");
         treeNodeCache.flushMenuItemCache();
       }
     } else {
@@ -70,6 +75,8 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
         getContext().getDatabase()));
     BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
         getContext().getDatabase()));
+    LOGGER.trace("TreeNodeDocumentUpdatedListener checkMenuItemDiffs menuItemObj ["
+        + menuItemObj + "], menuItemOrigObj [" + menuItemOrigObj + "]");
     if ((menuItemObj != null) && (menuItemOrigObj != null)) {
       int newPos = menuItemObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
       int oldPos = menuItemOrigObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
