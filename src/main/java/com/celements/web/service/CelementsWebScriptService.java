@@ -43,6 +43,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
+import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
 import com.celements.validation.IFormValidationServiceRole;
@@ -82,6 +83,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   IFormValidationServiceRole formValidationService;
+
+  @Requirement
+  ITreeNodeCache treeNodeCacheService;
 
   @Requirement
   Execution execution;
@@ -631,4 +635,16 @@ public class CelementsWebScriptService implements ScriptService {
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
     return webUtilsService.cleanupXHTMLtoHTML5(xhtml, layoutRef);
   }
+
+  /**
+   * Cache should maintain itself. Thus this flushMenuItemCache should not be called
+   * anymore.
+   * 
+   * @deprecated
+   */
+  @Deprecated
+  public void flushMenuItemCache() {
+    treeNodeCacheService.flushMenuItemCache();
+  }
+
 }

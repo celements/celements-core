@@ -106,7 +106,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public void flushCache(XWikiContext context) {
-    util.flushMenuItemCache(context);
+//    util.flushMenuItemCache(context);
   }
 
   public void init(XWikiContext context) {
