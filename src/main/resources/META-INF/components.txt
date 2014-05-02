@@ -46,6 +46,7 @@ com.celements.menu.access.DefaultMenuAccessProvider
 com.celements.navigation.listener.TreeNodeDocumentCreatedListener
 com.celements.navigation.listener.TreeNodeDocumentDeletedListener
 com.celements.navigation.listener.TreeNodeDocumentUpdatedListener
+com.celements.navigation.service.TreeNodeCacheListener
 com.celements.mandatory.WikiCreatedEventListener
 com.celements.mandatory.FileBaseTag0
 com.celements.mandatory.FileBaseTag1
