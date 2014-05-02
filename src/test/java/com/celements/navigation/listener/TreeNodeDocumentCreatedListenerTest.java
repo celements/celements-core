@@ -1,4 +1,4 @@
-package com.celements.navigation.service;
+package com.celements.navigation.listener;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.xwiki.observation.EventListener;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.navigation.listener.TreeNodeDocumentCreatedListener;
 import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeDocumentCreatedListenerTest extends AbstractBridgedComponentTestCase {

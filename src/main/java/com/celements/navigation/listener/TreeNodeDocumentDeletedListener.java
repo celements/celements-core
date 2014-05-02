@@ -1,4 +1,4 @@
-package com.celements.navigation.service;
+package com.celements.navigation.listener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,15 +14,16 @@ import org.xwiki.observation.event.Event;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.NavigationClasses;
+import com.celements.navigation.service.ITreeNodeCache;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("TreeNodeDocumentCreatedListener")
-public class TreeNodeDocumentCreatedListener implements EventListener {
+@Component("TreeNodeDocumentDeletedListener")
+public class TreeNodeDocumentDeletedListener implements EventListener {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
-      TreeNodeDocumentCreatedListener.class);
+      TreeNodeDocumentDeletedListener.class);
 
   @Requirement
   ITreeNodeCache treeNodeCache;
@@ -42,7 +43,7 @@ public class TreeNodeDocumentCreatedListener implements EventListener {
   }
 
   public String getName() {
-    return "TreeNodeDocumentCreatedListener";
+    return "TreeNodeDocumentDeletedListener";
   }
 
   public List<Event> getEvents() {
@@ -50,14 +51,26 @@ public class TreeNodeDocumentCreatedListener implements EventListener {
   }
 
   public void onEvent(Event event, Object source, Object data) {
-    XWikiDocument document = (XWikiDocument) source;
-    LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
-        + document.getDocumentReference() + "].");
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    if (menuItemObj != null) {
-      treeNodeCache.flushMenuItemCache();
+    XWikiDocument document = getOrginialDocument(source);
+    if (document != null) {
+      LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
+          + document.getDocumentReference() + "].");
+      BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
+          getContext().getDatabase()));
+      if (menuItemObj != null) {
+        treeNodeCache.flushMenuItemCache();
+      }
+    } else {
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
+          + source + "] and data [" + data + "] -> skip.");
     }
+  }
+
+  private XWikiDocument getOrginialDocument(Object source) {
+    if (source != null) {
+      return ((XWikiDocument) source).getOriginalDocument();
+    }
+    return null;
   }
 
 }

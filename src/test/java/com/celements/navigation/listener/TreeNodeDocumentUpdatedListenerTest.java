@@ -1,4 +1,4 @@
-package com.celements.navigation.service;
+package com.celements.navigation.listener;
 
 import static org.junit.Assert.*;
 
@@ -11,6 +11,7 @@ import org.xwiki.observation.EventListener;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
+import com.celements.navigation.listener.TreeNodeDocumentUpdatedListener;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
