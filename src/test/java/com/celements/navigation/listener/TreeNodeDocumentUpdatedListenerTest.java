@@ -35,34 +35,7 @@ public class TreeNodeDocumentUpdatedListenerTest
   }
 
   @Test
-  public void testCheckMenuItemDiffs_no_menuItem() {
-    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestPage");
-    XWikiDocument document = new XWikiDocument(testDocRef);
-    XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    replayDefault();
-    assertFalse(eventListener.checkMenuItemDiffs(document, origDoc));
-    verifyDefault();
-  }
-
-
-  @Test
-  public void testCheckMenuItemDiffs_remove_menuItem() {
-    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestPage");
-    XWikiDocument document = new XWikiDocument(testDocRef);
-    XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemOrigObj);
-    replayDefault();
-    assertTrue(eventListener.checkMenuItemDiffs(document, origDoc));
-    verifyDefault();
-  }
-
-  @Test
-  public void testCheckMenuItemDiffs_add_menuItem() {
+  public void testIsMenuItemAdded_added() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -72,12 +45,158 @@ public class TreeNodeDocumentUpdatedListenerTest
         context.getDatabase()));
     document.addXObject(menuItemObj);
     replayDefault();
-    assertTrue(eventListener.checkMenuItemDiffs(document, origDoc));
+    assertTrue(eventListener.isMenuItemAdded(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testCheckMenuItemDiffs_changePos_menuItem() {
+  public void testIsMenuItemAdded_deleted() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemOrigObj = new BaseObject();
+    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    origDoc.addXObject(menuItemOrigObj);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemAdded(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemAdded_changed() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    document.addXObject(menuItemObj);
+    BaseObject menuItemOrigObj = new BaseObject();
+    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    origDoc.addXObject(menuItemOrigObj);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemAdded(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemAdded_noMenuItems() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemAdded(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemDeleted_added() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    document.addXObject(menuItemObj);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemDeleted_deleted() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemOrigObj = new BaseObject();
+    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    origDoc.addXObject(menuItemOrigObj);
+    replayDefault();
+    assertTrue(eventListener.isMenuItemDeleted(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemDeleted_changed() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    document.addXObject(menuItemObj);
+    BaseObject menuItemOrigObj = new BaseObject();
+    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    origDoc.addXObject(menuItemOrigObj);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemDeleted_noMenuItems() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemUpdated_no_menuItem() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemUpdated_remove_menuItem() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemOrigObj = new BaseObject();
+    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    origDoc.addXObject(menuItemOrigObj);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemUpdated_add_menuItem() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    document.addXObject(menuItemObj);
+    replayDefault();
+    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsMenuItemUpdated_changePos_menuItem() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -93,12 +212,12 @@ public class TreeNodeDocumentUpdatedListenerTest
     menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 1);
     document.addXObject(menuItemObj);
     replayDefault();
-    assertTrue(eventListener.checkMenuItemDiffs(document, origDoc));
+    assertTrue(eventListener.isMenuItemUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testCheckMenuItemDiffs_parentChange() {
+  public void testIsMenuItemUpdated_parentChange() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -120,12 +239,12 @@ public class TreeNodeDocumentUpdatedListenerTest
     menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     document.addXObject(menuItemObj);
     replayDefault();
-    assertTrue(eventListener.checkMenuItemDiffs(document, origDoc));
+    assertTrue(eventListener.isMenuItemUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testCheckMenuItemDiffs_parentChange_noMenuItem() {
+  public void testIsMenuItemUpdated_parentChange_noMenuItem() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -137,12 +256,12 @@ public class TreeNodeDocumentUpdatedListenerTest
         "TestSpace", "TestOrigParentPage");
     origDoc.setParentReference((EntityReference)origParentReference);
     replayDefault();
-    assertFalse(eventListener.checkMenuItemDiffs(document, origDoc));
+    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testCheckMenuItemDiffs_noChanges() {
+  public void testIsMenuItemUpdated_noChanges() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -164,7 +283,7 @@ public class TreeNodeDocumentUpdatedListenerTest
     menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
     document.addXObject(menuItemObj);
     replayDefault();
-    assertFalse(eventListener.checkMenuItemDiffs(document, origDoc));
+    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
     verifyDefault();
   }
 
