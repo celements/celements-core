@@ -1,6 +1,7 @@
 package com.celements.navigation.listener;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -8,28 +9,34 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.NavigationClasses;
-import com.celements.navigation.service.ITreeNodeCache;
+import com.celements.navigation.event.TreeNodeDeletedEvent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("TreeNodeDocumentDeletedListener")
-public class TreeNodeDocumentDeletedListener implements EventListener {
+public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentListener
+    implements EventListener {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       TreeNodeDocumentDeletedListener.class);
 
   @Requirement
-  ITreeNodeCache treeNodeCache;
+  private ComponentManager componentManager;
 
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navClasses;
+
+  @Requirement
+  RemoteObservationManagerContext remoteObservationManagerContext;
 
   @Requirement
   Execution execution;
@@ -52,17 +59,21 @@ public class TreeNodeDocumentDeletedListener implements EventListener {
 
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument document = getOrginialDocument(source);
-    if (document != null) {
+    if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
       BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
           getContext().getDatabase()));
       if (menuItemObj != null) {
-        treeNodeCache.flushMenuItemCache();
+        LOGGER.debug("TreeNodeDocumentDeletedListener checkMenuItemDiffs deleted from "
+            + document.getDocumentReference() + "]");
+        TreeNodeDeletedEvent delTreeNodeEvent = new TreeNodeDeletedEvent();
+        getObservationManager().notify(delTreeNodeEvent, source, Collections.emptyMap());
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "] -> skip.");
+          + source + "] and data [" + data + "], isLocalEvent ["
+          + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }
 
@@ -71,6 +82,16 @@ public class TreeNodeDocumentDeletedListener implements EventListener {
       return ((XWikiDocument) source).getOriginalDocument();
     }
     return null;
+  }
+
+  @Override
+  protected ComponentManager getComponentManager() {
+    return componentManager;
+  }
+
+  @Override
+  protected Log getLogger() {
+    return LOGGER;
   }
 
 }
