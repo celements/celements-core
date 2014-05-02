@@ -12,6 +12,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.navigation.NavigationClasses;
@@ -30,6 +31,9 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
 
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navClasses;
+
+  @Requirement
+  RemoteObservationManagerContext remoteObservationManagerContext;
 
   @Requirement
   Execution execution;
@@ -52,11 +56,15 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
     return Arrays.asList((Event)new DocumentUpdatedEvent());
   }
 
+  private boolean isLocalEvent() {
+    return !remoteObservationManagerContext.isRemoteState();
+  }
+
   public void onEvent(Event event, Object source, Object data) {
     LOGGER.trace("TreeNodeDocumentUpdatedListener onEvent: start.");
     XWikiDocument document = (XWikiDocument) source;
     XWikiDocument origDoc = getOrginialDocument(source);
-    if ((document != null) && (origDoc != null)) {
+    if ((document != null) && (origDoc != null) && isLocalEvent()) {
       LOGGER.debug("TreeNodeDocumentUpdatedListener onEvent: got event for ["
           + event.getClass() + "] on document [" + document.getDocumentReference()
           + "].");
@@ -66,7 +74,8 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "] -> skip.");
+          + source + "] and data [" + data + "], isLocalEvent [" + isLocalEvent()
+          + "] -> skip.");
     }
   }
 
