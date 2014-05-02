@@ -21,7 +21,6 @@ import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.event.TreeNodeCreatedEvent;
 import com.celements.navigation.event.TreeNodeDeletedEvent;
 import com.celements.navigation.event.TreeNodeUpdatedEvent;
-import com.celements.navigation.service.ITreeNodeCache;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -35,9 +34,6 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
 
   @Requirement
   private ComponentManager componentManager;
-
-  @Requirement
-  ITreeNodeCache treeNodeCache;
 
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navClasses;
@@ -66,15 +62,12 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
     return Arrays.asList((Event)new DocumentUpdatedEvent());
   }
 
-  private boolean isLocalEvent() {
-    return !remoteObservationManagerContext.isRemoteState();
-  }
-
   public void onEvent(Event event, Object source, Object data) {
     LOGGER.trace("TreeNodeDocumentUpdatedListener onEvent: start.");
     XWikiDocument document = (XWikiDocument) source;
     XWikiDocument origDoc = getOrginialDocument(source);
-    if ((document != null) && (origDoc != null) && isLocalEvent()) {
+    if ((document != null) && (origDoc != null)
+        && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("TreeNodeDocumentUpdatedListener onEvent: got event for ["
           + event.getClass() + "] on document [" + document.getDocumentReference()
           + "].");
@@ -97,8 +90,8 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent [" + isLocalEvent()
-          + "] -> skip.");
+          + source + "] and data [" + data + "], isLocalEvent ["
+          + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }
 
