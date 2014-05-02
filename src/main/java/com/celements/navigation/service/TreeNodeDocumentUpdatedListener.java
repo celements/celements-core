@@ -80,11 +80,15 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
     if ((menuItemObj != null) && (menuItemOrigObj != null)) {
       int newPos = menuItemObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
       int oldPos = menuItemOrigObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
+      LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs newPos ["
+          + newPos + "], oldPos [" + oldPos + "]");
       if (newPos != oldPos) {
         return true;
       } else {
         DocumentReference parentRef = document.getParentReference();
         DocumentReference parentOrigRef = origDoc.getParentReference();
+        LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs parentRef ["
+            + parentRef + "], parentOrigRef [" + parentOrigRef + "]");
         if ((parentRef != null) && (parentOrigRef != null)) {
           return !parentRef.equals(parentOrigRef);
         } else {
@@ -92,6 +96,9 @@ public class TreeNodeDocumentUpdatedListener implements EventListener {
         }
       }
     } else if ((menuItemObj != null) || (menuItemOrigObj != null)) {
+      LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs added or deleted,"
+          + " new menu item [" + (menuItemObj != null) + "], old menu item["
+          + (menuItemOrigObj != null) + "]");
       return true;
     }
     return false;
