@@ -56,18 +56,17 @@ public class TreeNodeEventConverter extends AbstractEventConverter {
    *      org.xwiki.observation.remote.RemoteEventData)
    */
   public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent) {
-    LOGGER.debug("toRemote remoteEvent [" + remoteEvent + "], localEvent [" + localEvent
-        + "].");
     if (isSerializable(localEvent)) {
       remoteEvent.setEvent((Serializable) localEvent.getEvent());
       remoteEvent.setSource((Serializable) localEvent.getSource());
       remoteEvent.setData((Serializable) localEvent.getData());
+      LOGGER.debug("toRemote serializable [" + localEvent.getClass().getName()
+          + "], remoteEvent [" + remoteEvent + "], localEvent [" + localEvent + "].");
       return true;
     } else {
       LOGGER.debug("toRemote not serializable [" + localEvent.getClass().getName()
           + "], localEvent [" + localEvent + "].");
     }
-
     return false;
   }
 
