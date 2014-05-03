@@ -84,7 +84,8 @@ public class TreeNodeEventConverter extends AbstractEventConverter {
     LOGGER.trace("isSerializable: [" + isSerializable + "], getEvent instanceof ["
         + (localEvent.getEvent() instanceof Serializable) + "] isSerializable getData ["
         + isSerializable(localEvent.getData()) + "] isSerializable getSource ["
-        + isSerializable(localEvent.getSource()) + "].");
+        + isSerializable(localEvent.getSource()) + "] source class ["
+        + localEvent.getSource().getClass().getName() + "].");
     return isSerializable;
   }
 
