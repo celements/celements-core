@@ -64,7 +64,8 @@ public class TreeNodeEventConverter extends AbstractEventConverter {
       remoteEvent.setData((Serializable) localEvent.getData());
       return true;
     } else {
-      LOGGER.debug("toRemote not serializale [" + isSerializable(localEvent) + "].");
+      LOGGER.debug("toRemote not serializable [" + localEvent.getClass().getName()
+          + "], localEvent [" + localEvent + "].");
     }
 
     return false;
@@ -78,8 +79,13 @@ public class TreeNodeEventConverter extends AbstractEventConverter {
    * @return true is the local event is fully serializable, false otherwise.
    */
   private boolean isSerializable(LocalEventData localEvent) {
-    return localEvent.getEvent() instanceof Serializable
+    boolean isSerializable = localEvent.getEvent() instanceof Serializable
         && isSerializable(localEvent.getData()) && isSerializable(localEvent.getSource());
+    LOGGER.trace("isSerializable: [" + isSerializable + "], getEvent instanceof ["
+        + (localEvent.getEvent() instanceof Serializable) + "] isSerializable getData ["
+        + isSerializable(localEvent.getData()) + "] isSerializable getSource ["
+        + isSerializable(localEvent.getSource()) + "].");
+    return isSerializable;
   }
 
   /**
