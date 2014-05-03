@@ -1,7 +1,6 @@
 package com.celements.navigation.listener;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -67,8 +66,9 @@ public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentLis
       if (menuItemObj != null) {
         LOGGER.debug("TreeNodeDocumentDeletedListener checkMenuItemDiffs deleted from "
             + document.getDocumentReference() + "]");
-        TreeNodeDeletedEvent delTreeNodeEvent = new TreeNodeDeletedEvent();
-        getObservationManager().notify(delTreeNodeEvent, source, Collections.emptyMap());
+        TreeNodeDeletedEvent delTreeNodeEvent = new TreeNodeDeletedEvent(
+            document.getDocumentReference());
+        getObservationManager().notify(delTreeNodeEvent, source, getContext());
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["

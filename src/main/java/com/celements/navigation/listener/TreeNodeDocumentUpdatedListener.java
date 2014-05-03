@@ -74,19 +74,22 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
       if (isMenuItemAdded(document, origDoc)) {
         LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs added to "
             + document.getDocumentReference() + "]");
-        TreeNodeCreatedEvent newTreeNodeEvent = new TreeNodeCreatedEvent();
-        getObservationManager().notify(newTreeNodeEvent, source, Collections.emptyMap());
+        TreeNodeCreatedEvent newTreeNodeEvent = new TreeNodeCreatedEvent(
+            document.getDocumentReference());
+        getObservationManager().notify(newTreeNodeEvent, source, getContext());
       } else if (isMenuItemDeleted(document, origDoc)) {
         LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs deleted from "
             + document.getDocumentReference() + "]");
-        TreeNodeDeletedEvent delTreeNodeEvent = new TreeNodeDeletedEvent();
-        getObservationManager().notify(delTreeNodeEvent, source, Collections.emptyMap());
+        TreeNodeDeletedEvent delTreeNodeEvent = new TreeNodeDeletedEvent(
+            document.getDocumentReference());
+        getObservationManager().notify(delTreeNodeEvent, source, getContext());
       }
       if (isMenuItemUpdated(document, origDoc)) {
         LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs updated on "
             + document.getDocumentReference() + "]");
-        TreeNodeUpdatedEvent updTreeNodeEvent = new TreeNodeUpdatedEvent();
-        getObservationManager().notify(updTreeNodeEvent, source, Collections.emptyMap());
+        TreeNodeUpdatedEvent updTreeNodeEvent = new TreeNodeUpdatedEvent(
+            document.getDocumentReference());
+        getObservationManager().notify(updTreeNodeEvent, source, getContext());
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["

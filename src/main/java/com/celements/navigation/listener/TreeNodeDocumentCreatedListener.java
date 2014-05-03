@@ -1,7 +1,6 @@
 package com.celements.navigation.listener;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -67,8 +66,9 @@ public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentLis
       if (menuItemObj != null) {
         LOGGER.debug("TreeNodeDocumentCreatedListener checkMenuItemDiffs added to "
             + document.getDocumentReference() + "]");
-        TreeNodeCreatedEvent newTreeNodeEvent = new TreeNodeCreatedEvent();
-        getObservationManager().notify(newTreeNodeEvent, source, Collections.emptyMap());
+        TreeNodeCreatedEvent newTreeNodeEvent = new TreeNodeCreatedEvent(
+            document.getDocumentReference());
+        getObservationManager().notify(newTreeNodeEvent, source, getContext());
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
