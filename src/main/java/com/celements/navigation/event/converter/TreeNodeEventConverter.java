@@ -39,7 +39,8 @@ public class TreeNodeEventConverter extends AbstractXWikiEventConverter {
   /**
    * {@inheritDoc}
    * 
-   * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(org.xwiki.observation.remote.LocalEventData,
+   * @see org.xwiki.observation.remote.converter.LocalEventConverter#toRemote(
+   *      org.xwiki.observation.remote.LocalEventData,
    *      org.xwiki.observation.remote.RemoteEventData)
    */
   public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent) {
@@ -61,7 +62,8 @@ public class TreeNodeEventConverter extends AbstractXWikiEventConverter {
   /**
    * {@inheritDoc}
    * 
-   * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(org.xwiki.observation.remote.RemoteEventData,
+   * @see org.xwiki.observation.remote.converter.RemoteEventConverter#fromRemote(
+   *      org.xwiki.observation.remote.RemoteEventData,
    *      org.xwiki.observation.remote.LocalEventData)
    */
   public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent) {
