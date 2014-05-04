@@ -21,16 +21,12 @@ package com.celements.navigation.cmd;
 
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase {
@@ -38,19 +34,13 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
   private XWikiContext context;
   private ReorderSaveCommand restrSaveCmd;
   private ReorderSaveHandler mockHandler;
-  private XWiki wiki;
-  private IWebUtils webUtilsMock;
 
   @Before
   public void setUp_RestructureSaveCommandTest() throws Exception {
     context = getContext();
-    wiki = createMock(XWiki.class);
-    context.setWiki(wiki);
     restrSaveCmd = new ReorderSaveCommand();
-    mockHandler = createMock(ReorderSaveHandler.class);
+    mockHandler = createMockAndAddToDefault(ReorderSaveHandler.class);
     restrSaveCmd.injected_Handler(mockHandler);
-    webUtilsMock = createMock(IWebUtils.class);
-    restrSaveCmd.injected_WebUtils(webUtilsMock);
   }
 
   @Test
@@ -70,22 +60,6 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
   }
 
   @Test
-  public void testGetWebUtils() {
-    restrSaveCmd.injected_WebUtils(null);
-    assertNotNull(restrSaveCmd.getWebUtils());
-    assertEquals("Expecting RestructureSaveWebUtils WebUtils.",
-        WebUtils.getInstance(), restrSaveCmd.getWebUtils());
-  }
-
-  @Test
-  public void testInjected_WebUtils() {
-    restrSaveCmd.injected_WebUtils(webUtilsMock);
-    assertNotNull(restrSaveCmd.getWebUtils());
-    assertSame("Expecting injected WebUtils object.",
-        webUtilsMock, restrSaveCmd.getWebUtils());
-  }
-
-  @Test
   public void testRestructureSave() {
     String structureJSON = "[{\"CN1:MySpace.MyDoc\": [\"LIN1:MyDoc.Node1\","
       + " \"LIN1:MyDoc.Node2\"]}, "
@@ -98,14 +72,11 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
     expectLastCall().anyTimes();
     mockHandler.stringEvent(isA(String.class));
     expectLastCall().anyTimes();
-    expect(mockHandler.isFlushCacheNeeded()).andReturn(true);
-    webUtilsMock.flushMenuItemCache(same(context));
-    expectLastCall().once();
 //    Set<String> dirtyParents = Collections.emptySet();
 //    expect(mockHandler.getDirtyParents()).andReturn(dirtyParents);
-    replay(wiki, mockHandler, webUtilsMock);
+    replayDefault();
     restrSaveCmd.reorderSave("MySpace.MyDoc", structureJSON, context);
-    verify(wiki, mockHandler, webUtilsMock);
+    verifyDefault();
   }
 
   @Test
@@ -121,12 +92,11 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
     expectLastCall().anyTimes();
     mockHandler.stringEvent(isA(String.class));
     expectLastCall().anyTimes();
-    expect(mockHandler.isFlushCacheNeeded()).andReturn(false);
 //    Set<String> dirtyParents = Collections.emptySet();
 //    expect(mockHandler.getDirtyParents()).andReturn(dirtyParents);
-    replay(wiki, mockHandler, webUtilsMock);
+    replayDefault();
     restrSaveCmd.reorderSave("MySpace.MyDoc", structureJSON, context);
-    verify(wiki, mockHandler, webUtilsMock);
+    verifyDefault();
   }
 
 }
