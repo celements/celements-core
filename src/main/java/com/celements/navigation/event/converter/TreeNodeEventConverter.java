@@ -65,8 +65,10 @@ public class TreeNodeEventConverter extends AbstractXWikiEventConverter {
    *      org.xwiki.observation.remote.LocalEventData)
    */
   public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent) {
+    LOGGER.trace("fromRemote: start for event [" + remoteEvent.getEvent().getClass()
+        + "].");
     if (this.events.contains(remoteEvent.getEvent().getClass())) {
-      LOGGER.trace("fromRemote: serialize event [" + localEvent.getEvent().getClass()
+      LOGGER.trace("fromRemote: unserialize event [" + remoteEvent.getEvent().getClass()
           + "].");
       // fill the local event
       XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
@@ -77,7 +79,7 @@ public class TreeNodeEventConverter extends AbstractXWikiEventConverter {
       }
       return true;
     } else {
-      LOGGER.debug("fromRemote: skip event [" + localEvent.getEvent().getClass() + "].");
+      LOGGER.debug("fromRemote: skip event [" + remoteEvent.getEvent().getClass() + "].");
     }
     return false;
   }
