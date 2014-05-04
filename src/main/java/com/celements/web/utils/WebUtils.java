@@ -131,7 +131,9 @@ public class WebUtils implements IWebUtils {
    */
   @Deprecated
   public void flushMenuItemCache(XWikiContext context) {
-    getTreeNodeCache().flushMenuItemCache();
+    LOGGER.info("flushMenuItemCache called. Do not call flushMenuItemCache for MenuItem "
+        + " changes anymore. The TreeNodeDocument change listener take care of flushing "
+        + " the cache if needed.");
   }
 
   /**

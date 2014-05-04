@@ -39,7 +39,6 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
   private String parentFN;
   private EReorderLiteral currentCommand;
   private Integer currentPos;
-  private boolean flushCacheNeeded;
   private Set<String> dirtyParents;
 
   public ReorderSaveHandler(XWikiContext context) {
@@ -134,7 +133,6 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
           }
           if (updateNeeded) {
             context.getWiki().saveDocument(xdoc, "Restructuring", context);
-            setFlushCacheNeeded();
           }
         } catch (XWikiException e) {
           LOGGER.error("readPropertyKey: cannot load document [" + docFN 
@@ -153,14 +151,6 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
   void markParentDirty(String parent) {
     getDirtyParents().add(parent);
-  }
-
-  void setFlushCacheNeeded() {
-    this.flushCacheNeeded = true;
-  }
-
-  boolean isFlushCacheNeeded() {
-    return flushCacheNeeded;
   }
 
   public Set<String> getDirtyParents() {

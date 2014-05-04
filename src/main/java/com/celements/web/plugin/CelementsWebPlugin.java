@@ -100,16 +100,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return getPrepareVelocityContextService().getVelocityName();
   }
 
-  public void flushCache() {
-    //TODO: check if flushCache is called for changing a page MenuItem.
-    LOGGER.debug("Entered method flushCache");
-  }
-
-  public void flushCache(XWikiContext context) {
-    LOGGER.warn("flushCache called. Do not call flushCache for MenuItem changes anymore");
-//    util.flushMenuItemCache(context);
-  }
-
   public void init(XWikiContext context) {
     //TODO check if this is really needed for main-wiki or if we get a virtualInit on the
     //TODO main wiki to. (if needed move to ApplicationStartedEvent listener)

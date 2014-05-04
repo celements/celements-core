@@ -26,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonParseException;
 
 import com.celements.sajson.Parser;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 
 public class ReorderSaveCommand {
@@ -35,7 +33,6 @@ public class ReorderSaveCommand {
   private static Log mLogger = LogFactory.getFactory().getInstance(
       ReorderSaveCommand.class);
   private ReorderSaveHandler injected_Handler;
-  private IWebUtils injected_WebUtils;
 
   /**
    * For Tests only!!!
@@ -59,9 +56,6 @@ public class ReorderSaveCommand {
         handler);
     try {
       jsonParser.parse(structureJSON);
-      if (handler.isFlushCacheNeeded()) {
-        getWebUtils().flushMenuItemCache(context);
-      }
       return "OK";
     } catch (JsonParseException exp) {
       mLogger.error("Failed to save restructre.", exp);
@@ -69,21 +63,6 @@ public class ReorderSaveCommand {
       mLogger.error("Failed to save restructre.", exp);
     }
     return "Failed";
-  }
-
-  IWebUtils getWebUtils() {
-    if (injected_WebUtils != null) {
-      return injected_WebUtils;
-    }
-    return WebUtils.getInstance();
-  }
-
-  /**
-   * For Tests only!!!
-   * @param injected_WebUtils
-   */
-  void injected_WebUtils(IWebUtils injected_WebUtils) {
-    this.injected_WebUtils = injected_WebUtils;
   }
 
 }

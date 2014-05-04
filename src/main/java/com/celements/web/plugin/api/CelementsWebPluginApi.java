@@ -136,8 +136,15 @@ public class CelementsWebPluginApi extends Api {
     this.plugin = plugin;
   }
 
+  /**
+   * @Deprecated Do not call flushCache for MenuItem changes anymore.  
+   * The TreeNodeDocument change listener take care of flushing the cache if needed.
+   */
+  @Deprecated
   public void flushCache() {
-    plugin.flushCache(context);
+    LOGGER.warn("flushCache called. Do not call flushCache for MenuItem "
+        + " changes anymore. The TreeNodeDocument change listener take care of flushing "
+        + " the cache if needed.");
   }
 
   /**
