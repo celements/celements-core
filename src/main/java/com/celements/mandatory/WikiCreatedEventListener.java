@@ -31,8 +31,8 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("celements.mandatory.WikiCreatedEventListener")
@@ -43,6 +43,9 @@ public class WikiCreatedEventListener implements EventListener {
 
   @Requirement
   IMandatoryDocumentCompositorRole mandatoryDocCmp;
+
+  @Requirement
+  RemoteObservationManagerContext remoteObservationManagerContext;
 
   @Requirement
   private Execution execution;
@@ -63,7 +66,9 @@ public class WikiCreatedEventListener implements EventListener {
     String saveDbName = getContext().getDatabase();
     WikiEvent wikiEvent = (WikiEvent) event;
     String newDbName = wikiEvent.getWikiId();
-    if (!"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
+    if (!remoteObservationManagerContext.isRemoteState()
+        && !"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart",
+            "1"))) {
       try {
         getContext().setDatabase(newDbName);
         LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
