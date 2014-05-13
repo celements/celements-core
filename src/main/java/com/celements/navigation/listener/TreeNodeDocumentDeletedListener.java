@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
@@ -72,7 +72,7 @@ public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentLis
   }
 
   public List<Event> getEvents() {
-    return Arrays.asList((Event)new DocumentCreatedEvent());
+    return Arrays.asList((Event)new DocumentDeletedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -96,7 +96,7 @@ public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentLis
     }
   }
 
-  private XWikiDocument getOrginialDocument(Object source) {
+  XWikiDocument getOrginialDocument(Object source) {
     if (source != null) {
       return ((XWikiDocument) source).getOriginalDocument();
     }
