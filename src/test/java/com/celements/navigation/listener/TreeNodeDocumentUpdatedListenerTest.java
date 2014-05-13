@@ -2,16 +2,20 @@ package com.celements.navigation.listener;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.NavigationClasses;
-import com.celements.navigation.listener.TreeNodeDocumentUpdatedListener;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -32,6 +36,20 @@ public class TreeNodeDocumentUpdatedListenerTest
   @Test
   public void testComponentSingleton() {
     assertSame(eventListener, getTreeNodeDocumentUpdatedListener());
+  }
+
+  @Test
+  public void testGetEvents() {
+    List<String> expectedEventClassList = Arrays.asList(new DocumentUpdatedEvent(
+        ).getClass().getName());
+    replayDefault();
+    List<Event> actualEventList = eventListener.getEvents();
+    assertEquals(expectedEventClassList.size(), actualEventList.size());
+    for (Event actualEvent : actualEventList) {
+      assertTrue("Unexpected Event [" + actualEvent.getClass().getName() + "] found.",
+          expectedEventClassList.contains(actualEvent.getClass().getName()));
+    }
+    verifyDefault();
   }
 
   @Test
