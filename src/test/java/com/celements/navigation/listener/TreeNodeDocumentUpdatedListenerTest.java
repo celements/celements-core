@@ -235,6 +235,27 @@ public class TreeNodeDocumentUpdatedListenerTest
   }
 
   @Test
+  public void testIsMenuItemUpdated_changeNavPart_menuItem() {
+    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
+        "TestSpace", "TestPage");
+    XWikiDocument document = new XWikiDocument(testDocRef);
+    XWikiDocument origDoc = new XWikiDocument(testDocRef);
+    BaseObject menuItemOrigObj = new BaseObject();
+    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    menuItemOrigObj.setStringValue(NavigationClasses.MENU_PART_FIELD, "");
+    origDoc.addXObject(menuItemOrigObj);
+    BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+        context.getDatabase()));
+    menuItemObj.setStringValue(NavigationClasses.MENU_PART_FIELD, "mainNav");
+    document.addXObject(menuItemObj);
+    replayDefault();
+    assertTrue(eventListener.isMenuItemUpdated(document, origDoc));
+    verifyDefault();
+  }
+
+  @Test
   public void testIsMenuItemUpdated_parentChange() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");

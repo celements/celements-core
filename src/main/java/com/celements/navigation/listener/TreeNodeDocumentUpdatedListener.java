@@ -22,6 +22,7 @@ package com.celements.navigation.listener;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -146,10 +147,14 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
     if ((menuItemObj != null) && (menuItemOrigObj != null)) {
       int newPos = menuItemObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
       int oldPos = menuItemOrigObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
+      String newPart = menuItemObj.getStringValue(NavigationClasses.MENU_PART_FIELD);
+      String oldPart = menuItemOrigObj.getStringValue(NavigationClasses.MENU_PART_FIELD);
       LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs newPos ["
           + newPos + "], oldPos [" + oldPos + "]");
       if (newPos != oldPos) {
         return true;
+      } else if (!StringUtils.equals(newPart, oldPart)) {
+          return true;
       } else {
         DocumentReference parentRef = document.getParentReference();
         DocumentReference parentOrigRef = origDoc.getParentReference();
