@@ -134,7 +134,10 @@ public class CellRenderStrategy implements IRenderStrategy {
     String cellContent = "";
     try {
       LOGGER.debug("renderEmptyChildren: parent [" + node + "].");
+      long millisec = System.currentTimeMillis();
       cellContent = getRendererCmd().renderCelementsCell(node.getDocumentReference());
+      LOGGER.info("renderEmptyChildren: rendered parent [" + node
+          + "]. Time used in millisec: " + (System.currentTimeMillis() - millisec));
     } catch (XWikiException exp) {
       LOGGER.error("failed to get cell [" + node + "] document to render cell"
           + " content.", exp);
