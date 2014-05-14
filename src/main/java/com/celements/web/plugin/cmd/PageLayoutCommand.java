@@ -323,6 +323,7 @@ public class PageLayoutCommand {
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+    long millisec = System.currentTimeMillis();
     LOGGER.debug("getPageLayoutForDoc: for [" + documentReference + "].");
     SpaceReference layoutSpaceRef = null;
     if (layoutExists(documentReference.getLastSpaceReference())) {
@@ -340,7 +341,8 @@ public class PageLayoutCommand {
       layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
     LOGGER.info("getPageLayoutForDoc: for [" + documentReference + "] returning ["
-        + layoutSpaceRef + "].");
+        + layoutSpaceRef + "].  Time used in millisec: "
+        + (System.currentTimeMillis() - millisec));
     return layoutSpaceRef;
   }
 
