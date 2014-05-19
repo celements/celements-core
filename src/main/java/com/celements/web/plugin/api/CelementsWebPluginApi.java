@@ -153,8 +153,16 @@ public class CelementsWebPluginApi extends Api {
    *  to solve browser caching issues with files on disk e.g. tinymce
    * @return
    */
-  public String getLastStartupTimeStamp(){
+  public String getLastStartupTimeStamp() {
     return new LastStartupTimeStamp().getLastStartupTimeStamp();
+  }
+
+  public boolean resetLastStartupTimeStamp() {
+    if (hasProgrammingRights()) {
+      new LastStartupTimeStamp().resetLastStartupTimeStamp();
+      return true;
+    }
+    return false;
   }
 
   /**
