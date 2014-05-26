@@ -42,18 +42,20 @@ public class CelementsRightsCommand {
       Vector<BaseObject> rights = doc.getObjects("XWiki.XWikiRights");
       if (rights != null){
         for (BaseObject right : rights) {
-          boolean validGroups = isValidGroups(right);
-          boolean validUsers = isValidUsers(right);
-          boolean validLevels = isValidLevels(right);
-          mLogger.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
-              + right.getNumber() + "] results: " + validGroups + ", " + validUsers
-              + ", " + validLevels);
-          if (!(validGroups && validUsers && validLevels)) return false;
+          if (right != null) {
+            boolean validGroups = isValidGroups(right);
+            boolean validUsers = isValidUsers(right);
+            boolean validLevels = isValidLevels(right);
+            mLogger.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
+                + right.getNumber() + "] results: " + validGroups + ", " + validUsers
+                + ", " + validLevels);
+            if (!(validGroups && validUsers && validLevels)) return false;
+          }
         }
       }
       return true;
-    } catch (Exception e) {
-      mLogger.error("Exception while trying to check celements rights", e);
+    } catch (Exception exp) {
+      mLogger.error("Exception while trying to check celements rights", exp);
     }
     return false;
   }
