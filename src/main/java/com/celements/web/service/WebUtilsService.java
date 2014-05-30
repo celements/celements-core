@@ -359,11 +359,17 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public DocumentReference resolveDocumentReference(String fullName) {
-    DocumentReference eventRef = new DocumentReference(referenceResolver.resolve(
-        fullName, EntityType.DOCUMENT, new WikiReference(getContext().getDatabase())));
-    LOGGER.debug("getDocRefFromFullName: for [" + fullName + "] got reference ["
-        + eventRef + "].");
-    return eventRef;
+    return resolveDocumentReference(fullName, new WikiReference(getContext(
+        ).getDatabase()));
+  }
+
+  public DocumentReference resolveDocumentReference(String fullName, 
+      WikiReference wikiRef) {
+    DocumentReference docRef = new DocumentReference(referenceResolver.resolve(fullName, 
+        EntityType.DOCUMENT, wikiRef));
+    LOGGER.debug("resolveDocumentReference: for [" + fullName + "] got reference [" 
+        + docRef + "].");
+    return docRef;
   }
 
   public SpaceReference resolveSpaceReference(String spaceName) {
