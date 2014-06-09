@@ -92,7 +92,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     assertTrue("expecting no trash restriction [" + hql  + "].",
         hql.matches(".*[where |and ]and doc.space <> 'Trash' .*"));
     assertTrue("missing order by [" + hql  + "].",
-        hql.matches(".* order by doc.space, doc.parent, pos.value"));
+        hql.matches(".* order by doc.parent, pos.value"));
   }
 
   @Test
