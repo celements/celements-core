@@ -96,14 +96,14 @@ public class GetNotMappedMenuItemsForParentCommandTest
         hql.matches(".* order by doc.space, doc.parent, pos.value"));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetTreeNodesForParentKey_miss() throws XWikiException {
     context.setDatabase("mydatabase");
-    List resultList = Arrays.asList(Arrays.asList("MySpace.MyDoc1", "MySpace", "", 1
-        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
-        resultList).atLeastOnce();
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1",
+        "MySpace", "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace",
+            "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
+        ).andReturn(resultList).atLeastOnce();
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), "", 1),
         new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc2"),
@@ -138,14 +138,14 @@ public class GetNotMappedMenuItemsForParentCommandTest
     verifyAll();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetTreeNodesForParentKey_miss_empty() throws XWikiException {
     context.setDatabase("mydatabase");
-    List resultList = Arrays.asList(Arrays.asList("MySpace.MyDoc1", "MySpace", "", 1
-        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
-        resultList).atLeastOnce();
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1",
+        "MySpace", "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace",
+            "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
+        ).andReturn(resultList).atLeastOnce();
     replayAll();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(
         "mydatabase:MySpace2.", context);
@@ -171,7 +171,6 @@ public class GetNotMappedMenuItemsForParentCommandTest
     verifyAll();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetTreeNodesForParentKey_differentDbs() throws Exception {
     context.setDatabase("myTestWiki");
@@ -179,10 +178,11 @@ public class GetNotMappedMenuItemsForParentCommandTest
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         "mydatabase", "MySpace", "MyDoc1"), "", 1),
         new TreeNode(new DocumentReference("mydatabase", "MySpace", "MyDoc2"), "", 2));
-    List resultList = Arrays.asList(Arrays.asList("MySpace.MyDoc1", "MySpace", "", 1
-        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
-        resultList).atLeastOnce();
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1",
+        "MySpace", "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace",
+            "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
+        ).andReturn(resultList).atLeastOnce();
     replayAll();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(
         searchParentKey, context);
@@ -235,15 +235,14 @@ public class GetNotMappedMenuItemsForParentCommandTest
     verifyAll();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetTreeNodesForParentKey_miss_IllegalArgumentExp_emptySpace(
       ) throws XWikiException {
     context.setDatabase("mydatabase");
-    List resultList = Arrays.asList(Arrays.asList(".MyDoc1", "", "", 1
-        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
-        resultList).atLeastOnce();
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList(".MyDoc1", "", "", 1
+        ).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
+        ).andReturn(resultList).atLeastOnce();
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc2"), "", 2));
     replayAll();
@@ -257,14 +256,13 @@ public class GetNotMappedMenuItemsForParentCommandTest
     verifyAll();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testExecuteSearch_fixDbForSearch() throws Exception {
     context.setDatabase("myTestWiki");
-    List resultList = Arrays.asList(Arrays.asList(".MyDoc1", "", "", 1
-        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
-        resultList).atLeastOnce();
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList(".MyDoc1", "", "", 1
+        ).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
+        ).andReturn(resultList).atLeastOnce();
     replayAll();
     List<Object[]> result = notMappedItemsCmd.executeSearch("mydatabase", context);
     assertEquals("expect database being adjusted.", "mydatabase", context.getDatabase());
@@ -272,14 +270,14 @@ public class GetNotMappedMenuItemsForParentCommandTest
     verifyAll();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testGetFromDBForParentKey_preserve_db() throws Exception {
     context.setDatabase("myTestWiki");
-    List resultList = Arrays.asList(Arrays.asList("MySpace.MyDoc1", "MySpace", "", 1
-        ).toArray(), Arrays.asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
-    expect(mockStore.search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
-        resultList).atLeastOnce();
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1",
+        "MySpace", "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace",
+            "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
+        ).andReturn(resultList).atLeastOnce();
     replayAll();
     List<Object[]> result = notMappedItemsCmd.getFromDBForParentKey("mydatabase:MySpace.",
         context);
