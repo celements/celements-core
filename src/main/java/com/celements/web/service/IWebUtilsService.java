@@ -93,7 +93,13 @@ public interface IWebUtilsService {
 
   public DocumentReference resolveDocumentReference(String fullName);
 
+  public DocumentReference resolveDocumentReference(String fullName, 
+      WikiReference wikiRef);
+
   public SpaceReference resolveSpaceReference(String spaceName);
+
+  public SpaceReference resolveSpaceReference(String spaceName, 
+      WikiReference wikiRef);
 
   public boolean isAdminUser();
 

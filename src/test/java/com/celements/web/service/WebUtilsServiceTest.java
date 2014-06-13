@@ -729,6 +729,33 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testResolveDocumentReference_wikiRef_null() {
+    replayDefault();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "XWiki.test", null);
+    assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
+    verifyDefault();
+  }
+
+  @Test
+  public void testResolveDocumentReference_wikiRef_with() {
+    replayDefault();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "XWiki.test", new WikiReference("database"));
+    assertEquals("database", testDocRef.getWikiReference().getName());
+    verifyDefault();
+  }
+
+  @Test
+  public void testResolveDocumentReference_wikiRef_inName() {
+    replayDefault();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "xwiki:XWiki.test", new WikiReference("database"));
+    assertEquals("xwiki", testDocRef.getWikiReference().getName());
+    verifyDefault();
+  }
+
+  @Test
   public void testResolveSpaceReference_mainWiki() {
     replayDefault();
     SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference(
