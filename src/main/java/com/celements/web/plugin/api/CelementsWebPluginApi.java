@@ -1094,7 +1094,11 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public String getPageLayoutForDoc(DocumentReference docRef) {
-    return getPageLayoutCmd().getPageLayoutForDoc(docRef).getName();
+    SpaceReference pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(docRef);
+    if (pageLayoutForDoc != null) {
+      return pageLayoutForDoc.getName();
+    }
+    return "";
   }
 
   public String renderPageLayout() {
