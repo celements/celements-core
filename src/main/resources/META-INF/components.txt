@@ -56,3 +56,4 @@ com.celements.web.service.MobileLoggingScriptService
 com.celements.rendering.XHTMLtoHTML5cleanup
 com.celements.navigation.presentation.LayoutEditorPresentationType
 com.celements.navigation.event.converter.TreeNodeEventConverter
+com.celements.rteConfig.classes.RTEConfigClasses
