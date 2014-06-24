@@ -42,6 +42,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -359,29 +360,32 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public DocumentReference resolveDocumentReference(String fullName) {
-    return resolveDocumentReference(fullName, new WikiReference(getContext(
-        ).getDatabase()));
+    return resolveDocumentReference(fullName, null);
   }
 
   public DocumentReference resolveDocumentReference(String fullName, 
       WikiReference wikiRef) {
-    DocumentReference docRef = new DocumentReference(referenceResolver.resolve(fullName, 
-        EntityType.DOCUMENT, wikiRef));
-    LOGGER.debug("resolveDocumentReference: for [" + fullName + "] got reference [" 
-        + docRef + "].");
-    return docRef;
+    return new DocumentReference(resolveEntityReference(fullName, EntityType.DOCUMENT, 
+        wikiRef));
   }
 
   public SpaceReference resolveSpaceReference(String spaceName) {
-    String wikiName;
-    if (spaceName.contains(":")) {
-      wikiName = spaceName.split(":")[0];
-      spaceName = spaceName.split(":")[1];
-    } else {
-      wikiName = getContext().getDatabase();
+    return resolveSpaceReference(spaceName, null);
+  }
+
+  public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef) {
+    return new SpaceReference(resolveEntityReference(spaceName, EntityType.SPACE, 
+        wikiRef));
+  }
+
+  private EntityReference resolveEntityReference(String name, EntityType type, 
+      WikiReference wikiRef) {
+    if (wikiRef == null) {
+      wikiRef = new WikiReference(getContext().getDatabase());
     }
-    SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
-    return spaceRef;
+    EntityReference ref = referenceResolver.resolve(name, type, wikiRef);
+    LOGGER.debug("resolveEntityReference: for [" + name + "] got reference [" + ref + "]");
+    return ref;
   }
 
   public boolean isAdminUser() {
