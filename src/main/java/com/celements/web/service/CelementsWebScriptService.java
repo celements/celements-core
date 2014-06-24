@@ -21,6 +21,7 @@ package com.celements.web.service;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +46,7 @@ import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.rendering.RenderCommand;
+import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
 import com.celements.validation.IFormValidationServiceRole;
 import com.celements.validation.ValidationType;
@@ -86,6 +88,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   ITreeNodeCache treeNodeCacheService;
+
+  @Requirement
+  IRTEConfigTemplateRole rteConfigTemplateService;
 
   @Requirement
   Execution execution;
@@ -645,6 +650,21 @@ public class CelementsWebScriptService implements ScriptService {
   @Deprecated
   public void flushMenuItemCache() {
     treeNodeCacheService.flushMenuItemCache();
+  }
+
+  public List<com.xpn.xwiki.api.Object> getRTETemplateList() {
+    try {
+      List<BaseObject> rteTemplateList = rteConfigTemplateService.getRTETemplateList();
+      List<com.xpn.xwiki.api.Object> rteTemplateListExternal =
+          new ArrayList<com.xpn.xwiki.api.Object>();
+      for(BaseObject rteTmpl : rteTemplateList) {
+        rteTemplateListExternal.add(rteTmpl.newObjectApi(rteTmpl, getContext()));
+      }
+      return rteTemplateListExternal;
+    } catch (XWikiException exp) {
+      LOGGER.error("getRTETemplateList failed.", exp);
+    }
+    return Collections.emptyList();
   }
 
 }
