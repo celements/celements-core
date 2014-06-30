@@ -51,6 +51,7 @@ import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.DocMetaTagsCmd;
+import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.PlainTextCommand;
@@ -70,6 +71,9 @@ import com.xpn.xwiki.util.Util;
 public class CelementsWebScriptService implements ScriptService {
 
   public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
+  
+  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
+      "com.celements.web.ExternalJavaScriptFilesCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebScriptService.class);
@@ -670,5 +674,25 @@ public class CelementsWebScriptService implements ScriptService {
   public void flushMenuItemCache() {
     treeNodeCacheService.flushMenuItemCache();
   }
+  
+  public String getAllExternalJavaScriptFiles() throws XWikiException {
+    return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
+  }
+  
+  public String addExtJSfileOnce(String jsFile) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
+  }
 
+  public String addExtJSfileOnce(String jsFile, String action) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+  }
+  
+  private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
+    if (getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
+      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand(
+          getContext()));
+    }
+    return (ExternalJavaScriptFilesCommand) getContext().get(
+        JAVA_SCRIPT_FILES_COMMAND_KEY);
+  }
 }

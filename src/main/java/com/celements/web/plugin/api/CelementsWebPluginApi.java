@@ -74,6 +74,7 @@ import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
+import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RemoteUserValidator;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
@@ -105,8 +106,13 @@ public class CelementsWebPluginApi extends Api {
 
   public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
+  /**
+   * @Deprecated: 
+   *  
+   */
+  @Deprecated
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
-      "com.celements.web.ExternalJavaScriptFilesCommand";
+      CelementsWebScriptService.JAVA_SCRIPT_FILES_COMMAND_KEY;
 
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
       "com.celements.web.PageLayoutCommand";
@@ -371,16 +377,12 @@ public class CelementsWebPluginApi extends Api {
     return plugin.getVersionMode(context);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use celementsweb script service
+   */
+  @Deprecated
   public String getAllExternalJavaScriptFiles() throws XWikiException {
-    return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
-  }
-
-  private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
-    if (context.get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
-      context.put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand(
-          context));
-    }
-    return (ExternalJavaScriptFilesCommand) context.get(JAVA_SCRIPT_FILES_COMMAND_KEY);
+    return getScriptService().getAllExternalJavaScriptFiles();
   }
 
   /**
@@ -399,16 +401,24 @@ public class CelementsWebPluginApi extends Api {
     return getScriptService().displayImageMapConfigs();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use celementsweb script service
+   */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
+    return getScriptService().addExtJSfileOnce(jsFile);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use celementsweb script service
+   */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile, String action) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+    return getScriptService().addExtJSfileOnce(jsFile, action);
   }
 
   public String getUsernameForUserData(String login) {
-    String possibleLogins = plugin.getPossibleLogins(context);
+    String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
     String account = "";
     try {
       LOGGER.debug("executing getUsernameForUserData in plugin");
