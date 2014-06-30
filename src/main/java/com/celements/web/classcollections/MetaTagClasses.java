@@ -22,48 +22,50 @@ package com.celements.web.classcollections;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.CelementsClassCollection;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.metaTag.classes")
-public class MetaTagClasses extends CelementsClassCollection {
+public class MetaTagClasses extends AbstractClassCollection {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(MetaTagClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(MetaTagClasses.class);
 
-  @Requirement
-  Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
+  public static final String META_TAG_CLASS_SPACE = "Classes";
+  public static final String META_TAG_CLASS_DOC = "MetaTagClass";
+  public static final String META_TAG_CLASS = META_TAG_CLASS_SPACE + "."
+        + META_TAG_CLASS_DOC;
 
   @Override
   protected Log getLogger() {
-    return mLogger;
+    return LOGGER;
+  }
+
+  public String getConfigName() {
+    return "metaTag";
   }
 
   @Override
-  protected void initClasses(XWikiContext context) throws XWikiException {
+  protected void initClasses() throws XWikiException {
     getMetaTagClass();
   }
   
-  BaseClass getMetaTagClass() throws XWikiException {
+  public DocumentReference getMetaTagClassRef(String wikiName) {
+    return new DocumentReference(wikiName, META_TAG_CLASS_SPACE, META_TAG_CLASS_DOC);
+  }
+
+  private BaseClass getMetaTagClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "MetaTagClass");
+    DocumentReference classRef = getMetaTagClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      mLogger.error(exp);
+      LOGGER.error("Failed to get " + META_TAG_CLASS + " document", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -79,13 +81,8 @@ public class MetaTagClasses extends CelementsClassCollection {
       bclass.setCustomMapping("internal");
     }
 
-    setContentAndSaveClassDocument(doc, needsUpdate, getContext());
+    setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
-  }
-
-
-  public String getConfigName() {
-    return "metaTag";
   }
 
 }

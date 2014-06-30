@@ -188,6 +188,7 @@ public class Navigation implements INavigation {
   public void setPresentationType(String presentationTypeHint) {
     if (presentationTypeHint != null) {
       try {
+        LOGGER.info("setPresentationType to [" + presentationTypeHint + "].");
         setPresentationType(Utils.getComponentManager().lookup(
             IPresentationTypeRole.class, presentationTypeHint));
       } catch (ComponentLookupException failedToLoadException) {
@@ -587,12 +588,29 @@ public class Navigation implements INavigation {
       if (isActiveMenuItem(docRef)) {
         cssClass += " active";
       }
+      if (isRestrictedRights(docRef)) {
+        cssClass += " cel_nav_restricted_rights";
+      }
     }
     return cssClass.trim();
   }
 
+  boolean isRestrictedRights(DocumentReference docRef) {
+    try {
+      return !getContext().getWiki().getRightService().hasAccessLevel("view",
+          "XWiki.XWikiGuest", getWebUtilsService().getRefLocalSerializer().serialize(
+              docRef), getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to check isRestrictedRights for [" + docRef + "].", exp);
+    }
+    return false;
+  }
+
   String getPageLayoutName(DocumentReference docRef) {
-    SpaceReference pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
+    SpaceReference pageLayoutRef = getPresentationType().getPageLayoutForDoc(docRef);
+    if (pageLayoutRef == null) {
+      pageLayoutRef = pageLayoutCmd.getPageLayoutForDoc(docRef);
+    }
     if (pageLayoutRef != null) {
       return "layout_" + pageLayoutRef.getName();
     }
@@ -758,7 +776,7 @@ public class Navigation implements INavigation {
 
   private void generateLanguageMenu(INavigationBuilder navBuilder,
       XWikiContext context) {
-    List<String> langs = WebUtils.getInstance().getAllowedLanguages(context);
+    List<String> langs = getWebUtilsService().getAllowedLanguages();
     mainUlCssClasses += " language";
     navBuilder.openLevel(mainUlCssClasses);
     for (String language : langs) {

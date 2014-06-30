@@ -32,6 +32,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celCellsClasses")
 public class CellsClasses extends AbstractClassCollection {
 
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CellsClasses.class);
 
@@ -39,6 +40,7 @@ public class CellsClasses extends AbstractClassCollection {
   public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
   public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
     + CELEMENTS_CELL_CLASS_NAME;
+  public static final String CELLCLASS_IDNAME_FIELD = "idname";
 
   public CellsClasses() {}
 
@@ -72,15 +74,15 @@ public class CellsClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(cellClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get cell class document.", exp);
       doc = new XWikiDocument(cellClassRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(cellClassRef);
-    needsUpdate |= bclass.addTextField("idname", "id attribute", 30);
+    needsUpdate |= bclass.addTextField(CELLCLASS_IDNAME_FIELD, "id attribute", 30);
     needsUpdate |= bclass.addTextField("css_classes", "CSS Classes", 30);
     needsUpdate |= bclass.addTextAreaField("css_styles", "CSS Styles", 15, 20);
     
@@ -106,8 +108,8 @@ public class CellsClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(pageLayoutPropertiesClassRef,
           getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get pageLayoutProperties class document.", exp);
       doc = new XWikiDocument(pageLayoutPropertiesClassRef);
       needsUpdate = true;
     }
@@ -119,6 +121,8 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("authors", "Authors", 30);
     needsUpdate |= bclass.addTextAreaField("license", "License", 15, 30);
     needsUpdate |= bclass.addTextField("version", "Version", 30);
+    needsUpdate |= bclass.addStaticListField("doctype", "Doctype", 1, false, 
+        "XHTML 1.1|HTML 5", "select");
     
     if(!"internal".equals(bclass.getCustomMapping())){
       needsUpdate = true;
@@ -141,8 +145,8 @@ public class CellsClasses extends AbstractClassCollection {
     
     try {
       doc = getContext().getWiki().getDocument(groupCellClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get groupCell class document.", exp);
       doc = new XWikiDocument(groupCellClassRef);
       needsUpdate = true;
     }
@@ -167,8 +171,8 @@ public class CellsClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(pageDepCellConfigClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get pageDepCellConfig class document.", exp);
       doc = new XWikiDocument(pageDepCellConfigClassRef);
       needsUpdate = true;
     }

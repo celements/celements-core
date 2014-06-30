@@ -109,6 +109,25 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(1, list.get(4).getIntValue("i"));
   }
   
+  @Test
+  public void testGetObjectsOrdered_severalObjects_unset_fields() {
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
+        ).getDatabase(), "S", "D"));
+    for (BaseObject obj : getSortTestBaseObjects()) {
+      doc.addXObject(obj);
+    }
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), 
+        "dnull", true, "s1", true);
+    assertEquals(5, list.size());
+    assertNull(list.get(0).getDateValue("dnull"));
+    assertEquals("a", list.get(0).getStringValue("s1"));
+    assertNull(list.get(1).getDateValue("dnull"));
+    assertEquals("c", list.get(1).getStringValue("s1"));
+    assertEquals(100l, list.get(2).getDateValue("dnull").getTime());
+    assertEquals(200l, list.get(3).getDateValue("dnull").getTime());
+    assertEquals(400l, list.get(4).getDateValue("dnull").getTime());
+  }
+  
   private DocumentReference getBOClassRef() {
     return new DocumentReference(getContext().getDatabase(), "Classes", "TestClass");
   }
@@ -129,6 +148,7 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     obj.setStringValue("s2", "t");
     obj.setIntValue("i", 2);
     obj.setDateValue("d", new Date(400l));
+    obj.setDateValue("dnull", new Date(400l));
     obj.setLongValue("l", 1l);
     objs.add(obj);
     obj = new BaseObject();
@@ -145,6 +165,7 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     obj.setStringValue("s2", "s");
     obj.setIntValue("i", 2);
     obj.setDateValue("d", new Date(200l));
+    obj.setDateValue("dnull", new Date(200l));
     obj.setLongValue("l", 4l);
     objs.add(obj);
     obj = new BaseObject();
@@ -153,6 +174,7 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     obj.setStringValue("s2", "v");
     obj.setIntValue("i", 2);
     obj.setDateValue("d", new Date(100l));
+    obj.setDateValue("dnull", new Date(100l));
     obj.setLongValue("l", 3l);
     objs.add(obj);
     return objs;

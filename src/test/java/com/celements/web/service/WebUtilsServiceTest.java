@@ -3,6 +3,7 @@ package com.celements.web.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,8 +42,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_WebUtilsServiceTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
@@ -55,11 +55,11 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     doc.setParentReference((EntityReference)null);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    replayAll();
+    replayDefault();
     context.setDoc(doc);
     assertNull(doc.getParentReference());
     assertNull(webUtilsService.getParentForLevel(1)); //root
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -75,10 +75,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).once();
     expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).once();
-    replayAll();
+    replayDefault();
     context.setDoc(doc);
     assertEquals(parentRef,webUtilsService.getParentForLevel(2));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -94,10 +94,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).once();
     expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).once();
-    replayAll();
+    replayDefault();
     context.setDoc(doc);
     assertEquals(docRef,webUtilsService.getParentForLevel(3));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -113,12 +113,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).times(3);
     expect(xwiki.getDocument(eq(parentRef), same(context))).andReturn(docP).times(3);
     expect(xwiki.exists(eq(parentRef), same(context))).andReturn(true).times(3);
-    replayAll();
+    replayDefault();
     context.setDoc(doc);
     assertNull(webUtilsService.getParentForLevel(4));
     assertNull(webUtilsService.getParentForLevel(0));
     assertNull(webUtilsService.getParentForLevel(-1));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -140,9 +140,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(parentRef2), same(context))).andReturn(docP2).once();
     expect(xwiki.exists(eq(parentRef2), same(context))).andReturn(true).once();
     List<DocumentReference> docParentsList = Arrays.asList(parentRef1, parentRef2);
-    replayAll();
+    replayDefault();
     assertEquals(docParentsList, webUtilsService.getDocumentParentsList(docRef, false));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -166,9 +166,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(parentRef2), same(context))).andReturn(true).once();
 
     List<DocumentReference> docParentsList = Arrays.asList(docRef, parentRef1, parentRef2);
-    replayAll();
+    replayDefault();
     assertEquals(docParentsList, webUtilsService.getDocumentParentsList(docRef, true));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -188,11 +188,11 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         eq(context.getDoc()), same(context))).andReturn("<table>blabla</table>"
             ).atLeastOnce();
 
-    replayAll(doc, mockRenderer);
+    replayDefault(doc, mockRenderer);
     String json ="[{\"content\" : \"<table>blabla</table>\", \"section\" : 2," +
         " \"sectionNr\" : 3}]";
     assertEquals(json, webUtilsService.getDocSectionAsJSON("(?=<table)", docRef, 2));
-    verifyAll(doc, mockRenderer);
+    verifyDefault(doc, mockRenderer);
   }
 
   @Test
@@ -206,9 +206,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(doc.getTranslatedDocument(same(context))
         ).andReturn(new XWikiDocument(transDocRef)).once();
 
-    replayAll(doc);
+    replayDefault(doc);
     assertNull(webUtilsService.getDocSection("(?=<table)", docRef, 1));
-    verifyAll(doc);
+    verifyDefault(doc);
   }
 
   @Test
@@ -227,9 +227,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRenderer.renderText(eq("{pre}abc{/pre}"), eq(context.getDoc()), same(context))
         ).andReturn("abc").atLeastOnce();
 
-    replayAll(doc, mockRenderer);
+    replayDefault(doc, mockRenderer);
     assertEquals("abc", webUtilsService.getDocSection("(?=<table)", docRef, 1));
-    verifyAll(doc, mockRenderer);
+    verifyDefault(doc, mockRenderer);
   }
 
   @Test
@@ -248,10 +248,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRenderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()),
         same(context))).andReturn("<table>blabla</table>").atLeastOnce();
 
-    replayAll(doc, mockRenderer);
+    replayDefault(doc, mockRenderer);
     assertEquals("<table>blabla</table>",
         webUtilsService.getDocSection("(?=<table)", docRef, 1));
-    verifyAll(doc, mockRenderer);
+    verifyDefault(doc, mockRenderer);
   }
 
   @Test
@@ -270,10 +270,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRenderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(context.getDoc()),
         same(context))).andReturn("<table>blabla</table>").atLeastOnce();
 
-    replayAll(doc, mockRenderer);
+    replayDefault(doc, mockRenderer);
     assertEquals("<table>blabla</table>", webUtilsService.getDocSection("(?=<table)",
         docRef, 2));
-    verifyAll(doc, mockRenderer);
+    verifyDefault(doc, mockRenderer);
   }
 
   @Test
@@ -292,10 +292,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRenderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(context.getDoc()),
         same(context))).andReturn("<table>abc</table>").atLeastOnce();
 
-    replayAll(doc, mockRenderer);
+    replayDefault(doc, mockRenderer);
     assertEquals("<table>abc</table>", webUtilsService.getDocSection("(?=<table)",
         docRef, 3));
-    verifyAll(doc, mockRenderer);
+    verifyDefault(doc, mockRenderer);
   }
 
   @Test
@@ -308,9 +308,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).once();
 
-    replayAll(doc);
+    replayDefault(doc);
     assertEquals(0, webUtilsService.countSections("", docRef));
-    verifyAll(doc);
+    verifyDefault(doc);
   }
 
   @Test
@@ -324,9 +324,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    replayAll(doc);
+    replayDefault(doc);
     assertEquals(1, webUtilsService.countSections("(?=<table)", docRef));
-    verifyAll(doc);
+    verifyDefault(doc);
   }
 
   @Test
@@ -340,9 +340,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    replayAll(doc);
+    replayDefault(doc);
     assertEquals(1, webUtilsService.countSections("(?=<table)", docRef));
-    verifyAll(doc);
+    verifyDefault(doc);
   }
 
   @Test
@@ -356,9 +356,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     expect(doc.getTranslatedDocument(same(context))).andReturn(transDoc).atLeastOnce();
-    replayAll(doc);
+    replayDefault(doc);
     assertEquals(3, webUtilsService.countSections("(?=<table)", docRef));
-    verifyAll(doc);
+    verifyDefault(doc);
   }
 
   @Test
@@ -391,12 +391,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
     expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
         ).andReturn("de");
-    replayAll();
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser(userName);
     assertEquals("de", webUtilsService.getAdminLanguage());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -413,12 +413,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     userObj.setStringValue("admin_language", "fr");
     userDoc.setXObject(0, userObj);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayAll();
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser(userName);
     assertEquals("fr", webUtilsService.getAdminLanguage());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -435,12 +435,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     userObj.setStringValue("admin_language", "fr");
     userDoc.setXObject(0, userObj);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayAll();
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.NotMyUser");
     assertEquals("fr", webUtilsService.getAdminLanguage(userName));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -459,12 +459,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     userObj.setStringValue("admin_language", "");
     userDoc.setXObject(0, userObj);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(userDoc);
-    replayAll();
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.NotMyUser");
     assertEquals("en", webUtilsService.getAdminLanguage(userName));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -485,12 +485,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
         ).andReturn("");
     expect(xwiki.Param(eq("celements.admin_language"))).andReturn("");
-    replayAll();
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser(userName);
     assertEquals(systemDefaultAdminLang, webUtilsService.getAdminLanguage());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -500,12 +500,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     context.setDoc(new XWikiDocument(currentDocRef));
     expect(xwiki.getRightService()).andReturn(null).anyTimes();
 
-    replayAll();
+    replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.TestUser");
     assertFalse(webUtilsService.isAdminUser());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -515,12 +515,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     //hasAdminRights must not be called it will fail with an NPE
 
-    replayAll(mockRightsService);
+    replayDefault(mockRightsService);
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.TestUser");
     assertFalse(webUtilsService.isAdminUser());
-    verifyAll(mockRightsService);
+    verifyDefault(mockRightsService);
   }
 
   @Test
@@ -538,12 +538,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     List<DocumentReference> emptyGroupList = Collections.emptyList();
     expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
         same(context))).andReturn(emptyGroupList).atLeastOnce();
-    replayAll(mockRightsService, groupServiceMock);
+    replayDefault(mockRightsService, groupServiceMock);
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.TestUser");
     assertFalse(webUtilsService.isAdminUser());
-    verifyAll(mockRightsService, groupServiceMock);
+    verifyDefault(mockRightsService, groupServiceMock);
   }
 
   @Test
@@ -562,12 +562,12 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         "XWiki", "XWikiAdminGroup");
     expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
         same(context))).andReturn(Arrays.asList(adminGroupDocRef)).atLeastOnce();
-    replayAll(mockRightsService, groupServiceMock);
+    replayDefault(mockRightsService, groupServiceMock);
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.TestUser");
     assertTrue(webUtilsService.isAdminUser());
-    verifyAll(mockRightsService, groupServiceMock);
+    verifyDefault(mockRightsService, groupServiceMock);
   }
 
   @Test
@@ -579,14 +579,14 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).anyTimes();
 
-    replayAll(mockRightsService);
+    replayDefault(mockRightsService);
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.TestUser");
     assertNotNull(context.getXWikiUser());
     assertNotNull(context.getDoc());
     assertTrue(webUtilsService.isAdminUser());
-    verifyAll(mockRightsService);
+    verifyDefault(mockRightsService);
   }
 
   @Test
@@ -602,14 +602,14 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     XWikiDocument guestUserDoc = new XWikiDocument(userDocRef);
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(guestUserDoc
         ).anyTimes();
-    replayAll(mockRightsService);
+    replayDefault(mockRightsService);
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
     context.setUser("XWiki.XWikiGuest");
     assertNotNull(context.getXWikiUser());
     assertNotNull(context.getDoc());
     assertFalse(webUtilsService.isAdvancedAdmin());
-    verifyAll(mockRightsService);
+    verifyDefault(mockRightsService);
   }
 
   @Test
@@ -713,43 +713,70 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testResolveDocumentReference_mainWiki() {
-    replayAll();
+    replayDefault();
     DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
         "xwiki:XWiki.test");
     assertEquals("xwiki", testDocRef.getWikiReference().getName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testResolveDocumentReference_localWiki() {
-    replayAll();
+    replayDefault();
     DocumentReference testDocRef = webUtilsService.resolveDocumentReference("XWiki.test");
     assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
-    verifyAll();
+    verifyDefault();
+  }
+
+  @Test
+  public void testResolveDocumentReference_wikiRef_null() {
+    replayDefault();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "XWiki.test", null);
+    assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
+    verifyDefault();
+  }
+
+  @Test
+  public void testResolveDocumentReference_wikiRef_with() {
+    replayDefault();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "XWiki.test", new WikiReference("database"));
+    assertEquals("database", testDocRef.getWikiReference().getName());
+    verifyDefault();
+  }
+
+  @Test
+  public void testResolveDocumentReference_wikiRef_inName() {
+    replayDefault();
+    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
+        "xwiki:XWiki.test", new WikiReference("database"));
+    assertEquals("xwiki", testDocRef.getWikiReference().getName());
+    verifyDefault();
   }
 
   @Test
   public void testResolveSpaceReference_mainWiki() {
-    replayAll();
+    replayDefault();
     SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference(
         "myMasterCellWiki:XWiki");
     EntityReference parent = testSpaceRef.getParent();
     assertEquals(WikiReference.class, parent.getClass());
     assertEquals("myMasterCellWiki", parent.getName());
     assertEquals("XWiki", testSpaceRef.getName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testResolveSpaceReference_localWiki() {
-    replayAll();
+    replayDefault();
     context.setDatabase("myFirstWiki");
     SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference("mySpace");
     EntityReference parent = testSpaceRef.getParent();
     assertEquals(WikiReference.class, parent.getClass());
     assertEquals(context.getDatabase(), parent.getName());
     assertEquals("mySpace", testSpaceRef.getName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -862,13 +889,13 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     Attachment att2 = createMock(Attachment.class);
     Attachment att3 = createMock(Attachment.class);
     List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
-    replayAll(att1, att2, att3);
+    replayDefault(att1, att2, att3);
     List<Attachment> resultList = webUtilsService.reduceListToSize(attachments, 0, 5);
     assertEquals(3, resultList.size());
     assertTrue(resultList.contains(att1));
     assertTrue(resultList.contains(att2));
     assertTrue(resultList.contains(att3));
-    verifyAll(att1, att2, att3);
+    verifyDefault(att1, att2, att3);
   }
 
   @Test
@@ -877,13 +904,13 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     Attachment att2 = createMock(Attachment.class);
     Attachment att3 = createMock(Attachment.class);
     List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
-    replayAll(att1, att2, att3);
+    replayDefault(att1, att2, att3);
     List<Attachment> resultList = webUtilsService.reduceListToSize(attachments, 0, 2);
     assertEquals(2, resultList.size());
     assertTrue(resultList.contains(att1));
     assertTrue(resultList.contains(att2));
     assertFalse(resultList.contains(att3));
-    verifyAll(att1, att2, att3);
+    verifyDefault(att1, att2, att3);
   }
 
   @Test
@@ -892,13 +919,13 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     Attachment att2 = createMock(Attachment.class);
     Attachment att3 = createMock(Attachment.class);
     List<Attachment> attachments = Arrays.asList(att1 , att2, att3);
-    replayAll(att1, att2, att3);
+    replayDefault(att1, att2, att3);
     List<Attachment> resultList = webUtilsService.reduceListToSize(attachments, 1, 5);
     assertEquals(2, resultList.size());
     assertFalse(resultList.contains(att1));
     assertTrue(resultList.contains(att2));
     assertTrue(resultList.contains(att3));
-    verifyAll(att1, att2, att3);
+    verifyDefault(att1, att2, att3);
   }
 
   @Test
@@ -906,19 +933,19 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     String wikiName = "myTestWikiName";
     DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName"
         );
-    replayAll();
+    replayDefault();
     assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(docRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetAllowedLanguages_NPE() {
     context.setDoc(null);
-    replayAll();
+    replayDefault();
     List<String> resultList = Arrays.asList();
     assertEquals("Expect empty list if no context or current doc available.", resultList,
         webUtilsService.getAllowedLanguages());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -931,11 +958,11 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         ).anyTimes();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
         ).andReturn("de,en").once();
-    replayAll();
+    replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
         webUtilsService.getAllowedLanguages());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -948,11 +975,11 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         ).anyTimes();
     expect(xwiki.getSpacePreference(eq("languages"), eq("testSpace"), eq(""),
         same(context))).andReturn("de,en").once();
-    replayAll();
+    replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
         webUtilsService.getAllowedLanguages("testSpace"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -967,11 +994,11 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         ).anyTimes();
     expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context))
         ).andReturn("de en").once();
-    replayAll();
+    replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
         webUtilsService.getAllowedLanguages());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -986,36 +1013,36 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         ).anyTimes();
     expect(xwiki.getSpacePreference(eq("language"), eq("testSpace"), eq(""),
         same(context))).andReturn("de en").once();
-    replayAll();
+    replayDefault();
     List<String> resultList = Arrays.asList("de", "en");
     assertEquals("Expect languages from space preferences", resultList,
         webUtilsService.getAllowedLanguages("testSpace"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetParentSpace() {
     expect(xwiki.getSpacePreference(eq("parent"), same(context))).andReturn(
         "parentSpaceName").atLeastOnce();
-    replayAll();
+    replayDefault();
     assertEquals("parentSpaceName", webUtilsService.getParentSpace());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetParentSpace_spaceName() {
     expect(xwiki.getSpacePreference(eq("parent"), eq("mySpace"), eq(""), same(context))
         ).andReturn("parentSpaceName").atLeastOnce();
-    replayAll();
+    replayDefault();
     assertEquals("parentSpaceName", webUtilsService.getParentSpace("mySpace"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetRequestParameterMap_none() {
-    replayAll();
+    replayDefault();
     Map<String, String[]> requestMap = webUtilsService.getRequestParameterMap();
-    verifyAll();
+    verifyDefault();
 
     assertNull(requestMap);
   }
@@ -1030,9 +1057,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
     expect(mockXWikiRequest.getParameterMap()).andReturn(requestMap).once();
 
-    replayAll(mockXWikiRequest);
+    replayDefault(mockXWikiRequest);
     Map<String, String[]> request = webUtilsService.getRequestParameterMap();
-    verifyAll(mockXWikiRequest);
+    verifyDefault(mockXWikiRequest);
 
     assertNotNull(request);
     assertEquals(2, request.size());
@@ -1049,9 +1076,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetInheritedTemplatedPath_null() {
-    replayAll();
+    replayDefault();
     assertNull(webUtilsService.getInheritedTemplatedPath(null));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1059,10 +1086,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
         "Templates", "myView");
     expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
-    replayAll();
+    replayDefault();
     assertEquals("Templates.myView", webUtilsService.getInheritedTemplatedPath(
         localTemplateRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1073,10 +1100,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web",
         "Templates", "myView");
     expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
-    replayAll();
+    replayDefault();
     assertEquals("celements2web:Templates.myView",
         webUtilsService.getInheritedTemplatedPath(localTemplateRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1084,10 +1111,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web",
         "Templates", "myView");
     expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
-    replayAll();
+    replayDefault();
     assertEquals("celements2web:Templates.myView",
         webUtilsService.getInheritedTemplatedPath(centralTemplateRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1095,10 +1122,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web",
         "Templates", "myView");
     expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
-    replayAll();
+    replayDefault();
     assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
         centralTemplateRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1109,10 +1136,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web",
         "Templates", "myView");
     expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
-    replayAll();
+    replayDefault();
     assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
         localTemplateRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1120,10 +1147,10 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralTemplateRef = new DocumentReference("celements2web",
         "Templates", "myView");
     expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
-    replayAll();
+    replayDefault();
     assertEquals(":Templates.myView", webUtilsService.getInheritedTemplatedPath(
         centralTemplateRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -1136,6 +1163,164 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetTemplatePathOnDisk_Ajax() {
     assertEquals("/templates/celAjax/myScript.vm",
         webUtilsService.getTemplatePathOnDisk(":Ajax.myScript"));
+  }
+
+  @Test
+  public void testRenderInheritableDocument_local_exists() throws Exception {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(true).once();
+    XWikiDocument localTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
+    expect(localTemplateDocDef.getDocumentReference()).andReturn(localTemplateRef
+        ).anyTimes();
+    expect(xwiki.getDocument(eq(localTemplateRef), same(context))).andReturn(
+        localTemplateDocDef).once();
+    String localScriptText = "my expected local script";
+    expect(localTemplateDocDef.getTranslatedContent(eq("de"), same(context))).andReturn(
+        localScriptText);
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy")).anyTimes();
+    String expectedRenderedText = "my expected rendered local script";
+    expect(mockRenderingEngine.renderText(eq(localScriptText), same(localTemplateDocDef),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "de"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_central_exists() throws Exception {
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(true).once();
+    XWikiDocument centralTemplateDocDef = createMockAndAddToDefault(XWikiDocument.class);
+    expect(centralTemplateDocDef.getDocumentReference()).andReturn(centralTemplateRef
+        ).anyTimes();
+    expect(xwiki.getDocument(eq(centralTemplateRef), same(context))).andReturn(
+        centralTemplateDocDef).once();
+    String centralScriptText = "my expected central script";
+    expect(centralTemplateDocDef.getTranslatedContent(eq("en"), same(context))).andReturn(
+        centralScriptText);
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    expect(mockRenderingEngine.getRendererNames()).andReturn(Arrays.asList("velocity",
+        "groovy")).anyTimes();
+    String expectedRenderedText = "my expected rendered central script";
+    expect(mockRenderingEngine.renderText(eq(centralScriptText), same(
+        centralTemplateDocDef), (XWikiDocument) isNull(), same(context))).andReturn(
+            expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText,webUtilsService.renderInheritableDocument(
+        localTemplateRef, "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_disk_langSpecific_no_local_no_central(
+      ) throws Exception {
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    String diskScriptText = "my expected disk script fr";
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))
+        ).andReturn(diskScriptText).once();
+    String expectedRenderedText = "my expected rendered disk script";
+    expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    //TODO check for language doc on disc
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "fr"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_disk_noLang_no_local_no_central(
+      ) throws Exception {
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
+        new IOException()).once();
+    String diskScriptText = "my expected disk script";
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView.vm"))).andReturn(
+        diskScriptText).once();
+    String expectedRenderedText = "my expected rendered disk script";
+    expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "fr"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testRenderInheritableDocument_disk_defLang_no_local_no_central(
+      ) throws Exception {
+    XWikiRenderingEngine mockRenderingEngine = createMockAndAddToDefault(
+        XWikiRenderingEngine.class);
+    DocumentReference localTemplateRef = new DocumentReference(context.getDatabase(),
+        "Templates", "myView");
+    expect(xwiki.exists(eq(localTemplateRef), same(context))).andReturn(false).once();
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        "Templates", "myView");
+    expect(xwiki.exists(eq(centralTemplateRef), same(context))).andReturn(false).once();
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_fr.vm"))).andThrow(
+        new IOException()).once();
+    String diskScriptText = "my expected disk script";
+    expect(xwiki.getResourceContent(eq("/templates/celTemplates/myView_en.vm"))
+        ).andReturn(diskScriptText).once();
+    String expectedRenderedText = "my expected rendered disk script";
+    expect(mockRenderingEngine.renderText(eq(diskScriptText), (XWikiDocument) isNull(),
+        (XWikiDocument) isNull(), same(context))).andReturn(expectedRenderedText).once();
+    replayDefault();
+    webUtilsService.injectedRenderingEngine = mockRenderingEngine;
+    assertEquals(expectedRenderedText, webUtilsService.renderInheritableDocument(
+        localTemplateRef, "fr", "en"));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsSuperAdminUser() throws Exception {
+    context.setUser("XWiki.MyAdmin");
+    context.setMainXWiki("main");
+    context.setDatabase("main");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setParentReference((EntityReference)null);
+    context.setDoc(doc);
+    XWikiRightService mockRightsService = createMockAndAddToDefault(
+        XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    assertNotNull("check precondition", context.getXWikiUser());
+    assertNotNull("check precondition", context.getDoc());
+    assertTrue("check precondition", context.isMainWiki());
+    assertTrue("isSuperAdminUser must be true for admins in Main Wiki.",
+        webUtilsService.isSuperAdminUser());
+    verifyDefault();
   }
 
   //*****************************************************************
@@ -1189,16 +1374,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     obj.setLongValue("l", 3l);
     objs.add(obj);
     return objs;
-  }
-
-  private void replayAll(Object ... mocks) {
-    replay(xwiki);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object ... mocks) {
-    verify(xwiki);
-    verify(mocks);
   }
 
 }

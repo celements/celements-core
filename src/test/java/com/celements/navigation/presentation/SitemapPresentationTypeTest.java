@@ -100,10 +100,11 @@ public class SitemapPresentationTypeTest extends AbstractBridgedComponentTestCas
     replayAll();
     sitemapPres.addLanguageLinks(outStream, currentDocRef);
     assertEquals("<div class=\"docLangs\"><a title=\"German\" href=\"" + currDocDeEditUrlStr
-        + "\" class=\"defaultLanguage transExists\">de</a><a title=\"French\" href=\""
-        + currDocFrEditUrlStr + "\" class=\"transNotExists\">fr</a><a title=\"English\""
-        + " href=\"" + currDocEnEditUrlStr + "\" class=\"transExists\">en</a></div>",
-        outStream.toString());
+        + "\" target=\"_blank\" class=\"defaultLanguage transExists\">de</a>"
+        + "<a title=\"French\" href=\"" + currDocFrEditUrlStr
+        + "\" target=\"_blank\" class=\"transNotExists\">fr</a><a title=\"English\""
+        + " href=\"" + currDocEnEditUrlStr + "\" target=\"_blank\" class=\"transExists\">"
+        + "en</a></div>", outStream.toString());
     verifyAll();
   }
 

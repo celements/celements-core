@@ -35,7 +35,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class UserNameForUserDataCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       UserNameForUserDataCommand.class);
 
   public String getUsernameForUserData(String login, String possibleLogins,
@@ -60,7 +60,7 @@ public class UserNameForUserDataCommand {
       
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, context);
-      mLogger.info("searching users for " + login + " and found " + users.size());
+      LOGGER.info("searching users for " + login + " and found " + users.size());
       
       int usersFound = 0;
       for (String tmpUserDoc : users) {
@@ -70,7 +70,7 @@ public class UserNameForUserDataCommand {
         }
       }
       if(usersFound > 1){
-        mLogger.warn("Found more than one user for login '" + login
+        LOGGER.warn("Found more than one user for login '" + login
             + "' in possible fields '" + possibleLogins + "'");
         return null;
       }
@@ -97,7 +97,7 @@ public class UserNameForUserDataCommand {
       }
     }
     
-    mLogger.info("Find login for '" + login + "' in fields: '"
+    LOGGER.info("Find login for '" + login + "' in fields: '"
         + possibleLogins + "' Result: '" + userDoc + "'");
     
     return userDoc;

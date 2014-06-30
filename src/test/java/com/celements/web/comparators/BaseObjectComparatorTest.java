@@ -3,14 +3,11 @@ package com.celements.web.comparators;
 import static org.junit.Assert.*;
 
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
@@ -117,6 +114,20 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
+  public void testCompare_null() {
+    BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
+    BaseObject obj1 = new BaseObject();
+    BaseObject obj2 = new BaseObject();
+    obj1.setDateValue("x", new Date(1000000));
+    obj2.setDateValue("x", null);
+    assertEquals(1, comp.compare(obj1, obj2));
+    obj1.setDateValue("x", null);
+    assertEquals(0, comp.compare(obj1, obj2));
+    obj2.setDateValue("x", new Date(541342131));
+    assertEquals(-1, comp.compare(obj1, obj2));
+  }
+
+  @Test
   public void testCompareFieldStringPropertyStringProperty() {
     BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);
     StringProperty prop1 = new StringProperty();
@@ -179,7 +190,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase{
     prop2.setValue(new Date(541342131));
     assertEquals(-1, comp.compareField(prop1, prop2));
   }
-
+  
   @Test
   public void testGetValue() {
     BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);

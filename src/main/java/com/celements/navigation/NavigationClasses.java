@@ -33,10 +33,25 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celNavigationClasses")
 public class NavigationClasses extends AbstractClassCollection {
 
+  public static final String MENU_NAME_CLASS_DOC = "MenuName";
+  public static final String MENU_NAME_CLASS_SPACE = "Celements2";
+  public static final String MENU_NAME_CLASS = MENU_NAME_CLASS_SPACE + "."
+      + MENU_NAME_CLASS_DOC;
+  public static final String MENU_NAME_FIELD = "menu_name";
+  public static final String MENU_NAME_IMAGE_FIELD = "image";
+  public static final String MENU_NAME_TOOLTIP_FIELD = "tooltip";
+  public static final String MENU_NAME_LANG_FIELD = "lang";
+
+  public static final String MAPPED_MENU_ITEM_CLASS_SPACE = "Classes";
+  public static final String MAPPED_MENU_ITEM_CLASS_DOC = "MenuItemClass";
+  public static final String MAPPED_MENU_ITEM_CLASS = MAPPED_MENU_ITEM_CLASS_SPACE + "."
+        + MAPPED_MENU_ITEM_CLASS_DOC;
+
   public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
-  public static final String NAVIGATION_CONFIG_CLASS_SPACE = "Celements2";
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
   public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
-      + "." + NAVIGATION_CONFIG_CLASS_DOC;
+        + "." + NAVIGATION_CONFIG_CLASS_DOC;
+
   public static final String MENU_ELEMENT_NAME_FIELD = "menu_element_name";
   public static final String FROM_HIERARCHY_LEVEL_FIELD = "from_hierarchy_level";
   public static final String TO_HIERARCHY_LEVEL_FIELD = "to_hierarchy_level";
@@ -48,7 +63,11 @@ public class NavigationClasses extends AbstractClassCollection {
   public static final String PRESENTATION_TYPE_FIELD = "presentation_type";
 
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
-  public static final String MENU_ITEM_CLASS_SPACE = "Celements2";
+  public static final String MENU_ITEM_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
+  public static final String MENU_ITEM_CLASS = MENU_ITEM_CLASS_SPACE + "."
+        + MENU_ITEM_CLASS_DOC;
+  public static final String MENU_POSITION_FIELD = "menu_position";
+  public static final String PART_NAME_FIELD = "part_name";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NavigationClasses.class);
@@ -71,7 +90,7 @@ public class NavigationClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getMenuNameClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements2", "MenuName");
+    return new DocumentReference(wikiName, MENU_NAME_CLASS_SPACE, MENU_NAME_CLASS_DOC);
   }
 
   BaseClass getMenuNameClass() throws XWikiException {
@@ -81,18 +100,18 @@ public class NavigationClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get " + MENU_NAME_CLASS + " class document.", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("menu_name", "Multilingual MenuName", 30);
-    needsUpdate |= bclass.addTextField("lang", "Language", 5);
-    needsUpdate |= bclass.addTextField("tooltip", "Tool Tip", 30);
-    needsUpdate |= bclass.addTextField("image", "Background Image", 30);
+    needsUpdate |= bclass.addTextField(MENU_NAME_FIELD, "Multilingual MenuName", 30);
+    needsUpdate |= bclass.addTextField(MENU_NAME_LANG_FIELD, "Language", 5);
+    needsUpdate |= bclass.addTextField(MENU_NAME_TOOLTIP_FIELD, "Tool Tip", 30);
+    needsUpdate |= bclass.addTextField(MENU_NAME_IMAGE_FIELD, "Background Image", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
@@ -115,8 +134,8 @@ public class NavigationClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get " + NAVIGATION_CONFIG_CLASS + " class document.", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -157,23 +176,24 @@ public class NavigationClasses extends AbstractClassCollection {
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get " + MENU_ITEM_CLASS + " class document.", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField("menu_position", "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField("part_name", "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(MENU_POSITION_FIELD, "Position", 30, "integer");
+    needsUpdate |= bclass.addTextField(PART_NAME_FIELD, "Menu Part Name", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getNewMenuItemClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Classes", "MenuItemClass");
+    return new DocumentReference(wikiName, MAPPED_MENU_ITEM_CLASS_SPACE,
+        MAPPED_MENU_ITEM_CLASS_DOC);
   }
 
   BaseClass getNewMenuItemClass() throws XWikiException {
@@ -184,16 +204,16 @@ public class NavigationClasses extends AbstractClassCollection {
 
     try {
       doc = xwiki.getDocument(classRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get " + MAPPED_MENU_ITEM_CLASS + " class document.", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField("menu_position", "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField("part_name", "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(MENU_POSITION_FIELD, "Position", 30, "integer");
+    needsUpdate |= bclass.addTextField(PART_NAME_FIELD, "Menu Part Name", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

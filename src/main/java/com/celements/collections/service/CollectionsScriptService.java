@@ -12,7 +12,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.collections.ICollectionsService;
-import com.celements.iterator.XObjectIterator;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;

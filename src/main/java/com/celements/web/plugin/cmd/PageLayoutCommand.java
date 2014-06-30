@@ -247,6 +247,7 @@ public class PageLayoutCommand {
    * @return
    */
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    long millisec = System.currentTimeMillis();
     LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
     IRenderStrategy cellRenderer = new CellRenderStrategy(getContext()).setOutputWriter(
         new DivWriter());
@@ -256,6 +257,8 @@ public class PageLayoutCommand {
     renderEngine.renderPageLayout(layoutSpaceRef);
     getRenderingLayoutStack().pop();
     setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
+    LOGGER.info("renderPageLayout finishing. Time used in millisec: "
+        + (System.currentTimeMillis() - millisec));
     return cellRenderer.getAsString();
   }
 
@@ -320,6 +323,7 @@ public class PageLayoutCommand {
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+    long millisec = System.currentTimeMillis();
     LOGGER.debug("getPageLayoutForDoc: for [" + documentReference + "].");
     SpaceReference layoutSpaceRef = null;
     if (layoutExists(documentReference.getLastSpaceReference())) {
@@ -337,7 +341,8 @@ public class PageLayoutCommand {
       layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
     LOGGER.info("getPageLayoutForDoc: for [" + documentReference + "] returning ["
-        + layoutSpaceRef + "].");
+        + layoutSpaceRef + "].  Time used in millisec: "
+        + (System.currentTimeMillis() - millisec));
     return layoutSpaceRef;
   }
 

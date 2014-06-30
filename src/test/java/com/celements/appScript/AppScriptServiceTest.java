@@ -519,6 +519,62 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
         docRef));
     verifyAll();
   }
+  
+  @Test
+  public void testGetAppScriptURL_queryString_queryStringEmpty() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
+        "someSpace", "someDoc");
+    String scriptName = "someSpace/someDoc";
+
+    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc"), 
+        (String) isNull(), same(context))).andReturn("theURL").once();
+    
+    replayAll();
+    assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, null));
+    verifyAll();
+  }
+  
+  @Test
+  public void testGetAppScriptURL() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
+        "someSpace", "someDoc");
+    String scriptName = "someSpace/someDoc";
+    String queryString = "string=a{sd]f&string2=a[sd}f";
+
+    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" 
+        + queryString), (String) isNull(), same(context))).andReturn("theURL").once();
+    
+    replayAll();
+    assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, queryString));
+    verifyAll();
+  }
+  
+  @Test
+  public void testGetAppScriptURL_queryStringWithAmp() {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
+        "someSpace", "someDoc");
+    String scriptName = "someSpace/someDoc";
+    String queryString = "&string=a{sd]f&string2=a[sd}f";
+
+    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" 
+        + queryString), (String) isNull(), same(context))).andReturn("theURL").once();
+    
+    replayAll();
+    assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, queryString));
+    verifyAll();
+  }
+  
+  @Test
+  public void testGetAppScriptURL_longName() {
+    String scriptName = "path/to/my/appscript";
+    String queryString = "string=a{sd]f&string2=a[sd}f";
+    
+    replayAll();
+    String url = appScriptService.getAppScriptURL(scriptName, queryString);
+    assertEquals("/app/" + scriptName + "?xpage=app&s=" + scriptName 
+        + "&string=a%7Bsd%5Df&string2=a%5Bsd%7Df", url);
+    verifyAll();
+  }
 
 
   private void replayAll(Object ... mocks) {

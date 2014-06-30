@@ -19,7 +19,9 @@
  */
 package com.celements.rendering;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,6 +39,7 @@ import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.web.Utils;
@@ -110,6 +113,22 @@ public class RenderCommand {
       return renderCelementsDocument(elemDocRef, getContext().getLanguage(), renderMode);
   }
 
+  public String renderCelementsDocumentPreserveVelocityContext(
+      DocumentReference elementDocRef, String lang, String renderMode
+      ) throws XWikiException {
+    VelocityContext preservedVcontext = (VelocityContext) getExecutionContext(
+        ).getProperty("velocityContext");
+    VelocityContext vContext = (VelocityContext) preservedVcontext.clone();
+    getContext().put("vcontext", vContext);
+    getExecutionContext().setProperty("velocityContext", vContext);
+    try {
+      return renderCelementsDocument(elementDocRef, lang, renderMode);
+    } finally {
+      getContext().put("vcontext", preservedVcontext);
+      getExecutionContext().setProperty("velocityContext", preservedVcontext);
+    }
+  }
+
   public String renderCelementsDocument(DocumentReference elemDocRef, String lang,
       String renderMode) throws XWikiException {
     XWikiDocument cellDoc = getContext().getWiki().getDocument(elemDocRef, getContext());
@@ -123,7 +142,7 @@ public class RenderCommand {
 
   public String renderCelementsDocument(XWikiDocument cellDoc, String lang,
       String renderMode) throws XWikiException {
-    LOGGER.trace("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
+    LOGGER.debug("renderCelementsDocument: cellDoc [" + cellDoc.getDocumentReference()
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
     String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(
         cellDoc.getDocumentReference());
@@ -146,15 +165,46 @@ public class RenderCommand {
 
   public String renderTemplatePath(String renderTemplatePath, String lang
       ) throws XWikiException {
+    return renderTemplatePath(renderTemplatePath, lang, null);
+  }
+
+  public String renderTemplatePath(String renderTemplatePath, String lang, String defLang
+      ) throws XWikiException {
     String templateContent;
     XWikiDocument templateDoc = getContext().getDoc();
     if (renderTemplatePath.startsWith(":")) {
-      String templatePath = getTemplatePathOnDisk(renderTemplatePath);
-      try {
-        templateContent = getContext().getWiki().getResourceContent(templatePath);
-      } catch (IOException exp) {
-        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-        return "";
+      List<String> langList = new ArrayList<String>();
+      if (lang != null) {
+        langList.add(lang);
+      }
+      if ((defLang != null) && !defLang.equals(lang)) {
+        langList.add(defLang);
+      }
+      templateContent = "";
+      for(String theLang : langList) {
+        String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
+        try {
+          templateContent = getContext().getWiki().getResourceContent(templatePath);
+        } catch (FileNotFoundException fnfExp) {
+          LOGGER.trace("FileNotFound [" + templatePath + "].");
+          templateContent = "";
+        } catch (IOException exp) {
+          LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
+          templateContent = "";
+        }
+      }
+      if ("".equals(templateContent)) {
+        String templatePathDef = getTemplatePathOnDisk(renderTemplatePath);
+        try {
+          templateContent = getContext().getWiki().getResourceContent(templatePathDef);
+        } catch (FileNotFoundException fnfExp) {
+          LOGGER.trace("FileNotFound [" + templatePathDef + "].");
+          return "";
+        } catch (IOException exp) {
+          LOGGER.debug("Exception while parsing template [" + templatePathDef + "].",
+              exp);
+          return "";
+        }
       }
     } else {
       DocumentReference renderTemplateDocRef = getWebUtilsService(
@@ -162,19 +212,41 @@ public class RenderCommand {
       templateDoc = getTemplateDoc(renderTemplateDocRef);
       templateContent = getTranslatedContent(templateDoc, lang);
     }
-    return getRenderingEngine().renderText(templateContent,
+    if (LOGGER.isDebugEnabled()) {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      Document cellDoc = (Document) vcontext.get("celldoc");
+      LOGGER.debug("renderTemplatePath: cellDoc before [" + cellDoc + "].");
+    }
+    LOGGER.trace("renderTemplatePath: template content for lang [" + lang
+        + "] and context.language [" + getContext().getLanguage() + "] is ["
+        + templateContent + "]");
+    String renderedContent = getRenderingEngine().renderText(templateContent,
         templateDoc, getContext().getDoc(), getContext());
+    LOGGER.trace("renderTemplatePath: rendered content for lang [" + lang
+        + "] and context.language ["  + getContext().getLanguage() + "] is ["
+        + renderedContent + "]");
+    if (LOGGER.isDebugEnabled()) {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      Document cellDoc = (Document) vcontext.get("celldoc");
+      LOGGER.debug("renderTemplatePath: cellDoc after [" + cellDoc + "].");
+    }
+    return renderedContent;
   }
 
   public String renderDocument(DocumentReference docRef) {
     return renderDocument(docRef, getContext().getLanguage());
   }
 
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef) {
+    return renderDocument(docRef, includeDocRef, getContext().getLanguage());
+  }
+
   public String renderDocument(DocumentReference docRef, String lang) {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef + "].");
     try {
       XWikiDocument xwikidoc = getContext().getWiki().getDocument(docRef, getContext());
-      return renderDocument(xwikidoc, lang);
+      return renderDocument(xwikidoc, null, lang);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get translated document for [" + docRef + "] in [" + lang
           + "].", exp);
@@ -182,16 +254,45 @@ public class RenderCommand {
     return "";
   }
 
-  public String renderDocument(XWikiDocument document) throws XWikiException {
-    return renderDocument(document, document.getLanguage());
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef, String lang) {
+    LOGGER.debug("renderDocument for lang  [" + lang + "] and docref [" + docRef
+        + "] and includeDocRef [" + includeDocRef + "].");
+    try {
+      XWikiDocument contentdoc = getContext().getWiki().getDocument(docRef, getContext());
+      XWikiDocument includeDoc = getContext().getWiki().getDocument(includeDocRef,
+          getContext());
+      return renderDocument(contentdoc, includeDoc, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get translated document for [" + docRef
+          + "] or includeDoc [" + includeDocRef + "].", exp);
+    }
+    return "";
   }
 
-  public String renderDocument(XWikiDocument document, String lang
-      ) throws XWikiException {
+  public String renderDocument(XWikiDocument document) throws XWikiException {
+    return renderDocument(document, null, document.getLanguage());
+  }
+
+  /**
+   * renderDocument renders the given document content for the requested language.
+   * The includingdoc will be $doc in the velocity context during rendering.
+   */
+  public String renderDocument(XWikiDocument document, XWikiDocument includingdoc,
+      String lang) throws XWikiException {
     LOGGER.debug("renderDocument for lang  [" + lang + "] and doc ["
         + document.getDocumentReference() + "].");
-    return getRenderingEngine().renderText(getTranslatedContent(document, lang), document,
-        getContext());
+    String translatedContent = getTranslatedContent(document, lang);
+    LOGGER.trace("translated content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + translatedContent + "]");
+    if (includingdoc == null) {
+      includingdoc = getContext().getDoc();
+    }
+    String renderedContent = getRenderingEngine().renderText(translatedContent,
+        document, includingdoc, getContext());
+    LOGGER.trace("rendered content for lang [" + lang + "] and context.language [" 
+        + getContext().getLanguage() + "] is [" + renderedContent + "]");
+    return renderedContent;
   }
 
   XWikiRenderingEngine getRenderingEngine() throws XWikiException {
@@ -241,8 +342,12 @@ public class RenderCommand {
   }
 
   String getTemplatePathOnDisk(String renderTemplatePath) {
+    return getTemplatePathOnDisk(renderTemplatePath, null);
+  }
+
+  String getTemplatePathOnDisk(String renderTemplatePath, String lang) {
     String templateOnDiskPath = getWebUtilsService().getTemplatePathOnDisk(
-        renderTemplatePath);
+        renderTemplatePath, lang);
     if (templateOnDiskPath.startsWith(":")) {
       templateOnDiskPath = renderTemplatePath.replaceAll("^:", "/templates/celTemplates/")
           + ".vm";

@@ -35,6 +35,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -42,6 +43,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
+import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
 import com.celements.validation.IFormValidationServiceRole;
@@ -52,6 +54,7 @@ import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.PlainTextCommand;
+import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -61,6 +64,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
@@ -81,6 +85,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   IFormValidationServiceRole formValidationService;
+
+  @Requirement
+  ITreeNodeCache treeNodeCacheService;
 
   @Requirement
   Execution execution;
@@ -150,11 +157,16 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String getCurrentPageURL(String queryString) {
+    String ret;
     if(isAppScriptRequest()) {
-      return getAppScriptURL(getScriptNameFromURL(), queryString);
+      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      return "?" + queryString;
+      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      ret = Util.escapeURL("?" + queryString);
     }
+    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    return ret;
   }
 
   public String convertToPlainText(String htmlContent) {
@@ -287,6 +299,10 @@ public class CelementsWebScriptService implements ScriptService {
     return new AttachmentURLCommand().getAttachmentURL(fileName, action, getContext());
   }
 
+  public String getAttachmentURLPrefix() {
+    return new AttachmentURLCommand().getAttachmentURLPrefix();
+  }
+
   public String getSkinFileExternal(String fileName, String action) {
     return new AttachmentURLCommand().getExternalAttachmentURL(fileName, action,
         getContext());
@@ -296,6 +312,12 @@ public class CelementsWebScriptService implements ScriptService {
     RenderCommand renderCommand = new RenderCommand();
     renderCommand.setDefaultPageType("RichText");
     return renderCommand;
+  }
+
+  public String renderCelementsDocument(DocumentReference elementDocRef,
+      boolean preserveVelocityContext) {
+    return renderCelementsDocument(elementDocRef, getContext().getLanguage(), "view",
+        true);
   }
 
   public String renderCelementsDocument(DocumentReference elementDocRef) {
@@ -309,9 +331,19 @@ public class CelementsWebScriptService implements ScriptService {
 
   public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
       String renderMode) {
+    return renderCelementsDocument(elementDocRef, lang, renderMode, false);
+  }
+
+  public String renderCelementsDocument(DocumentReference elementDocRef, String lang,
+      String renderMode, boolean preserveVelocityContext) {
     try {
-      return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang,
-          renderMode);
+      if (preserveVelocityContext) {
+        return getCelementsRenderCmd().renderCelementsDocumentPreserveVelocityContext(
+            elementDocRef, lang, renderMode);
+      } else {
+        return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang,
+            renderMode);
+      }
     } catch (XWikiException exp) {
       LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
     }
@@ -339,9 +371,23 @@ public class CelementsWebScriptService implements ScriptService {
     return new RenderCommand().renderDocument(docRef);
   }
 
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef) {
+    LOGGER.trace("renderDocument: docRef [" + docRef + "] and includeDocRef ["
+      + includeDocRef +  "].");
+    return new RenderCommand().renderDocument(docRef, includeDocRef);
+  }
+
   public String renderDocument(DocumentReference docRef, String lang) {
     LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
     return new RenderCommand().renderDocument(docRef, lang);
+  }
+
+  public String renderDocument(DocumentReference docRef,
+      DocumentReference includeDocRef, String lang) {
+    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef
+        + "] and includeDocRef [" + includeDocRef + "].");
+    return new RenderCommand().renderDocument(docRef, includeDocRef, lang);
   }
 
   public String renderDocument(Document renderDoc) {
@@ -370,9 +416,29 @@ public class CelementsWebScriptService implements ScriptService {
         removePre, rendererNameList);
   }
 
+  public String renderInheritableDocument(DocumentReference docRef) {
+    return renderInheritableDocument(docRef, getContext().getLanguage());
+  }
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang) {
+    try {
+      return webUtilsService.renderInheritableDocument(docRef, lang);
+    } catch (XWikiException exp) {
+      LOGGER.error("renderInheritableDocument: Failed to render inheritable [" + docRef
+          + "] in lang [" + lang + "].");
+    }
+    return "";
+  }
+
   public boolean useNewButtons() {
-    return getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
-        "celements.usenewbuttons", 0, getContext()) == 1;
+    int wikiConfig = getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
+        "celements.usenewbuttons", 0, getContext());
+    return getContext().getWiki().getSpacePreferenceAsInt("useNewButtons", wikiConfig,
+        getContext()) == 1;
+  }
+
+  public String getDefaultAdminLanguage() {
+    return webUtilsService.getDefaultAdminLanguage();
   }
 
   /**
@@ -537,6 +603,72 @@ public class CelementsWebScriptService implements ScriptService {
     } else {
       return null;
     }
+  }
+  
+  public boolean addFileToFileBaseTag(DocumentReference fileDocRef, String fileName, 
+      DocumentReference tagDocRef) {
+    return addFileToFileBaseTag(fileDocRef.getLastSpaceReference().getName() + "." 
+        + fileDocRef.getName(), fileName, tagDocRef);
+  }
+  
+  public boolean addFileToFileBaseTag(String fileDocFullName, String fileName, 
+      DocumentReference tagDocRef) {
+    //FIXME not all tag documents have a page type: who cares? deprecated? migration?
+//    DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
+//        "Celements2.PageType");
+    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference(
+        "Classes.FilebaseTag");
+    String tagValue = fileDocFullName + "/" + fileName;
+    try {
+      XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
+      if(/*(tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) != null)
+          && */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
+        BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
+        obj.setStringValue("attachment", tagValue);
+        getContext().getWiki().saveDocument(tagDoc, getContext());
+        return true;
+      }
+    } catch (XWikiException xwe) {
+      LOGGER.error("Could not get tag Document", xwe);
+    }
+    return false;
+  }
+
+  public boolean getUserAdminShowLoginName() {
+    boolean showLoginName = (getContext().getWiki().getXWikiPreferenceAsInt(
+        "celUserAdminShowLoginName", "celements.administration.showloginname", 0,
+        getContext()) != 0);
+    return (webUtilsService.isAdvancedAdmin() || showLoginName);
+  }
+
+  public String getPossibleLogins() {
+    return new PossibleLoginsCommand().getPossibleLogins();
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference docRef) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, docRef);
+  }
+
+  @Deprecated
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef) {
+    return webUtilsService.cleanupXHTMLtoHTML5(xhtml, layoutRef);
+  }
+
+  /**
+   * Cache should maintain itself. Thus this flushMenuItemCache should not be called
+   * anymore.
+   * 
+   * @deprecated
+   */
+  @Deprecated
+  public void flushMenuItemCache() {
+    treeNodeCacheService.flushMenuItemCache();
   }
 
 }

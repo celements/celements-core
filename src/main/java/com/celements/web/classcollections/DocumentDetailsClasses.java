@@ -32,12 +32,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.documentDetails")
 public class DocumentDetailsClasses extends AbstractClassCollection {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentDetailsClasses.class);
 
   @Override
   protected Log getLogger() {
-    return mLogger;
+    return LOGGER;
   }
 
   @Override
@@ -55,7 +55,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      mLogger.error(exp);
+      LOGGER.error(exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -63,7 +63,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addDateField("publishDate", "Publish Date (dd.MM.yyyy HH:mm)", 
-        "dd.MM.yyyy HH:mm", 1);
+        "dd.MM.yyyy HH:mm", 0);
     needsUpdate |= bclass.addDateField("unpublishDate", "Unpublish Date (dd.MM.yyyy " +
         "HH:mm)", "dd.MM.yyyy HH:mm", 0);
 
@@ -85,7 +85,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      mLogger.error(exp);
+      LOGGER.error(exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }

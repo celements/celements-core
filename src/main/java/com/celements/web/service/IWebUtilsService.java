@@ -67,9 +67,17 @@ public interface IWebUtilsService {
 
   public XWikiMessageTool getAdminMessageTool();
 
+  public String getDefaultAdminLanguage();
+
   public String getAdminLanguage();
 
+  /**
+   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
+   */
+  @Deprecated
   public String getAdminLanguage(String userFullName);
+
+  public String getAdminLanguage(DocumentReference userRef);
 
   public String getDefaultLanguage();
 
@@ -85,12 +93,24 @@ public interface IWebUtilsService {
 
   public DocumentReference resolveDocumentReference(String fullName);
 
+  public DocumentReference resolveDocumentReference(String fullName, 
+      WikiReference wikiRef);
+
   public SpaceReference resolveSpaceReference(String spaceName);
+
+  public SpaceReference resolveSpaceReference(String spaceName, 
+      WikiReference wikiRef);
 
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
 
+  public boolean isSuperAdminUser();
+
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
+  
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
@@ -152,5 +172,21 @@ public interface IWebUtilsService {
       ) throws XWikiException;
 
   public String getTemplatePathOnDisk(String renderTemplatePath);
+
+  public String getTemplatePathOnDisk(String renderTemplatePath, String lang);
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang
+      ) throws XWikiException;
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang,
+      String defLang) throws XWikiException;
+
+  public boolean isLayoutEditor();
+
+  public String cleanupXHTMLtoHTML5(String xhtml);
+  
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
+
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
 
 }

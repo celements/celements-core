@@ -65,7 +65,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _docRef2 = new DocumentReference(_context.getDatabase(), "Test", "Doc2");
     _testDoc2 = new XWikiDocument(_docRef2);
     _docList = new ArrayList<String>();
-  }  
+  }
 
   @Test
   public void testSetClassName() {
@@ -73,7 +73,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _iterator.setClassName(className);
     assertEquals(className, _iterator.getClassName());
   }
-  
+
   @Test
   public void testSetFilter() {
     String key = "key";
@@ -82,7 +82,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertEquals(key, _iterator.getFilterKey());
     assertEquals(value, _iterator.getFilterValue());
   }
-  
+
   @Test
   public void testSetDocList() {
     _docList.add("Test.Doc");
@@ -113,7 +113,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
       fail("Exception expected.");
     } catch(NoSuchElementException ex) {
       //expected behaviour
-    }    
+    }
     verify(_xwiki);
   }
 
@@ -126,9 +126,9 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname2);
     _iterator.setDocList(_docList);
     expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc
-      ).anyTimes();
+        ).anyTimes();
     expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2
-      ).anyTimes();
+        ).anyTimes();
     replay(_xwiki);
     Iterator<BaseObject> firstObjectIterator = _iterator.getObjectIterator();
     _iterator.moveToNextDoc();
@@ -242,7 +242,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testHasNext_false() throws Exception {
     String fullname = "Test.Doc";
@@ -258,9 +258,9 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     replay(_xwiki);
     _iterator.next();
     assertEquals(false, _iterator.hasNext());
-    verify(_xwiki); 
+    verify(_xwiki);
   }
-  
+
   @Test
   public void testHasNext_classNameNotDefined() throws Exception {
     _iterator.setClassName(null);
@@ -304,7 +304,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertSame("Expecting second object in list.", secondObj, _iterator.next());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testNext_allObjMultipleDoc() throws Exception {
     String fullname = "Test.Doc";
@@ -340,7 +340,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testNext_emptyDocsInList() throws Exception {
     String fullname0 = "Test.Doc0";
@@ -373,7 +373,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testNext_deletedNullObjectsInList() throws Exception {
     String fullname = "Test.Doc";
@@ -395,7 +395,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testNext_classNameNotDefined() throws Exception {
     _iterator.setClassName(null);
@@ -417,7 +417,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
       //expected behaviour
     }
     verify(_xwiki);
-  }  
+  }
 
   @Test
   public void testNext_noMoreElementsException() throws Exception {
@@ -431,7 +431,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     }
     verify(_xwiki);
   }
-  
+
   @Test
   public void testNext_withFilter() throws Exception{
     String fullname = "Test.Doc";
@@ -467,7 +467,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testValidObject(){
     BaseObject firstObj = new BaseObject();
@@ -476,7 +476,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _iterator.setFilter("key1", "value1");
     assertTrue(_iterator.isValidObject());
   }
-  
+
   @Test
   public void testRemove() {
     try {
@@ -486,7 +486,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
       //expected behaviour
     }
   }
-  
+
   @Test
   public void testIterator_foreach() throws Exception {
     String fullname = "Test.Doc";

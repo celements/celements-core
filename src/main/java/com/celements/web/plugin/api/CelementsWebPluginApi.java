@@ -26,13 +26,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -40,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
@@ -68,6 +69,7 @@ import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
+import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
@@ -135,18 +137,30 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.2 instead use TreeNodeCache
+   * Do not call flushCache for MenuItem changes anymore.  
+   * The TreeNodeDocument change listener take care of flushing the cache if needed.
    */
   @Deprecated
   public void flushCache() {
-    plugin.flushCache(context);
+    LOGGER.warn("flushCache called. Do not call flushCache for MenuItem "
+        + " changes anymore. The TreeNodeDocument change listener take care of flushing "
+        + " the cache if needed.");
   }
 
   /**
    * @deprecated since 2.2 instead use CelementsWebScriptService
    */
   @Deprecated
-  public String getLastStartupTimeStamp(){
+  public String getLastStartupTimeStamp() {
     return getScriptService().getLastStartupTimeStamp();
+  }
+
+  public boolean resetLastStartupTimeStamp() {
+    if (hasProgrammingRights()) {
+      new LastStartupTimeStamp().resetLastStartupTimeStamp();
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -298,6 +312,13 @@ public class CelementsWebPluginApi extends Api {
     return getScriptService().getDocMetaTags(language, defaultLanguage);
   }
 
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListSortedSpace(spaceName, comparator, 
+        imagesOnly, start, nb);
+  }
+
   /**
    * @deprecated since 2.33.0 use WebUtilsScriptService
    */
@@ -443,17 +464,18 @@ public class CelementsWebPluginApi extends Api {
     return encryptString("hash:SHA-512:", str);
   }
 
-  public void sendNewValidation(String user, String possibleFields) {
+  public boolean sendNewValidation(String user, String possibleFields) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
       LOGGER.debug("sendNewValidation for user [" + user + "].");
       try {
-        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
+        return new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
             possibleFields);
       } catch (XWikiException exp) {
         LOGGER.error("sendNewValidation: failed.", exp);
       }
     }
+    return false;
   }
 
   public void sendNewValidation(String user, String possibleFields,
@@ -607,11 +629,26 @@ public class CelementsWebPluginApi extends Api {
    * @param fullName
    * @param includeDoc
    * @return List of all parents, starting at the specified doc (bottom up)
+   * 
+   * @deprecated since 2.41.0 instead use
+   *             getDocumentParentsDocRefList(DocumentReference, boolean)
    */
-  public List<String> getDocumentParentsList(String fullName,
-      boolean includeDoc) {
+  @Deprecated
+  public List<String> getDocumentParentsList(String fullName, boolean includeDoc) {
     return WebUtils.getInstance().getDocumentParentsList(fullName, includeDoc,
         context);
+  }
+
+  /**
+   * Returns a list of all parent for a specified doc
+   * 
+   * @param fullName
+   * @param includeDoc
+   * @return List of all parents, starting at the specified doc (bottom up)
+   */
+  public List<DocumentReference> getDocumentParentsDocRefList(DocumentReference docRef,
+      boolean includeDoc) {
+    return getWebUtilsService().getDocumentParentsList(docRef, includeDoc);
   }
 
   /**
@@ -830,7 +867,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public boolean isEmptyRTEString(String rteContent) {
-    return new EmptyCheckCommand().isEmptyRTEString(rteContent);
+    return getDefaultEmptyCheckService().isEmptyRTEString(rteContent);
   }
 
   public String getParentSpace() {
@@ -1039,9 +1076,9 @@ public class CelementsWebPluginApi extends Api {
     Map<String, Map<ValidationType, Set<String>>> validateMap = getScriptService(
         ).validateRequest();
     for (String key : validateMap.keySet()) {
-      Iterator<String> iter = validateMap.get(key).get(ValidationType.ERROR).iterator();
-      if (iter.hasNext()) {
-        ret.put(key, iter.next());
+      Set<String> set = validateMap.get(key).get(ValidationType.ERROR);
+      if ((set != null) && (set.size() > 0)) {
+        ret.put(key, set.iterator().next());
       }
     }
     return ret;
@@ -1056,6 +1093,28 @@ public class CelementsWebPluginApi extends Api {
 
   public String renderPageLayout(SpaceReference spaceRef) {
     return getPageLayoutCmd().renderPageLayout(spaceRef);
+  }
+
+  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
+      SpaceReference layoutSpaceRef) {
+    XWikiDocument oldContextDoc = context.getDoc();
+    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
+        + "] and layoutSpaceRef [" + layoutSpaceRef + "] overwrite oldContextDoc ["
+        + oldContextDoc.getDocumentReference() + "].");
+    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    try {
+      XWikiDocument newContextDoc = context.getWiki().getDocument(docRef, context);
+      context.setDoc(newContextDoc);
+      vcontext.put("doc", newContextDoc.newDocument(context));
+      return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
+          exp);
+    } finally {
+      context.setDoc(oldContextDoc);
+      vcontext.put("doc", oldContextDoc.newDocument(context));
+    }
+    return "";
   }
 
   public SpaceReference getCurrentRenderingLayout() {
@@ -1081,7 +1140,11 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public String getPageLayoutForDoc(DocumentReference docRef) {
-    return getPageLayoutCmd().getPageLayoutForDoc(docRef).getName();
+    SpaceReference pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(docRef);
+    if (pageLayoutForDoc != null) {
+      return pageLayoutForDoc.getName();
+    }
+    return "";
   }
 
   public String renderPageLayout() {
@@ -1254,9 +1317,17 @@ public class CelementsWebPluginApi extends Api {
     return new ReorderSaveCommand().reorderSave(fullName, structureJSON, context);
   }
 
+  /**
+   * @deprecated since 2.34.0 instad use layoutExists(SpaceReference)
+   */
+  @Deprecated
   public boolean layoutExists(String layoutSpaceName) {
     return getPageLayoutCmd().layoutExists(getWebUtilsService().resolveSpaceReference(
         layoutSpaceName));
+  }
+
+  public boolean layoutExists(SpaceReference layoutSpaceRef) {
+    return getPageLayoutCmd().layoutExists(layoutSpaceRef);
   }
 
   public boolean layoutEditorAvailable() {
@@ -1433,8 +1504,17 @@ public class CelementsWebPluginApi extends Api {
     return context.getWiki().clearName(fileName, false, true, context);
   }
 
+  /**
+   * @deprecated since 2.41.0
+   *             instead use getDocHeaderTitle(DocumentReference)
+   */
+  @Deprecated
   public String getDocHeaderTitle(String fullName) {
     return new DocHeaderTitleCommand().getDocHeaderTitle(fullName, context);
+  }
+  
+  public String getDocHeaderTitle(DocumentReference docRef) {
+    return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
   }
 
   public void logDeprecatedVelocityScript(String logMessage) {
@@ -1610,7 +1690,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   public void checkClasses()  {
-    new CheckClassesCommand().checkClasses(context);
+    new CheckClassesCommand().checkClasses();
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
@@ -1719,6 +1799,10 @@ public class CelementsWebPluginApi extends Api {
 
   private IEmptyCheckRole getEmptyCheckService() {
     return Utils.getComponent(IEmptyCheckRole.class);
+  }
+
+  private IDefaultEmptyDocStrategyRole getDefaultEmptyCheckService() {
+    return Utils.getComponent(IDefaultEmptyDocStrategyRole.class);
   }
 
 }

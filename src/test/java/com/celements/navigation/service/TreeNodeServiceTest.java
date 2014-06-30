@@ -161,11 +161,10 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testFetchNodesForParentKey_onlyOldArray() throws Exception {
-    String
-      wikiName = "myWiki",
-      spaceName = "mySpace",
-      docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+"."+docName;    
+    String wikiName = "myWiki";
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    String parentKey = wikiName + ":" + spaceName + "." + docName;    
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);
@@ -186,11 +185,10 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testFetchNodesForParentKey_onlyNewMappedList() {
-    String
-      wikiName = "myWiki",
-      spaceName = "mySpace",
-      docName = "myDoc",
-      parentKey = wikiName+":"+spaceName+"."+docName;    
+    String wikiName = "myWiki";
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    String parentKey = wikiName + ":" + spaceName + "." + docName;    
     context.setDatabase(wikiName);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
         docName);

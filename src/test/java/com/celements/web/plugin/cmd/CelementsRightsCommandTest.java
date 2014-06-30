@@ -22,8 +22,12 @@ package com.celements.web.plugin.cmd;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -37,12 +41,15 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
   CelementsRightsCommand celRightsCmd = null;
   private XWikiContext context;
   private XWiki xwiki;
+  private DocumentReference xwikiRightsClassRef;
   
   @Before
   public void setUp_CelementsRightsCommandTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    xwikiRightsClassRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiRights");
     celRightsCmd = new CelementsRightsCommand();
   }
   
@@ -177,6 +184,27 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     XWikiDocument testDoc = new XWikiDocument();
     testDoc.setFullName(fullName);
     testDoc.setObject("XWiki.XWikiRights", 0, rightsObj);
+    expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(testDoc).once();
+    replay(xwiki);
+    assertTrue(celRightsCmd.isCelementsRights(fullName, context));
+    verify(xwiki);
+  }
+
+  @Test
+  public void testIsCelementsRights_oneValidUser_validLevel_delObject(
+      ) throws XWikiException {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "TestDoc");
+    XWikiDocument testDoc = new XWikiDocument(docRef);
+    BaseObject rightsObj = new BaseObject();
+    rightsObj.setXClassReference(xwikiRightsClassRef);
+    String users = "XWiki.XWikiGuest";
+    rightsObj.setLargeStringValue("users", users);
+    String levels = "view";
+    rightsObj.setLargeStringValue("levels", levels);
+    testDoc.setXObjects(xwikiRightsClassRef, Arrays.<BaseObject>asList((BaseObject)null,
+        rightsObj));
+    String fullName = "MySpace.TestDoc";
     expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(testDoc).once();
     replay(xwiki);
     assertTrue(celRightsCmd.isCelementsRights(fullName, context));

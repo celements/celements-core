@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
@@ -49,6 +50,10 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
 
   public String getEmptyDictionaryKey() {
     return "cel_nav_empty_presentation";
+  }
+
+  public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
+    return null;
   }
 
 }

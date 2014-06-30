@@ -1,0 +1,89 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.celements.mandatory;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.bridge.event.WikiEvent;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
+
+import com.xpn.xwiki.XWikiContext;
+
+@Component("celements.mandatory.WikiCreatedEventListener")
+public class WikiCreatedEventListener implements EventListener {
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      WikiCreatedEventListener.class);
+
+  @Requirement
+  IMandatoryDocumentCompositorRole mandatoryDocCmp;
+
+  @Requirement
+  RemoteObservationManagerContext remoteObservationManagerContext;
+
+  @Requirement
+  private Execution execution;
+
+  protected XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
+  public String getName() {
+    return "celements.mandatory.WikiCreatedEventListener";
+  }
+
+  public List<Event> getEvents() {
+    return Arrays.<Event>asList(new WikiCreatedEvent());
+  }
+
+  public void onEvent(Event event, Object source, Object data) {
+    String saveDbName = getContext().getDatabase();
+    WikiEvent wikiEvent = (WikiEvent) event;
+    String newDbName = wikiEvent.getWikiId();
+    if (!remoteObservationManagerContext.isRemoteState()
+        && !"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart",
+            "1"))) {
+      try {
+        getContext().setDatabase(newDbName);
+        LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+            + newDbName + "] now executing checkAllMandatoryDocuments.");
+        mandatoryDocCmp.checkAllMandatoryDocuments();
+      } finally {
+        LOGGER.debug("finishing onEvent in WikiCreatedEventListener for wikiId ["
+            + getContext().getDatabase() + "].");
+        getContext().setDatabase(saveDbName);
+      }
+    } else {
+      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+          + newDbName + "] yet skipping checkAllMandatoryDocuments. It will be done"
+          + " on virtualInit.");
+    }
+  }
+
+}

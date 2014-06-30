@@ -23,10 +23,13 @@ import java.net.MalformedURLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class AttachmentURLCommand {
 
@@ -34,12 +37,22 @@ public class AttachmentURLCommand {
       AttachmentURLCommand.class);
 
   public String getAttachmentURL(String link, XWikiContext context) {
-    return getAttachmentURL(link, getDefaultAction(context), context);
+    return getAttachmentURL(link, getDefaultAction(), context);
   }
 
-  protected String getDefaultAction(XWikiContext context) {
-    return context.getWiki().getXWikiPreference("celdefaultAttAction",
-        "celements.attachmenturl.defaultaction", "file", context);
+  protected String getDefaultAction() {
+    return getContext().getWiki().getXWikiPreference("celdefaultAttAction",
+        "celements.attachmenturl.defaultaction", "file", getContext());
+  }
+
+  public String getAttachmentURLPrefix() {
+    return getAttachmentURLPrefix(getDefaultAction());
+  }
+
+  public String getAttachmentURLPrefix(String action) {
+    XWikiURLFactory urlf = getContext().getURLFactory();
+    return urlf.createResourceURL("", true, getContext()).toString().replace("/skin/", "/"
+        + action + "/");
   }
 
   public String getAttachmentURL(String link, String action, XWikiContext context) {
@@ -107,6 +120,14 @@ public class AttachmentURLCommand {
       LOGGER.error("Failed to getServerURL.", exp);
     }
     return "";
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
   }
 
 }

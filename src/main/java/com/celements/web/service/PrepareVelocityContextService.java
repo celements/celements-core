@@ -38,6 +38,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * TODO implement VelocityContextInitializer role
+ *      --> maybe XWiki overwrites later some vcontext variables ($language, $doc, $tdoc)
  * @author fabian
  *
  */
@@ -173,8 +174,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         vcontext.put("isAdmin", webUtilsService.isAdminUser());
       }
       if (!vcontext.containsKey("isSuperAdmin")) {
-        vcontext.put("isSuperAdmin", (webUtilsService.isAdminUser()
-            && getContext().getUser().startsWith("xwiki:")));
+        vcontext.put("isSuperAdmin", webUtilsService.isSuperAdminUser());
       }
       if (!vcontext.containsKey("admin_language")) {
         vcontext.put("admin_language", webUtilsService.getAdminLanguage());
@@ -329,17 +329,22 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return false;
   }
 
-  private XWikiDocument getPageTypeDoc(XWikiContext context) {
+  XWikiDocument getPageTypeDoc(XWikiContext context) {
     if(context.getDoc() != null) {
-      try {
-        XWikiDocument pageTypeDoc = new PageType(new DocumentReference(
-            context.getDatabase(), "PageTypes",
-            pageTypeResolver.getPageTypeRefForCurrentDoc().getConfigName())
-            ).getTemplateDocument(getContext());
-        LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
-        return pageTypeDoc;
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to getPageTypeDoc.", exp);
+      PageTypeReference pTRefForCurrDoc = pageTypeResolver.getPageTypeRefForCurrentDoc();
+      if (pTRefForCurrDoc != null) {
+        try {
+          DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
+              "PageTypes", pTRefForCurrDoc.getConfigName());
+          XWikiDocument pageTypeDoc = new PageType(pageTypeDocRef).getTemplateDocument(
+              getContext());
+          LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
+          return pageTypeDoc;
+        } catch (XWikiException exp) {
+          LOGGER.error("Failed to getPageTypeDoc.", exp);
+        }
+      } else {
+        LOGGER.info("no pageType reference for current document found.");
       }
     }
     return null;

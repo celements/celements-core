@@ -246,12 +246,4 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     verify(wiki);
   }
 
-  @Test
-  public void testSetFlushCacheNeeded() {
-    assertFalse("Expecting default false.", restrSaveCmd.isFlushCacheNeeded());
-    restrSaveCmd.setFlushCacheNeeded();
-    assertTrue("Expecting true after calling setFlushCacheNeeded.",
-        restrSaveCmd.isFlushCacheNeeded());
-  }
-
 }

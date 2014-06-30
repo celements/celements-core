@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
+import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.pagetype.IPageType;
 import com.celements.rendering.RenderCommand;
@@ -42,6 +43,7 @@ import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
+import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -98,24 +100,30 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return getPrepareVelocityContextService().getVelocityName();
   }
 
-  public void flushCache() {
-    //TODO: check if flushCache is called for changing a page MenuItem.
-    LOGGER.debug("Entered method flushCache");
-  }
-
-  public void flushCache(XWikiContext context) {
-    util.flushMenuItemCache(context);
-  }
-
   public void init(XWikiContext context) {
+    //TODO check if this is really needed for main-wiki or if we get a virtualInit on the
+    //TODO main wiki to. (if needed move to ApplicationStartedEvent listener)
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
-    new CheckClassesCommand().checkClasses(context);
+    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
+        "1"))) {
+      new CheckClassesCommand().checkClasses();
+    }
+    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
+      new CheckMandatoryDocuments().checkMandatoryDocuments();
+    }
     super.init(context);
   }
 
   public void virtualInit(XWikiContext context) {
+    //TODO move to WikiReadyEvent listener (after migration to xwiki > 4.1-M1
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
-    new CheckClassesCommand().checkClasses(context);
+    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
+        "1"))) {
+      new CheckClassesCommand().checkClasses();
+    }
+    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
+      new CheckMandatoryDocuments().checkMandatoryDocuments();
+    }
     super.virtualInit(context);
   }
 
@@ -417,18 +425,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
   }
 
+  /**
+   * @deprecated since 2.33.0 instead use PossibleLoginsCommand
+   */
+  @Deprecated
   public String getPossibleLogins(XWikiContext context) {
-    String possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
-    if((possibleLogins == null) || "".equals(possibleLogins.trim())) {
-      String db = context.getDatabase();
-      context.setDatabase("celements2web");
-      possibleLogins = context.getWiki().getXWikiPreference("cellogin", context);
-      context.setDatabase(db);
-      if((possibleLogins == null) || "".equals(possibleLogins)) {
-        possibleLogins = "loginname";
-      }
-    }
-    return possibleLogins;
+    return new PossibleLoginsCommand().getPossibleLogins();
   }
   
   @SuppressWarnings("deprecation")
