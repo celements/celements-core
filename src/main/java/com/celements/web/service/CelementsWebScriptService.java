@@ -36,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -45,6 +46,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.appScript.IAppScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
@@ -88,6 +90,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   ITreeNodeCache treeNodeCacheService;
+
+  @Requirement
+  ITreeNodeService treeNodeService;
 
   @Requirement
   IRTEConfigTemplateRole rteConfigTemplateService;
@@ -665,6 +670,10 @@ public class CelementsWebScriptService implements ScriptService {
       LOGGER.error("getRTETemplateList failed.", exp);
     }
     return Collections.emptyList();
+  }
+
+  public EntityReference getParentReference(DocumentReference docRef) {
+    return treeNodeService.getParentReference(docRef);
   }
 
 }
