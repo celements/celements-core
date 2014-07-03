@@ -26,13 +26,17 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase {
 
@@ -43,14 +47,13 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Before
   public void setUp_RestructureSaveCommandTest() throws Exception {
     context = getContext();
-    wiki = createMock(XWiki.class);
-    context.setWiki(wiki);
+    wiki = getWikiMock();
     restrSaveCmd = new ReorderSaveHandler(context);
   }
 
   @Test
   public void testGetParentFN_null() {
-    restrSaveCmd.inject_ParentFN(null);
+    restrSaveCmd.inject_ParentRef(null);
     assertNotNull("expecting empty string instead of null", restrSaveCmd.getParentFN());
     assertEquals("", restrSaveCmd.getParentFN());
   }
@@ -74,7 +77,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testGetDirtyParents() {
-    Set<String> dirtyParents = restrSaveCmd.getDirtyParents();
+    Set<EntityReference> dirtyParents = restrSaveCmd.getDirtyParents();
     assertNotNull(dirtyParents);
     assertTrue(dirtyParents.isEmpty());
     assertSame(dirtyParents, restrSaveCmd.getDirtyParents());
@@ -82,168 +85,250 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testMarkParentDirty() {
-    String parent = "MyStructDoc.MyParentDoc";
-    restrSaveCmd.markParentDirty(parent);
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(),
+        "MyStructDoc", "MyParentDoc");
+    restrSaveCmd.markParentDirty(parentRef);
     assertEquals(1, restrSaveCmd.getDirtyParents().size());
-    assertTrue(restrSaveCmd.getDirtyParents().contains(parent));
+    assertTrue(restrSaveCmd.getDirtyParents().contains(parentRef));
   }
 
   @Test
   public void testReadPropertyKey() {
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
-    expect(wiki.exists(eq("MySpace.MyDoc"), same(context))).andReturn(true);
-    replay(wiki);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    replayDefault();
     restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
     assertEquals("MySpace.MyDoc", restrSaveCmd.getParentFN());
-    verify(wiki);
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsDiffParentReferences_oldRef_Null() {
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(null);
+    replayDefault();
+    assertTrue(restrSaveCmd.hasDiffParentReferences(parentRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsDiffParentReferences_newRef_Null() {
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    replayDefault();
+    assertTrue(restrSaveCmd.hasDiffParentReferences(null));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsDiffParentReferences_newRef_changed() {
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    EntityReference parentRef2 = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc2");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    replayDefault();
+    assertTrue(restrSaveCmd.hasDiffParentReferences(parentRef2));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsDiffParentReferences_both_Null() {
+    restrSaveCmd.inject_ParentRef(null);
+    replayDefault();
+    assertFalse(restrSaveCmd.hasDiffParentReferences(null));
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsDiffParentReferences_newRef_same() {
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    EntityReference parentRef2 = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    replayDefault();
+    assertFalse(restrSaveCmd.hasDiffParentReferences(parentRef2));
+    verifyDefault();
   }
 
   @Test
   public void testReadPropertyKey_notexists() {
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
-    expect(wiki.exists(eq("MySpace.MyDoc"), same(context))).andReturn(false);
-    replay(wiki);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(false);
+    replayDefault();
     restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
     assertEquals("", restrSaveCmd.getParentFN());
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
   public void testStringEvent_onlyPosition() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    String parentFN = "MySpace.MyParentDoc";
-    restrSaveCmd.inject_ParentFN(parentFN);
-    String docFN = "MySpace.MyDoc1";
-    expect(wiki.exists(eq(docFN), same(context))).andReturn(true);
-    XWikiDocument xdoc = new XWikiDocument();
-    xdoc.setParent(parentFN);
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc1");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    xdoc.setParentReference(parentRef);
     BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 12);
-    xdoc.setObject("Celements2.MenuItem", 0, menuItemObj);
-    expect(wiki.getDocument(eq(docFN), same(context))).andReturn(xdoc);
+    xdoc.setXObject(0, menuItemObj);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
-    replay(wiki);
+    replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
     assertEquals("expecting position reset.", 0,
         menuItemObj.getIntValue("menu_position"));
     assertTrue("expecting parent in dirtyParents after position changed.",
-        restrSaveCmd.getDirtyParents().contains(parentFN));
+        restrSaveCmd.getDirtyParents().contains(parentRef));
     assertEquals(1, restrSaveCmd.getDirtyParents().size());
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
   public void testStringEvent_onlyParents() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    String parentFN = "MySpace.MyParentDoc";
-    restrSaveCmd.inject_ParentFN(parentFN);
-    String docFN = "MySpace.MyDoc1";
-    expect(wiki.exists(eq(docFN), same(context))).andReturn(true);
-    XWikiDocument xdoc = new XWikiDocument();
-    String oldParentFN = "MySpace.OldParentDoc";
-    xdoc.setParent(oldParentFN);
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc1");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "OldParentDoc");
+    xdoc.setParentReference(oldParentRef);
     BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 0);
-    xdoc.setObject("Celements2.MenuItem", 0, menuItemObj);
-    expect(wiki.getDocument(eq(docFN), same(context))).andReturn(xdoc);
+    xdoc.setXObject(0, menuItemObj);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
-    replay(wiki);
+    replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
-    assertEquals("expecting parent reset.", parentFN, xdoc.getParent());
+    assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
     assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(oldParentFN));
+      ).contains(oldParentRef));
     assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(parentFN));
+      ).contains(parentRef));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
   public void testStringEvent_parentsAndPosition() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    String parentFN = "MySpace.MyParentDoc";
-    restrSaveCmd.inject_ParentFN(parentFN);
-    String docFN = "MySpace.MyDoc1";
-    expect(wiki.exists(eq(docFN), same(context))).andReturn(true);
-    XWikiDocument xdoc = new XWikiDocument();
-    String oldParentFN = "MySpace.OldParentDoc";
-    xdoc.setParent(oldParentFN);
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc1");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "OldParentDoc");
+    xdoc.setParentReference(oldParentRef);
     BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 12);
-    xdoc.setObject("Celements2.MenuItem", 0, menuItemObj);
-    expect(wiki.getDocument(eq(docFN), same(context))).andReturn(xdoc);
+    xdoc.setXObject(0, menuItemObj);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
-    replay(wiki);
+    replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
-    assertEquals("expecting parent reset.", parentFN, xdoc.getParent());
+    assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
     assertEquals("expecting position reset.", 0,
         menuItemObj.getIntValue("menu_position"));
     assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(oldParentFN));
+      ).contains(oldParentRef));
     assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(parentFN));
+      ).contains(parentRef));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
   public void testStringEvent_emptyParentForRootElement() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    restrSaveCmd.inject_ParentFN("");
-    String docFN = "MySpace.MyDoc1";
-    expect(wiki.exists(eq(docFN), same(context))).andReturn(true);
-    XWikiDocument xdoc = new XWikiDocument();
-    String oldParentFN = "MySpace.OldParentDoc";
-    xdoc.setParent(oldParentFN);
+    restrSaveCmd.inject_ParentRef(null);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc1");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "OldParentDoc");
+    xdoc.setParentReference(oldParentRef);
     BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 12);
-    xdoc.setObject("Celements2.MenuItem", 0, menuItemObj);
-    expect(wiki.getDocument(eq(docFN), same(context))).andReturn(xdoc);
+    xdoc.setXObject(0, menuItemObj);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
     wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
     expectLastCall();
-    replay(wiki);
+    replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
-    assertEquals("expecting parent reset.", "", xdoc.getParent());
+    assertNull("expecting parent reset.", xdoc.getParentReference());
     assertEquals("expecting position reset.", 0,
         menuItemObj.getIntValue("menu_position"));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
-    verify(wiki);
+    verifyDefault();
   }
 
   @Test
   public void testStringEvent_noChanges() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    String parentFN = "MySpace.MyParentDoc";
-    restrSaveCmd.inject_ParentFN(parentFN);
-    String docFN = "MySpace.MyDoc1";
-    expect(wiki.exists(eq(docFN), same(context))).andReturn(true);
-    XWikiDocument xdoc = new XWikiDocument();
-    xdoc.setParent(parentFN);
+    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDoc1");
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    xdoc.setParentReference(parentRef);
     BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getMenuItemClassRef());
     menuItemObj.setIntValue("menu_position", 0);
-    xdoc.setObject("Celements2.MenuItem", 0, menuItemObj);
-    expect(wiki.getDocument(eq(docFN), same(context))).andReturn(xdoc);
-    replay(wiki);
+    xdoc.setXObject(0, menuItemObj);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
+    replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
     assertEquals("expecting increment afterwards.", new Integer(1),
         restrSaveCmd.getCurrentPos());
-    assertEquals("expecting parent reset.", parentFN, xdoc.getParent());
+    assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
     assertEquals("expecting position reset.", 0,
         menuItemObj.getIntValue("menu_position"));
     assertTrue("noChanges --> no parents need to be updated",
         restrSaveCmd.getDirtyParents().isEmpty());
-    verify(wiki);
+    verifyDefault();
+  }
+
+  private INavigationClassConfig getNavClassConfig() {
+    return Utils.getComponent(INavigationClassConfig.class);
+  }
+
+  private DocumentReference getMenuItemClassRef() {
+    return getNavClassConfig().getMenuItemClassRef(context.getDatabase());
   }
 
 }
