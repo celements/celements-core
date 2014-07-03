@@ -567,6 +567,9 @@ public class TreeNodeService implements ITreeNodeService {
     return new InheritorFactory();
   }
 
+  /**
+   * TODO write unit tests and test if working
+   */
   public void moveTreeDocAfter(DocumentReference moveDocRef,
       DocumentReference insertAfterDocRef) throws XWikiException {
     EntityReference parentRef = getParentReference(moveDocRef);
