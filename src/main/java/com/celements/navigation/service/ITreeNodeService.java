@@ -88,4 +88,9 @@ public interface ITreeNodeService {
   
   public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart); 
 
+  public EntityReference getParentReference(DocumentReference docRef);
+
+  public EntityReference getParentEntityRef(DocumentReference docRef
+      ) throws XWikiException;
+
 }

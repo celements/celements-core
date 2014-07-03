@@ -529,7 +529,16 @@ public class TreeNodeService implements ITreeNodeService {
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
   
-  private EntityReference getParentEntityRef(DocumentReference docRef
+  public EntityReference getParentReference(DocumentReference docRef) {
+    try {
+      return getParentEntityRef(docRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to getParentReference for [" + docRef + "].", exp);
+    }
+    return null;
+  }
+
+  public EntityReference getParentEntityRef(DocumentReference docRef
       ) throws XWikiException {
     EntityReference parent = getContext().getWiki().getDocument(docRef,
         getContext()).getParentReference();
