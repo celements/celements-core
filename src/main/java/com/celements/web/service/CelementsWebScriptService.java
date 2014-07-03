@@ -44,6 +44,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
@@ -674,6 +675,15 @@ public class CelementsWebScriptService implements ScriptService {
 
   public EntityReference getParentReference(DocumentReference docRef) {
     return treeNodeService.getParentReference(docRef);
+  }
+
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) {
+    try {
+      treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
+    }
   }
 
 }

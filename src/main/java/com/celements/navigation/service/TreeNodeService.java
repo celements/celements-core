@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -40,6 +41,7 @@ import org.xwiki.model.reference.SpaceReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.iterator.XObjectIterator;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
@@ -78,6 +80,9 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Requirement
   Map<String, ITreeNodeProvider> nodeProviders;
+
+  @Requirement
+  INavigationClassConfig navClasses;
 
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navigationClasses;
@@ -560,6 +565,49 @@ public class TreeNodeService implements ITreeNodeService {
       return injectedInheritorFactory;
     }
     return new InheritorFactory();
+  }
+
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) throws XWikiException {
+    EntityReference parentRef = getParentReference(moveDocRef);
+    XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
+        getContext());
+    BaseObject menuItemObj = moveDoc.getXObject(navClasses.getMenuItemClassRef(
+        getContext().getDatabase()));
+    String menuPart = menuItemObj.getStringValue(
+        INavigationClassConfig.MENU_PART_FIELD);
+    if (menuPart == null) {
+      menuPart = "";
+    }
+    List<TreeNode> treeNodes = getSubNodesForParent(parentRef,
+        menuPart);
+    TreeNode moveTreeNode = null;
+    for (TreeNode theNode : treeNodes) {
+      if (moveDocRef.equals(theNode.getDocumentReference())) {
+        moveTreeNode = theNode;
+      }
+    }
+    if (moveTreeNode != null) {
+      treeNodes.remove(moveTreeNode);
+      ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
+      int splitPos = 0;
+      if (insertAfterDocRef != null) {
+        for (int pos = 0; pos < treeNodes.size(); pos ++) {
+          if (insertAfterDocRef.equals(treeNodes.get(pos).getDocumentReference())) {
+            splitPos = pos;
+          }
+        }
+      }
+      newTreeNodes.addAll(treeNodes.subList(0, splitPos));
+      newTreeNodes.add(moveTreeNode);
+      newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
+      storeOrder(newTreeNodes);
+    }
+  }
+
+  @Override
+  public void storeOrder(List<TreeNode> newTreeNodes) {
+    throw new NotImplementedException();
   }
 
 }

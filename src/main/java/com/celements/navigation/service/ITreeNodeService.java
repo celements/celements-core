@@ -93,4 +93,9 @@ public interface ITreeNodeService {
   public EntityReference getParentEntityRef(DocumentReference docRef
       ) throws XWikiException;
 
+  public void storeOrder(List<TreeNode> newTreeNodes);
+
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) throws XWikiException;
+
 }
