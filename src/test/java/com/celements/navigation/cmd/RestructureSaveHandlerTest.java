@@ -28,6 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.INavigationClassConfig;
@@ -67,7 +69,8 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testExtractDocFN_NavigationCreateID() {
     Navigation helpNav = new Navigation("N1");
-    helpNav.setMenuSpace("MySpace");
+    helpNav.setNodeSpace(new SpaceReference("MySpace", new WikiReference(
+        context.getDatabase())));
     String menuItemName = "MySpace.MyDoc";
     String navUniqLiId = helpNav.getUniqueId(menuItemName);
     assertEquals("getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
