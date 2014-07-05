@@ -138,8 +138,8 @@ public class TreeNodeService implements ITreeNodeService {
     //TODO move to ITreeNodeProvider and integrate over all nodeProviders
     try {
       XWikiDocument document = getContext().getWiki().getDocument(docRef, getContext());
-      List<BaseObject> menuItems = document.getXObjects(getNavigationClasses(
-          ).getMenuItemClassRef(getContext().getDatabase()));
+      List<BaseObject> menuItems = document.getXObjects(
+          navClassConfig.getMenuItemClassRef(getContext().getDatabase()));
       return ((menuItems != null) && !menuItems.isEmpty());
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for reference [" + docRef + "].", exp);
@@ -586,25 +586,9 @@ public class TreeNodeService implements ITreeNodeService {
   @Override
   public void moveTreeDocAfter(DocumentReference moveDocRef,
       DocumentReference insertAfterDocRef) throws XWikiException {
-    EntityReference parentRef = getParentReference(moveDocRef);
-    XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
-        getContext());
-    BaseObject menuItemObj = moveDoc.getXObject(navClassConfig.getMenuItemClassRef(
-        getContext().getDatabase()));
-    String menuPart = menuItemObj.getStringValue(
-        INavigationClassConfig.MENU_PART_FIELD);
-    if (menuPart == null) {
-      menuPart = "";
-    }
-    List<TreeNode> treeNodes = getSubNodesForParent(parentRef,
-        menuPart);
-    TreeNode moveTreeNode = null;
-    for (TreeNode theNode : treeNodes) {
-      if (moveDocRef.equals(theNode.getDocumentReference())) {
-        moveTreeNode = theNode;
-      }
-    }
-    if (moveTreeNode != null) {
+    if (isTreeNode(moveDocRef)) {
+      TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
+      List<TreeNode> treeNodes = getSiblingTreeNodes(moveDocRef);
       treeNodes.remove(moveTreeNode);
       ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
       int splitPos = 0;
@@ -620,6 +604,35 @@ public class TreeNodeService implements ITreeNodeService {
       newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
       storeOrder(newTreeNodes);
     }
+  }
+
+  private TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef)
+      throws XWikiException {
+    List<TreeNode> siblingTreeNodes = getSiblingTreeNodes(moveDocRef);
+    TreeNode moveTreeNode = null;
+    for (TreeNode theNode : siblingTreeNodes) {
+      if (moveDocRef.equals(theNode.getDocumentReference())) {
+        moveTreeNode = theNode;
+      }
+    }
+    return moveTreeNode;
+  }
+
+  private List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef)
+      throws XWikiException {
+    EntityReference parentRef = getParentReference(moveDocRef);
+    XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
+        getContext());
+    BaseObject menuItemObj = moveDoc.getXObject(navClassConfig.getMenuItemClassRef(
+        getContext().getDatabase()));
+    String menuPart = menuItemObj.getStringValue(
+        INavigationClassConfig.MENU_PART_FIELD);
+    if (menuPart == null) {
+      menuPart = "";
+    }
+    //TODO only use menuPart if main node (parentRef is a space reference)
+    List<TreeNode> siblingTreeNodes = getSubNodesForParent(parentRef, menuPart);
+    return siblingTreeNodes;
   }
 
   /**
