@@ -22,8 +22,8 @@ import com.celements.cells.CellsClasses;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.inheritor.InheritorFactory;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
-import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
@@ -290,7 +290,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class),
         isA(String.class), same(context))).andReturn(true).anyTimes();
     BaseObject navConfigObj1 = new BaseObject();
-    DocumentReference navigationConfigClassRef = getNavigationClasses(
+    DocumentReference navigationConfigClassRef = getNavClassConfig(
         ).getNavigationConfigClassRef(context.getDatabase());
     XWikiDocument navConfigDoc1 = new XWikiDocument(navConfigDocRef1);
     navConfigObj1.setXClassReference(navigationConfigClassRef);
@@ -335,7 +335,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setXObjects(Navigation.getNavigationConfigClassReference(
+    webPrefDoc.setXObjects(getNavClassConfig().getNavigationConfigClassRef(
         context.getDatabase()), navObjects);
     expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin"
         ).atLeastOnce();
@@ -439,7 +439,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
-    webPrefDoc.setXObjects(Navigation.getNavigationConfigClassReference(
+    webPrefDoc.setXObjects(getNavClassConfig().getNavigationConfigClassRef(
         context.getDatabase()), navObjects);
     replayAll(mockPageLayoutCmd);
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
@@ -507,10 +507,10 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class),
         isA(String.class), same(context))).andReturn(true).anyTimes();
     BaseObject navConfigObj = new BaseObject();
-    DocumentReference navigationConfigClassRef = getNavigationClasses(
+    DocumentReference navigationConfigClassRef = getNavClassConfig(
         ).getNavigationConfigClassRef(context.getDatabase());
     navConfigObj.setXClassReference(navigationConfigClassRef);
-    navConfigObj.setIntValue(NavigationClasses.TO_HIERARCHY_LEVEL_FIELD, 3);
+    navConfigObj.setIntValue(INavigationClassConfig.TO_HIERARCHY_LEVEL_FIELD, 3);
     XWikiDocument navConfigDoc = new XWikiDocument(navConfigDocRef);
     navConfigDoc.addXObject(navConfigObj);
     expect(wiki.getDocument(eq(navConfigDocRef), same(context))).andReturn(navConfigDoc);
@@ -581,7 +581,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
     menuItemNext.setDocumentReference(docRefNext);
-    DocumentReference menuItemClassRef = new NavigationClasses().getMenuItemClassRef(
+    DocumentReference menuItemClassRef = getNavClassConfig().getMenuItemClassRef(
         context.getDatabase());
     menuItemItemDoc.setXClassReference(menuItemClassRef);
     menuItemPrev.setXClassReference(menuItemClassRef);
@@ -622,29 +622,28 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void getSiblingMenuItem_next() throws XWikiException {
-    String
-      db = "siblingPrevious",
-      space = "Celements2",
-      celDocName = "MenuItem",
-      fullName = db+":"+space+"."+celDocName;
+    String db = "siblingPrevious";
+    String space = "Celements2";
+    String celDocName = "MenuItem";
+    String fullName = db + ":" + space + "." + celDocName;
     
     context.setDatabase(db);
     
     EntityReference entRefCel = new EntityReference(celDocName, EntityType.DOCUMENT, 
-        new EntityReference(space, EntityType.SPACE,
-            new EntityReference(db, EntityType.WIKI)));
-    DocumentReference
-      mItemDocRef = new DocumentReference(context.getDatabase(),"mySpace","myMenuItemDoc"),   
-      docRefPrev = new DocumentReference(context.getDatabase(),"mySpace","DocPrev"),
-      docRefNext = new DocumentReference(context.getDatabase(),"mySpace","DocNext");
-    XWikiDocument 
-      doc = new XWikiDocument(mItemDocRef),
-      docPrev = new XWikiDocument(docRefPrev),
-      docNext = new XWikiDocument(docRefNext);
-    BaseObject
-      menuItemItemDoc = new BaseObject(),
-      menuItemPrev = new BaseObject(),
-      menuItemNext = new BaseObject();
+        new EntityReference(space, EntityType.SPACE, new EntityReference(db,
+            EntityType.WIKI)));
+    DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(),"mySpace",
+        "myMenuItemDoc");   
+    DocumentReference docRefPrev = new DocumentReference(context.getDatabase(),"mySpace",
+        "DocPrev");
+    DocumentReference docRefNext = new DocumentReference(context.getDatabase(),"mySpace",
+        "DocNext");
+    XWikiDocument doc = new XWikiDocument(mItemDocRef);
+    XWikiDocument docPrev = new XWikiDocument(docRefPrev);
+    XWikiDocument docNext = new XWikiDocument(docRefNext);
+    BaseObject menuItemItemDoc = new BaseObject();
+    BaseObject menuItemPrev = new BaseObject();
+    BaseObject menuItemNext = new BaseObject();
     
     doc.setParentReference(entRefCel);
     docPrev.setParentReference(entRefCel);
@@ -653,7 +652,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
     menuItemNext.setDocumentReference(docRefNext);
-    DocumentReference menuItemClassRef = new NavigationClasses().getMenuItemClassRef(
+    DocumentReference menuItemClassRef = getNavClassConfig().getMenuItemClassRef(
         context.getDatabase());
     menuItemItemDoc.setXClassReference(menuItemClassRef);
     menuItemPrev.setXClassReference(menuItemClassRef);
@@ -716,7 +715,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
     menuItemNext.setDocumentReference(docRefNext);
-    DocumentReference menuItemClassRef = new NavigationClasses().getMenuItemClassRef(
+    DocumentReference menuItemClassRef = getNavClassConfig().getMenuItemClassRef(
         context.getDatabase());
     menuItemItemDoc.setXClassReference(menuItemClassRef);
     menuItemPrev.setXClassReference(menuItemClassRef);
@@ -778,7 +777,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
     menuItemNext.setDocumentReference(docRefNext);
-    DocumentReference menuItemClassRef = new NavigationClasses().getMenuItemClassRef(
+    DocumentReference menuItemClassRef = getNavClassConfig().getMenuItemClassRef(
         context.getDatabase());
     menuItemItemDoc.setXClassReference(menuItemClassRef);
     menuItemPrev.setXClassReference(menuItemClassRef);
@@ -850,7 +849,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
     menuItemNext.setDocumentReference(docRefNext);
-    DocumentReference menuItemClassRef = new NavigationClasses().getMenuItemClassRef(
+    DocumentReference menuItemClassRef = getNavClassConfig().getMenuItemClassRef(
         context.getDatabase());
     menuItemItemDoc.setXClassReference(menuItemClassRef);
     menuItemPrev.setXClassReference(menuItemClassRef);
@@ -922,7 +921,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
     BaseObject navObj = new BaseObject();
-    navObj.setXClassReference(Navigation.getNavigationConfigClassReference(
+    navObj.setXClassReference(getNavClassConfig().getNavigationConfigClassRef(
         context.getDatabase()));
     navObj.setStringValue("menu_element_name", "mainMenu");
     navObj.setIntValue("to_hierarchy_level", toLevel);
@@ -936,9 +935,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         "celements.celCellsClasses");
   }
 
-  private NavigationClasses getNavigationClasses() {
-    return (NavigationClasses) Utils.getComponent(IClassCollectionRole.class,
-        "celements.celNavigationClasses");
+  private INavigationClassConfig getNavClassConfig() {
+    return Utils.getComponent(INavigationClassConfig.class);
   }
 
 }
