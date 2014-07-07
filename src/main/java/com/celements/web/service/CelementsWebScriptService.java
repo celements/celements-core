@@ -51,6 +51,7 @@ import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
+import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
@@ -672,6 +673,44 @@ public class CelementsWebScriptService implements ScriptService {
     return null;
   }
   
+  public void logDeprecatedVelocityScript(String logMessage) {
+    LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
+  }
+  
+  public String getDocHeaderTitle(DocumentReference docRef) {
+    return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
+  }
+  
+  public String clearFileName(String fileName) {
+    return getContext().getWiki().clearName(fileName, false, true, getContext());
+  }
+  
+  public boolean isTranslationAvailable(Document doc, String language) {
+    try {
+      return doc.getTranslationList().contains(language);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
+          exp);
+      return (language.equals(getWebUtilsService().getDefaultLanguage())
+          && getContext().getWiki().exists(doc.getDocumentReference(), getContext()));
+    }
+  }
+  
+  public String getEditURL(Document doc) {
+    if(!getContext().getWiki().exists(doc.getDocumentReference(), getContext())
+        || !isValidLanguage() || !isTranslationAvailable(doc, getContext(
+            ).getLanguage())) {
+      return doc.getURL("edit", "language=" + getWebUtilsService().getDefaultLanguage());
+    } else {
+      return doc.getURL("edit", "language=" + getContext().getLanguage());
+    }
+  }
+  
+  public boolean isValidLanguage() {
+    return getWebUtilsScriptService().getAllowedLanguages().contains(getContext(
+        ).getLanguage());
+  }
+  
   private boolean hasProgrammingRights() {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }
@@ -679,5 +718,13 @@ public class CelementsWebScriptService implements ScriptService {
   private EditorSupportScriptService getEditorSupportScriptService() {
     return (EditorSupportScriptService) Utils.getComponent(ScriptService.class, 
         "editorsupport");
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private WebUtilsScriptService getWebUtilsScriptService() {
+    return (WebUtilsScriptService) Utils.getComponent(ScriptService.class, "webUtils");
   }
 }

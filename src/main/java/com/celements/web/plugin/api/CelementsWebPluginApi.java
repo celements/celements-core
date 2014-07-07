@@ -1662,28 +1662,31 @@ public class CelementsWebPluginApi extends Api {
     return getScriptService().renderCelementsDocument(renderDoc, renderMode);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getEditURL(Document)}
+   */
+  @Deprecated
   public String getEditURL(Document doc) {
-    if(!context.getWiki().exists(doc.getDocumentReference(), context)
-        || !isValidLanguage() || !isTranslationAvailable(doc, context.getLanguage())) {
-      return doc.getURL("edit", "language=" + getWebUtilsService().getDefaultLanguage());
-    } else {
-      return doc.getURL("edit", "language=" + context.getLanguage());
-    }
+    return getScriptService().getEditURL(doc);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #isTranslationAvailable(Document, String)}
+   */
+  @Deprecated
   public boolean isTranslationAvailable(Document doc, String language) {
-    try {
-      return doc.getTranslationList().contains(language);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
-          exp);
-      return (language.equals(getWebUtilsService().getDefaultLanguage())
-          && context.getWiki().exists(doc.getDocumentReference(), context));
-    }
+    return getScriptService().isTranslationAvailable(doc, language);
   }
-
+  
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #isValidLanguage()}
+   */
+  @Deprecated
   public boolean isValidLanguage() {
-    return getAllowedLanguages().contains(context.getLanguage());
+    return getScriptService().isValidLanguage();
   }
 
   /**
@@ -1694,8 +1697,13 @@ public class CelementsWebPluginApi extends Api {
     return new DocumentCreationWorkerControlApi(context);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #clearFileName(String)}
+   */
+  @Deprecated
   public String clearFileName(String fileName) {
-    return context.getWiki().clearName(fileName, false, true, context);
+    return getScriptService().clearFileName(fileName);
   }
 
   /**
@@ -1707,12 +1715,22 @@ public class CelementsWebPluginApi extends Api {
     return new DocHeaderTitleCommand().getDocHeaderTitle(fullName, context);
   }
   
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getDocHeaderTitle(DocumentReference)}
+   */
+  @Deprecated
   public String getDocHeaderTitle(DocumentReference docRef) {
-    return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
+    return getScriptService().getDocHeaderTitle(docRef);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #logDeprecatedVelocityScript(String)}
+   */
+  @Deprecated
   public void logDeprecatedVelocityScript(String logMessage) {
-    LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
+    getScriptService().logDeprecatedVelocityScript(logMessage);
   }
 
   /**
@@ -2056,23 +2074,19 @@ public class CelementsWebPluginApi extends Api {
   }
   
   private ActionScriptService getActionScriptService() {
-    return (ActionScriptService) Utils.getComponent(ScriptService.class, 
-        "action");
+    return (ActionScriptService) Utils.getComponent(ScriptService.class, "action");
   }
   
   private LayoutScriptService getLayoutScriptService() {
-    return (LayoutScriptService) Utils.getComponent(ScriptService.class, 
-        "layout");
+    return (LayoutScriptService) Utils.getComponent(ScriptService.class, "layout");
   }
   
   private CaptchaScriptService getCaptchaScriptService() {
-    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, 
-        "captcha");
+    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captcha");
   }
   
   private CSSScriptService getCSSScriptService() {
-    return (CSSScriptService) Utils.getComponent(ScriptService.class, 
-        "css");
+    return (CSSScriptService) Utils.getComponent(ScriptService.class, "css");
   }
   
   private LegacySkinScriptService getLegacySkinScriptService() {
@@ -2081,18 +2095,15 @@ public class CelementsWebPluginApi extends Api {
   }
   
   private DocFormScriptService getDocFormScriptService() {
-    return (DocFormScriptService) Utils.getComponent(ScriptService.class, 
-        "docform");
+    return (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
   }
   
   private FileBaseScriptService getFileBaseScriptService() {
-    return (FileBaseScriptService) Utils.getComponent(ScriptService.class, 
-        "filebase");
+    return (FileBaseScriptService) Utils.getComponent(ScriptService.class, "filebase");
   }
   
   private RTEConfigScriptService getRTEConfigScriptService() {
-    return (RTEConfigScriptService) Utils.getComponent(ScriptService.class, 
-        "rteconfig");
+    return (RTEConfigScriptService) Utils.getComponent(ScriptService.class, "rteconfig");
   }
   
   private NextFreeDocScriptService getNextFreeDocScriptService() {
@@ -2101,22 +2112,18 @@ public class CelementsWebPluginApi extends Api {
   }
   
   private CelMailScriptService getCelMailScriptService() {
-    return (CelMailScriptService) Utils.getComponent(ScriptService.class, 
-        "celmail");
+    return (CelMailScriptService) Utils.getComponent(ScriptService.class, "celmail");
   }
   
   private ImageScriptService getImageScriptService() {
-    return (ImageScriptService) Utils.getComponent(ScriptService.class, 
-        "image");
+    return (ImageScriptService) Utils.getComponent(ScriptService.class, "image");
   }
   
   private JSScriptService getJSScriptService() {
-    return (JSScriptService) Utils.getComponent(ScriptService.class, 
-        "javascript");
+    return (JSScriptService) Utils.getComponent(ScriptService.class, "javascript");
   }
   
   private AppScriptScriptService getAppScriptScriptService() {
-    return (AppScriptScriptService) Utils.getComponent(ScriptService.class, 
-        "appscript");
+    return (AppScriptScriptService) Utils.getComponent(ScriptService.class, "appscript");
   }
 }
