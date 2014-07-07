@@ -88,6 +88,7 @@ import com.celements.web.service.LayoutScriptService;
 import com.celements.web.service.LegacySkinScriptService;
 import com.celements.web.service.NextFreeDocScriptService;
 import com.celements.web.service.RTEConfigScriptService;
+import com.celements.web.service.WebFormScriptService;
 import com.celements.web.service.WebUtilsScriptService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
@@ -1433,21 +1434,24 @@ public class CelementsWebPluginApi extends Api {
     return getLayoutScriptService().getAllPageLayouts();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link WebFormScriptService
+   * #isFormFilled()}
+   */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public boolean isFormFilled() {
-    return plugin.isFormFilled(context.getRequest().getParameterMap(),
-        Collections.<String>emptySet());
+    return getWebFormScriptService().isFormFilled();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link WebFormScriptService
+   * #isFormFilled(String)}
+   */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public boolean isFormFilled(String excludeFields) {
-    Set<String> excludeSet = new HashSet<String>();
-    for (String field : excludeFields.split(",")) {
-      if(!"".equals(field.trim()) && (field.trim().length() > 0)) {
-        excludeSet.add(field);
-      }
-    }
-    return plugin.isFormFilled(context.getRequest().getParameterMap(), excludeSet);
+    return getWebFormScriptService().isFormFilled(excludeFields);
   }
 
   public boolean resetProgrammingRights() {
@@ -2125,5 +2129,9 @@ public class CelementsWebPluginApi extends Api {
   
   private AppScriptScriptService getAppScriptScriptService() {
     return (AppScriptScriptService) Utils.getComponent(ScriptService.class, "appscript");
+  }
+  
+  private WebFormScriptService getWebFormScriptService() {
+    return (WebFormScriptService) Utils.getComponent(ScriptService.class, "webform");
   }
 }

@@ -10,6 +10,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 @ComponentRole
 public interface IActionServiceRole {
+  
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context);
 }
