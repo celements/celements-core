@@ -69,6 +69,7 @@ import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.service.ActionScriptService;
+import com.celements.web.service.AppScriptScriptService;
 import com.celements.web.service.AuthenticationScriptService;
 import com.celements.web.service.CSSScriptService;
 import com.celements.web.service.CaptchaScriptService;
@@ -1903,51 +1904,57 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getAppScriptURL(String)}
    */
   @Deprecated
   public String getAppScriptURL(String scriptName) {
-    return getScriptService().getAppScriptURL(scriptName);
+    return getAppScriptScriptService().getAppScriptURL(scriptName);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getAppScriptURL(String, String)}
    */
   @Deprecated
   public String getAppScriptURL(String scriptName, String queryString) {
-    return getScriptService().getAppScriptURL(scriptName, queryString);
+    return getAppScriptScriptService().getAppScriptURL(scriptName, queryString);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #isAppScriptCurrentPage(String)}
    */
   @Deprecated
   public boolean isAppScriptCurrentPage(String scriptName) {
-    return getScriptService().isAppScriptCurrentPage(scriptName);
+    return getAppScriptScriptService().isAppScriptCurrentPage(scriptName);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getScriptNameFromURL()}
    */
   @Deprecated
   public String getScriptNameFromURL() {
-    return getScriptService().getScriptNameFromURL();
+    return getAppScriptScriptService().getScriptNameFromURL();
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #isAppScriptRequest()}
    */
   @Deprecated
   public boolean isAppScriptRequest() {
-    return getScriptService().isAppScriptRequest();
+    return getAppScriptScriptService().isAppScriptRequest();
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getCurrentPageURL(String)}
    */
   @Deprecated
   public String getCurrentPageURL(String queryString) {
-    return getScriptService().getCurrentPageURL(queryString);
+    return getAppScriptScriptService().getCurrentPageURL(queryString);
   }
 
   /**
@@ -2073,5 +2080,10 @@ public class CelementsWebPluginApi extends Api {
   private JSScriptService getJSScriptService() {
     return (JSScriptService) Utils.getComponent(ScriptService.class, 
         "javascript");
+  }
+  
+  private AppScriptScriptService getAppScriptScriptService() {
+    return (AppScriptScriptService) Utils.getComponent(ScriptService.class, 
+        "appscript");
   }
 }

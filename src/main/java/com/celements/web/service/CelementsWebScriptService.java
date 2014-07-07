@@ -138,39 +138,6 @@ public class CelementsWebScriptService implements ScriptService {
     return appScriptService.isAppScriptAvailable(scriptName);
   }
 
-  public String getAppScriptURL(String scriptName) {
-    return appScriptService.getAppScriptURL(scriptName);
-  }
-
-  public String getAppScriptURL(String scriptName, String queryString) {
-    return appScriptService.getAppScriptURL(scriptName, queryString);
-  }
-
-  public boolean isAppScriptCurrentPage(String scriptName) {
-    return appScriptService.isAppScriptCurrentPage(scriptName);
-  }
-
-  public String getScriptNameFromURL() {
-    return appScriptService.getScriptNameFromURL();
-  }
-
-  public boolean isAppScriptRequest() {
-    return appScriptService.isAppScriptRequest();
-  }
-
-  public String getCurrentPageURL(String queryString) {
-    String ret;
-    if(isAppScriptRequest()) {
-      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
-      ret = getAppScriptURL(getScriptNameFromURL(), queryString);
-    } else {
-      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
-      ret = Util.escapeURL("?" + queryString);
-    }
-    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
-    return ret;
-  }
-
   public String convertToPlainText(String htmlContent) {
     LOGGER.trace("convertToPlainText called on celementsweb script service for ["
         + htmlContent + "].");
