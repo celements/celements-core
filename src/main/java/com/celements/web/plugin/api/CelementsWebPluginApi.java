@@ -126,6 +126,10 @@ public class CelementsWebPluginApi extends Api {
 
   private CelementsWebPlugin plugin;
 
+  /**
+   * @deprecated since ???NEXTRELEASE???
+   */
+  @Deprecated
   public CelementsWebPluginApi(
       CelementsWebPlugin plugin,
       XWikiContext context) {
@@ -133,11 +137,19 @@ public class CelementsWebPluginApi extends Api {
     setPlugin(plugin);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE???
+   */
+  @Deprecated
   //FIXME must check programming Rights!!!
   public CelementsWebPlugin getPlugin(){
     return plugin;
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE???
+   */
+  @Deprecated
   //FIXME must not be public! why do we need it in the API class anyway?
   public void setPlugin(CelementsWebPlugin plugin) {
     this.plugin = plugin;
@@ -1729,17 +1741,15 @@ public class CelementsWebPluginApi extends Api {
   public boolean congressRegistrationPlausibility(Document document) {
     return getSynCustom().congressRegistrationPlausibility(document);
   }
-
+  
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #newObjectForFormStorage(Document, String)}
+   */
+  @Deprecated
   public com.xpn.xwiki.api.Object newObjectForFormStorage(Document storageDoc,
       String className) {
-    if (hasProgrammingRights()) {
-      BaseObject newStoreObj = new FormObjStorageCommand().newObject(
-          storageDoc.getDocument(), className, context);
-      if (newStoreObj != null) {
-        return newStoreObj.newObjectApi(newStoreObj, context);
-      }
-    }
-    return null;
+    return getScriptService().newObjectForFormStorage(storageDoc, className);
   }
 
   /**
@@ -1761,13 +1771,17 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getObjStoreOptionsMap(String)}
+   * 
    * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as
    * a Map.
    * @param options The String saved in the store object
    * @return Map containing all the
    */
+  @Deprecated
   public Map<String, String> getObjStoreOptionsMap(String options) {
-    return (new ParseObjStoreCommand()).getObjStoreOptionsMap(options, context);
+    return getScriptService().getObjStoreOptionsMap(options);
   }
 
   /**
@@ -1797,8 +1811,13 @@ public class CelementsWebPluginApi extends Api {
     return getAuthenticationScriptService().getLoginRedirectURL();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #isCelementsRights(String)}
+   */
+  @Deprecated
   public boolean isCelementsRights(String fullName) {
-    return new CelementsRightsCommand().isCelementsRights(fullName, context);
+    return getScriptService().isCelementsRights(fullName);
   }
 
   /**
@@ -1886,21 +1905,35 @@ public class CelementsWebPluginApi extends Api {
         input, firstCol, secCol, limit);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getDefaultSpace()}
+   */
+  @Deprecated
   public String getDefaultSpace() {
-    return context.getWiki().getDefaultSpace(context);
+    return getScriptService().getDefaultSpace();
   }
 
-  public void checkClasses()  {
-    new CheckClassesCommand().checkClasses();
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #checkClasses()}
+   */
+  @Deprecated
+  public void checkClasses() {
+    getScriptService().checkClasses();
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
     return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
   }
 
+  /**
+   * @deprecated since 2.11.2 instead use {@link ImageScriptService
+   * #getRandomImages(String, int)}
+   */
+  @Deprecated
   public boolean useImageAnimations() {
-    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation",
-        "celements.celImageAnimation", "0", context));
+    return getImageScriptService().useImageAnimations();
   }
 
   /**

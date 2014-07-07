@@ -24,4 +24,9 @@ public class ImageScriptService {
       int num) throws ClassNotFoundException{
     return WebUtils.getInstance().getRandomImages(fullName, num, getContext());
   }
+  
+  public boolean useImageAnimations() {
+    return "1".equals(getContext().getWiki().getSpacePreference("celImageAnimation",
+        "celements.celImageAnimation", "0", getContext()));
+  }
 }

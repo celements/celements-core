@@ -46,14 +46,16 @@ import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
-import com.celements.validation.IFormValidationServiceRole;
 import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
+import com.celements.web.plugin.cmd.CelementsRightsCommand;
+import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.DocMetaTagsCmd;
-import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
+import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
+import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
@@ -65,7 +67,6 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 @Component("celementsweb")
@@ -641,6 +642,38 @@ public class CelementsWebScriptService implements ScriptService {
   @Deprecated
   public void flushMenuItemCache() {
     treeNodeCacheService.flushMenuItemCache();
+  }
+  
+  public void checkClasses()  {
+    new CheckClassesCommand().checkClasses();
+  }
+  
+  public String getDefaultSpace() {
+    return getContext().getWiki().getDefaultSpace(getContext());
+  }
+  
+  public boolean isCelementsRights(String fullName) {
+    return new CelementsRightsCommand().isCelementsRights(fullName, getContext());
+  }
+  
+  public Map<String, String> getObjStoreOptionsMap(String options) {
+    return (new ParseObjStoreCommand()).getObjStoreOptionsMap(options, getContext());
+  }
+  
+  public com.xpn.xwiki.api.Object newObjectForFormStorage(Document storageDoc,
+      String className) {
+    if (hasProgrammingRights()) {
+      BaseObject newStoreObj = new FormObjStorageCommand().newObject(
+          storageDoc.getDocument(), className, getContext());
+      if (newStoreObj != null) {
+        return newStoreObj.newObjectApi(newStoreObj, getContext());
+      }
+    }
+    return null;
+  }
+  
+  private boolean hasProgrammingRights() {
+    return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }
   
   private EditorSupportScriptService getEditorSupportScriptService() {

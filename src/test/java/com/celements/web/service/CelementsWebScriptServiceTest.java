@@ -25,6 +25,7 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   private XWikiContext context;
   private XWiki xwiki;
   private CelementsWebScriptService celWebService;
+  private AppScriptScriptService appScriptScriptService;
   private XWikiRightService mockRightService;
 
   @Before
@@ -38,6 +39,8 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     celWebService.webUtilsService = Utils.getComponent(IWebUtilsService.class);
     celWebService.execution = Utils.getComponent(Execution.class);
     celWebService.appScriptService = Utils.getComponent(IAppScriptService.class);
+    
+    appScriptScriptService.appScriptService = Utils.getComponent(IAppScriptService.class);
   }
 
   @Test
@@ -118,7 +121,7 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
         eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
         ).andReturn("Content.login").anyTimes();
     replayAll(mockRequest);
-    assertTrue(celWebService.isAppScriptRequest());
+    assertTrue(appScriptScriptService.isAppScriptRequest());
     verifyAll(mockRequest);
   }
   
@@ -135,7 +138,7 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
         ).andReturn("theURL").once();
     
     replayAll(appScriptServiceMock);
-    assertEquals("theURL", celWebService.getCurrentPageURL(queryString));
+    assertEquals("theURL", appScriptScriptService.getCurrentPageURL(queryString));
     verifyAll(appScriptServiceMock);
   }
   
@@ -148,7 +151,7 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(false).once();
     
     replayAll(appScriptServiceMock);
-    assertEquals("?my%5BQuery%7DString", celWebService.getCurrentPageURL(queryString));
+    assertEquals("?my%5BQuery%7DString", appScriptScriptService.getCurrentPageURL(queryString));
     verifyAll(appScriptServiceMock);
   }
 
