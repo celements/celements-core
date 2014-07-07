@@ -47,8 +47,13 @@ import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.service.ActionService;
+import com.celements.web.service.AuthenticationService;
+import com.celements.web.service.IActionServiceRole;
+import com.celements.web.service.IAuthenticationServiceRole;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.service.WebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -60,7 +65,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -245,34 +249,24 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return new NewCelementsTokenForUserCommand(
         ).getNewCelementsTokenForUserWithAuthentication(accountName, guestPlus, context);
   }
-  public String encryptString(String encoding, String str) {
-    return new PasswordClass().getEquivalentPassword(encoding, str);
-  }
   
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationService
+   * #getPasswordHash(String, String)}
+   */
+  @Deprecated
+  public String encryptString(String encoding, String str) {
+    return getAuthenticationService().getPasswordHash(encoding, str);
+  }
+   
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationService
+   * #activateAccount(String)}
+   */
+  @Deprecated
   public Map<String, String> activateAccount(String activationCode,
-      XWikiContext context) throws XWikiException{
-    Map<String, String> userAccount = new HashMap<String, String>();
-    String hashedCode = encryptString("hash:SHA-512:", activationCode);
-    String username = new UserNameForUserDataCommand().getUsernameForUserData(hashedCode,
-        "validkey", context);
-    
-    if((username != null) && !username.equals("")){
-      String password = context.getWiki().generateRandomString(24);
-      XWikiDocument doc = context.getWiki().getDocument(username, context);
-      BaseObject obj = doc.getObject("XWiki.XWikiUsers");
-
-//      obj.set("validkey", "", context);
-      obj.set("active", "1", context);
-      obj.set("force_pwd_change", "1", context);
-      obj.set("password", password, context);
-      
-      context.getWiki().saveDocument(doc, context);
-      
-      userAccount.put("username", username);
-      userAccount.put("password", password);
-    }
-    
-    return userAccount;
+      XWikiContext context) throws XWikiException{    
+    return getAuthenticationService().activateAccount(activationCode);
   }
 
   public String getEmailAdressForUser(String username, XWikiContext context) {
@@ -337,24 +331,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     }
     return new CelSendMail(context);
   }
-    
+  
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsService
+   * #getAttachmentsForDocs(List)}
+   */
+  @Deprecated 
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN, XWikiContext context) {
-    List<Attachment> attachments = new ArrayList<Attachment>();
-    for(String docFN : docsFN) {
-      try {
-        LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
-        for(XWikiAttachment xwikiAttachment : context.getWiki().getDocument(
-            docFN, context).getAttachmentList()) {
-          LOGGER.info("getAttachmentsForDocs: adding attachment " + 
-              xwikiAttachment.getFilename() + " to list.");
-          attachments.add(new Attachment(context.getWiki().getDocument(
-              docFN, context).newDocument(context), xwikiAttachment, context));
-        }
-      } catch (XWikiException e) {
-        LOGGER.error(e);
-      }
-    }
-    return attachments;
+    return getWebUtilsService().getAttachmentsForDocs(docsFN);
   }
 
   /**
@@ -592,18 +576,16 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return null;
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationService
+   * #checkAuth(String, String, String, String, Boolean)}
+   */
+  @Deprecated  
   public XWikiUser checkAuth(String logincredential, String password,
         String rememberme, String possibleLogins, Boolean noRedirect, XWikiContext context
       ) throws XWikiException {
-    String loginname = getUsernameForUserData(logincredential, possibleLogins, context);
-    if ("".equals(loginname) && possibleLogins.matches("(.*,)?loginname(,.*)?")) {
-        loginname = logincredential;
-    }
-    if (noRedirect != null) {
-      context.put("ajax", noRedirect);
-    }
-    return context.getWiki().getAuthService().checkAuth(loginname, password, rememberme,
-        context);
+    return getAuthenticationService().checkAuth(logincredential, password, rememberme, 
+        possibleLogins, noRedirect);
   }
 
   /**
@@ -616,42 +598,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, cmd);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link ActionService
+   * #executeAction(Document, Map, XWikiDocument, XWikiContext)}
+   */
+  @Deprecated  
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context) {
-    LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
-    VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
-    vcontext.put("theDoc", actionDoc);
-    Boolean debug = (Boolean)vcontext.get("debug");
-    vcontext.put("debug", true);
-    Boolean hasedit = (Boolean)vcontext.get("hasedit");
-    vcontext.put("hasedit", true);
-    Object req = vcontext.get("request");
-    vcontext.put("request", getApiUsableMap(request));
-    XWikiDocument execAct = null;
-    try {
-      execAct = context.getWiki()
-          .getDocument("celements2web:Macros.executeActions", context);
-    } catch (XWikiException e) {
-      LOGGER.error("Could not get action Macro", e);
-    }
-    String actionContent = "";
-    if(execAct != null) {
-      String execContent = execAct.getContent();
-      execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
-      actionContent = context.getWiki().getRenderingEngine().interpretText(
-          execContent, includingDoc, context);
-    }
-    Object successfulObj = vcontext.get("successful");
-    boolean successful = (successfulObj != null)
-                          && "true".equals(successfulObj.toString());
-    if(!successful) {
-      LOGGER.error("Error executing action. Output:" + vcontext.get("actionScriptOutput"));
-      LOGGER.error("Rendered Action Script: " + actionContent);
-    }
-    vcontext.put("debug", debug);
-    vcontext.put("hasedit", hasedit);
-    vcontext.put("request", req);
-    return successful;
+    return getActionService().executeAction(actionDoc, request, includingDoc, context);
   }
 
   //FIXME Hack to get mail execution to work. The script is not expecting arrays in the
@@ -804,5 +758,16 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public boolean addTranslation(String fullName, String language, XWikiContext context) {
     return new AddTranslationCommand().addTranslation(fullName, language, context);
   }
-
+  
+  private IAuthenticationServiceRole getAuthenticationService() {
+    return Utils.getComponent(IAuthenticationServiceRole.class);
+  }
+  
+  private IActionServiceRole getActionService() {
+    return Utils.getComponent(IActionServiceRole.class);
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
 }

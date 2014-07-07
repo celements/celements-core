@@ -1,0 +1,271 @@
+package com.celements.web.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
+
+import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
+import com.celements.web.plugin.cmd.PossibleLoginsCommand;
+import com.celements.web.plugin.cmd.RemoteUserValidator;
+import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.token.NewCelementsTokenForUserCommand;
+import com.celements.web.token.TokenLDAPAuthServiceImpl;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+
+@Component("authentication")
+public class AuthenticationScriptService implements ScriptService {
+  
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      AuthenticationScriptService.class);
+  
+  @Requirement
+  private IWebUtilsService webUtilsService;
+  
+  @Requirement
+  private IAuthenticationServiceRole authenticationService;
+  
+  @Requirement
+  private Execution execution;
+
+  private XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+  
+  public String getUsernameForUserData(String login) {
+    String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
+    String account = "";
+    try {
+      LOGGER.debug("executing getUsernameForUserData in plugin");
+      account = new UserNameForUserDataCommand().getUsernameForUserData(login,
+          possibleLogins, getContext());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get usernameForUserData for login [" + login
+          + "] and possibleLogins [" + possibleLogins + "].", exp);
+    }
+    return account;
+  }
+  
+  public String getUsernameForUserData(String login, String possibleLogins) {
+    String account = "";
+    if(hasProgrammingRights() || hasAdminRights()) {
+      try {
+        LOGGER.debug("executing getUsernameForUserData in plugin");
+        account = new UserNameForUserDataCommand().getUsernameForUserData(login,
+            possibleLogins, getContext());
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to get usernameForUserData for login [" + login
+            + "] and possibleLogins [" + possibleLogins + "].", exp);
+      }
+    } else {
+      LOGGER.debug("missing ProgrammingRights for [" + getContext().get("sdoc")
+          + "]: getUsernameForUserData cannot be executed!");
+    }
+    return account;
+  }
+  
+  public String getPasswordHash(String encoding, String str) {
+    return authenticationService.getPasswordHash(encoding, str);
+  }
+  
+  public String getPasswordHash(String str) {
+    return getPasswordHash("hash:SHA-512:", str);
+  }
+  
+  public boolean sendNewValidation(String user, String possibleFields) {
+    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
+        && (user.trim().length() > 0)) {
+      LOGGER.debug("sendNewValidation for user [" + user + "].");
+      try {
+        return new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
+            possibleFields);
+      } catch (XWikiException exp) {
+        LOGGER.error("sendNewValidation: failed.", exp);
+      }
+    }
+    return false;
+  }
+  
+  public void sendNewValidation(String user, String possibleFields,
+      DocumentReference mailContentDocRef) {
+    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
+        && (user.trim().length() > 0)) {
+      LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
+          + mailContentDocRef + "].");
+      try {
+        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
+            possibleFields, mailContentDocRef);
+      } catch (XWikiException exp) {
+        LOGGER.error("sendNewValidation: failed.", exp);
+      }
+    } else {
+      LOGGER.warn("sendNewValidation: new validation email for user [" + user
+          + "] not sent.");
+    }
+  }
+  
+  public String getNewValidationTokenForUser() {
+    if(hasProgrammingRights() && (getContext().getUser() != null)) {
+      try {
+        DocumentReference accountDocRef = webUtilsService.resolveDocumentReference(
+            getContext().getUser());
+        return new PasswordRecoveryAndEmailValidationCommand(
+            ).getNewValidationTokenForUser(accountDocRef);
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to create new validation Token for user: "
+            + getContext().getUser(), exp);
+      }
+    }
+    return null;
+  }
+  
+  public String getNewCelementsTokenForUser(Boolean guestPlus) {
+    if(getContext().getUser() != null) {
+      try {
+        return new NewCelementsTokenForUserCommand(
+            ).getNewCelementsTokenForUserWithAuthentication(getContext().getUser(), guestPlus,
+                getContext());
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to create new validation Token for user: "
+            + getContext().getUser(), exp);
+      }
+    }
+    return null;
+  }
+  
+  public String getNewCelementsTokenForUser(Boolean guestPlus, int minutesValid) {
+    if(getContext().getUser() != null) {
+      try {
+        return new NewCelementsTokenForUserCommand(
+            ).getNewCelementsTokenForUserWithAuthentication(getContext().getUser(), 
+                guestPlus, minutesValid, getContext());
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to create new validation Token for user: "
+            + getContext().getUser(), exp);
+      }
+    }
+    return null;
+  }
+  
+  public String getNewCelementsTokenForUser() {
+    return getNewCelementsTokenForUser(false);
+  }
+  
+  public Map<String, String> activateAccount(String activationCode) throws XWikiException{
+    return authenticationService.activateAccount(activationCode);
+  }
+  
+  public String getUniqueValidationKey() throws XWikiException {
+    return new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
+  }
+  
+  public String recoverPassword() throws XWikiException {
+    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
+  }
+
+  public String recoverPassword(String account) throws XWikiException {
+    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account,
+        account);
+  }
+  
+  public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
+    if (hasProgrammingRights()) {
+      String username = getContext().getRequest().getParameter("username");
+      LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
+      XWikiAuthService authService = getContext().getWiki().getAuthService();
+      if (authService instanceof TokenLDAPAuthServiceImpl) {
+        return ((TokenLDAPAuthServiceImpl) authService).checkAuthByToken(username, 
+            userToken, getContext());
+      } else {
+        LOGGER.warn("checkAuthByToken: Not using TokenLDAPAuthService");
+      }
+    } else {
+      LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
+          + getContext().get("sdoc") + "]: checkAuthByToken cannot be executed!");
+    }
+    return null;
+  }
+  
+  public XWikiUser checkAuth(String logincredential, String password, String rememberme,
+      String possibleLogins) throws XWikiException {
+    return authenticationService.checkAuth(logincredential, password, rememberme, 
+        possibleLogins, null);
+  }
+  
+  public XWikiUser checkAuth(String logincredential, String password, String rememberme,
+      String possibleLogins, boolean noRedirect) throws XWikiException {
+    return authenticationService.checkAuth(logincredential, password, rememberme, 
+        possibleLogins, noRedirect);
+  }
+  
+  
+  
+  public String isValidUserJSON(String username, String password, String memberOfGroup,
+      List<String> returnGroupMemberships) {
+    RemoteUserValidator validater = new RemoteUserValidator();
+    if(hasProgrammingRights()) {
+      return validater.isValidUserJSON(username, password, memberOfGroup,
+          returnGroupMemberships, getContext());
+    }
+    return null;
+  }
+  
+  public String getLogoutRedirectURL() {
+    XWiki xwiki = getContext().getWiki();
+    String logoutRedirectConf = xwiki.getSpacePreference("LogoutRedirect",
+        "celements.logoutRedirect", xwiki.getDefaultSpace(getContext()) + ".WebHome", 
+        getContext());
+    String logoutRedirectURL = logoutRedirectConf;
+    if (!logoutRedirectConf.startsWith("http://")
+        && !logoutRedirectConf.startsWith("https://")) {
+      logoutRedirectURL = xwiki.getURL(logoutRedirectConf, "view", "logout=1", 
+          getContext());
+    }
+    return logoutRedirectURL;
+  }
+  
+  public String getLoginRedirectURL() {
+    XWiki xwiki = getContext().getWiki();
+    String loginRedirectConf = xwiki.getSpacePreference("LoginRedirect",
+        "celements.loginRedirect", xwiki.getDefaultSpace(getContext()) + ".WebHome", 
+        getContext());
+    String loginRedirectURL = loginRedirectConf;
+    if (!loginRedirectConf.startsWith("http://")
+        && !loginRedirectConf.startsWith("https://")) {
+      loginRedirectURL = xwiki.getURL(loginRedirectConf, "view", "", getContext());
+    }
+    return loginRedirectURL;
+  }
+  
+  public boolean hasAccessLevel(String level, String user, boolean isUser,
+      DocumentReference docRef) {
+    try {
+      return ((XWikiRightServiceImpl) getContext().getWiki().getRightService()
+          ).hasAccessLevel(level, user, webUtilsService.getRefDefaultSerializer(
+              ).serialize(docRef), isUser, getContext());
+    } catch (Exception exp) {
+      LOGGER.warn("hasAccessLevel failed for level[" +level+"] user["+user+"] " +
+      		"docRef["+docRef+"] isUser["+isUser+"]", exp);
+      return false;
+    }
+  }
+  
+  private boolean hasProgrammingRights() {
+    return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
+  }
+
+  private boolean hasAdminRights() {
+    return getContext().getWiki().getRightService().hasAdminRights(getContext());
+  }
+}

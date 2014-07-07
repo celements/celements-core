@@ -11,6 +11,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
+import com.celements.navigation.cmd.ReorderSaveCommand;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("treeNode")
@@ -72,5 +73,8 @@ public class TreeNodeScriptService implements ScriptService {
   public int queryCount() {
     return treeNodeCache.queryCount();
   }
-
+  
+  public String navReorderSave(String fullName, String structureJSON) {
+    return new ReorderSaveCommand().reorderSave(fullName, structureJSON, getContext());
+  }
 }

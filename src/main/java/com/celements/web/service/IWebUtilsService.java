@@ -29,6 +29,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -188,5 +189,7 @@ public interface IWebUtilsService {
   public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
 
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
+  
+  public List<Attachment> getAttachmentsForDocs(List<String> docsFN);
 
 }

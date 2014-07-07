@@ -66,14 +66,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
   public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
-  
-  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
-      "com.celements.web.ExternalJavaScriptFilesCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebScriptService.class);
@@ -86,9 +84,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   IWebUtilsService webUtilsService;
-
-  @Requirement
-  IFormValidationServiceRole formValidationService;
+  
+  @Requirement("legacyskin")
+  ScriptService legacySkinScriptService;
 
   @Requirement
   ITreeNodeCache treeNodeCacheService;
@@ -556,12 +554,15 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link EditorSupportScriptService
+   * #validateRequest()}
    * 
    * @return empty map means the validation has been successful. Otherwise validation
    *          messages are returned for invalid fields.
    */
+  @Deprecated
   public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
-    return formValidationService.validateRequest();
+    return getEditorSupportScriptService().validateRequest();
   }
 
   /**
@@ -578,13 +579,13 @@ public class CelementsWebScriptService implements ScriptService {
     return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, getContext());
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * #getSkinConfigObj()}
+   */
+  @Deprecated
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj();
-    if (skinConfigObj != null) {
-      return skinConfigObj.newObjectApi(skinConfigObj, getContext());
-    } else {
-      return null;
-    }
+    return ((LegacySkinScriptService) legacySkinScriptService).getSkinConfigObj();
   }
 
   public com.xpn.xwiki.api.Object getSkinConfigObj(String fallbackClassName) {
@@ -675,24 +676,8 @@ public class CelementsWebScriptService implements ScriptService {
     treeNodeCacheService.flushMenuItemCache();
   }
   
-  public String getAllExternalJavaScriptFiles() throws XWikiException {
-    return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
-  }
-  
-  public String addExtJSfileOnce(String jsFile) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
-  }
-
-  public String addExtJSfileOnce(String jsFile, String action) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
-  }
-  
-  private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
-    if (getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
-      getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand(
-          getContext()));
-    }
-    return (ExternalJavaScriptFilesCommand) getContext().get(
-        JAVA_SCRIPT_FILES_COMMAND_KEY);
+  private EditorSupportScriptService getEditorSupportScriptService() {
+    return (EditorSupportScriptService) Utils.getComponent(ScriptService.class, 
+        "editorsupport");
   }
 }

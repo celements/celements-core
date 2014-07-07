@@ -61,6 +61,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -948,6 +949,26 @@ public class WebUtilsService implements IWebUtilsService {
     } else {
       return null;
     }
+  }
+  
+  public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    for(String docFN : docsFN) {
+      try {
+        LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
+        for(XWikiAttachment xwikiAttachment : getContext().getWiki().getDocument(
+            resolveDocumentReference(docFN), getContext()).getAttachmentList()) {
+          LOGGER.info("getAttachmentsForDocs: adding attachment " + 
+              xwikiAttachment.getFilename() + " to list.");
+          attachments.add(new Attachment(getContext().getWiki().getDocument(
+              resolveDocumentReference(docFN), getContext()).newDocument(getContext()), 
+              xwikiAttachment, getContext()));
+        }
+      } catch (XWikiException e) {
+        LOGGER.error(e);
+      }
+    }
+    return attachments;
   }
 
   private String[] getValueAsStringArray(Object value) {

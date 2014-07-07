@@ -490,6 +490,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use ImageService
    */
+  @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context) {
     try {
