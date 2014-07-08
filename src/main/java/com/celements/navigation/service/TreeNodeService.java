@@ -643,9 +643,6 @@ public class TreeNodeService implements ITreeNodeService {
     storeOrder(newTreeNodes, false);
   }
 
-  /**
-   * TODO write unit tests and test if working
-   */
   @Override
   public void storeOrder(List<TreeNode> newTreeNodes, boolean isMinorEdit) {
     int pos = -1;

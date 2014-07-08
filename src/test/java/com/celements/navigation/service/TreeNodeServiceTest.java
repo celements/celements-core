@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
@@ -904,6 +905,118 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         treeNodeService.getParentKey(docRef, false));
   }
 
+  @Test
+  public void testStoreOrder() throws Exception {
+    String parentFN = "mySpace.name";
+    String spaceName = "mySapce";
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos3 = 1;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    XWikiDocument navDoc1 = createNavDoc(treeNode1);
+    expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
+    XWikiDocument navDoc2 = createNavDoc(treeNode2);
+    expect(wiki.getDocument(eq(docRef2), same(context))).andReturn(navDoc2);
+    XWikiDocument navDoc3 = createNavDoc(treeNode3);
+    expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
+    // expecting correct savings
+    Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
+    Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
+    Capture<XWikiDocument> capDoc3 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
+    replayDefault();
+    treeNodeService.storeOrder(newTreeNodes);
+    XWikiDocument savedDoc1 = capDoc1.getValue();
+    BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(0, menuItemObj1.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc2 = capDoc2.getValue();
+    BaseObject menuItemObj2 = savedDoc2.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(1, menuItemObj2.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc3 = capDoc3.getValue();
+    BaseObject menuItemObj3 = savedDoc3.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(2, menuItemObj3.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    verifyDefault();
+  }
+
+  @Test
+  public void testStoreOrder_minorEdits() throws Exception {
+    String parentFN = "mySpace.name";
+    String spaceName = "mySapce";
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos3 = 1;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    XWikiDocument navDoc1 = createNavDoc(treeNode1);
+    expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
+    XWikiDocument navDoc2 = createNavDoc(treeNode2);
+    expect(wiki.getDocument(eq(docRef2), same(context))).andReturn(navDoc2);
+    XWikiDocument navDoc3 = createNavDoc(treeNode3);
+    expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
+    // expecting correct savings
+    Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc1), isA(String.class), eq(true), same(context));
+    Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc2), isA(String.class), eq(true), same(context));
+    Capture<XWikiDocument> capDoc3 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc3), isA(String.class), eq(true), same(context));
+    replayDefault();
+    treeNodeService.storeOrder(newTreeNodes, true);
+    XWikiDocument savedDoc1 = capDoc1.getValue();
+    BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(0, menuItemObj1.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc2 = capDoc2.getValue();
+    BaseObject menuItemObj2 = savedDoc2.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(1, menuItemObj2.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc3 = capDoc3.getValue();
+    BaseObject menuItemObj3 = savedDoc3.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(2, menuItemObj3.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    verifyDefault();
+  }
+
+
+  private XWikiDocument createNavDoc(TreeNode treeNode1) {
+    XWikiDocument navDoc = new XWikiDocument(treeNode1.getDocumentReference());
+    navDoc.setParent(treeNode1.getParent());
+    BaseObject menuItemObj = new BaseObject();
+    menuItemObj.setXClassReference(getNavClassConfig().getMenuItemClassRef(
+        context.getDatabase()));
+    menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        treeNode1.getPosition());
+    navDoc.addXObject(menuItemObj);
+    return navDoc;
+  }
 
   private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
     BaseObject navObj = new BaseObject();
