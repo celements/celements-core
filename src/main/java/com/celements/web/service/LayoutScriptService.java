@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -17,6 +18,7 @@ import com.celements.web.plugin.api.PageLayoutApi;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 @Component("layout")
@@ -102,9 +104,35 @@ public class LayoutScriptService  implements ScriptService {
     return getPageLayoutCmd().layoutEditorAvailable();
   }
   
+  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
+      SpaceReference layoutSpaceRef) {
+    XWikiDocument oldContextDoc = getContext().getDoc();
+    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
+        + "] and layoutSpaceRef [" + layoutSpaceRef + "] overwrite oldContextDoc ["
+        + oldContextDoc.getDocumentReference() + "].");
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    try {
+      XWikiDocument newContextDoc = getContext().getWiki().getDocument(docRef, 
+          getContext());
+      getContext().setDoc(newContextDoc);
+      vcontext.put("doc", newContextDoc.newDocument(getContext()));
+      return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
+          exp);
+    } finally {
+      getContext().setDoc(oldContextDoc);
+      vcontext.put("doc", oldContextDoc.newDocument(getContext()));
+    }
+    return "";
+  }
+  
+  public SpaceReference getCurrentRenderingLayout() {
+    return getPageLayoutCmd().getCurrentRenderingLayout();
+  }
+  
   /**
-   * TODO: Vielleicht direkt TreeNodeService verwenden
-   * @return
+   * TODO: Probably use TreeNodeService directly
    */
   private PageLayoutCommand getPageLayoutCmd() {
     if (!getContext().containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {

@@ -20,7 +20,6 @@
 package com.celements.web.plugin.api;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,14 +30,11 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
@@ -47,7 +43,6 @@ import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
-import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.RTEConfig;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
@@ -56,18 +51,12 @@ import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
-import com.celements.web.plugin.cmd.CelementsRightsCommand;
-import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.CssCommand;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
-import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
 import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.RenameCommand;
-import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.service.ActionScriptService;
 import com.celements.web.service.AppScriptScriptService;
 import com.celements.web.service.AuthenticationScriptService;
@@ -80,7 +69,6 @@ import com.celements.web.service.DocFormScriptService;
 import com.celements.web.service.EditorSupportScriptService;
 import com.celements.web.service.EmptyCheckScriptService;
 import com.celements.web.service.FileBaseScriptService;
-import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.ImageScriptService;
 import com.celements.web.service.JSScriptService;
@@ -100,7 +88,6 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -581,13 +568,6 @@ public class CelementsWebPluginApi extends Api {
   //        || ((context.get("sdoc") == null) && (context.get("idoc") == null)));
   //  }
 
-  private CssCommand getCssCmd() {
-    if (!context.containsKey(CELEMENTS_CSSCOMMAND)) {
-      context.put(CELEMENTS_CSSCOMMAND, new CssCommand());
-    }
-    return (CssCommand) context.get(CELEMENTS_CSSCOMMAND);
-  }
-
   /**
    * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
    * #getAllCSS()}
@@ -1010,8 +990,13 @@ public class CelementsWebPluginApi extends Api {
     getSynCustom().sendCallbackNotificationMail(data, recipients);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link RTEConfigScriptService
+   * #isEmptyRTEString(String)}
+   */
+  @Deprecated
   public boolean isEmptyRTEString(String rteContent) {
-    return getDefaultEmptyCheckService().isEmptyRTEString(rteContent);
+    return getRTEConfigScriptService().isEmptyRTEString(rteContent);
   }
 
   /**
@@ -1023,14 +1008,20 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsScriptService().getParentSpace();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link RTEConfigScriptService
+   * #getRTEConfigsList()}
+   */
+  @Deprecated
   public List<DocumentReference> getRTEConfigsList() {
-    return new RTEConfig().getRTEConfigsList();
+    return getRTEConfigScriptService().getRTEConfigsList();
   }
 
   /**
    * @deprecated since ???NEXTRELEASE??? instead use {@link RTEConfigScriptService
    * #getRTEConfigField(String)}
    */
+  @Deprecated
   public String getRTEConfigField(String name) {
     return getRTEConfigScriptService().getRTEConfigField(name);
   }
@@ -1271,30 +1262,24 @@ public class CelementsWebPluginApi extends Api {
     return getLayoutScriptService().renderPageLayout(spaceRef);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * #renderCelementsDocumentWithLayout(DocumentReference, SpaceReference)}
+   */
+  @Deprecated
   public String renderCelementsDocumentWithLayout(DocumentReference docRef,
       SpaceReference layoutSpaceRef) {
-    XWikiDocument oldContextDoc = context.getDoc();
-    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
-        + "] and layoutSpaceRef [" + layoutSpaceRef + "] overwrite oldContextDoc ["
-        + oldContextDoc.getDocumentReference() + "].");
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-    try {
-      XWikiDocument newContextDoc = context.getWiki().getDocument(docRef, context);
-      context.setDoc(newContextDoc);
-      vcontext.put("doc", newContextDoc.newDocument(context));
-      return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
-          exp);
-    } finally {
-      context.setDoc(oldContextDoc);
-      vcontext.put("doc", oldContextDoc.newDocument(context));
-    }
-    return "";
+    return getLayoutScriptService().renderCelementsDocumentWithLayout(docRef, 
+        layoutSpaceRef);
   }
-
+  
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * #getCurrentRenderingLayout()}
+   */
+  @Deprecated
   public SpaceReference getCurrentRenderingLayout() {
-    return getPageLayoutCmd().getCurrentRenderingLayout();
+    return getLayoutScriptService().getCurrentRenderingLayout();
   }
 
   /**
@@ -1651,12 +1636,6 @@ public class CelementsWebPluginApi extends Api {
   public String renderDocument(Document renderDoc, boolean removePre,
       List<String> rendererNameList) {
     return getScriptService().renderDocument(renderDoc, removePre, rendererNameList);
-  }
-
-  private RenderCommand getCelementsRenderCmd() {
-    RenderCommand renderCommand = new RenderCommand();
-    renderCommand.setDefaultPageType("RichText");
-    return renderCommand;
   }
 
   /**
@@ -2061,21 +2040,8 @@ public class CelementsWebPluginApi extends Api {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  private IPrepareVelocityContext getPrepareVelocityContextService() {
-    return Utils.getComponent(IPrepareVelocityContext.class);
-  }
-
-  private DefaultStringEntityReferenceSerializer getEntitySerializer() {
-    return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
-        EntityReferenceSerializer.class));
-  }
-
   private IEmptyCheckRole getEmptyCheckService() {
     return Utils.getComponent(IEmptyCheckRole.class);
-  }
-
-  private IDefaultEmptyDocStrategyRole getDefaultEmptyCheckService() {
-    return Utils.getComponent(IDefaultEmptyDocStrategyRole.class);
   }
 
   private AuthenticationScriptService getAuthenticationScriptService() {
