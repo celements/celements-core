@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -43,20 +42,15 @@ import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
-import com.celements.rteConfig.RTEConfig;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
-import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
-import com.celements.web.plugin.cmd.LastStartupTimeStamp;
-import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.service.ActionScriptService;
 import com.celements.web.service.AppScriptScriptService;
 import com.celements.web.service.AuthenticationScriptService;
@@ -87,7 +81,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -163,12 +156,13 @@ public class CelementsWebPluginApi extends Api {
     return getScriptService().getLastStartupTimeStamp();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #resetLastStartupTimeStamp()}
+   */
+  @Deprecated
   public boolean resetLastStartupTimeStamp() {
-    if (hasProgrammingRights()) {
-      new LastStartupTimeStamp().resetLastStartupTimeStamp();
-      return true;
-    }
-    return false;
+    return getScriptService().resetLastStartupTimeStamp();
   }
 
   /**
@@ -1243,17 +1237,6 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * TODO: Vielleicht direkt TreeNodeService verwenden
-   * @return
-   */
-  private PageLayoutCommand getPageLayoutCmd() {
-    if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-      context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
-    }
-    return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
-  }
-
-  /**
    * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
    * #renderPageLayout(SpaceReference)}
    */
@@ -1320,15 +1303,22 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.18.0 instead use addTranslation(DocumentReference, String)
+   * @deprecated since 2.18.0 instead use {@link CelementsWebScriptService
+   * #addTranslation(DocumentReference, String)}
    */
   @Deprecated
   public boolean addTranslation(String fullName, String language) {
-    return new AddTranslationCommand().addTranslation(fullName, language, context);
+    return getScriptService().addTranslation(getWebUtilsService(
+        ).resolveDocumentReference(fullName), language);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #addTranslation(DocumentReference, String)}
+   */
+  @Deprecated
   public boolean addTranslation(DocumentReference docRef, String language) {
-    return new AddTranslationCommand().addTranslation(docRef, language);
+    return getScriptService().addTranslation(docRef, language);
   }
 
   /**
@@ -1342,20 +1332,40 @@ public class CelementsWebPluginApi extends Api {
     return getSynCustom().getBMI();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #renameSpace(String, String)}
+   */
+  @Deprecated
   public List<String> renameSpace(String spaceName, String newSpaceName) {
-    return new RenameCommand().renameSpace(spaceName, newSpaceName, context);
+    return getScriptService().renameSpace(spaceName, newSpaceName);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #renameDoc(String, String)}
+   */
+  @Deprecated
   public boolean renameDoc(String fullName, String newDocName) {
-    return new RenameCommand().renameDoc(fullName, newDocName, context);
+    return getScriptService().renameDoc(fullName, newDocName);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getSupportedAdminLanguages()}
+   */
+  @Deprecated
   public List<String> getSupportedAdminLanguages() {
-    return plugin.getSupportedAdminLanguages();
+    return getScriptService().getSupportedAdminLanguages();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #writeUTF8Response(String, String)}
+   */
+  @Deprecated
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
-    return plugin.writeUTF8Response(filename, renderDocFullName, context);
+    return getScriptService().writeUTF8Response(filename, renderDocFullName);
   }
 
   /**

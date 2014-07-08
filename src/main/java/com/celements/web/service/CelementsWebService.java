@@ -1,5 +1,8 @@
 package com.celements.web.service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -19,12 +23,16 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiResponse;
 
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebService.class);
+  
+  private List<String> supportedAdminLangList;
   
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -160,5 +168,57 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       }
     }
     return isUnique;
+  }
+
+  public List<String> getSupportedAdminLanguages() {
+    if (supportedAdminLangList == null) {
+      supportedAdminLangList =  Arrays.asList(new String[] {"de","fr","en","it"});
+    }
+    return supportedAdminLangList;
+  }
+  
+  public boolean writeUTF8Response(String filename, String renderDocFullName) {
+    boolean success = false;
+    if(getContext().getWiki().exists(webUtilsService.resolveDocumentReference(
+        renderDocFullName), getContext())) {
+      XWikiDocument renderDoc;
+      try {
+        renderDoc = getContext().getWiki().getDocument(
+            webUtilsService.resolveDocumentReference(renderDocFullName), getContext());
+        adjustResponseHeader(filename, getContext().getResponse());
+        setResponseContent(renderDoc, getContext().getResponse());
+      } catch (XWikiException e) {
+        LOGGER.error(e);
+      }
+      getContext().setFinished(true);
+    }
+    return success;
+  }
+  
+  private void adjustResponseHeader(String filename, XWikiResponse response) {
+    response.setContentType("text/plain");
+    String ofilename = Util.encodeURI(filename, getContext()).replaceAll("\\+", " ");
+    response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename + 
+        "\"; charset='UTF-8'");
+  }
+  
+  private void setResponseContent(XWikiDocument renderDoc, XWikiResponse response) 
+      throws XWikiException {
+    String renderedContent = new RenderCommand().renderDocument(renderDoc);
+    byte[] data = {};
+    try {
+      data = renderedContent.getBytes("UTF-8");
+    } catch (UnsupportedEncodingException e1) {
+      e1.printStackTrace();
+    }
+    response.setContentLength(data.length + 3);
+    try {
+      response.getOutputStream().write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
+      response.getOutputStream().write(data);
+    } catch (IOException e) {
+      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+          XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+          "Exception while sending response", e);
+    }
   }
 }

@@ -549,60 +549,27 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return apiConform;
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * #getSupportedAdminLanguages()}
+   */
+  @Deprecated 
   public List<String> getSupportedAdminLanguages() {
-    if (supportedAdminLangList == null) {
-      setSupportedAdminLanguages(Arrays.asList(new String[] {"de","fr","en","it"}));
-    }
-    return supportedAdminLangList;
+    return getCelementsWebService().getSupportedAdminLanguages();
   }
 
   public void setSupportedAdminLanguages(List<String> newSupportedAdminLangList) {
     supportedAdminLangList = newSupportedAdminLangList;
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * #writeUTF8Response(String, String)}
+   */
+  @Deprecated 
   public boolean writeUTF8Response(String filename, String renderDocFullName, 
       XWikiContext context) {
-    boolean success = false;
-    if(context.getWiki().exists(renderDocFullName, context)) {
-      XWikiDocument renderDoc;
-      try {
-        renderDoc = context.getWiki().getDocument(renderDocFullName, context);
-        adjustResponseHeader(filename, context.getResponse(), context);
-        setResponseContent(renderDoc, context.getResponse(), context);
-      } catch (XWikiException e) {
-        LOGGER.error(e);
-      }
-      context.setFinished(true);
-    }
-    return success;
-  }
-  
-  void adjustResponseHeader(String filename, XWikiResponse response, 
-      XWikiContext context) {
-    response.setContentType("text/plain");
-    String ofilename = Util.encodeURI(filename, context).replaceAll("\\+", " ");
-    response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename + 
-        "\"; charset='UTF-8'");
-  }
-
-  void setResponseContent(XWikiDocument renderDoc, XWikiResponse response,
-      XWikiContext context) throws XWikiException {
-    String renderedContent = new RenderCommand().renderDocument(renderDoc);
-    byte[] data = {};
-    try {
-      data = renderedContent.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException e1) {
-      e1.printStackTrace();
-    }
-    response.setContentLength(data.length + 3);
-    try {
-      response.getOutputStream().write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
-      response.getOutputStream().write(data);
-    } catch (IOException e) {
-      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-          XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-          "Exception while sending response", e);
-    }
+    return getCelementsWebService().writeUTF8Response(filename, renderDocFullName);
   }
 
   public boolean isFormFilled(Map<String, String[]> parameterMap, 

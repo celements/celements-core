@@ -47,6 +47,7 @@ import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.rendering.RenderCommand;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
+import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
@@ -59,6 +60,7 @@ import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
+import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.xpn.xwiki.XWikiConfig;
@@ -781,6 +783,34 @@ public class CelementsWebScriptService implements ScriptService {
   
   public int createUser(boolean validate) throws XWikiException {
     return getCelementsWebService().createUser(validate);
+  }
+  
+  public boolean addTranslation(DocumentReference docRef, String language) {
+    return new AddTranslationCommand().addTranslation(docRef, language);
+  }
+  
+  public List<String> renameSpace(String spaceName, String newSpaceName) {
+    return new RenameCommand().renameSpace(spaceName, newSpaceName, getContext());
+  }
+  
+  public boolean renameDoc(String fullName, String newDocName) {
+    return new RenameCommand().renameDoc(fullName, newDocName, getContext());
+  }
+  
+  public List<String> getSupportedAdminLanguages() {
+    return getCelementsWebService().getSupportedAdminLanguages();
+  }
+  
+  public boolean writeUTF8Response(String filename, String renderDocFullName) {
+    return getCelementsWebService().writeUTF8Response(filename, renderDocFullName);
+  }
+  
+  public boolean resetLastStartupTimeStamp() {
+    if (hasProgrammingRights()) {
+      new LastStartupTimeStamp().resetLastStartupTimeStamp();
+      return true;
+    }
+    return false;
   }
   
   private boolean hasAdminRights() {

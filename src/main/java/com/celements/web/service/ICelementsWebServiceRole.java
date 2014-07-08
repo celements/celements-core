@@ -1,5 +1,6 @@
 package com.celements.web.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -18,4 +19,8 @@ public interface ICelementsWebServiceRole {
       boolean validate) throws XWikiException;
   
   public Map<String, String> getUniqueNameValueRequestMap();
+  
+  public List<String> getSupportedAdminLanguages();
+  
+  public boolean writeUTF8Response(String filename, String renderDocFullName);
 }
