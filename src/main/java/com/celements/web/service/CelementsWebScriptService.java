@@ -656,8 +656,9 @@ public class CelementsWebScriptService implements ScriptService {
     return getContext().getWiki().getDefaultSpace(getContext());
   }
   
-  public boolean isCelementsRights(String fullName) {
-    return new CelementsRightsCommand().isCelementsRights(fullName, getContext());
+  public boolean isCelementsRights(DocumentReference docRef) {
+    return new CelementsRightsCommand().isCelementsRights(getWebUtilsService(
+        ).getRefDefaultSerializer().serialize(docRef), getContext());
   }
   
   public Map<String, String> getObjStoreOptionsMap(String options) {
@@ -793,8 +794,9 @@ public class CelementsWebScriptService implements ScriptService {
     return new RenameCommand().renameSpace(spaceName, newSpaceName, getContext());
   }
   
-  public boolean renameDoc(String fullName, String newDocName) {
-    return new RenameCommand().renameDoc(fullName, newDocName, getContext());
+  public boolean renameDoc(DocumentReference docRef, String newDocName) {
+    return new RenameCommand().renameDoc(getWebUtilsService().getRefDefaultSerializer(
+        ).serialize(docRef), newDocName, getContext());
   }
   
   public List<String> getSupportedAdminLanguages() {

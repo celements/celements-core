@@ -64,7 +64,6 @@ public class CelementsWebService implements ICelementsWebServiceRole {
         validate);
   }
   
-//  @SuppressWarnings("deprecation")
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate) throws XWikiException {
     String accountName = "";

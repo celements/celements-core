@@ -9,10 +9,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 @Component("treeNode")
 public class TreeNodeScriptService implements ScriptService {
@@ -74,7 +77,20 @@ public class TreeNodeScriptService implements ScriptService {
     return treeNodeCache.queryCount();
   }
   
-  public String navReorderSave(String fullName, String structureJSON) {
-    return new ReorderSaveCommand().reorderSave(fullName, structureJSON, getContext());
+  public String navReorderSave(DocumentReference docRef, String structureJSON) {
+    return new ReorderSaveCommand().reorderSave(getWebUtilsService(
+        ).getRefDefaultSerializer().serialize(docRef), structureJSON, getContext());
+  }
+  
+  public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
+    return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
+  }
+  
+  private IEmptyCheckRole getEmptyCheckService() {
+    return Utils.getComponent(IEmptyCheckRole.class);
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 }

@@ -149,7 +149,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 instead use CelementsWebScriptService
+   * @deprecated since 2.2 instead use {@link CelementsWebScriptService
+   * #getLastStartupTimeStamp()}
    */
   @Deprecated
   public String getLastStartupTimeStamp() {
@@ -191,7 +192,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #createNavigation()}
    */
   @Deprecated
   public NavigationApi createNavigation() {
@@ -199,7 +201,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #enableMappedMenuItems()}
    */
   @Deprecated
   public void enableMappedMenuItems() {
@@ -207,7 +210,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getMaxConfiguredNavigationLevel()}
    */
   @Deprecated
   public int getMaxConfiguredNavigationLevel() {
@@ -215,7 +219,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #isTreeNode(DocumentReference)}
    */
   @Deprecated
   public boolean isTreeNode(DocumentReference docRef) {
@@ -223,7 +228,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #isNavigationEnabled(String)}
    */
   @Deprecated
   public boolean isNavigationEnabled(String configName) {
@@ -231,7 +237,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getNavigation(String)}
    */
   @Deprecated
   public NavigationApi getNavigation(String configName) {
@@ -239,7 +246,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #includeNavigation(String)}
    */
   @Deprecated
   public String includeNavigation(String configName) {
@@ -247,7 +255,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use getSubNodesForParentRef in treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
@@ -256,7 +265,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 use getSubNodesForParentRef in treeNode script service instead
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
@@ -265,7 +275,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference)
+   * @deprecated since 2.24.0 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
@@ -282,7 +293,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference, String)
+   * @deprecated since 2.24.0 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -301,7 +313,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.33.0 use treeNode script service instead
+   * @deprecated since 2.33.0 instead use {@link TreeNodeScriptService
+   * #queryCount()}
    */
   @Deprecated
   public int queryCount() {
@@ -330,7 +343,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.33.0 use WebUtilsScriptService
+   * @deprecated since 2.33.0 instead use {@link WebUtilsService
+   * #getAttachmentListSorted(Document, String)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
@@ -339,7 +353,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.33.0 use WebUtilsScriptService
+   * @deprecated since 2.33.0 instead use {@link WebUtilsService
+   * #getAttachmentListSorted(Document, String, boolean, int, int)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
@@ -349,7 +364,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.33.0 use WebUtilsScriptService
+   * @deprecated since 2.33.0 instead use {@link WebUtilsService
+   * #getAttachmentListSortedAsJSON(Document, String, boolean)}
    */
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
@@ -359,7 +375,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.33.0 use WebUtilsScriptService
+   * @deprecated since 2.33.0 use instead use {@link WebUtilsService
+   * #getAttachmentListSortedAsJSON(Document, String, boolean, int, int)}
    */
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
@@ -622,10 +639,6 @@ public class CelementsWebPluginApi extends Api {
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
-    DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("usage of deprecated isEmptyRTEDocument(String) on ["
-        + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
-        + docRef.getName() + "].");
     return getEmptyCheckService().isEmptyRTEDocument(getWebUtilsService(
         ).resolveDocumentReference(fullName));
   }
@@ -774,13 +787,13 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.30.0 instead use
-   *             {@link NextFreeDocScriptService#getNextTitledPageDocRef(String, String)}
+   * @deprecated since 2.30.0 instead use {@link NextFreeDocScriptService
+   * #getNextTitledPageDocRef(String, String)}
    */
   @Deprecated
   public String getNextTitledPageFullName(String space, String title) {
-    return this.getWebUtilsService().getRefLocalSerializer().serialize(
-        this.getNextTitledPageDocRef(space, title));
+    return getWebUtilsService().getRefLocalSerializer().serialize(
+        getNextTitledPageDocRef(space, title));
   }
 
   /**
@@ -1065,7 +1078,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.11.5 use $services.celMenu.getMenuBar() instead
+   * @deprecated since 2.11.5 use $services.celMenu instead
    */
   @Deprecated
   public MenuScriptService getMenuBar() {
@@ -1079,7 +1092,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map
       ) throws XWikiException {
-    return getDocFormScriptService().updateDocFromMap(fullname, map);
+    return getDocFormScriptService().updateDocFromMap(getWebUtilsService(
+        ).resolveDocumentReference(fullname), map);
   }
 
   private DocFormCommand getDocFormCommand() {
@@ -1106,7 +1120,8 @@ public class CelementsWebPluginApi extends Api {
   @SuppressWarnings("unchecked")
   public Set<Document> updateDocFromRequest(String fullname
       ) throws XWikiException {
-    return getDocFormScriptService().updateDocFromRequest(fullname);
+    return getDocFormScriptService().updateDocFromRequest(getWebUtilsService(
+        ).resolveDocumentReference(fullname));
   }
 
   /**
@@ -1134,8 +1149,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken) {
-    return getFileBaseScriptService().tokenBasedUpload(attachToDocFN, fieldName, 
-        userToken);
+    return getFileBaseScriptService().tokenBasedUpload(getWebUtilsService(
+        ).resolveDocumentReference(attachToDocFN), fieldName, userToken);
   }
 
   /**
@@ -1145,7 +1160,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken,
       Boolean createIfNotExists) {
-    return getFileBaseScriptService().tokenBasedUpload(attachToDocFN, fieldName, 
+    return getFileBaseScriptService().tokenBasedUpload(getWebUtilsService(
+        ).resolveDocumentReference(attachToDocFN), fieldName, 
         userToken, createIfNotExists);
   }
 
@@ -1220,7 +1236,9 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2.0 instead use celementsweb script service
+   * @deprecated since 2.2.0 instead use {@link EditorSupportScriptService
+   * #validateRequest()}, Note: the validateRequest Method has an other
+   * return parameter (Map<String, Map<ValidationType, Set<String>>>)
    */
   @Deprecated
   public Map<String, String> validateRequest() {
@@ -1347,7 +1365,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean renameDoc(String fullName, String newDocName) {
-    return getScriptService().renameDoc(fullName, newDocName);
+    return getScriptService().renameDoc(getWebUtilsService().resolveDocumentReference(
+        fullName), newDocName);
   }
 
   /**
@@ -1503,7 +1522,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String navReorderSave(String fullName, String structureJSON) {
-    return getTreeNodeScriptService().navReorderSave(fullName, structureJSON);
+    return getTreeNodeScriptService().navReorderSave(getWebUtilsService(
+        ).resolveDocumentReference(fullName), structureJSON);
   }
 
   /**
@@ -1638,8 +1658,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.17.0
-   *             instead use renderDocument in {@link CelementsWebScriptService
+   * @deprecated since 2.17.0 instead use {@link CelementsWebScriptService
    * #renderDocument(Document, boolean, List)}
    */
   @Deprecated
@@ -1649,8 +1668,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.17.0
-   *             instead use renderCelementsDocument in CelementsWebScriptService
+   * @deprecated since 2.17.0 instead use {@link CelementsWebScriptService
+   * #renderCelementsDocument(Document)}
    */
   @Deprecated
   public String renderCelementsDocument(Document renderDoc) {
@@ -1658,8 +1677,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.17.0
-   *             instead use renderCelementsDocument in CelementsWebScriptService
+   * @deprecated since 2.17.0 instead use {@link CelementsWebScriptService
+   * #renderCelementsDocument(Document, String)}
    */
   @Deprecated
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
@@ -1839,7 +1858,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public boolean isCelementsRights(String fullName) {
-    return getScriptService().isCelementsRights(fullName);
+    return getScriptService().isCelementsRights(getWebUtilsService(
+        ).resolveDocumentReference(fullName));
   }
 
   /**
@@ -1945,8 +1965,13 @@ public class CelementsWebPluginApi extends Api {
     getScriptService().checkClasses();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link TreeNodeScriptService
+   * #getNextNonEmptyChildren(DocumentReference)}
+   */
+  @Deprecated
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
+    return getTreeNodeScriptService().getNextNonEmptyChildren(documentRef);
   }
 
   /**

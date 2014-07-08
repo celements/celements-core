@@ -19,8 +19,6 @@
  */
 package com.celements.web.plugin;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,18 +30,15 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.pagetype.IPageType;
-import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
@@ -55,7 +50,9 @@ import com.celements.web.service.IActionServiceRole;
 import com.celements.web.service.IAuthenticationServiceRole;
 import com.celements.web.service.ICelementsWebServiceRole;
 import com.celements.web.service.IPrepareVelocityContext;
+import com.celements.web.service.IWebFormServiceRole;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.service.WebFormService;
 import com.celements.web.service.WebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
@@ -65,16 +62,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiResponse;
 
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
@@ -534,21 +528,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return getActionService().executeAction(actionDoc, request, includingDoc, context);
   }
 
-  //FIXME Hack to get mail execution to work. The script is not expecting arrays in the
-  //      map, since it expects a request. Multiple values with the same name get lost 
-  //      in this "quick and dirty" fix
-  private Object getApiUsableMap(Map<String, String[]> request) {
-    Map<String, String> apiConform = new HashMap<String, String>();
-    for (String key : request.keySet()) {
-      if((request.get(key) != null) && (request.get(key).length > 0)) {
-        apiConform.put(key, request.get(key)[0]);
-      } else {
-        apiConform.put(key, null);
-      }
-    }
-    return apiConform;
-  }
-
   /**
    * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
    * #getSupportedAdminLanguages()}
@@ -572,13 +551,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return getCelementsWebService().writeUTF8Response(filename, renderDocFullName);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link WebFormService
+   * #isFormFilled(Map, Set)}
+   */
+  @Deprecated 
   public boolean isFormFilled(Map<String, String[]> parameterMap, 
       Set<String> additionalFields) {
-    boolean isFilled = false;
-    if(parameterMap.size() > getIsFilledModifier(parameterMap, additionalFields)) {
-      isFilled = true;
-    }
-    return isFilled;
+    return getWebFormService().isFormFilled(parameterMap, additionalFields);
   }
   
   short getIsFilledModifier(Map<String, String[]> parameterMap, 
@@ -662,6 +642,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   
   private ICelementsWebServiceRole getCelementsWebService() {
     return Utils.getComponent(ICelementsWebServiceRole.class);
+  }
+  
+  private IWebFormServiceRole getWebFormService() {
+    return Utils.getComponent(IWebFormServiceRole.class);
   }
   
   private IWebUtilsService getWebUtilsService() {

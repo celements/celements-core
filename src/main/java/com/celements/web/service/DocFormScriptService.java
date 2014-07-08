@@ -9,6 +9,7 @@ import java.util.Set;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.cmd.DocFormCommand;
@@ -16,6 +17,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 @Component("docform")
 public class DocFormScriptService implements ScriptService{
@@ -29,7 +31,7 @@ public class DocFormScriptService implements ScriptService{
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
-  public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map
+  public Set<Document> updateDocFromMap(DocumentReference docRef, Map<String, ?> map
       ) throws XWikiException {
     Map<String, String[]> recompMap = new HashMap<String, String[]>();
     for (String key : map.keySet()) {
@@ -40,7 +42,8 @@ public class DocFormScriptService implements ScriptService{
       }
     }
     Set<Document> docs = new HashSet<Document>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(fullname,
+    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(
+        getWebUtilsService().getRefDefaultSerializer().serialize(docRef),
         recompMap, getContext());
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
@@ -53,10 +56,10 @@ public class DocFormScriptService implements ScriptService{
   }
   
   @SuppressWarnings("unchecked")
-  public Set<Document> updateDocFromRequest(String fullname
+  public Set<Document> updateDocFromRequest(DocumentReference docRef
       ) throws XWikiException {
     Set<Document> docs = new HashSet<Document>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(fullname,
+    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(getWebUtilsService().getRefDefaultSerializer().serialize(docRef),
         getContext().getRequest().getParameterMap(), getContext());
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
@@ -69,5 +72,9 @@ public class DocFormScriptService implements ScriptService{
       getContext().put(_DOC_FORM_COMMAND_OBJECT, new DocFormCommand());
     }
     return (DocFormCommand) getContext().get(_DOC_FORM_COMMAND_OBJECT);
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 }
