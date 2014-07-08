@@ -635,9 +635,6 @@ public class TreeNodeService implements ITreeNodeService {
     return siblingTreeNodes;
   }
 
-  /**
-   * TODO write unit tests and test if working
-   */
   @Override
   public void storeOrder(List<TreeNode> newTreeNodes) {
     storeOrder(newTreeNodes, false);
