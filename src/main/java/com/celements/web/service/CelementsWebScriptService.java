@@ -59,6 +59,7 @@ import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
+import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -711,6 +712,81 @@ public class CelementsWebScriptService implements ScriptService {
         ).getLanguage());
   }
   
+  public boolean resetProgrammingRights() {
+    if (hasAdminRights()) {
+      return new ResetProgrammingRightsCommand().resetCelements2webRigths(getContext());
+    } else {
+      LOGGER.warn("user [" + getContext().getUser() + "] tried to reset programming rights,"
+          + " but has no admin rights.");
+    }
+    return false;
+  }
+  
+  public String getCelementsWebCoreVersion() {
+    return getContext().getWiki().Param("com.celements.version");
+  }
+  
+  public String getCelementsWebAppVersion() {
+    DocumentReference centralAppDocRef = new DocumentReference("celements2web", "XApp",
+        "XWikiApplicationCelements2web");
+    DocumentReference xappClassDocRef = new DocumentReference("celements2web",
+        "XAppClasses", "XWikiApplicationClass");
+    try {
+      XWikiDocument appReceiptDoc = getContext().getWiki().getDocument(centralAppDocRef,
+          getContext());
+      BaseObject appClassObj = appReceiptDoc.getXObject(xappClassDocRef);
+      if (appClassObj != null) {
+        return appClassObj.getStringValue("appversion");
+      }
+    } catch (XWikiException exp) {
+      LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
+    }
+    return "N/A";
+  }
+  
+  public int getNextObjPageId(SpaceReference spaceRef, DocumentReference classRef, String propertyName) 
+      throws XWikiException{
+    String sql = ", BaseObject as obj, IntegerProperty as art_id";
+    sql += " where obj.name=doc.fullName";
+    sql += " and obj.className='" + getWebUtilsService().getRefLocalSerializer(
+        ).serialize(classRef) + "'";
+    sql += " and doc.space='" + spaceRef.getName() + "' and obj.id = art_id.id.id";
+    sql += " and art_id.id.name='" + propertyName + "' order by art_id.value desc";
+    int nextId = 1;
+    List<XWikiDocument> docs = getContext().getWiki().getStore().searchDocuments(sql, 
+        getContext());
+    if (docs.size() > 0) {
+      nextId = 1 + docs.get(0).getXObject(classRef).getIntValue(propertyName);
+    }
+    return nextId;
+  }
+  
+  public String getEmailAdressForCurrentUser() {
+    return getCelementsWebService().getEmailAdressForUser(getWebUtilsService(
+        ).resolveDocumentReference(getContext().getUser()));
+  }
+  
+  public String getEmailAdressForUser(String username) {
+    if (hasProgrammingRights()) {
+      return getCelementsWebService().getEmailAdressForUser(getWebUtilsService(
+          ).resolveDocumentReference(username));
+    } else {
+      return null;
+    }
+  }
+  
+  public int createUser() throws XWikiException {
+    return getCelementsWebService().createUser(true);
+  }
+  
+  public int createUser(boolean validate) throws XWikiException {
+    return getCelementsWebService().createUser(validate);
+  }
+  
+  private boolean hasAdminRights() {
+    return getContext().getWiki().getRightService().hasAdminRights(getContext());
+  }
+
   private boolean hasProgrammingRights() {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }
@@ -722,6 +798,10 @@ public class CelementsWebScriptService implements ScriptService {
   
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private ICelementsWebServiceRole getCelementsWebService() {
+    return Utils.getComponent(ICelementsWebServiceRole.class);
   }
   
   private WebUtilsScriptService getWebUtilsScriptService() {

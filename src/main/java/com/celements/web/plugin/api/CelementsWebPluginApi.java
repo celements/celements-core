@@ -477,21 +477,19 @@ public class CelementsWebPluginApi extends Api {
     return getAuthenticationScriptService().getUsernameForUserData(login, possibleLogins);
   }
 
-  public int getNextObjPageId(String spacename, String classname, String propertyName) throws XWikiException{
-    String sql = ", BaseObject as obj, IntegerProperty as art_id";
-    sql += " where obj.name=doc.fullName";
-    sql += " and obj.className='" + classname + "'";
-    sql += " and doc.space='" + spacename + "' and obj.id = art_id.id.id";
-    sql += " and art_id.id.name='" + propertyName + "' order by art_id.value desc";
-
-    int nextId = 1;
-
-    List<XWikiDocument> docs = context.getWiki().getStore().searchDocuments(sql, context);
-    if(docs.size() > 0){
-      nextId = 1 + docs.get(0).getObject(classname).getIntValue(propertyName);
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getNextObjPageId(SpaceReference, DocumentReference, String)}
+   */
+  @Deprecated  
+  public int getNextObjPageId(String spacename, String classname, String propertyName) 
+      throws XWikiException{
+    SpaceReference spaceRef = getWebUtilsService().resolveSpaceReference(spacename);
+    if (spaceRef != null) {
+      return getScriptService().getNextObjPageId(spaceRef, getWebUtilsService(
+          ).resolveDocumentReference(classname), propertyName);
     }
-
-    return nextId;
+    return 1;
   }
 
   /**
@@ -666,17 +664,23 @@ public class CelementsWebPluginApi extends Api {
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
     return getEmptyCheckService().isEmptyRTEDocument(documentRef);
   }
-
+  
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getEmailAdressForCurrentUser()}
+   */
+  @Deprecated  
   public String getEmailAdressForCurrentUser() {
-    return plugin.getEmailAdressForUser(context.getUser(), context);
+    return getScriptService().getEmailAdressForCurrentUser();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getEmailAdressForUser(String)}
+   */
+  @Deprecated
   public String getEmailAdressForUser(String username) {
-    if (hasProgrammingRights()) {
-      return plugin.getEmailAdressForUser(username, context);
-    } else {
-      return null;
-    }
+    return getScriptService().getEmailAdressForUser(username);
   }
 
   /**
@@ -769,7 +773,9 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsScriptService().getAttachmentsForDocs(docsFN);
   }
 
-  // TODO Propabely can be removed as soon as all installations are on xwiki 2+
+  /**
+   * @deprecated since ???NEXTRELEASE???
+   */
   @Deprecated
   public int sendLatin1Mail(
       String from, String replyTo,
@@ -910,12 +916,22 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsScriptService().getAllowedLanguages(spaceName);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #createUser()}
+   */
+  @Deprecated
   public int createUser() throws XWikiException {
-    return plugin.createUser(true, context);
+    return getScriptService().createUser(true);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #createUser(boolean)}
+   */
+  @Deprecated
   public int createUser(boolean validate) throws XWikiException {
-    return plugin.createUser(validate, context);
+    return getScriptService().createUser(validate);
   }
 
   /**
@@ -1394,26 +1410,22 @@ public class CelementsWebPluginApi extends Api {
     return getSynCustom().getExportMapping(mappingStr, congress);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getCelementsWebAppVersion()}
+   */
+  @Deprecated
   public String getCelementsWebAppVersion() {
-    DocumentReference centralAppDocRef = new DocumentReference("celements2web", "XApp",
-        "XWikiApplicationCelements2web");
-    DocumentReference xappClassDocRef = new DocumentReference("celements2web",
-        "XAppClasses", "XWikiApplicationClass");
-    try {
-      XWikiDocument appReceiptDoc = context.getWiki().getDocument(centralAppDocRef,
-          context);
-      BaseObject appClassObj = appReceiptDoc.getXObject(xappClassDocRef);
-      if (appClassObj != null) {
-        return appClassObj.getStringValue("appversion");
-      }
-    } catch (XWikiException exp) {
-      LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
-    }
-    return "N/A";
+    return getScriptService().getCelementsWebAppVersion();
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #getCelementsWebCoreVersion()}
+   */
+  @Deprecated
   public String getCelementsWebCoreVersion() {
-    return context.getWiki().Param("com.celements.version");
+    return getScriptService().getCelementsWebCoreVersion();
   }
 
   /**
@@ -1454,14 +1466,13 @@ public class CelementsWebPluginApi extends Api {
     return getWebFormScriptService().isFormFilled(excludeFields);
   }
 
+  /**
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * #resetProgrammingRights()}
+   */
+  @Deprecated
   public boolean resetProgrammingRights() {
-    if (hasAdminRights()) {
-      return new ResetProgrammingRightsCommand().resetCelements2webRigths(context);
-    } else {
-      LOGGER.warn("user [" + context.getUser() + "] tried to reset programming rights,"
-          + " but has no admin rights.");
-    }
-    return false;
+    return getScriptService().resetProgrammingRights();
   }
 
   /**
