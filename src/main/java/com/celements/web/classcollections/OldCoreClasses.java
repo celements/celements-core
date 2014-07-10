@@ -6,6 +6,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
+import com.celements.rteConfig.classes.RTEConfigClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,11 +50,15 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String RTE_CONFIG_TYPE_CLASS = RTE_CONFIG_TYPE_CLASS_SPACE + "."
         + RTE_CONFIG_TYPE_CLASS_DOC;
 
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC =
-      "RTEConfigTypePropertiesClass";
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = "Classes";
+      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+  @Deprecated
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE =
+      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE;
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS =
-      RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE + "." + RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
 
   public static final String KEY_VALUE_CLASS_DOC = "KeyValueClass";
   public static final String KEY_VALUE_CLASS_SPACE = "Classes";

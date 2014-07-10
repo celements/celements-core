@@ -21,6 +21,7 @@ package com.celements.web.service;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -35,6 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -42,9 +44,12 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.rendering.RenderCommand;
+import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
@@ -95,6 +100,12 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   ITreeNodeCache treeNodeCacheService;
+
+  @Requirement
+  ITreeNodeService treeNodeService;
+
+  @Requirement
+  IRTEConfigTemplateRole rteConfigTemplateService;
 
   @Requirement
   Execution execution;
@@ -815,6 +826,34 @@ public class CelementsWebScriptService implements ScriptService {
     return false;
   }
   
+  public List<com.xpn.xwiki.api.Object> getRTETemplateList() {
+    try {
+      List<BaseObject> rteTemplateList = rteConfigTemplateService.getRTETemplateList();
+      List<com.xpn.xwiki.api.Object> rteTemplateListExternal =
+          new ArrayList<com.xpn.xwiki.api.Object>();
+      for(BaseObject rteTmpl : rteTemplateList) {
+        rteTemplateListExternal.add(rteTmpl.newObjectApi(rteTmpl, getContext()));
+      }
+      return rteTemplateListExternal;
+    } catch (XWikiException exp) {
+      LOGGER.error("getRTETemplateList failed.", exp);
+    }
+    return Collections.emptyList();
+  }
+
+  public EntityReference getParentReference(DocumentReference docRef) {
+    return treeNodeService.getParentReference(docRef);
+  }
+
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) {
+    try {
+      treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
+    }
+  }
+  
   private boolean hasAdminRights() {
     return getContext().getWiki().getRightService().hasAdminRights(getContext());
   }
@@ -839,4 +878,5 @@ public class CelementsWebScriptService implements ScriptService {
   private WebUtilsScriptService getWebUtilsScriptService() {
     return (WebUtilsScriptService) Utils.getComponent(ScriptService.class, "webUtils");
   }
+
 }

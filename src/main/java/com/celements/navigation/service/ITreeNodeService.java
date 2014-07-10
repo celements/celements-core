@@ -90,4 +90,16 @@ public interface ITreeNodeService {
   
   public void enableMappedMenuItems();
 
+  public EntityReference getParentReference(DocumentReference docRef);
+
+  public EntityReference getParentEntityRef(DocumentReference docRef
+      ) throws XWikiException;
+
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) throws XWikiException;
+
+  public void storeOrder(List<TreeNode> newTreeNodes);
+  
+  public void storeOrder(List<TreeNode> newTreeNodes, boolean isMinorEdit);
+
 }
