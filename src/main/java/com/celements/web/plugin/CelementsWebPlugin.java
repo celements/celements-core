@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
@@ -273,7 +274,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   @Deprecated
   public String getEmailAdressForUser(String username, XWikiContext context) {
     return getCelementsWebService().getEmailAdressForUser(
-        getWebService().resolveDocumentReference(username));
+        getWebUtilsService().resolveDocumentReference(username));
   }
   
   //TODO Delegation can be removed as soon as latin1 flag can be removed
@@ -509,7 +510,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.2 use ITreeNodeService instead
+   * @deprecated since ???NEXTRELEASE??? instead use {@link ITreeNodeService
+   * #enableMappedMenuItems()}
    */
   @Deprecated
   public void enableMappedMenuItems(XWikiContext context) {
@@ -611,11 +613,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    */
   @Deprecated
   public String getDefaultLanguage(XWikiContext context) {
-    return getWebService().getDefaultLanguage();
-  }
-
-  private IWebUtilsService getWebService() {
-    return Utils.getComponent(IWebUtilsService.class);
+    return getWebUtilsService().getDefaultLanguage();
   }
 
   /**

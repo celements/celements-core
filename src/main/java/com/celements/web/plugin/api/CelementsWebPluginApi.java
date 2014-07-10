@@ -38,6 +38,7 @@ import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
+import com.celements.navigation.service.TreeNodeCache;
 import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
@@ -87,16 +88,28 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class CelementsWebPluginApi extends Api {
 
+  
+  /**
+   * @Deprecated: since ???NEXTRELEASE??? instead use variable in {@link CSSScriptService}
+   *  
+   */
+  @Deprecated
   public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
 
   /**
-   * @Deprecated: 
+   * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link JSScriptService}
    *  
    */
   @Deprecated
   public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
-      JSScriptService.JAVA_SCRIPT_FILES_COMMAND_KEY;
+      "com.celements.web.ExternalJavaScriptFilesCommand";
 
+  /**
+   * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link 
+   * LayoutScriptService}
+   *  
+   */
+  @Deprecated
   public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
       "com.celements.web.PageLayoutCommand";
 
@@ -137,7 +150,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 instead use TreeNodeCache
+   * @deprecated since ???NEXTRELEASE??? instead use {@link TreeNodeCache}
    * Do not call flushCache for MenuItem changes anymore.  
    * The TreeNodeDocument change listener take care of flushing the cache if needed.
    */
@@ -149,7 +162,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.2 instead use {@link CelementsWebScriptService
+   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
    * #getLastStartupTimeStamp()}
    */
   @Deprecated

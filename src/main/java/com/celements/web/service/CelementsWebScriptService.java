@@ -76,7 +76,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
-  public static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
+  private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       CelementsWebScriptService.class);

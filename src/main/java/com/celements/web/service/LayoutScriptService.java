@@ -27,7 +27,7 @@ public class LayoutScriptService  implements ScriptService {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       LayoutScriptService.class);
   
-  public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
+  private static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
       "com.celements.web.PageLayoutCommand";
   
   @Requirement

@@ -40,8 +40,7 @@ public class ActionService implements IActionServiceRole {
     vcontext.put("request", getApiUsableMap(request));
     XWikiDocument execAct = null;
     try {
-      execAct = context.getWiki()
-          .getDocument(webUtilsService.resolveDocumentReference(
+      execAct = context.getWiki().getDocument(webUtilsService.resolveDocumentReference(
               "celements2web:Macros.executeActions"), context);
     } catch (XWikiException e) {
       LOGGER.error("Could not get action Macro", e);

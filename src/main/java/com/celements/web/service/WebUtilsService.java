@@ -73,6 +73,9 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class WebUtilsService implements IWebUtilsService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtilsService.class);
+  
+  private static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
+      "com.celements.web.PageLayoutCommand";
 
   @Requirement("default")
   EntityReferenceSerializer<String> serializer_default;
@@ -907,12 +910,10 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   private PageLayoutCommand getPageLayoutCmd() {
-    if (!getContext().containsKey(CelementsWebPluginApi.CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-      getContext().put(CelementsWebPluginApi.CELEMENTS_PAGE_LAYOUT_COMMAND, 
-          new PageLayoutCommand());
+    if (!getContext().containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      getContext().put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
     }
-    return (PageLayoutCommand) getContext().get(
-        CelementsWebPluginApi.CELEMENTS_PAGE_LAYOUT_COMMAND);
+    return (PageLayoutCommand) getContext().get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
   @Deprecated
