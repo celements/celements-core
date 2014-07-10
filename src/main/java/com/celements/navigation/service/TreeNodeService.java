@@ -646,13 +646,13 @@ public class TreeNodeService implements ITreeNodeService {
     XWiki wiki = getContext().getWiki();
     for (TreeNode theNode : newTreeNodes) {
       DocumentReference theDocRef = theNode.getDocumentReference();
-      pos++;
       try {
         XWikiDocument theDoc = wiki.getDocument(theDocRef,
             getContext());
         BaseObject menuItemObj = theDoc.getXObject(navClassConfig.getMenuItemClassRef(
             getContext().getDatabase()));
         if (menuItemObj != null) {
+          pos++;
           int oldPos = menuItemObj.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
               -1);
           if (oldPos != pos) {

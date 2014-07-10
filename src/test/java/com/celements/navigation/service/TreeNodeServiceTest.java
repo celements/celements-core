@@ -908,17 +908,17 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testStoreOrder() throws Exception {
     String parentFN = "mySpace.name";
-    String spaceName = "mySapce";
+    String spaceName = "mySpace";
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
         "Doc1");
     Integer oldPos1 = 3;
     TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
-        "Doc1");
+        "Doc2");
     Integer oldPos2 = 2;
     TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
-        "Doc1");
+        "Doc3");
     Integer oldPos3 = 1;
     TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
@@ -931,10 +931,13 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     // expecting correct savings
     Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
     Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
     Capture<XWikiDocument> capDoc3 = new Capture<XWikiDocument>();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
     replayDefault();
     treeNodeService.storeOrder(newTreeNodes);
     XWikiDocument savedDoc1 = capDoc1.getValue();
@@ -958,17 +961,17 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testStoreOrder_minorEdits() throws Exception {
     String parentFN = "mySpace.name";
-    String spaceName = "mySapce";
+    String spaceName = "mySpace";
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
         "Doc1");
     Integer oldPos1 = 3;
     TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
-        "Doc1");
+        "Doc2");
     Integer oldPos2 = 2;
     TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
-        "Doc1");
+        "Doc3");
     Integer oldPos3 = 1;
     TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
@@ -981,12 +984,209 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     // expecting correct savings
     Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
     wiki.saveDocument(capture(capDoc1), isA(String.class), eq(true), same(context));
+    expectLastCall().once();
     Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
     wiki.saveDocument(capture(capDoc2), isA(String.class), eq(true), same(context));
+    expectLastCall().once();
     Capture<XWikiDocument> capDoc3 = new Capture<XWikiDocument>();
     wiki.saveDocument(capture(capDoc3), isA(String.class), eq(true), same(context));
+    expectLastCall().once();
     replayDefault();
     treeNodeService.storeOrder(newTreeNodes, true);
+    XWikiDocument savedDoc1 = capDoc1.getValue();
+    BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(0, menuItemObj1.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc2 = capDoc2.getValue();
+    BaseObject menuItemObj2 = savedDoc2.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(1, menuItemObj2.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc3 = capDoc3.getValue();
+    BaseObject menuItemObj3 = savedDoc3.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(2, menuItemObj3.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    verifyDefault();
+  }
+
+  @Test
+  public void testStoreOrder_nullObjects() throws Exception {
+    String parentFN = "mySpace.name";
+    String spaceName = "mySpace";
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc2");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc3");
+    Integer oldPos3 = 5;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    XWikiDocument navDoc1 = createNavDoc(treeNode1);
+    expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
+    XWikiDocument navDoc2 = new XWikiDocument(docRef2);
+    expect(wiki.getDocument(eq(docRef2), same(context))).andReturn(navDoc2);
+    XWikiDocument navDoc3 = createNavDoc(treeNode3);
+    expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
+    // expecting correct savings
+    Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc1), isA(String.class), eq(true), same(context));
+    expectLastCall().once();
+    Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc2), isA(String.class), eq(true), same(context));
+    expectLastCall().once();
+    replayDefault();
+    treeNodeService.storeOrder(newTreeNodes, true);
+    XWikiDocument savedDoc1 = capDoc1.getValue();
+    BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(0, menuItemObj1.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc2 = capDoc2.getValue();
+    BaseObject menuItemObj2 = savedDoc2.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(1, menuItemObj2.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    verifyDefault();
+  }
+
+  @Test
+  public void testStoreOrder_rightOrder() throws Exception {
+    String parentFN = "mySpace.name";
+    String spaceName = "mySpace";
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 0;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc2");
+    Integer oldPos2 = 1;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc3");
+    Integer oldPos3 = 2;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    XWikiDocument navDoc1 = createNavDoc(treeNode1);
+    expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
+    XWikiDocument navDoc2 = createNavDoc(treeNode2);
+    expect(wiki.getDocument(eq(docRef2), same(context))).andReturn(navDoc2);
+    XWikiDocument navDoc3 = createNavDoc(treeNode3);
+    expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
+    // expecting NO savings
+    replayDefault();
+    treeNodeService.storeOrder(newTreeNodes);
+    XWikiDocument savedDoc1 = navDoc1;
+    BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(0, menuItemObj1.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc2 = navDoc2;
+    BaseObject menuItemObj2 = savedDoc2.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(1, menuItemObj2.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc3 = navDoc3;
+    BaseObject menuItemObj3 = savedDoc3.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(2, menuItemObj3.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    verifyDefault();
+  }
+
+  @Test
+  public void testStoreOrder_exception_onGetDoc() throws Exception {
+    String parentFN = "mySpace.name";
+    String spaceName = "mySpace";
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc2");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc3");
+    Integer oldPos3 = 1;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    XWikiDocument navDoc1 = createNavDoc(treeNode1);
+    expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
+    expect(wiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException());
+    XWikiDocument navDoc3 = createNavDoc(treeNode3);
+    expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
+    // expecting correct savings
+    Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
+    Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
+    Capture<XWikiDocument> capDoc3 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
+    replayDefault();
+    treeNodeService.storeOrder(newTreeNodes);
+    XWikiDocument savedDoc1 = capDoc1.getValue();
+    BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(0, menuItemObj1.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc2 = capDoc2.getValue();
+    BaseObject menuItemObj2 = savedDoc2.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(1, menuItemObj2.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    XWikiDocument savedDoc3 = capDoc3.getValue();
+    BaseObject menuItemObj3 = savedDoc3.getXObject(getNavClassConfig(
+        ).getMenuItemClassRef(context.getDatabase()));
+    assertEquals(2, menuItemObj3.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+        -1));
+    verifyDefault();
+  }
+
+  @Test
+  public void testStoreOrder_exception_onSaveDoc() throws Exception {
+    String parentFN = "mySpace.name";
+    String spaceName = "mySpace";
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc2");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc3");
+    Integer oldPos3 = 1;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    XWikiDocument navDoc1 = createNavDoc(treeNode1);
+    expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
+    XWikiDocument navDoc2 = createNavDoc(treeNode2);
+    expect(wiki.getDocument(eq(docRef2), same(context))).andReturn(navDoc2);
+    XWikiDocument navDoc3 = createNavDoc(treeNode3);
+    expect(wiki.getDocument(eq(docRef3), same(context))).andReturn(navDoc3);
+    // expecting correct savings
+    Capture<XWikiDocument> capDoc1 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc1), isA(String.class), eq(false), same(context));
+    expectLastCall().andThrow(new XWikiException());
+    Capture<XWikiDocument> capDoc2 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc2), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
+    Capture<XWikiDocument> capDoc3 = new Capture<XWikiDocument>();
+    wiki.saveDocument(capture(capDoc3), isA(String.class), eq(false), same(context));
+    expectLastCall().once();
+    replayDefault();
+    treeNodeService.storeOrder(newTreeNodes);
     XWikiDocument savedDoc1 = capDoc1.getValue();
     BaseObject menuItemObj1 = savedDoc1.getXObject(getNavClassConfig(
         ).getMenuItemClassRef(context.getDatabase()));
