@@ -606,8 +606,8 @@ public class TreeNodeService implements ITreeNodeService {
     }
   }
 
-  private TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef)
-      throws XWikiException {
+  public TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef
+      ) throws XWikiException {
     List<TreeNode> siblingTreeNodes = getSiblingTreeNodes(moveDocRef);
     TreeNode moveTreeNode = null;
     for (TreeNode theNode : siblingTreeNodes) {
@@ -618,8 +618,8 @@ public class TreeNodeService implements ITreeNodeService {
     return moveTreeNode;
   }
 
-  private List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef)
-      throws XWikiException {
+  public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
+      ) throws XWikiException {
     EntityReference parentRef = getParentReference(moveDocRef);
     XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
         getContext());
