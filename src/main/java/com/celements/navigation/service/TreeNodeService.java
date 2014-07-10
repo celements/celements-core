@@ -40,6 +40,7 @@ import org.xwiki.model.reference.SpaceReference;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.iterator.XObjectIterator;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
@@ -48,6 +49,7 @@ import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -80,6 +82,9 @@ public class TreeNodeService implements ITreeNodeService {
   @Requirement
   Map<String, ITreeNodeProvider> nodeProviders;
 
+  @Requirement
+  INavigationClassConfig navClassConfig;
+
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navigationClasses;
 
@@ -102,6 +107,7 @@ public class TreeNodeService implements ITreeNodeService {
     return pageLayoutCmd;
   }
 
+  @Override
   public int getActiveMenuItemPos(int menuLevel, String menuPart) {
     List<DocumentReference> parents = webUtilsService.getDocumentParentsList(
         getContext().getDoc().getDocumentReference(), true);
@@ -111,6 +117,7 @@ public class TreeNodeService implements ITreeNodeService {
     return -1;
   }
 
+  @Override
   public int getMenuItemPos(DocumentReference docRef, String menuPart) {
     try {
       EntityReference parent = getParentEntityRef(docRef);
@@ -127,12 +134,13 @@ public class TreeNodeService implements ITreeNodeService {
     return -1;
   }
 
+  @Override
   public boolean isTreeNode(DocumentReference docRef) {
     //TODO move to ITreeNodeProvider and integrate over all nodeProviders
     try {
       XWikiDocument document = getContext().getWiki().getDocument(docRef, getContext());
-      List<BaseObject> menuItems = document.getXObjects(getNavigationClasses(
-          ).getMenuItemClassRef(getContext().getDatabase()));
+      List<BaseObject> menuItems = document.getXObjects(
+          navClassConfig.getMenuItemClassRef(getContext().getDatabase()));
       return ((menuItems != null) && !menuItems.isEmpty());
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for reference [" + docRef + "].", exp);
@@ -146,6 +154,7 @@ public class TreeNodeService implements ITreeNodeService {
    * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
+  @Override
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter) {
     if("".equals(menuSpace)) {
@@ -187,7 +196,8 @@ public class TreeNodeService implements ITreeNodeService {
         + reference + "].");
     return parentKey;
   }
-  
+
+  @Override
   public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
       INavFilter<T> filter) {
     LOGGER.trace("getSubNodesForParent: entRef [" + entRef + "] filter class ["
@@ -210,6 +220,7 @@ public class TreeNodeService implements ITreeNodeService {
    * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
+  @Override
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       String menuPart) {
     InternalRightsFilter filter = new InternalRightsFilter();
@@ -387,6 +398,7 @@ public class TreeNodeService implements ITreeNodeService {
    * getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
+  @Override
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
       INavFilter<T> filter) {
     if("".equals(menuSpace)) {
@@ -403,6 +415,7 @@ public class TreeNodeService implements ITreeNodeService {
     return menuArray;
   }
 
+  @Override
   public Integer getMaxConfiguredNavigationLevel() {
     List<BaseObject> navConfigObjects = new Vector<BaseObject>();
     List<BaseObject> navConfigDocsObjs = getNavObjectsOnConfigDocs();
@@ -476,11 +489,13 @@ public class TreeNodeService implements ITreeNodeService {
     }
     return navConfigObjects2;
   }
-  
+
+  @Override
   public TreeNode getPrevMenuItem(DocumentReference docRef) throws XWikiException {
     return getSiblingMenuItem(docRef, true);
   }
 
+  @Override
   public TreeNode getNextMenuItem(DocumentReference docRef) throws XWikiException {
     return getSiblingMenuItem(docRef, false);
   }
@@ -515,6 +530,7 @@ public class TreeNodeService implements ITreeNodeService {
     return null;
   }
 
+  @Override
   public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart) {
     DocumentReference parent = webUtilsService.getParentForLevel(menuLevel);
     if (parent != null) {
@@ -537,7 +553,18 @@ public class TreeNodeService implements ITreeNodeService {
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
   
-  private EntityReference getParentEntityRef(DocumentReference docRef
+  @Override
+  public EntityReference getParentReference(DocumentReference docRef) {
+    try {
+      return getParentEntityRef(docRef);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to getParentReference for [" + docRef + "].", exp);
+    }
+    return null;
+  }
+
+  @Override
+  public EntityReference getParentEntityRef(DocumentReference docRef
       ) throws XWikiException {
     EntityReference parent = getContext().getWiki().getDocument(docRef,
         getContext()).getParentReference();
@@ -559,6 +586,97 @@ public class TreeNodeService implements ITreeNodeService {
       return injectedInheritorFactory;
     }
     return new InheritorFactory();
+  }
+
+  /**
+   * TODO write unit tests and test if working
+   */
+  @Override
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) throws XWikiException {
+    if (isTreeNode(moveDocRef)) {
+      TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
+      List<TreeNode> treeNodes = getSiblingTreeNodes(moveDocRef);
+      treeNodes.remove(moveTreeNode);
+      ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
+      int splitPos = 0;
+      if (insertAfterDocRef != null) {
+        for (int pos = 0; pos < treeNodes.size(); pos ++) {
+          if (insertAfterDocRef.equals(treeNodes.get(pos).getDocumentReference())) {
+            splitPos = pos;
+          }
+        }
+      }
+      newTreeNodes.addAll(treeNodes.subList(0, splitPos));
+      newTreeNodes.add(moveTreeNode);
+      newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
+      storeOrder(newTreeNodes);
+    }
+  }
+
+  private TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef)
+      throws XWikiException {
+    List<TreeNode> siblingTreeNodes = getSiblingTreeNodes(moveDocRef);
+    TreeNode moveTreeNode = null;
+    for (TreeNode theNode : siblingTreeNodes) {
+      if (moveDocRef.equals(theNode.getDocumentReference())) {
+        moveTreeNode = theNode;
+      }
+    }
+    return moveTreeNode;
+  }
+
+  private List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef)
+      throws XWikiException {
+    EntityReference parentRef = getParentReference(moveDocRef);
+    XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
+        getContext());
+    BaseObject menuItemObj = moveDoc.getXObject(navClassConfig.getMenuItemClassRef(
+        getContext().getDatabase()));
+    String menuPart = menuItemObj.getStringValue(
+        INavigationClassConfig.MENU_PART_FIELD);
+    if (menuPart == null) {
+      menuPart = "";
+    }
+    //TODO only use menuPart if main node (parentRef is a space reference)
+    List<TreeNode> siblingTreeNodes = getSubNodesForParent(parentRef, menuPart);
+    return siblingTreeNodes;
+  }
+
+  @Override
+  public void storeOrder(List<TreeNode> newTreeNodes) {
+    storeOrder(newTreeNodes, false);
+  }
+
+  @Override
+  public void storeOrder(List<TreeNode> newTreeNodes, boolean isMinorEdit) {
+    int pos = -1;
+    XWiki wiki = getContext().getWiki();
+    for (TreeNode theNode : newTreeNodes) {
+      DocumentReference theDocRef = theNode.getDocumentReference();
+      pos++;
+      try {
+        XWikiDocument theDoc = wiki.getDocument(theDocRef,
+            getContext());
+        BaseObject menuItemObj = theDoc.getXObject(navClassConfig.getMenuItemClassRef(
+            getContext().getDatabase()));
+        if (menuItemObj != null) {
+          int oldPos = menuItemObj.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+              -1);
+          if (oldPos != pos) {
+            menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD, pos);
+            wiki.saveDocument(theDoc, "changed menu position from '" + oldPos + "' to '"
+                + pos + "'.", isMinorEdit, getContext());
+          }
+        } else {
+          LOGGER.error("storeOrder: failed to get menuItemObject of [" + theDocRef
+              + "].");
+        }
+      } catch (XWikiException exp) {
+        LOGGER.error("storeOrder: Failed to get document ["
+            + theDocRef + "].");
+      }
+    }
   }
 
 }

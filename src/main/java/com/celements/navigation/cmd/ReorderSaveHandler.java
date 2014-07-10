@@ -22,24 +22,30 @@ package com.celements.navigation.cmd;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.sajson.AbstractEventHandler;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       ReorderSaveHandler.class);
   private XWikiContext context;
-  private String parentFN;
+  private EntityReference parentRef;
   private EReorderLiteral currentCommand;
   private Integer currentPos;
-  private Set<String> dirtyParents;
+  private Set<EntityReference> dirtyParents;
 
   public ReorderSaveHandler(XWikiContext context) {
     this.context = context;
@@ -58,10 +64,11 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
     LOGGER.debug("read property key: " + key);
     if (currentCommand == EReorderLiteral.PARENT_CHILDREN_PROPERTY) {
       String newParentFN = extractDocFN(key);
-      if (context.getWiki().exists(newParentFN, context)) {
-        parentFN = newParentFN;
+      DocumentReference newParentRef = convertToDocRef(newParentFN);
+      if ((newParentRef != null) && context.getWiki().exists(newParentRef, context)) {
+        parentRef = newParentRef;
       } else {
-        parentFN = null;
+        parentRef = null;
         LOGGER.error("readPropertyKey: cannot load parentDocument [" + newParentFN 
             + "].");
       }
@@ -72,6 +79,13 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
     }
   }
 
+  DocumentReference convertToDocRef(String docFN) {
+    if (!StringUtils.isEmpty(docFN)) {
+      return getWebUtils().resolveDocumentReference(docFN);
+    }
+    return null;
+  }
+
   String extractDocFN(String param) {
     if (param.split(":").length > 2) {
       return param.split(":")[2];
@@ -80,9 +94,13 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
     }
   }
 
+  EntityReference getParentReference() {
+    return parentRef;
+  }
+
   String getParentFN() {
-    if (parentFN != null) {
-      return parentFN;
+    if (parentRef != null) {
+      return getWebUtils().getRefLocalSerializer().serialize(parentRef);
     }
     return "";
   }
@@ -98,8 +116,8 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
    * FOR TESTS ONLY!!!
    * @param object 
    */
-  void inject_ParentFN(String newParent) {
-    parentFN = newParent;
+  void inject_ParentRef(EntityReference newParent) {
+    parentRef = newParent;
   }
 
   /**
@@ -114,21 +132,23 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
     LOGGER.debug("string event: " + value + " with parent " + getParentFN());
     if (currentCommand == EReorderLiteral.ELEMENT_ID) {
       String docFN = extractDocFN(value);
-      if (context.getWiki().exists(docFN, context)) {
+      DocumentReference docRef = convertToDocRef(docFN);
+      if ((docRef != null) && context.getWiki().exists(docRef, context)) {
         try {
           boolean updateNeeded = false;
-          XWikiDocument xdoc = context.getWiki().getDocument(docFN, context);
-          if (!getParentFN().equals(xdoc.getParent())) {
-            markParentDirty(xdoc.getParent());
-            xdoc.setParent(getParentFN());
-            markParentDirty(getParentFN());
+          XWikiDocument xdoc = context.getWiki().getDocument(docRef, context);
+          if (hasDiffParentReferences(xdoc.getParentReference())) {
+            markParentDirty(xdoc.getParentReference());
+            xdoc.setParentReference(getParentReference());
+            markParentDirty(getParentReference());
             updateNeeded = true;
           }
-          BaseObject menuItemObj = xdoc.getObject("Celements2.MenuItem");
+          BaseObject menuItemObj = xdoc.getXObject(getNavClassConfig(
+              ).getMenuItemClassRef(context.getDatabase()));
           if ((menuItemObj != null)
               && (menuItemObj.getIntValue("menu_position") != getCurrentPos())) {
             menuItemObj.setIntValue("menu_position", getCurrentPos());
-            markParentDirty(xdoc.getParent());
+            markParentDirty(xdoc.getParentReference());
             updateNeeded = true;
           }
           if (updateNeeded) {
@@ -149,15 +169,33 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
     }
   }
 
-  void markParentDirty(String parent) {
-    getDirtyParents().add(parent);
+  boolean hasDiffParentReferences(EntityReference parentReference) {
+    if (getParentReference() != null) {
+      return !getParentReference().equals(parentReference);
+    } else if (parentReference != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  public Set<String> getDirtyParents() {
+  void markParentDirty(EntityReference parentRef) {
+    getDirtyParents().add(parentRef);
+  }
+
+  public Set<EntityReference> getDirtyParents() {
     if (dirtyParents == null) {
-      dirtyParents = new HashSet<String>();
+      dirtyParents = new HashSet<EntityReference>();
     }
     return dirtyParents;
+  }
+
+  private IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private INavigationClassConfig getNavClassConfig() {
+    return Utils.getComponent(INavigationClassConfig.class);
   }
 
 }
