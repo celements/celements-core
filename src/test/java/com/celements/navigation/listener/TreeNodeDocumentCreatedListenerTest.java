@@ -16,6 +16,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeDocumentCreatedListenerTest extends AbstractBridgedComponentTestCase {
   
+  private static final String _COMPONENT_NAME = "TreeNodeDocumentCreatedListener";
   private TreeNodeDocumentCreatedListener eventListener;
 
   @Before
@@ -26,6 +27,11 @@ public class TreeNodeDocumentCreatedListenerTest extends AbstractBridgedComponen
   @Test
   public void testComponentSingleton() {
     assertSame(eventListener, getTreeNodeDocumentCreatedListener());
+  }
+
+  @Test
+  public void testGetName() {
+    assertEquals(_COMPONENT_NAME, eventListener.getName());
   }
 
   @Test
@@ -43,8 +49,8 @@ public class TreeNodeDocumentCreatedListenerTest extends AbstractBridgedComponen
   }
 
   private TreeNodeDocumentCreatedListener getTreeNodeDocumentCreatedListener() {
-    return (TreeNodeDocumentCreatedListener) Utils.getComponent(
-        EventListener.class, "TreeNodeDocumentCreatedListener");
+    return (TreeNodeDocumentCreatedListener) Utils.getComponent(EventListener.class,
+        _COMPONENT_NAME);
   }
 
 }
