@@ -24,6 +24,7 @@ import com.xpn.xwiki.web.Utils;
 public class TreeNodeDocumentUpdatedListenerTest
     extends AbstractBridgedComponentTestCase {
   
+  private static final String _COMPONENT_NAME = "TreeNodeDocumentUpdatedListener";
   private TreeNodeDocumentUpdatedListener eventListener;
   private XWikiContext context;
 
@@ -36,6 +37,11 @@ public class TreeNodeDocumentUpdatedListenerTest
   @Test
   public void testComponentSingleton() {
     assertSame(eventListener, getTreeNodeDocumentUpdatedListener());
+  }
+
+  @Test
+  public void testGetName() {
+    assertEquals(_COMPONENT_NAME, eventListener.getName());
   }
 
   @Test
@@ -333,8 +339,8 @@ public class TreeNodeDocumentUpdatedListenerTest
   }
 
   private TreeNodeDocumentUpdatedListener getTreeNodeDocumentUpdatedListener() {
-    return (TreeNodeDocumentUpdatedListener) Utils.getComponent(
-        EventListener.class, "TreeNodeDocumentUpdatedListener");
+    return (TreeNodeDocumentUpdatedListener) Utils.getComponent(EventListener.class,
+        _COMPONENT_NAME);
   }
 
 }

@@ -28,6 +28,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponentTestCase {
   
+  private static final String _COMPONENT_NAME = "TreeNodeDocumentDeletedListener";
   private TreeNodeDocumentDeletedListener eventListener;
   private XWikiContext context;
   private ObservationManager defaultObservationManager;
@@ -58,6 +59,11 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
   @Test
   public void testComponentSingleton() {
     assertSame(eventListener, getTreeNodeDocumentDeletedListener());
+  }
+
+  @Test
+  public void testGetName() {
+    assertEquals(_COMPONENT_NAME, eventListener.getName());
   }
 
   @Test
@@ -177,8 +183,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
   }
 
   private TreeNodeDocumentDeletedListener getTreeNodeDocumentDeletedListener() {
-    return (TreeNodeDocumentDeletedListener) Utils.getComponent(
-        EventListener.class, "TreeNodeDocumentDeletedListener");
+    return (TreeNodeDocumentDeletedListener) Utils.getComponent(EventListener.class,
+        _COMPONENT_NAME);
   }
 
 }

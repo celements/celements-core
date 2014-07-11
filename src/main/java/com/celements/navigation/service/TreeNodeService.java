@@ -614,8 +614,8 @@ public class TreeNodeService implements ITreeNodeService {
     }
   }
 
-  private TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef)
-      throws XWikiException {
+  public TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef
+      ) throws XWikiException {
     List<TreeNode> siblingTreeNodes = getSiblingTreeNodes(moveDocRef);
     TreeNode moveTreeNode = null;
     for (TreeNode theNode : siblingTreeNodes) {
@@ -626,8 +626,8 @@ public class TreeNodeService implements ITreeNodeService {
     return moveTreeNode;
   }
 
-  private List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef)
-      throws XWikiException {
+  public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
+      ) throws XWikiException {
     EntityReference parentRef = getParentReference(moveDocRef);
     XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
         getContext());
@@ -654,13 +654,13 @@ public class TreeNodeService implements ITreeNodeService {
     XWiki wiki = getContext().getWiki();
     for (TreeNode theNode : newTreeNodes) {
       DocumentReference theDocRef = theNode.getDocumentReference();
-      pos++;
       try {
         XWikiDocument theDoc = wiki.getDocument(theDocRef,
             getContext());
         BaseObject menuItemObj = theDoc.getXObject(navClassConfig.getMenuItemClassRef(
             getContext().getDatabase()));
         if (menuItemObj != null) {
+          pos++;
           int oldPos = menuItemObj.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
               -1);
           if (oldPos != pos) {

@@ -11,6 +11,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeCacheListenerTest extends AbstractBridgedComponentTestCase {
   
+  private static final String _COMPONENT_NAME = "TreeNodeCacheListener";
   private TreeNodeCacheListener eventListener;
 
   @Before
@@ -23,9 +24,14 @@ public class TreeNodeCacheListenerTest extends AbstractBridgedComponentTestCase 
     assertSame(eventListener, getTreeNodeCacheListener());
   }
 
+  @Test
+  public void testGetName() {
+    assertEquals(_COMPONENT_NAME, eventListener.getName());
+  }
+
   private TreeNodeCacheListener getTreeNodeCacheListener() {
     return (TreeNodeCacheListener) Utils.getComponent(EventListener.class,
-        "TreeNodeCacheListener");
+        _COMPONENT_NAME);
   }
 
 }
