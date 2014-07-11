@@ -44,7 +44,7 @@ public class TreeNodeCacheListener implements EventListener {
   ITreeNodeCache treeNodeCache;
 
   public String getName() {
-    return "TreeNodeDocumentDeletedListener";
+    return "TreeNodeCacheListener";
   }
 
   public List<Event> getEvents() {
