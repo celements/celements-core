@@ -10,15 +10,8 @@ import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-@Component("nextfreedoc")
+@Component("emptycheck")
 public class EmptyCheckScriptService implements ScriptService{
-  
-  @Requirement
-  private Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
   
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
     return getEmptyCheckService().isEmptyRTEDocument(documentRef);

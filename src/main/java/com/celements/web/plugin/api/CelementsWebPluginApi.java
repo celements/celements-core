@@ -652,7 +652,7 @@ public class CelementsWebPluginApi extends Api {
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
-    return getEmptyCheckService().isEmptyRTEDocument(getWebUtilsService(
+    return getEmptyCheckScriptService().isEmptyRTEDocument(getWebUtilsService(
         ).resolveDocumentReference(fullName));
   }
 
@@ -662,7 +662,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated  
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
-    return getEmptyCheckService().isEmptyRTEDocument(documentRef);
+    return getEmptyCheckScriptService().isEmptyRTEDocument(documentRef);
   }
   
   /**
@@ -2088,10 +2088,6 @@ public class CelementsWebPluginApi extends Api {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  private IEmptyCheckRole getEmptyCheckService() {
-    return Utils.getComponent(IEmptyCheckRole.class);
-  }
-
   private AuthenticationScriptService getAuthenticationScriptService() {
     return (AuthenticationScriptService) Utils.getComponent(ScriptService.class, 
         "authentication");
@@ -2158,5 +2154,9 @@ public class CelementsWebPluginApi extends Api {
   
   private WebFormScriptService getWebFormScriptService() {
     return (WebFormScriptService) Utils.getComponent(ScriptService.class, "webform");
+  }
+  
+  private EmptyCheckScriptService getEmptyCheckScriptService() {
+    return (EmptyCheckScriptService) Utils.getComponent(ScriptService.class, "emptycheck");
   }
 }

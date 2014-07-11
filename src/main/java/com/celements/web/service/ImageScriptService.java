@@ -5,13 +5,14 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
 @Component("image")
-public class ImageScriptService {
+public class ImageScriptService implements ScriptService {
   
   @Requirement
   private Execution execution;
