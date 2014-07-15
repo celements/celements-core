@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.radeox.util.logging.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -44,15 +45,22 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
+  public String getEmailAdressForUser(String username) {
+    return getEmailAdressForUser(webUtilsService.resolveDocumentReference(username));
+  }
+  
   public String getEmailAdressForUser(DocumentReference userDocRef) {
     if (getContext().getWiki().exists(userDocRef, getContext())) {
       try {
         XWikiDocument doc = getContext().getWiki().getDocument(userDocRef, getContext());
         BaseObject obj = doc.getXObject(webUtilsService.resolveDocumentReference(
             "XWiki.XWikiUsers"));
-        return obj.getStringValue("email");
-      } catch (XWikiException e) {
-        LOGGER.error(e);
+        if (obj != null) {
+          return obj.getStringValue("email");
+        }
+      } catch (XWikiException exp) {
+        LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef
+            + "]'", exp);
       }
     }
     return null;
