@@ -61,13 +61,21 @@ public class DocFormCommand {
   private final Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
   private final Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
 
+  /**
+   * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link 
+   * #updateDocFromMap(DocumentReference, Map, XWikiContext)}
+   */
+  @Deprecated
   public Set<XWikiDocument> updateDocFromMap(String fullname, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    String docSpace = fullname.split("\\.")[0];
-    String docName = fullname.split("\\.")[1];
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), docSpace,
-        docName);
+    return updateDocFromMap(getWebUtilsService().resolveDocumentReference(fullname), 
+        data, context);
+  }
+
+  public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data,
+      XWikiContext context) throws XWikiException {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
+
     String template = context.getRequest().getParameter("template");
     if(doc.isNew() && !"".equals(template.trim())) {
       DocumentReference templRef = getWebUtilsService().resolveDocumentReference(template);
@@ -82,7 +90,8 @@ public class DocFormCommand {
     }
     for (String key : data.keySet()) {
       if(key != null) {
-        String[] parts = getDocFullname(key, docSpace, docName);
+        String[] parts = getDocFullname(key, docRef.getLastSpaceReference().getName(), 
+            docRef.getName());
         DocumentReference saveDocRef = new DocumentReference(context.getDatabase(
             ), parts[0], parts[1]);
         LOGGER.debug("request key:'" + key + "'=value:" + data.get(key).length);
@@ -102,7 +111,7 @@ public class DocFormCommand {
     docSet.addAll(changedDocs.values());
     return docSet;
   }
-
+  
   String getFindObjectFieldInRequestRegex() {
     return "([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_){1,2}-?(\\d)*_(.*)";
   }

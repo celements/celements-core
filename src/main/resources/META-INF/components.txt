@@ -77,4 +77,5 @@ com.celements.web.service.LayoutScriptService
 com.celements.web.service.LegacySkinScriptService
 com.celements.web.service.NextFreeDocScriptService
 com.celements.web.service.RTEConfigScriptService
-com.celements.web.service.TreeNodeScriptService
+com.celements.navigation.service.TreeNodeScriptService
+com.celements.web.service.CelementsWebService

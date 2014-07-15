@@ -17,7 +17,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 @Component("docform")
 public class DocFormScriptService implements ScriptService{
@@ -42,8 +41,7 @@ public class DocFormScriptService implements ScriptService{
       }
     }
     Set<Document> docs = new HashSet<Document>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(
-        getWebUtilsService().getRefDefaultSerializer().serialize(docRef),
+    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
         recompMap, getContext());
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
@@ -59,7 +57,7 @@ public class DocFormScriptService implements ScriptService{
   public Set<Document> updateDocFromRequest(DocumentReference docRef
       ) throws XWikiException {
     Set<Document> docs = new HashSet<Document>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(getWebUtilsService().getRefDefaultSerializer().serialize(docRef),
+    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
         getContext().getRequest().getParameterMap(), getContext());
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
@@ -72,9 +70,5 @@ public class DocFormScriptService implements ScriptService{
       getContext().put(_DOC_FORM_COMMAND_OBJECT, new DocFormCommand());
     }
     return (DocFormCommand) getContext().get(_DOC_FORM_COMMAND_OBJECT);
-  }
-  
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
   }
 }
