@@ -22,7 +22,9 @@ package com.celements.navigation;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -51,6 +53,19 @@ public class TreeNode {
   public TreeNode(DocumentReference docRef, String parent, Integer position) {
     setDocumentReference(docRef);
     setParent(parent);
+    setPosition(position);
+  }
+
+  public TreeNode(DocumentReference docRef, DocumentReference parentRef, Integer position
+      ) {
+    setDocumentReference(docRef);
+    setParent(getWebUtilsService().getRefLocalSerializer().serialize(parentRef));
+    setPosition(position);
+  }
+
+  public TreeNode(DocumentReference docRef, SpaceReference parentRef, Integer position) {
+    setDocumentReference(docRef);
+    setParent("");
     setPosition(position);
   }
 
@@ -156,6 +171,10 @@ public class TreeNode {
 
   private ExecutionContext getExecutionContext() {
     return Utils.getComponent(Execution.class).getContext();
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }
