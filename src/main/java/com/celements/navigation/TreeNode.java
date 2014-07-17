@@ -22,7 +22,9 @@ package com.celements.navigation;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -89,6 +91,15 @@ public class TreeNode {
   void setFullName(String fullName) {
     setDocumentReference(new DocumentReference(databaseName, fullName.split("\\.")[0],
         fullName.split("\\.")[1]));
+  }
+
+  public EntityReference getParentRef() {
+    if ("".equals(parent)) {
+      return docRef.getLastSpaceReference();
+    } else {
+      return getWebUtilsService().resolveDocumentReference(parent,
+          (WikiReference) docRef.getLastSpaceReference().getParent());
+    }
   }
 
   public String getParent() {
