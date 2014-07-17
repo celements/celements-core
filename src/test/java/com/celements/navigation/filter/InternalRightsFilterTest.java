@@ -143,7 +143,7 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   public void testIncludeTreeNode_noViewRights() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), null, 0);
+        "MyDoc"), (String)null, 0);
     expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
         eq(docFullName), same(context))).andReturn(false);
     replay(wiki, rightsService);
@@ -155,7 +155,7 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   public void testIncludeTreeNode_hasViewRights_noMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), null, 0);
+        "MyDoc"), (String)null, 0);
     filter.setMenuPart("");
     expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
         eq(docFullName), same(context))).andReturn(true);
