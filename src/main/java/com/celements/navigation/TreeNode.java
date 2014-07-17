@@ -63,7 +63,8 @@ public class TreeNode {
     setPosition(position);
   }
 
-  public TreeNode(DocumentReference docRef, SpaceReference parentRef, Integer position) {
+  public TreeNode(DocumentReference docRef, SpaceReference parentRef, String partName,
+      Integer position) {
     setDocumentReference(docRef);
     setParent("");
     setPosition(position);
