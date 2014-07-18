@@ -545,6 +545,10 @@ public class TreeNodeService implements ITreeNodeService {
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
   
+  /**
+   * getParentReference returns only DocumentReference or SpaceReference even though the
+   * return type is an EntityReference
+   */
   @Override
   public EntityReference getParentReference(DocumentReference docRef) {
     try {
@@ -555,15 +559,19 @@ public class TreeNodeService implements ITreeNodeService {
     return null;
   }
 
+  /**
+   * getParentEntityRef returns only DocumentReference or SpaceReference even though the
+   * return type is an EntityReference
+   */
   @Override
   public EntityReference getParentEntityRef(DocumentReference docRef
       ) throws XWikiException {
-    EntityReference parent = getContext().getWiki().getDocument(docRef, getContext()
+    EntityReference parentRef = getContext().getWiki().getDocument(docRef, getContext()
         ).getParentReference();
-    if ((parent == null) || ("".equals(parent))) {
-      parent = docRef.getLastSpaceReference();
+    if ((parentRef == null) || (docRef.equals(parentRef))) {
+      parentRef = docRef.getLastSpaceReference();
     }
-    return parent;
+    return parentRef;
   }
 
   /**

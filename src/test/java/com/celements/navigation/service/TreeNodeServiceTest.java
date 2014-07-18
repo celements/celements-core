@@ -906,6 +906,23 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetParentEntityRef() throws Exception {
+    String wikiName = context.getDatabase();
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    DocumentReference docRef = new DocumentReference(wikiName, spaceName, docName);
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    EntityReference parentReference = new SpaceReference(spaceName,
+        new WikiReference(wikiName));
+    theDoc.setParentReference(parentReference);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).anyTimes();
+    replayDefault();
+    EntityReference entityRef = treeNodeService.getParentEntityRef(docRef);
+    assertEquals(parentReference, entityRef);
+    verifyDefault();
+  }
+
+  @Test
   public void testGetTreeNodeForDocRef() throws Exception {
     String wikiName = context.getDatabase();
     String spaceName = "mySpace";
@@ -1218,7 +1235,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
 
   private XWikiDocument createNavDoc(TreeNode treeNode1) {
     XWikiDocument navDoc = new XWikiDocument(treeNode1.getDocumentReference());
-    navDoc.setParent(treeNode1.getParent());
+    navDoc.setParentReference(treeNode1.getParentRef());
     BaseObject menuItemObj = new BaseObject();
     menuItemObj.setXClassReference(getNavClassConfig().getMenuItemClassRef(
         context.getDatabase()));
