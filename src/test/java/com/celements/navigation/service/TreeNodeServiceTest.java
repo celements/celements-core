@@ -940,6 +940,19 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetTreeNodeForDocRef_noTreeNodeObj() throws Exception {
+    String wikiName = context.getDatabase();
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    DocumentReference docRef = new DocumentReference(wikiName, spaceName, docName);
+    XWikiDocument navDoc1 = new XWikiDocument(docRef);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(navDoc1).anyTimes();
+    replayDefault();
+    assertNull(treeNodeService.getTreeNodeForDocRef(docRef));
+    verifyDefault();
+  }
+
+  @Test
   public void testStoreOrder() throws Exception {
     String parentFN = "mySpace.name";
     String spaceName = "mySpace";

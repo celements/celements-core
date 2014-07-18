@@ -621,19 +621,18 @@ public class TreeNodeService implements ITreeNodeService {
     XWikiDocument moveDoc = getContext().getWiki().getDocument(docRef, getContext());
     BaseObject menuItemObj = moveDoc.getXObject(navClassConfig.getMenuItemClassRef(
         getContext().getDatabase()));
-    int pos = menuItemObj.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD, -1);
-    if (parentRef instanceof SpaceReference) {
-      String menuPart = menuItemObj.getStringValue(
-          INavigationClassConfig.MENU_PART_FIELD);
-      if (menuPart == null) {
-        menuPart = "";
+    if (menuItemObj != null) {
+      int pos = menuItemObj.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD, -1);
+      if (parentRef instanceof SpaceReference) {
+        String menuPart = menuItemObj.getStringValue(
+            INavigationClassConfig.MENU_PART_FIELD);
+        if (menuPart == null) {
+          menuPart = "";
+        }
+        treeNode = new TreeNode(docRef, (SpaceReference)parentRef, menuPart, pos);
+      } else if (parentRef instanceof DocumentReference) {
+        treeNode = new TreeNode(docRef, (DocumentReference)parentRef, pos);
       }
-      treeNode = new TreeNode(docRef, (SpaceReference)parentRef, menuPart, pos);
-    } else if (parentRef instanceof DocumentReference) {
-      treeNode = new TreeNode(docRef, (DocumentReference)parentRef, pos);
-    } else {
-      new IllegalArgumentException("unexpected parent reference of type ["
-          + parentRef.getClass() + "].");
     }
     return treeNode;
   }
