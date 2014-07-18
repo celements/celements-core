@@ -595,23 +595,40 @@ public class TreeNodeService implements ITreeNodeService {
   public void moveTreeDocAfter(DocumentReference moveDocRef,
       DocumentReference insertAfterDocRef) throws XWikiException {
     if (isTreeNode(moveDocRef)) {
-      TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
-      List<TreeNode> treeNodes = getSiblingTreeNodes_internal(moveDocRef);
-      treeNodes.remove(moveTreeNode);
-      ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
-      int splitPos = 0;
+      TreeNode insertAfterTreeNode = null;
       if (insertAfterDocRef != null) {
-        for (int pos = 0; pos < treeNodes.size(); pos ++) {
-          if (insertAfterDocRef.equals(treeNodes.get(pos).getDocumentReference())) {
-            splitPos = pos;
-          }
-        }
+        insertAfterTreeNode = getTreeNodeForDocRef(insertAfterDocRef);
       }
-      newTreeNodes.addAll(treeNodes.subList(0, splitPos));
-      newTreeNodes.add(moveTreeNode);
-      newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
+      TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
+      ArrayList<TreeNode> newTreeNodes = moveTreeNodeAfter(moveTreeNode,
+          insertAfterTreeNode);
       storeOrder(newTreeNodes);
+    } else {
+      LOGGER.info("Failed to moveTreeDocAfter for moveDocRef [" + moveDocRef
+          + "] and insertAfterDocRef [" + insertAfterDocRef + "] because one of them is"
+          + " no TreeNode.");
     }
+  }
+
+  /**
+   * TODO write unit tests and test if working
+   */
+  ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode,
+      TreeNode insertAfterTreeNode) {
+    List<TreeNode> treeNodes = fetchNodesForParentKey(moveTreeNode.getParentRef());
+    treeNodes.remove(moveTreeNode);
+    ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
+    int splitPos = 0;
+    if (insertAfterTreeNode != null) {
+      int newSplitPos = treeNodes.indexOf(insertAfterTreeNode);
+      if (newSplitPos > -1) {
+        splitPos = newSplitPos;
+      }
+    }
+    newTreeNodes.addAll(treeNodes.subList(0, splitPos));
+    newTreeNodes.add(moveTreeNode);
+    newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
+    return newTreeNodes;
   }
 
   @Override
@@ -641,14 +658,6 @@ public class TreeNodeService implements ITreeNodeService {
     TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
     List<TreeNode> siblingTreeNodes = getSubNodesForParent(moveTreeNode.getParentRef(),
         moveTreeNode.getPartName(getContext()));
-    return siblingTreeNodes;
-  }
-
-  @Override
-  public List<TreeNode> getSiblingTreeNodes_internal(DocumentReference moveDocRef
-      ) throws XWikiException {
-    TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
-    List<TreeNode> siblingTreeNodes = fetchNodesForParentKey(moveTreeNode.getParentRef());
     return siblingTreeNodes;
   }
 
