@@ -610,24 +610,23 @@ public class TreeNodeService implements ITreeNodeService {
     }
   }
 
-  /**
-   * TODO write unit tests and test if working
-   */
   ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode,
       TreeNode insertAfterTreeNode) {
-    List<TreeNode> treeNodes = fetchNodesForParentKey(moveTreeNode.getParentRef());
+    List<TreeNode> treeNodes = new ArrayList<TreeNode>(fetchNodesForParentKey(
+        moveTreeNode.getParentRef()));
     treeNodes.remove(moveTreeNode);
     ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
     int splitPos = 0;
+    int maxPos = treeNodes.size();
     if (insertAfterTreeNode != null) {
       int newSplitPos = treeNodes.indexOf(insertAfterTreeNode);
       if (newSplitPos > -1) {
-        splitPos = newSplitPos;
+        splitPos = newSplitPos + 1;
       }
     }
     newTreeNodes.addAll(treeNodes.subList(0, splitPos));
     newTreeNodes.add(moveTreeNode);
-    newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
+    newTreeNodes.addAll(treeNodes.subList(splitPos, maxPos));
     return newTreeNodes;
   }
 
