@@ -19,71 +19,77 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
+import com.celements.nextfreedoc.INextFreeDocRole;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
+/**
+ * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole}
+ *  
+ */
+@Deprecated
 public class NextFreeDocNameCommand {
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      NextFreeDocNameCommand.class);
-
-  public String getNextUntitledPageFullName(String space, XWikiContext context) {
-    return createUntitledPageFullName(
-        getNextTitledPageNum(space, "untitled", context), space, "untitled");
-  }
   
+  /**
+   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
+   *              #getNextTitledPageDocRef(SpaceReference, String)}
+   *  
+   */
+  @Deprecated
   public String getNextTitledPageFullName(String space, String title,
       XWikiContext context) {
-    return createUntitledPageFullName(getNextTitledPageNum(space, title, context), space,
-        title);
+    DocumentReference docRef = getNextFreeDocService().getNextTitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())), title);
+    return getWebUtilsService().getRefLocalSerializer().serialize(docRef);
   }
 
+  /**
+   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
+   *              #getNextTitledPageDocRef(SpaceReference, String)}
+   *  
+   */
+  @Deprecated
   public DocumentReference getNextTitledPageDocRef(String space, String title,
       XWikiContext context) {
-    return createUntitledPageDocRef(getNextTitledPageNum(space, title, context), space,
-        title, context);
+    return getNextFreeDocService().getNextTitledPageDocRef(new SpaceReference(space, 
+        new WikiReference(context.getDatabase())), title);
   }
 
-  private long getNextTitledPageNum(String space, String title, XWikiContext context) {
-    long num = 1;
-    while (!isAvailableDocRef(context, createUntitledPageDocRef(num, space, title,
-        context))) {
-      num += 1;
-    }
-    return num;
+  /**
+   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
+   *              #getNextUntitledPageDocRef(SpaceReference)}
+   *  
+   */
+  @Deprecated
+  public String getNextUntitledPageFullName(String space, XWikiContext context) {
+    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())));
+    return getWebUtilsService().getRefLocalSerializer().serialize(docRef);
   }
 
-  private boolean isAvailableDocRef(XWikiContext context, DocumentReference newDocRef) {
-    try {
-      return (!context.getWiki().exists(newDocRef, context)
-          && (context.getWiki().getDocument(newDocRef, context).getLock(context) == null)
-          );
-    } catch (XWikiException exp) {
-      LOGGER.info("Failed to check new document reference [" + newDocRef + "].", exp);
-    }
-    return false;
-  }
-
-  private String createUntitledPageFullName(long num, String space, String title) {
-    return space + "." + createUntitledPageName(title, num);
-  }
-
-  private DocumentReference createUntitledPageDocRef(long num, String space, String title,
-      XWikiContext context) {
-    return new DocumentReference(context.getDatabase(), space, createUntitledPageName(
-        title, num));
-  }
-
-  private String createUntitledPageName(String title, long num) {
-    return title + num;
-  }
-
+  /**
+   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
+   *              #getNextUntitledPageDocRef(SpaceReference)}
+   *  
+   */
+  @Deprecated
   public String getNextUntitledPageName(String space, XWikiContext context) {
-    return createUntitledPageName("untitled", getNextTitledPageNum(space, "untitled",
-        context));
+    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(
+        new SpaceReference(space, new WikiReference(context.getDatabase())));
+    return docRef.getName();
   }
+  
+  private INextFreeDocRole getNextFreeDocService() {
+    return Utils.getComponent(INextFreeDocRole.class);
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+  
 }
