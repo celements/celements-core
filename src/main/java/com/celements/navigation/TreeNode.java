@@ -19,6 +19,7 @@
  */
 package com.celements.navigation;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -70,6 +71,9 @@ public class TreeNode {
     setDocumentReference(docRef);
     setParent("");
     setPosition(position);
+    if (!StringUtils.isEmpty(partName)) {
+      setPartName(partName);
+    }
   }
 
   /**
