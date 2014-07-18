@@ -923,7 +923,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetTreeNodeForDocRef() throws Exception {
+  public void testGetTreeNodeForDocRef_parentSpaceRef() throws Exception {
     String wikiName = context.getDatabase();
     String spaceName = "mySpace";
     String docName = "myDoc";
@@ -936,6 +936,46 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     replayDefault();
     TreeNode treeNodeTest = treeNodeService.getTreeNodeForDocRef(docRef);
     assertEquals(expectedTreeNode, treeNodeTest);
+    assertEquals(spaceRef, treeNodeTest.getParentRef());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetTreeNodeForDocRef_parentSpaceRef_partName_mainNav(
+      ) throws Exception {
+    String wikiName = context.getDatabase();
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    DocumentReference docRef = new DocumentReference(wikiName, spaceName, docName);
+    SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
+    int pos = 2;
+    TreeNode expectedTreeNode = new TreeNode(docRef, spaceRef, "mainNav", pos);
+    XWikiDocument navDoc1 = createNavDoc(expectedTreeNode);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(navDoc1).anyTimes();
+    replayDefault();
+    TreeNode treeNodeTest = treeNodeService.getTreeNodeForDocRef(docRef);
+    assertEquals(expectedTreeNode, treeNodeTest);
+    assertEquals(spaceRef, treeNodeTest.getParentRef());
+    assertEquals("mainNav", treeNodeTest.getPartName(getContext()));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetTreeNodeForDocRef_parentDocRef(
+      ) throws Exception {
+    String wikiName = context.getDatabase();
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    DocumentReference docRef = new DocumentReference(wikiName, spaceName, docName);
+    DocumentReference parentRef = new DocumentReference(wikiName, spaceName, "myParent");
+    int pos = 3;
+    TreeNode expectedTreeNode = new TreeNode(docRef, parentRef, pos);
+    XWikiDocument navDoc1 = createNavDoc(expectedTreeNode);
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(navDoc1).anyTimes();
+    replayDefault();
+    TreeNode treeNodeTest = treeNodeService.getTreeNodeForDocRef(docRef);
+    assertEquals(expectedTreeNode, treeNodeTest);
+    assertEquals(parentRef, treeNodeTest.getParentRef());
     verifyDefault();
   }
 
@@ -1254,6 +1294,11 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         context.getDatabase()));
     menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
         treeNode1.getPosition());
+    String partName = treeNode1.getPartName(getContext());
+    if ("".equals(partName)) {
+      partName = null;
+    }
+    menuItemObj.setStringValue(INavigationClassConfig.MENU_PART_FIELD, partName);
     navDoc.addXObject(menuItemObj);
     return navDoc;
   }

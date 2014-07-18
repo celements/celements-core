@@ -626,9 +626,6 @@ public class TreeNodeService implements ITreeNodeService {
       if (parentRef instanceof SpaceReference) {
         String menuPart = menuItemObj.getStringValue(
             INavigationClassConfig.MENU_PART_FIELD);
-        if (menuPart == null) {
-          menuPart = "";
-        }
         treeNode = new TreeNode(docRef, (SpaceReference)parentRef, menuPart, pos);
       } else if (parentRef instanceof DocumentReference) {
         treeNode = new TreeNode(docRef, (DocumentReference)parentRef, pos);
