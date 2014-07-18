@@ -102,6 +102,9 @@ public interface ITreeNodeService {
   public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
       ) throws XWikiException;
 
+  public List<TreeNode> getSiblingTreeNodes_internal(DocumentReference moveDocRef
+      ) throws XWikiException;
+
   public void storeOrder(List<TreeNode> newTreeNodes);
   
   public void storeOrder(List<TreeNode> newTreeNodes, boolean isMinorEdit);

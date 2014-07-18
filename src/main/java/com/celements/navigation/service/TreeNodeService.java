@@ -596,7 +596,7 @@ public class TreeNodeService implements ITreeNodeService {
       DocumentReference insertAfterDocRef) throws XWikiException {
     if (isTreeNode(moveDocRef)) {
       TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
-      List<TreeNode> treeNodes = getSiblingTreeNodes(moveDocRef);
+      List<TreeNode> treeNodes = getSiblingTreeNodes_internal(moveDocRef);
       treeNodes.remove(moveTreeNode);
       ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
       int splitPos = 0;
@@ -614,6 +614,7 @@ public class TreeNodeService implements ITreeNodeService {
     }
   }
 
+  @Override
   public TreeNode getTreeNodeForDocRef(DocumentReference docRef
       ) throws XWikiException {
     EntityReference parentRef = getParentReference(docRef);
@@ -634,11 +635,20 @@ public class TreeNodeService implements ITreeNodeService {
     return treeNode;
   }
 
+  @Override
   public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
       ) throws XWikiException {
     TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
     List<TreeNode> siblingTreeNodes = getSubNodesForParent(moveTreeNode.getParentRef(),
         moveTreeNode.getPartName(getContext()));
+    return siblingTreeNodes;
+  }
+
+  @Override
+  public List<TreeNode> getSiblingTreeNodes_internal(DocumentReference moveDocRef
+      ) throws XWikiException {
+    TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
+    List<TreeNode> siblingTreeNodes = fetchNodesForParentKey(moveTreeNode.getParentRef());
     return siblingTreeNodes;
   }
 

@@ -84,9 +84,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> mockTreeNodeList = Arrays.asList(treeNode, null);
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
         same(context))).andReturn(mockTreeNodeList);
-    List<TreeNode> emptyList = Collections.emptyList();
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
-        same(context))).andReturn(emptyList);
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
     expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
         eq(spaceName + "." + docName), same(context))).andReturn(true);
     replayDefault();
@@ -989,6 +988,79 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(navDoc1).anyTimes();
     replayDefault();
     assertNull(treeNodeService.getTreeNodeForDocRef(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetSiblingTreeNodes() throws Exception {
+    String wikiName = context.getDatabase();
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    DocumentReference moveDocRef = new DocumentReference(wikiName, spaceName, docName);
+    DocumentReference parentRef = new DocumentReference(wikiName, spaceName, "myParent");
+    int pos = 3;
+    TreeNode moveTreeNode = new TreeNode(moveDocRef, parentRef, pos);
+    XWikiDocument moveDoc = createNavDoc(moveTreeNode);
+    expect(wiki.getDocument(eq(moveDocRef), same(context))).andReturn(moveDoc).anyTimes();
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc2");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc3");
+    Integer oldPos3 = 1;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
+    List<TreeNode> expectedTreeNodes = Arrays.asList(treeNode1, moveTreeNode, treeNode2,
+        treeNode3);
+    String parentKey = wikiName + ":" + spaceName + ".myParent";
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(expectedTreeNodes);
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        isA(String.class), same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedTreeNodes, treeNodeService.getSiblingTreeNodes(moveDocRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetSiblingTreeNodes_internal() throws Exception {
+    String wikiName = context.getDatabase();
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    DocumentReference moveDocRef = new DocumentReference(wikiName, spaceName, docName);
+    DocumentReference parentRef = new DocumentReference(wikiName, spaceName, "myParent");
+    int pos = 3;
+    TreeNode moveTreeNode = new TreeNode(moveDocRef, parentRef, pos);
+    XWikiDocument moveDoc = createNavDoc(moveTreeNode);
+    expect(wiki.getDocument(eq(moveDocRef), same(context))).andReturn(moveDoc).anyTimes();
+    DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc1");
+    Integer oldPos1 = 3;
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc2");
+    Integer oldPos2 = 2;
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
+    DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName,
+        "Doc3");
+    Integer oldPos3 = 1;
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
+    List<TreeNode> expectedTreeNodes = Arrays.asList(treeNode1, moveTreeNode, treeNode2,
+        treeNode3);
+    String parentKey = wikiName + ":" + spaceName + ".myParent";
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(expectedTreeNodes);
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(Collections.<TreeNode>emptyList());
+    replayDefault();
+    assertEquals(expectedTreeNodes, treeNodeService.getSiblingTreeNodes_internal(
+        moveDocRef));
     verifyDefault();
   }
 
