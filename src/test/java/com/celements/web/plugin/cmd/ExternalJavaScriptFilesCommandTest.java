@@ -42,10 +42,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
   public void setUp_ExternalJavaScriptFilesCommandTest() throws Exception {
     context = getContext();
     command = new ExternalJavaScriptFilesCommand(context);
-    attUrlCmd = createMock(AttachmentURLCommand.class);
+    attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     command.injectAttUrlCmd(attUrlCmd);
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
   }
 
   @Test
@@ -54,9 +53,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).once();
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
   @Test
@@ -66,9 +65,9 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         ).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).anyTimes();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
   @Test
@@ -77,12 +76,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>", 
         command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
 
   @Test
@@ -91,12 +90,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
     expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>", 
         command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
   @Test
@@ -116,12 +115,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         ).times(2);
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).anyTimes();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->", 
         command.addExtJSfileOnce(fileNotFound));
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
 
   @Test
@@ -132,12 +131,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         ).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).anyTimes();
     expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->", 
         command.addExtJSfileOnce(fileNotFound));
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
 
   @Test
@@ -163,14 +162,14 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
     expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(
         mainPrefDoc).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
     String allStr = command.getAllExternalJavaScriptFiles();
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>\n"
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
   @Test
@@ -202,7 +201,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
     expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(
         mainPrefDoc).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(attFileURL, "file"));
     assertEquals("", command.addExtJSfileOnce(attFileURL));
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
@@ -210,7 +209,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     assertEquals("<script type=\"text/javascript\""
         + " src=\"/file/celJS/prototype.js?version=20110401120000\"></script>\n"
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
 }
