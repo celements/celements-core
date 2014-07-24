@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.PageTypeClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -60,8 +60,8 @@ public class CreateDocumentCommand {
         String pageTypeStr = "";
         if (pageType != null) {
           DocumentReference pageTypeClassRef = new DocumentReference(
-              getContext().getDatabase(), PageTypeCommand.PAGE_TYPE_CLASS_SPACE,
-              PageTypeCommand.PAGE_TYPE_CLASS_DOC);
+              docRef.getWikiReference().getName(), PageTypeClasses.PAGE_TYPE_CLASS_SPACE,
+              PageTypeClasses.PAGE_TYPE_CLASS_DOC);
           BaseObject pageTypeObj = theNewDoc.getXObject(pageTypeClassRef, true,
               getContext());
           pageTypeObj.setStringValue("page_type", pageType);
