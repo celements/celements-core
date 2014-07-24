@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.PageTypeClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -125,8 +125,37 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theNewDoc).once();
     DocumentReference pageTypeClassRef = new DocumentReference(
-        getContext().getDatabase(), PageTypeCommand.PAGE_TYPE_CLASS_SPACE,
-        PageTypeCommand.PAGE_TYPE_CLASS_DOC);
+        getContext().getDatabase(), PageTypeClasses.PAGE_TYPE_CLASS_SPACE,
+        PageTypeClasses.PAGE_TYPE_CLASS_DOC);
+    BaseClass pageTypeClassMock = createMock(BaseClass.class);
+    expect(xwiki.getXClass(pageTypeClassRef, context)).andReturn(pageTypeClassMock
+        ).once();
+    xwiki.saveDocument(same(theNewDoc), eq("init RichText-document"), eq(false),
+        same(context));
+    expectLastCall().once();
+    BaseObject newPageTypeObj = new BaseObject();
+    newPageTypeObj.setXClassReference(pageTypeClassRef);
+    expect(pageTypeClassMock.newCustomClassInstance(same(context))).andReturn(
+        newPageTypeObj);
+    replayAll(pageTypeClassMock);
+    XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType);
+    assertNotNull(theDoc);
+    BaseObject ptObj = theDoc.getXObject(pageTypeClassRef);
+    assertNotNull(ptObj);
+    assertEquals("RichText", ptObj.getStringValue("page_type"));
+    verifyAll(pageTypeClassMock);
+  }
+
+  @Test
+  public void testCreateDocument_differentDB() throws Exception {
+    String pageType = "RichText";
+    String database = "otherDB";
+    DocumentReference docRef = new DocumentReference(database, "mySpace", "myNewDocument");
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
+    XWikiDocument theNewDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theNewDoc).once();
+    DocumentReference pageTypeClassRef = new DocumentReference(database, 
+        PageTypeClasses.PAGE_TYPE_CLASS_SPACE, PageTypeClasses.PAGE_TYPE_CLASS_DOC);
     BaseClass pageTypeClassMock = createMock(BaseClass.class);
     expect(xwiki.getXClass(pageTypeClassRef, context)).andReturn(pageTypeClassMock
         ).once();
