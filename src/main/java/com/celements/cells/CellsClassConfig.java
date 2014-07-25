@@ -1,7 +1,9 @@
 package com.celements.cells;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
+@Component
 public class CellsClassConfig implements ICellsClassConfig {
 
   @Override

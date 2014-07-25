@@ -60,3 +60,4 @@ com.celements.rteConfig.classes.RTEConfigClasses
 com.celements.rteConfig.RTEConfigTemplateService
 com.celements.navigation.NavigationClassConfig
 com.celements.nextfreedoc.NextFreeDocService
+com.celements.cells.CellsClassConfig
