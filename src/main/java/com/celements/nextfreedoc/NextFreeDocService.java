@@ -27,6 +27,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NextFreeDocService.class);
   
+  // TODO refactor to org.xwiki.cache.CacheManager
   private final Map<DocumentReference, Long> numCache = new HashMap<DocumentReference, Long>();
   
   @Requirement
