@@ -304,6 +304,8 @@ public class OldCoreClasses extends AbstractClassCollection {
         "Use Images for Navigation", "yesno");
     needsUpdate |= bclass.addBooleanField("publishdate_active",
         "Activate Publication Date", "yesno");
+    needsUpdate |= bclass.addBooleanField("extract_active", "Activate Document Extracts",
+        "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
