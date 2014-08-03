@@ -35,6 +35,9 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentDetailsClasses.class);
 
+  public static final String FIELD_DOC_EXTRACT_CONTENT = "extract";
+  public static final String FIELD_DOC_EXTRACT_LANGUAGE = "language";
+
   @Override
   protected Log getLogger() {
     return LOGGER;
@@ -99,8 +102,8 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("language", "Language", 30);
-    needsUpdate |= bclass.addTextAreaField("extract", "Extract", 80, 7);
+    needsUpdate |= bclass.addTextField(FIELD_DOC_EXTRACT_LANGUAGE, "Language", 30);
+    needsUpdate |= bclass.addTextAreaField(FIELD_DOC_EXTRACT_CONTENT, "Extract", 80, 7);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
