@@ -46,11 +46,15 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     getDocumentExtractClass();
   }
   
+  public DocumentReference getDocumentPublicationClassRef(String wikiName) {
+    return new DocumentReference(wikiName, "Classes", "DocumentPublication");
+  }
+
   BaseClass getDocumentPublicationClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "DocumentPublication");
+    DocumentReference classRef = getDocumentPublicationClassRef(getContext(
+        ).getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
@@ -76,11 +80,14 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  public DocumentReference getDocumentExtractClassRef(String wikiName) {
+    return new DocumentReference(wikiName, "Classes", "DocumentExtract");
+  }
+
   BaseClass getDocumentExtractClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "DocumentExtract");
+    DocumentReference classRef = getDocumentExtractClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
