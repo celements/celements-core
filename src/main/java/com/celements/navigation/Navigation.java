@@ -46,6 +46,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
@@ -597,9 +598,13 @@ public class Navigation implements INavigation {
 
   boolean isRestrictedRights(DocumentReference docRef) {
     try {
-      return !getContext().getWiki().getRightService().hasAccessLevel("view",
-          "XWiki.XWikiGuest", getWebUtilsService().getRefLocalSerializer().serialize(
-              docRef), getContext());
+      String docFN = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
+      XWikiRightService rightService = getContext().getWiki().getRightService();
+      boolean isRestricted = !rightService.hasAccessLevel("view", "XWiki.XWikiGuest",
+          docFN, getContext());
+      LOGGER.debug("isRestrictedRights for [" + docFN + "] returns [" + isRestricted
+          + "] using rights service [" + rightService.getClass().getName() + "].");
+      return isRestricted;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to check isRestrictedRights for [" + docRef + "].", exp);
     }
