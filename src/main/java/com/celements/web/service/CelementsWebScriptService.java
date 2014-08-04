@@ -44,7 +44,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
-import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
@@ -427,6 +426,14 @@ public class CelementsWebScriptService implements ScriptService {
       List<String> rendererNameList) {
     return renderDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(),
         removePre, rendererNameList);
+  }
+
+  public boolean existsInheritableDocument(DocumentReference docRef) {
+    return webUtilsService.existsInheritableDocument(docRef, getContext().getLanguage());
+  }
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang) {
+    return webUtilsService.existsInheritableDocument(docRef, lang);
   }
 
   public String renderInheritableDocument(DocumentReference docRef) {

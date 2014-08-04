@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -931,6 +932,25 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.debug("renderInheritableDocument: call renderTemplatePath for ["
         + templatePath + "] and lang [" + lang + "] and defLang [" + defLang + "].");
     return renderCommand.renderTemplatePath(templatePath, lang, defLang);
+  }
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang) {
+    return existsInheritableDocument(docRef, lang, null);
+  }
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang,
+      String defLang) {
+    String templatePath = getInheritedTemplatedPath(docRef);
+    LOGGER.debug("existsInheritableDocument: check content for templatePath ["
+        + templatePath + "] and lang [" + lang + "] and defLang [" + defLang + "].");
+    if (templatePath.startsWith(":")) {
+      return !StringUtils.isEmpty(getTranslatedDiscTemplateContent(templatePath, lang,
+          defLang));
+    } else {
+      //Template must exist otherwise getInheritedTemplatedPath would have fallen back
+      //on disk template path.
+      return true;
+    }
   }
 
   private PageLayoutCommand getPageLayoutCmd() {

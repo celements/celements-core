@@ -192,4 +192,9 @@ public interface IWebUtilsService {
   public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
       String defLang);
 
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang);
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang,
+      String defLang);
+
 }
