@@ -189,4 +189,7 @@ public interface IWebUtilsService {
 
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
 
+  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
+      String defLang);
+
 }

@@ -19,6 +19,8 @@
  */
 package com.celements.web.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -958,6 +960,45 @@ public class WebUtilsService implements IWebUtilsService {
       return html5Cleaner.cleanAll(xhtml);
     }
     return xhtml;
+  }
+
+  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
+      String defLang) {
+    String templateContent;
+    List<String> langList = new ArrayList<String>();
+    if (lang != null) {
+      langList.add(lang);
+    }
+    if ((defLang != null) && !defLang.equals(lang)) {
+      langList.add(defLang);
+    }
+    templateContent = "";
+    for(String theLang : langList) {
+      String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
+      try {
+        templateContent = getContext().getWiki().getResourceContent(templatePath);
+      } catch (FileNotFoundException fnfExp) {
+        LOGGER.trace("FileNotFound [" + templatePath + "].");
+        templateContent = "";
+      } catch (IOException exp) {
+        LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
+        templateContent = "";
+      }
+    }
+    if ("".equals(templateContent)) {
+      String templatePathDef = getTemplatePathOnDisk(renderTemplatePath);
+      try {
+        templateContent = getContext().getWiki().getResourceContent(templatePathDef);
+      } catch (FileNotFoundException fnfExp) {
+        LOGGER.trace("FileNotFound [" + templatePathDef + "].");
+        return "";
+      } catch (IOException exp) {
+        LOGGER.debug("Exception while parsing template [" + templatePathDef + "].",
+            exp);
+        return "";
+      }
+    }
+    return templateContent;
   }
 
 }
