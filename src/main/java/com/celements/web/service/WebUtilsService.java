@@ -592,7 +592,7 @@ public class WebUtilsService implements IWebUtilsService {
     MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
     for(DocumentReference parentDocRef : getDocumentParentsList(docRef, false)) {
       String parentDocFN = serializer_default.serialize(parentDocRef);
-      parentsListMNStr += menuNameCmd.getMenuNameBaseObject(parentDocFN, getContext(
+      parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN, getContext(
           ).getLanguage(), getContext()) + ",";
       parentsListStr += parentDocFN + ",";
     }
