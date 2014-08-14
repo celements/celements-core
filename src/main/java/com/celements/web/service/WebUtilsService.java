@@ -588,10 +588,16 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
     docData.put("parent", serializer_default.serialize(xwikiDoc.getParentReference()));
     String parentsListStr = "";
+    String parentsListMNStr = "";
+    MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
     for(DocumentReference parentDocRef : getDocumentParentsList(docRef, false)) {
-      parentsListStr += serializer_default.serialize(parentDocRef) + ",";
+      String parentDocFN = serializer_default.serialize(parentDocRef);
+      parentsListMNStr += menuNameCmd.getMenuNameBaseObject(parentDocFN, getContext(
+          ).getLanguage(), getContext()) + ",";
+      parentsListStr += parentDocFN + ",";
     }
     docData.put("parentslist", parentsListStr.replace(",+$", ""));
+    docData.put("parentslistmenuname", parentsListMNStr.replace(",+$", ""));
     docData.put("creator", xwikiDoc.getCreator());
     docData.put("author", xwikiDoc.getAuthor());
     docData.put("creator", xwikiDoc.getCreator());
