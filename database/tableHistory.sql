@@ -126,4 +126,7 @@ alter table xwikiattachment_content modify column XWA_CONTENT LONGBLOB NOT NULL;
 alter table xwikiattachment_archive modify column XWA_ARCHIVE LONGBLOB NOT NULL;
 
 UPDATE SchemaVersion SET `version` = '9' WHERE `schema` = 'celements.web';
- 
+
+-- execute only in main DB
+update xwikidoc set XWD_CONTENT_AUTHOR = concat('xwiki:', XWD_CONTENT_AUTHOR)
+    where XWD_CONTENT_AUTHOR like 'XWiki.%';
