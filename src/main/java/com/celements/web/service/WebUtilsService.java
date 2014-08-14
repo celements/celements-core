@@ -586,7 +586,8 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
     docData.put("translation", "" + xwikiDoc.getTranslation());
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
-    docData.put("parent", serializer_default.serialize(xwikiDoc.getParentReference()));
+    String xwikiDocFN = serializer_default.serialize(xwikiDoc.getParentReference());
+    docData.put("parent", xwikiDocFN);
     String parentsListStr = "";
     String parentsListMNStr = "";
     MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
@@ -615,9 +616,8 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("comment", xwikiDoc.getComment());
     docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
-    docData.put("menuName", new MultilingualMenuNameCommand().getMultilingualMenuName(
-        xwikiDoc.getXObject(getRef("Celements2", "MenuItem")),
-        xwikiDoc.getLanguage(), getContext()));
+    docData.put("menuName", menuNameCmd.getMultilingualMenuName(xwikiDocFN,
+        getContext().getLanguage(), getContext()));
     //docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
     /** TODO add Attachments
