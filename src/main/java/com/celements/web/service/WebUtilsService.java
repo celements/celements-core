@@ -663,9 +663,9 @@ public class WebUtilsService implements IWebUtilsService {
         try {
           docData.put("versions", xwikiDoc.getDocumentArchive(getContext()
               ).getArchive(getContext()));
-        } catch (XWikiException e) {
+        } catch (XWikiException exp) {
             LOGGER.error("Document [" + docRef.getName()
-                + "] has malformed history");
+                + "] has malformed history", exp);
         }
     }
 
