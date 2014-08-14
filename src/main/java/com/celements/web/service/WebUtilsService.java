@@ -647,8 +647,15 @@ public class WebUtilsService implements IWebUtilsService {
       try {
         docData.put("renderedcontent", replaceInternalWithExternalLinks(
             xwikiDoc.getRenderedContent(getContext()), host));
-      } catch (XWikiException e) {
-        LOGGER.error("Exception with rendering content: " + e.getFullMessage());
+      } catch (XWikiException exp) {
+        LOGGER.error("Exception with rendering content: ", exp);
+      }
+      try {
+        docData.put("celrenderedcontent", replaceInternalWithExternalLinks(
+            getCelementsRenderCmd().renderCelementsDocument(xwikiDoc.getDocumentReference(
+                ), getContext().getLanguage(), "view"), host));
+      } catch (XWikiException exp) {
+        LOGGER.error("Exception with rendering content: ", exp);
       }
     }
 
@@ -663,6 +670,12 @@ public class WebUtilsService implements IWebUtilsService {
     }
 
     return docData;
+  }
+
+  private RenderCommand getCelementsRenderCmd() {
+    RenderCommand renderCommand = new RenderCommand();
+    renderCommand.setDefaultPageType("RichText");
+    return renderCommand;
   }
 
   String replaceInternalWithExternalLinks(String content, String host) {
