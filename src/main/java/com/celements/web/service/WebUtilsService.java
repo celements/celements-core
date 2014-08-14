@@ -597,8 +597,8 @@ public class WebUtilsService implements IWebUtilsService {
           ).getLanguage(), getContext()) + ",";
       parentsListStr += parentDocFN + ",";
     }
-    docData.put("parentslist", parentsListStr.replace(",+$", ""));
-    docData.put("parentslistmenuname", parentsListMNStr.replace(",+$", ""));
+    docData.put("parentslist", parentsListStr.replaceAll(",*$", ""));
+    docData.put("parentslistmenuname", parentsListMNStr.replaceAll(",*$", ""));
     docData.put("creator", xwikiDoc.getCreator());
     docData.put("author", xwikiDoc.getAuthor());
     docData.put("creator", xwikiDoc.getCreator());
