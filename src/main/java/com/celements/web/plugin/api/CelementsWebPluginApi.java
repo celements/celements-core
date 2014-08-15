@@ -845,6 +845,10 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsService().getJSONContent(contentDoc.getDocument());
   }
 
+  public String getJSONContent(DocumentReference contentDocRef) {
+    return getWebUtilsService().getJSONContent(contentDocRef);
+  }
+
   /**
    * 
    * @param authorDocName

@@ -703,6 +703,15 @@ public class WebUtilsService implements IWebUtilsService {
     return result;
   }
   
+  public String getJSONContent(DocumentReference docRef) {
+    try {
+      return getJSONContent(getContext().getWiki().getDocument(docRef, getContext()));
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get document [" + docRef + "] for JSON.", exp);
+    }
+    return "{}";
+  }
+
   public String getJSONContent(XWikiDocument cdoc) {
     Map<String, String> data;
     try {

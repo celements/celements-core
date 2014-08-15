@@ -146,6 +146,8 @@ public interface IWebUtilsService {
   
   public String getJSONContent(XWikiDocument cdoc);
   
+  public String getJSONContent(DocumentReference docRef);
+
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
   
   public String getMajorVersion(XWikiDocument doc);
