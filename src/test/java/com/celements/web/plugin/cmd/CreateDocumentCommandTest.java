@@ -33,6 +33,7 @@ import com.celements.pagetype.PageTypeClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -173,6 +174,51 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     assertNotNull(ptObj);
     assertEquals("RichText", ptObj.getStringValue("page_type"));
     verifyAll(pageTypeClassMock);
+  }
+
+  @Test
+  public void testCreateDocument_noSave() throws Exception {
+    String pageType = "RichText";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myNewDocument");
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
+    XWikiDocument theNewDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theNewDoc).once();
+    DocumentReference pageTypeClassRef = new DocumentReference(
+        getContext().getDatabase(), PageTypeClasses.PAGE_TYPE_CLASS_SPACE,
+        PageTypeClasses.PAGE_TYPE_CLASS_DOC);
+    BaseClass pageTypeClassMock = createMock(BaseClass.class);
+    expect(xwiki.getXClass(pageTypeClassRef, context)).andReturn(pageTypeClassMock
+        ).once();
+    BaseObject newPageTypeObj = new BaseObject();
+    newPageTypeObj.setXClassReference(pageTypeClassRef);
+    expect(pageTypeClassMock.newCustomClassInstance(same(context))).andReturn(
+        newPageTypeObj);
+    replayAll(pageTypeClassMock);
+    XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType, false);
+    assertNotNull(theDoc);
+    BaseObject ptObj = theDoc.getXObject(pageTypeClassRef);
+    assertNotNull(ptObj);
+    assertEquals("RichText", ptObj.getStringValue("page_type"));
+    verifyAll(pageTypeClassMock);
+  }
+
+  @Test
+  public void testCreateDocument_XWE() throws Exception {
+    String pageType = "RichText";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myNewDocument");
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException()
+    ).once();
+    replayAll();
+    try {
+      createDocumentCmd.createDocument(docRef, pageType, false);
+      fail("expecting XWE");
+    } catch (XWikiException xwe) {
+      // expected
+    }
+    verifyAll();
   }
 
   private void replayAll(Object ... mocks) {
