@@ -46,33 +46,51 @@ public class CreateDocumentCommand {
   IWebUtilsService injected_webService;
 
   /**
-   * createDocument creates a new document if it does not exist.
-   * @param docRef 
-   * 
+   * createDocument creates a new document if it does not exist
+   * @param docRef
+   * @param pageType
    * @return
    */
   public XWikiDocument createDocument(DocumentReference docRef, String pageType) {
+    try {
+      return createDocument(docRef, pageType, true);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get document [" + docRef + "].", exp);
+      return null;
+    }
+  }
+
+  /**
+   * createDocument creates a new document if it does not exist
+   * @param docRef
+   * @param pageType
+   * @param withSave
+   * @return
+   * @throws XWikiException 
+   */
+  public XWikiDocument createDocument(DocumentReference docRef, String pageType, 
+      boolean withSave) throws XWikiException {
     if (!getContext().getWiki().exists(docRef, getContext())) {
-      try {
-        XWikiDocument theNewDoc = getContext().getWiki().getDocument(docRef,
+      XWikiDocument theNewDoc = getContext().getWiki().getDocument(docRef, getContext());
+      initNewXWikiDocument(theNewDoc);
+      String pageTypeStr = "";
+      if (pageType != null) {
+        DocumentReference pageTypeClassRef = new DocumentReference(
+            docRef.getWikiReference().getName(), PageTypeClasses.PAGE_TYPE_CLASS_SPACE,
+            PageTypeClasses.PAGE_TYPE_CLASS_DOC);
+        BaseObject pageTypeObj = theNewDoc.getXObject(pageTypeClassRef, true,
             getContext());
-        initNewXWikiDocument(theNewDoc);
-        String pageTypeStr = "";
-        if (pageType != null) {
-          DocumentReference pageTypeClassRef = new DocumentReference(
-              docRef.getWikiReference().getName(), PageTypeClasses.PAGE_TYPE_CLASS_SPACE,
-              PageTypeClasses.PAGE_TYPE_CLASS_DOC);
-          BaseObject pageTypeObj = theNewDoc.getXObject(pageTypeClassRef, true,
-              getContext());
-          pageTypeObj.setStringValue("page_type", pageType);
-          pageTypeStr = pageType + "-";
-        }
-        getContext().getWiki().saveDocument(theNewDoc, "init " + pageTypeStr + "document",
-            false, getContext());
-        return theNewDoc;
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to get document [" + docRef + "].", exp);
+        pageTypeObj.setStringValue("page_type", pageType);
+        pageTypeStr = pageType + "-";
       }
+      if (withSave) {
+        getContext().getWiki().saveDocument(theNewDoc, "init " + pageTypeStr + "document", 
+            false, getContext());
+        LOGGER.debug("saved '" + theNewDoc + "'");
+      } else {
+        LOGGER.debug("skipped saving '" + theNewDoc + "'");
+      }
+      return theNewDoc;
     } else {
       LOGGER.warn("Failed to create new Document [" + docRef
           + "] because it already exists");
