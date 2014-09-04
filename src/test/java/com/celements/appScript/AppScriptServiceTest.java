@@ -24,9 +24,20 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_AppScriptServiceTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     appScriptService = (AppScriptService)Utils.getComponent(IAppScriptService.class);
+  }
+
+  @Test
+  public void testGetStartIndex_Space_Action() {
+    String myAppScriptPath = "/app/myAppScript";
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
+        eq(IAppScriptService.APP_SCRIPT_XPAGE))).andReturn(
+            IAppScriptService.APP_SCRIPT_XPAGE).atLeastOnce();
+    replayDefault();
+    int startIndex = appScriptService.getStartIndex(myAppScriptPath);
+    assertEquals("myAppScript", myAppScriptPath.substring(startIndex));
+    verifyDefault();
   }
 
   @Test
@@ -578,13 +589,11 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki);
-    replay(mocks);
+    replayDefault(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki);
-    verify(mocks);
+    verifyDefault(mocks);
   }
 
 }
