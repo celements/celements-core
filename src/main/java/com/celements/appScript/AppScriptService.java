@@ -52,8 +52,11 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public boolean hasDocAppScript(String scriptName) {
-    LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "]");
-    return hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
+    boolean hasDocAppScript = hasLocalAppScript(scriptName)
+        || hasCentralAppScript(scriptName);
+    LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "] hasDocAppScript ["
+        + hasDocAppScript + "]");
+    return hasDocAppScript;
   }
 
   public boolean hasLocalAppScript(String scriptName) {
