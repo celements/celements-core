@@ -4,6 +4,7 @@ package com.celements.appScript;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -21,12 +22,22 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private XWiki xwiki;
   private AppScriptService appScriptService;
+  private IEmptyCheckRole preseveEmptyCheck;
+  private IEmptyCheckRole emptyCheckMock;
 
   @Before
   public void setUp_AppScriptServiceTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
     appScriptService = (AppScriptService)Utils.getComponent(IAppScriptService.class);
+    preseveEmptyCheck = appScriptService.emptyCheck;
+    emptyCheckMock = createMockAndAddToDefault(IEmptyCheckRole.class);
+    appScriptService.emptyCheck = emptyCheckMock;
+  }
+
+  @After
+  public void tearDown_AppScriptServiceTest() {
+     appScriptService.emptyCheck = preseveEmptyCheck;
   }
 
   @Test
@@ -307,6 +318,10 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
     expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false);
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false
+        ).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(false
+        ).anyTimes();
     replayAll(mockRequest);
     assertFalse(appScriptService.hasDocAppScript("sub/testScript"));
     verifyAll(mockRequest);
@@ -331,6 +346,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAppScriptDocRef_localOverwritesCentral() throws Exception {
+    appScriptService.emptyCheck = preseveEmptyCheck;
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -385,6 +401,10 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(centralAppScriptDocRef), same(context))).andReturn(
         appScriptDoc).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false
+        ).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(true
+        ).anyTimes();
     replayAll(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
