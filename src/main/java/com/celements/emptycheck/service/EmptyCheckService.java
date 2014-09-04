@@ -78,7 +78,7 @@ public class EmptyCheckService implements IEmptyCheckRole {
 
   List<String> getCheckImplNamesConfig() {
     String implConfigNames = getContext().getWiki().getXWikiPreference(
-        "ceL_emptycheck_moduls", "celements.emptycheckModuls", "default", getContext());
+        EMPTYCHECK_MODULS_PREF_NAME, "celements.emptycheckModuls", "default", getContext());
     if ((implConfigNames != null) && (!"".equals(implConfigNames))) {
       return Arrays.asList(implConfigNames.split("[;,]"));
     } else {

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -351,7 +352,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(appScriptDoc
         ).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayAll(mockRequest);
