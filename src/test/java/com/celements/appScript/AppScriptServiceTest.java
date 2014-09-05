@@ -4,11 +4,13 @@ package com.celements.appScript;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -20,13 +22,34 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private XWiki xwiki;
   private AppScriptService appScriptService;
+  private IEmptyCheckRole preseveEmptyCheck;
+  private IEmptyCheckRole emptyCheckMock;
 
   @Before
   public void setUp_AppScriptServiceTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     appScriptService = (AppScriptService)Utils.getComponent(IAppScriptService.class);
+    preseveEmptyCheck = appScriptService.emptyCheck;
+    emptyCheckMock = createMockAndAddToDefault(IEmptyCheckRole.class);
+    appScriptService.emptyCheck = emptyCheckMock;
+  }
+
+  @After
+  public void tearDown_AppScriptServiceTest() {
+     appScriptService.emptyCheck = preseveEmptyCheck;
+  }
+
+  @Test
+  public void testGetStartIndex_Space_Action() {
+    String myAppScriptPath = "/app/myAppScript";
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
+        eq(IAppScriptService.APP_SCRIPT_XPAGE))).andReturn(
+            IAppScriptService.APP_SCRIPT_XPAGE).atLeastOnce();
+    replayDefault();
+    int startIndex = appScriptService.getStartIndex(myAppScriptPath);
+    assertEquals("myAppScript", myAppScriptPath.substring(startIndex));
+    verifyDefault();
   }
 
   @Test
@@ -295,6 +318,10 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
     expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false);
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false
+        ).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(false
+        ).anyTimes();
     replayAll(mockRequest);
     assertFalse(appScriptService.hasDocAppScript("sub/testScript"));
     verifyAll(mockRequest);
@@ -319,6 +346,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAppScriptDocRef_localOverwritesCentral() throws Exception {
+    appScriptService.emptyCheck = preseveEmptyCheck;
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
@@ -340,7 +368,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(appScriptDoc
         ).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayAll(mockRequest);
@@ -373,6 +401,10 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(centralAppScriptDocRef), same(context))).andReturn(
         appScriptDoc).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false
+        ).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(true
+        ).anyTimes();
     replayAll(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
@@ -578,13 +610,11 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
 
   private void replayAll(Object ... mocks) {
-    replay(xwiki);
-    replay(mocks);
+    replayDefault(mocks);
   }
 
   private void verifyAll(Object ... mocks) {
-    verify(xwiki);
-    verify(mocks);
+    verifyDefault(mocks);
   }
 
 }

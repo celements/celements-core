@@ -52,8 +52,11 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public boolean hasDocAppScript(String scriptName) {
-    LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "]");
-    return hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
+    boolean hasDocAppScript = hasLocalAppScript(scriptName)
+        || hasCentralAppScript(scriptName);
+    LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "] hasDocAppScript ["
+        + hasDocAppScript + "]");
+    return hasDocAppScript;
   }
 
   public boolean hasLocalAppScript(String scriptName) {
@@ -62,8 +65,12 @@ public class AppScriptService implements IAppScriptService {
   }
 
   private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
-    return (getContext().getWiki().exists(appScriptDocRef, getContext())
-        && !emptyCheck.isEmptyRTEDocument(appScriptDocRef));
+    boolean existsAppScriptDoc = getContext().getWiki().exists(appScriptDocRef,
+        getContext());
+    boolean isNotEmptyAppScriptDoc = !emptyCheck.isEmptyRTEDocument(appScriptDocRef);
+    LOGGER.debug("docAppScriptExists check [" + appScriptDocRef + "]: exists ["
+        + existsAppScriptDoc + "] isNotEmpty [" + isNotEmptyAppScriptDoc + "]");
+    return (existsAppScriptDoc && isNotEmptyAppScriptDoc);
   }
 
   public boolean hasCentralAppScript(String scriptName) {
