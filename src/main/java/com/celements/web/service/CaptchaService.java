@@ -72,8 +72,7 @@ public class CaptchaService implements ICaptchaServiceRole {
   }
 
   public String getCaptchaType() {
-    return getContext(
-        ).getRequest().get("captcha_type");
+    return getContext().getRequest().get("captcha_type");
   }
 
   public String getCaptchaId() {
@@ -83,9 +82,9 @@ public class CaptchaService implements ICaptchaServiceRole {
   public String getCaptchaId(String captchaType) {
     CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, captchaType);
     try {
-      _LOGGER.info("Captcha user id is '" + cv.getUserId(getContext().getRequest())
-          + "'");
-      return cv.getUserId(getContext().getRequest());
+      String userId = cv.getUserId(getContext().getRequest());
+      _LOGGER.info("Captcha user id is [" + userId + "]");
+      return userId;
     } catch (Exception e) {
       _LOGGER.error("Exception while attempting to verify captcha", e);
     }
