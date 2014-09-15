@@ -52,10 +52,10 @@ public class CaptchaService implements ICaptchaServiceRole {
     if((answer != null) && (answer.length() > 0)) {
         try {
           _LOGGER.info("Checking answer for user id '" 
-              + getCaptchaVerifyier().getUserId(getContext().getRequest()) + "'");
+              + getCaptchaVerifier().getUserId(getContext().getRequest()) + "'");
           String anwserCacheKey = "captcha_" + getCaptchaType() + "_anwserCache";
           if (!getContext().containsKey(anwserCacheKey)) {
-            Boolean isAnswerCorrect = getCaptchaVerifyier().isAnswerCorrect(getContext(
+            Boolean isAnswerCorrect = getCaptchaVerifier().isAnswerCorrect(getContext(
                 ).getRequest().get("captcha_id"), answer);
             getContext().put(anwserCacheKey, isAnswerCorrect);
           }
@@ -67,7 +67,7 @@ public class CaptchaService implements ICaptchaServiceRole {
     return false;
   }
 
-  private CaptchaVerifier getCaptchaVerifyier() {
+  private CaptchaVerifier getCaptchaVerifier() {
     return Utils.getComponent(CaptchaVerifier.class, getCaptchaType());
   }
 
