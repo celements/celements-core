@@ -104,6 +104,39 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testCheckCaptcha_singleCall_noAnswer() throws Exception {
+    expect(requestMock.get(eq("captcha_answer"))).andReturn(null).atLeastOnce();
+    expect(requestMock.get(eq("captcha_type"))).andReturn("image").anyTimes();
+    expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).anyTimes();
+    replayDefault();
+    assertFalse(captchaService.checkCaptcha());
+    verifyDefault();
+  }
+
+  @Test
+  public void testCheckCaptcha_singleCall_emptyAnswer() throws Exception {
+    expect(requestMock.get(eq("captcha_answer"))).andReturn("").atLeastOnce();
+    expect(requestMock.get(eq("captcha_type"))).andReturn("image").anyTimes();
+    expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).anyTimes();
+    replayDefault();
+    assertFalse(captchaService.checkCaptcha());
+    verifyDefault();
+  }
+
+  @Test
+  public void testCheckCaptcha_singleCall_exception() throws Exception {
+    String wrongAnwser = "chetuck";
+    expect(requestMock.get(eq("captcha_answer"))).andReturn(wrongAnwser).atLeastOnce();
+    expect(requestMock.get(eq("captcha_type"))).andReturn("image").atLeastOnce();
+    expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).atLeastOnce();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(wrongAnwser))
+        ).andThrow(new Exception()).once();
+    replayDefault();
+    assertFalse(captchaService.checkCaptcha());
+    verifyDefault();
+  }
+
+  @Test
   public void testCheckCaptcha_doubleCall_true() throws Exception {
     String expectedAnwser = "chetuck";
     expect(requestMock.get(eq("captcha_answer"))).andReturn(expectedAnwser).atLeastOnce();
