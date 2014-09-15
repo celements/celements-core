@@ -28,7 +28,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CaptchaCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log _LOGGER = LogFactory.getFactory().getInstance(
       CaptchaCommand.class);
 
   public boolean checkCaptcha(XWikiContext context) {
@@ -37,12 +37,12 @@ public class CaptchaCommand {
       CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, context.getRequest(
           ).get("captcha_type"));
         try {
-          mLogger.info("Checking answer for user id '" 
+          _LOGGER.info("Checking answer for user id '" 
               + cv.getUserId(context.getRequest()) + "'");
           return cv.isAnswerCorrect(context.getRequest().get("captcha_id"), answer);
 //        return cv.isAnswerCorrect(cv.getUserId(context.getRequest()), answer);
         } catch (Exception e) {
-          mLogger.error("Exception while attempting to verify captcha", e);
+          _LOGGER.error("Exception while attempting to verify captcha", e);
         }
     }
     return false;
@@ -51,10 +51,10 @@ public class CaptchaCommand {
   public String getCaptchaId(XWikiContext context) {
     CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, "image");
   try {
-    mLogger.info("Captcha user id is '" + cv.getUserId(context.getRequest()) + "'");
+    _LOGGER.info("Captcha user id is '" + cv.getUserId(context.getRequest()) + "'");
     return cv.getUserId(context.getRequest());
   } catch (Exception e) {
-    mLogger.error("Exception while attempting to verify captcha", e);
+    _LOGGER.error("Exception while attempting to verify captcha", e);
   }
     return "";
   }
