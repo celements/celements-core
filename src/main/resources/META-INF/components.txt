@@ -62,3 +62,4 @@ com.celements.navigation.NavigationClassConfig
 com.celements.nextfreedoc.NextFreeDocService
 com.celements.cells.CellsClassConfig
 com.celements.navigation.presentation.RenderedExtractPresentationType
+com.celements.web.service.CaptchaService
