@@ -58,6 +58,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PrepareVelocityContextService.class);
 
+  private String _CEL_PREPARE_VELOCITY_COUNTER = "celPrepareVelocityCounter";
+  private String _CEL_PREPARE_VELOCITY_TOTALTIME = "celPrepareVelocityTotelTime";
+  
   @Requirement
   Execution execution;
 
@@ -79,15 +82,38 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   public void prepareVelocityContext(VelocityContext vcontext) {
-    LOGGER.debug("prepareVelocityContext: with vcontext [" + vcontext + "].");
+    Integer count = 0;
+    if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER) != null) {
+      count = (Integer) getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER);
+    }
+    count = count++;
+    long startMillis = System.currentTimeMillis();
+    LOGGER.debug("prepareVelocityContext [" + count + "]: with vcontext ["
+        + vcontext + "].");
     fixLanguagePreference(vcontext);
-    LOGGER.trace("prepareVelocityContext: after fixLanguagePreference.");
+    LOGGER.trace("prepareVelocityContext [" + count + "]: after fixLanguagePreference.");
     fixTdocForInvalidLanguage(vcontext);
-    LOGGER.trace("prepareVelocityContext: after fixTdocForInvalidLanguage.");
+    LOGGER.trace("prepareVelocityContext [" + count
+        + "]: after fixTdocForInvalidLanguage.");
     initCelementsVelocity(vcontext);
-    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
+    LOGGER.trace("prepareVelocityContext [" + count + "]: after initCelementsVelocity.");
     initPanelsVelocity(vcontext);
-    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
+    LOGGER.trace("prepareVelocityContext [" + count + "]: after initCelementsVelocity.");
+    getExecContext().setProperty(_CEL_PREPARE_VELOCITY_COUNTER, count);
+    if (LOGGER.isInfoEnabled()) {
+      long endMillis = System.currentTimeMillis();
+      long timeUsed = endMillis - startMillis;
+      Long totalTimeUsed = 0L;
+      if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_TOTALTIME) != null) {
+        totalTimeUsed = (Long) getExecContext().getProperty(
+            _CEL_PREPARE_VELOCITY_TOTALTIME);
+      }
+      totalTimeUsed += timeUsed;
+      getExecContext().setProperty(_CEL_PREPARE_VELOCITY_TOTALTIME, totalTimeUsed);
+      LOGGER.info("prepareVelocityContext [" + count + "]: with vcontext ["
+          + vcontext + "] finished in [" + timeUsed + "], total time [" + totalTimeUsed
+          + "].");
+    }
   }
 
   /**
