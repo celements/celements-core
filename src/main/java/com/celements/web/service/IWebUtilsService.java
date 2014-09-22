@@ -39,6 +39,12 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @ComponentRole
 public interface IWebUtilsService {
   
+  public static final Date DATE_LOW = new Date(-62135773200000L);
+  /**
+   * {@value #DATE_HIGH} has the value [Fri Dec 31 23:59:00 CET 9999]
+   */
+  public static final Date DATE_HIGH = new Date(253402297140000L);
+  
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
    * corresponding DocumentReference or throws IndexOutOfBoundsException

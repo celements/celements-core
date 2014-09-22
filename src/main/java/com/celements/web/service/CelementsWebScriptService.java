@@ -696,5 +696,16 @@ public class CelementsWebScriptService implements ScriptService {
       LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
     }
   }
+  
+  /**
+   * @deprecated: Move after Refactoring to WebUtilScriptService
+   */
+  @Deprecated
+  public boolean isHighDate(Date date) {
+    if (date.compareTo(IWebUtilsService.DATE_HIGH) >= 0) {
+      return true;
+    } 
+    return false;
+  }
 
 }
