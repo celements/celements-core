@@ -701,7 +701,7 @@ public class CelementsWebScriptService implements ScriptService {
    * TODO Move after Refactoring to WebUtilScriptService
    */
   public boolean isHighDate(Date date) {
-    if (date.compareTo(IWebUtilsService.DATE_HIGH) >= 0) {
+    if ((date != null) && date.compareTo(IWebUtilsService.DATE_HIGH) >= 0) {
       return true;
     } 
     return false;

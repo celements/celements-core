@@ -152,6 +152,19 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     verifyAll(appScriptServiceMock);
   }
 
+  @Test
+  public void testIsHighDate() {
+    replayAll();
+    assertTrue(celWebService.isHighDate(IWebUtilsService.DATE_HIGH));
+    verifyAll();
+  }
+
+  @Test
+  public void testIsHighDate_NPE() {
+    replayAll();
+    assertFalse(celWebService.isHighDate(null));
+    verifyAll();
+  }
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, mockRightService);
