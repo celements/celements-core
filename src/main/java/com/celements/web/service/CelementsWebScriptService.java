@@ -698,9 +698,8 @@ public class CelementsWebScriptService implements ScriptService {
   }
   
   /**
-   * @deprecated: Move after Refactoring to WebUtilScriptService
+   * TODO Move after Refactoring to WebUtilScriptService
    */
-  @Deprecated
   public boolean isHighDate(Date date) {
     if (date.compareTo(IWebUtilsService.DATE_HIGH) >= 0) {
       return true;
