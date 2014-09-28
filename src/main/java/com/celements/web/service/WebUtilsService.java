@@ -53,6 +53,8 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.sajson.Builder;
@@ -598,7 +600,11 @@ public class WebUtilsService implements IWebUtilsService {
     }
     docData.put("parentslist", parentsListStr.replaceAll(",*$", ""));
     docData.put("parentslistmenuname", parentsListMNStr.replaceAll(",*$", ""));
-    docData.put("creator", xwikiDoc.getCreator());
+    PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
+        xwikiDoc);
+    if (pageTypeRef != null) {
+      docData.put("pagetype", pageTypeRef.getConfigName());
+    }
     docData.put("author", xwikiDoc.getAuthor());
     docData.put("creator", xwikiDoc.getCreator());
     docData.put("customClass", xwikiDoc.getCustomClass());
@@ -1052,6 +1058,10 @@ public class WebUtilsService implements IWebUtilsService {
       }
     }
     return templateContent;
+  }
+
+  private IPageTypeResolverRole getPageTypeResolver() {
+    return Utils.getComponent(IPageTypeResolverRole.class);
   }
 
 }
