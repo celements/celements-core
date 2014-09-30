@@ -630,9 +630,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     } catch (XWikiException e) {
       LOGGER.error("Could not get action Macro", e);
     }
+    String execContent = "";
     String actionContent = "";
     if(execAct != null) {
-      String execContent = execAct.getContent();
+      execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
       actionContent = context.getWiki().getRenderingEngine().interpretText(
           execContent, includingDoc, context);
@@ -641,8 +642,12 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     boolean successful = (successfulObj != null)
                           && "true".equals(successfulObj.toString());
     if(!successful) {
-      LOGGER.error("Error executing action. Output:" + vcontext.get("actionScriptOutput"));
-      LOGGER.error("Rendered Action Script: " + actionContent);
+      LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
+          "actionScriptOutput"));
+      LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
+      LOGGER.debug("executeAction: execAct == " + execAct);
+      LOGGER.debug("executeAction: execContent length: " + execContent.length());
+      LOGGER.debug("executeAction: execContent length: " + actionContent.length());
     }
     vcontext.put("debug", debug);
     vcontext.put("hasedit", hasedit);
