@@ -636,10 +636,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       vcontext.put("javaDebug", true);
       execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
-      LOGGER.error("vcontext before interpretText " + ((VelocityContext) context.get("vcontext")));
       actionContent = context.getWiki().getRenderingEngine().interpretText(
           execContent, includingDoc, context);
-      LOGGER.error("vcontext before interpretText " + ((VelocityContext) context.get("vcontext")));
     }
     Object successfulObj = vcontext.get("successful");
     boolean successful = (successfulObj != null)
