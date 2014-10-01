@@ -636,8 +636,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       vcontext.put("javaDebug", true);
       execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
+      LOGGER.error("vcontext before interpretText " + ((VelocityContext) context.get("vcontext")));
       actionContent = context.getWiki().getRenderingEngine().interpretText(
           execContent, includingDoc, context);
+      LOGGER.error("vcontext before interpretText " + ((VelocityContext) context.get("vcontext")));
     }
     Object successfulObj = vcontext.get("successful");
     boolean successful = (successfulObj != null)
@@ -650,6 +652,9 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       LOGGER.error("executeAction: includingDoc: " + includingDoc);
       LOGGER.error("executeAction: execContent length: " + execContent.length());
       LOGGER.error("executeAction: execContent length: " + actionContent.length());
+      LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
+      LOGGER.error("executeAction: vcontext (in context) " + 
+          ((VelocityContext) context.get("vcontext")));
     }
     vcontext.put("debug", debug);
     vcontext.put("hasedit", hasedit);
