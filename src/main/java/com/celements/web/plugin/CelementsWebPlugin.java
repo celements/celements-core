@@ -647,6 +647,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
           "actionScriptOutput"));
       LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
       LOGGER.error("executeAction: execAct == " + execAct);
+      LOGGER.error("executeAction: includingDoc: " + includingDoc);
       LOGGER.error("executeAction: execContent length: " + execContent.length());
       LOGGER.error("executeAction: execContent length: " + actionContent.length());
     }
