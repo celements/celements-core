@@ -33,6 +33,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.velocity.VelocityManager;
 
 import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
@@ -615,7 +616,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context) {
     LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
-    VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
+    VelocityContext vcontext = getVelocityManager().getVelocityContext();
     vcontext.put("theDoc", actionDoc);
     Boolean debug = (Boolean)vcontext.get("debug");
     vcontext.put("debug", true);
@@ -652,7 +653,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       LOGGER.error("executeAction: execContent length: " + actionContent.length());
       LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
       LOGGER.error("executeAction: vcontext (in context) " + 
-          ((VelocityContext) context.get("vcontext")));
+          getVelocityManager().getVelocityContext());
     }
     vcontext.put("debug", debug);
     vcontext.put("hasedit", hasedit);
@@ -795,6 +796,10 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   private IWebUtilsService getWebService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  VelocityManager getVelocityManager() {
+    return Utils.getComponent(VelocityManager.class);
   }
 
   /**
