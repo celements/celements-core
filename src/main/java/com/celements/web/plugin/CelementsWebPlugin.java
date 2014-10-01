@@ -633,6 +633,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     String execContent = "";
     String actionContent = "";
     if(execAct != null) {
+      vcontext.put("javaDebug", true);
       execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
       actionContent = context.getWiki().getRenderingEngine().interpretText(
