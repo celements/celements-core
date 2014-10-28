@@ -289,6 +289,8 @@ public class OldCoreClasses extends AbstractClassCollection {
     // needsUpdate |= bclass.addTextField("plugins" , "Additional Plugins", 30);
     needsUpdate |= bclass.addTextField("activated_classcollections",
         "Activated Class Collections", 30);
+    needsUpdate |= bclass.addTextField("celGoogleAnalyticsAccount",
+        "Google Analytics Account Number", 30);
 
     // Ensure all needed Sendmail Plugin config fields are available
     needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);

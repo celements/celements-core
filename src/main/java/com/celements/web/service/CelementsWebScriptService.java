@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -705,6 +706,15 @@ public class CelementsWebScriptService implements ScriptService {
       return true;
     } 
     return false;
+  }
+
+  public boolean hasGoogleAnalytics() {
+    return !StringUtils.isEmpty(getGoogleAnalytics()); 
+  }
+
+  public String getGoogleAnalytics() {
+    return getContext().getWiki().getXWikiPreference("celGoogleAnalyticsAccount", "",
+        getContext());
   }
 
 }
