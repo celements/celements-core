@@ -402,7 +402,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addNumberField("thumbWidth", "Thumbnail Width", 30, "integer");
     needsUpdate |= bclass.addNumberField("height2", "Photo Height", 30, "integer");
     needsUpdate |= bclass.addNumberField("photoWidth", "Photo Width", 30, "integer");
-    needsUpdate |= bclass.addTextField("id", "id", 30);
+    needsUpdate |= bclass.addNumberField("id", "id", 30, "integer");
     needsUpdate |= bclass.addBooleanField("hasOverview", "hasOverview", "yesno");
     needsUpdate |= bclass.addStaticListField("theme", "theme",
         "grey|black|red|green|blue|gold|orange");
