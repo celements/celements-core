@@ -207,4 +207,15 @@ public interface IWebUtilsService {
   public boolean existsInheritableDocument(DocumentReference docRef, String lang,
       String defLang);
 
+  /**
+   * used to send an email if result of <param>jobMailName</param> is not empty
+   * 
+   * @param jobMailName inheritable Mails document name
+   * @param fromAddr sender address
+   * @param toAddr  recipients
+   * @param params list of strings passed through to dictionary subject resolving
+   */
+  public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
+      List<String> params);
+
 }
