@@ -106,6 +106,8 @@ public interface IWebUtilsService {
 
   public SpaceReference resolveSpaceReference(String spaceName, 
       WikiReference wikiRef);
+  
+  public WikiReference getLastWikiReference(DocumentReference docRef);
 
   public boolean isAdminUser();
 
