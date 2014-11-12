@@ -47,8 +47,14 @@ public class GetPageTypesCommand {
     return Utils.getComponent(Execution.class).getContext();
   }
 
+  /**
+   * @deprecated since 1.100 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getPageTypesByCategories()
+   */
+  @Deprecated
   public List<String> getPageTypesForCategories(Set<String> catList, boolean onlyVisible,
       XWikiContext context) {
+    LOGGER.warn("deprecated usage of getPageTypesForCategories.");
     Set<String> pageTypeSet = getXObjectPageTypes(catList, onlyVisible, context);
     if (doesContainEmptyCategory(catList)) {
       pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
