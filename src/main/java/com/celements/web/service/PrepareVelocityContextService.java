@@ -86,7 +86,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER) != null) {
       count = (Integer) getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER);
     }
-    count = count++;
+    count = count + 1;
     long startMillis = System.currentTimeMillis();
     LOGGER.debug("prepareVelocityContext [" + count + "]: with vcontext ["
         + vcontext + "].");
