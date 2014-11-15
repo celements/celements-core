@@ -65,3 +65,6 @@ com.celements.navigation.presentation.RenderedExtractPresentationType
 com.celements.web.service.CaptchaService
 com.celements.pagetype.xobject.XObjectPageTypeCache
 com.celements.pagetype.xobject.event.converter.XObjectPageTypeEventConverter
+com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentDeletedListener
+com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentUpdatedListener
+com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentCreatedListener
