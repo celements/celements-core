@@ -22,6 +22,7 @@ package com.celements.pagetype;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
@@ -33,27 +34,45 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celPageTypeClasses")
 public class PageTypeClasses extends AbstractClassCollection {
 
-
   private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeClasses.class);
 
+  /**
+   * @deprecated instead use constants from IPageTypeClassConfig
+   */
+  @Deprecated
   public static final String PAGE_TYPE_PROPERTIES_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String PAGE_TYPE_PROPERTIES_CLASS_DOC = "PageTypeProperties";
+  @Deprecated
   public static final String PAGE_TYPE_PROPERTIES_CLASS = 
     PAGE_TYPE_PROPERTIES_CLASS_SPACE + "." + PAGE_TYPE_PROPERTIES_CLASS_DOC;
 
+  @Deprecated
   public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
+  @Deprecated
   public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "."
       + PAGE_TYPE_CLASS_DOC;
+  @Deprecated
   public static final String PAGE_TYPE_FIELD = "page_type";
 
-  public PageTypeClasses() {}
+  @Requirement
+  IPageTypeClassConfig pageTypeClassConfig;
 
+  /**
+   * @deprecated instead use getPageTypePropertiesClassRef(String) in INavigationClassConfig
+   */
+  @Deprecated
   public DocumentReference getPageTypePropertiesClassRef(String wikiName) {
     return new DocumentReference(wikiName, PAGE_TYPE_PROPERTIES_CLASS_SPACE,
         PAGE_TYPE_PROPERTIES_CLASS_DOC);
   }
 
+  /**
+   * @deprecated instead use getPageTypeClassRef(String) in INavigationClassConfig
+   */
+  @Deprecated
   public DocumentReference getPageTypeClassRef(String wikiName) {
     return new DocumentReference(wikiName, PAGE_TYPE_CLASS_SPACE, PAGE_TYPE_CLASS_DOC);
   }
@@ -80,8 +99,8 @@ public class PageTypeClasses extends AbstractClassCollection {
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
-    DocumentReference pageTypePropertiesClassRef = getPageTypePropertiesClassRef(
-        getContext().getDatabase());
+    DocumentReference pageTypePropertiesClassRef = 
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase());
     try {
       doc = xwiki.getDocument(pageTypePropertiesClassRef, getContext());
     } catch (XWikiException e) {
@@ -115,7 +134,8 @@ public class PageTypeClasses extends AbstractClassCollection {
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
-    DocumentReference pageTypeClassRef = getPageTypeClassRef(getContext().getDatabase());
+    DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
+        getContext().getDatabase());
     try {
       doc = xwiki.getDocument(pageTypeClassRef, getContext());
     } catch (XWikiException e) {
