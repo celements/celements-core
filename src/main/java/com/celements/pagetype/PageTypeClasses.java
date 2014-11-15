@@ -111,19 +111,29 @@ public class PageTypeClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(pageTypePropertiesClassRef);
-    needsUpdate |= bclass.addTextField("type_name", "Type Pretty Name", 30);
-    needsUpdate |= bclass.addTextField("category", "Category", 30);
-    needsUpdate |= bclass.addTextField("page_edit", "Type Edit Template", 30);
-    needsUpdate |= bclass.addTextField("page_view", "Type View Template", 30);
-    needsUpdate |= bclass.addBooleanField("visible", "Visible", "yesno");
-    needsUpdate |= bclass.addBooleanField("show_frame", "Show Frame", "yesno");
-    needsUpdate |= bclass.addBooleanField("load_richtext", "Load Richtext Editor",
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
+        "Type Pretty Name", 30);
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_CATEGORY,
+        "Category", 30);
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_PAGE_EDIT,
+        "Type Edit Template", 30);
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_PAGE_VIEW,
+        "Type View Template", 30);
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_VISIBLE,
+        "Visible", "yesno");
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_SHOW_FRAME,
+        "Show Frame", "yesno");
+    needsUpdate |= bclass.addBooleanField(
+        IPageTypeClassConfig.PAGETYPE_PROP_LOAD_RICHTEXT, "Load Richtext Editor",
         "yesno");
-    needsUpdate |= bclass.addNumberField("rte_width", "Richtext Editor Width", 30,
+    needsUpdate |= bclass.addNumberField(IPageTypeClassConfig.PAGETYPE_PROP_RTE_WIDTH,
+        "Richtext Editor Width", 30,
         "integer");
-    needsUpdate |= bclass.addNumberField("rte_height", "Richtext Editor Height", 30,
+    needsUpdate |= bclass.addNumberField(IPageTypeClassConfig.PAGETYPE_PROP_RTE_HEIGHT,
+        "Richtext Editor Height", 30,
         "integer");
-    needsUpdate |= bclass.addBooleanField("haspagetitle", "Has Page Title", "yesno");
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_HASPAGETITLE,
+        "Has Page Title", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
