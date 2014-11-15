@@ -68,5 +68,5 @@ com.celements.pagetype.xobject.event.converter.XObjectPageTypeEventConverter
 com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentDeletedListener
 com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentUpdatedListener
 com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentCreatedListener
+com.celements.pagetype.xobject.XObjectPageTypeCacheListener
 com.celements.pagetype.PageTypeClassConfig
-
