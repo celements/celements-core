@@ -74,7 +74,7 @@ public class GetPageTypesCommand {
     if (getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_COUNTER) != null) {
       count = (Integer) getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_COUNTER);
     }
-    count = count++;
+    count = count + 1;
     long startMillis = System.currentTimeMillis();
     try {
       context.setDatabase("celements2web");

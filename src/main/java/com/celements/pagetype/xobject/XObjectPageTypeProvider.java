@@ -74,7 +74,7 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
     if (getExecContext().getProperty(_CEL_XOBJ_GETALLPAGETYPES_COUNTER) != null) {
       count = (Integer) getExecContext().getProperty(_CEL_XOBJ_GETALLPAGETYPES_COUNTER);
     }
-    count = count++;
+    count = count + 1;
     long startMillis = System.currentTimeMillis();
     ArrayList<PageTypeReference> pageTypeList = new ArrayList<PageTypeReference>();
     Set<String> pageTypeSet = getPageTypeCmd.getAllXObjectPageTypes(getContext());
