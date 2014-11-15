@@ -33,9 +33,8 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.classes.IClassCollectionRole;
-import com.celements.navigation.NavigationClasses;
-import com.celements.navigation.event.TreeNodeCreatedEvent;
+import com.celements.pagetype.IPageTypeClassConfig;
+import com.celements.pagetype.xobject.event.XObjectPageTypeCreatedEvent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -50,8 +49,8 @@ public class XObjectPageTypeDocumentCreatedListener
   @Requirement
   private ComponentManager componentManager;
 
-  @Requirement("celements.celNavigationClasses")
-  IClassCollectionRole navClasses;
+  @Requirement
+  IPageTypeClassConfig pageTypeClassConfig;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -61,10 +60,6 @@ public class XObjectPageTypeDocumentCreatedListener
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
-
-  private NavigationClasses getNavClasses() {
-    return (NavigationClasses) navClasses;
   }
 
   public String getName() {
@@ -80,14 +75,14 @@ public class XObjectPageTypeDocumentCreatedListener
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-          getContext().getDatabase()));
-      if (menuItemObj != null) {
-        LOGGER.debug("XObjectPageTypeDocumentCreatedListener checkMenuItemDiffs added to "
+      BaseObject pageTypePropObj = document.getXObject(
+          pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+      if (pageTypePropObj != null) {
+        LOGGER.debug("XObjectPageTypeDocumentCreatedListener onEvent added to "
             + document.getDocumentReference() + "]");
-        TreeNodeCreatedEvent newTreeNodeEvent = new TreeNodeCreatedEvent(
-            document.getDocumentReference());
-        getObservationManager().notify(newTreeNodeEvent, source, getContext());
+        XObjectPageTypeCreatedEvent newXObjectPageTypeEvent =
+            new XObjectPageTypeCreatedEvent(document.getDocumentReference());
+        getObservationManager().notify(newXObjectPageTypeEvent, source, getContext());
       }
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["

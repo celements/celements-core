@@ -38,9 +38,8 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.navigation.NavigationClasses;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
-import com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentDeletedListener;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -60,7 +59,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest
   public void setUp_XObjectPageTypeDocumentDeletedListenerTest() throws Exception {
     componentManager = Utils.getComponentManager();
     context = getContext();
-    eventListener = getXObjectPageTypeDocumentDeletedListener();
+    eventListener = getXObjPageTypeDocUpdatedListener();
     defaultObservationManager = getComponentManager().lookup(ObservationManager.class);
     componentManager.release(defaultObservationManager);
     ComponentDescriptor<ObservationManager> obsManagDesc =
@@ -79,7 +78,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testComponentSingleton() {
-    assertSame(eventListener, getXObjectPageTypeDocumentDeletedListener());
+    assertSame(eventListener, getXObjPageTypeDocUpdatedListener());
   }
 
   @Test
@@ -180,17 +179,17 @@ public class XObjectPageTypeDocumentDeletedListenerTest
   }
 
   @Test
-  public void testOnEvent_localEvent_menuItemObj() {
+  public void testOnEvent_localEvent_pageTypePropObj() {
     DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
         "spaceName", "pageTypeDocName");
     Event docDelEvent = new DocumentDeletedEvent(pageTypeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(new NavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    origDoc.addXObject(pageTypePropObj);
     RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
@@ -203,9 +202,13 @@ public class XObjectPageTypeDocumentDeletedListenerTest
     verifyDefault();
   }
 
-  private XObjectPageTypeDocumentDeletedListener getXObjectPageTypeDocumentDeletedListener() {
-    return (XObjectPageTypeDocumentDeletedListener) Utils.getComponent(EventListener.class,
-        _COMPONENT_NAME);
+  private IPageTypeClassConfig getPageTypeClassConfig() {
+    return Utils.getComponent(IPageTypeClassConfig.class);
+  }
+
+  private XObjectPageTypeDocumentDeletedListener getXObjPageTypeDocUpdatedListener() {
+    return (XObjectPageTypeDocumentDeletedListener) Utils.getComponent(
+        EventListener.class, _COMPONENT_NAME);
   }
 
 }

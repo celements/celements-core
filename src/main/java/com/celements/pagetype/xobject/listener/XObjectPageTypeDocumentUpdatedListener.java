@@ -30,13 +30,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.classes.IClassCollectionRole;
-import com.celements.navigation.NavigationClasses;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeCreatedEvent;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
 import com.celements.pagetype.xobject.event.XObjectPageTypeUpdatedEvent;
@@ -54,8 +52,8 @@ public class XObjectPageTypeDocumentUpdatedListener
   @Requirement
   private ComponentManager componentManager;
 
-  @Requirement("celements.celNavigationClasses")
-  IClassCollectionRole navClasses;
+  @Requirement
+  IPageTypeClassConfig pageTypeClassConfig;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -65,10 +63,6 @@ public class XObjectPageTypeDocumentUpdatedListener
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
-
-  private NavigationClasses getNavClasses() {
-    return (NavigationClasses) navClasses;
   }
 
   public String getName() {
@@ -91,20 +85,20 @@ public class XObjectPageTypeDocumentUpdatedListener
           + event.getClass() + "] on document [" + document.getDocumentReference()
           + "].");
       if (isPageTypePropertiesAdded(document, origDoc)) {
-        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener checkMenuItemDiffs added to "
+        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent added to "
             + document.getDocumentReference() + "]");
         XObjectPageTypeCreatedEvent newXObjectPageTypeEvent =
             new XObjectPageTypeCreatedEvent(document.getDocumentReference());
         getObservationManager().notify(newXObjectPageTypeEvent, source, getContext());
-      } else if (isMenuItemDeleted(document, origDoc)) {
-        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener checkMenuItemDiffs"
+      } else if (isPageTypePropertiesDeleted(document, origDoc)) {
+        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent"
             + " deleted from " + document.getDocumentReference() + "]");
         XObjectPageTypeDeletedEvent delXObjectPageTypeEvent = new
             XObjectPageTypeDeletedEvent(document.getDocumentReference());
         getObservationManager().notify(delXObjectPageTypeEvent, source, getContext());
       }
-      if (isMenuItemUpdated(document, origDoc)) {
-        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener checkMenuItemDiffs updated on "
+      if (isPageTypePropertiesUpdated(document, origDoc)) {
+        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent updated on "
             + document.getDocumentReference() + "]");
         XObjectPageTypeUpdatedEvent updXObjectPageTypeEvent =
             new XObjectPageTypeUpdatedEvent(document.getDocumentReference());
@@ -118,56 +112,83 @@ public class XObjectPageTypeDocumentUpdatedListener
   }
 
   boolean isPageTypePropertiesAdded(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    LOGGER.trace("checkMenuItemAdded checkMenuItemDiffs menuItemObj [" + menuItemObj
-        + "], menuItemOrigObj [" + menuItemOrigObj + "]");
-    return ((menuItemObj != null) && (menuItemOrigObj == null));
+    BaseObject pageTypePropObj = document.getXObject(
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    LOGGER.trace("isPageTypePropertiesAdded pageTypePropObj [" + pageTypePropObj
+        + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
+    return ((pageTypePropObj != null) && (pageTypePropOrigObj == null));
   }
 
-  boolean isMenuItemDeleted(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    LOGGER.trace("checkMenuItemAdded checkMenuItemDiffs menuItemObj [" + menuItemObj
-        + "], menuItemOrigObj [" + menuItemOrigObj + "]");
-    return ((menuItemObj == null) && (menuItemOrigObj != null));
+  boolean isPageTypePropertiesDeleted(XWikiDocument document, XWikiDocument origDoc) {
+    BaseObject pageTypePropObj = document.getXObject(
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    LOGGER.trace("isPageTypePropertiesDeleted pageTypePropObj [" + pageTypePropObj
+        + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
+    return ((pageTypePropObj == null) && (pageTypePropOrigObj != null));
   }
 
-  boolean isMenuItemUpdated(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
-        getContext().getDatabase()));
-    LOGGER.trace("XObjectPageTypeDocumentUpdatedListener checkMenuItemDiffs menuItemObj ["
-        + menuItemObj + "], menuItemOrigObj [" + menuItemOrigObj + "]");
-    if ((menuItemObj != null) && (menuItemOrigObj != null)) {
-      int newPos = menuItemObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
-      int oldPos = menuItemOrigObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
-      String newPart = menuItemObj.getStringValue(NavigationClasses.MENU_PART_FIELD);
-      String oldPart = menuItemOrigObj.getStringValue(NavigationClasses.MENU_PART_FIELD);
-      LOGGER.debug("XObjectPageTypeDocumentUpdatedListener checkMenuItemDiffs newPos ["
-          + newPos + "], oldPos [" + oldPos + "]");
-      if (newPos != oldPos) {
-        return true;
-      } else if (!StringUtils.equals(newPart, oldPart)) {
-          return true;
-      } else {
-        DocumentReference parentRef = document.getParentReference();
-        DocumentReference parentOrigRef = origDoc.getParentReference();
-        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener checkMenuItemDiffs parentRef ["
-            + parentRef + "], parentOrigRef [" + parentOrigRef + "]");
-        if ((parentRef != null) && (parentOrigRef != null)) {
-          return !parentRef.equals(parentOrigRef);
-        } else {
-          return ((parentRef != null) || (parentOrigRef != null));
-        }
-      }
+  boolean isPageTypePropertiesUpdated(XWikiDocument document, XWikiDocument origDoc) {
+    BaseObject pageTypePropObj = document.getXObject(
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(
+        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    LOGGER.trace("isPageTypePropertiesUpdated pageTypePropObj ["
+        + pageTypePropObj + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
+    boolean hasDiff = false;
+    if ((pageTypePropObj != null) && (pageTypePropOrigObj != null)) {
+      hasDiff |= hasStringDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME);
+      hasDiff |= hasStringDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_CATEGORY);
+      hasDiff |= hasStringDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_PAGE_EDIT);
+      hasDiff |= hasStringDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_PAGE_VIEW);
+      hasDiff |= hasBooleanDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_VISIBLE);
+      hasDiff |= hasBooleanDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_SHOW_FRAME);
+      hasDiff |= hasBooleanDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_LOAD_RICHTEXT);
+      hasDiff |= hasIntegerDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_RTE_WIDTH);
+      hasDiff |= hasIntegerDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_RTE_HEIGHT);
+      hasDiff |= hasBooleanDiff(pageTypePropObj, pageTypePropOrigObj,
+          IPageTypeClassConfig.PAGETYPE_PROP_HASPAGETITLE);
     }
-    return false;
+    return hasDiff;
+  }
+
+  private boolean hasStringDiff(BaseObject pageTypePropObj, BaseObject pageTypePropOrigObj,
+      String fieldName) {
+    String newValue = pageTypePropObj.getStringValue(fieldName);
+    String oldValue = pageTypePropOrigObj.getStringValue(fieldName);
+    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
+        + "] new value [" + newValue + "], old value [" + oldValue + "]");
+    return (!StringUtils.equals(newValue, oldValue));
+  }
+
+  private boolean hasBooleanDiff(BaseObject pageTypePropObj,
+      BaseObject pageTypePropOrigObj, String fieldName) {
+    int newValue = pageTypePropObj.getIntValue(fieldName, -1);
+    int oldValue = pageTypePropOrigObj.getIntValue(fieldName, -1);
+    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
+        + "] new value [" + newValue + "], old value [" + oldValue + "]");
+    return (newValue != oldValue);
+  }
+
+  private boolean hasIntegerDiff(BaseObject pageTypePropObj,
+      BaseObject pageTypePropOrigObj, String fieldName) {
+    int newValue = pageTypePropObj.getIntValue(fieldName);
+    int oldValue = pageTypePropOrigObj.getIntValue(fieldName);
+    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
+        + "] new value [" + newValue + "], old value [" + oldValue + "]");
+    return (newValue != oldValue);
   }
 
   private XWikiDocument getOrginialDocument(Object source) {

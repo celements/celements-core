@@ -32,9 +32,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
-import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.navigation.NavigationClasses;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -50,12 +49,12 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
   @Before
   public void setUp_XObjectPageTypeDocumentUpdatedListenerTest() throws Exception {
     context = getContext();
-    eventListener = getXObjectPageTypeDocumentUpdatedListener();
+    eventListener = getXObjPageTypeDocUpdatedListener();
   }
 
   @Test
   public void testComponentSingleton() {
-    assertSame(eventListener, getXObjectPageTypeDocumentUpdatedListener());
+    assertSame(eventListener, getXObjPageTypeDocUpdatedListener());
   }
 
   @Test
@@ -83,10 +82,10 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    document.addXObject(menuItemObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    document.addXObject(pageTypePropObj);
     replayDefault();
     assertTrue(eventListener.isPageTypePropertiesAdded(document, origDoc));
     verifyDefault();
@@ -98,10 +97,10 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemOrigObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesAdded(document, origDoc));
     verifyDefault();
@@ -113,21 +112,21 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    document.addXObject(menuItemObj);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemOrigObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    document.addXObject(pageTypePropObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesAdded(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsPageTypePropertiesAdded_noMenuItems() {
+  public void testIsPageTypePropertiesAdded_noPageTypePropObj() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -138,194 +137,131 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
   }
 
   @Test
-  public void testIsMenuItemDeleted_added() {
+  public void testIsPageTypePropertiesDeleted_added() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    document.addXObject(menuItemObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    document.addXObject(pageTypePropObj);
     replayDefault();
-    assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesDeleted(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemDeleted_deleted() {
+  public void testIsPageTypePropertiesDeleted_deleted() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemOrigObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
-    assertTrue(eventListener.isMenuItemDeleted(document, origDoc));
+    assertTrue(eventListener.isPageTypePropertiesDeleted(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemDeleted_changed() {
+  public void testIsPageTypePropertiesDeleted_changed() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    document.addXObject(menuItemObj);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemOrigObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    document.addXObject(pageTypePropObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
-    assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesDeleted(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemDeleted_noMenuItems() {
-    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestPage");
-    XWikiDocument document = new XWikiDocument(testDocRef);
-    XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    replayDefault();
-    assertFalse(eventListener.isMenuItemDeleted(document, origDoc));
-    verifyDefault();
-  }
-
-  @Test
-  public void testIsMenuItemUpdated_no_menuItem() {
+  public void testIsPageTypePropertiesDeleted_noPageTypePropObj() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     replayDefault();
-    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesDeleted(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemUpdated_remove_menuItem() {
+  public void testIsPageTypePropertiesUpdated_no_PageTypePropObj() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    origDoc.addXObject(menuItemOrigObj);
     replayDefault();
-    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemUpdated_add_menuItem() {
+  public void testIsPageTypePropertiesUpdated_remove_PageTypePropObj() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    document.addXObject(menuItemObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
-    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemUpdated_changePos_menuItem() {
+  public void testIsPageTypePropertiesUpdated_add_PageTypePropObj() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig().getPageTypePropertiesClassRef(
         context.getDatabase()));
-    menuItemOrigObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
-    origDoc.addXObject(menuItemOrigObj);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 1);
-    document.addXObject(menuItemObj);
+    document.addXObject(pageTypePropObj);
     replayDefault();
-    assertTrue(eventListener.isMenuItemUpdated(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemUpdated_changeNavPart_menuItem() {
+  public void testIsPageTypePropertiesUpdated_typeName_PageTypePropObj() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemOrigObj.setStringValue(NavigationClasses.MENU_PART_FIELD, "");
-    origDoc.addXObject(menuItemOrigObj);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemObj.setStringValue(NavigationClasses.MENU_PART_FIELD, "mainNav");
-    document.addXObject(menuItemObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
+        "oldTypeName");
+    origDoc.addXObject(pageTypePropOrigObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
+        "newTypeName");
+    document.addXObject(pageTypePropObj);
     replayDefault();
-    assertTrue(eventListener.isMenuItemUpdated(document, origDoc));
+    assertTrue(eventListener.isPageTypePropertiesUpdated(document, origDoc));
     verifyDefault();
   }
 
   @Test
-  public void testIsMenuItemUpdated_parentChange() {
-    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestPage");
-    XWikiDocument document = new XWikiDocument(testDocRef);
-    DocumentReference parentReference = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestParentPage");
-    document.setParentReference((EntityReference)parentReference);
-    XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    DocumentReference origParentReference = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestOrigParentPage");
-    origDoc.setParentReference((EntityReference)origParentReference);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemOrigObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
-    origDoc.addXObject(menuItemOrigObj);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
-    document.addXObject(menuItemObj);
-    replayDefault();
-    assertTrue(eventListener.isMenuItemUpdated(document, origDoc));
-    verifyDefault();
-  }
-
-  @Test
-  public void testIsMenuItemUpdated_parentChange_noMenuItem() {
-    DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestPage");
-    XWikiDocument document = new XWikiDocument(testDocRef);
-    DocumentReference parentReference = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestParentPage");
-    document.setParentReference((EntityReference)parentReference);
-    XWikiDocument origDoc = new XWikiDocument(testDocRef);
-    DocumentReference origParentReference = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestOrigParentPage");
-    origDoc.setParentReference((EntityReference)origParentReference);
-    replayDefault();
-    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
-    verifyDefault();
-  }
-
-  @Test
-  public void testIsMenuItemUpdated_noChanges() {
+  public void testIsPageTypePropertiesUpdated_noChanges() {
     DocumentReference testDocRef = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestPage");
     XWikiDocument document = new XWikiDocument(testDocRef);
@@ -336,30 +272,30 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     DocumentReference origParentReference = new DocumentReference(context.getDatabase(),
         "TestSpace", "TestParentPage");
     origDoc.setParentReference((EntityReference)origParentReference);
-    BaseObject menuItemOrigObj = new BaseObject();
-    menuItemOrigObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemOrigObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
-    origDoc.addXObject(menuItemOrigObj);
-    BaseObject menuItemObj = new BaseObject();
-    menuItemObj.setXClassReference(getNavigationClasses().getMenuItemClassRef(
-        context.getDatabase()));
-    menuItemObj.setIntValue(NavigationClasses.MENU_POSITION_FIELD, 2);
-    document.addXObject(menuItemObj);
+    BaseObject pageTypePropOrigObj = new BaseObject();
+    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
+        "typeName");
+    origDoc.addXObject(pageTypePropOrigObj);
+    BaseObject pageTypePropObj = new BaseObject();
+    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
+        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
+        "typeName");
+    document.addXObject(pageTypePropObj);
     replayDefault();
-    assertFalse(eventListener.isMenuItemUpdated(document, origDoc));
+    assertFalse(eventListener.isPageTypePropertiesUpdated(document, origDoc));
     verifyDefault();
   }
 
-
-  private NavigationClasses getNavigationClasses() {
-    return (NavigationClasses) Utils.getComponent(IClassCollectionRole.class,
-        "celements.celNavigationClasses");
+  private IPageTypeClassConfig getPageTypeClassConfig() {
+    return Utils.getComponent(IPageTypeClassConfig.class);
   }
 
-  private XObjectPageTypeDocumentUpdatedListener getXObjectPageTypeDocumentUpdatedListener() {
-    return (XObjectPageTypeDocumentUpdatedListener) Utils.getComponent(EventListener.class,
-        _COMPONENT_NAME);
+  private XObjectPageTypeDocumentUpdatedListener getXObjPageTypeDocUpdatedListener() {
+    return (XObjectPageTypeDocumentUpdatedListener) Utils.getComponent(
+        EventListener.class, _COMPONENT_NAME);
   }
 
 }

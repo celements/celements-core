@@ -33,8 +33,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.classes.IClassCollectionRole;
-import com.celements.navigation.NavigationClasses;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,8 +49,8 @@ public class XObjectPageTypeDocumentDeletedListener
   @Requirement
   private ComponentManager componentManager;
 
-  @Requirement("celements.celNavigationClasses")
-  IClassCollectionRole navClasses;
+  @Requirement
+  IPageTypeClassConfig pageTypeClassConfig;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -61,10 +60,6 @@ public class XObjectPageTypeDocumentDeletedListener
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
-
-  private NavigationClasses getNavClasses() {
-    return (NavigationClasses) navClasses;
   }
 
   public String getName() {
@@ -80,10 +75,10 @@ public class XObjectPageTypeDocumentDeletedListener
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject menuItemObj = document.getXObject(getNavClasses().getMenuItemClassRef(
-          getContext().getDatabase()));
-      if (menuItemObj != null) {
-        LOGGER.debug("XObjectPageTypeDocumentDeletedListener checkMenuItemDiffs deleted from "
+      BaseObject pageTypePropObj = document.getXObject(
+          pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+      if (pageTypePropObj != null) {
+        LOGGER.debug("XObjectPageTypeDocumentDeletedListener onEvent deleted from "
             + document.getDocumentReference() + "]");
         XObjectPageTypeDeletedEvent delXObjectPageTypeEvent =
             new XObjectPageTypeDeletedEvent(document.getDocumentReference());
