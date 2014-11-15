@@ -19,7 +19,7 @@
  */
 package com.celements.navigation.listener;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
@@ -50,6 +50,6 @@ public abstract class AbstractTreeNodeDocumentListener {
 
   abstract protected ComponentManager getComponentManager();
   
-  abstract protected Log getLogger();
+  abstract protected Logger getLogger();
 
 }

@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -48,7 +48,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentListener
     implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger LOGGER = LoggerFactory.getLogger(
       TreeNodeDocumentUpdatedListener.class);
 
   @Requirement
@@ -183,7 +183,7 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
   }
 
   @Override
-  protected Log getLogger() {
+  protected Logger getLogger() {
     return LOGGER;
   }
 
