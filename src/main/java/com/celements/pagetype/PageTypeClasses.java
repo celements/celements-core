@@ -103,8 +103,9 @@ public class PageTypeClasses extends AbstractClassCollection {
         pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase());
     try {
       doc = xwiki.getDocument(pageTypePropertiesClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get [" + pageTypePropertiesClassRef + "] class document",
+          exp);
       doc = new XWikiDocument(pageTypePropertiesClassRef);
       needsUpdate = true;
     }
@@ -148,8 +149,8 @@ public class PageTypeClasses extends AbstractClassCollection {
         getContext().getDatabase());
     try {
       doc = xwiki.getDocument(pageTypeClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to get [" + pageTypeClassRef + "] class document", exp);
       doc = new XWikiDocument(pageTypeClassRef);
       needsUpdate = true;
     }
