@@ -213,13 +213,18 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       if (!vcontext.containsKey("celements2_skin")) {
         vcontext.put("celements2_skin", getCelementsSkinDoc(getContext()));
       }
-      if (!vcontext.containsKey("celements2_baseurl")
-          && (getCelementsSkinDoc(getContext()) != null)) {
-        String celements2_baseurl = getCelementsSkinDoc(getContext()).getURL("view");
-        if (celements2_baseurl.indexOf("/",8) > 0) {
-          vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
-              celements2_baseurl.indexOf("/",8)));
+      try {
+        if (!vcontext.containsKey("celements2_baseurl")
+            && (getContext().getURLFactory() != null)) {
+          XWikiDocument celementsSkinXWikiDoc = getCelementsSkinXWikiDoc(getContext());
+          String celements2_baseurl = celementsSkinXWikiDoc.getURL("view", getContext());
+          if (celements2_baseurl.indexOf("/",8) > 0) {
+            vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
+                celements2_baseurl.indexOf("/",8)));
+          }
         }
+      } catch (XWikiException exp) {
+        LOGGER.error("failed to get CelementsSkin XWikiDocument.", exp);
       }
       if (!vcontext.containsKey("page_type")) {
         PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
@@ -274,14 +279,19 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private Document getCelementsSkinDoc(XWikiContext context) {
     Document skinDoc = null;
     try {
-      skinDoc = context.getWiki(
-          ).getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"),
-              context).newDocument(context);
+      skinDoc = getCelementsSkinXWikiDoc(context).newDocument(context);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to load celements2_skin"
           + " (celements2web:XWiki.Celements2Skin) ", exp);
     }
     return skinDoc;
+  }
+
+  private XWikiDocument getCelementsSkinXWikiDoc(XWikiContext context
+      ) throws XWikiException {
+    return context.getWiki(
+        ).getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"),
+            context);
   }
 
 
