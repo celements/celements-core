@@ -163,6 +163,12 @@ public interface IWebUtilsService {
 
   public WikiReference getWikiRef(XWikiDocument doc);
 
+  /**
+   * @deprecated instead use {@link #getWikiRef(EntityReference)}
+   */
+  @Deprecated
+  public WikiReference getWikiRef(DocumentReference docRef);
+
   public WikiReference getWikiRef(EntityReference ref);
 
   public List<String> getAllowedLanguages(String spaceName);
