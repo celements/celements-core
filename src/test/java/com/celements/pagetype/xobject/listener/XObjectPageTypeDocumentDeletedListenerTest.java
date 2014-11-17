@@ -32,6 +32,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -187,8 +188,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropObj);
     RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
@@ -202,8 +202,9 @@ public class XObjectPageTypeDocumentDeletedListenerTest
     verifyDefault();
   }
 
-  private IPageTypeClassConfig getPageTypeClassConfig() {
-    return Utils.getComponent(IPageTypeClassConfig.class);
+  private DocumentReference getPageTypePropertiesClassRef() {
+    return Utils.getComponent(IPageTypeClassConfig.class).getPageTypePropertiesClassRef(
+        new WikiReference(context.getDatabase()));
   }
 
   private XObjectPageTypeDocumentDeletedListener getXObjPageTypeDocUpdatedListener() {

@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -83,8 +84,7 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     document.addXObject(pageTypePropObj);
     replayDefault();
     assertTrue(eventListener.isPageTypePropertiesAdded(document, origDoc));
@@ -98,8 +98,7 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesAdded(document, origDoc));
@@ -113,12 +112,10 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     document.addXObject(pageTypePropObj);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesAdded(document, origDoc));
@@ -143,8 +140,7 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     document.addXObject(pageTypePropObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesDeleted(document, origDoc));
@@ -158,8 +154,7 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertTrue(eventListener.isPageTypePropertiesDeleted(document, origDoc));
@@ -173,12 +168,10 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     document.addXObject(pageTypePropObj);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesDeleted(document, origDoc));
@@ -214,8 +207,7 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     origDoc.addXObject(pageTypePropOrigObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesUpdated(document, origDoc));
@@ -229,8 +221,7 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig().getPageTypePropertiesClassRef(
-        context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     document.addXObject(pageTypePropObj);
     replayDefault();
     assertFalse(eventListener.isPageTypePropertiesUpdated(document, origDoc));
@@ -244,14 +235,12 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     XWikiDocument document = new XWikiDocument(testDocRef);
     XWikiDocument origDoc = new XWikiDocument(testDocRef);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     pageTypePropOrigObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
         "oldTypeName");
     origDoc.addXObject(pageTypePropOrigObj);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     pageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
         "newTypeName");
     document.addXObject(pageTypePropObj);
@@ -273,14 +262,12 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
         "TestSpace", "TestParentPage");
     origDoc.setParentReference((EntityReference)origParentReference);
     BaseObject pageTypePropOrigObj = new BaseObject();
-    pageTypePropOrigObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropOrigObj.setXClassReference(getPageTypePropertiesClassRef());
     pageTypePropOrigObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
         "typeName");
     origDoc.addXObject(pageTypePropOrigObj);
     BaseObject pageTypePropObj = new BaseObject();
-    pageTypePropObj.setXClassReference(getPageTypeClassConfig(
-        ).getPageTypePropertiesClassRef(context.getDatabase()));
+    pageTypePropObj.setXClassReference(getPageTypePropertiesClassRef());
     pageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
         "typeName");
     document.addXObject(pageTypePropObj);
@@ -289,8 +276,9 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
     verifyDefault();
   }
 
-  private IPageTypeClassConfig getPageTypeClassConfig() {
-    return Utils.getComponent(IPageTypeClassConfig.class);
+  private DocumentReference getPageTypePropertiesClassRef() {
+    return Utils.getComponent(IPageTypeClassConfig.class).getPageTypePropertiesClassRef(
+        new WikiReference(context.getDatabase()));
   }
 
   private XObjectPageTypeDocumentUpdatedListener getXObjPageTypeDocUpdatedListener() {

@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -58,7 +59,10 @@ public class PageTypeClasses extends AbstractClassCollection {
   public static final String PAGE_TYPE_FIELD = "page_type";
 
   @Requirement
-  IPageTypeClassConfig pageTypeClassConfig;
+  private IPageTypeClassConfig pageTypeClassConfig;
+
+  @Requirement
+  private IWebUtilsService webUtilsService;
 
   /**
    * @deprecated instead use getPageTypePropertiesClassRef(WikiReference) in IPageTypeClassConfig
@@ -100,7 +104,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
 
     DocumentReference pageTypePropertiesClassRef = 
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase());
+        pageTypeClassConfig.getPageTypePropertiesClassRef(webUtilsService.getWikiRef());
     try {
       doc = xwiki.getDocument(pageTypePropertiesClassRef, getContext());
     } catch (XWikiException exp) {
@@ -146,7 +150,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
 
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
-        getContext().getDatabase());
+        webUtilsService.getWikiRef());
     try {
       doc = xwiki.getDocument(pageTypeClassRef, getContext());
     } catch (XWikiException exp) {
