@@ -855,6 +855,11 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  public WikiReference getWikiRef() {
+    return getWikiRef((EntityReference) null);
+  }
+
+  @Override
   public WikiReference getWikiRef(XWikiDocument doc) {
     return getWikiRef(doc != null ? doc.getDocumentReference() : null);
   }

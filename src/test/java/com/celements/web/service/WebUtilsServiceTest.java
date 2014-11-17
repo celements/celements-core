@@ -930,6 +930,14 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetWikiRef() {
+    String wikiName = context.getDatabase();
+    replayDefault();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef());
+    verifyDefault();
+  }
+
+  @Test
   public void testGetWikiRef_docRef() {
     String wikiName = "myTestWikiName";
     DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName");

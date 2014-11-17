@@ -159,6 +159,8 @@ public interface IWebUtilsService {
   
   public String getMajorVersion(XWikiDocument doc);
 
+  public WikiReference getWikiRef();
+
   public WikiReference getWikiRef(XWikiDocument doc);
 
   public WikiReference getWikiRef(EntityReference ref);
