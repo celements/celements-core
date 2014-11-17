@@ -866,6 +866,15 @@ public class WebUtilsService implements IWebUtilsService {
     return getWikiRef(doc != null ? doc.getDocumentReference() : null);
   }
 
+  /**
+   * @deprecated instead use {@link #getWikiRef(EntityReference)}
+   */
+  @Deprecated
+  @Override
+  public WikiReference getWikiRef(DocumentReference ref) {
+    return getWikiRef((EntityReference) ref);
+  }
+
   @Override
   public WikiReference getWikiRef(EntityReference ref) {
     WikiReference ret = null;
