@@ -220,5 +220,7 @@ public interface IWebUtilsService {
    */
   public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
+  
+  public WikiReference getCentralWikiRef();
 
 }

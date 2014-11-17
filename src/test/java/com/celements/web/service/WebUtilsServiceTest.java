@@ -1375,6 +1375,11 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         webUtilsService.isSuperAdminUser());
     verifyDefault();
   }
+  
+  @Test
+  public void testGetCentralWikiRef() {
+    assertEquals("celements2web", webUtilsService.getCentralWikiRef().getName());
+  }
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *

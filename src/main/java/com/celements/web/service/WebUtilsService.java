@@ -77,6 +77,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 @Component
 public class WebUtilsService implements IWebUtilsService {
+  
+  private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
 
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
@@ -1176,6 +1178,11 @@ public class WebUtilsService implements IWebUtilsService {
     } catch (XWikiException exp) {
       _LOGGER.error("Failed to render email template document [" + emailTemplateDocRef + "].", exp);
     }
+  }
+  
+  @Override
+  public WikiReference getCentralWikiRef() {
+    return CENTRAL_WIKI_REF;
   }
 
 }

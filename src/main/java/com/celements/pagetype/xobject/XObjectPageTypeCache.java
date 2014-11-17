@@ -33,10 +33,14 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
 @Component
 public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
+
+  @Requirement
+  private IWebUtilsService webUtilsService;
 
   GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
 
@@ -54,7 +58,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
   }
 
   public void invalidateCacheForWiki(WikiReference wikiRef) {
-    if (new WikiReference("celements2web").equals(wikiRef)) {
+    if (webUtilsService.getCentralWikiRef().equals(wikiRef)) {
       pageTypeRefCache = null;
     } else if (pageTypeRefCache != null) {
       pageTypeRefCache.remove(wikiRef);
