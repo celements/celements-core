@@ -20,6 +20,7 @@
 package com.celements.pagetype.xobject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
         pageTypeList.add(new PageTypeReference(xObjPT.getName(),
             "com.celements.XObjectPageTypeProvider", xObjPT.getCategories()));
       }
-      getPageTypeRefCache().put(database, pageTypeList);
+      getPageTypeRefCache().put(database, Collections.unmodifiableList(pageTypeList));
     }
     return getPageTypeRefCache().get(database);
   }

@@ -110,6 +110,12 @@ public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
     PageTypeReference richTextPTref = allPageTypes.get(0);
     assertEquals("RichText", richTextPTref.getConfigName());
     assertEquals(Arrays.asList(""), richTextPTref.getCategories());
+    try {
+      allPageTypes.remove(0);
+      fail("should throw UnsupportedOperationException");
+    } catch (UnsupportedOperationException exc) {
+      // expected
+    }
     verifyDefault();
   }
 
