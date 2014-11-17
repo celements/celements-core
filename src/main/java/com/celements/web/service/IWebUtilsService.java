@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -106,8 +107,6 @@ public interface IWebUtilsService {
 
   public SpaceReference resolveSpaceReference(String spaceName, 
       WikiReference wikiRef);
-  
-  public WikiReference getLastWikiReference(DocumentReference docRef);
 
   public boolean isAdminUser();
 
@@ -160,7 +159,11 @@ public interface IWebUtilsService {
   
   public String getMajorVersion(XWikiDocument doc);
 
-  public WikiReference getWikiRef(DocumentReference docRef);
+  public WikiReference getWikiRef();
+
+  public WikiReference getWikiRef(XWikiDocument doc);
+
+  public WikiReference getWikiRef(EntityReference ref);
 
   public List<String> getAllowedLanguages(String spaceName);
 
@@ -217,5 +220,7 @@ public interface IWebUtilsService {
    */
   public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
+  
+  public WikiReference getCentralWikiRef();
 
 }

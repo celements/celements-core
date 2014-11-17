@@ -77,6 +77,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 @Component
 public class WebUtilsService implements IWebUtilsService {
+  
+  private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
 
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
@@ -415,12 +417,6 @@ public class WebUtilsService implements IWebUtilsService {
     EntityReference ref = referenceResolver.resolve(name, type, wikiRef);
     _LOGGER.debug("resolveEntityReference: for [" + name + "] got reference [" + ref + "]");
     return ref;
-  }
-
-  @Override
-  public WikiReference getLastWikiReference(DocumentReference docRef) {
-    return (WikiReference) docRef.getLastSpaceReference().extractReference(
-        EntityType.WIKI);
   }
 
   @Override
@@ -861,8 +857,30 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public WikiReference getWikiRef(DocumentReference docRef) {
-    return (WikiReference) docRef.getLastSpaceReference().getParent();
+  public WikiReference getWikiRef() {
+    return getWikiRef((EntityReference) null);
+  }
+
+  @Override
+  public WikiReference getWikiRef(XWikiDocument doc) {
+    return getWikiRef(doc != null ? doc.getDocumentReference() : null);
+  }
+
+  @Override
+  public WikiReference getWikiRef(EntityReference ref) {
+    WikiReference ret = null;
+    if (ref instanceof WikiReference) {
+      ret = (WikiReference) ref;
+    } else if (ref instanceof SpaceReference) {
+      ret = (WikiReference) ref.extractReference(EntityType.WIKI);
+    } else if (ref instanceof DocumentReference) {
+      ret = (WikiReference) ((DocumentReference) ref).getLastSpaceReference(
+          ).extractReference(EntityType.WIKI);
+    }    
+    if (ret == null) {
+      ret = new WikiReference(getContext().getDatabase());
+    }
+    return ret;
   }
 
   @Override
@@ -1160,6 +1178,11 @@ public class WebUtilsService implements IWebUtilsService {
     } catch (XWikiException exp) {
       _LOGGER.error("Failed to render email template document [" + emailTemplateDocRef + "].", exp);
     }
+  }
+  
+  @Override
+  public WikiReference getCentralWikiRef() {
+    return CENTRAL_WIKI_REF;
   }
 
 }

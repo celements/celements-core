@@ -19,9 +19,7 @@
  */
 package com.celements.pagetype.xobject;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +31,15 @@ import org.xwiki.context.ExecutionContext;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
-@Component("com.celements.XObjectPageTypeProvider")
+@Component(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
 public class XObjectPageTypeProvider implements IPageTypeProviderRole {
+
+  public static final String X_OBJECT_PAGE_TYPE_PROVIDER =
+      "com.celements.XObjectPageTypeProvider";
 
   private static Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeProvider.class);
 
@@ -46,8 +47,13 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
   private String _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME =
       "celXObjectGetAllPageTypesTotelTime";
 
-  GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
   PageTypeCommand pageTypeCmd = new PageTypeCommand();
+
+  @Requirement
+  IXObjectPageTypeCacheRole xobjectPageTypeCache;
+  
+  @Requirement
+  private IWebUtilsService webUtilsService;
 
   @Requirement
   Execution execution;
@@ -76,13 +82,8 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
     }
     count = count + 1;
     long startMillis = System.currentTimeMillis();
-    ArrayList<PageTypeReference> pageTypeList = new ArrayList<PageTypeReference>();
-    Set<String> pageTypeSet = getPageTypeCmd.getAllXObjectPageTypes(getContext());
-    for (String pageTypeFN : pageTypeSet) {
-      XObjectPageTypeConfig xObjPT = getXObjectPTConfigForFN(pageTypeFN);
-      pageTypeList.add(new PageTypeReference(xObjPT.getName(),
-          "com.celements.XObjectPageTypeProvider", xObjPT.getCategories()));
-    }
+    List<PageTypeReference> pageTypeList = xobjectPageTypeCache.getPageTypesRefsForWiki(
+        webUtilsService.getWikiRef());
     getExecContext().setProperty(_CEL_XOBJ_GETALLPAGETYPES_COUNTER, count);
     if (LOGGER.isInfoEnabled()) {
       long endMillis = System.currentTimeMillis();
