@@ -32,6 +32,7 @@ import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
 @Component(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
@@ -50,6 +51,9 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
 
   @Requirement
   IXObjectPageTypeCacheRole xobjectPageTypeCache;
+  
+  @Requirement
+  private IWebUtilsService webUtilsService;
 
   @Requirement
   Execution execution;
@@ -78,8 +82,8 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
     }
     count = count + 1;
     long startMillis = System.currentTimeMillis();
-    List<PageTypeReference> pageTypeList =
-        xobjectPageTypeCache.getPageTypesRefsForDatabase(getContext().getDatabase());
+    List<PageTypeReference> pageTypeList = xobjectPageTypeCache.getPageTypesRefsForWiki(
+        webUtilsService.getWikiRef());
     getExecContext().setProperty(_CEL_XOBJ_GETALLPAGETYPES_COUNTER, count);
     if (LOGGER.isInfoEnabled()) {
       long endMillis = System.currentTimeMillis();

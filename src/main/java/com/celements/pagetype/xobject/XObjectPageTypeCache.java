@@ -29,6 +29,7 @@ import java.util.Set;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
@@ -39,7 +40,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
 
   GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
 
-  Map<String, List<PageTypeReference>> pageTypeRefCache;
+  Map<WikiReference, List<PageTypeReference>> pageTypeRefCache;
 
   @Requirement
   Execution execution;
@@ -52,24 +53,24 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
     return new XObjectPageTypeConfig(pageTypeFN);
   }
 
-  public void invalidateCacheForDatabase(String database) {
-    if ("celements2web".equals(database)) {
+  public void invalidateCacheForWiki(WikiReference wikiRef) {
+    if (new WikiReference("celements2web").equals(wikiRef)) {
       pageTypeRefCache = null;
     } else if (pageTypeRefCache != null) {
-      pageTypeRefCache.remove(database);
+      pageTypeRefCache.remove(wikiRef);
     }
   }
 
-  Map<String, List<PageTypeReference>> getPageTypeRefCache() {
+  Map<WikiReference, List<PageTypeReference>> getPageTypeRefCache() {
     if (pageTypeRefCache == null) {
-      pageTypeRefCache = new HashMap<String, List<PageTypeReference>>();
+      pageTypeRefCache = new HashMap<WikiReference, List<PageTypeReference>>();
     }
     return pageTypeRefCache;
   }
 
   @Override
-  public List<PageTypeReference> getPageTypesRefsForDatabase(String database) {
-    if (!getPageTypeRefCache().containsKey(database)) {
+  public List<PageTypeReference> getPageTypesRefsForWiki(WikiReference wikiRef) {
+    if (!getPageTypeRefCache().containsKey(wikiRef)) {
       List<PageTypeReference> pageTypeList = new ArrayList<PageTypeReference>();
       Set<String> pageTypeSet = getPageTypeCmd.getAllXObjectPageTypes(getContext());
       for (String pageTypeFN : pageTypeSet) {
@@ -77,9 +78,9 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
         pageTypeList.add(new PageTypeReference(xObjPT.getName(),
             "com.celements.XObjectPageTypeProvider", xObjPT.getCategories()));
       }
-      getPageTypeRefCache().put(database, Collections.unmodifiableList(pageTypeList));
+      getPageTypeRefCache().put(wikiRef, Collections.unmodifiableList(pageTypeList));
     }
-    return getPageTypeRefCache().get(database);
+    return getPageTypeRefCache().get(wikiRef);
   }
 
 }

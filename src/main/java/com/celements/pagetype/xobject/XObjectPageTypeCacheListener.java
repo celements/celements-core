@@ -60,8 +60,7 @@ public class XObjectPageTypeCacheListener implements EventListener {
     if (document != null) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      pageTypeCache.invalidateCacheForDatabase(webUtilsService.getWikiRef(
-          document.getDocumentReference()).getName());
+      pageTypeCache.invalidateCacheForWiki(webUtilsService.getWikiRef(document));
     } else {
       LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
           + source + "] and data [" + data + "] -> skip.");

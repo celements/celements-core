@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.pagetype.PageTypeReference;
@@ -48,6 +49,7 @@ public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
   private GetPageTypesCommand getPageTypeCmdMock;
   private XObjectPageTypeCache xObjPageTypeCache;
   private GetPageTypesCommand backupGetPageTypeCmd;
+  private WikiReference wikiRef;
 
   @Before
   public void setUp_XObjectPageTypeCacheTest() throws Exception {
@@ -58,6 +60,7 @@ public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
     getPageTypeCmdMock = createMockAndAddToDefault(GetPageTypesCommand.class);
     backupGetPageTypeCmd = xObjPageTypeCache.getPageTypeCmd;
     xObjPageTypeCache.getPageTypeCmd = getPageTypeCmdMock;
+    wikiRef = new WikiReference(context.getDatabase());
   }
 
   @After
@@ -66,32 +69,32 @@ public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testInvalidateCacheForDatabase_celements2web() {
+  public void testInvalidateCacheForWiki_celements2web() {
     assertNotNull(xObjPageTypeCache.getPageTypeRefCache());
     replayDefault();
-    xObjPageTypeCache.invalidateCacheForDatabase("celements2web");
+    xObjPageTypeCache.invalidateCacheForWiki(new WikiReference("celements2web"));
     assertNull(xObjPageTypeCache.pageTypeRefCache);
     verifyDefault();
   }
 
   @Test
-  public void testInvalidateCacheForDatabase() {
-    Map<String, List<PageTypeReference>> pageTypeRefCache =
+  public void testInvalidateCacheForWiki() {
+    Map<WikiReference, List<PageTypeReference>> pageTypeRefCache =
         xObjPageTypeCache.getPageTypeRefCache();
     assertNotNull(pageTypeRefCache);
     PageTypeReference pageTypeRefMack = createMockAndAddToDefault(
         PageTypeReference.class);
-    pageTypeRefCache.put(context.getDatabase(), Arrays.asList(pageTypeRefMack));
-    assertTrue(pageTypeRefCache.containsKey(context.getDatabase()));
+    pageTypeRefCache.put(wikiRef, Arrays.asList(pageTypeRefMack));
+    assertTrue(pageTypeRefCache.containsKey(wikiRef));
     replayDefault();
-    xObjPageTypeCache.invalidateCacheForDatabase(context.getDatabase());
+    xObjPageTypeCache.invalidateCacheForWiki(wikiRef);
     assertNotNull(xObjPageTypeCache.pageTypeRefCache);
-    assertFalse(pageTypeRefCache.containsKey(context.getDatabase()));
+    assertFalse(pageTypeRefCache.containsKey(wikiRef));
     verifyDefault();
   }
 
   @Test
-  public void testGetPageTypesRefsForDatabase() throws Exception {
+  public void testGetPageTypesRefsForWiki() throws Exception {
     Set<String> allPageTypeNames = new HashSet<String>(Arrays.asList(
         "PageTypes.RichText"));
     expect(getPageTypeCmdMock.getAllXObjectPageTypes(same(context))).andReturn(
@@ -104,8 +107,8 @@ public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq("celements2web:PageTypes.RichText"), same(context))
         ).andReturn(centralRichTextPTdoc).anyTimes();
     replayDefault();
-    List<PageTypeReference> allPageTypes = xObjPageTypeCache.getPageTypesRefsForDatabase(
-        context.getDatabase());
+    List<PageTypeReference> allPageTypes = xObjPageTypeCache.getPageTypesRefsForWiki(
+        wikiRef);
     assertFalse("expecting RichtText page type reference.", allPageTypes.isEmpty());
     PageTypeReference richTextPTref = allPageTypes.get(0);
     assertEquals("RichText", richTextPTref.getConfigName());
