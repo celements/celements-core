@@ -39,9 +39,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("XObjectPageTypeDocumentCreatedListener")
+@Component(XObjectPageTypeDocumentCreatedListener.NAME)
 public class XObjectPageTypeDocumentCreatedListener
     extends AbstractXObjectPageTypeDocumentListener implements EventListener {
+
+  public static final String NAME = "XObjectPageTypeDocumentCreatedListener";
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentCreatedListener.class);
@@ -63,7 +65,7 @@ public class XObjectPageTypeDocumentCreatedListener
   }
 
   public String getName() {
-    return "XObjectPageTypeDocumentCreatedListener";
+    return NAME;
   }
 
   public List<Event> getEvents() {

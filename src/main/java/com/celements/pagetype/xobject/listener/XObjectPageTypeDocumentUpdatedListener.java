@@ -42,9 +42,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("XObjectPageTypeDocumentUpdatedListener")
+@Component(XObjectPageTypeDocumentUpdatedListener.NAME)
 public class XObjectPageTypeDocumentUpdatedListener
     extends AbstractXObjectPageTypeDocumentListener implements EventListener {
+
+  public static final String NAME = "XObjectPageTypeDocumentUpdatedListener";
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentUpdatedListener.class);
@@ -67,7 +69,7 @@ public class XObjectPageTypeDocumentUpdatedListener
 
   public String getName() {
     LOGGER.trace("XObjectPageTypeDocumentUpdatedListener getName");
-    return "XObjectPageTypeDocumentUpdatedListener";
+    return NAME;
   }
 
   public List<Event> getEvents() {
@@ -189,13 +191,6 @@ public class XObjectPageTypeDocumentUpdatedListener
     LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
         + "] new value [" + newValue + "], old value [" + oldValue + "]");
     return (newValue != oldValue);
-  }
-
-  private XWikiDocument getOrginialDocument(Object source) {
-    if (source != null) {
-      return ((XWikiDocument) source).getOriginalDocument();
-    }
-    return null;
   }
 
   @Override

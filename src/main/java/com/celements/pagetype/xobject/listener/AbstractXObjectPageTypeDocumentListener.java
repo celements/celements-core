@@ -24,6 +24,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 public abstract class AbstractXObjectPageTypeDocumentListener {
 
   /**
@@ -39,13 +41,19 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
     if (this.observationManager == null) {
       try {
         this.observationManager = getComponentManager().lookup(ObservationManager.class);
-  
       } catch (ComponentLookupException e) {
         throw new RuntimeException(
             "Cound not retrieve an Observation Manager against the component manager");
       }
     }
     return this.observationManager;
+  }
+
+  protected XWikiDocument getOrginialDocument(Object source) {
+    if (source != null) {
+      return ((XWikiDocument) source).getOriginalDocument();
+    }
+    return null;
   }
 
   abstract protected ComponentManager getComponentManager();

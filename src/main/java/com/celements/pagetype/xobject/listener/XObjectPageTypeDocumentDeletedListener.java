@@ -39,9 +39,11 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("XObjectPageTypeDocumentDeletedListener")
+@Component(XObjectPageTypeDocumentDeletedListener.NAME)
 public class XObjectPageTypeDocumentDeletedListener
     extends AbstractXObjectPageTypeDocumentListener implements EventListener {
+
+  public static final String NAME = "XObjectPageTypeDocumentDeletedListener";
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentDeletedListener.class);
@@ -63,7 +65,7 @@ public class XObjectPageTypeDocumentDeletedListener
   }
 
   public String getName() {
-    return "XObjectPageTypeDocumentDeletedListener";
+    return NAME;
   }
 
   public List<Event> getEvents() {
@@ -89,13 +91,6 @@ public class XObjectPageTypeDocumentDeletedListener
           + source + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
-  }
-
-  XWikiDocument getOrginialDocument(Object source) {
-    if (source != null) {
-      return ((XWikiDocument) source).getOriginalDocument();
-    }
-    return null;
   }
 
   @Override
