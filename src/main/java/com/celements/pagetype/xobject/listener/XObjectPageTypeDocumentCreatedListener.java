@@ -33,7 +33,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeCreatedEvent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,9 +49,6 @@ public class XObjectPageTypeDocumentCreatedListener
 
   @Requirement
   private ComponentManager componentManager;
-
-  @Requirement
-  IPageTypeClassConfig pageTypeClassConfig;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -77,8 +73,8 @@ public class XObjectPageTypeDocumentCreatedListener
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject pageTypePropObj = document.getXObject(
-          pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+      BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
+          document));
       if (pageTypePropObj != null) {
         LOGGER.debug("XObjectPageTypeDocumentCreatedListener onEvent added to "
             + document.getDocumentReference() + "]");

@@ -55,9 +55,6 @@ public class XObjectPageTypeDocumentUpdatedListener
   private ComponentManager componentManager;
 
   @Requirement
-  IPageTypeClassConfig pageTypeClassConfig;
-
-  @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
 
   @Requirement
@@ -114,30 +111,30 @@ public class XObjectPageTypeDocumentUpdatedListener
   }
 
   boolean isPageTypePropertiesAdded(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject pageTypePropObj = document.getXObject(
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
-    BaseObject pageTypePropOrigObj = origDoc.getXObject(
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
+        document));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(
+        document));
     LOGGER.trace("isPageTypePropertiesAdded pageTypePropObj [" + pageTypePropObj
         + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
     return ((pageTypePropObj != null) && (pageTypePropOrigObj == null));
   }
 
   boolean isPageTypePropertiesDeleted(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject pageTypePropObj = document.getXObject(
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
-    BaseObject pageTypePropOrigObj = origDoc.getXObject(
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
+        document));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(
+        document));
     LOGGER.trace("isPageTypePropertiesDeleted pageTypePropObj [" + pageTypePropObj
         + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
     return ((pageTypePropObj == null) && (pageTypePropOrigObj != null));
   }
 
   boolean isPageTypePropertiesUpdated(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject pageTypePropObj = document.getXObject(
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
-    BaseObject pageTypePropOrigObj = origDoc.getXObject(
-        pageTypeClassConfig.getPageTypePropertiesClassRef(getContext().getDatabase()));
+    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
+        document));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(
+        document));
     LOGGER.trace("isPageTypePropertiesUpdated pageTypePropObj ["
         + pageTypePropObj + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
     boolean hasDiff = false;

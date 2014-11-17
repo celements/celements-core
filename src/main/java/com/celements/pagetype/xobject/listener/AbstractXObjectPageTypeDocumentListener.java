@@ -20,13 +20,23 @@
 package com.celements.pagetype.xobject.listener;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 
+import com.celements.pagetype.IPageTypeClassConfig;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractXObjectPageTypeDocumentListener {
+
+  @Requirement
+  private IPageTypeClassConfig pageTypeClassConfig;
+
+  @Requirement
+  private IWebUtilsService webUtilsService;
 
   /**
    * The observation manager that will be use to fire user creation events.
@@ -54,6 +64,11 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
       return ((XWikiDocument) source).getOriginalDocument();
     }
     return null;
+  }
+  
+  protected DocumentReference getPageTypePropertiesClassRef(XWikiDocument doc) {
+    return pageTypeClassConfig.getPageTypePropertiesClassRef(webUtilsService.getWikiRef(
+        doc));
   }
 
   abstract protected ComponentManager getComponentManager();
