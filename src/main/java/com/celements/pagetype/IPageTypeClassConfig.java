@@ -2,6 +2,7 @@ package com.celements.pagetype;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 @ComponentRole
 public interface IPageTypeClassConfig {
@@ -27,7 +28,21 @@ public interface IPageTypeClassConfig {
   public static final String PAGETYPE_PROP_CATEGORY = "category";
   public static final String PAGETYPE_PROP_TYPE_NAME = "type_name";
 
+
+  /**
+   * @deprecated instead use getPageTypePropertiesClassRef(WikiReference)
+   */
+  @Deprecated
   public DocumentReference getPageTypePropertiesClassRef(String wikiName);
+
+  public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef);
+
+  /**
+   * @deprecated instead use getPageTypePropertiesClassRef(WikiReference)
+   */
+  @Deprecated
   public DocumentReference getPageTypeClassRef(String wikiName);
+
+  public DocumentReference getPageTypeClassRef(WikiReference wikiRef);
 
 }

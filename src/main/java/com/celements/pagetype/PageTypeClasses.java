@@ -61,7 +61,7 @@ public class PageTypeClasses extends AbstractClassCollection {
   IPageTypeClassConfig pageTypeClassConfig;
 
   /**
-   * @deprecated instead use getPageTypePropertiesClassRef(String) in INavigationClassConfig
+   * @deprecated instead use getPageTypePropertiesClassRef(WikiReference) in IPageTypeClassConfig
    */
   @Deprecated
   public DocumentReference getPageTypePropertiesClassRef(String wikiName) {
@@ -70,7 +70,7 @@ public class PageTypeClasses extends AbstractClassCollection {
   }
 
   /**
-   * @deprecated instead use getPageTypeClassRef(String) in INavigationClassConfig
+   * @deprecated instead use getPageTypeClassRef(WikiReference) in IPageTypeClassConfig
    */
   @Deprecated
   public DocumentReference getPageTypeClassRef(String wikiName) {
