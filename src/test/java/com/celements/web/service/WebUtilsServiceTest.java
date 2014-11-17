@@ -15,6 +15,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -929,12 +930,56 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetWikiRef() {
+  public void testGetWikiRef_docRef() {
     String wikiName = "myTestWikiName";
-    DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName"
-        );
+    DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName");
     replayDefault();
     assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(docRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_spaceRef() {
+    WikiReference wikiRef = new WikiReference("myTestWikiName");
+    SpaceReference spaceRef = new SpaceReference("mySpaceName", wikiRef);
+    replayDefault();
+    assertEquals(wikiRef, webUtilsService.getWikiRef(spaceRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_wikiRef() {
+    WikiReference wikiRef = new WikiReference("myTestWikiName");
+    replayDefault();
+    assertEquals(wikiRef, webUtilsService.getWikiRef(wikiRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_null() {
+    String wikiName = context.getDatabase();
+    replayDefault();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(
+        (DocumentReference) null));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_doc() {
+    String wikiName = "myTestWikiName";
+    DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    replayDefault();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(doc));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_doc_null() {
+    String wikiName = context.getDatabase();
+    replayDefault();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(
+        (XWikiDocument) null));
     verifyDefault();
   }
 

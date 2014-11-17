@@ -418,12 +418,6 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public WikiReference getLastWikiReference(DocumentReference docRef) {
-    return (WikiReference) docRef.getLastSpaceReference().extractReference(
-        EntityType.WIKI);
-  }
-
-  @Override
   public boolean isAdminUser() {
     try {
       if ((getContext().getXWikiUser() != null)
@@ -861,8 +855,25 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public WikiReference getWikiRef(DocumentReference docRef) {
-    return (WikiReference) docRef.getLastSpaceReference().getParent();
+  public WikiReference getWikiRef(XWikiDocument doc) {
+    return getWikiRef(doc != null ? doc.getDocumentReference() : null);
+  }
+
+  @Override
+  public WikiReference getWikiRef(EntityReference ref) {
+    WikiReference ret = null;
+    if (ref instanceof WikiReference) {
+      ret = (WikiReference) ref;
+    } else if (ref instanceof SpaceReference) {
+      ret = (WikiReference) ref.extractReference(EntityType.WIKI);
+    } else if (ref instanceof DocumentReference) {
+      ret = (WikiReference) ((DocumentReference) ref).getLastSpaceReference(
+          ).extractReference(EntityType.WIKI);
+    }    
+    if (ret == null) {
+      ret = new WikiReference(getContext().getDatabase());
+    }
+    return ret;
   }
 
   @Override
