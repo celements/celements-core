@@ -1,4 +1,4 @@
-package ch.post.dpag.ftp;
+package com.celements.ftpclient;
 
 import static org.junit.Assert.*;
 
