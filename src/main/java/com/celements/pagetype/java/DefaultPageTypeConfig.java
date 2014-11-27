@@ -67,7 +67,7 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
     return getWebUtilsService().getInheritedTemplatedPath(localTemplateRef);
   }
 
-  public DocumentReference getLocalTemplateRef(String renderMode) {
+  private DocumentReference getLocalTemplateRef(String renderMode) {
     return new DocumentReference(getContext().getDatabase(),
         "Templates", pageTypeImpl.getRenderTemplateForRenderMode(renderMode));
   }
