@@ -30,7 +30,7 @@ import org.junit.Test;
 import com.celements.sajson.Builder;
 import com.celements.sajson.ECommand;
 
-public class JSONbuilderTest {
+public class BuilderTest {
 
   private Builder builder;
   
@@ -261,7 +261,7 @@ public class JSONbuilderTest {
   public void testAddNumber_illegalInDictionary() {
     builder.openDictionary();
     try {
-      builder.addNumber(new BigDecimal(2.0));
+      builder.addNumber(5L);
       fail("Expecting IllegalStateException. Numbers cannot" +
             "be added to a dictionary.");
     } catch (IllegalStateException e) {
@@ -483,40 +483,71 @@ public class JSONbuilderTest {
     builder.addNull();
     assertTrue("addNull must add ', null' to the json expression.",
         builder.internal_getUnfinishedJSON().endsWith(", null"));
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
   public void testAddNumber() {
-    builder.addNumber(new BigDecimal(BigInteger.valueOf(23409876), 5));
+    builder.addNumber(23409876);
     String unfinishedJSON = builder.internal_getUnfinishedJSON();
-    assertTrue("addNumber must add '234.09876' to the json expression. '"
-        + unfinishedJSON + "'", unfinishedJSON.endsWith("234.09876"));
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+    assertTrue("addNumber must add '23409876' to the json expression. '"
+        + unfinishedJSON + "'", unfinishedJSON.endsWith("23409876"));
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
   public void testAddNumberl_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
-    builder.addNumber(new BigDecimal(BigInteger.valueOf(23409876), 5));
+    builder.addNumber(23409876);
     assertTrue("addNumber must remove the PROPERTY_COMMAND from stack.",
-        builder.internal_getWorkerStack().peek(
-            ) == ECommand.DICTIONARY_COMMAND);
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+        builder.internal_getWorkerStack().peek() == ECommand.DICTIONARY_COMMAND);
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
   public void testAddNumber_notFirstElement() {
     builder.setOnFirstElement(false);
-    builder.addNumber(new BigDecimal(BigInteger.valueOf(23409876), 5));
+    builder.addNumber(23409876);
     assertTrue("addNumber must add ', 23409876' to the json expression.",
-        builder.internal_getUnfinishedJSON().endsWith(", 234.09876"));
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+        builder.internal_getUnfinishedJSON().endsWith(", 23409876"));
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddNumber_Long() {
+    builder.addNumber(234098763455237134L);
+    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    assertTrue("addNumber must add '234098763455237134L' to the json expression. '"
+        + unfinishedJSON + "'", unfinishedJSON.endsWith("234098763455237134"));
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddNumber_Float() {
+    builder.addNumber(4.3f);
+    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    assertTrue("addNumber must add '4.3' to the json expression. '"
+        + unfinishedJSON + "'", unfinishedJSON.endsWith("4.3"));
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddNumber_Double() {
+    builder.addNumber(341.431d);
+    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    assertTrue("addNumber must add '341.431' to the json expression. '"
+        + unfinishedJSON + "'", unfinishedJSON.endsWith("341.431"));
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
+  }
+
+  @Test
+  public void testAddNumber_BigDecimal() {
+    builder.addNumber(new BigDecimal(BigInteger.valueOf(23409876), 5));
+    String unfinishedJSON = builder.internal_getUnfinishedJSON();
+    assertTrue("addNumber must add '234.09876' to the json expression. '"
+        + unfinishedJSON + "'", unfinishedJSON.endsWith("234.09876"));
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
@@ -525,20 +556,18 @@ public class JSONbuilderTest {
     String unfinishedJSON = builder.internal_getUnfinishedJSON();
     assertTrue("addInteger must add '23409876' to the json expression. '"
         + unfinishedJSON + "'", unfinishedJSON.endsWith("23409876"));
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
-  public void testAddIntegerl_implicitOpenPropertyClosing() {
+  public void testAddInteger_implicitOpenPropertyClosing() {
     builder.openDictionary();
     builder.openProperty("myKey");
     builder.addInteger(23409876);
     assertTrue("addInteger must remove the PROPERTY_COMMAND from stack.",
         builder.internal_getWorkerStack().peek(
             ) == ECommand.DICTIONARY_COMMAND);
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
@@ -547,8 +576,7 @@ public class JSONbuilderTest {
     builder.addInteger(23409876);
     assertTrue("addInteger must add ', 23409876' to the json expression.",
         builder.internal_getUnfinishedJSON().endsWith(", 23409876"));
-    assertFalse("After addNull firstElement must be false.",
-        builder.isOnFirstElement());
+    assertFalse("After addNull firstElement must be false.", builder.isOnFirstElement());
   }
 
   @Test
