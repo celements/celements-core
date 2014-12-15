@@ -1,7 +1,16 @@
 package com.celements.web.service;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.isNull;
+import static org.easymock.EasyMock.same;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +24,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -26,6 +34,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -1379,6 +1388,71 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetCentralWikiRef() {
     assertEquals("celements2web", webUtilsService.getCentralWikiRef().getName());
+  }
+  
+  @Test
+  public void testFilterAttachmentsByTag_null() {
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    attachments.add(new Attachment(null, null, getContext()));
+    attachments.add(new Attachment(null, null, getContext()));
+    List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, null);
+    assertEquals(2, atts.size());
+  }
+  
+  @Test
+  public void testFilterAttachmentsByTag_empty() {
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    attachments.add(new Attachment(null, null, getContext()));
+    attachments.add(new Attachment(null, null, getContext()));
+    List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, "");
+    assertEquals(2, atts.size());
+  }
+  
+  @Test
+  public void testFilterAttachmentsByTag_tagDoesNotExist() {
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    attachments.add(new Attachment(null, null, getContext()));
+    attachments.add(new Attachment(null, null, getContext()));
+    expect(xwiki.exists(eq(webUtilsService.resolveDocumentReference("Tag.T")), 
+        same(getContext()))).andReturn(false).once();
+    replayDefault();
+    List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, "Tag.T");
+    verifyDefault();
+    assertEquals(2, atts.size());
+  }
+  
+  @Test
+  public void testFilterAttachmentsByTag() throws XWikiException {
+    String tagName = "Tag.Tags";
+    String docName = "Content_attachments.Filebase";
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), 
+        "Content_attachments", "Filebase");
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    DocumentReference tagRef = webUtilsService.resolveDocumentReference(tagName);
+    DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), 
+        "Classes", "FilebaseTag");
+    expect(xwiki.exists(eq(tagRef), same(getContext()))).andReturn(true).once();
+    XWikiDocument tagDoc = createMock(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(tagRef), same(getContext()))).andReturn(tagDoc).once();
+    expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/abc.jpg"), 
+        eq(false))).andReturn(new BaseObject()).once();
+    expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/bcd.jpg"), 
+        eq(false))).andReturn(null).once();
+    expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/cde.jpg"), 
+        eq(false))).andReturn(new BaseObject()).once();
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(
+        theDoc, "abc.jpg"), getContext()));
+    attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(
+        theDoc, "bcd.jpg"), getContext()));
+    attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(
+        theDoc, "cde.jpg"), getContext()));
+    replayDefault(tagDoc);
+    List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, tagName);
+    verifyDefault(tagDoc);
+    assertEquals(2, atts.size());
+    assertEquals("abc.jpg", atts.get(0).getFilename());
+    assertEquals("cde.jpg", atts.get(1).getFilename());
   }
 
   //*****************************************************************

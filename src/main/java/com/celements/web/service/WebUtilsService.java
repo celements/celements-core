@@ -487,11 +487,10 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return false;
   }
-
-  @SuppressWarnings("unchecked")
+  
   @Override
-  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator, boolean imagesOnly, int start, int nb
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
       ) throws ClassNotFoundException {
     List<Attachment> attachments = new ArrayList<Attachment>();
     try {
@@ -523,7 +522,16 @@ public class WebUtilsService implements IWebUtilsService {
         }
       }
     }
-    return reduceListToSize(attachments, start, nb);
+    return reduceListToSize(filterAttachmentsByTag(attachments, tagName), start, nb);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getAttachmentListForTagSortedSpace(spaceName, null, comparator, imagesOnly, 
+        start, nb);
   }
 
   @SuppressWarnings("unchecked")
@@ -568,6 +576,12 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
       boolean imagesOnly, int start, int nb) {
+    return getAttachmentListForTagSorted(doc, null, comparator, imagesOnly, start, nb);
+  }
+
+  @Override
+  public List<Attachment> getAttachmentListForTagSorted(Document doc,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb) {
     try {
       List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
       if (imagesOnly) {
@@ -577,11 +591,36 @@ public class WebUtilsService implements IWebUtilsService {
           }
         }
       }
-      return reduceListToSize(attachments, start, nb);
+      return reduceListToSize(filterAttachmentsByTag(attachments, tagName), start, nb);
     } catch (ClassNotFoundException exp) {
       _LOGGER.error("getAttachmentListSorted failed.", exp);
     }
     return Collections.emptyList();
+  }
+  
+  List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
+    if((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName
+        ), getContext())) {
+      List<Attachment> filteredAttachments = new ArrayList<Attachment>();
+      DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), 
+          "Classes", "FilebaseTag");
+      try {
+        XWikiDocument filterDoc = getContext().getWiki().getDocument(
+            resolveDocumentReference(tagName), getContext());
+        for(Attachment attachment : attachments) {
+          String attFN = attachment.getDocument().getFullName() + "/" + 
+              attachment.getFilename();
+          if(null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
+            filteredAttachments.add(attachment);
+          }
+        }
+      } catch(XWikiException xwe) {
+        _LOGGER.error("Exception getting tag document '" + tagName + "'", xwe);
+      }
+      return filteredAttachments;
+    } else {
+      return attachments;
+    }
   }
 
   @Override

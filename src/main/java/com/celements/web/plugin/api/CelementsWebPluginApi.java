@@ -290,6 +290,13 @@ public class CelementsWebPluginApi extends Api {
         imagesOnly, start, nb);
   }
   
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListForTagSortedSpace(spaceName, tagName, 
+        comparator, imagesOnly, start, nb);
+  }
+  
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
     return getWebUtilsService().getAttachmentListSorted(doc, comparator);
@@ -299,6 +306,12 @@ public class CelementsWebPluginApi extends Api {
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
     return getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
         start, nb);
+  }
+  
+  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb) {
+    return getWebUtilsService().getAttachmentListForTagSorted(doc, tagName, comparator,
+        imagesOnly, start, nb);
   }
 
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,

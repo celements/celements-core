@@ -118,6 +118,10 @@ public interface IWebUtilsService {
       String comparator, boolean imagesOnly, int start, int nb
       ) throws ClassNotFoundException;
   
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
+  
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
@@ -132,7 +136,12 @@ public interface IWebUtilsService {
   //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
       boolean imagesOnly, int start, int nb);
-
+  
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb);
+  
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
