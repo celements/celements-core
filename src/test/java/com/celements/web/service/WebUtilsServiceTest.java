@@ -24,6 +24,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -943,6 +944,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     String wikiName = context.getDatabase();
     replayDefault();
     assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_attRef() {
+    String wikiName = "myTestWikiName";
+    AttachmentReference attRef = new AttachmentReference("myFile.jpg", 
+        new DocumentReference(wikiName, "mySpaceName", "myDocName"));
+    replayDefault();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(attRef));
     verifyDefault();
   }
 

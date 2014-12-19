@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -108,6 +110,16 @@ public interface IWebUtilsService {
   public SpaceReference resolveSpaceReference(String spaceName, 
       WikiReference wikiRef);
 
+  public AttachmentReference resolveAttachmentReference(String fullName);
+
+  public AttachmentReference resolveAttachmentReference(String fullName, 
+      WikiReference wikiRef);
+
+  public EntityReference resolveEntityReference(String name, EntityType type);
+
+  public EntityReference resolveEntityReference(String name, EntityType type, 
+      WikiReference wikiRef);
+
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
@@ -172,10 +184,6 @@ public interface IWebUtilsService {
 
   public WikiReference getWikiRef(XWikiDocument doc);
 
-  /**
-   * @deprecated instead use {@link #getWikiRef(EntityReference)}
-   */
-  @Deprecated
   public WikiReference getWikiRef(DocumentReference docRef);
 
   public WikiReference getWikiRef(EntityReference ref);

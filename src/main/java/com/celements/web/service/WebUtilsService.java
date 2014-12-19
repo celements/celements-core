@@ -44,6 +44,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -409,7 +410,25 @@ public class WebUtilsService implements IWebUtilsService {
         wikiRef));
   }
 
-  private EntityReference resolveEntityReference(String name, EntityType type, 
+  @Override
+  public AttachmentReference resolveAttachmentReference(String fullName) {
+    return resolveAttachmentReference(fullName, null);
+  }
+
+  @Override
+  public AttachmentReference resolveAttachmentReference(String fullName,
+      WikiReference wikiRef) {
+    return new AttachmentReference(resolveEntityReference(fullName, EntityType.ATTACHMENT,
+        wikiRef));
+  }
+
+  @Override
+  public EntityReference resolveEntityReference(String name, EntityType type) {
+    return resolveEntityReference(name, type, null);
+  }
+
+  @Override
+  public EntityReference resolveEntityReference(String name, EntityType type, 
       WikiReference wikiRef) {
     if (wikiRef == null) {
       wikiRef = new WikiReference(getContext().getDatabase());
@@ -906,10 +925,6 @@ public class WebUtilsService implements IWebUtilsService {
     return getWikiRef(ref);
   }
 
-  /**
-   * @deprecated instead use {@link #getWikiRef(EntityReference)}
-   */
-  @Deprecated
   @Override
   public WikiReference getWikiRef(DocumentReference ref) {
     return getWikiRef((EntityReference) ref);
@@ -921,11 +936,12 @@ public class WebUtilsService implements IWebUtilsService {
     if (ref instanceof WikiReference) {
       ret = (WikiReference) ref;
     } else if (ref instanceof SpaceReference) {
-      ret = (WikiReference) ref.extractReference(EntityType.WIKI);
+      ret = getWikiRef(ref.extractReference(EntityType.WIKI));
     } else if (ref instanceof DocumentReference) {
-      ret = (WikiReference) ((DocumentReference) ref).getLastSpaceReference(
-          ).extractReference(EntityType.WIKI);
-    }    
+      ret = getWikiRef(ref.extractReference(EntityType.SPACE));
+    } else if (ref instanceof AttachmentReference) {
+      ret = getWikiRef(ref.extractReference(EntityType.DOCUMENT));
+    }
     if (ret == null) {
       ret = new WikiReference(getContext().getDatabase());
     }
