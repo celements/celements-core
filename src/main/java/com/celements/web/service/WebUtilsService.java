@@ -69,6 +69,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -506,6 +507,24 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return false;
   }
+
+  @Override
+  public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException {
+    XWikiDocument attDoc = getContext().getWiki().getDocument(
+        attRef.getDocumentReference(), getContext());
+    return attDoc.getAttachment(attRef.getName());
+  }
+
+  @Override
+  public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException {
+    XWikiAttachment att = getAttachment(attRef);
+    if (att != null) {
+      XWikiDocument attDoc = getContext().getWiki().getDocument(
+          attRef.getDocumentReference(), getContext());
+      return new Attachment(attDoc.newDocument(getContext()), att, getContext());
+    }
+    return null;
+  }
   
   @Override
   public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
@@ -933,16 +952,9 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public WikiReference getWikiRef(EntityReference ref) {
     WikiReference ret = null;
-    if (ref instanceof WikiReference) {
-      ret = (WikiReference) ref;
-    } else if (ref instanceof SpaceReference) {
-      ret = getWikiRef(ref.extractReference(EntityType.WIKI));
-    } else if (ref instanceof DocumentReference) {
-      ret = getWikiRef(ref.extractReference(EntityType.SPACE));
-    } else if (ref instanceof AttachmentReference) {
-      ret = getWikiRef(ref.extractReference(EntityType.DOCUMENT));
-    }
-    if (ret == null) {
+    if (ref != null) {
+      ret = new WikiReference(ref.extractReference(EntityType.WIKI));
+    } else {
       ret = new WikiReference(getContext().getDatabase());
     }
     return ret;

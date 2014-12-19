@@ -35,6 +35,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -125,6 +126,10 @@ public interface IWebUtilsService {
   public boolean isAdvancedAdmin();
 
   public boolean isSuperAdminUser();
+
+  public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
+
+  public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
 
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
       String comparator, boolean imagesOnly, int start, int nb
