@@ -109,6 +109,8 @@ public class RTEConfigClasses extends AbstractClassCollection {
         "RichTextEditor valid elements config", 80, 15);
     needsUpdate |= bclass.addTextAreaField("invalid_elements",
         "RichTextEditor invalid elements config", 80, 15);
+    needsUpdate |= bclass.addTextField("link_picker_spaces",
+        "Spaces listed in Link Picker", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

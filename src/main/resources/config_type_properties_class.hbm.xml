@@ -31,5 +31,8 @@
   <property name="invalid_elements" type="text">
     <column name="RCP_INVALID_ELES" />
   </property>
+  <property name="link_picker_spaces" type="string">
+    <column name="RCP_LINK_PICKER_SPACES" length="255"/>
+  </property>
 </class>
 </hibernate-mapping>
