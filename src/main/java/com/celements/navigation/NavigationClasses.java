@@ -22,6 +22,7 @@ package com.celements.navigation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
@@ -101,6 +102,9 @@ public class NavigationClasses extends AbstractClassCollection {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NavigationClasses.class);
+
+  @Requirement
+  INavigationClassConfig navClassCfg;
 
   public String getConfigName() {
     return "celNavigationClasses";
@@ -214,20 +218,26 @@ public class NavigationClasses extends AbstractClassCollection {
   BaseClass getMenuItemClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = getMenuItemClassRef(getContext().getDatabase());
+    DocumentReference classRef = navClassCfg.getMenuItemClassRef(getContext(
+        ).getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + MENU_ITEM_CLASS + " class document.", exp);
+      LOGGER.error("Failed to get " + INavigationClassConfig.MENU_ITEM_CLASS
+          + " class document.", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField(MENU_POSITION_FIELD, "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField(PART_NAME_FIELD, "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD,
+        "Position", 30, "integer");
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD,
+        "Menu Part Name", 30);
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.TARGET_FIELD, "Link Target",
+        30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -246,20 +256,24 @@ public class NavigationClasses extends AbstractClassCollection {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
-    DocumentReference classRef = getNewMenuItemClassRef(getContext().getDatabase());
+    DocumentReference classRef = navClassCfg.getNewMenuItemClassRef(getContext(
+        ).getDatabase());
 
     try {
       doc = xwiki.getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + MAPPED_MENU_ITEM_CLASS + " class document.", exp);
+      LOGGER.error("Failed to get " + INavigationClassConfig.MAPPED_MENU_ITEM_CLASS
+          + " class document.", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField(MENU_POSITION_FIELD, "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField(PART_NAME_FIELD, "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD,
+        "Position", 30, "integer");
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD,
+        "Menu Part Name", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

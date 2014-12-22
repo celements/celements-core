@@ -7,8 +7,8 @@
     <column name="RCP_ID" not-null="true" />
     <generator class="assigned" />
   </id>
-  <property name="styles" type="string">
-    <column name="RCP_STYLES" length="255"/>
+  <property name="styles" type="text">
+    <column name="RCP_STYLES" />
   </property>
   <property name="plugins" type="string">
     <column name="RCP_PLUGINS" length="255"/>
@@ -30,6 +30,9 @@
   </property>
   <property name="invalid_elements" type="text">
     <column name="RCP_INVALID_ELES" />
+  </property>
+  <property name="link_picker_spaces" type="string">
+    <column name="RCP_LINK_PICKER_SPACES" length="255"/>
   </property>
 </class>
 </hibernate-mapping>

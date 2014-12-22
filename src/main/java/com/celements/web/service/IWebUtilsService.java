@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -33,6 +35,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -108,11 +111,25 @@ public interface IWebUtilsService {
   public SpaceReference resolveSpaceReference(String spaceName, 
       WikiReference wikiRef);
 
+  public AttachmentReference resolveAttachmentReference(String fullName);
+
+  public AttachmentReference resolveAttachmentReference(String fullName, 
+      WikiReference wikiRef);
+
+  public EntityReference resolveEntityReference(String name, EntityType type);
+
+  public EntityReference resolveEntityReference(String name, EntityType type, 
+      WikiReference wikiRef);
+
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
 
   public boolean isSuperAdminUser();
+
+  public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
+
+  public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
 
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
       String comparator, boolean imagesOnly, int start, int nb
@@ -172,10 +189,6 @@ public interface IWebUtilsService {
 
   public WikiReference getWikiRef(XWikiDocument doc);
 
-  /**
-   * @deprecated instead use {@link #getWikiRef(EntityReference)}
-   */
-  @Deprecated
   public WikiReference getWikiRef(DocumentReference docRef);
 
   public WikiReference getWikiRef(EntityReference ref);

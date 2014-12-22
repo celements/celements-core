@@ -1,16 +1,7 @@
 package com.celements.web.service;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.isNull;
-import static org.easymock.EasyMock.same;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +15,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -722,71 +714,91 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testResolveDocumentReference_mainWiki() {
-    replayDefault();
-    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
-        "xwiki:XWiki.test");
-    assertEquals("xwiki", testDocRef.getWikiReference().getName());
-    verifyDefault();
+  public void testResolveEntityReference_default() {
+    WikiReference wikiRef = new WikiReference("db");
+    SpaceReference ref = new SpaceReference("mySpace", wikiRef);
+    EntityReference ret = webUtilsService.resolveEntityReference(
+        webUtilsService.getRefDefaultSerializer().serialize(ref), EntityType.SPACE);
+    assertEquals(wikiRef, webUtilsService.getWikiRef(ret));
   }
 
   @Test
-  public void testResolveDocumentReference_localWiki() {
-    replayDefault();
-    DocumentReference testDocRef = webUtilsService.resolveDocumentReference("XWiki.test");
-    assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
-    verifyDefault();
+  public void testResolveEntityReference_default_withRef() {
+    WikiReference wikiRef = new WikiReference("db");
+    WikiReference otherWikiRef = new WikiReference("otherDB");
+    SpaceReference ref = new SpaceReference("mySpace", wikiRef);
+    EntityReference ret = webUtilsService.resolveEntityReference(
+        webUtilsService.getRefDefaultSerializer().serialize(ref), EntityType.SPACE, 
+        otherWikiRef);
+    assertEquals(wikiRef, webUtilsService.getWikiRef(ret));
   }
 
   @Test
-  public void testResolveDocumentReference_wikiRef_null() {
-    replayDefault();
-    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
-        "XWiki.test", null);
-    assertEquals(context.getDatabase(), testDocRef.getWikiReference().getName());
-    verifyDefault();
+  public void testResolveEntityReference_default_withNullRef() {
+    WikiReference wikiRef = new WikiReference("db");
+    SpaceReference ref = new SpaceReference("mySpace", wikiRef);
+    EntityReference ret = webUtilsService.resolveEntityReference(
+        webUtilsService.getRefDefaultSerializer().serialize(ref), EntityType.SPACE, null);
+    assertEquals(wikiRef, webUtilsService.getWikiRef(ret));
   }
 
   @Test
-  public void testResolveDocumentReference_wikiRef_with() {
-    replayDefault();
-    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
-        "XWiki.test", new WikiReference("database"));
-    assertEquals("database", testDocRef.getWikiReference().getName());
-    verifyDefault();
+  public void testResolveEntityReference_local() {
+    WikiReference wikiRef = new WikiReference("db");
+    SpaceReference ref = new SpaceReference("mySpace", wikiRef);
+    EntityReference ret = webUtilsService.resolveEntityReference(
+        webUtilsService.getRefLocalSerializer().serialize(ref), EntityType.SPACE);
+    assertEquals(new WikiReference(context.getDatabase()), webUtilsService.getWikiRef(
+        ret));
   }
 
   @Test
-  public void testResolveDocumentReference_wikiRef_inName() {
-    replayDefault();
-    DocumentReference testDocRef = webUtilsService.resolveDocumentReference(
-        "xwiki:XWiki.test", new WikiReference("database"));
-    assertEquals("xwiki", testDocRef.getWikiReference().getName());
-    verifyDefault();
+  public void testResolveEntityReference_local_withRef() {
+    WikiReference wikiRef = new WikiReference("db");
+    WikiReference otherWikiRef = new WikiReference("otherDB");
+    SpaceReference ref = new SpaceReference("mySpace", wikiRef);
+    EntityReference ret = webUtilsService.resolveEntityReference(
+        webUtilsService.getRefLocalSerializer().serialize(ref), EntityType.SPACE, 
+        otherWikiRef);
+    assertEquals(otherWikiRef, webUtilsService.getWikiRef(ret));
   }
 
   @Test
-  public void testResolveSpaceReference_mainWiki() {
-    replayDefault();
-    SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference(
-        "myMasterCellWiki:XWiki");
-    EntityReference parent = testSpaceRef.getParent();
-    assertEquals(WikiReference.class, parent.getClass());
-    assertEquals("myMasterCellWiki", parent.getName());
-    assertEquals("XWiki", testSpaceRef.getName());
-    verifyDefault();
+  public void testResolveEntityReference_local_withNullRef() {
+    EntityReference ret = webUtilsService.resolveEntityReference("mySpace", 
+        EntityType.SPACE, null);
+    assertEquals(new WikiReference(context.getDatabase()), webUtilsService.getWikiRef(
+        ret));
   }
 
   @Test
-  public void testResolveSpaceReference_localWiki() {
-    replayDefault();
-    context.setDatabase("myFirstWiki");
-    SpaceReference testSpaceRef = webUtilsService.resolveSpaceReference("mySpace");
-    EntityReference parent = testSpaceRef.getParent();
-    assertEquals(WikiReference.class, parent.getClass());
-    assertEquals(context.getDatabase(), parent.getName());
-    assertEquals("mySpace", testSpaceRef.getName());
-    verifyDefault();
+  public void testResolveSpaceReference() {
+    WikiReference wikiRef = new WikiReference("db");
+    SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
+    SpaceReference ret = webUtilsService.resolveSpaceReference(
+        webUtilsService.getRefDefaultSerializer().serialize(spaceRef));
+    assertEquals(spaceRef, ret);
+  }
+
+  @Test
+  public void testResolveDocumentReference() {
+    WikiReference wikiRef = new WikiReference("db");
+    SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
+    DocumentReference docRef = new DocumentReference("myDoc", spaceRef);
+    DocumentReference ret = webUtilsService.resolveDocumentReference(
+        webUtilsService.getRefDefaultSerializer().serialize(docRef));
+    assertEquals(docRef, ret);
+  }
+
+  @Test
+  public void testResolveAttachmentReference() {
+    WikiReference wikiRef = new WikiReference("db");
+    SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);
+    DocumentReference docRef = new DocumentReference("myDoc", spaceRef);
+    AttachmentReference attRef = new AttachmentReference("myFile", docRef);
+    AttachmentReference ret = webUtilsService.resolveAttachmentReference(
+        webUtilsService.getRefDefaultSerializer().serialize(attRef));
+    assertEquals(attRef, ret);
   }
   
   @Test
@@ -947,6 +959,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetWikiRef_attRef() {
+    String wikiName = "myTestWikiName";
+    AttachmentReference attRef = new AttachmentReference("myFile.jpg", 
+        new DocumentReference(wikiName, "mySpaceName", "myDocName"));
+    replayDefault();
+    assertEquals(new WikiReference(wikiName), webUtilsService.getWikiRef(attRef));
+    verifyDefault();
+  }
+
+  @Test
   public void testGetWikiRef_docRef() {
     String wikiName = "myTestWikiName";
     DocumentReference docRef = new DocumentReference(wikiName, "mySpaceName", "myDocName");
@@ -969,6 +991,16 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     WikiReference wikiRef = new WikiReference("myTestWikiName");
     replayDefault();
     assertEquals(wikiRef, webUtilsService.getWikiRef(wikiRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetWikiRef_entityRef() {
+    EntityReference wikiRef = new EntityReference("myTestWikiName", EntityType.WIKI);
+    EntityReference ref = new EntityReference("mySpaceName", EntityType.SPACE, 
+        wikiRef);
+    replayDefault();
+    assertEquals(wikiRef, webUtilsService.getWikiRef(ref));
     verifyDefault();
   }
 
@@ -1477,6 +1509,116 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(2, atts.size());
     assertEquals("abc.jpg", atts.get(0).getFilename());
     assertEquals("cde.jpg", atts.get(1).getFilename());
+  }
+
+  @Test
+  public void testGetAttachment() throws Exception {
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument attDoc = new XWikiDocument(attDocRef);
+    XWikiAttachment att = new XWikiAttachment(attDoc, "myFile");
+    attDoc.setAttachmentList(Arrays.asList(att));
+    AttachmentReference attRef = new AttachmentReference(att.getFilename(), attDocRef);
+
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
+    
+    replayDefault();
+    XWikiAttachment ret = webUtilsService.getAttachment(attRef);
+    verifyDefault();
+
+    assertSame(att, ret);
+  }
+
+  @Test
+  public void testGetAttachment_notFound() throws Exception {
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument attDoc = new XWikiDocument(attDocRef);
+    attDoc.setAttachmentList(Arrays.asList(new XWikiAttachment()));
+    AttachmentReference attRef = new AttachmentReference("myFile", attDocRef);
+
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
+    
+    replayDefault();
+    XWikiAttachment ret = webUtilsService.getAttachment(attRef);
+    verifyDefault();
+
+    assertNull(ret);
+  }
+
+  @Test
+  public void testGetAttachment_XWE() throws Exception {
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    AttachmentReference attRef = new AttachmentReference("myFile", attDocRef);
+    Throwable cause = new XWikiException();
+
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andThrow(cause).once();
+    
+    replayDefault();
+    try {
+      webUtilsService.getAttachment(attRef);
+      fail("expecting XWikiException");
+    } catch (XWikiException xwe) {
+      assertSame(cause, xwe);
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetAttachmentApi() throws Exception {
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument attDoc = new XWikiDocument(attDocRef);
+    XWikiAttachment att = new XWikiAttachment(attDoc, "myFile");
+    attDoc.setAttachmentList(Arrays.asList(att));
+    AttachmentReference attRef = new AttachmentReference(att.getFilename(), attDocRef);
+
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).times(2);
+    
+    replayDefault();
+    Attachment ret = webUtilsService.getAttachmentApi(attRef);
+    verifyDefault();
+
+    assertEquals(att.getFilename(), ret.getFilename());
+    assertEquals(att.getDoc().getDocumentReference(), 
+        ret.getDocument().getDocumentReference());
+  }
+
+  @Test
+  public void testGetAttachmentApi_notFound() throws Exception {
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument attDoc = new XWikiDocument(attDocRef);
+    attDoc.setAttachmentList(Arrays.asList(new XWikiAttachment()));
+    AttachmentReference attRef = new AttachmentReference("myFile", attDocRef);
+
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andReturn(attDoc).once();
+    
+    replayDefault();
+    Attachment ret = webUtilsService.getAttachmentApi(attRef);
+    verifyDefault();
+
+    assertNull(ret);
+  }
+
+  @Test
+  public void testGetAttachmentApi_XWE() throws Exception {
+    DocumentReference attDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    AttachmentReference attRef = new AttachmentReference("myFile", attDocRef);
+    Throwable cause = new XWikiException();
+
+    expect(xwiki.getDocument(eq(attDocRef), same(context))).andThrow(cause).once();
+    
+    replayDefault();
+    try {
+      webUtilsService.getAttachmentApi(attRef);
+      fail("expecting XWikiException");
+    } catch (XWikiException xwe) {
+      assertSame(cause, xwe);
+    }
+    verifyDefault();
   }
 
   //*****************************************************************
