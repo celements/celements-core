@@ -236,6 +236,8 @@ public class NavigationClasses extends AbstractClassCollection {
         "Position", 30, "integer");
     needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD,
         "Menu Part Name", 30);
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.TARGET_FIELD, "Link Target",
+        30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
