@@ -601,12 +601,17 @@ public class WebUtilsService implements IWebUtilsService {
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
     if((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName
         ), getContext())) {
-      List<Attachment> filteredAttachments = new ArrayList<Attachment>();
+      XWikiDocument filterDoc = null;
+      try {
+        filterDoc = getContext().getWiki().getDocument(
+            resolveDocumentReference(tagName), getContext());
+      } catch(XWikiException xwe) {
+        _LOGGER.error("Exception getting tag document '" + tagName + "'", xwe);
+      }
       DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), 
           "Classes", "FilebaseTag");
-      try {
-        XWikiDocument filterDoc = getContext().getWiki().getDocument(
-            resolveDocumentReference(tagName), getContext());
+      if((filterDoc != null) && (filterDoc.getXObjectSize(tagClassRef) > 0)) {
+        List<Attachment> filteredAttachments = new ArrayList<Attachment>();
         for(Attachment attachment : attachments) {
           String attFN = attachment.getDocument().getFullName() + "/" + 
               attachment.getFilename();
@@ -614,13 +619,10 @@ public class WebUtilsService implements IWebUtilsService {
             filteredAttachments.add(attachment);
           }
         }
-      } catch(XWikiException xwe) {
-        _LOGGER.error("Exception getting tag document '" + tagName + "'", xwe);
+        return filteredAttachments;
       }
-      return filteredAttachments;
-    } else {
-      return attachments;
     }
+    return attachments;
   }
 
   @Override
