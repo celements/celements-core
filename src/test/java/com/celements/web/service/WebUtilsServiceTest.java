@@ -1454,6 +1454,29 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
+  public void testFilterAttachmentsByTag_filterHasNoTagLists() throws XWikiException {
+    String tagName = "Tag.Tags";
+    String docName = "Content_attachments.Filebase";
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), 
+        "Content_attachments", "Filebase");
+    List<Attachment> attachments = new ArrayList<Attachment>();
+    attachments.add(new Attachment(null, null, getContext()));
+    attachments.add(new Attachment(null, null, getContext()));
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    DocumentReference tagRef = webUtilsService.resolveDocumentReference(tagName);
+    DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), 
+        "Classes", "FilebaseTag");
+    expect(xwiki.exists(eq(tagRef), same(getContext()))).andReturn(true).once();
+    XWikiDocument tagDoc = createMock(XWikiDocument.class);
+    expect(xwiki.getDocument(eq(tagRef), same(getContext()))).andReturn(tagDoc).once();
+    expect(tagDoc.getXObjectSize(eq(tagClassRef))).andReturn(0);
+    replayDefault();
+    List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, tagName);
+    verifyDefault();
+    assertEquals(2, atts.size());
+  }
+  
+  @Test
   public void testFilterAttachmentsByTag() throws XWikiException {
     String tagName = "Tag.Tags";
     String docName = "Content_attachments.Filebase";
@@ -1466,6 +1489,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(tagRef), same(getContext()))).andReturn(true).once();
     XWikiDocument tagDoc = createMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq(tagRef), same(getContext()))).andReturn(tagDoc).once();
+    expect(tagDoc.getXObjectSize(eq(tagClassRef))).andReturn(3);
     expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/abc.jpg"), 
         eq(false))).andReturn(new BaseObject()).once();
     expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/bcd.jpg"), 
