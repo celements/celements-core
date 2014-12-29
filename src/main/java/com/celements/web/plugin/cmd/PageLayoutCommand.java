@@ -179,6 +179,12 @@ public class PageLayoutCommand {
         PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
   }
 
+  /**
+   * checks if the layout exists locally (in terms of layoutSpaceRef)
+   * 
+   * @param layoutSpaceRef
+   * @return
+   */
   public boolean layoutExists(SpaceReference layoutSpaceRef){
       return (getLayoutPropDoc(layoutSpaceRef) != null);
   }
