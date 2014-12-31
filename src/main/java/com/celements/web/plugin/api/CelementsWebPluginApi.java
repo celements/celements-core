@@ -1085,7 +1085,7 @@ public class CelementsWebPluginApi extends Api {
       XWikiDocument newContextDoc = context.getWiki().getDocument(docRef, context);
       context.setDoc(newContextDoc);
       vcontext.put("doc", newContextDoc.newDocument(context));
-      return getPageLayoutCmd().renderPageLayoutLocal(layoutSpaceRef);
+      return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
           exp);
