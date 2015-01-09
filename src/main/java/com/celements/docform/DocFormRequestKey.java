@@ -47,8 +47,6 @@ public class DocFormRequestKey {
   }
 
   public boolean sameObject(DocFormRequestKey other) {
-    System.out.println("compare " + this);
-    System.out.println("with " + other);
     return (this.classRef != null) && (this.objNb != null) && (this.objNb >= 0)
         && ObjectUtils.equals(this.classRef, other.classRef) 
         && ObjectUtils.equals(this.objNb, other.objNb);
