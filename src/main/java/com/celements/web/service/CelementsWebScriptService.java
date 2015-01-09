@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
@@ -44,7 +45,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
-import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
@@ -288,6 +288,10 @@ public class CelementsWebScriptService implements ScriptService {
     return new AttachmentURLCommand().getAttachmentURLPrefix();
   }
 
+  public String getAttachmentURLPrefix(String action) {
+    return new AttachmentURLCommand().getAttachmentURLPrefix(action);
+  }
+
   public String getSkinFileExternal(String fileName, String action) {
     return new AttachmentURLCommand().getExternalAttachmentURL(fileName, action,
         getContext());
@@ -399,6 +403,14 @@ public class CelementsWebScriptService implements ScriptService {
       List<String> rendererNameList) {
     return renderDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(),
         removePre, rendererNameList);
+  }
+
+  public boolean existsInheritableDocument(DocumentReference docRef) {
+    return webUtilsService.existsInheritableDocument(docRef, getContext().getLanguage());
+  }
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang) {
+    return webUtilsService.existsInheritableDocument(docRef, lang);
   }
 
   public String renderInheritableDocument(DocumentReference docRef) {
@@ -878,5 +890,23 @@ public class CelementsWebScriptService implements ScriptService {
   private WebUtilsScriptService getWebUtilsScriptService() {
     return (WebUtilsScriptService) Utils.getComponent(ScriptService.class, "webUtils");
   }
+  
+  /**
+   * TODO Move after Refactoring to WebUtilScriptService
+   */
+  public boolean isHighDate(Date date) {
+    if ((date != null) && date.compareTo(IWebUtilsService.DATE_HIGH) >= 0) {
+      return true;
+    } 
+    return false;
+  }
 
+  public boolean hasGoogleAnalytics() {
+    return !StringUtils.isEmpty(getGoogleAnalytics()); 
+  }
+
+  public String getGoogleAnalytics() {
+    return getContext().getWiki().getXWikiPreference("celGoogleAnalyticsAccount", "",
+        getContext());
+  }
 }

@@ -52,6 +52,7 @@ import com.celements.web.plugin.CelementsWebPlugin;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
+import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.ActionScriptService;
 import com.celements.web.service.AppScriptScriptService;
 import com.celements.web.service.AuthenticationScriptService;
@@ -360,6 +361,13 @@ public class CelementsWebPluginApi extends Api {
    * #getAttachmentListSorted(Document, String)}
    */
   @Deprecated
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListForTagSortedSpace(spaceName, tagName, 
+        comparator, imagesOnly, start, nb);
+  }
+
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
     return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator);
@@ -374,6 +382,12 @@ public class CelementsWebPluginApi extends Api {
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
     return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator, imagesOnly,
         start, nb);
+  }
+  
+  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb) {
+    return getWebUtilsService().getAttachmentListForTagSorted(doc, tagName, comparator,
+        imagesOnly, start, nb);
   }
 
   /**
@@ -1054,6 +1068,14 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsScriptService().getJSONContent(contentDoc);
   }
 
+  public String getJSONContent(DocumentReference docRef) {
+    if (hasAccessLevel("view", context.getUser(), true, getWebUtilsService(
+        ).getRefLocalSerializer().serialize(docRef))) {
+      return getWebUtilsService().getJSONContent(docRef);
+    }
+    return "{}";
+  }
+
   /**
    * 
    * @param authorDocName
@@ -1267,6 +1289,17 @@ public class CelementsWebPluginApi extends Api {
     return ret;
   }
 
+  private PageLayoutCommand getPageLayoutCmd() {
+    if (!context.containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      context.put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
+    }
+    return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
+  }
+
+  public boolean canRenderLayout(SpaceReference spaceRef) {
+    return getPageLayoutCmd().canRenderLayout(spaceRef);
+  }
+  
   /**
    * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
    * #renderPageLayout(SpaceReference)}
@@ -1302,7 +1335,8 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String renderPageLayout(String spaceName) {
-    return this.renderPageLayout(getWebUtilsService().resolveSpaceReference(spaceName));
+    return getPageLayoutCmd().renderPageLayoutLocal(
+        getWebUtilsService().resolveSpaceReference(spaceName));
   }
 
   /**

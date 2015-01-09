@@ -13,6 +13,9 @@
   <property name="part_name" type="string">
     <column name="MIC_PART_NAME" />
   </property>
+  <property name="link_target" type="string">
+    <column name="MIC_LINK_TARGET" />
+  </property>
   </class>
 
   <class entity-name="Celements2.MenuName" table="cel_menunames">

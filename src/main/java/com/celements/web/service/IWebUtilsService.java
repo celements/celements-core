@@ -24,7 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -33,12 +36,20 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
 public interface IWebUtilsService {
+  
+  public static final Date DATE_LOW = new Date(-62135773200000L);
+  
+  /**
+   * {@value #DATE_HIGH} has the value [Fri Dec 31 23:59:00 CET 9999]
+   */
+  public static final Date DATE_HIGH = new Date(253402297140000L);
 
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
@@ -102,14 +113,32 @@ public interface IWebUtilsService {
   public SpaceReference resolveSpaceReference(String spaceName, 
       WikiReference wikiRef);
 
+  public AttachmentReference resolveAttachmentReference(String fullName);
+
+  public AttachmentReference resolveAttachmentReference(String fullName, 
+      WikiReference wikiRef);
+
+  public EntityReference resolveEntityReference(String name, EntityType type);
+
+  public EntityReference resolveEntityReference(String name, EntityType type, 
+      WikiReference wikiRef);
+
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
 
   public boolean isSuperAdminUser();
 
+  public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
+
+  public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
+
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
       String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
+  
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
       ) throws ClassNotFoundException;
   
   //TODO change signature requirement to XWikiDocument instead of document and mark
@@ -126,7 +155,12 @@ public interface IWebUtilsService {
   //     the old version as deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
-
+  
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb);
+  
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,
@@ -146,12 +180,20 @@ public interface IWebUtilsService {
   public String[] splitStringByLength(String inStr, int maxLength);
 
   public String getJSONContent(XWikiDocument cdoc);
+  
+  public String getJSONContent(DocumentReference docRef);
 
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
 
   public String getMajorVersion(XWikiDocument doc);
 
+  public WikiReference getWikiRef();
+
+  public WikiReference getWikiRef(XWikiDocument doc);
+
   public WikiReference getWikiRef(DocumentReference docRef);
+
+  public WikiReference getWikiRef(EntityReference ref);
 
   public List<String> getAllowedLanguages(String spaceName);
 
@@ -191,5 +233,26 @@ public interface IWebUtilsService {
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
   
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN);
+
+  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
+      String defLang);
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang);
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang,
+      String defLang);
+
+  /**
+   * used to send an email if result of <param>jobMailName</param> is not empty
+   * 
+   * @param jobMailName inheritable Mails document name
+   * @param fromAddr sender address
+   * @param toAddr  recipients
+   * @param params list of strings passed through to dictionary subject resolving
+   */
+  public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
+      List<String> params);
+  
+  public WikiReference getCentralWikiRef();
 
 }

@@ -22,8 +22,8 @@ package com.celements.navigation.listener;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentListener
     implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger LOGGER = LoggerFactory.getLogger(
       TreeNodeDocumentDeletedListener.class);
 
   @Requirement
@@ -109,7 +109,7 @@ public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentLis
   }
 
   @Override
-  protected Log getLogger() {
+  protected Logger getLogger() {
     return LOGGER;
   }
 

@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.common.classes.IClassCollectionRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -134,8 +133,18 @@ public class NavigationApi extends Api {
     navigation.setMenuPart(menuPart);
   }
 
+  /**
+   * 
+   * @param menuSpace (default: $doc.web)
+   * 
+   * @deprecated since 2.57.0 instead use setNodeSpace
+   */
   public void setMenuSpace(String menuSpace) {
     navigation.setMenuSpace(menuSpace);
+  }
+
+  public void setNodeSpace(SpaceReference newNodeSpaceRef) {
+    navigation.setNodeSpace(newNodeSpaceRef);
   }
 
   public String getPrevMenuItemFullName(com.xpn.xwiki.api.Object menuItem) {
@@ -278,9 +287,8 @@ public class NavigationApi extends Api {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  private NavigationClasses getNavigationClasses() {
-    return (NavigationClasses) Utils.getComponent(IClassCollectionRole.class,
-        "celements.celNavigationClasses");
+  private INavigationClassConfig getNavigationClasses() {
+    return Utils.getComponent(INavigationClassConfig.class);
   }
 
   public boolean isEmptyMainMenu() {

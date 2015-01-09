@@ -19,7 +19,6 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +27,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -55,6 +55,7 @@ public class ExternalJavaScriptFilesCommand {
 
   private XWikiContext context;
   private Set<String> extJSfileSet;
+  private Set<String> extJSAttUrlSet;
   private List<String> extJSfileList;
   private List<String> extJSnotFoundList;
   private boolean displayedAll = false;
@@ -63,18 +64,30 @@ public class ExternalJavaScriptFilesCommand {
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
     extJSfileSet = new HashSet<String>();
+    extJSAttUrlSet = new HashSet<String>();
     extJSfileList = new Vector<String>();
     extJSnotFoundList = new Vector<String>();
   }
 
   public String addExtJSfileOnce(String jsFile) {
-    return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
-        context));
+    return addExtJSfileOnce(jsFile, null);
   }
 
   public String addExtJSfileOnce(String jsFile, String action) {
-    return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
-        action, context));
+    if (!extJSAttUrlSet.contains(jsFile)) {
+      if (getAttUrlCmd().isAttachmentLink(jsFile)
+          || getAttUrlCmd().isOnDiskLink(jsFile)) {
+        extJSAttUrlSet.add(jsFile);
+      }
+      if (!StringUtils.isEmpty(action)) {
+        return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
+            action, context));
+      } else {
+        return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
+            context));
+      }
+    }
+    return "";
   }
 
   private String addExtJSfileOnce_internal(String jsFile, String jsFileUrl) {

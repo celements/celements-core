@@ -58,6 +58,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       PrepareVelocityContextService.class);
 
+  private String _CEL_PREPARE_VELOCITY_COUNTER = "celPrepareVelocityCounter";
+  private String _CEL_PREPARE_VELOCITY_TOTALTIME = "celPrepareVelocityTotelTime";
+  
   @Requirement
   Execution execution;
 
@@ -79,15 +82,38 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   public void prepareVelocityContext(VelocityContext vcontext) {
-    LOGGER.debug("prepareVelocityContext: with vcontext [" + vcontext + "].");
+    Integer count = 0;
+    if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER) != null) {
+      count = (Integer) getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER);
+    }
+    count = count + 1;
+    long startMillis = System.currentTimeMillis();
+    LOGGER.debug("prepareVelocityContext [" + count + "]: with vcontext ["
+        + vcontext + "].");
     fixLanguagePreference(vcontext);
-    LOGGER.trace("prepareVelocityContext: after fixLanguagePreference.");
+    LOGGER.trace("prepareVelocityContext [" + count + "]: after fixLanguagePreference.");
     fixTdocForInvalidLanguage(vcontext);
-    LOGGER.trace("prepareVelocityContext: after fixTdocForInvalidLanguage.");
+    LOGGER.trace("prepareVelocityContext [" + count
+        + "]: after fixTdocForInvalidLanguage.");
     initCelementsVelocity(vcontext);
-    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
+    LOGGER.trace("prepareVelocityContext [" + count + "]: after initCelementsVelocity.");
     initPanelsVelocity(vcontext);
-    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
+    LOGGER.trace("prepareVelocityContext [" + count + "]: after initCelementsVelocity.");
+    getExecContext().setProperty(_CEL_PREPARE_VELOCITY_COUNTER, count);
+    if (LOGGER.isInfoEnabled()) {
+      long endMillis = System.currentTimeMillis();
+      long timeUsed = endMillis - startMillis;
+      Long totalTimeUsed = 0L;
+      if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_TOTALTIME) != null) {
+        totalTimeUsed = (Long) getExecContext().getProperty(
+            _CEL_PREPARE_VELOCITY_TOTALTIME);
+      }
+      totalTimeUsed += timeUsed;
+      getExecContext().setProperty(_CEL_PREPARE_VELOCITY_TOTALTIME, totalTimeUsed);
+      LOGGER.info("prepareVelocityContext [" + count + "]: with vcontext ["
+          + vcontext + "] finished in [" + timeUsed + "], total time [" + totalTimeUsed
+          + "].");
+    }
   }
 
   /**
@@ -187,13 +213,18 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       if (!vcontext.containsKey("celements2_skin")) {
         vcontext.put("celements2_skin", getCelementsSkinDoc(getContext()));
       }
-      if (!vcontext.containsKey("celements2_baseurl")
-          && (getCelementsSkinDoc(getContext()) != null)) {
-        String celements2_baseurl = getCelementsSkinDoc(getContext()).getURL("view");
-        if (celements2_baseurl.indexOf("/",8) > 0) {
-          vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
-              celements2_baseurl.indexOf("/",8)));
+      try {
+        if (!vcontext.containsKey("celements2_baseurl")
+            && (getContext().getURLFactory() != null)) {
+          XWikiDocument celementsSkinXWikiDoc = getCelementsSkinXWikiDoc(getContext());
+          String celements2_baseurl = celementsSkinXWikiDoc.getURL("view", getContext());
+          if (celements2_baseurl.indexOf("/",8) > 0) {
+            vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
+                celements2_baseurl.indexOf("/",8)));
+          }
         }
+      } catch (XWikiException exp) {
+        LOGGER.error("failed to get CelementsSkin XWikiDocument.", exp);
       }
       if (!vcontext.containsKey("page_type")) {
         PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
@@ -248,14 +279,19 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private Document getCelementsSkinDoc(XWikiContext context) {
     Document skinDoc = null;
     try {
-      skinDoc = context.getWiki(
-          ).getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"),
-              context).newDocument(context);
+      skinDoc = getCelementsSkinXWikiDoc(context).newDocument(context);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to load celements2_skin"
           + " (celements2web:XWiki.Celements2Skin) ", exp);
     }
     return skinDoc;
+  }
+
+  private XWikiDocument getCelementsSkinXWikiDoc(XWikiContext context
+      ) throws XWikiException {
+    return context.getWiki(
+        ).getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"),
+            context);
   }
 
 

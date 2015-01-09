@@ -9,11 +9,13 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class ActionService implements IActionServiceRole {
@@ -30,7 +32,7 @@ public class ActionService implements IActionServiceRole {
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context) {
     LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
-    VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
+    VelocityContext vcontext = getVelocityManager().getVelocityContext();
     vcontext.put("theDoc", actionDoc);
     Boolean debug = (Boolean)vcontext.get("debug");
     vcontext.put("debug", true);
@@ -40,14 +42,16 @@ public class ActionService implements IActionServiceRole {
     vcontext.put("request", getApiUsableMap(request));
     XWikiDocument execAct = null;
     try {
-      execAct = context.getWiki().getDocument(webUtilsService.resolveDocumentReference(
-              "celements2web:Macros.executeActions"), context);
+      execAct = context.getWiki()
+          .getDocument("celements2web:Macros.executeActions", context);
     } catch (XWikiException e) {
       LOGGER.error("Could not get action Macro", e);
     }
+    String execContent = "";
     String actionContent = "";
     if(execAct != null) {
-      String execContent = execAct.getContent();
+      vcontext.put("javaDebug", true);
+      execContent = execAct.getContent();
       execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
       actionContent = context.getWiki().getRenderingEngine().interpretText(
           execContent, includingDoc, context);
@@ -56,8 +60,16 @@ public class ActionService implements IActionServiceRole {
     boolean successful = (successfulObj != null)
                           && "true".equals(successfulObj.toString());
     if(!successful) {
-      LOGGER.error("Error executing action. Output:" + vcontext.get("actionScriptOutput"));
-      LOGGER.error("Rendered Action Script: " + actionContent);
+      LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
+          "actionScriptOutput"));
+      LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
+      LOGGER.error("executeAction: execAct == " + execAct);
+      LOGGER.error("executeAction: includingDoc: " + includingDoc);
+      LOGGER.error("executeAction: execContent length: " + execContent.length());
+      LOGGER.error("executeAction: execContent length: " + actionContent.length());
+      LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
+      LOGGER.error("executeAction: vcontext (in context) " + 
+          getVelocityManager().getVelocityContext());
     }
     vcontext.put("debug", debug);
     vcontext.put("hasedit", hasedit);
@@ -78,5 +90,9 @@ public class ActionService implements IActionServiceRole {
       }
     }
     return apiConform;
+  }
+  
+  VelocityManager getVelocityManager() {
+    return Utils.getComponent(VelocityManager.class);
   }
 }

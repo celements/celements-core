@@ -58,6 +58,7 @@ com.celements.rendering.XHTMLtoHTML5cleanup
 com.celements.navigation.presentation.LayoutEditorPresentationType
 com.celements.navigation.event.converter.TreeNodeEventConverter
 com.celements.rteConfig.classes.RTEConfigClasses
+com.celements.rteConfig.classes.RTEConfigClassConfig
 com.celements.rteConfig.RTEConfigTemplateService
 com.celements.navigation.NavigationClassConfig
 com.celements.web.service.ActionScriptService
@@ -79,3 +80,16 @@ com.celements.web.service.NextFreeDocScriptService
 com.celements.web.service.RTEConfigScriptService
 com.celements.navigation.service.TreeNodeScriptService
 com.celements.web.service.CelementsWebService
+com.celements.nextfreedoc.NextFreeDocService
+com.celements.cells.CellsClassConfig
+com.celements.navigation.presentation.RenderedExtractPresentationType
+com.celements.web.service.CaptchaService
+com.celements.pagetype.xobject.XObjectPageTypeCache
+com.celements.pagetype.xobject.event.converter.XObjectPageTypeEventConverter
+com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentDeletedListener
+com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentUpdatedListener
+com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentCreatedListener
+com.celements.pagetype.xobject.XObjectPageTypeCacheListener
+com.celements.pagetype.PageTypeClassConfig
+com.celements.ftpclient.CelFTPClient
+com.celements.pagetype.java.JavaPageTypeProvider

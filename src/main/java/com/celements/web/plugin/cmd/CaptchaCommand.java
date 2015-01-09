@@ -19,43 +19,29 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.captcha.CaptchaVerifier;
-
+import com.celements.web.service.ICaptchaServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * @deprecated instead use ICaptchaServiceRole
+ */
+@Deprecated
 public class CaptchaCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      CaptchaCommand.class);
-
+  /**
+   * @deprecated instead use ICaptchaServiceRole.checkCaptcha
+   */
+  @Deprecated
   public boolean checkCaptcha(XWikiContext context) {
-    String answer = context.getRequest().get("captcha_answer");
-    if((answer != null) && (answer.length() > 0)) {
-      CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, context.getRequest(
-          ).get("captcha_type"));
-        try {
-          mLogger.info("Checking answer for user id '" 
-              + cv.getUserId(context.getRequest()) + "'");
-          return cv.isAnswerCorrect(context.getRequest().get("captcha_id"), answer);
-//        return cv.isAnswerCorrect(cv.getUserId(context.getRequest()), answer);
-        } catch (Exception e) {
-          mLogger.error("Exception while attempting to verify captcha", e);
-        }
-    }
-    return false;
+    return Utils.getComponent(ICaptchaServiceRole.class).checkCaptcha();
   }
 
+  /**
+   * @deprecated instead use ICaptchaServiceRole.getCaptchaId
+   */
+  @Deprecated
   public String getCaptchaId(XWikiContext context) {
-    CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, "image");
-  try {
-    mLogger.info("Captcha user id is '" + cv.getUserId(context.getRequest()) + "'");
-    return cv.getUserId(context.getRequest());
-  } catch (Exception e) {
-    mLogger.error("Exception while attempting to verify captcha", e);
-  }
-    return "";
+    return Utils.getComponent(ICaptchaServiceRole.class).getCaptchaId();
   }
 }

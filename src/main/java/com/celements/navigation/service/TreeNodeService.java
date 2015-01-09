@@ -553,6 +553,10 @@ public class TreeNodeService implements ITreeNodeService {
     return new DocumentReference(getContext().getDatabase(), spaceName, pageName);
   }
   
+  /**
+   * getParentReference returns only DocumentReference or SpaceReference even though the
+   * return type is an EntityReference
+   */
   @Override
   public EntityReference getParentReference(DocumentReference docRef) {
     try {
@@ -563,15 +567,19 @@ public class TreeNodeService implements ITreeNodeService {
     return null;
   }
 
+  /**
+   * getParentEntityRef returns only DocumentReference or SpaceReference even though the
+   * return type is an EntityReference
+   */
   @Override
   public EntityReference getParentEntityRef(DocumentReference docRef
       ) throws XWikiException {
-    EntityReference parent = getContext().getWiki().getDocument(docRef,
-        getContext()).getParentReference();
-    if ((parent == null) || ("".equals(parent))) {
-      parent = docRef.getLastSpaceReference();
+    EntityReference parentRef = getContext().getWiki().getDocument(docRef, getContext()
+        ).getParentReference();
+    if ((parentRef == null) || (docRef.equals(parentRef))) {
+      parentRef = docRef.getLastSpaceReference();
     }
-    return parent;
+    return parentRef;
   }
 
   /**
@@ -595,51 +603,68 @@ public class TreeNodeService implements ITreeNodeService {
   public void moveTreeDocAfter(DocumentReference moveDocRef,
       DocumentReference insertAfterDocRef) throws XWikiException {
     if (isTreeNode(moveDocRef)) {
-      TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
-      List<TreeNode> treeNodes = getSiblingTreeNodes(moveDocRef);
-      treeNodes.remove(moveTreeNode);
-      ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
-      int splitPos = 0;
+      TreeNode insertAfterTreeNode = null;
       if (insertAfterDocRef != null) {
-        for (int pos = 0; pos < treeNodes.size(); pos ++) {
-          if (insertAfterDocRef.equals(treeNodes.get(pos).getDocumentReference())) {
-            splitPos = pos;
-          }
-        }
+        insertAfterTreeNode = getTreeNodeForDocRef(insertAfterDocRef);
       }
-      newTreeNodes.addAll(treeNodes.subList(0, splitPos));
-      newTreeNodes.add(moveTreeNode);
-      newTreeNodes.addAll(treeNodes.subList(splitPos, treeNodes.size() - 1));
+      TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
+      ArrayList<TreeNode> newTreeNodes = moveTreeNodeAfter(moveTreeNode,
+          insertAfterTreeNode);
       storeOrder(newTreeNodes);
+    } else {
+      LOGGER.info("Failed to moveTreeDocAfter for moveDocRef [" + moveDocRef
+          + "] and insertAfterDocRef [" + insertAfterDocRef + "] because one of them is"
+          + " no TreeNode.");
     }
   }
 
-  public TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef
-      ) throws XWikiException {
-    List<TreeNode> siblingTreeNodes = getSiblingTreeNodes(moveDocRef);
-    TreeNode moveTreeNode = null;
-    for (TreeNode theNode : siblingTreeNodes) {
-      if (moveDocRef.equals(theNode.getDocumentReference())) {
-        moveTreeNode = theNode;
+  ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode,
+      TreeNode insertAfterTreeNode) {
+    List<TreeNode> treeNodes = new ArrayList<TreeNode>(fetchNodesForParentKey(
+        moveTreeNode.getParentRef()));
+    treeNodes.remove(moveTreeNode);
+    ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
+    int splitPos = 0;
+    int maxPos = treeNodes.size();
+    if (insertAfterTreeNode != null) {
+      int newSplitPos = treeNodes.indexOf(insertAfterTreeNode);
+      if (newSplitPos > -1) {
+        splitPos = newSplitPos + 1;
       }
     }
-    return moveTreeNode;
+    newTreeNodes.addAll(treeNodes.subList(0, splitPos));
+    newTreeNodes.add(moveTreeNode);
+    newTreeNodes.addAll(treeNodes.subList(splitPos, maxPos));
+    return newTreeNodes;
   }
 
-  public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
+  @Override
+  public TreeNode getTreeNodeForDocRef(DocumentReference docRef
       ) throws XWikiException {
-    EntityReference parentRef = getParentReference(moveDocRef);
-    XWikiDocument moveDoc = getContext().getWiki().getDocument(moveDocRef,
-        getContext());
+    EntityReference parentRef = getParentReference(docRef);
+    TreeNode treeNode = null;
+    XWikiDocument moveDoc = getContext().getWiki().getDocument(docRef, getContext());
     BaseObject menuItemObj = moveDoc.getXObject(navClassConfig.getMenuItemClassRef(
         getContext().getDatabase()));
-    String menuPart = menuItemObj.getStringValue(
-        INavigationClassConfig.MENU_PART_FIELD);
-    if (menuPart == null) {
-      menuPart = "";
+    if (menuItemObj != null) {
+      int pos = menuItemObj.getIntValue(INavigationClassConfig.MENU_POSITION_FIELD, -1);
+      if (parentRef instanceof SpaceReference) {
+        String menuPart = menuItemObj.getStringValue(
+            INavigationClassConfig.MENU_PART_FIELD);
+        treeNode = new TreeNode(docRef, (SpaceReference)parentRef, menuPart, pos);
+      } else if (parentRef instanceof DocumentReference) {
+        treeNode = new TreeNode(docRef, (DocumentReference)parentRef, pos);
+      }
     }
-    //TODO only use menuPart if main node (parentRef is a space reference)
-    List<TreeNode> siblingTreeNodes = getSubNodesForParent(parentRef, menuPart);
+    return treeNode;
+  }
+
+  @Override
+  public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
+      ) throws XWikiException {
+    TreeNode moveTreeNode = getTreeNodeForDocRef(moveDocRef);
+    List<TreeNode> siblingTreeNodes = getSubNodesForParent(moveTreeNode.getParentRef(),
+        moveTreeNode.getPartName(getContext()));
     return siblingTreeNodes;
   }
 

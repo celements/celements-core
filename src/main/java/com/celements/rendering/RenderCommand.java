@@ -19,12 +19,10 @@
  */
 package com.celements.rendering;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -173,64 +171,39 @@ public class RenderCommand {
     String templateContent;
     XWikiDocument templateDoc = getContext().getDoc();
     if (renderTemplatePath.startsWith(":")) {
-      List<String> langList = new ArrayList<String>();
-      if (lang != null) {
-        langList.add(lang);
-      }
-      if ((defLang != null) && !defLang.equals(lang)) {
-        langList.add(defLang);
-      }
-      templateContent = "";
-      for(String theLang : langList) {
-        String templatePath = getTemplatePathOnDisk(renderTemplatePath, theLang);
-        try {
-          templateContent = getContext().getWiki().getResourceContent(templatePath);
-        } catch (FileNotFoundException fnfExp) {
-          LOGGER.trace("FileNotFound [" + templatePath + "].");
-          templateContent = "";
-        } catch (IOException exp) {
-          LOGGER.debug("Exception while parsing template [" + templatePath + "].", exp);
-          templateContent = "";
-        }
-      }
-      if ("".equals(templateContent)) {
-        String templatePathDef = getTemplatePathOnDisk(renderTemplatePath);
-        try {
-          templateContent = getContext().getWiki().getResourceContent(templatePathDef);
-        } catch (FileNotFoundException fnfExp) {
-          LOGGER.trace("FileNotFound [" + templatePathDef + "].");
-          return "";
-        } catch (IOException exp) {
-          LOGGER.debug("Exception while parsing template [" + templatePathDef + "].",
-              exp);
-          return "";
-        }
-      }
+      templateContent = getWebUtilsService().getTranslatedDiscTemplateContent(
+          renderTemplatePath, lang, defLang);
     } else {
       DocumentReference renderTemplateDocRef = getWebUtilsService(
           ).resolveDocumentReference(renderTemplatePath);
       templateDoc = getTemplateDoc(renderTemplateDocRef);
       templateContent = getTranslatedContent(templateDoc, lang);
     }
-    if (LOGGER.isDebugEnabled()) {
-      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-      Document cellDoc = (Document) vcontext.get("celldoc");
-      LOGGER.debug("renderTemplatePath: cellDoc before [" + cellDoc + "].");
+    if (!StringUtils.isEmpty(templateContent)) {
+      if (LOGGER.isDebugEnabled()) {
+        VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+        Document cellDoc = (Document) vcontext.get("celldoc");
+        LOGGER.debug("renderTemplatePath: cellDoc before [" + cellDoc + "].");
+      }
+      LOGGER.trace("renderTemplatePath: template content for lang [" + lang
+          + "] and context.language [" + getContext().getLanguage() + "] is ["
+          + templateContent + "]");
+      String renderedContent = getRenderingEngine().renderText(templateContent,
+          templateDoc, getContext().getDoc(), getContext());
+      LOGGER.trace("renderTemplatePath: rendered content for lang [" + lang
+          + "] and context.language ["  + getContext().getLanguage() + "] is ["
+          + renderedContent + "]");
+      if (LOGGER.isDebugEnabled()) {
+        VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+        Document cellDoc = (Document) vcontext.get("celldoc");
+        LOGGER.debug("renderTemplatePath: cellDoc after [" + cellDoc + "].");
+      }
+      return renderedContent;
+    } else {
+      LOGGER.info("renderTemplatePath: skip rendering, because empty Template ["
+          + renderTemplatePath + "].");
     }
-    LOGGER.trace("renderTemplatePath: template content for lang [" + lang
-        + "] and context.language [" + getContext().getLanguage() + "] is ["
-        + templateContent + "]");
-    String renderedContent = getRenderingEngine().renderText(templateContent,
-        templateDoc, getContext().getDoc(), getContext());
-    LOGGER.trace("renderTemplatePath: rendered content for lang [" + lang
-        + "] and context.language ["  + getContext().getLanguage() + "] is ["
-        + renderedContent + "]");
-    if (LOGGER.isDebugEnabled()) {
-      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-      Document cellDoc = (Document) vcontext.get("celldoc");
-      LOGGER.debug("renderTemplatePath: cellDoc after [" + cellDoc + "].");
-    }
-    return renderedContent;
+    return "";
   }
 
   public String renderDocument(DocumentReference docRef) {

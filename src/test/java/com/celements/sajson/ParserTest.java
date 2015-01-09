@@ -28,7 +28,7 @@ import com.celements.sajson.ILexicalParser;
 import com.celements.sajson.Parser;
 import com.celements.web.contextmenu.ERequestLiteral;
 
-public class JSONparserTest {
+public class ParserTest {
 
   private Parser jsonParser;
   private ILexicalParser<ERequestLiteral> jsonEventHandlerMock;

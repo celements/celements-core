@@ -20,7 +20,6 @@
 package com.celements.sajson;
 
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.Stack;
 
 /**
@@ -142,17 +141,7 @@ public class Builder {
     implicitCloseProperty();
   }
   
-  public void addNumber(BigDecimal value) {
-    checkNoDictionary();
-    if (value != null) {
-      addOpeningPart(value.toString());
-    } else {
-      addNull();
-    }
-    implicitCloseProperty();
-  }
-  
-  public void addFloat(Float value) {
+  public void addNumber(Number value) {
     checkNoDictionary();
     if (value != null) {
       addOpeningPart(value.toString());
@@ -162,14 +151,20 @@ public class Builder {
     implicitCloseProperty();
   }
 
+  /**
+   * @deprecated instead use {@link #addNumber(Number)}
+   */
+  @Deprecated
+  public void addFloat(Float value) {
+    addNumber(value);
+  }
+
+  /**
+   * @deprecated instead use {@link #addNumber(Number)}
+   */
+  @Deprecated
   public void addInteger(Integer value) {
-    checkNoDictionary();
-    if (value != null) {
-      addOpeningPart(value.toString());
-    } else {
-      addNull();
-    }
-    implicitCloseProperty();
+    addNumber(value);
   }
 
   public void addNull() {
