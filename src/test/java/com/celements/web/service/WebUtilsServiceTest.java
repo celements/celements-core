@@ -1621,6 +1621,73 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testResolveEntityTypeForFullName_wiki() {
+    String fullName = "myWiki";
+    assertSame(EntityType.WIKI, webUtilsService.resolveEntityTypeForFullName(fullName));
+    assertSame(EntityType.WIKI, webUtilsService.resolveEntityTypeForFullName(fullName, 
+        EntityType.WIKI));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_space() {
+    String fullName = "myWiki:mySpace";
+    assertSame(EntityType.SPACE, webUtilsService.resolveEntityTypeForFullName(fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_space_local() {
+    String fullName = "mySpace";
+    assertSame(EntityType.SPACE, webUtilsService.resolveEntityTypeForFullName(fullName, 
+        EntityType.SPACE));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_doc() {
+    String fullName = "myWiki:mySpace.myDoc";
+    assertSame(EntityType.DOCUMENT, webUtilsService.resolveEntityTypeForFullName(
+        fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_doc_local() {
+    String fullName = "mySpace.myDoc";
+    assertSame(EntityType.DOCUMENT, webUtilsService.resolveEntityTypeForFullName(
+        fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_att() {
+    String fullName = "myWiki:mySpace.myDoc@myAtt";
+    assertSame(EntityType.ATTACHMENT, webUtilsService.resolveEntityTypeForFullName(
+        fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_att_local() {
+    String fullName = "mySpace.myDoc@myAtt";
+    assertSame(EntityType.ATTACHMENT, webUtilsService.resolveEntityTypeForFullName(
+        fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_null() {
+    String fullName = null;
+    assertNull(webUtilsService.resolveEntityTypeForFullName(fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_empty() {
+    String fullName = "";
+    assertNull(webUtilsService.resolveEntityTypeForFullName(fullName));
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_invalid() {
+    String fullName = "mySpace_myDoc";
+    assertNull(webUtilsService.resolveEntityTypeForFullName(fullName));
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/
