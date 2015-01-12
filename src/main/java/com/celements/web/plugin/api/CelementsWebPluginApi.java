@@ -1066,6 +1066,10 @@ public class CelementsWebPluginApi extends Api {
     return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
+  public boolean canRenderLayout(SpaceReference spaceRef) {
+    return getPageLayoutCmd().canRenderLayout(spaceRef);
+  }
+
   public String renderPageLayout(SpaceReference spaceRef) {
     return getPageLayoutCmd().renderPageLayout(spaceRef);
   }
@@ -1101,7 +1105,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayout(
+    return getPageLayoutCmd().renderPageLayoutLocal(
         getWebUtilsService().resolveSpaceReference(spaceName));
   }
 
