@@ -1658,7 +1658,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testResolveEntityTypeForFullName_att() {
-    String fullName = "myWiki:mySpace.myDoc@myAtt";
+    String fullName = "myWiki:mySpace.myDoc@myAtt.jpg";
     assertSame(EntityType.ATTACHMENT, webUtilsService.resolveEntityTypeForFullName(
         fullName));
   }
