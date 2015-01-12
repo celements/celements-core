@@ -128,7 +128,6 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     assertEquals(objMock, docFormCmd.getChangedObjects().get("W:Sp.Doc_W:A.B_0"));
   }
   
-  // TODO do nothing in this case?
   @Test
   public void setOrRemoveObj_get_notExists() throws XWikiException {
     DocumentReference docRef = new DocumentReference("W", "Sp", "Doc");
