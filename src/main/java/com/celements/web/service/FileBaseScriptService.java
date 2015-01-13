@@ -1,7 +1,7 @@
 package com.celements.web.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -16,8 +16,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("filebase")
 public class FileBaseScriptService implements ScriptService{
   
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      FileBaseScriptService.class);
+  private static Logger _LOGGER  = LoggerFactory.getLogger(FileBaseScriptService.class);
   
   @Requirement
   private Execution execution;
@@ -37,7 +36,7 @@ public class FileBaseScriptService implements ScriptService{
           ).getRefLocalSerializer().serialize(attachToDocRef), fieldName, userToken,
           createIfNotExists, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: ", exp);
+      _LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }

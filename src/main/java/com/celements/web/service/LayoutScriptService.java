@@ -2,9 +2,9 @@ package com.celements.web.service;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -23,9 +23,8 @@ import com.xpn.xwiki.web.Utils;
 
 @Component("layout")
 public class LayoutScriptService  implements ScriptService {
-  
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      LayoutScriptService.class);
+
+  private static Logger _LOGGER  = LoggerFactory.getLogger(LayoutScriptService.class);
   
   private static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
       "com.celements.web.PageLayoutCommand";
@@ -68,11 +67,11 @@ public class LayoutScriptService  implements ScriptService {
           ).getUser(), layoutPropDocName, getContext())) {
         return getPageLayoutCmd().deleteLayout(layoutSpaceRef);
       } else {
-        LOGGER.warn("NO delete rights on [" + layoutPropDocName
+        _LOGGER.warn("NO delete rights on [" + layoutPropDocName
             + "] for user [" + getContext().getUser() + "].");
       }
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to check delete rights on [" + layoutSpaceName + "] for user ["
+      _LOGGER.error("Failed to check delete rights on [" + layoutSpaceName + "] for user ["
           + getContext().getUser() + "].");
     }
     return false;
@@ -107,7 +106,7 @@ public class LayoutScriptService  implements ScriptService {
   public String renderCelementsDocumentWithLayout(DocumentReference docRef,
       SpaceReference layoutSpaceRef) {
     XWikiDocument oldContextDoc = getContext().getDoc();
-    LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
+    _LOGGER.debug("renderCelementsDocumentWithLayout for docRef [" + docRef
         + "] and layoutSpaceRef [" + layoutSpaceRef + "] overwrite oldContextDoc ["
         + oldContextDoc.getDocumentReference() + "].");
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
@@ -118,7 +117,7 @@ public class LayoutScriptService  implements ScriptService {
       vcontext.put("doc", newContextDoc.newDocument(getContext()));
       return getPageLayoutCmd().renderPageLayout(layoutSpaceRef);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
+      _LOGGER.error("Failed to get docRef document to renderCelementsDocumentWithLayout.",
           exp);
     } finally {
       getContext().setDoc(oldContextDoc);

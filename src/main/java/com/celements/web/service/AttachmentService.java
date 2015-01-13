@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -55,8 +55,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 @Component
 public class AttachmentService implements IAttachmentServiceRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      AttachmentService.class);
+  private static Logger _LOGGER  = LoggerFactory.getLogger(AttachmentService.class);
 
   /** The prefix of the corresponding filename input field name. */
   private static final String FILENAME_FIELD_NAME = "filename";
@@ -88,7 +87,7 @@ public class AttachmentService implements IAttachmentServiceRole {
       FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException {
     XWikiResponse response = getContext().getResponse();
     String username = getContext().getUser();
-    LOGGER.debug("uploadAttachment: fieldName [" + fieldName + "], filename [" + filename
+    _LOGGER.debug("uploadAttachment: fieldName [" + fieldName + "], filename [" + filename
         + "], context username [" + username + "], doc [" + doc.getDocumentReference()
         + "].");
 
@@ -135,7 +134,7 @@ public class AttachmentService implements IAttachmentServiceRole {
 
     // Save the document.
     try {
-      LOGGER.debug("uploadAttachment: save document [" + doc.getDocumentReference()
+      _LOGGER.debug("uploadAttachment: save document [" + doc.getDocumentReference()
           + "] after adding filename [" + filename + "] in revision [" + nextRev + "].");
       getContext().getWiki().saveDocument(doc, comment, getContext());
     } catch (XWikiException e) {
@@ -180,8 +179,8 @@ public class AttachmentService implements IAttachmentServiceRole {
       }
     }
 
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("uploadMultipleAttachments: found fileNames [ key: "
+    if (_LOGGER.isTraceEnabled()) {
+      _LOGGER.trace("uploadMultipleAttachments: found fileNames [ key: "
           + Arrays.deepToString(fileNames.keySet().toArray()) + " values : "
           + Arrays.deepToString(fileNames.values().toArray()) + "].");
     }
@@ -189,13 +188,13 @@ public class AttachmentService implements IAttachmentServiceRole {
       try {
         uploadAttachment(file.getValue(), file.getKey(), fileupload, doc);
       } catch (Exception ex) {
-        LOGGER.warn("Saving uploaded file failed", ex);
+        _LOGGER.warn("Saving uploaded file failed", ex);
         failedFiles.add(file.getKey());
       }
     }
 
     int numSavedFiles = fileNames.size() - failedFiles.size();
-    LOGGER.debug("Found files to upload: " + fileNames + ", Failed attachments: "
+    _LOGGER.debug("Found files to upload: " + fileNames + ", Failed attachments: "
         + failedFiles + ", Wrong attachment names: " + wrongFileNames + ", saved files: "
         + numSavedFiles);
     return numSavedFiles;

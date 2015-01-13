@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -28,9 +28,8 @@ import com.xpn.xwiki.web.XWikiResponse;
 
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
-  
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CelementsWebService.class);
+
+  private static Logger _LOGGER  = LoggerFactory.getLogger(CelementsWebService.class);
   
   private List<String> supportedAdminLangList;
   
@@ -58,7 +57,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
           return obj.getStringValue("email");
         }
       } catch (XWikiException exp) {
-        LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef
+        _LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef
             + "]'", exp);
       }
     }
@@ -131,7 +130,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       getContext().getWiki().saveDocument(doc, getContext());
       
       if(validate) {
-        LOGGER.info("send account validation mail with data: accountname='" + accountName
+        _LOGGER.info("send account validation mail with data: accountname='" + accountName
             + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
         try{
           new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(
@@ -139,7 +138,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
                   "Tools.AccountActivationMail"), 
                   webUtilsService.getDefaultAdminLanguage());
         } catch(XWikiException e){
-          LOGGER.error("Exception while sending validation mail to '" + 
+          _LOGGER.error("Exception while sending validation mail to '" + 
               userData.get("email") + "'", e);
         }
       }
@@ -194,7 +193,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
         adjustResponseHeader(filename, getContext().getResponse());
         setResponseContent(renderDoc, getContext().getResponse());
       } catch (XWikiException e) {
-        LOGGER.error(e);
+        _LOGGER.error("", e);
       }
       getContext().setFinished(true);
     }

@@ -3,8 +3,8 @@ package com.celements.web.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -27,7 +27,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 @Component("authentication")
 public class AuthenticationScriptService implements ScriptService {
   
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger _LOGGER  = LoggerFactory.getLogger(
       AuthenticationScriptService.class);
   
   @Requirement
@@ -47,11 +47,11 @@ public class AuthenticationScriptService implements ScriptService {
     String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
     String account = "";
     try {
-      LOGGER.debug("executing getUsernameForUserData in plugin");
+      _LOGGER.debug("executing getUsernameForUserData in plugin");
       account = new UserNameForUserDataCommand().getUsernameForUserData(login,
           possibleLogins, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get usernameForUserData for login [" + login
+      _LOGGER.error("Failed to get usernameForUserData for login [" + login
           + "] and possibleLogins [" + possibleLogins + "].", exp);
     }
     return account;
@@ -61,15 +61,15 @@ public class AuthenticationScriptService implements ScriptService {
     String account = "";
     if(hasProgrammingRights() || hasAdminRights()) {
       try {
-        LOGGER.debug("executing getUsernameForUserData in plugin");
+        _LOGGER.debug("executing getUsernameForUserData in plugin");
         account = new UserNameForUserDataCommand().getUsernameForUserData(login,
             possibleLogins, getContext());
       } catch (XWikiException exp) {
-        LOGGER.error("Failed to get usernameForUserData for login [" + login
+        _LOGGER.error("Failed to get usernameForUserData for login [" + login
             + "] and possibleLogins [" + possibleLogins + "].", exp);
       }
     } else {
-      LOGGER.debug("missing ProgrammingRights for [" + getContext().get("sdoc")
+      _LOGGER.debug("missing ProgrammingRights for [" + getContext().get("sdoc")
           + "]: getUsernameForUserData cannot be executed!");
     }
     return account;
@@ -86,12 +86,12 @@ public class AuthenticationScriptService implements ScriptService {
   public boolean sendNewValidation(String user, String possibleFields) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
-      LOGGER.debug("sendNewValidation for user [" + user + "].");
+      _LOGGER.debug("sendNewValidation for user [" + user + "].");
       try {
         return new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
             possibleFields);
       } catch (XWikiException exp) {
-        LOGGER.error("sendNewValidation: failed.", exp);
+        _LOGGER.error("sendNewValidation: failed.", exp);
       }
     }
     return false;
@@ -101,16 +101,16 @@ public class AuthenticationScriptService implements ScriptService {
       DocumentReference mailContentDocRef) {
     if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
         && (user.trim().length() > 0)) {
-      LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
+      _LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
           + mailContentDocRef + "].");
       try {
         new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
             possibleFields, mailContentDocRef);
       } catch (XWikiException exp) {
-        LOGGER.error("sendNewValidation: failed.", exp);
+        _LOGGER.error("sendNewValidation: failed.", exp);
       }
     } else {
-      LOGGER.warn("sendNewValidation: new validation email for user [" + user
+      _LOGGER.warn("sendNewValidation: new validation email for user [" + user
           + "] not sent.");
     }
   }
@@ -123,7 +123,7 @@ public class AuthenticationScriptService implements ScriptService {
         return new PasswordRecoveryAndEmailValidationCommand(
             ).getNewValidationTokenForUser(accountDocRef);
       } catch (XWikiException exp) {
-        LOGGER.error("Failed to create new validation Token for user: "
+        _LOGGER.error("Failed to create new validation Token for user: "
             + getContext().getUser(), exp);
       }
     }
@@ -137,7 +137,7 @@ public class AuthenticationScriptService implements ScriptService {
             ).getNewCelementsTokenForUserWithAuthentication(getContext().getUser(), guestPlus,
                 getContext());
       } catch (XWikiException exp) {
-        LOGGER.error("Failed to create new validation Token for user: "
+        _LOGGER.error("Failed to create new validation Token for user: "
             + getContext().getUser(), exp);
       }
     }
@@ -151,7 +151,7 @@ public class AuthenticationScriptService implements ScriptService {
             ).getNewCelementsTokenForUserWithAuthentication(getContext().getUser(), 
                 guestPlus, minutesValid, getContext());
       } catch (XWikiException exp) {
-        LOGGER.error("Failed to create new validation Token for user: "
+        _LOGGER.error("Failed to create new validation Token for user: "
             + getContext().getUser(), exp);
       }
     }
@@ -182,16 +182,16 @@ public class AuthenticationScriptService implements ScriptService {
   public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
     if (hasProgrammingRights()) {
       String username = getContext().getRequest().getParameter("username");
-      LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
+      _LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
       XWikiAuthService authService = getContext().getWiki().getAuthService();
       if (authService instanceof TokenLDAPAuthServiceImpl) {
         return ((TokenLDAPAuthServiceImpl) authService).checkAuthByToken(username, 
             userToken, getContext());
       } else {
-        LOGGER.warn("checkAuthByToken: Not using TokenLDAPAuthService");
+        _LOGGER.warn("checkAuthByToken: Not using TokenLDAPAuthService");
       }
     } else {
-      LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
+      _LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
           + getContext().get("sdoc") + "]: checkAuthByToken cannot be executed!");
     }
     return null;
@@ -255,7 +255,7 @@ public class AuthenticationScriptService implements ScriptService {
           ).hasAccessLevel(level, user, webUtilsService.getRefDefaultSerializer(
               ).serialize(docRef), isUser, getContext());
     } catch (Exception exp) {
-      LOGGER.warn("hasAccessLevel failed for level[" +level+"] user["+user+"] " +
+      _LOGGER.warn("hasAccessLevel failed for level[" +level+"] user["+user+"] " +
       		"docRef["+docRef+"] isUser["+isUser+"]", exp);
       return false;
     }

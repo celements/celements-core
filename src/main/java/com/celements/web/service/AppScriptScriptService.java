@@ -1,7 +1,7 @@
 package com.celements.web.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.script.service.ScriptService;
@@ -12,8 +12,7 @@ import com.xpn.xwiki.util.Util;
 @Component("appscript")
 public class AppScriptScriptService implements ScriptService {
   
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      AppScriptScriptService.class);
+  private static Logger _LOGGER  = LoggerFactory.getLogger(AppScriptScriptService.class);
   
   @Requirement
   IAppScriptService appScriptService;
@@ -21,13 +20,13 @@ public class AppScriptScriptService implements ScriptService {
   public String getCurrentPageURL(String queryString) {
     String ret;
     if(isAppScriptRequest()) {
-      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      _LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
       ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      _LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
       ret = Util.escapeURL("?" + queryString);
     }
-    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    _LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
     return ret;
   }
   

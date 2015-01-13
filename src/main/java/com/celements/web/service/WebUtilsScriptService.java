@@ -3,8 +3,8 @@ package com.celements.web.service;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -20,7 +20,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 @Component("webUtils")
 public class WebUtilsScriptService implements ScriptService {
   
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger _LOGGER  = LoggerFactory.getLogger(
       AuthenticationScriptService.class);
 
   @Requirement
@@ -75,11 +75,11 @@ public class WebUtilsScriptService implements ScriptService {
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = Collections.emptyList();
     if (hasProgrammingRights()){
-      LOGGER.info("getAttachmentsForDocs: fetching attachments...");
+      _LOGGER.info("getAttachmentsForDocs: fetching attachments...");
       attachments = webUtilsService.getAttachmentsForDocs(docsFN);
     }
     else {
-      LOGGER.info("getAttachmentsForDocs: no programming rights");
+      _LOGGER.info("getAttachmentsForDocs: no programming rights");
     }
     return attachments;
   }
@@ -119,7 +119,7 @@ public class WebUtilsScriptService implements ScriptService {
     try {
       return webUtilsService.getUserNameForDocRef(userDocRef);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
+      _LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
     }
     return "N/A";
   }
