@@ -73,3 +73,4 @@ com.celements.pagetype.xobject.XObjectPageTypeCacheListener
 com.celements.pagetype.PageTypeClassConfig
 com.celements.ftpclient.CelFTPClient
 com.celements.pagetype.java.JavaPageTypeProvider
+com.celements.copydoc.CopyDocumentService
