@@ -16,6 +16,9 @@ import com.xpn.xwiki.web.Utils;
 @Component("filebase")
 public class FileBaseScriptService implements ScriptService{
   
+  @Requirement
+  IWebUtilsService webUtilsService;
+  
   private static Logger _LOGGER  = LoggerFactory.getLogger(FileBaseScriptService.class);
   
   @Requirement
@@ -25,15 +28,16 @@ public class FileBaseScriptService implements ScriptService{
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
-  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, String userToken) {
+  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
+      String userToken) {
     return tokenBasedUpload(attachToDocRef, fieldName, userToken, false);
   }
   
-  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, String userToken,
-      Boolean createIfNotExists) {
+  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
+      String userToken, Boolean createIfNotExists) {
     try {
-      return new TokenBasedUploadCommand().tokenBasedUpload(getWebUtilsService(
-          ).getRefLocalSerializer().serialize(attachToDocRef), fieldName, userToken,
+      return new TokenBasedUploadCommand().tokenBasedUpload(webUtilsService.
+          getRefLocalSerializer().serialize(attachToDocRef), fieldName, userToken,
           createIfNotExists, getContext());
     } catch (XWikiException exp) {
       _LOGGER.error("token based attachment upload failed: ", exp);
@@ -41,7 +45,7 @@ public class FileBaseScriptService implements ScriptService{
     return 0;
   }
   
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
-  }
+//  private IWebUtilsService getWebUtilsService() {
+//    return Utils.getComponent(IWebUtilsService.class);
+//  }
 }
