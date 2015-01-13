@@ -352,9 +352,8 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     context.setRequest(request);
     expect(request.getParameter(eq("template"))).andReturn("");
     replayAll(request);
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(context.getDatabase() + 
-        ":Full.Name", 
-        data, context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap(context.getDatabase() 
+        + ":Full.Name", data, context);
     verifyAll(obj, obj2, request);
     assertTrue(changedDocs.contains(defaultDoc));
     assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());

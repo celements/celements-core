@@ -389,7 +389,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * #getUniqueNameValueRequestMap()}
    */
   @Deprecated 
-  @SuppressWarnings("unchecked")
   public Map<String, String> getUniqueNameValueRequestMap(XWikiContext context) {
     return getCelementsWebService().getUniqueNameValueRequestMap();
   }

@@ -34,7 +34,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.menu.MenuScriptService;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
@@ -1152,7 +1151,6 @@ public class CelementsWebPluginApi extends Api {
    * #updateDocFromRequest(String)}
    */
   @Deprecated
-  @SuppressWarnings("unchecked")
   public Set<Document> updateDocFromRequest(String fullname
       ) throws XWikiException {
     return getDocFormScriptService().updateDocFromRequest(getWebUtilsService(
@@ -1512,7 +1510,6 @@ public class CelementsWebPluginApi extends Api {
    * #isFormFilled()}
    */
   @Deprecated
-  @SuppressWarnings("unchecked")
   public boolean isFormFilled() {
     return getWebFormScriptService().isFormFilled();
   }
@@ -1522,7 +1519,6 @@ public class CelementsWebPluginApi extends Api {
    * #isFormFilled(String)}
    */
   @Deprecated
-  @SuppressWarnings("unchecked")
   public boolean isFormFilled(String excludeFields) {
     return getWebFormScriptService().isFormFilled(excludeFields);
   }

@@ -61,7 +61,6 @@ import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
-import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -576,7 +575,6 @@ public class WebUtilsService implements IWebUtilsService {
     return reduceListToSize(filterAttachmentsByTag(attachments, tagName), start, nb);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<Attachment> getAttachmentListSortedSpace(String spaceName,
       String comparator, boolean imagesOnly, int start, int nb

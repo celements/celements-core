@@ -912,7 +912,8 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     assertTrue(context.get(GetMappedMenuItemsForParentCommand.
         CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
     assertTrue(((GetMappedMenuItemsForParentCommand)context.get(
-        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).is_isActive());
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)
+        ).is_isActive());
   }
 
   @Test

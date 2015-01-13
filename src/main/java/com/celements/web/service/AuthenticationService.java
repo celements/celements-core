@@ -8,7 +8,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
-import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
