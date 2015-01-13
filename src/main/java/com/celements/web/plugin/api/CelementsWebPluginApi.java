@@ -86,6 +86,12 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
+/**
+ * @Deprecated: since ???NEXTRELEASE???  instead use class {@link 
+ * CelementsWebScriptService} or a special named ScriptService
+ *  
+ */
+@Deprecated
 public class CelementsWebPluginApi extends Api {
 
   
