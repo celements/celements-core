@@ -44,8 +44,7 @@ public interface ICopyDocumentRole {
    * @param bObj
    * @param name
    * @return
-   * @throws XWikiException
    */
-  public Object getValue(BaseObject bObj, String name) throws XWikiException;
+  public Object getValue(BaseObject bObj, String name);
 
 }

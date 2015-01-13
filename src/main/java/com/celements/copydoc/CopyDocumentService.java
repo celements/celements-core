@@ -200,8 +200,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return hasChanged;
   }
 
-  boolean copyObject(BaseObject srcObj, BaseObject trgObj, boolean set
-      ) throws XWikiException {
+  boolean copyObject(BaseObject srcObj, BaseObject trgObj, boolean set) {
     boolean hasChanged = false;
     Set<String> srcProps = srcObj.getPropertyList();
     Set<String> trgProps = new HashSet<String>(trgObj.getPropertyList());
@@ -226,24 +225,27 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public Object getValue(BaseObject bObj, String name) throws XWikiException {
+  public Object getValue(BaseObject bObj, String name) {
     Object value = null;
-    if ((bObj != null) && (bObj.get(name) instanceof BaseProperty)) {
-        value = ((BaseProperty) bObj.get(name)).getValue();
-    }
-    // avoid comparing empty string to null
-    if ((value instanceof String) && StringUtils.isBlank((String) value)) {
-      value = null;
-    }
-    // Make sure to not return Timestamp since Timestamp.equals(Date) always returns false
-    if (value instanceof Date) {
-      value = new Date(((Date) value).getTime());
+    try {
+      if ((bObj != null) && (bObj.get(name) instanceof BaseProperty)) {
+          value = ((BaseProperty) bObj.get(name)).getValue();
+      }
+      // avoid comparing empty string to null
+      if ((value instanceof String) && StringUtils.isBlank((String) value)) {
+        value = null;
+      }
+      // assure to not return Timestamp since Timestamp.equals(Date) always returns false
+      if (value instanceof Date) {
+        value = new Date(((Date) value).getTime());
+      }
+    } catch (XWikiException xwe) {
+      LOGGER.error("Should never happen", xwe);
     }
     return value;
   }
 
-  void setValue(BaseObject bObj, String name, Object val, boolean set
-      ) throws XWikiException {
+  void setValue(BaseObject bObj, String name, Object val, boolean set) {
     if (set) {
       if (val instanceof Collection) {
         val = StringUtils.join((Collection<?>) val, "|");
