@@ -76,6 +76,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 @Component("celementsweb")
@@ -152,6 +153,39 @@ public class CelementsWebScriptService implements ScriptService {
 
   public boolean isAppScriptAvailable(String scriptName) {
     return appScriptService.isAppScriptAvailable(scriptName);
+  }
+
+  public String getAppScriptURL(String scriptName) {
+    return appScriptService.getAppScriptURL(scriptName);
+  }
+
+  public String getAppScriptURL(String scriptName, String queryString) {
+    return appScriptService.getAppScriptURL(scriptName, queryString);
+  }
+
+  public boolean isAppScriptCurrentPage(String scriptName) {
+    return appScriptService.isAppScriptCurrentPage(scriptName);
+  }
+
+  public String getScriptNameFromURL() {
+    return appScriptService.getScriptNameFromURL();
+  }
+
+  public boolean isAppScriptRequest() {
+    return appScriptService.isAppScriptRequest();
+  }
+
+  public String getCurrentPageURL(String queryString) {
+    String ret;
+    if(isAppScriptRequest()) {
+      _LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      ret = getAppScriptURL(getScriptNameFromURL(), queryString);
+    } else {
+      _LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      ret = Util.escapeURL("?" + queryString);
+    }
+    _LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    return ret;
   }
 
   public String convertToPlainText(String htmlContent) {
