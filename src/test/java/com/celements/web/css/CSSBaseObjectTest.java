@@ -201,4 +201,35 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     verify(xwiki, mockUtils);
   }
 
+  @Test
+  public void testGetCSSBasePath_fullName() {
+    String cssVal = "Content.WebHome";
+    bo.setStringValue("cssname", cssVal);
+    CSSBaseObject cssFile = new CSSBaseObject(bo, context);
+    assertEquals("xwikidb:" + cssVal, cssFile.getCssBasePath());
+  }
+
+  @Test
+  public void testGetCSSBasePath_absoluteInternal() {
+    String cssVal = "/file/Content/WebHome/test.css";
+    bo.setStringValue("cssname", cssVal);
+    CSSBaseObject cssFile = new CSSBaseObject(bo, context);
+    assertEquals(cssVal, cssFile.getCssBasePath());
+  }
+
+  @Test
+  public void testGetCSSBasePath_external() {
+    String cssVal = "http://www.celements.ch/";
+    bo.setStringValue("cssname", cssVal);
+    CSSBaseObject cssFile = new CSSBaseObject(bo, context);
+    assertEquals(cssVal, cssFile.getCssBasePath());
+  }
+
+  @Test
+  public void testGetCSSBasePath_externalSecure() {
+    String cssVal = "https://www.celements.ch/";
+    bo.setStringValue("cssname", cssVal);
+    CSSBaseObject cssFile = new CSSBaseObject(bo, context);
+    assertEquals(cssVal, cssFile.getCssBasePath());
+  }
 }

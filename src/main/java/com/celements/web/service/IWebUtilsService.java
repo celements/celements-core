@@ -205,6 +205,10 @@ public interface IWebUtilsService {
 
   public EntityReferenceSerializer<String> getRefLocalSerializer();
 
+  public String serializeRef(EntityReference entityRef);
+
+  public String serializeRef(EntityReference entityRef, boolean local);
+  
   public Map<String, String[]> getRequestParameterMap();
 
   public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
@@ -252,7 +256,27 @@ public interface IWebUtilsService {
    */
   public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
-  
+
   public WikiReference getCentralWikiRef();
+
+  /**
+   * resolves the {@link EntityType} for the given fullName.<br>
+   * <br>
+   * Simple names will return {@link EntityType#WIKI}.
+   * 
+   * @param fullName
+   * @return
+   */
+  public EntityType resolveEntityTypeForFullName(String fullName);
+
+  /**
+   * resolves the {@link EntityType} for the given fullName.
+   * 
+   * @param fullName
+   * @param defaultNameType EntityType used if given fullName is just a simple name
+   * @return
+   */
+  public EntityType resolveEntityTypeForFullName(String fullName, 
+      EntityType defaultNameType);
 
 }

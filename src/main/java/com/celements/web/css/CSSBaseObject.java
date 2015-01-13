@@ -103,7 +103,7 @@ public class CSSBaseObject extends CSS {
     String str = "";
     if(obj != null) {
       str = obj.getStringValue("cssname");
-      if ((str != null) && !"".equals(str) && !str.contains(":")) {
+      if((str != null) && !"".equals(str) && !str.contains(":") && !str.startsWith("/")) {
         str = obj.getDocumentReference().getWikiReference().getName() + ":" + str;
       }
     }

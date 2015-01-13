@@ -85,6 +85,11 @@ public class WebUtilsService implements IWebUtilsService {
 
   private static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
       "com.celements.web.PageLayoutCommand";
+  
+  private static final String REGEX_WORD = "[a-zA-Z0-9]*";
+  private static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
+  private static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
+  private static final String REGEX_ATT = REGEX_DOC + "\\@.*";
 
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
@@ -1006,7 +1011,21 @@ public class WebUtilsService implements IWebUtilsService {
   public EntityReferenceSerializer<String> getRefLocalSerializer() {
     return serializer_local;
   }
-  
+
+  @Override
+  public String serializeRef(EntityReference entityRef) {
+    return getRefDefaultSerializer().serialize(entityRef);
+  }
+
+  @Override
+  public String serializeRef(EntityReference entityRef, boolean local) {
+    if (local) {
+      return getRefLocalSerializer().serialize(entityRef);
+    } else {
+      return getRefDefaultSerializer().serialize(entityRef);
+    }
+  }
+
   @Override
   public Map<String, String[]> getRequestParameterMap() {
     XWikiRequest request = getContext().getRequest();
@@ -1287,6 +1306,31 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public WikiReference getCentralWikiRef() {
     return CENTRAL_WIKI_REF;
+  }
+  
+  @Override
+  public EntityType resolveEntityTypeForFullName(String fullName) {
+    return resolveEntityTypeForFullName(fullName, null);
+  }
+  
+  @Override
+  public EntityType resolveEntityTypeForFullName(String fullName, 
+      EntityType defaultNameType) {
+    EntityType ret = null;
+    if (StringUtils.isNotBlank(fullName)) {
+      if (fullName.matches(REGEX_WORD)) {
+        ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
+      } else if (fullName.matches(REGEX_SPACE)) {
+        ret = EntityType.SPACE;
+      } else if (fullName.matches(REGEX_DOC)) {
+        ret = EntityType.DOCUMENT;
+      } else if (fullName.matches(REGEX_ATT)) {
+        ret = EntityType.ATTACHMENT;
+      }
+    }
+    _LOGGER.debug("resolveEntityTypeForFullName: got '" + ret + "' for fullName '" 
+        + fullName + "' and default '" + defaultNameType + "'");
+    return ret;
   }
 
 }
