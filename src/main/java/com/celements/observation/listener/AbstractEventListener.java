@@ -11,7 +11,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
-public abstract class AbstractListener implements EventListener {
+public abstract class AbstractEventListener implements EventListener {
 
   @Requirement
   private RemoteObservationManagerContext remoteObsManagerContext;
