@@ -43,11 +43,7 @@ public abstract class AbstractDocumentDeleteListener extends AbstractDocumentLis
       doc = doc.getOriginalDocument();
     }
     if ((doc != null) && (getRequiredObj(doc) != null)) {
-      if (event instanceof DocumentDeletingEvent) {
-        notifyEvent = getDeletingEvent(doc.getDocumentReference());
-      } else if (event instanceof DocumentDeletedEvent) {
-        notifyEvent = getDeletedEvent(doc.getDocumentReference());
-      }
+      notifyEvent = getDeleteEvent(event, doc.getDocumentReference());
     }
     return notifyEvent;
   }

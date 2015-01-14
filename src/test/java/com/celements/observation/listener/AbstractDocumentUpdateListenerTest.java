@@ -148,7 +148,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     creatingEventMock = null;
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     
     replayDefault();
@@ -162,7 +162,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     createdEventMock = null;
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     
     replayDefault();
@@ -175,7 +175,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     Event event = new DocumentUpdatingEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     obsManagerMock.notify(same(creatingEventMock), same(docMock), same(context));
     expectLastCall().once();
@@ -190,7 +190,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     Event event = new DocumentUpdatedEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     obsManagerMock.notify(same(createdEventMock), same(docMock), same(context));
     expectLastCall().once();
@@ -207,7 +207,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
-    expect(origDocMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     
     replayDefault();
     listener.onEvent(event, docMock, context);
@@ -221,7 +221,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
-    expect(origDocMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     
     replayDefault();
     listener.onEvent(event, docMock, context);
@@ -234,7 +234,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
-    expect(origDocMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
     
@@ -249,7 +249,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
-    expect(origDocMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletedEventMock), same(docMock), same(context));
     expectLastCall().once();
     
@@ -263,8 +263,8 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     Event event = new DocumentUpdatingEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
-    expect(origDocMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     
     replayDefault();
     listener.onEvent(event, docMock, context);
@@ -276,8 +276,8 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     Event event = new DocumentUpdatedEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
-    expect(origDocMock.getXObject(eq(classRef))).andReturn(newBaseObject()).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     
     replayDefault();
     listener.onEvent(event, docMock, context);
@@ -343,23 +343,16 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
   }
 
   private BaseObject getBaseObject1() {
-    BaseObject bObj = newBaseObject();
+    BaseObject bObj = new BaseObject();
     bObj.setStringValue(fields.get(0), "val");
     bObj.setStringValue(fields.get(1), "val1");
     return bObj;
   }
 
   private BaseObject getBaseObject2() {
-    BaseObject bObj = newBaseObject();
+    BaseObject bObj = new BaseObject();
     bObj.setStringValue(fields.get(0), "val");
     bObj.setStringValue(fields.get(1), "val2");
-    return bObj;
-  }
-
-  private BaseObject newBaseObject() {
-    BaseObject bObj = new BaseObject();
-    bObj.setDocumentReference(docRef);
-    bObj.setXClassReference(classRef);
     return bObj;
   }
 

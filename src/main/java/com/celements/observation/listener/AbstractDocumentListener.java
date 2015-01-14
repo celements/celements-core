@@ -61,6 +61,16 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
    */
   protected abstract DocumentReference getRequiredObjClassRef(WikiReference wikiRef);
 
+  protected Event getCreateEvent(Event event, DocumentReference docRef) {
+    Event ret = null;
+    if (isEventING(event)) {
+      ret = getCreatingEvent(docRef);
+    } else if (isEventED(event)) {
+      ret = getCreatedEvent(docRef);
+    }
+    return ret;
+  }
+
   /**
    * Returns a new instance of the associated creating event or null of if listening on 
    * {@link DocumentCreatingEvent}s is not required
@@ -76,6 +86,16 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
    * @return
    */
   protected abstract Event getCreatedEvent(DocumentReference docRef);
+
+  protected Event getUpdateEvent(Event event, DocumentReference docRef) {
+    Event ret = null;
+    if (isEventING(event)) {
+      ret = getUpdatingEvent(docRef);
+    } else if (isEventED(event)) {
+      ret = getUpdatedEvent(docRef);
+    }
+    return ret;
+  }
 
   /**
    * Returns a new instance of the associated updating event or null of if listening on 
@@ -93,6 +113,16 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
    */
   protected abstract Event getUpdatedEvent(DocumentReference docRef);
 
+  protected Event getDeleteEvent(Event event, DocumentReference docRef) {
+    Event ret = null;
+    if (isEventING(event)) {
+      ret = getDeletingEvent(docRef);
+    } else if (isEventED(event)) {
+      ret = getDeletedEvent(docRef);
+    }
+    return ret;
+  }
+
   /**
    * Returns a new instance of the associated deleting event or null of if listening on 
    * {@link DocumentDeletingEvent}s is not required
@@ -108,6 +138,18 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
    * @return
    */
   protected abstract Event getDeletedEvent(DocumentReference docRef);
+
+  private boolean isEventING(Event event) {
+    return (event instanceof DocumentCreatingEvent) 
+        || (event instanceof DocumentUpdatingEvent)
+        || (event instanceof DocumentDeletingEvent);
+  }
+
+  private boolean isEventED(Event event) {
+    return (event instanceof DocumentCreatedEvent) 
+        || (event instanceof DocumentUpdatedEvent)
+        || (event instanceof DocumentDeletedEvent);
+  }
 
   protected abstract Logger getLogger();
 

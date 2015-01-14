@@ -48,33 +48,13 @@ public abstract class AbstractDocumentUpdateListener extends AbstractDocumentLis
     BaseObject bObj = getRequiredObj(doc);
     BaseObject origBObj = getRequiredObj(doc.getOriginalDocument());
     if (isEventCreate(bObj, origBObj)) {
-      if (isEventING(event)) {
-        notifyEvent = getCreatingEvent(bObj.getDocumentReference());
-      } else if (isEventED(event)) {
-        notifyEvent = getCreatedEvent(bObj.getDocumentReference());
-      }
+      notifyEvent = getCreateEvent(event, doc.getDocumentReference());
     } else if (isEventDelete(bObj, origBObj)) {
-      if (isEventING(event)) {
-        notifyEvent = getDeletingEvent(origBObj.getDocumentReference());
-      } else if (isEventED(event)) {
-        notifyEvent = getDeletedEvent(origBObj.getDocumentReference());
-      }
+      notifyEvent = getDeleteEvent(event, doc.getDocumentReference());
     } else if (isEventUpdate(bObj, origBObj)) {
-      if (isEventING(event)) {
-        notifyEvent = getUpdatingEvent(bObj.getDocumentReference());
-      } else if (isEventED(event)) {
-        notifyEvent = getUpdatedEvent(bObj.getDocumentReference());
-      }
+      notifyEvent = getUpdateEvent(event, doc.getDocumentReference());
     }
     return notifyEvent;
-  }
-
-  private boolean isEventING(Event event) {
-    return (event instanceof DocumentUpdatingEvent);
-  }
-
-  private boolean isEventED(Event event) {
-    return (event instanceof DocumentUpdatedEvent);
   }
 
   protected boolean isEventCreate(BaseObject bObj, BaseObject origBObj) {

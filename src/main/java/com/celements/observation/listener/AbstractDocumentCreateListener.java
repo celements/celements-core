@@ -21,11 +21,7 @@ public abstract class AbstractDocumentCreateListener extends AbstractDocumentLis
   protected Event getNotifyEvent(Event event, XWikiDocument doc) {
     Event notifyEvent = null;
     if (getRequiredObj(doc) != null) {
-      if (event instanceof DocumentCreatingEvent) {
-        notifyEvent = getCreatingEvent(doc.getDocumentReference());
-      } else if (event instanceof DocumentCreatedEvent) {
-        notifyEvent = getCreatedEvent(doc.getDocumentReference());
-      }
+      notifyEvent = getCreateEvent(event, doc.getDocumentReference());
     }
     return notifyEvent;
   }
