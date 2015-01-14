@@ -65,7 +65,6 @@ import com.celements.web.service.EditorSupportScriptService;
 import com.celements.web.service.EmptyCheckScriptService;
 import com.celements.web.service.FileBaseScriptService;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.service.ImageScriptService;
 import com.celements.web.service.JSScriptService;
 import com.celements.web.service.LayoutScriptService;
 import com.celements.web.service.LegacySkinScriptService;
@@ -419,12 +418,12 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since ???NEXTRELEASE??? instead use {@link ImageScriptService
-   * #getRandomImages(String, int)}
+   * #getRandomImages(String, int)} in the celements-photo-component Component
    */
   @Deprecated
   public List<Attachment> getRandomImages(String fullName,
       int num) throws ClassNotFoundException{
-    return getImageScriptService().getRandomImages(fullName, num);
+    return WebUtils.getInstance().getRandomImages(fullName, num, context);
   }
 
   /**
@@ -2025,11 +2024,13 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.11.2 instead use {@link ImageScriptService
-   * #getRandomImages(String, int)}
+   * #useImageAnimations()} in the celements-photo-component Component
    */
   @Deprecated
   public boolean useImageAnimations() {
-    return getImageScriptService().useImageAnimations();
+    String defaultValue = context.getWiki().Param("celements.celImageAnimation", "0");
+    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation",
+        defaultValue, context));
   }
 
   /**
@@ -2174,10 +2175,6 @@ public class CelementsWebPluginApi extends Api {
   
   private CelMailScriptService getCelMailScriptService() {
     return (CelMailScriptService) Utils.getComponent(ScriptService.class, "celmail");
-  }
-  
-  private ImageScriptService getImageScriptService() {
-    return (ImageScriptService) Utils.getComponent(ScriptService.class, "image");
   }
   
   private JSScriptService getJSScriptService() {
