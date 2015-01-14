@@ -72,7 +72,6 @@ com.celements.web.service.DocFormScriptService
 com.celements.web.service.EditorSupportScriptService
 com.celements.web.service.EmptyCheckScriptService
 com.celements.web.service.FileBaseScriptService
-com.celements.web.service.ImageScriptService
 com.celements.web.service.JSScriptService
 com.celements.web.service.LayoutScriptService
 com.celements.web.service.LegacySkinScriptService
