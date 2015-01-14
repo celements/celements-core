@@ -21,7 +21,9 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -30,6 +32,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
 
   private TestDocumentDeleteListener listener;
   private XWikiContext context;
+  private XWiki wiki;
   private RemoteObservationManagerContext remoteObsManContextMock;
   private ObservationManager obsManagerMock;
 
@@ -44,13 +47,13 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
   @Before
   public void setUp_AbstractDocumentDeleteListenerTest() throws Exception {
     context = getContext();
+    wiki = getWikiMock();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
     docRef = new DocumentReference("wiki", "Space", "SomeDoc");
     docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     origDocMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(origDocMock.getDocumentReference()).andReturn(docRef).anyTimes();
-    expect(docMock.getOriginalDocument()).andReturn(origDocMock).anyTimes();
 
     listener = new TestDocumentDeleteListener();
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
@@ -122,7 +125,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
     Event event = new DocumentDeletingEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
+    expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     
     replayDefault();
     listener.onEvent(event, docMock, context);
@@ -134,6 +138,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
     Event event = new DocumentDeletedEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     
     replayDefault();
@@ -147,7 +152,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
     deletingEventMock = null;
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     
     replayDefault();
     listener.onEvent(event, docMock, context);
@@ -160,6 +166,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
     deletedEventMock = null;
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     
     replayDefault();
@@ -168,12 +175,47 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
   }
 
   @Test
-  public void testOnEvent_ing() {
+  public void testOnEvent_ing_origDocSet() throws XWikiException {
     Event event = new DocumentDeletingEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
+    expectLastCall().once();
+    
+    replayDefault();
+    listener.onEvent(event, docMock, context);
+    verifyDefault();
+  }
+
+  @Test
+  public void testOnEvent_ing_origDocLoad() throws XWikiException {
+    Event event = new DocumentDeletingEvent();
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getOriginalDocument()).andReturn(null).once();
+    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(origDocMock).once();
+    docMock.setOriginalDocument(same(origDocMock));
+    expectLastCall().once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
+    expectLastCall().once();
+    
+    replayDefault();
+    listener.onEvent(event, docMock, context);
+    verifyDefault();
+  }
+
+  @Test
+  public void testOnEvent_ing_origDocLoad_fail() throws XWikiException {
+    Event event = new DocumentDeletingEvent();
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getOriginalDocument()).andReturn(null).once();
+    expect(wiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException()
+        ).once();
+    docMock.setOriginalDocument(isNull(XWikiDocument.class));
     expectLastCall().once();
     
     replayDefault();
@@ -186,6 +228,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
     Event event = new DocumentDeletedEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletedEventMock), same(docMock), same(context));
     expectLastCall().once();

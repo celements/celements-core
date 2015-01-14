@@ -27,6 +27,7 @@ import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractDocumentDeleteListener extends AbstractDocumentListener {
@@ -39,11 +40,21 @@ public abstract class AbstractDocumentDeleteListener extends AbstractDocumentLis
   @Override
   protected Event getNotifyEvent(Event event, XWikiDocument doc) {
     Event notifyEvent = null;
-    if (event instanceof DocumentDeletedEvent) {
-      doc = doc.getOriginalDocument();
-    }
-    if ((doc != null) && (getRequiredObj(doc) != null)) {
-      notifyEvent = getDeleteEvent(event, doc.getDocumentReference());
+    if (doc != null) {
+      DocumentReference docRef = doc.getDocumentReference();
+      XWikiDocument origDoc = doc.getOriginalDocument();
+      if ((origDoc == null) && (event instanceof DocumentDeletingEvent)) {
+        try {
+          origDoc = getContext().getWiki().getDocument(docRef, getContext());
+        } catch (XWikiException xwe) {
+          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", 
+              doc, event, xwe);
+        }
+        doc.setOriginalDocument(origDoc);
+      }
+      if (getRequiredObj(origDoc) != null) {
+        notifyEvent = getDeleteEvent(event, docRef);
+      }
     }
     return notifyEvent;
   }
