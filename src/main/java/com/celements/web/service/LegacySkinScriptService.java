@@ -17,6 +17,9 @@ public class LegacySkinScriptService implements ScriptService{
 
   @Requirement
   private Execution execution;
+  
+  @Requirement
+  private IPrepareVelocityContext prepareVelocityContext;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -32,22 +35,18 @@ public class LegacySkinScriptService implements ScriptService{
   }
   
   public int showRightPanels() {
-    return getPrepareVelocityContextService().showRightPanels();
+    return prepareVelocityContext.showRightPanels();
   }
   
   public int showLeftPanels() {
-    return getPrepareVelocityContextService().showLeftPanels();
+    return prepareVelocityContext.showLeftPanels();
   }
 
   public List<String> getRightPanels() {
-    return getPrepareVelocityContextService().getRightPanels();
+    return prepareVelocityContext.getRightPanels();
   }
 
   public List<String> getLeftPanels() {
-    return getPrepareVelocityContextService().getLeftPanels();
-  }
-  
-  private IPrepareVelocityContext getPrepareVelocityContextService() {
-    return Utils.getComponent(IPrepareVelocityContext.class);
+    return prepareVelocityContext.getLeftPanels();
   }
 }
