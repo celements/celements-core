@@ -19,13 +19,15 @@
  */
 package com.celements.web.css;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWikiContext;

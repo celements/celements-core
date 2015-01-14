@@ -19,7 +19,9 @@
  */
 package com.celements.pagetype.xobject.listener;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +33,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentCreatedListener;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectPageTypeDocumentCreatedListenerTest

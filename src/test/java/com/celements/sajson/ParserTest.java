@@ -19,13 +19,13 @@
  */
 package com.celements.sajson;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.sajson.ILexicalParser;
-import com.celements.sajson.Parser;
 import com.celements.web.contextmenu.ERequestLiteral;
 
 public class ParserTest {

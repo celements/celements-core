@@ -19,8 +19,12 @@
  */
 package com.celements.emptycheck.service;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.same;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,8 +38,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.emptycheck.service.EmptyCheckService;
-import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;

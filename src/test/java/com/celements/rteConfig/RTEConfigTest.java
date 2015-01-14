@@ -19,8 +19,13 @@
  */
 package com.celements.rteConfig;
 
-import static junit.framework.Assert.*;
-import static org.easymock.EasyMock.*;
+import static junit.framework.Assert.assertEquals;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.same;
+import static org.easymock.EasyMock.verify;
 
 import org.junit.Before;
 import org.junit.Test;

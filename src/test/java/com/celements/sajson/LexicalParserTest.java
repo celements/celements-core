@@ -19,18 +19,15 @@
  */
 package com.celements.sajson;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import com.celements.sajson.ECommand;
-import com.celements.sajson.IEventHandler;
-import com.celements.sajson.IGenericLiteral;
-import com.celements.sajson.LexicalParser;
 
 public class LexicalParserTest {
 
