@@ -22,9 +22,6 @@ package com.celements.web.token;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

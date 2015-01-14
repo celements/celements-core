@@ -31,7 +31,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentCreatedListener;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectPageTypeDocumentCreatedListenerTest
