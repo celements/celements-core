@@ -1,4 +1,4 @@
-package com.celements.observation.listener;
+package com.celements.common.observation.listener;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;

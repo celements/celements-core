@@ -1,4 +1,4 @@
-package com.celements.observation.listener;
+package com.celements.common.observation.listener;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -16,6 +16,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.celements.common.observation.listener.AbstractDocumentCreateListener;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;

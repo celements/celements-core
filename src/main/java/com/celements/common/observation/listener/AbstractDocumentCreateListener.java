@@ -1,4 +1,4 @@
-package com.celements.observation.listener;
+package com.celements.common.observation.listener;
 
 import java.util.Arrays;
 import java.util.List;

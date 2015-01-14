@@ -1,4 +1,4 @@
-package com.celements.observation.listener;
+package com.celements.common.observation.listener;
 
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
