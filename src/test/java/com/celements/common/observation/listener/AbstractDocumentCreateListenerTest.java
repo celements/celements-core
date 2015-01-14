@@ -3,6 +3,9 @@ package com.celements.common.observation.listener;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,7 +19,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.observation.listener.AbstractDocumentCreateListener;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -56,6 +58,19 @@ public class AbstractDocumentCreateListenerTest extends AbstractBridgedComponent
 
     creatingEventMock = createMockAndAddToDefault(Event.class);
     createdEventMock = createMockAndAddToDefault(Event.class);
+  }
+
+  @Test
+  public void testGetEvents() {
+    Set<Class<? extends Event>> eventClasses = new HashSet<Class<? extends Event>>();
+    for (Event theEvent : listener.getEvents()) {
+      eventClasses.add(theEvent.getClass());
+    }
+    assertEquals(2, eventClasses.size());
+    assertTrue("Expecting registration for DocumentCreatingEvent",
+        eventClasses.contains(DocumentCreatingEvent.class));
+    assertTrue("Expecting registration for DocumentCreatedEvent events",
+        eventClasses.contains(DocumentCreatedEvent.class));
   }
 
   @Test

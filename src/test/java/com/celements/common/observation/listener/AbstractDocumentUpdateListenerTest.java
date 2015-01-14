@@ -4,7 +4,9 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +21,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.observation.listener.AbstractDocumentUpdateListener;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.copydoc.ICopyDocumentRole;
 import com.celements.web.service.IWebUtilsService;
@@ -75,6 +76,19 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     updatedEventMock = createMockAndAddToDefault(Event.class);
     deletingEventMock = createMockAndAddToDefault(Event.class);
     deletedEventMock = createMockAndAddToDefault(Event.class);
+  }
+
+  @Test
+  public void testGetEvents() {
+    Set<Class<? extends Event>> eventClasses = new HashSet<Class<? extends Event>>();
+    for (Event theEvent : listener.getEvents()) {
+      eventClasses.add(theEvent.getClass());
+    }
+    assertEquals(2, eventClasses.size());
+    assertTrue("Expecting registration for DocumentUpdatingEvent",
+        eventClasses.contains(DocumentUpdatingEvent.class));
+    assertTrue("Expecting registration for DocumentUpdatedEvent events",
+        eventClasses.contains(DocumentUpdatedEvent.class));
   }
 
   @Test
