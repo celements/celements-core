@@ -18,8 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package com.celements.inheritor;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 

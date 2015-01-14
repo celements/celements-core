@@ -19,9 +19,7 @@
  */
 package com.celements.navigation.event.converter;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;

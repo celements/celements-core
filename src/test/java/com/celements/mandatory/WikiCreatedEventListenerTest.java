@@ -1,6 +1,6 @@
 package com.celements.mandatory;
 
-import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.*;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -19,9 +19,7 @@
  */
 package com.celements.sajson;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 
 import org.junit.Before;
 import org.junit.Test;
