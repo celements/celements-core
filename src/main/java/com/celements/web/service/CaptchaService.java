@@ -47,6 +47,7 @@ public class CaptchaService implements ICaptchaServiceRole {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override 
   public boolean checkCaptcha() {
     String answer = getContext().getRequest().get("captcha_answer");
     if((answer != null) && (answer.length() > 0)) {
@@ -75,10 +76,12 @@ public class CaptchaService implements ICaptchaServiceRole {
     return getContext().getRequest().get("captcha_type");
   }
 
+  @Override 
   public String getCaptchaId() {
     return getCaptchaId("image");
   }
 
+  @Override 
   public String getCaptchaId(String captchaType) {
     CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, captchaType);
     try {

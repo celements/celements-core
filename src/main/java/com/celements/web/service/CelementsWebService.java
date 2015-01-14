@@ -47,6 +47,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return getEmailAdressForUser(webUtilsService.resolveDocumentReference(username));
   }
   
+  @Override
   public String getEmailAdressForUser(DocumentReference userDocRef) {
     if (getContext().getWiki().exists(userDocRef, getContext())) {
       try {
@@ -64,12 +65,14 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return null;
   }
   
+  @Override
   public int createUser(boolean validate) throws XWikiException{
     String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
     return createUser(getUniqueNameValueRequestMap(), possibleLogins, 
         validate);
   }
   
+  @Override
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate) throws XWikiException {
     String accountName = "";
@@ -147,6 +150,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   }
   
   @SuppressWarnings("unchecked")
+  @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
     Map<String, String[]> params = getContext().getRequest().getParameterMap();
     Map<String, String> resultMap = new HashMap<String, String>();
@@ -175,6 +179,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return isUnique;
   }
 
+  @Override
   public List<String> getSupportedAdminLanguages() {
     if (supportedAdminLangList == null) {
       supportedAdminLangList =  Arrays.asList(new String[] {"de","fr","en","it"});
@@ -182,6 +187,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     return supportedAdminLangList;
   }
   
+  @Override
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
     boolean success = false;
     if(getContext().getWiki().exists(webUtilsService.resolveDocumentReference(

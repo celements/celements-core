@@ -15,6 +15,7 @@ public class WebFormService implements IWebFormServiceRole {
   final String PARAM_LANGUAGE = "language";
   final String PARAM_XREDIRECT = "xredirect";
 
+  @Override
   public boolean isFormFilled(Map<String, String[]> parameterMap,
       Set<String> additionalFields) {
     boolean isFilled = false;

@@ -28,10 +28,12 @@ public class AuthenticationService implements IAuthenticationServiceRole {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
+  @Override 
   public String getPasswordHash(String encoding, String str) {
     return new PasswordClass().getEquivalentPassword(encoding, str);
   }
   
+  @Override 
   public Map<String, String> activateAccount(String activationCode) throws XWikiException{
     Map<String, String> userAccount = new HashMap<String, String>();
     String hashedCode = getPasswordHash("hash:SHA-512:", activationCode);
@@ -61,7 +63,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
     return userAccount;
   }
   
-  
+  @Override 
   public XWikiUser checkAuth(String logincredential, String password,
       String rememberme, String possibleLogins, Boolean noRedirect) 
           throws XWikiException {

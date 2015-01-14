@@ -81,6 +81,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return execution.getContext();
   }
 
+  @Override
   public void prepareVelocityContext(VelocityContext vcontext) {
     Integer count = 0;
     if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER) != null) {
@@ -121,6 +122,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * 
    * @deprecated instead use prepareVelocityContext(VelocityContext)
    */
+  @Override
   @Deprecated
   public void prepareVelocityContext(XWikiContext context) {
     if (context != null) {
@@ -294,7 +296,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
             context);
   }
 
-
+  @Override
   public int showRightPanels() {
     if (showRightPanelsBoolean(getContext()) && !getRightPanels().isEmpty()) {
       return 1;
@@ -307,6 +309,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return showPanelByConfigName(context, "showRightPanels");
   }
 
+  @Override
   public int showLeftPanels() {
     if (showLeftPanelsBoolean(getContext()) && !getLeftPanels().isEmpty()) {
       return 1;
@@ -319,6 +322,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return showPanelByConfigName(context, "showLeftPanels");
   }
 
+  @Override
   public List<String> getRightPanels() {
     if (showRightPanelsBoolean(getContext())) {
       return Arrays.asList(getPanelString(getContext(), "rightPanels").split(","));
@@ -327,6 +331,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     }
   }
 
+  @Override
   public List<String> getLeftPanels() {
     if (showLeftPanelsBoolean(getContext())) {
       return Arrays.asList(getPanelString(getContext(), "leftPanels").split(","));
@@ -471,6 +476,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return false;
   }
 
+  @Override
   public String getVelocityName() {
     return "celementsweb";
   }

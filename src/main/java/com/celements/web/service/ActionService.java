@@ -28,6 +28,7 @@ public class ActionService implements IActionServiceRole {
   @Requirement
   private Execution execution;
   
+  @Override 
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context) {
     _LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");

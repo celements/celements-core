@@ -83,6 +83,7 @@ public class AttachmentService implements IAttachmentServiceRole {
    *           if the form data cannot be accessed, or if the database operation
    *           failed
    */
+  @Override 
   public boolean uploadAttachment(String fieldName, String filename,
       FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException {
     XWikiResponse response = getContext().getResponse();
@@ -156,6 +157,7 @@ public class AttachmentService implements IAttachmentServiceRole {
    * @param fieldNamePrefix
    * @return number of saved attachments
    */
+  @Override 
   public int uploadMultipleAttachments(XWikiDocument attachToDoc, String fieldNamePrefix
       ) {
     XWikiDocument doc = attachToDoc.clone();

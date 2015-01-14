@@ -259,6 +259,7 @@ public class WebUtilsService implements IWebUtilsService {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
 
+  @Override
   public List<String> getAllowedLanguages() {
     if ((getContext() != null) && (getContext().getDoc() != null)) {
       return getAllowedLanguages(getContext().getDoc().getDocumentReference(
@@ -1205,6 +1206,7 @@ public class WebUtilsService implements IWebUtilsService {
     return xhtml;
   }
 
+  @Override
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = new ArrayList<Attachment>();
     for(String docFN : docsFN) {
