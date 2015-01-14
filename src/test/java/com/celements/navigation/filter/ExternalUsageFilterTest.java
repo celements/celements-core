@@ -20,16 +20,12 @@
 package com.celements.navigation.filter;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
-
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.navigation.filter.ExternalUsageFilter;
-import com.celements.navigation.filter.InternalRightsFilter;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;

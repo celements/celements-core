@@ -34,8 +34,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.emptycheck.service.EmptyCheckService;
-import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;

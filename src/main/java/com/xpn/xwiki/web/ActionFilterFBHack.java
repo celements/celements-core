@@ -17,8 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.web.ActionFilter;
-import com.xpn.xwiki.web.XWikiConfigurationService;
 
 public class ActionFilterFBHack implements Filter {
     /** Logging helper. */

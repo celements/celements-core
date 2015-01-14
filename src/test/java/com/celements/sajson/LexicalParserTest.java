@@ -27,11 +27,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.sajson.ECommand;
-import com.celements.sajson.IEventHandler;
-import com.celements.sajson.IGenericLiteral;
-import com.celements.sajson.LexicalParser;
-
 public class LexicalParserTest {
 
   private IEventHandler<IGenericLiteral> mockEventHandler;

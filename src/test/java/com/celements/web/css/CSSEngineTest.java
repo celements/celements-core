@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWikiContext;

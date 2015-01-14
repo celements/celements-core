@@ -20,6 +20,7 @@
 package com.celements.web.comparators;
 
 import java.util.Comparator;
+
 import com.xpn.xwiki.api.Attachment;
 
 public class AttachmentAscendingNameComparator implements Comparator<Attachment>{

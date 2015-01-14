@@ -27,9 +27,6 @@ import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.sajson.Builder;
-import com.celements.sajson.ECommand;
-
 public class BuilderTest {
 
   private Builder builder;

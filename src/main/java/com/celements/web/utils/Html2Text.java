@@ -20,6 +20,7 @@
 package com.celements.web.utils;
 import java.io.IOException;
 import java.io.Reader;
+
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 

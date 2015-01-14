@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;

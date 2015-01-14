@@ -20,7 +20,6 @@
 package com.celements.mandatory;
 
 import static org.easymock.EasyMock.*;
-
 import static org.junit.Assert.*;
 
 import org.junit.Before;
