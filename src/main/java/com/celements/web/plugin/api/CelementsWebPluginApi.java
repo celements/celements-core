@@ -86,7 +86,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
- * @Deprecated: since ???NEXTRELEASE???  instead use class {@link 
+ * @Deprecated: since 2.59 instead use class {@link 
  * CelementsWebScriptService} or a special named ScriptService
  *  
  */
@@ -95,14 +95,14 @@ public class CelementsWebPluginApi extends Api {
 
   
   /**
-   * @Deprecated: since ???NEXTRELEASE??? instead use variable in {@link CSSScriptService}
+   * @Deprecated: since 2.59 instead use variable in {@link CSSScriptService}
    *  
    */
   @Deprecated
   public static final String CELEMENTS_CSSCOMMAND = CSSScriptService.CELEMENTS_CSSCOMMAND;
 
   /**
-   * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link JSScriptService}
+   * @Deprecated: since 2.59 instead use variable in {@link JSScriptService}
    *  
    */
   @Deprecated
@@ -110,7 +110,7 @@ public class CelementsWebPluginApi extends Api {
       JSScriptService.JAVA_SCRIPT_FILES_COMMAND_KEY;
 
   /**
-   * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link 
+   * @Deprecated: since 2.59 instead use variable in {@link 
    * IWebUtilsService}
    *  
    */
@@ -126,7 +126,7 @@ public class CelementsWebPluginApi extends Api {
   private CelementsWebPlugin plugin;
 
   /**
-   * @deprecated since ???NEXTRELEASE???
+   * @deprecated since 2.59
    */
   @Deprecated
   public CelementsWebPluginApi(
@@ -137,7 +137,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE???
+   * @deprecated since 2.59
    */
   @Deprecated
   //FIXME must check programming Rights!!!
@@ -146,7 +146,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE???
+   * @deprecated since 2.59
    */
   @Deprecated
   //FIXME must not be public! why do we need it in the API class anyway?
@@ -155,7 +155,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link TreeNodeCache}
+   * @deprecated since 2.59 instead use {@link TreeNodeCache}
    * Do not call flushCache for MenuItem changes anymore.  
    * The TreeNodeDocument change listener take care of flushing the cache if needed.
    */
@@ -167,7 +167,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getLastStartupTimeStamp()}
    */
   @Deprecated
@@ -176,7 +176,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #resetLastStartupTimeStamp()}
    */
   @Deprecated
@@ -349,7 +349,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @Deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsService
+   * @Deprecated since 2.59 instead use {@link WebUtilsService
    * #getAttachmentListSortedSpace(String, String, boolean, int, int)}
    */
   @Deprecated
@@ -417,7 +417,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link ImageScriptService
+   * @deprecated since 2.59 instead use {@link ImageScriptService
    * #getRandomImages(String, int)} in the celements-photo-component Component
    */
   @Deprecated
@@ -427,7 +427,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getMessageTool(String)}
    */
   @Deprecated
@@ -436,7 +436,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? always celements3 mode by now
+   * @deprecated since 2.59 always celements3 mode by now
    */
   @Deprecated
   public String getVersionMode() {
@@ -444,7 +444,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link JSScriptService
+   * @deprecated since 2.59 instead use {@link JSScriptService
    * #getAllExternalJavaScriptFiles()}
    */
   @Deprecated
@@ -471,7 +471,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link JSScriptService
+   * @deprecated since 2.59 instead use {@link JSScriptService
    * #addExtJSfileOnce(String)}
    */
   @Deprecated
@@ -480,7 +480,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link JSScriptService
+   * @deprecated since 2.59 instead use {@link JSScriptService
    * #addExtJSfileOnce(String, String)}
    */
   @Deprecated
@@ -489,7 +489,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getUsernameForUserData(String)}
    */
   @Deprecated
@@ -498,7 +498,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getUsernameForUserData(String, String)}
    */
   @Deprecated
@@ -507,7 +507,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getNextObjPageId(SpaceReference, DocumentReference, String)}
    */
   @Deprecated  
@@ -522,7 +522,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getPasswordHash(String, String)}
    */
   @Deprecated
@@ -531,7 +531,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getPasswordHash(String)}
    */
   @Deprecated
@@ -540,7 +540,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #sendNewValidation(String, String)}
    */
   @Deprecated
@@ -549,7 +549,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #sendNewValidation(String, String, DocumentReference)}
    */
   @Deprecated
@@ -560,7 +560,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getNewValidationTokenForUser()}
    */
   @Deprecated
@@ -569,7 +569,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getNewCelementsTokenForUser()}
    */
   @Deprecated
@@ -578,7 +578,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getNewCelementsTokenForUser(Boolean)}
    */
   @Deprecated
@@ -587,7 +587,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getNewCelementsTokenForUser(Boolean, int)}
    */
   @Deprecated
@@ -611,7 +611,7 @@ public class CelementsWebPluginApi extends Api {
   //  }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
+   * @deprecated since 2.59 instead use {@link CSSScriptService
    * #getAllCSS()}
    */
   @Deprecated
@@ -620,7 +620,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
+   * @deprecated since 2.59 instead use {@link CSSScriptService
    * #displayAllCSS()}
    */
   @Deprecated
@@ -629,7 +629,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
+   * @deprecated since 2.59 instead use {@link CSSScriptService
    * #getRTEContentCSS()}
    */
   @Deprecated
@@ -638,7 +638,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
+   * @deprecated since 2.59 instead use {@link CSSScriptService
    * #includeCSSPage(String)}
    */
   @Deprecated
@@ -647,7 +647,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
+   * @deprecated since 2.59 instead use {@link CSSScriptService
    * #includeCSSAfterPreferences(String)}
    */
   @Deprecated
@@ -656,7 +656,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CSSScriptService
+   * @deprecated since 2.59 instead use {@link CSSScriptService
    * #includeCSSAfterSkin(String)}
    */
   @Deprecated
@@ -675,7 +675,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link EmptyCheckScriptService
+   * @deprecated since 2.59 instead use {@link EmptyCheckScriptService
    * #isEmptyRTEDocument(DocumentReference)}
    */
   @Deprecated  
@@ -684,7 +684,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getEmailAdressForCurrentUser()}
    */
   @Deprecated  
@@ -693,7 +693,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getEmailAdressForUser(String)}
    */
   @Deprecated
@@ -702,7 +702,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #activateAccount(String)}
    */
   @Deprecated
@@ -727,7 +727,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getDocumentParentsDocRefList(DocumentReference, boolean)}
    * 
    * Returns a list of all parent for a specified doc
@@ -760,7 +760,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
    * #getSkinConfigObj()}
    */
   @Deprecated
@@ -769,7 +769,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelMailScriptService
+   * @deprecated since 2.59 instead use {@link CelMailScriptService
    * #sendMail(String, String, String, String, String, String, String, String, List, Map)}
    */
   @Deprecated
@@ -783,7 +783,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getAttachmentsForDocs(List)}
    */
   @Deprecated
@@ -792,7 +792,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE???
+   * @deprecated since 2.59
    */
   @Deprecated
   public int sendLatin1Mail(
@@ -809,7 +809,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link NextFreeDocScriptService
+   * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
    * #getNextTitledPageDocRef(String, String)}
    */
   @Deprecated
@@ -828,7 +828,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link NextFreeDocScriptService
+   * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
    * #getNextUntitledPageFullName(String)}
    */
   public String getNextUntitledPageFullName(String space) {
@@ -836,7 +836,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link NextFreeDocScriptService
+   * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
    * #getNextUntitledPageName(String)}
    */
   public String getNextUntitledPageName(String space) {
@@ -844,7 +844,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
    * #showRightPanels()}
    */
   @Deprecated
@@ -853,7 +853,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
    * #showLeftPanels()}
    */
   @Deprecated
@@ -862,7 +862,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
    * #getRightPanels()}
    */
   @Deprecated
@@ -871,7 +871,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
    * #getLeftPanels()}
    */
   @Deprecated
@@ -880,7 +880,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getDocSectionAsJSON(String, DocumentReference, int)}
    */
   @Deprecated
@@ -891,7 +891,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #countSections(String, DocumentReference)}
    */
   @Deprecated
@@ -917,7 +917,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getAllowedLanguages()}
    */
   @Deprecated
@@ -926,7 +926,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getAllowedLanguages(String)}
    */
   @Deprecated
@@ -935,7 +935,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #createUser()}
    */
   @Deprecated
@@ -944,7 +944,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #createUser(boolean)}
    */
   @Deprecated
@@ -953,7 +953,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getUniqueValidationKey()}
    */
   @Deprecated
@@ -962,7 +962,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #recoverPassword()}
    */
   @Deprecated
@@ -971,7 +971,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #recoverPassword(String)}
    */
   @Deprecated
@@ -1029,7 +1029,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link RTEConfigScriptService
+   * @deprecated since 2.59 instead use {@link RTEConfigScriptService
    * #isEmptyRTEString(String)}
    */
   @Deprecated
@@ -1038,7 +1038,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getParentSpace()}
    */
   @Deprecated
@@ -1047,7 +1047,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link RTEConfigScriptService
+   * @deprecated since 2.59 instead use {@link RTEConfigScriptService
    * #getRTEConfigsList()}
    */
   @Deprecated
@@ -1056,7 +1056,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link RTEConfigScriptService
+   * @deprecated since 2.59 instead use {@link RTEConfigScriptService
    * #getRTEConfigField(String)}
    */
   @Deprecated
@@ -1065,7 +1065,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getJSONContent(Document)}
    */
   public String getJSONContent(Document contentDoc) {
@@ -1096,7 +1096,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getUserNameForDocRef(DocumentReference)}
    * 
    * @param authorDocName
@@ -1108,7 +1108,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsScriptService
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
    * #getMajorVersion(DocumentReference)}
    */
   @Deprecated
@@ -1125,7 +1125,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link DocFormScriptService
+   * @deprecated since 2.59 instead use {@link DocFormScriptService
    * #updateDocFromMap(String, Map)}
    */
   @Deprecated
@@ -1143,7 +1143,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link DocFormScriptService
+   * @deprecated since 2.59 instead use {@link DocFormScriptService
    * #updateDocFromRequest()}
    */
   @Deprecated
@@ -1152,7 +1152,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link DocFormScriptService
+   * @deprecated since 2.59 instead use {@link DocFormScriptService
    * #updateDocFromRequest(String)}
    */
   @Deprecated
@@ -1182,7 +1182,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link FileBaseScriptService
+   * @deprecated since 2.59 instead use {@link FileBaseScriptService
    * #tokenBasedUpload(String, String, String)}
    */
   @Deprecated
@@ -1192,7 +1192,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link FileBaseScriptService
+   * @deprecated since 2.59 instead use {@link FileBaseScriptService
    * #tokenBasedUpload(String, String, String, Boolean)}
    */
   @Deprecated
@@ -1204,7 +1204,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #checkAuthByToken(String)}
    * 
    * Check authentication from logincredential and password and set according persitent
@@ -1220,7 +1220,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #checkAuth(String, String, String, String)}
    * 
    * Check authentication from logincredential and password and set according persitent
@@ -1240,7 +1240,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #checkAuth(String, String, String, String, boolean)}
    * 
    * Check authentication from logincredential and password and set according persitent
@@ -1261,7 +1261,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated: since ???NEXTRELEASE??? instead use {@link EditorSupportScriptService
+   * @deprecated: since 2.59 instead use {@link EditorSupportScriptService
    * #validateField(String, String, String)}, Note: the validateField Method has an other
    * return parameter (Map<ValidationType, Set<String>> instead of String)
    *
@@ -1304,7 +1304,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #renderPageLayout(SpaceReference)}
    */
   @Deprecated
@@ -1313,7 +1313,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #renderCelementsDocumentWithLayout(DocumentReference, SpaceReference)}
    */
   @Deprecated
@@ -1324,7 +1324,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #getCurrentRenderingLayout()}
    */
   @Deprecated
@@ -1353,7 +1353,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #getPageLayoutForDoc(DocumentReference)}
    */
   @Deprecated
@@ -1362,7 +1362,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #renderPageLayout()}
    */
   @Deprecated
@@ -1381,7 +1381,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #addTranslation(DocumentReference, String)}
    */
   @Deprecated
@@ -1401,7 +1401,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #renameSpace(String, String)}
    */
   @Deprecated
@@ -1410,7 +1410,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #renameDoc(String, String)}
    */
   @Deprecated
@@ -1420,7 +1420,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getSupportedAdminLanguages()}
    */
   @Deprecated
@@ -1429,7 +1429,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #writeUTF8Response(String, String)}
    */
   @Deprecated
@@ -1475,7 +1475,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getCelementsWebAppVersion()}
    */
   @Deprecated
@@ -1484,7 +1484,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getCelementsWebCoreVersion()}
    */
   @Deprecated
@@ -1493,7 +1493,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #getActivePageLayouts()}
    */
   @Deprecated
@@ -1502,7 +1502,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #getAllPageLayouts()}
    */
   @Deprecated
@@ -1511,7 +1511,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebFormScriptService
+   * @deprecated since 2.59 instead use {@link WebFormScriptService
    * #isFormFilled()}
    */
   @Deprecated
@@ -1520,7 +1520,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebFormScriptService
+   * @deprecated since 2.59 instead use {@link WebFormScriptService
    * #isFormFilled(String)}
    */
   @Deprecated
@@ -1529,7 +1529,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #resetProgrammingRights()}
    */
   @Deprecated
@@ -1538,7 +1538,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #createNewLayout(String)}
    */
   @Deprecated
@@ -1547,7 +1547,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #deleteLayout(String)}
    */
   @Deprecated
@@ -1556,7 +1556,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #getPageLayoutApiForName(String)}
    */
   @Deprecated
@@ -1565,7 +1565,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link TreeNodeScriptService
+   * @deprecated since 2.59 instead use {@link TreeNodeScriptService
    * #navReorderSave(String, String)}
    */
   @Deprecated
@@ -1594,7 +1594,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #layoutEditorAvailable()}
    */
   @Deprecated
@@ -1734,7 +1734,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getEditURL(Document)}
    */
   @Deprecated
@@ -1743,7 +1743,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #isTranslationAvailable(Document, String)}
    */
   @Deprecated
@@ -1752,7 +1752,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #isValidLanguage()}
    */
   @Deprecated
@@ -1761,7 +1761,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? without replacement
+   * @deprecated since 2.59 without replacement
    */
   @Deprecated
   public DocumentCreationWorkerControlApi getTestDocumentCreationWorker() {
@@ -1769,7 +1769,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #clearFileName(String)}
    */
   @Deprecated
@@ -1787,7 +1787,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getDocHeaderTitle(DocumentReference)}
    */
   @Deprecated
@@ -1796,7 +1796,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #logDeprecatedVelocityScript(String)}
    */
   @Deprecated
@@ -1805,7 +1805,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #isValidUserJSON(String, String, String, List)}
    */
   @Deprecated
@@ -1832,7 +1832,7 @@ public class CelementsWebPluginApi extends Api {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #newObjectForFormStorage(Document, String)}
    */
   @Deprecated
@@ -1842,7 +1842,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CaptchaScriptService
+   * @deprecated since 2.59 instead use {@link CaptchaScriptService
    * #checkCaptcha()}
    */
   @Deprecated   
@@ -1851,7 +1851,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CaptchaScriptService
+   * @deprecated since 2.59 instead use {@link CaptchaScriptService
    * #getCaptchaId()}
    */
   @Deprecated 
@@ -1860,7 +1860,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getObjStoreOptionsMap(String)}
    * 
    * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as
@@ -1874,7 +1874,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LayoutScriptService
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
    * #useXWikiLoginLayout()}
    */
   @Deprecated 
@@ -1883,7 +1883,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getLogoutRedirectURL()}
    */
   @Deprecated
@@ -1892,7 +1892,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #getLoginRedirectURL()}
    */
   @Deprecated
@@ -1901,7 +1901,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #isCelementsRights(String)}
    */
   @Deprecated
@@ -1911,7 +1911,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link ActionScriptService
+   * @deprecated since 2.59 instead use {@link ActionScriptService
    * #executeAction(Document)}
    */
   @Deprecated
@@ -1920,7 +1920,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link ActionScriptService
+   * @deprecated since 2.59 instead use {@link ActionScriptService
    * #executeAction(Document, Map)}
    */
   @Deprecated
@@ -1932,7 +1932,7 @@ public class CelementsWebPluginApi extends Api {
   /**
    * API to check rights on a document for a given user or group
    * 
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationScriptService
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
    * #hasAccessLevel(String, String, boolean, String)}
    * 
    * @param level right to check (view, edit, comment, delete)
@@ -1965,7 +1965,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link EditorSupportScriptService
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
    * #getSuggestBaseClass(DocumentReference, String)}
    */
   @Deprecated
@@ -1975,7 +1975,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link EditorSupportScriptService
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
    * #getSuggestList(DocumentReference, String, String)}
    */
   @Deprecated
@@ -1985,7 +1985,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link EditorSupportScriptService
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
    * #getSuggestList(DocumentReference, String, List, String, String, String, int))}
    */
   @Deprecated
@@ -1996,7 +1996,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #getDefaultSpace()}
    */
   @Deprecated
@@ -2005,7 +2005,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebScriptService
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
    * #checkClasses()}
    */
   @Deprecated
@@ -2014,7 +2014,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link TreeNodeScriptService
+   * @deprecated since 2.59 instead use {@link TreeNodeScriptService
    * #getNextNonEmptyChildren(DocumentReference)}
    */
   @Deprecated

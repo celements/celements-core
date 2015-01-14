@@ -62,7 +62,7 @@ public class DocFormCommand {
   private final Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
 
   /**
-   * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link 
+   * @Deprecated: since 2.59  instead use variable in {@link 
    * #updateDocFromMap(DocumentReference, Map, XWikiContext)}
    */
   @Deprecated

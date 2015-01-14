@@ -248,7 +248,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link AuthenticationService
    * #getPasswordHash(String, String)}
    */
   @Deprecated
@@ -257,7 +257,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
    
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link AuthenticationService
    * #activateAccount(String)}
    */
   @Deprecated
@@ -267,7 +267,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * @deprecated since 2.59 instead use {@link CelementsWebService
    * #getEmailAdressForUser(DocumentReference)}
    */
   @Deprecated
@@ -327,7 +327,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebUtilsService
+   * @deprecated since 2.59 instead use {@link WebUtilsService
    * #getAttachmentsForDocs(List)}
    */
   @Deprecated 
@@ -385,7 +385,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * @deprecated since 2.59 instead use {@link CelementsWebService
    * #getUniqueNameValueRequestMap()}
    */
   @Deprecated 
@@ -394,7 +394,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * @deprecated since 2.59 instead use {@link CelementsWebService
    * #createUser(boolean)}
    */
   @Deprecated 
@@ -411,7 +411,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * @deprecated since 2.59 instead use {@link CelementsWebService
    * #createUser(Map, String, boolean)}
    */
   @Deprecated
@@ -496,7 +496,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link AuthenticationService
+   * @deprecated since 2.59 instead use {@link AuthenticationService
    * #checkAuth(String, String, String, String, Boolean)}
    */
   @Deprecated  
@@ -508,7 +508,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link ITreeNodeService
+   * @deprecated since 2.59 instead use {@link ITreeNodeService
    * #enableMappedMenuItems()}
    */
   @Deprecated
@@ -519,7 +519,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link ActionService
+   * @deprecated since 2.59 instead use {@link ActionService
    * #executeAction(Document, Map, XWikiDocument, XWikiContext)}
    */
   @Deprecated  
@@ -529,7 +529,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * @deprecated since 2.59 instead use {@link CelementsWebService
    * #getSupportedAdminLanguages()}
    */
   @Deprecated 
@@ -542,7 +542,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link CelementsWebService
+   * @deprecated since 2.59 instead use {@link CelementsWebService
    * #writeUTF8Response(String, String)}
    */
   @Deprecated 
@@ -552,7 +552,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link WebFormService
+   * @deprecated since 2.59 instead use {@link WebFormService
    * #isFormFilled(Map, Set)}
    */
   @Deprecated 

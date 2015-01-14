@@ -583,7 +583,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link EditorSupportScriptService
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
    * #validateRequest()}
    * 
    * @return empty map means the validation has been successful. Otherwise validation
@@ -609,7 +609,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since ???NEXTRELEASE??? instead use {@link LegacySkinScriptService
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
    * #getSkinConfigObj()}
    */
   @Deprecated
