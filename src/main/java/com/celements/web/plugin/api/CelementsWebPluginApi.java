@@ -99,24 +99,24 @@ public class CelementsWebPluginApi extends Api {
    *  
    */
   @Deprecated
-  public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
+  public static final String CELEMENTS_CSSCOMMAND = CSSScriptService.CELEMENTS_CSSCOMMAND;
 
   /**
    * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link JSScriptService}
    *  
    */
   @Deprecated
-  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
-      "com.celements.web.ExternalJavaScriptFilesCommand";
+  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY = 
+      JSScriptService.JAVA_SCRIPT_FILES_COMMAND_KEY;
 
   /**
    * @Deprecated: since ???NEXTRELEASE???  instead use variable in {@link 
-   * LayoutScriptService}
+   * IWebUtilsService}
    *  
    */
   @Deprecated
-  public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
-      "com.celements.web.PageLayoutCommand";
+  public static final String CELEMENTS_PAGE_LAYOUT_COMMAND = 
+      LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND;
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 

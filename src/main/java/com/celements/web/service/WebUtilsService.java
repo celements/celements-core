@@ -81,9 +81,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class WebUtilsService implements IWebUtilsService {
   
   private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
-
-  private static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
-      "com.celements.web.PageLayoutCommand";
   
   private static final String REGEX_WORD = "[a-zA-Z0-9]*";
   private static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
@@ -1177,10 +1174,12 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   private PageLayoutCommand getPageLayoutCmd() {
-    if (!getContext().containsKey(CELEMENTS_PAGE_LAYOUT_COMMAND)) {
-      getContext().put(CELEMENTS_PAGE_LAYOUT_COMMAND, new PageLayoutCommand());
+    if (!getContext().containsKey(LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND)) {
+      getContext().put(LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND, 
+          new PageLayoutCommand());
     }
-    return (PageLayoutCommand) getContext().get(CELEMENTS_PAGE_LAYOUT_COMMAND);
+    return (PageLayoutCommand) getContext().get(
+        LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
   @Deprecated

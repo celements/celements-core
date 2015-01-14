@@ -12,7 +12,7 @@ import com.xpn.xwiki.XWikiException;
 @Component("javascript")
 public class JSScriptService implements ScriptService {
   
-  private static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
+  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
       "com.celements.web.ExternalJavaScriptFilesCommand";
 
   @Requirement

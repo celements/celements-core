@@ -15,7 +15,7 @@ import com.xpn.xwiki.XWikiException;
 @Component("css")
 public class CSSScriptService implements ScriptService{
   
-  private static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
+  public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
   
   @Requirement
   private Execution execution;

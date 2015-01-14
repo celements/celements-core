@@ -11,6 +11,14 @@ import com.xpn.xwiki.XWikiContext;
 public interface IPrepareVelocityContext {
 
   public void prepareVelocityContext(VelocityContext vcontext);
+  
+  public static final String CEL_SUPPRESS_INVALID_LANG = "celSuppressInvalidLang";
+
+  public static final String CFG_LANGUAGE_SUPPRESS_INVALID =
+    "celements.language.suppressInvalid";
+
+  public static final String ADD_LANGUAGE_COOKIE_DONE =
+    "celements.addLanguageCookie.done";
 
   /**
    * @param context

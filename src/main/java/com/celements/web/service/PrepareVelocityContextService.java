@@ -47,14 +47,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
-  public static final String CEL_SUPPRESS_INVALID_LANG = "celSuppressInvalidLang";
-
-  public static final String CFG_LANGUAGE_SUPPRESS_INVALID =
-    "celements.language.suppressInvalid";
-
-  public static final String ADD_LANGUAGE_COOKIE_DONE =
-    "celements.addLanguageCookie.done";
-
   private static Logger _LOGGER  = LoggerFactory.getLogger(
       PrepareVelocityContextService.class);
 
