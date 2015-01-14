@@ -10,7 +10,6 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 @Component("legacyskin")
 public class LegacySkinScriptService implements ScriptService{
