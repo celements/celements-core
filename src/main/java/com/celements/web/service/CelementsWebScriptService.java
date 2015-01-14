@@ -656,7 +656,8 @@ public class CelementsWebScriptService implements ScriptService {
     try {
       XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
       if(/*(tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) != null)
-          && */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
+          && */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) 
+              == null)) {
         BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
         obj.setStringValue("attachment", tagValue);
         getContext().getWiki().saveDocument(tagDoc, getContext());
@@ -776,8 +777,8 @@ public class CelementsWebScriptService implements ScriptService {
     if (hasAdminRights()) {
       return new ResetProgrammingRightsCommand().resetCelements2webRigths(getContext());
     } else {
-      _LOGGER.warn("user [" + getContext().getUser() + "] tried to reset programming rights,"
-          + " but has no admin rights.");
+      _LOGGER.warn("user [" + getContext().getUser() 
+          + "] tried to reset programming rights, but has no admin rights.");
     }
     return false;
   }
@@ -804,7 +805,8 @@ public class CelementsWebScriptService implements ScriptService {
     return "N/A";
   }
   
-  public int getNextObjPageId(SpaceReference spaceRef, DocumentReference classRef, String propertyName) 
+  public int getNextObjPageId(SpaceReference spaceRef, DocumentReference classRef, 
+      String propertyName) 
       throws XWikiException{
     String sql = ", BaseObject as obj, IntegerProperty as art_id";
     sql += " where obj.name=doc.fullName";
