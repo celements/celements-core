@@ -16,7 +16,7 @@ public interface ICopyDocumentRole {
    * @return true if the given docs are different
    * @throws XWikiException
    */
-  boolean checkChanges(XWikiDocument doc1, XWikiDocument doc2) throws XWikiException;
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2) throws XWikiException;
 
   /**
    * Copies given source doc to given target doc and saves target if it has changed
@@ -38,6 +38,10 @@ public interface ICopyDocumentRole {
    * @throws XWikiException
    */
   public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc) throws XWikiException;
+
+  public boolean checkObject(BaseObject obj1, BaseObject obj2);
+
+  public boolean copyObject(BaseObject srcObj, BaseObject trgObj);
 
   /**
    * Reads out the value for the given BaseObject and name

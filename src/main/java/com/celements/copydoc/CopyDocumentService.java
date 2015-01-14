@@ -42,8 +42,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean checkChanges(XWikiDocument doc1, XWikiDocument doc2
-      ) throws XWikiException {
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2) throws XWikiException {
     return copyInternal(doc1, doc2, false);
   }
 
@@ -198,6 +197,16 @@ public class CopyDocumentService implements ICopyDocumentRole {
       }
     }
     return hasChanged;
+  }
+
+  @Override
+  public boolean checkObject(BaseObject obj1, BaseObject obj2) {
+    return copyObject(obj1, obj2, false);
+  }
+
+  @Override
+  public boolean copyObject(BaseObject srcObj, BaseObject trgObj) {
+    return copyObject(srcObj, trgObj, true);
   }
 
   boolean copyObject(BaseObject srcObj, BaseObject trgObj, boolean set) {
