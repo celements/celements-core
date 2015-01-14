@@ -377,11 +377,6 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     }
 
     @Override
-    protected List<String> getRequiredUpdateFields() {
-      return fields;
-    }
-
-    @Override
     protected Event getCreatingEvent(DocumentReference docRef) {
       assertEquals(AbstractDocumentUpdateListenerTest.this.docRef, docRef);
       return creatingEventMock;

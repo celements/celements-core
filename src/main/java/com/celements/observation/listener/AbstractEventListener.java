@@ -8,7 +8,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
 public abstract class AbstractEventListener implements EventListener {
@@ -18,9 +17,6 @@ public abstract class AbstractEventListener implements EventListener {
 
   @Requirement
   private ComponentManager componentManager;
-
-  @Requirement
-  private IWebUtilsService webUtilsService;
 
   @Requirement
   private Execution execution;
@@ -55,20 +51,18 @@ public abstract class AbstractEventListener implements EventListener {
     return !remoteObsManagerContext.isRemoteState();
   }
 
-  protected IWebUtilsService getWebUtilsService() {
-    return webUtilsService;
-  }
-
-  void injectRemoteObservationManagerContext(RemoteObservationManagerContext context) {
+  /**
+   * FOR TEST PURPOSES ONLY
+   */
+  public void injectRemoteObservationManagerContext(RemoteObservationManagerContext context) {
     this.remoteObsManagerContext = context;
   }
 
-  void injectObservationManager(ObservationManager observationManager) {
+  /**
+   * FOR TEST PURPOSES ONLY
+   */
+  public void injectObservationManager(ObservationManager observationManager) {
     this.observationManager = observationManager;
-  }
-
-  void injectWebUtilsService(IWebUtilsService webUtilsService) {
-    this.webUtilsService = webUtilsService;
   }
 
   void injecExecution(Execution execution) {

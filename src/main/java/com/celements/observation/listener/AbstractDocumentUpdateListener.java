@@ -22,7 +22,6 @@ package com.celements.observation.listener;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Requirement;
@@ -35,7 +34,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public abstract class AbstractDocumentUpdateListener extends AbstractDocumentListener {
 
   @Requirement
-  private ICopyDocumentRole copyDocService;
+  protected ICopyDocumentRole copyDocService;
 
   @Override
   public List<Event> getEvents() {
@@ -66,27 +65,9 @@ public abstract class AbstractDocumentUpdateListener extends AbstractDocumentLis
   }
 
   protected boolean isEventUpdate(BaseObject bObj, BaseObject origBObj) {
-    return (bObj != null) && (origBObj != null) && checkUpdateFields(bObj, origBObj);
+    return (bObj != null) && (origBObj != null) 
+        && copyDocService.checkObject(bObj, origBObj);
   }
-
-  private boolean checkUpdateFields(BaseObject bObj, BaseObject origBObj) {
-    boolean changed = false;
-    for (String name : getRequiredUpdateFields()) {
-      Object val = copyDocService.getValue(bObj, name);
-      Object origVal = copyDocService.getValue(origBObj, name);
-      if (!ObjectUtils.equals(val, origVal)) {
-        changed = true;
-        break;
-      }
-    }
-    return changed;
-  }
-
-  /**
-   * @return the names of the fields required to be changed on the required object on the
-   * triggered doc to qualify for notifying update events
-   */
-  protected abstract List<String> getRequiredUpdateFields();
 
   void injectCopyDocService(ICopyDocumentRole copyDocService) {
     this.copyDocService = copyDocService;
