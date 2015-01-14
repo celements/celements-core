@@ -9,7 +9,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.cmd.CelSendMail;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
 @Component("celmail")
@@ -19,10 +18,6 @@ public class CelMailScriptService implements ScriptService{
   
   @Requirement
   private Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
 
   public int sendMail(
       String from, String replyTo,

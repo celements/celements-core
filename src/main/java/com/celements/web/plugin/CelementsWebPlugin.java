@@ -84,8 +84,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   final String PARAM_LANGUAGE = "language";
   final String PARAM_XREDIRECT = "xredirect";
 
-  private List<String> supportedAdminLangList;
-
   private CelSendMail injectedCelSendMail;
 
   public CelementsWebPlugin(
@@ -538,7 +536,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   public void setSupportedAdminLanguages(List<String> newSupportedAdminLangList) {
-    supportedAdminLangList = newSupportedAdminLangList;
   }
 
   /**

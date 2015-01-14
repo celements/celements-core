@@ -53,6 +53,11 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
+/**
+ * 
+ * @deprecated since 2.59
+ */
+@Deprecated
 public class WebUtils implements IWebUtils {
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtils.class);

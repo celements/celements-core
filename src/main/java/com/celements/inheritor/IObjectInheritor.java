@@ -52,9 +52,7 @@ public interface IObjectInheritor {
   public Date getDateValue(String key);
   public Date getDateValue(String key, Date defaultValue);
   
-  @SuppressWarnings("unchecked")
   public List getListValue(String key);
-  @SuppressWarnings("unchecked")
   public List getListValue(String key, List defaultValue);
   
 }

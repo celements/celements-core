@@ -131,8 +131,4 @@ public class WebUtilsScriptService implements ScriptService {
   private boolean hasProgrammingRights() {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }
-
-  private boolean hasAdminRights() {
-    return getContext().getWiki().getRightService().hasAdminRights(getContext());
-  }
 }

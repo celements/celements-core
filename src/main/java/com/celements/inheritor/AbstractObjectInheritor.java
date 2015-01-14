@@ -116,12 +116,10 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
       return getObject(key).getDateValue(key);
   }
 
-  @SuppressWarnings("unchecked")
   public List getListValue(String key) {
     return getListValue(key, null);
   }
   
-  @SuppressWarnings("unchecked")
   public List getListValue(String key, List defaultValue) {
     if (getObject(key) == null)
       return defaultValue;

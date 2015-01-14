@@ -58,10 +58,6 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
   @Requirement
   Execution execution;
 
-  private XWikiContext getContext() {
-    return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-  }
-
   private ExecutionContext getExecContext() {
     return execution.getContext();
   }
