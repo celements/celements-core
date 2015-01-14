@@ -831,6 +831,7 @@ public class CelementsWebPluginApi extends Api {
    * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
    * #getNextUntitledPageFullName(String)}
    */
+  @Deprecated
   public String getNextUntitledPageFullName(String space) {
     return getNextFreeDocScriptService().getNextUntitledPageFullName(space);
   }
@@ -839,6 +840,7 @@ public class CelementsWebPluginApi extends Api {
    * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
    * #getNextUntitledPageName(String)}
    */
+  @Deprecated
   public String getNextUntitledPageName(String space) {
     return getNextFreeDocScriptService().getNextUntitledPageName(space);
   }
