@@ -94,3 +94,4 @@ com.celements.ftpclient.CelFTPClient
 com.celements.pagetype.java.JavaPageTypeProvider
 com.celements.copydoc.CopyDocumentService
 com.celements.webform.WebFormService
+com.celements.webform.WebFormScriptService
