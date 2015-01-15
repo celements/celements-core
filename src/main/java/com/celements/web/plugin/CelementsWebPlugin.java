@@ -535,7 +535,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return getCelementsWebService().getSupportedAdminLanguages();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #setSupportedAdminLanguages(List<String> newSupportedAdminLangList)}
+   */
+  @Deprecated 
   public void setSupportedAdminLanguages(List<String> newSupportedAdminLangList) {
+    getCelementsWebService().setSupportedAdminLanguages(newSupportedAdminLangList);
   }
 
   /**
@@ -556,46 +562,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public boolean isFormFilled(Map<String, String[]> parameterMap, 
       Set<String> additionalFields) {
     return getWebFormService().isFormFilled(parameterMap, additionalFields);
-  }
-  
-  short getIsFilledModifier(Map<String, String[]> parameterMap, 
-      Set<String> additionalFields) {
-    List<String> standardParams = new ArrayList<String>();
-    standardParams.add(PARAM_XPAGE);
-    standardParams.add(PARAM_CONF);
-    standardParams.add(PARAM_AJAX_MODE);
-    standardParams.add(PARAM_SKIN);
-    standardParams.add(PARAM_LANGUAGE);
-    standardParams.add(PARAM_XREDIRECT);
-    short modifier = 0;
-    if(parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_CONF) && 
-        arrayContains(parameterMap.get(PARAM_XPAGE), "overlay")) {
-      modifier += 1;
-    }
-    if(parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_AJAX_MODE) && 
-        arrayContains(parameterMap.get(PARAM_XPAGE), "celements_ajax")) {
-      modifier += 1;
-      if(parameterMap.containsKey(PARAM_SKIN)) {
-        modifier += 1;
-      }
-    }
-    if(parameterMap.containsKey(PARAM_XPAGE)) {
-      modifier += 1;
-    }
-    if(parameterMap.containsKey(PARAM_XREDIRECT)) {
-      modifier += 1;
-    }
-    if(parameterMap.containsKey(PARAM_LANGUAGE)) {
-      modifier += 1;
-    }
-    if((additionalFields != null) && additionalFields.size() > 0) {
-      for (String param : additionalFields) {
-        if(!standardParams.contains(param) && parameterMap.containsKey(param)) {
-          modifier += 1;
-        }
-      }
-    }
-    return modifier;
   }
   
   boolean arrayContains(String[] array, String value) {

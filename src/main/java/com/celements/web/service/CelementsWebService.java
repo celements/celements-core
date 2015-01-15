@@ -232,4 +232,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
           "Exception while sending response", e);
     }
   }
+
+  @Override
+  public void setSupportedAdminLanguages(List<String> supportedAdminLangList) {
+    this.supportedAdminLangList = supportedAdminLangList;
+  }
 }
