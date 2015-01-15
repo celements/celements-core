@@ -25,7 +25,7 @@ public class WebFormService implements IWebFormServiceRole {
     return isFilled;
   }
   
-  private short getIsFilledModifier(Map<String, String[]> parameterMap, 
+  short getIsFilledModifier(Map<String, String[]> parameterMap, 
       Set<String> additionalFields) {
     List<String> standardParams = new ArrayList<String>();
     standardParams.add(PARAM_XPAGE);
