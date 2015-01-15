@@ -31,6 +31,8 @@ import org.xwiki.captcha.CaptchaVerifier;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLifecycleException;
 
+import com.celements.captcha.CaptchaService;
+import com.celements.captcha.ICaptchaServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;

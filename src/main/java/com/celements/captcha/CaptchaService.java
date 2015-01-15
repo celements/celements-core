@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.service;
+package com.celements.captcha;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +47,7 @@ public class CaptchaService implements ICaptchaServiceRole {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override 
   public boolean checkCaptcha() {
     String answer = getContext().getRequest().get("captcha_answer");
     if((answer != null) && (answer.length() > 0)) {
@@ -75,10 +76,12 @@ public class CaptchaService implements ICaptchaServiceRole {
     return getContext().getRequest().get("captcha_type");
   }
 
+  @Override 
   public String getCaptchaId() {
     return getCaptchaId("image");
   }
 
+  @Override 
   public String getCaptchaId(String captchaType) {
     CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, captchaType);
     try {

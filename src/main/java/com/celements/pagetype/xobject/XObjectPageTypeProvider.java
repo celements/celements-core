@@ -33,7 +33,6 @@ import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 
 @Component(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
 public class XObjectPageTypeProvider implements IPageTypeProviderRole {
@@ -57,10 +56,6 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
 
   @Requirement
   Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-  }
 
   private ExecutionContext getExecContext() {
     return execution.getContext();

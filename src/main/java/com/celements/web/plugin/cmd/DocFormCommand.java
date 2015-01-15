@@ -63,9 +63,19 @@ public class DocFormCommand {
   private final Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
   private final Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
 
+  /**
+   * @Deprecated: since 2.59  instead use variable in {@link 
+   * #updateDocFromMap(DocumentReference, Map, XWikiContext)}
+   */
+  @Deprecated
   public Set<XWikiDocument> updateDocFromMap(String fullname, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    DocumentReference docRef = getWebUtilsService().resolveDocumentReference(fullname);
+    return updateDocFromMap(getWebUtilsService().resolveDocumentReference(fullname), 
+        data, context);
+  }
+
+  public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data,
+      XWikiContext context) throws XWikiException {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     String template = context.getRequest().getParameter("template");
     if(doc.isNew() && !"".equals(template.trim())) {

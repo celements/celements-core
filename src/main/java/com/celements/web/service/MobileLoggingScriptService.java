@@ -1,7 +1,7 @@
 package com.celements.web.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -13,7 +13,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component("mobileLogging")
 public class MobileLoggingScriptService implements ScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger _LOGGER  = LoggerFactory.getLogger(
       MobileLoggingScriptService.class);
 
   @Requirement
@@ -28,7 +28,7 @@ public class MobileLoggingScriptService implements ScriptService {
   }
 
   public String dimensionAndAgentLog(String message) {
-    LOGGER.info("dimensionAndAgentLog: mobileDim ["
+    _LOGGER.info("dimensionAndAgentLog: mobileDim ["
         + getContext().getRequest().getParameter("mobileDim") + "], userAgent ["
         + getContext().getRequest().getParameter("userAgent")
         + "], isOrientationLandscape [" + getContext().getRequest().getParameter(

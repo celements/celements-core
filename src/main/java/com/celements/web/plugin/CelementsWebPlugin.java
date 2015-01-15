@@ -19,12 +19,8 @@
  */
 package com.celements.web.plugin;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,43 +28,46 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.AuthenticationService;
+import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
+import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
-import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.service.CelementsWebService;
+import com.celements.web.service.ICelementsWebServiceRole;
 import com.celements.web.service.IPrepareVelocityContext;
 import com.celements.web.service.IWebUtilsService;
+import com.celements.web.service.WebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
+import com.celements.webform.ActionService;
+import com.celements.webform.IActionServiceRole;
+import com.celements.webform.IWebFormServiceRole;
+import com.celements.webform.WebFormService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiResponse;
 
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
@@ -83,8 +82,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   final String PARAM_SKIN = "skin";
   final String PARAM_LANGUAGE = "language";
   final String PARAM_XREDIRECT = "xredirect";
-
-  private List<String> supportedAdminLangList;
 
   private CelSendMail injectedCelSendMail;
 
@@ -246,47 +243,34 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return new NewCelementsTokenForUserCommand(
         ).getNewCelementsTokenForUserWithAuthentication(accountName, guestPlus, context);
   }
-  public String encryptString(String encoding, String str) {
-    return new PasswordClass().getEquivalentPassword(encoding, str);
-  }
   
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * #getPasswordHash(String, String)}
+   */
+  @Deprecated
+  public String encryptString(String encoding, String str) {
+    return getAuthenticationService().getPasswordHash(encoding, str);
+  }
+   
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * #activateAccount(String)}
+   */
+  @Deprecated
   public Map<String, String> activateAccount(String activationCode,
-      XWikiContext context) throws XWikiException{
-    Map<String, String> userAccount = new HashMap<String, String>();
-    String hashedCode = encryptString("hash:SHA-512:", activationCode);
-    String username = new UserNameForUserDataCommand().getUsernameForUserData(hashedCode,
-        "validkey", context);
-    
-    if((username != null) && !username.equals("")){
-      String password = context.getWiki().generateRandomString(24);
-      XWikiDocument doc = context.getWiki().getDocument(username, context);
-      BaseObject obj = doc.getObject("XWiki.XWikiUsers");
-
-//      obj.set("validkey", "", context);
-      obj.set("active", "1", context);
-      obj.set("force_pwd_change", "1", context);
-      obj.set("password", password, context);
-      
-      context.getWiki().saveDocument(doc, context);
-      
-      userAccount.put("username", username);
-      userAccount.put("password", password);
-    }
-    
-    return userAccount;
+      XWikiContext context) throws XWikiException{    
+    return getAuthenticationService().activateAccount(activationCode);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #getEmailAdressForUser(DocumentReference)}
+   */
+  @Deprecated
   public String getEmailAdressForUser(String username, XWikiContext context) {
-    if (context.getWiki().exists(username, context)) {
-      try {
-        XWikiDocument doc = context.getWiki().getDocument(username, context);
-        BaseObject obj = doc.getObject("XWiki.XWikiUsers");
-        return obj.getStringValue("email");
-      } catch (XWikiException e) {
-        LOGGER.error(e);
-      }
-    }
-    return null;
+    return getCelementsWebService().getEmailAdressForUser(
+        getWebUtilsService().resolveDocumentReference(username));
   }
   
   //TODO Delegation can be removed as soon as latin1 flag can be removed
@@ -338,24 +322,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     }
     return new CelSendMail(context);
   }
-    
+  
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsService
+   * #getAttachmentsForDocs(List)}
+   */
+  @Deprecated 
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN, XWikiContext context) {
-    List<Attachment> attachments = new ArrayList<Attachment>();
-    for(String docFN : docsFN) {
-      try {
-        LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
-        for(XWikiAttachment xwikiAttachment : context.getWiki().getDocument(
-            docFN, context).getAttachmentList()) {
-          LOGGER.info("getAttachmentsForDocs: adding attachment " + 
-              xwikiAttachment.getFilename() + " to list.");
-          attachments.add(new Attachment(context.getWiki().getDocument(
-              docFN, context).newDocument(context), xwikiAttachment, context));
-        }
-      } catch (XWikiException e) {
-        LOGGER.error(e);
-      }
-    }
-    return attachments;
+    return getWebUtilsService().getAttachmentsForDocs(docsFN);
   }
 
   /**
@@ -407,23 +381,22 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return Utils.getComponent(IPrepareVelocityContext.class);
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #getUniqueNameValueRequestMap()}
+   */
+  @Deprecated 
   public Map<String, String> getUniqueNameValueRequestMap(XWikiContext context) {
-    Map<String, String[]> params = context.getRequest().getParameterMap();
-    Map<String, String> resultMap = new HashMap<String, String>();
-    for (String key : params.keySet()) {
-      if((params.get(key) != null) && (params.get(key).length > 0)) {
-        resultMap.put(key, params.get(key)[0]);
-      } else {
-        resultMap.put(key, "");
-      }
-    }
-    return resultMap;
+    return getCelementsWebService().getUniqueNameValueRequestMap();
   }
   
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #createUser(boolean)}
+   */
+  @Deprecated 
   public int createUser(boolean validate, XWikiContext context) throws XWikiException{
-    String possibleLogins = getPossibleLogins(context);
-    return createUser(getUniqueNameValueRequestMap(context), possibleLogins, validate, context);
+    return getCelementsWebService().createUser(validate);
   }
 
   /**
@@ -434,88 +407,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return new PossibleLoginsCommand().getPossibleLogins();
   }
   
-  @SuppressWarnings("deprecation")
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #createUser(Map, String, boolean)}
+   */
+  @Deprecated
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate, XWikiContext context) throws XWikiException {
-    String accountName = "";
-    if(userData.containsKey("xwikiname")) {
-      accountName = userData.get("xwikiname");
-      userData.remove("xwikiname");
-    } else {
-      while(accountName.equals("") || context.getWiki().exists("XWiki." + accountName, context)){
-        accountName = context.getWiki().generateRandomString(12);
-      }
-    }
-    String validkey = "";
-    int success = -1;
-    if(areIdentifiersUnique(userData, possibleLogins, context)) {
-      if(!userData.containsKey("password")) {
-        String password = context.getWiki().generateRandomString(8);
-        userData.put("password", password);
-      }
-      if(!userData.containsKey("validkey")) {
-        validkey = getUniqueValidationKey(context);
-        userData.put("validkey", validkey);
-      } else {
-        validkey = userData.get("validkey");
-      }
-      if(!userData.containsKey("active")) {
-        userData.put("active", "0");
-      }
-      String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-      
-      //TODO as soon as all installations are on xwiki 1.8+ change to new method (using
-      //     XWikiDocument.XWIKI10_SYNTAXID as additional parameter
-      success = context.getWiki().createUser(accountName, userData, "XWiki.XWikiUsers",
-          content, "edit", context);
-    }
-    
-    if(success == 1){
-      // Set rights on user doc
-      XWikiDocument doc = context.getWiki().getDocument("XWiki." + accountName, context);
-      List<BaseObject> rightsObjs = doc.getObjects("XWiki.XWikiRights");
-      for (BaseObject rightObj : rightsObjs) {
-        if(rightObj.getStringValue("groups").equals("")){
-          rightObj.set("users", doc.getFullName(), context);
-          rightObj.set("allow", "1", context);
-          rightObj.set("levels", "view,edit,delete", context);
-          rightObj.set("groups", "", context);
-        } else{
-          rightObj.set("users", "", context);
-          rightObj.set("allow", "1", context);
-          rightObj.set("levels", "view,edit,delete", context);
-          rightObj.set("groups", "XWiki.XWikiAdminGroup", context);
-        }
-      }
-      context.getWiki().saveDocument(doc, context);
-      
-      if(validate) {
-        LOGGER.info("send account validation mail with data: accountname='" + accountName
-            + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
-        try{
-          new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(
-              userData.get("email"), validkey, "Tools.AccountActivationMail", context);
-        } catch(XWikiException e){
-          LOGGER.error("Exception while sending validation mail to '" + 
-              userData.get("email") + "'", e);
-        }
-      }
-    }
-    return success;
-  }
-
-  private boolean areIdentifiersUnique(Map<String, String> userData, 
-      String possibleLogins, XWikiContext context) throws XWikiException {
-    boolean isUnique = true;
-    for (String key : userData.keySet()) {
-      if(!"".equals(key.trim()) && (("," + possibleLogins + ",").indexOf("," + key + ",") >= 0)) {
-        String user = getUsernameForUserData(userData.get(key), possibleLogins, context);
-        if((user == null) || (user.length() > 0)) { //user == "" means there is no such user
-          isUnique = false;
-        }
-      }
-    }
-    return isUnique;
+    return getCelementsWebService().createUser(userData, possibleLogins, validate);
   }
 
   /**
@@ -593,192 +492,75 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     return null;
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationService
+   * #checkAuth(String, String, String, String, Boolean)}
+   */
+  @Deprecated  
   public XWikiUser checkAuth(String logincredential, String password,
         String rememberme, String possibleLogins, Boolean noRedirect, XWikiContext context
       ) throws XWikiException {
-    String loginname = getUsernameForUserData(logincredential, possibleLogins, context);
-    if ("".equals(loginname) && possibleLogins.matches("(.*,)?loginname(,.*)?")) {
-        loginname = logincredential;
-    }
-    if (noRedirect != null) {
-      context.put("ajax", noRedirect);
-    }
-    return context.getWiki().getAuthService().checkAuth(loginname, password, rememberme,
-        context);
+    return getAuthenticationService().checkAuth(logincredential, password, rememberme, 
+        possibleLogins, noRedirect);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link ITreeNodeService
+   * #enableMappedMenuItems()}
+   */
+  @Deprecated
   public void enableMappedMenuItems(XWikiContext context) {
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
     cmd.set_isActive(true);
     context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, cmd);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link ActionService
+   * #executeAction(Document, Map, XWikiDocument, XWikiContext)}
+   */
+  @Deprecated  
   public boolean executeAction(Document actionDoc, Map<String, String[]> request, 
       XWikiDocument includingDoc, XWikiContext context) {
-    LOGGER.info("Executing action on doc '" + actionDoc.getFullName() + "'");
-    VelocityContext vcontext = getVelocityManager().getVelocityContext();
-    vcontext.put("theDoc", actionDoc);
-    Boolean debug = (Boolean)vcontext.get("debug");
-    vcontext.put("debug", true);
-    Boolean hasedit = (Boolean)vcontext.get("hasedit");
-    vcontext.put("hasedit", true);
-    Object req = vcontext.get("request");
-    vcontext.put("request", getApiUsableMap(request));
-    XWikiDocument execAct = null;
-    try {
-      execAct = context.getWiki()
-          .getDocument("celements2web:Macros.executeActions", context);
-    } catch (XWikiException e) {
-      LOGGER.error("Could not get action Macro", e);
-    }
-    String execContent = "";
-    String actionContent = "";
-    if(execAct != null) {
-      vcontext.put("javaDebug", true);
-      execContent = execAct.getContent();
-      execContent = execContent.replaceAll("\\{(/?)pre\\}", "");
-      actionContent = context.getWiki().getRenderingEngine().interpretText(
-          execContent, includingDoc, context);
-    }
-    Object successfulObj = vcontext.get("successful");
-    boolean successful = (successfulObj != null)
-                          && "true".equals(successfulObj.toString());
-    if(!successful) {
-      LOGGER.error("executeAction: Error executing action. Output:" + vcontext.get(
-          "actionScriptOutput"));
-      LOGGER.error("executeAction: Rendered Action Script: " + actionContent);
-      LOGGER.error("executeAction: execAct == " + execAct);
-      LOGGER.error("executeAction: includingDoc: " + includingDoc);
-      LOGGER.error("executeAction: execContent length: " + execContent.length());
-      LOGGER.error("executeAction: execContent length: " + actionContent.length());
-      LOGGER.error("executeAction: vcontext (in variable) " + vcontext);
-      LOGGER.error("executeAction: vcontext (in context) " + 
-          getVelocityManager().getVelocityContext());
-    }
-    vcontext.put("debug", debug);
-    vcontext.put("hasedit", hasedit);
-    vcontext.put("request", req);
-    return successful;
+    return getActionService().executeAction(actionDoc, request, includingDoc, context);
   }
 
-  //FIXME Hack to get mail execution to work. The script is not expecting arrays in the
-  //      map, since it expects a request. Multiple values with the same name get lost 
-  //      in this "quick and dirty" fix
-  private Object getApiUsableMap(Map<String, String[]> request) {
-    Map<String, String> apiConform = new HashMap<String, String>();
-    for (String key : request.keySet()) {
-      if((request.get(key) != null) && (request.get(key).length > 0)) {
-        apiConform.put(key, request.get(key)[0]);
-      } else {
-        apiConform.put(key, null);
-      }
-    }
-    return apiConform;
-  }
-
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #getSupportedAdminLanguages()}
+   */
+  @Deprecated 
   public List<String> getSupportedAdminLanguages() {
-    if (supportedAdminLangList == null) {
-      setSupportedAdminLanguages(Arrays.asList(new String[] {"de","fr","en","it"}));
-    }
-    return supportedAdminLangList;
+    return getCelementsWebService().getSupportedAdminLanguages();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #setSupportedAdminLanguages(List<String> newSupportedAdminLangList)}
+   */
+  @Deprecated 
   public void setSupportedAdminLanguages(List<String> newSupportedAdminLangList) {
-    supportedAdminLangList = newSupportedAdminLangList;
+    getCelementsWebService().setSupportedAdminLanguages(newSupportedAdminLangList);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   * #writeUTF8Response(String, String)}
+   */
+  @Deprecated 
   public boolean writeUTF8Response(String filename, String renderDocFullName, 
       XWikiContext context) {
-    boolean success = false;
-    if(context.getWiki().exists(renderDocFullName, context)) {
-      XWikiDocument renderDoc;
-      try {
-        renderDoc = context.getWiki().getDocument(renderDocFullName, context);
-        adjustResponseHeader(filename, context.getResponse(), context);
-        setResponseContent(renderDoc, context.getResponse(), context);
-      } catch (XWikiException e) {
-        LOGGER.error(e);
-      }
-      context.setFinished(true);
-    }
-    return success;
-  }
-  
-  void adjustResponseHeader(String filename, XWikiResponse response, 
-      XWikiContext context) {
-    response.setContentType("text/plain");
-    String ofilename = Util.encodeURI(filename, context).replaceAll("\\+", " ");
-    response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename + 
-        "\"; charset='UTF-8'");
+    return getCelementsWebService().writeUTF8Response(filename, renderDocFullName);
   }
 
-  void setResponseContent(XWikiDocument renderDoc, XWikiResponse response,
-      XWikiContext context) throws XWikiException {
-    String renderedContent = new RenderCommand().renderDocument(renderDoc);
-    byte[] data = {};
-    try {
-      data = renderedContent.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException e1) {
-      e1.printStackTrace();
-    }
-    response.setContentLength(data.length + 3);
-    try {
-      response.getOutputStream().write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
-      response.getOutputStream().write(data);
-    } catch (IOException e) {
-      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-          XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-          "Exception while sending response", e);
-    }
-  }
-
+  /**
+   * @deprecated since 2.59 instead use {@link WebFormService
+   * #isFormFilled(Map, Set)}
+   */
+  @Deprecated 
   public boolean isFormFilled(Map<String, String[]> parameterMap, 
       Set<String> additionalFields) {
-    boolean isFilled = false;
-    if(parameterMap.size() > getIsFilledModifier(parameterMap, additionalFields)) {
-      isFilled = true;
-    }
-    return isFilled;
-  }
-  
-  short getIsFilledModifier(Map<String, String[]> parameterMap, 
-      Set<String> additionalFields) {
-    List<String> standardParams = new ArrayList<String>();
-    standardParams.add(PARAM_XPAGE);
-    standardParams.add(PARAM_CONF);
-    standardParams.add(PARAM_AJAX_MODE);
-    standardParams.add(PARAM_SKIN);
-    standardParams.add(PARAM_LANGUAGE);
-    standardParams.add(PARAM_XREDIRECT);
-    short modifier = 0;
-    if(parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_CONF) && 
-        arrayContains(parameterMap.get(PARAM_XPAGE), "overlay")) {
-      modifier += 1;
-    }
-    if(parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_AJAX_MODE) && 
-        arrayContains(parameterMap.get(PARAM_XPAGE), "celements_ajax")) {
-      modifier += 1;
-      if(parameterMap.containsKey(PARAM_SKIN)) {
-        modifier += 1;
-      }
-    }
-    if(parameterMap.containsKey(PARAM_XPAGE)) {
-      modifier += 1;
-    }
-    if(parameterMap.containsKey(PARAM_XREDIRECT)) {
-      modifier += 1;
-    }
-    if(parameterMap.containsKey(PARAM_LANGUAGE)) {
-      modifier += 1;
-    }
-    if((additionalFields != null) && additionalFields.size() > 0) {
-      for (String param : additionalFields) {
-        if(!standardParams.contains(param) && parameterMap.containsKey(param)) {
-          modifier += 1;
-        }
-      }
-    }
-    return modifier;
+    return getWebFormService().isFormFilled(parameterMap, additionalFields);
   }
   
   boolean arrayContains(String[] array, String value) {
@@ -791,15 +573,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    */
   @Deprecated
   public String getDefaultLanguage(XWikiContext context) {
-    return getWebService().getDefaultLanguage();
-  }
-
-  private IWebUtilsService getWebService() {
-    return Utils.getComponent(IWebUtilsService.class);
-  }
-
-  VelocityManager getVelocityManager() {
-    return Utils.getComponent(VelocityManager.class);
+    return getWebUtilsService().getDefaultLanguage();
   }
 
   /**
@@ -815,5 +589,24 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   public boolean addTranslation(String fullName, String language, XWikiContext context) {
     return new AddTranslationCommand().addTranslation(fullName, language, context);
   }
-
+  
+  private IAuthenticationServiceRole getAuthenticationService() {
+    return Utils.getComponent(IAuthenticationServiceRole.class);
+  }
+  
+  private IActionServiceRole getActionService() {
+    return Utils.getComponent(IActionServiceRole.class);
+  }
+  
+  private ICelementsWebServiceRole getCelementsWebService() {
+    return Utils.getComponent(ICelementsWebServiceRole.class);
+  }
+  
+  private IWebFormServiceRole getWebFormService() {
+    return Utils.getComponent(IWebFormServiceRole.class);
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
 }

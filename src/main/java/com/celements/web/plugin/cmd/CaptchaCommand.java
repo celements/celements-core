@@ -19,7 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
-import com.celements.web.service.ICaptchaServiceRole;
+import com.celements.captcha.ICaptchaServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
