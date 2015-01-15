@@ -33,7 +33,6 @@ import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 
 @Component(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
 public class XObjectPageTypeProvider implements IPageTypeProviderRole {

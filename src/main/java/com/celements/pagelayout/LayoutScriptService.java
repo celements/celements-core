@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.pagelayout;
 
 import java.util.Map;
 
@@ -16,6 +16,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.api.PageLayoutApi;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;

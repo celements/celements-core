@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.captcha;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;

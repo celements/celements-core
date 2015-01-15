@@ -55,6 +55,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.rendering.RenderCommand;

@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.webform;
 
 import java.util.Collections;
 import java.util.HashSet;

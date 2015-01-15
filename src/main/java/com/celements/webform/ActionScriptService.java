@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.webform;
 
 import java.util.ArrayList;
 import java.util.HashMap;

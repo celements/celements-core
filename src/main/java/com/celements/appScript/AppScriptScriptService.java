@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.appScript;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.appScript.IAppScriptService;
 import com.xpn.xwiki.util.Util;
 
 @Component("appscript")
@@ -48,5 +47,9 @@ public class AppScriptScriptService implements ScriptService {
   
   public String getAppScriptURL(String scriptName) {
     return appScriptService.getAppScriptURL(scriptName);
+  }
+  
+  public void setAppScriptService(IAppScriptService appScriptService) {
+    this.appScriptService = appScriptService;
   }
 }

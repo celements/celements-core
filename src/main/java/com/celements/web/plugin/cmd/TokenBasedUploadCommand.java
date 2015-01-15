@@ -22,7 +22,7 @@ package com.celements.web.plugin.cmd;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.celements.web.service.IAttachmentServiceRole;
+import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.auth;
 
 import java.util.Map;
 

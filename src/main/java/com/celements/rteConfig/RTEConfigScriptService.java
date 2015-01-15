@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.rteConfig;
 
 import java.util.List;
 
@@ -10,7 +10,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
-import com.celements.rteConfig.RTEConfig;
 import com.xpn.xwiki.XWikiException;
 
 @Component("rteconfig")

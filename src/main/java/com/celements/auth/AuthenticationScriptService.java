@@ -1,4 +1,4 @@
-package com.celements.web.service;
+package com.celements.auth;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +15,7 @@ import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RemoteUserValidator;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWiki;
