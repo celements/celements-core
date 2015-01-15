@@ -22,6 +22,10 @@ public class JSScriptService implements ScriptService {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public String getAllExternalJavaScriptFiles() throws XWikiException {
     return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
   }

@@ -24,14 +24,26 @@ public class CSSScriptService implements ScriptService{
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public List<CSS> getAllCSS() throws XWikiException{
     return getCssCmd().getAllCSS(getContext());
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public String displayAllCSS() throws XWikiException{
     return getCssCmd().displayAllCSS(getContext());
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public List<CSS> getRTEContentCSS() throws XWikiException{
     return getCssCmd().getRTEContentCSS(getContext());
   }
@@ -40,6 +52,10 @@ public class CSSScriptService implements ScriptService{
     getCssCmd().includeCSSPage(css, getContext());
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public void includeCSSAfterPreferences(String css) throws XWikiException{
     getCssCmd().includeCSSAfterPreferences(css, getContext());
   }

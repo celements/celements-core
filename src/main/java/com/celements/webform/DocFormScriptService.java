@@ -30,6 +30,10 @@ public class DocFormScriptService implements ScriptService{
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public Set<Document> updateDocFromMap(DocumentReference docRef, Map<String, ?> map
       ) throws XWikiException {
     Map<String, String[]> recompMap = new HashMap<String, String[]>();
@@ -49,10 +53,18 @@ public class DocFormScriptService implements ScriptService{
     return docs;
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public Set<Document> updateDocFromRequest() throws XWikiException {
     return updateDocFromRequest(null);
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   @SuppressWarnings("unchecked")
   public Set<Document> updateDocFromRequest(DocumentReference docRef
       ) throws XWikiException {

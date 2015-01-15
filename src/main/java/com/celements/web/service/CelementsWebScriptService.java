@@ -805,6 +805,10 @@ public class CelementsWebScriptService implements ScriptService {
     return "N/A";
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public int getNextObjPageId(SpaceReference spaceRef, DocumentReference classRef, 
       String propertyName) 
       throws XWikiException{
@@ -837,10 +841,18 @@ public class CelementsWebScriptService implements ScriptService {
     }
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public int createUser() throws XWikiException {
     return getCelementsWebService().createUser(true);
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public int createUser(boolean validate) throws XWikiException {
     return getCelementsWebService().createUser(validate);
   }

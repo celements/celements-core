@@ -163,23 +163,43 @@ public class AuthenticationScriptService implements ScriptService {
     return getNewCelementsTokenForUser(false);
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public Map<String, String> activateAccount(String activationCode) throws XWikiException{
     return authenticationService.activateAccount(activationCode);
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public String getUniqueValidationKey() throws XWikiException {
     return new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public String recoverPassword() throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
   }
 
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public String recoverPassword(String account) throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account,
         account);
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
     if (hasProgrammingRights()) {
       String username = getContext().getRequest().getParameter("username");
@@ -198,12 +218,20 @@ public class AuthenticationScriptService implements ScriptService {
     return null;
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
     return authenticationService.checkAuth(logincredential, password, rememberme, 
         possibleLogins, null);
   }
   
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins, boolean noRedirect) throws XWikiException {
     return authenticationService.checkAuth(logincredential, password, rememberme, 

@@ -44,8 +44,4 @@ public class FileBaseScriptService implements ScriptService{
     }
     return 0;
   }
-  
-//  private IWebUtilsService getWebUtilsService() {
-//    return Utils.getComponent(IWebUtilsService.class);
-//  }
 }
