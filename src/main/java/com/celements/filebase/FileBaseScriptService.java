@@ -13,7 +13,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
 
 @Component("filebase")
-public class FileBaseScriptService implements ScriptService{
+public class FileBaseScriptService implements ScriptService {
   
   @Requirement
   IWebUtilsService webUtilsService;
@@ -22,7 +22,14 @@ public class FileBaseScriptService implements ScriptService{
   
   @Requirement
   private Execution execution;
-  
+
+  @Requirement
+  IAttachmentServiceRole attachmentService;
+
+  public String clearFileName(String fileName) {
+    return attachmentService.clearFileName(fileName);
+  }
+
   public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
       String userToken) {
     return tokenBasedUpload(attachToDocRef, fieldName, userToken, false);

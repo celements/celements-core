@@ -254,14 +254,17 @@ public class AttachmentService implements IAttachmentServiceRole {
       return null;
     }
 
+    return clearFileName(filename);
+  }
+
+  @Override
+  public String clearFileName(String fileName) {
     // Issues fixed by the clearName :
-    // 1) Attaching images with a name containing special characters generates
-    // bugs
+    // 1) Attaching images with a name containing special characters generates bugs
     // (image are not displayed), XWIKI-2090.
-    // 2) Attached files that we can't delete or link in the Wiki pages,
-    // XWIKI-2087.
-    filename = getContext().getWiki().clearName(filename, false, true, getContext());
-    return filename;
+    // 2) Attached files that we can't delete or link in the Wiki pages, XWIKI-2087.
+    //TODO replace xwiki clearName with own fixed version allowing '_'
+    return getContext().getWiki().clearName(fileName, false, true, getContext());
   }
 
 }

@@ -45,6 +45,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
+import com.celements.filebase.FileBaseScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
@@ -743,8 +744,13 @@ public class CelementsWebScriptService implements ScriptService {
     return new DocHeaderTitleCommand().getDocHeaderTitle(docRef);
   }
   
+  /**
+   * @deprecated since 2.59.1 instead use clearFileName in FileBaseScriptService
+   */
+  @Deprecated
   public String clearFileName(String fileName) {
-    return getContext().getWiki().clearName(fileName, false, true, getContext());
+    return ((FileBaseScriptService)Utils.getComponent(ScriptService.class, "filebase")
+        ).clearFileName(fileName);
   }
   
   public boolean isTranslationAvailable(Document doc, String language) {

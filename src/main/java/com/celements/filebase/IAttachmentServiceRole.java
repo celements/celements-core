@@ -33,4 +33,6 @@ public interface IAttachmentServiceRole {
   public boolean uploadAttachment(String fieldName, String filename,
       FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException;
 
+  public String clearFileName(String fileName);
+
 }
