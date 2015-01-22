@@ -27,7 +27,7 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
   }
 
   @Test
-  public void testParse_keyword_content() {
+  public void testParse_whitelist_content() {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String fieldName = "content";
     String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + fieldName;
@@ -36,7 +36,7 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
   }
 
   @Test
-  public void testParse_keyword_content_noFullName() {
+  public void testParse_whitelist_content_noFullName() {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String keyString = "content";
     DocFormRequestKey key = parser.parse(keyString, docRef);
@@ -44,7 +44,7 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
   }
 
   @Test
-  public void testParse_keyword_title() {
+  public void testParse_whitelist_title() {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String fieldName = "title";
     String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + fieldName;
@@ -53,7 +53,7 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
   }
 
   @Test
-  public void testParse_keyword_title_noFullName() {
+  public void testParse_whitelist_title_noFullName() {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String keyString = "title";
     DocFormRequestKey key = parser.parse(keyString, docRef);
@@ -61,7 +61,7 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
   }
 
   @Test
-  public void testParse_keyword_other() {
+  public void testParse_whitelist_other() {
     DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
     String fieldName = "asdf";
     String keyString = serialize(docRef) + DocFormRequestKeyParser.KEY_DELIM + fieldName;
@@ -272,6 +272,14 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
         + DocFormRequestKeyParser.KEY_DELIM + "other4" 
         + DocFormRequestKeyParser.KEY_DELIM + "other5";
     assertNull(parser.parse(keyString, null));
+  }
+
+  @Test
+  public void testParse_skip_nb() {
+    DocumentReference docRef = new DocumentReference(db, "Space", "Doc");
+    DocumentReference classRef = new DocumentReference(db, "Classes", "Class");
+    String keyString = serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + "nb";
+    assertNull(parser.parse(keyString, docRef));
   }
   
   @Test
