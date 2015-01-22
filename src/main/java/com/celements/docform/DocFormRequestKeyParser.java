@@ -19,9 +19,9 @@ public class DocFormRequestKeyParser {
   private static Logger LOGGER = LoggerFactory.getLogger(DocFormRequestKeyParser.class);
 
   public static final String KEY_DELIM = "_";
-  public static final String REGEX_FULLNAME = "([a-zA-Z0-9]*\\:)?[a-zA-Z0-9]*\\.[a-zA-Z0-9]*";
+  public static final String REGEX_FULLNAME = "[a-zA-Z0-9]+\\.[a-zA-Z0-9]+";
   public static final String REGEX_OBJNB = "[-^]?(\\d)*";
-  public static final String REGEX_CONTENT_TITLE = "content|title";
+  public static final String REGEX_WHITELIST = "content|title";
 
   /**
    * Parses a given key string to {@link DocFormRequestKey} object
@@ -29,17 +29,25 @@ public class DocFormRequestKeyParser {
    * @param key syntax: "[fullName_]className_[-|^]objNb_fieldName" whereas fullName is 
    * optional and objNb can be preceded by "-" to create or "^" to delete the object
    * @param defaultDocRef used if no fullName is provided in the key
-   * @return
+   * @return key or null
    */
   public DocFormRequestKey parse(String key, DocumentReference defaultDocRef) {
     List<String> keyParts = new ArrayList<String>(Arrays.asList(key.split(KEY_DELIM)));
+    DocFormRequestKey ret;
     DocumentReference docRef = parseDocRef(keyParts, defaultDocRef);
-    DocumentReference classRef = parseClassRef(keyParts, docRef);
-    boolean remove = parseRemove(keyParts);
-    Integer objNb = parseObjNb(keyParts);
-    String fieldName = parseFieldName(keyParts);
-    DocFormRequestKey ret = new DocFormRequestKey(key, docRef, classRef, remove, objNb, 
-        fieldName);
+    if (isWhiteListKey(keyParts)) {
+      String fieldName = parseFieldName(keyParts);
+      ret = new DocFormRequestKey(key, docRef, null, false, null, fieldName);
+    } else if (isObjectFieldKey(keyParts)) {
+      DocumentReference classRef = parseClassRef(keyParts);
+      boolean remove = parseRemove(keyParts);
+      Integer objNb = parseObjNb(keyParts);
+      String fieldName = parseFieldName(keyParts);
+      ret = new DocFormRequestKey(key, docRef, classRef, remove, objNb, fieldName);
+    } else {
+      LOGGER.info("parse: skipped key '{}'", key);
+      ret = null;
+    }
     if (validate(ret)) {
       return ret;
     } else {
@@ -47,35 +55,33 @@ public class DocFormRequestKeyParser {
     }
   }
 
-  private boolean validate(DocFormRequestKey key) {
-    boolean valid = (key.getDocRef() != null);
-    if (!key.getFieldName().matches(REGEX_CONTENT_TITLE)) {
-      valid &= (key.getClassRef() != null);
-      valid &= (key.getObjNb() != null);
-      if (!key.isRemove()) {
-        valid &= StringUtils.isNotBlank(key.getFieldName());
-      }
-    }
-    return valid;
-  }
-
-  private DocumentReference parseDocRef(List<String> keyParts,
+  private DocumentReference parseDocRef(List<String> keyParts, 
       DocumentReference defaultDocRef) {
-    DocumentReference ret = defaultDocRef;
-    if (keyParts.size() > 1 && keyParts.get(0).matches(REGEX_FULLNAME) 
-        && (keyParts.get(1).matches(REGEX_FULLNAME) 
-        || keyParts.get(1).matches(REGEX_CONTENT_TITLE))) {
-      ret = getWebUtils().resolveDocumentReference(keyParts.remove(0));
+    DocumentReference ret = null;
+    if ((keyParts.size() > 1) && (keyParts.get(1).matches(REGEX_FULLNAME) 
+        || keyParts.get(1).matches(REGEX_WHITELIST))) {
+      String fullName = keyParts.remove(0);
+      if (fullName.matches(REGEX_FULLNAME)) {
+        ret = getWebUtils().resolveDocumentReference(fullName);
+      }
+    } else {
+      ret = defaultDocRef;
     }
     return ret;
   }
 
-  private DocumentReference parseClassRef(List<String> keyParts, 
-      DocumentReference docRef) {
+  private boolean isWhiteListKey(List<String> keyParts) {
+    return (keyParts.size() == 1) && keyParts.get(0).matches(REGEX_WHITELIST);
+  }
+
+  private boolean isObjectFieldKey(List<String> keyParts) {
+    return (keyParts.size() > 1) && keyParts.get(0).matches(REGEX_FULLNAME);
+  }
+
+  private DocumentReference parseClassRef(List<String> keyParts) {
     DocumentReference ret = null;
     if (getFirst(keyParts).matches(REGEX_FULLNAME)) {
-      ret = getWebUtils().resolveDocumentReference(keyParts.remove(0), 
-          getWebUtils().getWikiRef(docRef));
+      ret = getWebUtils().resolveDocumentReference(keyParts.remove(0));
     }
     return ret;
   }
@@ -107,11 +113,21 @@ public class DocFormRequestKeyParser {
     return StringUtils.join(keyParts.iterator(), KEY_DELIM);
   }
 
-  private String getFirst(List<String> list) {
-    if (list.size() > 0) {
-      return list.get(0);
+  private boolean validate(DocFormRequestKey key) {
+    boolean valid;
+    if (key != null) {
+      valid = (key.getDocRef() != null);
+      if (!key.getFieldName().matches(REGEX_WHITELIST)) {
+        valid &= (key.getClassRef() != null);
+        valid &= (key.getObjNb() != null);
+        if (!key.isRemove()) {
+          valid &= StringUtils.isNotBlank(key.getFieldName());
+        }
+      }
+    } else {
+      valid = true;
     }
-    return "";
+    return valid;
   }
 
   /**
@@ -119,7 +135,7 @@ public class DocFormRequestKeyParser {
    * See {@link #parse(String, DocumentReference)}
    * @param keys
    * @param defaultDocRef
-   * @return
+   * @return list of keys with no null elements
    */
   public Collection<DocFormRequestKey> parse(Collection<String> keys, 
       DocumentReference defaultDocRef) {
@@ -127,7 +143,7 @@ public class DocFormRequestKeyParser {
     for (String keyString : keys) {
       if (StringUtils.isNotBlank(keyString)) {
         DocFormRequestKey key = parse(keyString, defaultDocRef);
-        if (filterRequestKeySetForRemove(ret, key)) {
+        if ((key != null) && filterRequestKeySetForRemove(ret, key)) {
           ret.add(key);
         }
       }
@@ -150,6 +166,13 @@ public class DocFormRequestKeyParser {
       }
     }
     return ret;
+  }
+
+  private String getFirst(List<String> list) {
+    if (list.size() > 0) {
+      return list.get(0);
+    }
+    return "";
   }
 
   private IWebUtilsService getWebUtils() {
