@@ -10,7 +10,6 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 @Component("filebase")
@@ -23,10 +22,6 @@ public class FileBaseScriptService implements ScriptService{
   
   @Requirement
   private Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
   
   public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
       String userToken) {
@@ -36,9 +31,8 @@ public class FileBaseScriptService implements ScriptService{
   public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
       String userToken, Boolean createIfNotExists) {
     try {
-      return new TokenBasedUploadCommand().tokenBasedUpload(webUtilsService.
-          getRefLocalSerializer().serialize(attachToDocRef), fieldName, userToken,
-          createIfNotExists, getContext());
+      return new TokenBasedUploadCommand().tokenBasedUploadDocRef(attachToDocRef,
+          fieldName, userToken, createIfNotExists);
     } catch (XWikiException exp) {
       _LOGGER.error("token based attachment upload failed: ", exp);
     }
