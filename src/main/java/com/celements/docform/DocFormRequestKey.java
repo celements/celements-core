@@ -46,6 +46,11 @@ public class DocFormRequestKey {
     return fieldName;
   }
 
+  public boolean isWhiteListed() {
+    return (getClassRef() == null) && (getObjNb() == null) && getFieldName().matches(
+        DocFormRequestKeyParser.REGEX_WHITELIST);
+  }
+
   public boolean sameObject(DocFormRequestKey other) {
     return (this.classRef != null) && (this.objNb != null) && (this.objNb >= 0)
         && ObjectUtils.equals(this.classRef, other.classRef) 
