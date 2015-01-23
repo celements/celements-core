@@ -30,7 +30,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>  
   <artifactId>celements-core</artifactId>
-  <version>1.111-SNAPSHOT</version>
+  <version>1.111</version>
   <description>Celements Core</description> 
   <dependencies>    
     <!-- Add here all your dependencies -->
@@ -55,6 +55,6 @@
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-core.git</developerConnection>
     <url>https://github.com/celements/celements-core</url>
-    <tag>celements-core-1.41.2</tag>
+    <tag>celements-core-1.111</tag>
   </scm>
 </project>
