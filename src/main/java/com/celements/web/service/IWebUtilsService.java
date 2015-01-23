@@ -19,6 +19,7 @@
  */
 package com.celements.web.service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -131,35 +132,56 @@ public interface IWebUtilsService {
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
   public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
-
-  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator, boolean imagesOnly, int start, int nb
-      ) throws ClassNotFoundException;
   
-  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
-      String tagName, String comparator, boolean imagesOnly, int start, int nb
-      ) throws ClassNotFoundException;
-  
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
+  /**
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException;
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator);
+
+  /**
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, 
+   * boolean)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly);
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator, boolean imagesOnly);
+
+  /**
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, 
+   * boolean, int, int)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
-  
+
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb);
+
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
+
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
   public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
       String comparator, boolean imagesOnly, int start, int nb);
-  
+
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
+
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator,

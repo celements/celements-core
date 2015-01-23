@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -536,6 +537,103 @@ public class WebUtilsService implements IWebUtilsService {
     }
     return null;
   }
+
+  @Deprecated
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<Attachment> getAttachmentListSorted(Document doc,
+      String comparator) throws ClassNotFoundException {
+    List<Attachment> attachments = doc.getAttachmentList();
+
+    try {
+      Comparator<Attachment> comparatorClass =
+          (Comparator<Attachment>) Class.forName(
+              "com.celements.web.comparators." + comparator).newInstance();
+      Collections.sort(attachments, comparatorClass);
+    } catch (InstantiationException e) {
+      _LOGGER.error("getAttachmentListSorted failed.", e);
+    } catch (IllegalAccessException e) {
+      _LOGGER.error("getAttachmentListSorted failed.", e);
+    } catch (ClassNotFoundException e) {
+      throw e;
+    }
+
+    return attachments;
+  }
+
+  @Override
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator) {
+    return getAttachmentListSorted(doc, comparator, false);
+  }
+
+  @Deprecated
+  @Override
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly) {
+    return getAttachmentListSorted(doc, comparator, imagesOnly, 0, 0);
+  }
+
+  @Override
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator, boolean imagesOnly) {
+    return getAttachmentListSorted(doc, comparator, false, 0, 0);
+  }
+
+  @Deprecated
+  @Override
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
+      boolean imagesOnly, int start, int nb) {
+    return getAttachmentListForTagSorted(doc, null, comparator, imagesOnly, start, nb);
+  }
+
+  @Override
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb) {
+    List<XWikiAttachment> atts = new ArrayList<XWikiAttachment>(doc.getAttachmentList());
+    Collections.sort(atts, comparator);
+    if (imagesOnly) {
+      filterAttachmentsByImage(atts);
+    }
+    reduceListToSize(atts, start, nb);
+    return Collections.unmodifiableList(atts);
+  }
+
+  private void filterAttachmentsByImage(List<XWikiAttachment> atts) {
+    Iterator<XWikiAttachment> iter = atts.iterator();
+    while (iter.hasNext()) {
+      if (!iter.next().isImage(getContext())) {
+        iter.remove();
+      }
+    }
+  }
+
+  @Override
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getAttachmentListForTagSortedSpace(spaceName, null, comparator, imagesOnly, 
+        start, nb);
+  }
+
+  @Override
+  public List<Attachment> getAttachmentListForTagSorted(Document doc,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb) {
+    try {
+      List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
+      if (imagesOnly) {
+        for (Attachment att : new ArrayList<Attachment>(attachments)) {
+          if (!att.isImage()) {
+            attachments.remove(att);
+          }
+        }
+      }
+      return reduceListToSize(filterAttachmentsByTag(attachments, tagName), start, nb);
+    } catch (ClassNotFoundException exp) {
+      _LOGGER.error("getAttachmentListSorted failed.", exp);
+    }
+    return Collections.emptyList();
+  }
   
   @Override
   public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
@@ -572,78 +670,6 @@ public class WebUtilsService implements IWebUtilsService {
       }
     }
     return reduceListToSize(filterAttachmentsByTag(attachments, tagName), start, nb);
-  }
-
-  @Override
-  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator, boolean imagesOnly, int start, int nb
-      ) throws ClassNotFoundException {
-    return getAttachmentListForTagSortedSpace(spaceName, null, comparator, imagesOnly, 
-        start, nb);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException {
-    List<Attachment> attachments = doc.getAttachmentList();
-
-    try {
-      Comparator<Attachment> comparatorClass =
-          (Comparator<Attachment>) Class.forName(
-              "com.celements.web.comparators." + comparator).newInstance();
-      Collections.sort(attachments, comparatorClass);
-    } catch (InstantiationException e) {
-      _LOGGER.error("getAttachmentListSorted failed.", e);
-    } catch (IllegalAccessException e) {
-      _LOGGER.error("getAttachmentListSorted failed.", e);
-    } catch (ClassNotFoundException e) {
-      throw e;
-    }
-
-    return attachments;
-  }
-
-  List<Attachment> reduceListToSize(List<Attachment> attachments, int start, int nb) {
-    List<Attachment> countedAtts = new ArrayList<Attachment>();
-    if((start <= 0) && ((nb <= 0) || (nb >= attachments.size()))) {
-      countedAtts = attachments;
-    } else if(start < attachments.size()) {
-      countedAtts = attachments.subList(Math.max(0, start), Math.min(Math.max(0, start)
-          + Math.max(0, nb), attachments.size()));
-    }
-    return countedAtts;
-  }
-
-  @Override
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
-      boolean imagesOnly) {
-    return getAttachmentListSorted(doc, comparator, imagesOnly, 0, 0);
-  }
-
-  @Override
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
-      boolean imagesOnly, int start, int nb) {
-    return getAttachmentListForTagSorted(doc, null, comparator, imagesOnly, start, nb);
-  }
-
-  @Override
-  public List<Attachment> getAttachmentListForTagSorted(Document doc,
-      String tagName, String comparator, boolean imagesOnly, int start, int nb) {
-    try {
-      List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
-      if (imagesOnly) {
-        for (Attachment att : new ArrayList<Attachment>(attachments)) {
-          if (!att.isImage()) {
-            attachments.remove(att);
-          }
-        }
-      }
-      return reduceListToSize(filterAttachmentsByTag(attachments, tagName), start, nb);
-    } catch (ClassNotFoundException exp) {
-      _LOGGER.error("getAttachmentListSorted failed.", exp);
-    }
-    return Collections.emptyList();
   }
   
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
@@ -700,6 +726,17 @@ public class WebUtilsService implements IWebUtilsService {
     }
     jsonBuilder.closeArray();
     return jsonBuilder.getJSON();
+  }
+
+  <T> List<T> reduceListToSize(List<T> list, int start, int nb) {
+    List<T> countedAtts = new ArrayList<T>();
+    if ((start <= 0) && ((nb <= 0) || (nb >= list.size()))) {
+      countedAtts = list;
+    } else if (start < list.size()) {
+      countedAtts = list.subList(Math.max(0, start), Math.min(Math.max(0, start) 
+          + Math.max(0, nb), list.size()));
+    }
+    return countedAtts;
   }
 
   Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc,
