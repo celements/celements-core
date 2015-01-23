@@ -137,14 +137,18 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
     DocFormRequestKey key = new DocFormRequestKeyParser().parse("A.B_0_hi", docRef);
     DocumentReference classRef = new DocumentReference(db, "A", "B");
+    BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     expect(docMock.getXObject(eq(classRef), eq(0))).andReturn(null).once();
+    expect(docMock.newXObject(eq(classRef), same(context))).andReturn(objMock).once();
     String value = "value";
+    objMock.set(eq("hi"), eq(value), same(context));
+    expectLastCall().once();
     
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key, value, context);
     verifyDefault();
     
-    assertNull(docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
+    assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
   }
   
   @Test

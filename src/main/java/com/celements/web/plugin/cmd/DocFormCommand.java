@@ -148,7 +148,7 @@ public class DocFormCommand {
     BaseObject obj = changedObjects.get(getObjCacheKey(key));
     if(obj == null) {
       obj = doc.getXObject(key.getClassRef(), key.getObjNb());
-      if((obj == null) && (key.getObjNb() < 0)) {
+      if((obj == null) || (key.getObjNb() < 0)) {
         obj = doc.newXObject(key.getClassRef(), context);
         LOGGER.debug("setOrRemoveObj: new obj for key '{}'", key);
       }
