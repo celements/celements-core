@@ -119,7 +119,7 @@ public class DocFormRequestKeyParser {
     boolean valid;
     if (key != null) {
       valid = (key.getDocRef() != null);
-      if (!key.getFieldName().matches(REGEX_WHITELIST)) {
+      if (!key.isWhiteListed()) {
         valid &= (key.getClassRef() != null);
         valid &= (key.getObjNb() != null);
         if (!key.isRemove()) {

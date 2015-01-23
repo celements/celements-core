@@ -91,15 +91,17 @@ public class DocFormCommand {
     }
     DocFormRequestKeyParser parser = new DocFormRequestKeyParser();
     for (DocFormRequestKey key : parser.parse(data.keySet(), docRef)) {
-      LOGGER.debug("request key:'" + key.getKeyString() + "'=value:" + data.get(
-          key.getKeyString()).length);
       String value = collapse(data.get(key.getKeyString()));
-      if (key.getFieldName().equals("content")) {
+      LOGGER.debug("updateDocFromMap: request key '{}' with value '{}'", key, value);
+      if (key.isWhiteListed()) {
         XWikiDocument tSaveDoc = getTranslatedDoc(key.getDocRef(), context);
-        tSaveDoc.setContent(value);
-      } else if(key.getFieldName().equals("title")) {
-        XWikiDocument tSaveDoc = getTranslatedDoc(key.getDocRef(), context);
-        tSaveDoc.setTitle(value);
+        if (key.getFieldName().equals("content")) {
+          tSaveDoc.setContent(value);
+        } else if(key.getFieldName().equals("title")) {
+          tSaveDoc.setTitle(value);
+        } else {
+          LOGGER.info("updateDocFromMap: unknown field name in key '{}'", key);
+        }
       } else {
         XWikiDocument saveDoc = getUpdateDoc(key.getDocRef(), context);
         setOrRemoveObj(saveDoc, key, value, context);
