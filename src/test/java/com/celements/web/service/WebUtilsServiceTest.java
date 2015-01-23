@@ -22,6 +22,10 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
+import com.celements.web.comparators.XWikiAttachmentAscendingNameComparator;
+import com.celements.web.comparators.XWikiAttachmentDescendingChangeDateComparator;
+import com.celements.web.comparators.XWikiAttachmentDescendingNameComparator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -1686,6 +1690,175 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testResolveEntityTypeForFullName_invalid() {
     String fullName = "mySpace_myDoc";
     assertNull(webUtilsService.resolveEntityTypeForFullName(fullName));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_none() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Collections.<XWikiAttachment>emptyList()
+        ).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, null);
+    verifyDefault();
+    
+    assertEquals(0, ret.size());
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_single() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att)).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, null);
+    verifyDefault();
+    
+    assertEquals(1, ret.size());
+    assertSame(att, ret.get(0));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_noComparator() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, null);
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att1, ret.get(0));
+    assertSame(att2, ret.get(1));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_name_asc() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
+    expect(att1.getFilename()).andReturn("name2").once();
+    expect(att2.getFilename()).andReturn("name1").once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, 
+        new XWikiAttachmentAscendingNameComparator());
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att2, ret.get(0));
+    assertSame(att1, ret.get(1));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_name_desc() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
+    expect(att1.getFilename()).andReturn("name1").once();
+    expect(att2.getFilename()).andReturn("name2").once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, 
+        new XWikiAttachmentDescendingNameComparator());
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att2, ret.get(0));
+    assertSame(att1, ret.get(1));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_date_asc() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
+    expect(att1.getDate()).andReturn(new Date(1)).once();
+    expect(att2.getDate()).andReturn(new Date(0)).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, 
+        new XWikiAttachmentAscendingChangeDateComparator());
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att2, ret.get(0));
+    assertSame(att1, ret.get(1));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_date_desc() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2)).once();
+    expect(att1.getDate()).andReturn(new Date(0)).once();
+    expect(att2.getDate()).andReturn(new Date(1)).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, 
+        new XWikiAttachmentDescendingChangeDateComparator());
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att2, ret.get(0));
+    assertSame(att1, ret.get(1));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_imageOnly() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att3 = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2, att3)).once();
+    expect(att1.isImage(same(context))).andReturn(true).once();
+    expect(att2.isImage(same(context))).andReturn(false).once();
+    expect(att3.isImage(same(context))).andReturn(true).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, null, 
+        true);
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att1, ret.get(0));
+    assertSame(att3, ret.get(1));
+  }
+
+  @Test
+  public void testGetAttachmentListSorted_reduced() {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att1 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att2 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att3 = createMockAndAddToDefault(XWikiAttachment.class);
+    XWikiAttachment att4 = createMockAndAddToDefault(XWikiAttachment.class);
+    
+    expect(docMock.getAttachmentList()).andReturn(Arrays.asList(att1, att2, att3, att4)
+        ).once();
+    
+    replayDefault();
+    List<XWikiAttachment> ret = webUtilsService.getAttachmentListSorted(docMock, null, 
+        false, 1, 2);
+    verifyDefault();
+    
+    assertEquals(2, ret.size());
+    assertSame(att2, ret.get(0));
+    assertSame(att3, ret.get(1));
   }
 
   //*****************************************************************

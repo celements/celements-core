@@ -577,7 +577,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
       Comparator<XWikiAttachment> comparator, boolean imagesOnly) {
-    return getAttachmentListSorted(doc, comparator, false, 0, 0);
+    return getAttachmentListSorted(doc, comparator, imagesOnly, 0, 0);
   }
 
   @Deprecated
@@ -591,12 +591,13 @@ public class WebUtilsService implements IWebUtilsService {
   public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
       Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb) {
     List<XWikiAttachment> atts = new ArrayList<XWikiAttachment>(doc.getAttachmentList());
-    Collections.sort(atts, comparator);
+    if (comparator != null) {
+      Collections.sort(atts, comparator);
+    }
     if (imagesOnly) {
       filterAttachmentsByImage(atts);
     }
-    reduceListToSize(atts, start, nb);
-    return Collections.unmodifiableList(atts);
+    return Collections.unmodifiableList(reduceListToSize(atts, start, nb));
   }
 
   private void filterAttachmentsByImage(List<XWikiAttachment> atts) {
