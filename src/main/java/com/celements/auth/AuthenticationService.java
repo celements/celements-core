@@ -52,8 +52,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
     if((username != null) && !username.equals("")){
       String password = getContext().getWiki().generateRandomString(24);
 
-      DocumentReference userDocRef = webUtilsService.resolveDocumentReference(getContext(
-          ).getUser());
+      DocumentReference userDocRef = webUtilsService.resolveDocumentReference(username);
       _LOGGER.debug("activateAccount: userDocRef = " + userDocRef);
       XWikiDocument doc = getContext().getWiki().getDocument(userDocRef, getContext());
       _LOGGER.debug("activateAccount: userDoc = " + doc);
