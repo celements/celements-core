@@ -23,8 +23,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @Component
 public class AuthenticationService implements IAuthenticationServiceRole {
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(
-      CelementsWebScriptService.class);
+  private static Logger _LOGGER  = LoggerFactory.getLogger(AuthenticationService.class);
   
   @Requirement
   private IWebUtilsService webUtilsService;
