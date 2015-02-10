@@ -1206,8 +1206,8 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
-   * #checkAuthByToken(String)}
+   * @deprecated since 2.59 method dropped. Login happens automated, when token and 
+   *    username are set in request 
    * 
    * Check authentication from logincredential and password and set according persitent
    * login information If it fails user is unlogged
@@ -1218,7 +1218,14 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
-    return getAuthenticationScriptService().checkAuthByToken(userToken);
+    if(hasProgrammingRights()){
+      LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
+      return plugin.checkAuthByToken(userToken, context);
+    } else {
+      LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
+          + context.get("sdoc") + "]: checkAuthByToken cannot be executed!");
+    }
+    return null;
   }
   
   /**

@@ -200,28 +200,6 @@ public class AuthenticationScriptService implements ScriptService {
    * TODO: Please get rid of throwing an exception to the view (client), use try/catch
    * and write the exception in a log-file
    */
-  public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
-    if (hasProgrammingRights()) {
-      String username = getContext().getRequest().getParameter("username");
-      _LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
-      XWikiAuthService authService = getContext().getWiki().getAuthService();
-      if (authService instanceof TokenLDAPAuthServiceImpl) {
-        return ((TokenLDAPAuthServiceImpl) authService).checkAuthByToken(username, 
-            userToken, getContext());
-      } else {
-        _LOGGER.warn("checkAuthByToken: Not using TokenLDAPAuthService");
-      }
-    } else {
-      _LOGGER.debug("checkAuthByToken: missing ProgrammingRights for ["
-          + getContext().get("sdoc") + "]: checkAuthByToken cannot be executed!");
-    }
-    return null;
-  }
-  
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
-   */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
     return authenticationService.checkAuth(logincredential, password, rememberme, 

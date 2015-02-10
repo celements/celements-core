@@ -476,7 +476,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    * @return
    * @throws XWikiException
    * 
-   * @deprecated since 2.14.0 use TokenLDAPAuthServiceImpl instead
+   * @deprecated since 2.14.0 dropped. Set token and username in request for automated
+   *    login.
    */
   @Deprecated
   public XWikiUser checkAuthByToken(String userToken, XWikiContext context
