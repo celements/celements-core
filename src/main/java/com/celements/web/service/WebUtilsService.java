@@ -745,7 +745,7 @@ public class WebUtilsService implements IWebUtilsService {
       boolean bWithAttachmentContent, boolean bWithVersions) throws XWikiException {
     Map<String,String> docData = new LinkedHashMap<String, String>();
     DocumentReference docRef = xwikiDoc.getDocumentReference();
-    docData.put("web", docRef .getLastSpaceReference().getName());
+    docData.put("web", docRef.getLastSpaceReference().getName());
     docData.put("name", docRef.getName());
     docData.put("language", xwikiDoc.getLanguage());
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
