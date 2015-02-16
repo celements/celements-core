@@ -56,11 +56,13 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
+import com.celements.rights.AccessLevel;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
@@ -75,6 +77,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -127,6 +131,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement
   IDefaultEmptyDocStrategyRole emptyChecker;
+
+  @Requirement
+  INextFreeDocRole nextFreeDocService;
 
   @Requirement
   Execution execution;
@@ -518,6 +525,34 @@ public class WebUtilsService implements IWebUtilsService {
       _LOGGER.error("Failed to get user document for [" + user + "].", exp);
     }
     return false;
+  }
+
+  @Override
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
+      ) throws XWikiException {
+    return hasAccessLevel(ref, level, getContext().getXWikiUser());
+  }
+
+  @Override
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
+      ) throws XWikiException {
+    boolean ret = false;
+    DocumentReference docRef = null;
+    if (ref instanceof SpaceReference) {
+      docRef = nextFreeDocService.getNextUntitledPageDocRef((SpaceReference) ref);
+    } else if (ref instanceof DocumentReference) {
+      docRef = (DocumentReference) ref;
+    } else if (ref instanceof AttachmentReference) {
+      docRef = ((AttachmentReference) ref).getDocumentReference();
+    }
+    if (docRef != null) {
+      ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
+          (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
+          serializeRef(docRef), getContext());
+    }
+    _LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", 
+        ref, level, user, ret);
+    return ret;
   }
 
   @Override

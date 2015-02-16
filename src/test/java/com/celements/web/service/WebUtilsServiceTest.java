@@ -22,6 +22,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.nextfreedoc.INextFreeDocRole;
+import com.celements.rights.AccessLevel;
 import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
 import com.celements.web.comparators.XWikiAttachmentAscendingNameComparator;
 import com.celements.web.comparators.XWikiAttachmentDescendingChangeDateComparator;
@@ -36,6 +38,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -615,6 +618,84 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertNotNull(context.getXWikiUser());
     assertNotNull(context.getDoc());
     assertFalse(webUtilsService.isAdvancedAdmin());
+    verifyDefault(mockRightsService);
+  }
+
+  @Test
+  public void testHasAccessLevel_docRef() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
+        "MyDocument");
+    AccessLevel level = AccessLevel.EDIT;
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
+        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
+        ).andReturn(true).once();
+    
+    replayDefault(mockRightsService);
+    assertTrue(webUtilsService.hasAccessLevel(docRef, level));
+    verifyDefault(mockRightsService);
+  }
+
+  @Test
+  public void testHasAccessLevel_spaceRef() throws Exception {
+    SpaceReference spaceRef = new SpaceReference("MySpace", webUtilsService.getWikiRef());
+    DocumentReference docRef = new DocumentReference("untitled1", spaceRef);
+    AccessLevel level = AccessLevel.EDIT;
+    INextFreeDocRole nextFreeDocServiceMock = createMock(INextFreeDocRole.class);
+    webUtilsService.nextFreeDocService = nextFreeDocServiceMock;
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
+        docRef).once();
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
+        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
+        ).andReturn(true).once();
+    
+    replayDefault(mockRightsService, nextFreeDocServiceMock);
+    assertTrue(webUtilsService.hasAccessLevel(spaceRef, level));
+    verifyDefault(mockRightsService, nextFreeDocServiceMock);
+  }
+
+  @Test
+  public void testHasAccessLevel_attRef() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
+        "MyDocument");
+    AttachmentReference attRef = new AttachmentReference("file", docRef);
+    AccessLevel level = AccessLevel.EDIT;
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
+        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
+        ).andReturn(true).once();
+    
+    replayDefault(mockRightsService);
+    assertTrue(webUtilsService.hasAccessLevel(attRef, level));
+    verifyDefault(mockRightsService);
+  }
+
+  @Test
+  public void testHasAccessLevel_wikiRefRef() throws Exception {
+    AccessLevel level = AccessLevel.EDIT;
+    
+    replayDefault();
+    assertFalse(webUtilsService.hasAccessLevel(webUtilsService.getWikiRef(), level));
+    verifyDefault();
+  }
+
+  @Test
+  public void testHasAccessLevel_user() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
+        "MyDocument");
+    AccessLevel level = AccessLevel.VIEW;
+    XWikiUser user = new XWikiUser("MySpace.MyUser");
+    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(user.getUser()), 
+        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(false).once();
+    
+    replayDefault(mockRightsService);
+    assertFalse(webUtilsService.hasAccessLevel(docRef, level, user));
     verifyDefault(mockRightsService);
   }
 

@@ -33,12 +33,14 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.rights.AccessLevel;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
@@ -128,6 +130,12 @@ public interface IWebUtilsService {
   public boolean isAdvancedAdmin();
 
   public boolean isSuperAdminUser();
+
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
+      ) throws XWikiException;
+
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
+      ) throws XWikiException;
 
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
