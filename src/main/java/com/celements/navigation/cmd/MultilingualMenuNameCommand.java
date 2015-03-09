@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.cmd;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
@@ -101,7 +102,7 @@ public class MultilingualMenuNameCommand {
       menuName = menuNameObj.getStringValue("menu_name");
     }
     // if menuName is empty give back the DocURLname
-    if ((!allowEmptyMenuNames) && "".equals(menuName)) {
+    if ((!allowEmptyMenuNames) && StringUtils.isEmpty(menuName)) {
       menuName = fullName.substring(fullName.indexOf('.') + 1);
     }
     return menuName;
