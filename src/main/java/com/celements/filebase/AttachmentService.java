@@ -35,12 +35,15 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiResponse;
 
 /**
@@ -56,6 +59,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 public class AttachmentService implements IAttachmentServiceRole {
 
   private static Logger _LOGGER  = LoggerFactory.getLogger(AttachmentService.class);
+  XWikiMessageTool _injectedMsgTool;
 
   /** The prefix of the corresponding filename input field name. */
   private static final String FILENAME_FIELD_NAME = "filename";
@@ -126,10 +130,10 @@ public class AttachmentService implements IAttachmentServiceRole {
     params.add(filename);
     params.add(doc.getAttachmentRevisionURL(filename, nextRev, getContext()));
     if (attachment.isImage(getContext())) {
-      comment = getContext().getMessageTool().get("core.comment.uploadImageComment",
+      comment = getMessageTool().get("core.comment.uploadImageComment",
           params);
     } else {
-      comment = getContext().getMessageTool().get("core.comment.uploadAttachmentComment",
+      comment = getMessageTool().get("core.comment.uploadAttachmentComment",
           params);
     }
 
@@ -336,6 +340,75 @@ public class AttachmentService implements IAttachmentServiceRole {
     }
   
     return fileName;
+  }
+  
+  public int deleteAttachmentList(List<AttachmentReference> attachmentRefList) {
+    int nrDeleted = 0;
+    if(attachmentRefList != null) {
+      nrDeleted = deleteAttachmentMap(buildAttachmentsToDeleteMap(attachmentRefList));
+    }
+    return nrDeleted;
+  }
+
+  Map<DocumentReference, List<String>> buildAttachmentsToDeleteMap(
+      List<AttachmentReference> attachmentRefList) {
+    Map<DocumentReference, List<String>> attachmentMap = 
+        new HashMap<DocumentReference, List<String>>();
+    for(AttachmentReference attRef : attachmentRefList) {
+      DocumentReference docRef = attRef.getDocumentReference();
+      if(attachmentMap.containsKey(docRef)) {
+        List<String> attList = attachmentMap.get(docRef);
+        attList.add(attRef.getName());
+        attachmentMap.put(docRef, attList);
+      } else {
+        List<String> attList = new ArrayList<String>();
+        attList.add(attRef.getName());
+        attachmentMap.put(docRef, attList);
+      }
+    }
+    return attachmentMap;
+  }
+  
+  int deleteAttachmentMap(Map<DocumentReference, List<String>> attachmentMap) {
+    int nrDeleted = 0;
+    for(DocumentReference docRef : attachmentMap.keySet()) {
+      int nrDeletedOnDoc = 0;
+      try {
+        XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+        //Analogue to class DeleteAttachmentAction
+        String versionCommentList = "";
+        for(String filename : attachmentMap.get(docRef)) {
+            XWikiAttachment attachment = doc.getAttachment(filename);
+            if (attachment != null) {
+              versionCommentList += ", " + filename;
+              doc.deleteAttachment(attachment, getContext());
+              nrDeletedOnDoc++;
+            }
+        }
+        if(nrDeletedOnDoc > 0) {
+          doc.setAuthor(getContext().getUser());
+          // Set "deleted attachment" as the version comment.
+          doc.setComment(getMessageTool().get("core.comment.deleteAttachmentComment", 
+              Arrays.asList(versionCommentList.substring(2))));
+          // Needed to counter a side effect of XWIKI-1982: the attachment is deleted from
+          // the newdoc.originalDoc as well
+          doc.setOriginalDocument(doc);
+          // Also save the document and attachment metadata
+          getContext().getWiki().saveDocument(doc, getContext());
+        }
+        nrDeleted += nrDeletedOnDoc;
+      }catch(XWikiException xwe) {
+        _LOGGER.error("Exception deleting Attachments on doch " + docRef, xwe);
+      }
+    }
+    return nrDeleted;
+  }
+
+  XWikiMessageTool getMessageTool() {
+    if(_injectedMsgTool != null) {
+      return _injectedMsgTool;
+    }
+    return getContext().getMessageTool();
   }
 
 }
