@@ -130,11 +130,9 @@ public class AttachmentService implements IAttachmentServiceRole {
     params.add(filename);
     params.add(doc.getAttachmentRevisionURL(filename, nextRev, getContext()));
     if (attachment.isImage(getContext())) {
-      comment = getMessageTool().get("core.comment.uploadImageComment",
-          params);
+      comment = getMessageTool().get("core.comment.uploadImageComment", params);
     } else {
-      comment = getMessageTool().get("core.comment.uploadAttachmentComment",
-          params);
+      comment = getMessageTool().get("core.comment.uploadAttachmentComment", params);
     }
 
     // Save the document.
@@ -344,7 +342,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   
   public int deleteAttachmentList(List<AttachmentReference> attachmentRefList) {
     int nrDeleted = 0;
-    if(attachmentRefList != null) {
+    if (attachmentRefList != null) {
       nrDeleted = deleteAttachmentMap(buildAttachmentsToDeleteMap(attachmentRefList));
     }
     return nrDeleted;
@@ -354,9 +352,9 @@ public class AttachmentService implements IAttachmentServiceRole {
       List<AttachmentReference> attachmentRefList) {
     Map<DocumentReference, List<String>> attachmentMap = 
         new HashMap<DocumentReference, List<String>>();
-    for(AttachmentReference attRef : attachmentRefList) {
+    for (AttachmentReference attRef : attachmentRefList) {
       DocumentReference docRef = attRef.getDocumentReference();
-      if(attachmentMap.containsKey(docRef)) {
+      if (attachmentMap.containsKey(docRef)) {
         List<String> attList = attachmentMap.get(docRef);
         attList.add(attRef.getName());
         attachmentMap.put(docRef, attList);
@@ -371,13 +369,13 @@ public class AttachmentService implements IAttachmentServiceRole {
   
   int deleteAttachmentMap(Map<DocumentReference, List<String>> attachmentMap) {
     int nrDeleted = 0;
-    for(DocumentReference docRef : attachmentMap.keySet()) {
+    for (DocumentReference docRef : attachmentMap.keySet()) {
       int nrDeletedOnDoc = 0;
       try {
         XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
         //Analogue to class DeleteAttachmentAction
         String versionCommentList = "";
-        for(String filename : attachmentMap.get(docRef)) {
+        for (String filename : attachmentMap.get(docRef)) {
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (attachment != null) {
               versionCommentList += ", " + filename;
@@ -385,7 +383,7 @@ public class AttachmentService implements IAttachmentServiceRole {
               nrDeletedOnDoc++;
             }
         }
-        if(nrDeletedOnDoc > 0) {
+        if (nrDeletedOnDoc > 0) {
           doc.setAuthor(getContext().getUser());
           // Set "deleted attachment" as the version comment.
           doc.setComment(getMessageTool().get("core.comment.deleteAttachmentComment", 
@@ -397,7 +395,7 @@ public class AttachmentService implements IAttachmentServiceRole {
           getContext().getWiki().saveDocument(doc, getContext());
         }
         nrDeleted += nrDeletedOnDoc;
-      }catch(XWikiException xwe) {
+      } catch (XWikiException xwe) {
         _LOGGER.error("Exception deleting Attachments on doch " + docRef, xwe);
       }
     }
@@ -405,7 +403,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   }
 
   XWikiMessageTool getMessageTool() {
-    if(_injectedMsgTool != null) {
+    if (_injectedMsgTool != null) {
       return _injectedMsgTool;
     }
     return getContext().getMessageTool();
