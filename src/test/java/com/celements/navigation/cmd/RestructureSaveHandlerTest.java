@@ -179,7 +179,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
         ).getClass());
   }
   
-  //TODO uncleare if the serialization of DocumentRefrence or EntityReference is wrong
+  //TODO unclear if the serialization of DocumentRefrence or EntityReference is wrong
   //TODO and leads to database prefixes saved in the parent values.
   @Test
   public void testParentReference_entityReference() {
