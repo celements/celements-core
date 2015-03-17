@@ -19,7 +19,10 @@
  */
 package com.celements.filebase;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -35,4 +38,5 @@ public interface IAttachmentServiceRole {
 
   public String clearFileName(String fileName);
 
+  public int deleteAttachmentList(List<AttachmentReference> attachmentRefList);
 }

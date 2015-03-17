@@ -1,10 +1,13 @@
 package com.celements.filebase;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -44,5 +47,9 @@ public class FileBaseScriptService implements ScriptService {
       _LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
+  }
+  
+  public int deleteAttachmentList(List<AttachmentReference> attachmentRefList) {
+    return attachmentService.deleteAttachmentList(attachmentRefList);
   }
 }
