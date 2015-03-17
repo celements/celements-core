@@ -128,7 +128,6 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
   }
 
   short compareWithNullValue(Object val1, Object val2) {
-    System.out.println("comparing " + val1 + " with " + val2);
     if((val1 == null) || ((val1 instanceof BaseProperty) 
         && (((BaseProperty) val1).getValue() == null))) {
       if((val2 == null) || ((val2 instanceof BaseProperty) 
