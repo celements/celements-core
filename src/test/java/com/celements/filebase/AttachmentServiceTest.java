@@ -34,7 +34,6 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
   public void setUp_AttachmentServiceTest() throws ComponentLookupException, Exception {
     attService = (AttachmentService) getComponentManager().lookup(
         IAttachmentServiceRole.class);
-    getContext().setWiki(createMock(XWiki.class));
   }
   
   @Test
@@ -91,16 +90,14 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     attList.add(new AttachmentReference(name1, docRef));
     attList.add(new AttachmentReference(name2, docRef));
     attList.add(new AttachmentReference(name3, docRef));
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     expect(getContext().getWiki().getDocument(eq(docRef), same(getContext()))
         ).andReturn(doc).once();
     doc.setAuthor(eq(getContext().getUser()));
     expectLastCall();
     String comment = "deleted attachments " + names;
-    XWikiMessageTool msgTool = createMock(XWikiMessageTool.class);
-    attService._injectedMsgTool = msgTool;
-    expect(msgTool.get((String)anyObject(), eq(Arrays.asList(names)))
-        ).andReturn(comment).once();
+    ((TestMessageTool)getContext().getMessageTool()).injectMessage("core.comment." +
+              "deleteAttachmentComment", Arrays.asList(names), comment);
     doc.setComment(eq(comment));
     expectLastCall();
     doc.setOriginalDocument(same(doc));
@@ -119,9 +116,9 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     expect(doc.getAttachment(name3)).andReturn(att3).once();
     doc.deleteAttachment(same(att3), same(getContext()));
     expectLastCall();
-    replayDefault(getContext().getWiki(), doc, msgTool);
+    replayDefault();
     assertEquals(3, attService.deleteAttachmentList(attList));
-    verifyDefault(getContext().getWiki(), doc, msgTool);
+    verifyDefault();
   }
   
   @Test
@@ -143,30 +140,28 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     attList.add(new AttachmentReference(name3, docRef));
     attList.add(new AttachmentReference(name4, docRef2));
     attList.add(new AttachmentReference(name5, docRef));
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     expect(getContext().getWiki().getDocument(eq(docRef), same(getContext()))
         ).andReturn(doc).once();
     doc.setAuthor(eq(getContext().getUser()));
     expectLastCall();
     String comment = "deleted attachments " + names;
-    XWikiMessageTool msgTool = createMock(XWikiMessageTool.class);
-    attService._injectedMsgTool = msgTool;
-    expect(msgTool.get((String)anyObject(), eq(Arrays.asList(names)))
-        ).andReturn(comment).once();
+    ((TestMessageTool)getContext().getMessageTool()).injectMessage("core.comment." +
+        "deleteAttachmentComment", Arrays.asList(names), comment);
     doc.setComment(eq(comment));
     expectLastCall();
     doc.setOriginalDocument(same(doc));
     expectLastCall();
     getContext().getWiki().saveDocument(same(doc), same(getContext()));
     expectLastCall();
-    XWikiDocument doc2 = createMock(XWikiDocument.class);
+    XWikiDocument doc2 = createMockAndAddToDefault(XWikiDocument.class);
     expect(getContext().getWiki().getDocument(eq(docRef2), same(getContext()))
         ).andReturn(doc2).once();
     doc2.setAuthor(eq(getContext().getUser()));
     expectLastCall();
     String comment2 = "deleted attachments " + names2;
-    expect(msgTool.get((String)anyObject(), eq(Arrays.asList(names2)))
-        ).andReturn(comment2).once();
+    ((TestMessageTool)getContext().getMessageTool()).injectMessage("core.comment." +
+        "deleteAttachmentComment", Arrays.asList(names2), comment2);
     doc2.setComment(eq(comment2));
     expectLastCall();
     doc2.setOriginalDocument(same(doc2));
@@ -190,9 +185,9 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     expect(doc.getAttachment(name5)).andReturn(att5).once();
     doc.deleteAttachment(same(att5), same(getContext()));
     expectLastCall();
-    replayDefault(getContext().getWiki(), doc, doc2, msgTool);
+    replayDefault();
     assertEquals(4, attService.deleteAttachmentList(attList));
-    verifyDefault(getContext().getWiki(), doc, doc2, msgTool);
+    verifyDefault();
   }
   
   @Test
