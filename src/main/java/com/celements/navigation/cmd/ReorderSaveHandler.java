@@ -42,7 +42,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       ReorderSaveHandler.class);
   private XWikiContext context;
-  private EntityReference parentRef;
+  private DocumentReference parentRef;
   private EReorderLiteral currentCommand;
   private Integer currentPos;
   private Set<EntityReference> dirtyParents;
@@ -94,7 +94,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
     }
   }
 
-  EntityReference getParentReference() {
+  DocumentReference getParentReference() {
     return parentRef;
   }
 
@@ -116,7 +116,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
    * FOR TESTS ONLY!!!
    * @param object 
    */
-  void inject_ParentRef(EntityReference newParent) {
+  void inject_ParentRef(DocumentReference newParent) {
     parentRef = newParent;
   }
 
@@ -139,7 +139,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
           XWikiDocument xdoc = context.getWiki().getDocument(docRef, context);
           if (hasDiffParentReferences(xdoc.getParentReference())) {
             markParentDirty(xdoc.getParentReference());
-            xdoc.setParentReference(getParentReference());
+            xdoc.setParentReference((EntityReference)getParentReference());
             markParentDirty(getParentReference());
             updateNeeded = true;
           }

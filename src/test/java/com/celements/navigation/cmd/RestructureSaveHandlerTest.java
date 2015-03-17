@@ -26,8 +26,10 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -109,7 +111,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testIsDiffParentReferences_oldRef_Null() {
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(null);
     replayDefault();
@@ -119,7 +121,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testIsDiffParentReferences_newRef_Null() {
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     replayDefault();
@@ -129,9 +131,9 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testIsDiffParentReferences_newRef_changed() {
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
-    EntityReference parentRef2 = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc2");
     restrSaveCmd.inject_ParentRef(parentRef);
     replayDefault();
@@ -149,14 +151,52 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testIsDiffParentReferences_newRef_same() {
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
-    EntityReference parentRef2 = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     replayDefault();
     assertFalse(restrSaveCmd.hasDiffParentReferences(parentRef2));
     verifyDefault();
+  }
+
+  @Test
+  public void testParentReference_DocumentReference_entityRef() {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
+        "MySpace", "MyDoc1");
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(),
+        "MySpace", "ParentDoc");
+    xdoc.setParentReference((EntityReference)parentRef);
+    assertEquals(xdoc.getParentReference().getClass(), DocumentReference.class);
+  }
+
+  @Test
+  public void testConvertToDocRef() {
+    String parentFN = "MySpace.ParentDoc";
+    assertEquals(DocumentReference.class, restrSaveCmd.convertToDocRef(parentFN
+        ).getClass());
+  }
+  
+  //TODO uncleare if the serialization of DocumentRefrence or EntityReference is wrong
+  //TODO and leads to database prefixes saved in the parent values.
+  @Test
+  public void testParentReference_entityReference() {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
+        "MySpace", "MyDoc1");
+    XWikiDocument xdoc = new XWikiDocument(docRef);
+    EntityReference parentRef = new EntityReference("ParentDoc", EntityType.DOCUMENT,
+        new EntityReference("MySpace", EntityType.SPACE,
+            new EntityReference(getContext().getDatabase(), EntityType.WIKI)));
+    xdoc.setParentReference(parentRef);
+    assertEquals(xdoc.getParentReference().getClass(), DocumentReference.class);
+    EntityReferenceResolver<String> relativResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
+    String parentFN = "MySpace.ParentDoc";
+    EntityReference parentEntityRef = relativResolver.resolve(parentFN,
+        EntityType.DOCUMENT);
+    assertEquals(parentEntityRef.getClass(), EntityReference.class);
   }
 
   @Test
@@ -174,7 +214,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testStringEvent_onlyPosition() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -204,7 +244,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testStringEvent_onlyParents() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -237,7 +277,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testStringEvent_parentsAndPosition() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -301,7 +341,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testStringEvent_noChanges() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
-    EntityReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
