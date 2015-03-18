@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -179,24 +178,14 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
         ).getClass());
   }
   
-  //TODO unclear if the serialization of DocumentRefrence or EntityReference is wrong
-  //TODO and leads to database prefixes saved in the parent values.
   @Test
-  public void testParentReference_entityReference() {
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "MyDoc1");
-    XWikiDocument xdoc = new XWikiDocument(docRef);
-    EntityReference parentRef = new EntityReference("ParentDoc", EntityType.DOCUMENT,
-        new EntityReference("MySpace", EntityType.SPACE,
-            new EntityReference(getContext().getDatabase(), EntityType.WIKI)));
-    xdoc.setParentReference(parentRef);
-    assertEquals(xdoc.getParentReference().getClass(), DocumentReference.class);
-    EntityReferenceResolver<String> relativResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
-    String parentFN = "MySpace.ParentDoc";
-    EntityReference parentEntityRef = relativResolver.resolve(parentFN,
-        EntityType.DOCUMENT);
+  public void testGetRelativeParentReference() {
+    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(),
+        "MySpace", "ParentDoc");
+    restrSaveCmd.inject_ParentRef(parentRef);
+    EntityReference parentEntityRef = restrSaveCmd.getRelativeParentReference();
     assertEquals(parentEntityRef.getClass(), EntityReference.class);
+    assertNull(parentEntityRef.extractReference(EntityType.WIKI));
   }
 
   @Test

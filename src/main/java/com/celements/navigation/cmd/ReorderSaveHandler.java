@@ -25,8 +25,10 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.sajson.AbstractEventHandler;
@@ -139,7 +141,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
           XWikiDocument xdoc = context.getWiki().getDocument(docRef, context);
           if (hasDiffParentReferences(xdoc.getParentReference())) {
             markParentDirty(xdoc.getParentReference());
-            xdoc.setParentReference((EntityReference)getParentReference());
+            xdoc.setParentReference(getRelativeParentReference());
             markParentDirty(getParentReference());
             updateNeeded = true;
           }
@@ -167,6 +169,13 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
       throw new IllegalStateException("stringEvent: expecting element_id but"
           + " found [" + currentCommand + "] with parent [" + getParentFN() + "].");
     }
+  }
+
+  EntityReference getRelativeParentReference() {
+    @SuppressWarnings("unchecked")
+    EntityReferenceResolver<String> relativResolver = Utils.getComponent(
+        EntityReferenceResolver.class, "relative");
+    return relativResolver.resolve(getParentFN(), EntityType.DOCUMENT);
   }
 
   boolean hasDiffParentReferences(EntityReference parentReference) {
