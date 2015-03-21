@@ -119,6 +119,7 @@ public class ContentInheritor {
       throw new IllegalStateException("No IteratorFactory given.");
     }
     DocumentIterator iterator = getIteratorFactory().createIterator();
+    _LOGGER.info("ContentInheritor getDoc before while : ", iterator.hasNext());
     while(iterator.hasNext()){
       try {
         XWikiDocument doc = iterator.next();
