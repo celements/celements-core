@@ -47,8 +47,7 @@ public class ContentInheritorTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_ContentInheritorTest() throws Exception {
     _context = getContext();
-    _xwiki = createMock(XWiki.class);
-    _context.setWiki(_xwiki);
+    _xwiki = getWikiMock();
     _contentInheritor = new ContentInheritor();
     _docList = new ArrayList<String>();
     _iteratorFactory = getTestIteratorFactory(_docList);
@@ -69,20 +68,22 @@ public class ContentInheritorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetTitle() throws Exception {
+    _context.setLanguage("de");
     String fullname1 = "Test.Doc1";
     String title1 = "Title1";
     _docList.add(fullname1);
     XWikiDocument testDoc1 = new XWikiDocument();
     testDoc1.setFullName(fullname1);
+    testDoc1.setDefaultLanguage("de");
     testDoc1.setTitle(title1);
     expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(
         testDoc1).anyTimes();
     expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(
         true).anyTimes();
     _contentInheritor.setIteratorFactory(_iteratorFactory);
-    replay(_xwiki);
+    replayDefault();
     assertSame("Expecting title.", title1, _contentInheritor.getTitle());
-    verify(_xwiki);
+    verifyDefault();
   }
   
   @Test
@@ -92,7 +93,7 @@ public class ContentInheritorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname);
     XWikiDocument translatedDoc1 = new XWikiDocument();
     translatedDoc1.setTitle(title_de);
-    XWikiDocument testDoc1 = createMock(XWikiDocument.class);
+    XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
     expect(testDoc1.getTranslatedDocument(eq("de"), same(_context))).andReturn(
         translatedDoc1).anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
@@ -102,29 +103,30 @@ public class ContentInheritorTest extends AbstractBridgedComponentTestCase {
         true).anyTimes();
     _contentInheritor.setIteratorFactory(_iteratorFactory);
     _contentInheritor.setLanguage("de");
-    replay(testDoc1);
-    replay(_xwiki);
+    replayDefault();
     assertSame("Expecting german title.", title_de, 
         _contentInheritor.getTranslatedTitle(_context));
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testGetContent() throws XWikiException {
+    _context.setLanguage("de");
     String fullname1 = "Test.Doc1";
     String content1 = "Content1";
     _docList.add(fullname1);
     XWikiDocument testDoc1 = new XWikiDocument();
     testDoc1.setFullName(fullname1);
+    testDoc1.setDefaultLanguage("de");
     testDoc1.setContent(content1);
     expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(
         testDoc1).anyTimes();
     expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(
         true).anyTimes();
     _contentInheritor.setIteratorFactory(_iteratorFactory);
-    replay(_xwiki);
+    replayDefault();
     assertSame("Expecting content.", content1, _contentInheritor.getContent());
-    verify(_xwiki);
+    verifyDefault();
   }
   
   @Test
@@ -134,7 +136,7 @@ public class ContentInheritorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname);
     XWikiDocument translatedDoc1 = new XWikiDocument();
     translatedDoc1.setContent(content_de);
-    XWikiDocument testDoc1 = createMock(XWikiDocument.class);
+    XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
     expect(testDoc1.getTranslatedDocument(eq("de"), same(_context))).andReturn(
         translatedDoc1).anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
@@ -144,11 +146,10 @@ public class ContentInheritorTest extends AbstractBridgedComponentTestCase {
         true).anyTimes();
     _contentInheritor.setIteratorFactory(_iteratorFactory);
     _contentInheritor.setLanguage("de");
-    replay(testDoc1);
-    replay(_xwiki);
+    replayDefault();
     assertSame("Expecting german content.", content_de, 
         _contentInheritor.getTranslatedContent(_context));
-    verify(_xwiki);
+    verifyDefault();
   }
   
   @Test

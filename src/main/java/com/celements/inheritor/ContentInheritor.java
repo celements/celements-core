@@ -21,11 +21,13 @@ package com.celements.inheritor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.Execution;
 
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class ContentInheritor {
 
@@ -48,8 +50,13 @@ public class ContentInheritor {
   public void setLanguage(String language){
     _language = language;
   }
+
   protected String getLanguage(){
-    return _language;
+    if (_language != null) {
+      return _language;
+    } else {
+      return getContext().getLanguage();
+    }
   }
   
   public String getTitle(){
@@ -97,17 +104,17 @@ public class ContentInheritor {
   }
   
   public XWikiDocument getDocument(){
-    return getDoc(null);
+    return getDoc();
   }
   
   XWikiDocument getTranslatedDocument(XWikiContext context){
-    if (_language == null){
+    if (getLanguage() == null){
       throw new IllegalStateException("No language given.");
     }
-    return getDoc(context);
+    return getDoc();
   }
 
-  private XWikiDocument getDoc(XWikiContext context) {
+  private XWikiDocument getDoc() {
     if (getIteratorFactory() == null) {
       throw new IllegalStateException("No IteratorFactory given.");
     }
@@ -116,8 +123,8 @@ public class ContentInheritor {
       try {
         XWikiDocument doc = iterator.next();
         _LOGGER.debug("ContentInheritor getDoc next: ", doc);
-        if (context != null && _language != doc.getDefaultLanguage()){
-          doc = doc.getTranslatedDocument(_language, context);
+        if (getLanguage() != doc.getDefaultLanguage()){
+          doc = doc.getTranslatedDocument(getLanguage(), getContext());
         }
         if (!getEmptyDocumentChecker().isEmpty(doc)) {
           return doc;
@@ -139,4 +146,10 @@ public class ContentInheritor {
     }
     return _emptyDocumentChecker;
   }
+
+  private XWikiContext getContext() {
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
+  }
+
 }
