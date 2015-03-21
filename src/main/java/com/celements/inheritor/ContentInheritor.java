@@ -19,8 +19,8 @@
  */
 package com.celements.inheritor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.iterator.DocumentIterator;
 import com.celements.iterator.IIteratorFactory;
@@ -31,7 +31,7 @@ public class ContentInheritor {
 
   private IIteratorFactory<DocumentIterator> _iteratorFactory;
   private IEmptyDocumentChecker _emptyDocumentChecker;
-  private static Log mLogger = LogFactory.getFactory().getInstance(FieldInheritor.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(FieldInheritor.class);
   private String _language;
   
   public ContentInheritor(){
@@ -115,6 +115,7 @@ public class ContentInheritor {
     while(iterator.hasNext()){
       try {
         XWikiDocument doc = iterator.next();
+        _LOGGER.debug("ContentInheritor getDoc next: ", doc);
         if (context != null && _language != doc.getDefaultLanguage()){
           doc = doc.getTranslatedDocument(_language, context);
         }
@@ -122,7 +123,7 @@ public class ContentInheritor {
           return doc;
         }
       } catch (Exception exp) {
-        mLogger.warn("Failed to get translated document.", exp);
+        _LOGGER.warn("Failed to get translated document.", exp);
       }
     }
     return null;
