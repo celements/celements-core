@@ -174,7 +174,8 @@ public class PageDependentDocumentReferenceCommand {
       List<String> depDocList = getDependentDocList(docRef, depDocSpaceRef.getName());
       if (_LOGGER.isDebugEnabled()) {
         _LOGGER.debug("getDependentDocumentReference: inheritable for [" + docRef + "]"
-            + " [" + Arrays.deepToString(depDocList.toArray(new String[0])) + "]. ");
+            + " depDocList [" + Arrays.deepToString(depDocList.toArray(new String[0]))
+            + "]. ");
       } else {
         _LOGGER.info("getDependentDocumentReference: inheritable for [" + docRef + "]. ");
       }
