@@ -165,10 +165,9 @@ public class WebUtilsService implements IWebUtilsService {
     try {
       DocumentReference nextParent;
       if (includeDoc) {
-        nextParent = docRef;
-      } else {
-        nextParent = getParentRef(docRef);
+        docParents.add(docRef);
       }
+      nextParent = getParentRef(docRef);
       while ((nextParent != null)
           && getContext().getWiki().exists(nextParent, getContext())
           && !docParents.contains(nextParent)) {
