@@ -92,10 +92,13 @@ public class DocumentIterator implements Iterator<XWikiDocument>,
       String fullname;
       do {
         fullname = getDocIterator().next();
+        _LOGGER.debug("moveToNextDoc fullname [" + fullname + "]");
       } while (!_xwiki.exists(fullname, _context) && getDocIterator().hasNext());
       if (_xwiki.exists(fullname, _context)) {
+        _LOGGER.info("moveToNextDoc found next doc [" + fullname + "]");
         _currentDoc = _xwiki.getDocument(fullname, _context);
       } else {
+        _LOGGER.info("moveToNextDoc no next doc found.");
         _currentDoc = null;
       }
     } catch (XWikiException exp) {
