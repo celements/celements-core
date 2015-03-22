@@ -120,11 +120,11 @@ public class ContentInheritor {
       throw new IllegalStateException("No IteratorFactory given.");
     }
     DocumentIterator iterator = getIteratorFactory().createIterator();
-    _LOGGER.info("ContentInheritor getDoc before while : ", iterator.hasNext());
+    _LOGGER.info("ContentInheritor getDoc before while : " + iterator.hasNext());
     while(iterator.hasNext()){
       try {
         XWikiDocument doc = iterator.next();
-        _LOGGER.debug("ContentInheritor getDoc next: ", doc);
+        _LOGGER.debug("ContentInheritor getDoc next: " + doc);
         if (getLanguage() != doc.getDefaultLanguage()){
           doc = doc.getTranslatedDocument(getLanguage(), getContext());
         }
