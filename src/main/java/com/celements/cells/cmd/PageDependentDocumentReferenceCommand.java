@@ -20,6 +20,8 @@
 package com.celements.cells.cmd;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -170,7 +172,12 @@ public class PageDependentDocumentReferenceCommand {
         + depDocSpaceRef + "].");
     if (isInheritable) {
       List<String> depDocList = getDependentDocList(docRef, depDocSpaceRef.getName());
-      _LOGGER.debug("getDependentDocumentReference: inheritable for [" + docRef + "]. ");
+      if (_LOGGER.isDebugEnabled()) {
+        _LOGGER.debug("getDependentDocumentReference: inheritable for [" + docRef + "]"
+            + " [" + Arrays.deepToString(depDocList.toArray(new String[0])) + "]. ");
+      } else {
+        _LOGGER.info("getDependentDocumentReference: inheritable for [" + docRef + "]. ");
+      }
       XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(depDocList,
           getContext()).getDocument();
       if (pageDepDoc != null) {
