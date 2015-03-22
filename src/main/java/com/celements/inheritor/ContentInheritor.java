@@ -31,9 +31,10 @@ import com.xpn.xwiki.web.Utils;
 
 public class ContentInheritor {
 
+  private static Logger _LOGGER = LoggerFactory.getLogger(ContentInheritor.class);
+
   private IIteratorFactory<DocumentIterator> _iteratorFactory;
   private IEmptyDocumentChecker _emptyDocumentChecker;
-  private static Logger _LOGGER = LoggerFactory.getLogger(FieldInheritor.class);
   private String _language;
   
   public ContentInheritor(){
