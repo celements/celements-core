@@ -61,13 +61,13 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
     return session;
   }
 
-  private int executeWriteSQL(Session session, String sql) throws XWikiException {
+  private int executeWriteSQL(Session session, String sql) {
     int result = -1;
     Transaction transaction = session.beginTransaction();
     try {
       result = session.createSQLQuery(sql).executeUpdate();
     } catch (HibernateException hibExc) {
-      throw new XWikiException(0, 0, "Error executing sql '" + sql + "'", hibExc);
+      LOGGER.debug("error while executing sql '{}'", sql, hibExc);
     } finally {
       if (result > -1) {
         transaction.commit();
