@@ -96,13 +96,9 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   void checkXWikiPreferences() throws XWikiException {
-    DocumentReference xWikiPreferencesRef = getXWikiPreferencesRef(
-        getContext().getDatabase());
-    XWikiDocument wikiPrefDoc = getXWikiPreferencesDocument(xWikiPreferencesRef);
+    XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
     if (wikiPrefDoc != null) {
-      boolean dirty = checkPageType(wikiPrefDoc);
-      dirty |= checkWikiPreferences(wikiPrefDoc);
-      if (dirty) {
+      if (checkPageType(wikiPrefDoc) && checkWikiPreferences(wikiPrefDoc)) {
         LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
             + "].");
         getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
@@ -118,13 +114,9 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   void checkXWikiPreferencesMainWiki() throws XWikiException {
-    DocumentReference xWikiPreferencesRef = getXWikiPreferencesRef(
-        getContext().getDatabase());
-    XWikiDocument wikiPrefDoc = getXWikiPreferencesDocument(xWikiPreferencesRef);
+    XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
     if (wikiPrefDoc != null) {
-      boolean dirty = checkPageType(wikiPrefDoc);
-      dirty |= checkWikiPreferencesForMainWiki(wikiPrefDoc);
-      if (dirty) {
+      if (checkPageType(wikiPrefDoc) && checkWikiPreferencesForMainWiki(wikiPrefDoc)) {
         LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
             + "].");
         getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
@@ -139,16 +131,16 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     }
   }
 
-  private XWikiDocument getXWikiPreferencesDocument(DocumentReference xWikiPreferencesRef
-      ) throws XWikiException {
+  private XWikiDocument getXWikiPrefDoc() throws XWikiException {
     XWikiDocument wikiPrefDoc;
-    if (!getContext().getWiki().exists(xWikiPreferencesRef, getContext())) {
+    if (!getContext().getWiki().exists(getXWikiPreferencesRef(), getContext())) {
       LOGGER.debug("XWikiPreferencesDocument is missing that we create it. ["
           + getContext().getDatabase() + "]");
-      wikiPrefDoc = new CreateDocumentCommand().createDocument(xWikiPreferencesRef,
+      wikiPrefDoc = new CreateDocumentCommand().createDocument(getXWikiPreferencesRef(),
           "WikiPreference");
     } else {
-      wikiPrefDoc = getContext().getWiki().getDocument(xWikiPreferencesRef, getContext());
+      wikiPrefDoc = getContext().getWiki().getDocument(getXWikiPreferencesRef(), 
+          getContext());
       LOGGER.trace("XWikiPreferencesDocument already exists. ["
           + getContext().getDatabase() + "]");
     }
@@ -156,12 +148,11 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) throws XWikiException {
-    String wikiName = getContext().getDatabase();
     boolean dirty = false;
-    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(wikiName),
-        false, getContext());
+    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(), false, 
+        getContext());
     if (prefsObj == null) {
-      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(wikiName), getContext());
+      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(), getContext());
       prefsObj.set("editor", "Text", getContext());
       prefsObj.set("renderXWikiRadeoxRenderer", 0, getContext());
       prefsObj.set("pageWidth", "default", getContext());
@@ -218,12 +209,11 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
   }
 
   boolean checkWikiPreferencesForMainWiki(XWikiDocument wikiPrefDoc) throws XWikiException {
-    String wikiName = getContext().getDatabase();
     boolean dirty = false;
-    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(wikiName),
-        false, getContext());
+    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(), false, 
+        getContext());
     if (prefsObj == null) {
-      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(wikiName), getContext());
+      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(), getContext());
       prefsObj.set("editor", "Text", getContext());
       prefsObj.set("renderXWikiRadeoxRenderer", 1, getContext());
       prefsObj.set("pageWidth", "default", getContext());
@@ -273,8 +263,8 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     return false;
   }
 
-  private DocumentReference getXWikiPreferencesRef(String wikiName) {
-    return new DocumentReference(wikiName, "XWiki", "XWikiPreferences");
+  private DocumentReference getXWikiPreferencesRef() {
+    return new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences");
   }
 
 }

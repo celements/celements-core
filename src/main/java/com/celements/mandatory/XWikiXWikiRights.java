@@ -51,40 +51,37 @@ public class XWikiXWikiRights implements IMandatoryDocumentRole {
     return Arrays.asList("celements.MandatoryGroups");
   }
 
-
   public void checkDocuments() throws XWikiException {
-    LOGGER.debug("starting mandatory checkXWikiRights for database [" 
-        + getContext().getDatabase() + "], skipCelementsParam [" 
+    LOGGER.debug("starting mandatory checkXWikiRights for database ["
+        + getContext().getDatabase() + "], skipCelementsParam ["
         + isSkipCelementsWikiRights() + "].");
     if (!isSkipCelementsWikiRights()) {
       checkXWikiRights();
     } else {
       LOGGER.info("skip mandatory checkXWikiRights for database ["
-          + getContext().getDatabase() + "], skipCelementsParam [" 
+          + getContext().getDatabase() + "], skipCelementsParam ["
           + isSkipCelementsWikiRights() + "].");
     }
-    LOGGER.trace("end checkDocuments in XWikiXWikiRights for database [" 
+    LOGGER.trace("end checkDocuments in XWikiXWikiRights for database ["
         + getContext().getDatabase() + "].");
   }
 
   boolean isSkipCelementsWikiRights() {
     boolean isSkip = getContext().getWiki().ParamAsLong(
         "celements.mandatory.skipWikiRights", 0) == 1L;
-    LOGGER.trace("skipCelementsWikiRights for database [" + getContext().getDatabase() 
+    LOGGER.trace("skipCelementsWikiRights for database [" + getContext().getDatabase()
         + "] returning [" + isSkip + "].");
     return isSkip;
   }
 
   void checkXWikiRights() throws XWikiException {
-    DocumentReference xWikiPreferencesRef = getXWikiPreferencesRef(
-        getContext().getDatabase());
-    XWikiDocument wikiPrefDoc = getXWikiPreferencesDocument(xWikiPreferencesRef);
+    XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
     if (wikiPrefDoc != null) {
       boolean dirty = checkAccessRights(wikiPrefDoc);
       if (dirty) {
         LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
             + "].");
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiRights", 
+        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiRights",
             getContext());
       } else {
         LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodate. ["
@@ -96,40 +93,39 @@ public class XWikiXWikiRights implements IMandatoryDocumentRole {
     }
   }
 
-  private XWikiDocument getXWikiPreferencesDocument(DocumentReference xWikiPreferencesRef
-      ) throws XWikiException {
+  private XWikiDocument getXWikiPrefDoc() throws XWikiException {
     XWikiDocument wikiPrefDoc;
-    if (!getContext().getWiki().exists(xWikiPreferencesRef, getContext())) {
+    if (!getContext().getWiki().exists(getXWikiPreferencesRef(), getContext())) {
       LOGGER.debug("XWikiPreferencesDocument is missing that we create it. ["
           + getContext().getDatabase() + "]");
-      wikiPrefDoc = new CreateDocumentCommand().createDocument(xWikiPreferencesRef,
+      wikiPrefDoc = new CreateDocumentCommand().createDocument(getXWikiPreferencesRef(),
           "WikiPreference");
     } else {
-      wikiPrefDoc = getContext().getWiki().getDocument(xWikiPreferencesRef, getContext());
+      wikiPrefDoc = getContext().getWiki().getDocument(getXWikiPreferencesRef(), 
+          getContext());
       LOGGER.trace("XWikiPreferencesDocument already exists. ["
           + getContext().getDatabase() + "]");
     }
     return wikiPrefDoc;
   }
 
-  boolean checkAccessRights(XWikiDocument wikiPrefDoc)
-      throws XWikiException {
+  boolean checkAccessRights(XWikiDocument wikiPrefDoc) throws XWikiException {
     String wikiName = getContext().getDatabase();
-    BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(wikiName),
+    BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(),
         false, getContext());
     if (editRightsObj == null) {
       LOGGER.trace("checkAccessRights [" + wikiName + "], global rights class exists: "
-          + getContext().getWiki().exists(getGlobalRightsRef(wikiName), getContext()));
+          + getContext().getWiki().exists(getGlobalRightsRef(), getContext()));
       LOGGER.trace("checkAccessRights [" + wikiName + "], XWiki.ContentEditorsGroup"
           + " exists: " + getContext().getWiki().exists(new DocumentReference(wikiName,
               "XWiki", "ContentEditorsGroup"), getContext()));
-      editRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(wikiName), getContext());
+      editRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), getContext());
       editRightsObj.set("groups", "XWiki.ContentEditorsGroup", getContext());
       editRightsObj.set("levels", "edit,delete,undelete", getContext());
       editRightsObj.set("users", "", getContext());
       editRightsObj.set("allow", 1, getContext());
-      BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(
-          wikiName), getContext());
+      BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), 
+          getContext());
       LOGGER.trace("checkAccessRights [" + wikiName + "], XWiki.ContentEditorsGroup"
           + " exists: " + getContext().getWiki().exists(new DocumentReference(wikiName,
               "XWiki", "XWikiAdminGroup"), getContext()));
@@ -145,12 +141,12 @@ public class XWikiXWikiRights implements IMandatoryDocumentRole {
     return false;
   }
 
-  private DocumentReference getXWikiPreferencesRef(String wikiName) {
-    return new DocumentReference(wikiName, "XWiki", "XWikiPreferences");
+  private DocumentReference getXWikiPreferencesRef() {
+    return new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences");
   }
 
-  private DocumentReference getGlobalRightsRef(String wikiName) {
-    return new DocumentReference(wikiName, "XWiki", "XWikiGlobalRights");
+  private DocumentReference getGlobalRightsRef() {
+    return new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiGlobalRights");
   }
 
 }
