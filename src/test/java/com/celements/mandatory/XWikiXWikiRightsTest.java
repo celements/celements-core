@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.web.Utils;
 
 public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
 
@@ -34,8 +33,15 @@ public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_XWikiXWikiPreferencesTest() throws Exception {
-    mandatoryXWikiRights = (XWikiXWikiRights) Utils.getComponent(
+    mandatoryXWikiRights = (XWikiXWikiRights) getComponentManager().lookup(
         IMandatoryDocumentRole.class, "celements.mandatory.wikirights");
+  }
+
+  @Test
+  public void testDependsOnMandatoryDocuments() throws Exception {
+    assertEquals(1, mandatoryXWikiRights.dependsOnMandatoryDocuments().size());
+    assertEquals("celements.MandatoryGroups", 
+        mandatoryXWikiRights.dependsOnMandatoryDocuments().get(0));
   }
 
   @Test

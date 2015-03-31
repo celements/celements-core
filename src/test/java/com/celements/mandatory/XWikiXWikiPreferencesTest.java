@@ -28,7 +28,6 @@ import org.junit.Test;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
 
 public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase {
 
@@ -40,8 +39,13 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
   public void setUp_XWikiXWikiPreferencesTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    mandatoryXWikiPref = (XWikiXWikiPreferences) Utils.getComponent(
+    mandatoryXWikiPref = (XWikiXWikiPreferences) getComponentManager().lookup(
         IMandatoryDocumentRole.class, "celements.mandatory.wikipreferences");
+  }
+
+  @Test
+  public void testDependsOnMandatoryDocuments() throws Exception {
+    assertEquals(0, mandatoryXWikiPref.dependsOnMandatoryDocuments().size());
   }
 
   @Test
