@@ -19,19 +19,18 @@
  */
 package com.celements.mandatory;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.IClassCollectionRole;
-import com.celements.pagetype.PageTypeClasses;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -42,31 +41,27 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("celements.mandatory.wikipreferences")
 public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       XWikiXWikiPreferences.class);
 
   @Requirement
-  IWebUtilsService webUtils;
-
-  @Requirement("celements.celPageTypeClasses")
-  IClassCollectionRole pageTypeClasses;
+  private IWebUtilsService webUtilsService;
 
   @Requirement
-  Execution execution;
+  private IPageTypeClassConfig pageTypeClassConfig;
+
+  @Requirement
+  private Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-  }
-
-  private PageTypeClasses getPageTypeClasses() {
-    return (PageTypeClasses) pageTypeClasses;
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public List<String> dependsOnMandatoryDocuments() {
-    return Arrays.asList("celements.MandatoryGroups");
+    return Collections.emptyList();
   }
 
-
+  @Override
   public void checkDocuments() throws XWikiException {
     LOGGER.debug("starting mandatory checkXWikiPreferences for database ["
         + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
@@ -106,13 +101,12 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     XWikiDocument wikiPrefDoc = getXWikiPreferencesDocument(xWikiPreferencesRef);
     if (wikiPrefDoc != null) {
       boolean dirty = checkPageType(wikiPrefDoc);
-      dirty |= checkAccessRights(wikiPrefDoc);
       dirty |= checkWikiPreferences(wikiPrefDoc);
       if (dirty) {
         LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
             + "].");
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate"
-            + " XWiki.XWikiPreferences.", getContext());
+        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
+            getContext());
       } else {
         LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodate. ["
             + getContext().getDatabase() + "].");
@@ -129,13 +123,12 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     XWikiDocument wikiPrefDoc = getXWikiPreferencesDocument(xWikiPreferencesRef);
     if (wikiPrefDoc != null) {
       boolean dirty = checkPageType(wikiPrefDoc);
-      dirty |= checkAccessRights(wikiPrefDoc);
       dirty |= checkWikiPreferencesForMainWiki(wikiPrefDoc);
       if (dirty) {
         LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
             + "].");
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate"
-            + " XWiki.XWikiPreferences.", getContext());
+        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
+            getContext());
       } else {
         LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodate. ["
             + getContext().getDatabase() + "].");
@@ -265,42 +258,9 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     return dirty;
   }
 
-  boolean checkAccessRights(XWikiDocument wikiPrefDoc)
-      throws XWikiException {
-    String wikiName = getContext().getDatabase();
-    BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(wikiName),
-        false, getContext());
-    if (editRightsObj == null) {
-      LOGGER.trace("checkAccessRights [" + wikiName + "], global rights class exists: "
-          + getContext().getWiki().exists(getGlobalRightsRef(wikiName), getContext()));
-      LOGGER.trace("checkAccessRights [" + wikiName + "], XWiki.ContentEditorsGroup"
-          + " exists: " + getContext().getWiki().exists(new DocumentReference(wikiName,
-              "XWiki", "ContentEditorsGroup"), getContext()));
-      editRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(wikiName), getContext());
-      editRightsObj.set("groups", "XWiki.ContentEditorsGroup", getContext());
-      editRightsObj.set("levels", "edit,delete,undelete", getContext());
-      editRightsObj.set("users", "", getContext());
-      editRightsObj.set("allow", 1, getContext());
-      BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(
-          wikiName), getContext());
-      LOGGER.trace("checkAccessRights [" + wikiName + "], XWiki.ContentEditorsGroup"
-          + " exists: " + getContext().getWiki().exists(new DocumentReference(wikiName,
-              "XWiki", "XWikiAdminGroup"), getContext()));
-      adminRightsObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
-      adminRightsObj.set("levels", "admin,edit,comment,delete,undelete,register",
-          getContext());
-      adminRightsObj.set("users", "", getContext());
-      adminRightsObj.set("allow", 1, getContext());
-      LOGGER.debug("XWikiPreferences missing access rights fixed for database ["
-          + getContext().getDatabase() + "].");
-      return true;
-    }
-    return false;
-  }
-
   boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
-    DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
-        getContext().getDatabase());
+    DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
+        webUtilsService.getWikiRef());
     BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false,
         getContext());
     if (pageTypeObj == null) {
@@ -315,10 +275,6 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
 
   private DocumentReference getXWikiPreferencesRef(String wikiName) {
     return new DocumentReference(wikiName, "XWiki", "XWikiPreferences");
-  }
-
-  private DocumentReference getGlobalRightsRef(String wikiName) {
-    return new DocumentReference(wikiName, "XWiki", "XWikiGlobalRights");
   }
 
 }
