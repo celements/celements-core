@@ -97,3 +97,4 @@ com.celements.webform.WebFormService
 com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
+com.celements.query.QueryExecutionService
