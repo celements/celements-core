@@ -49,20 +49,20 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testNoMainWiki_main() {
+  public void testNotMainWiki_main() {
     context.setDatabase("mainWiki");
     context.setMainXWiki("mainWiki");
     replayDefault();
-    assertFalse(mandatoryXWikiPref.noMainWiki());
+    assertFalse(mandatoryXWikiPref.notMainWiki());
     verifyDefault();
   }
 
   @Test
-  public void testNoMainWiki_notMain() {
+  public void testNotMainWiki_notMain() {
     context.setDatabase("myWiki");
     context.setMainXWiki("mainWiki");
     replayDefault();
-    assertTrue(mandatoryXWikiPref.noMainWiki());
+    assertTrue(mandatoryXWikiPref.notMainWiki());
     verifyDefault();
   }
 
@@ -73,7 +73,7 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
     expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"), eq(0L))
         ).andReturn(0L).anyTimes();
     replayDefault();
-    mandatoryXWikiPref.isSkipCelementsWikiPreferences();
+    mandatoryXWikiPref.skipCelementsWikiPreferences();
     verifyDefault();
   }
 

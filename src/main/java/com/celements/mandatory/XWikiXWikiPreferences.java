@@ -63,88 +63,62 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
 
   @Override
   public void checkDocuments() throws XWikiException {
-    LOGGER.debug("starting mandatory checkXWikiPreferences for database ["
-        + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
-        + "], skipCelementsParam [" + isSkipCelementsWikiPreferences() + "].");
-    if (!isSkipCelementsWikiPreferences()) {
-      if (noMainWiki()) {
-        checkXWikiPreferences();
-      } else {
-        checkXWikiPreferencesMainWiki();
-      }
-    } else {
-      LOGGER.info("skip mandatory checkXWikiPreferences for database ["
-          + getContext().getDatabase() + "], noMainWiki [" + noMainWiki()
-          + "], skipCelementsParam [" + isSkipCelementsWikiPreferences() + "].");
+    LOGGER.debug("starting celements mandatory XWikiPreferences for db '{}'", getWiki());
+    if (!skipCelementsWikiPreferences()) {
+      checkXWikiPreferences();
     }
-    LOGGER.trace("end checkDocuments in XWikiXWikiPreferences for database ["
-        + getContext().getDatabase() + "].");
+    LOGGER.debug("end celements mandatory XWikiPreferences for db '{}'", getWiki());
   }
 
-  boolean isSkipCelementsWikiPreferences() {
-    boolean isSkip = getContext().getWiki().ParamAsLong(
+  boolean skipCelementsWikiPreferences() {
+    boolean skip = getContext().getWiki().ParamAsLong(
         "celements.mandatory.skipWikiPreferences", 0) == 1L;
-    LOGGER.trace("skipCelementsWikiPreferences for database ["
-        + getContext().getDatabase() + "] returning [" + isSkip + "].");
-    return isSkip;
-  }
-
-  boolean noMainWiki() {
-    String wikiName = getContext().getDatabase();
-    LOGGER.trace("noMainWiki for database [" + wikiName + "].");
-    return (wikiName != null) && !wikiName.equals(getContext().getMainXWiki());
+    LOGGER.trace("skipping XWikiPreferences for database '{}': {}", getWiki(), skip);
+    return skip;
   }
 
   void checkXWikiPreferences() throws XWikiException {
     XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
     if (wikiPrefDoc != null) {
-      if (checkPageType(wikiPrefDoc) && checkWikiPreferences(wikiPrefDoc)) {
-        LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
-            + "].");
+      boolean dirty = checkPageType(wikiPrefDoc);
+      if (notMainWiki()) {
+        dirty &= checkWikiPreferences(wikiPrefDoc);
+      } else {
+        dirty &= checkWikiPreferencesForMainWiki(wikiPrefDoc);
+      }
+      if (dirty) {
+        LOGGER.info("XWikiPreferences updated for db '{}'", getWiki());
         getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
             getContext());
       } else {
-        LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
+        LOGGER.debug("XWikiPreferences uptodate for db '{}'", getWiki());
       }
     } else {
       LOGGER.trace("skip checkXWikiPreferences because wikiPrefDoc is null! ["
-          + getContext().getDatabase() + "]");
-    }
-  }
-
-  void checkXWikiPreferencesMainWiki() throws XWikiException {
-    XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
-    if (wikiPrefDoc != null) {
-      if (checkPageType(wikiPrefDoc) && checkWikiPreferencesForMainWiki(wikiPrefDoc)) {
-        LOGGER.info("XWikiPreferencesDocument updated for [" + getContext().getDatabase()
-            + "].");
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
-            getContext());
-      } else {
-        LOGGER.debug("XWikiPreferencesDocument not saved. Everything uptodate. ["
-            + getContext().getDatabase() + "].");
-      }
-    } else {
-      LOGGER.trace("skip checkXWikiPreferences because wikiPrefDoc is null! ["
-          + getContext().getDatabase() + "]");
+          + getWiki() + "]");
     }
   }
 
   private XWikiDocument getXWikiPrefDoc() throws XWikiException {
     XWikiDocument wikiPrefDoc;
     if (!getContext().getWiki().exists(getXWikiPreferencesRef(), getContext())) {
-      LOGGER.debug("XWikiPreferencesDocument is missing that we create it. ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("XWikiPreferencesDocument is missing that we create it. [" 
+          + getWiki() + "]");
       wikiPrefDoc = new CreateDocumentCommand().createDocument(getXWikiPreferencesRef(),
           "WikiPreference");
     } else {
       wikiPrefDoc = getContext().getWiki().getDocument(getXWikiPreferencesRef(), 
           getContext());
-      LOGGER.trace("XWikiPreferencesDocument already exists. ["
-          + getContext().getDatabase() + "]");
+      LOGGER.trace("XWikiPreferencesDocument already exists. [" + getWiki() + "]");
     }
     return wikiPrefDoc;
+  }
+
+  boolean notMainWiki() {
+    boolean notMainWiki = (getWiki() != null) && !getWiki().equals(getContext(
+        ).getMainXWiki());
+    LOGGER.trace("not main wiki '{}': {}", getWiki(), notMainWiki);
+    return notMainWiki;
   }
 
   boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) throws XWikiException {
@@ -157,31 +131,31 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       prefsObj.set("renderXWikiRadeoxRenderer", 0, getContext());
       prefsObj.set("pageWidth", "default", getContext());
       LOGGER.debug("XWikiPreferences missing wiki preferences object added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("multilingual", -1) < 0) {
       prefsObj.setIntValue("multilingual", 1);
       LOGGER.debug("XWikiPreferences missing multilingual configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_edit", -1) < 0) {
       prefsObj.set("authenticate_edit", 1, getContext());
       LOGGER.debug("XWikiPreferences missing authenticate_edit configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_view", -1) < 0) {
       prefsObj.set("authenticate_view", 0, getContext());
       LOGGER.debug("XWikiPreferences missing authenticate_view configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getLongValue("upload_maxsize") <= 0) {
       prefsObj.set("upload_maxsize", 104857600L, getContext());
       LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     String documentBundles = prefsObj.getStringValue("documentBundles");
@@ -194,7 +168,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       }
       prefsObj.setStringValue("documentBundles", documentBundles);
       LOGGER.debug("XWikiPreferences added missing Celements2.Dictionary for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     String centralfilebaseConfig = prefsObj.getStringValue("cel_centralfilebase");
@@ -202,7 +176,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       prefsObj.set("cel_centralfilebase", "Content_attachments.FileBaseDoc",
           getContext());
       LOGGER.debug("XWikiPreferences missing cel_centralfilebase configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     return dirty;
@@ -218,31 +192,31 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       prefsObj.set("renderXWikiRadeoxRenderer", 1, getContext());
       prefsObj.set("pageWidth", "default", getContext());
       LOGGER.debug("XWikiPreferences missing wiki preferences object added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("multilingual", -1) < 0) {
       prefsObj.setIntValue("multilingual", 1);
       LOGGER.debug("XWikiPreferences missing multilingual configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_edit", -1) < 0) {
       prefsObj.set("authenticate_edit", 1, getContext());
       LOGGER.debug("XWikiPreferences missing authenticate_edit configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_view", -1) < 0) {
       prefsObj.set("authenticate_view", 1, getContext());
       LOGGER.debug("XWikiPreferences missing authenticate_view configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getLongValue("upload_maxsize") <= 0) {
       prefsObj.set("upload_maxsize", 104857600L, getContext());
       LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for"
-          + " database [" + getContext().getDatabase() + "].");
+          + " database [" + getWiki() + "].");
       dirty = true;
     }
     return dirty;
@@ -257,14 +231,18 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
       pageTypeObj = wikiPrefDoc.newXObject(pageTypeClassRef, getContext());
       pageTypeObj.setStringValue("page_type", "WikiPreference");
       LOGGER.debug("XWikiPreferences missing page type object fixed for database ["
-          + getContext().getDatabase() + "].");
+          + getWiki() + "].");
       return true;
     }
     return false;
   }
 
   private DocumentReference getXWikiPreferencesRef() {
-    return new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences");
+    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
+  }
+
+  private String getWiki() {
+    return getContext().getDatabase();
   }
 
 }
