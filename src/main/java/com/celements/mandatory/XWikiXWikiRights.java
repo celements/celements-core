@@ -25,76 +25,46 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celements.mandatory.wikirights")
-public class XWikiXWikiRights implements IMandatoryDocumentRole {
+public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(XWikiXWikiRights.class);
 
-  @Requirement
-  private Execution execution;
-
-  protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-  }
-
+  @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Arrays.asList("celements.MandatoryGroups");
   }
 
-  public void checkDocuments() throws XWikiException {
-    LOGGER.debug("starting celements mandatory XWikiRights for db '{}'", getWiki());
-    if (!skipCelementsWikiRights()) {
-      checkXWikiRights();
-    }
-    LOGGER.debug("end celements mandatory XWikiRights for db '{}'", getWiki());
+  @Override
+  public String getName() {
+    return "CelementsXWikiRights";
   }
 
-  boolean skipCelementsWikiRights() {
-    boolean skip = getContext().getWiki().ParamAsLong(
-        "celements.mandatory.skipWikiRights", 0) == 1L;
-    LOGGER.trace("skipping XWikiRights for database '{}': {}", getWiki(), skip);
-    return skip;
+  @Override
+  protected DocumentReference getDocRef() {
+    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
   }
 
-  void checkXWikiRights() throws XWikiException {
-    XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
-    if (wikiPrefDoc != null) {
-      if (checkAccessRights(wikiPrefDoc)) {
-        LOGGER.info("XWikiRights updated for db '{}'", getWiki());
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiRights",
-            getContext());
-      } else {
-        LOGGER.debug("XWikiRights uptodate for db '{}'", getWiki());
-      }
-    } else {
-      LOGGER.trace("skip checkXWikiRights because wikiPrefDoc is null! ["
-          + getWiki() + "]");
-    }
+  @Override
+  protected boolean skip() {
+    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiRights", 
+        0) == 1L;
   }
 
-  private XWikiDocument getXWikiPrefDoc() throws XWikiException {
-    XWikiDocument wikiPrefDoc;
-    if (!getContext().getWiki().exists(getXWikiPreferencesRef(), getContext())) {
-      LOGGER.debug("XWikiPreferencesDocument is missing that we create it. ["
-          + getWiki() + "]");
-      wikiPrefDoc = new CreateDocumentCommand().createDocument(getXWikiPreferencesRef(),
-          "WikiPreference");
-    } else {
-      wikiPrefDoc = getContext().getWiki().getDocument(getXWikiPreferencesRef(), 
-          getContext());
-      LOGGER.trace("XWikiPreferencesDocument already exists. [" + getWiki() + "]");
-    }
-    return wikiPrefDoc;
+  @Override
+  protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
+    return checkAccessRights(doc);
+  }
+
+  @Override
+  protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
+    return checkAccessRights(doc);
   }
 
   boolean checkAccessRights(XWikiDocument wikiPrefDoc) throws XWikiException {
@@ -128,16 +98,13 @@ public class XWikiXWikiRights implements IMandatoryDocumentRole {
     return false;
   }
 
-  private DocumentReference getXWikiPreferencesRef() {
-    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
-  }
-
   private DocumentReference getGlobalRightsRef() {
     return new DocumentReference(getWiki(), "XWiki", "XWikiGlobalRights");
   }
 
-  private String getWiki() {
-    return getContext().getDatabase();
+  @Override
+  public Logger getLogger() {
+    return LOGGER;
   }
 
 }

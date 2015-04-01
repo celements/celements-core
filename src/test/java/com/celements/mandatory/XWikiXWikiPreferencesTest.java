@@ -67,13 +67,13 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testSkipCelementsWikiPreferences_illegalValue() {
+  public void testSkip_illegalValue() {
     expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"))).andThrow(
         new NumberFormatException(null)).anyTimes();
     expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"), eq(0L))
         ).andReturn(0L).anyTimes();
     replayDefault();
-    mandatoryXWikiPref.skipCelementsWikiPreferences();
+    mandatoryXWikiPref.skip();
     verifyDefault();
   }
 

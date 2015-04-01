@@ -45,22 +45,22 @@ public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testSkipCelementsWikiRights() {
+  public void testSkip() {
     expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))
         ).andReturn(1L).anyTimes();
     replayDefault();
-    assertTrue(mandatoryXWikiRights.skipCelementsWikiRights());
+    assertTrue(mandatoryXWikiRights.skip());
     verifyDefault();
   }
 
   @Test
-  public void testSkipCelementsWikiRights_illegalValue() {
+  public void testSkip_illegalValue() {
     expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"))).andThrow(
         new NumberFormatException(null)).anyTimes();
     expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))
         ).andReturn(0L).anyTimes();
     replayDefault();
-    assertFalse(mandatoryXWikiRights.skipCelementsWikiRights());
+    assertFalse(mandatoryXWikiRights.skip());
     verifyDefault();
   }
 

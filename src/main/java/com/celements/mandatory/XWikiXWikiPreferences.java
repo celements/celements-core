@@ -27,106 +27,58 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.IPageTypeClassConfig;
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
-import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celements.mandatory.wikipreferences")
-public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
+public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
       XWikiXWikiPreferences.class);
 
   @Requirement
-  private IWebUtilsService webUtilsService;
-
-  @Requirement
   private IPageTypeClassConfig pageTypeClassConfig;
 
-  @Requirement
-  private Execution execution;
-
-  protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-  }
-
+  @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Collections.emptyList();
   }
 
   @Override
-  public void checkDocuments() throws XWikiException {
-    LOGGER.debug("starting celements mandatory XWikiPreferences for db '{}'", getWiki());
-    if (!skipCelementsWikiPreferences()) {
-      checkXWikiPreferences();
-    }
-    LOGGER.debug("end celements mandatory XWikiPreferences for db '{}'", getWiki());
+  public String getName() {
+    return "CelementsXWikiPreferences";
   }
 
-  boolean skipCelementsWikiPreferences() {
-    boolean skip = getContext().getWiki().ParamAsLong(
-        "celements.mandatory.skipWikiPreferences", 0) == 1L;
-    LOGGER.trace("skipping XWikiPreferences for database '{}': {}", getWiki(), skip);
-    return skip;
+  @Override
+  protected DocumentReference getDocRef() {
+    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
   }
 
-  void checkXWikiPreferences() throws XWikiException {
-    XWikiDocument wikiPrefDoc = getXWikiPrefDoc();
-    if (wikiPrefDoc != null) {
-      boolean dirty = checkPageType(wikiPrefDoc);
-      if (notMainWiki()) {
-        dirty |= checkWikiPreferences(wikiPrefDoc);
-      } else {
-        dirty |= checkWikiPreferencesForMainWiki(wikiPrefDoc);
-      }
-      if (dirty) {
-        LOGGER.info("XWikiPreferences updated for db '{}'", getWiki());
-        getContext().getWiki().saveDocument(wikiPrefDoc, "autocreate XWikiPreferences", 
-            getContext());
-      } else {
-        LOGGER.debug("XWikiPreferences uptodate for db '{}'", getWiki());
-      }
-    } else {
-      LOGGER.trace("skip checkXWikiPreferences because wikiPrefDoc is null! ["
-          + getWiki() + "]");
-    }
+  @Override
+  protected boolean skip() {
+    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiPreferences", 
+        0) == 1L;
   }
 
-  private XWikiDocument getXWikiPrefDoc() throws XWikiException {
-    XWikiDocument wikiPrefDoc;
-    if (!getContext().getWiki().exists(getXWikiPreferencesRef(), getContext())) {
-      LOGGER.debug("XWikiPreferencesDocument is missing that we create it. [" 
-          + getWiki() + "]");
-      wikiPrefDoc = new CreateDocumentCommand().createDocument(getXWikiPreferencesRef(),
-          "WikiPreference");
-    } else {
-      wikiPrefDoc = getContext().getWiki().getDocument(getXWikiPreferencesRef(), 
-          getContext());
-      LOGGER.trace("XWikiPreferencesDocument already exists. [" + getWiki() + "]");
-    }
-    return wikiPrefDoc;
+  @Override
+  protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
+    return checkPageType(doc) || checkWikiPreferences(doc);
   }
 
-  boolean notMainWiki() {
-    boolean notMainWiki = (getWiki() != null) && !getWiki().equals(getContext(
-        ).getMainXWiki());
-    LOGGER.trace("not main wiki '{}': {}", getWiki(), notMainWiki);
-    return notMainWiki;
+  @Override
+  protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
+    return checkPageType(doc) ||  checkWikiPreferencesForMainWiki(doc);
   }
 
-  boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) throws XWikiException {
+  private boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) throws XWikiException {
     boolean dirty = false;
-    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(), false, 
-        getContext());
+    BaseObject prefsObj = wikiPrefDoc.getXObject(getDocRef(), false, getContext());
     if (prefsObj == null) {
-      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(), getContext());
+      prefsObj = wikiPrefDoc.newXObject(getDocRef(), getContext());
       prefsObj.set("editor", "Text", getContext());
       prefsObj.set("renderXWikiRadeoxRenderer", 0, getContext());
       prefsObj.set("pageWidth", "default", getContext());
@@ -182,12 +134,12 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     return dirty;
   }
 
-  boolean checkWikiPreferencesForMainWiki(XWikiDocument wikiPrefDoc) throws XWikiException {
+  private boolean checkWikiPreferencesForMainWiki(XWikiDocument wikiPrefDoc
+      ) throws XWikiException {
     boolean dirty = false;
-    BaseObject prefsObj = wikiPrefDoc.getXObject(getXWikiPreferencesRef(), false, 
-        getContext());
+    BaseObject prefsObj = wikiPrefDoc.getXObject(getDocRef(), false, getContext());
     if (prefsObj == null) {
-      prefsObj = wikiPrefDoc.newXObject(getXWikiPreferencesRef(), getContext());
+      prefsObj = wikiPrefDoc.newXObject(getDocRef(), getContext());
       prefsObj.set("editor", "Text", getContext());
       prefsObj.set("renderXWikiRadeoxRenderer", 1, getContext());
       prefsObj.set("pageWidth", "default", getContext());
@@ -222,7 +174,7 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     return dirty;
   }
 
-  boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
+  private boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
         webUtilsService.getWikiRef());
     BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false,
@@ -237,12 +189,9 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     return false;
   }
 
-  private DocumentReference getXWikiPreferencesRef() {
-    return new DocumentReference(getWiki(), "XWiki", "XWikiPreferences");
-  }
-
-  private String getWiki() {
-    return getContext().getDatabase();
+  @Override
+  public Logger getLogger() {
+    return LOGGER;
   }
 
 }
