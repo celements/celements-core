@@ -82,9 +82,9 @@ public class XWikiXWikiPreferences implements IMandatoryDocumentRole {
     if (wikiPrefDoc != null) {
       boolean dirty = checkPageType(wikiPrefDoc);
       if (notMainWiki()) {
-        dirty &= checkWikiPreferences(wikiPrefDoc);
+        dirty |= checkWikiPreferences(wikiPrefDoc);
       } else {
-        dirty &= checkWikiPreferencesForMainWiki(wikiPrefDoc);
+        dirty |= checkWikiPreferencesForMainWiki(wikiPrefDoc);
       }
       if (dirty) {
         LOGGER.info("XWikiPreferences updated for db '{}'", getWiki());
