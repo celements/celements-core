@@ -66,9 +66,7 @@ public class WikiCreatedEventListener implements EventListener {
     String saveDbName = getContext().getDatabase();
     WikiEvent wikiEvent = (WikiEvent) event;
     String newDbName = wikiEvent.getWikiId();
-    if (!remoteObservationManagerContext.isRemoteState()
-        && !"1".equals(getContext().getWiki().Param("celements.mandatory.checkOnStart",
-            "1"))) {
+    if (!remoteObservationManagerContext.isRemoteState()) {
       try {
         getContext().setDatabase(newDbName);
         LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
@@ -80,9 +78,9 @@ public class WikiCreatedEventListener implements EventListener {
         getContext().setDatabase(saveDbName);
       }
     } else {
-      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-          + newDbName + "] yet skipping checkAllMandatoryDocuments. It will be done"
-          + " on virtualInit.");
+      LOGGER.debug("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+          + newDbName + "] yet skipping checkAllMandatoryDocuments because of remote "
+          + "state");
     }
   }
 

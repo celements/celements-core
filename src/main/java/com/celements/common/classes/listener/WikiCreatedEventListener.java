@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
 import com.xpn.xwiki.XWikiContext;
@@ -43,6 +44,9 @@ public class WikiCreatedEventListener implements EventListener {
 
   @Requirement
   IClassesCompositorComponent classesCompositor;
+
+  @Requirement
+  RemoteObservationManagerContext remoteObservationManagerContext;
 
   @Requirement
   private Execution execution;
@@ -64,8 +68,7 @@ public class WikiCreatedEventListener implements EventListener {
     String saveDbName = getContext().getDatabase();
     WikiEvent wikiEvent = (WikiEvent) event;
     String newDbName = wikiEvent.getWikiId();
-    if (!"1".equals(getContext().getWiki().Param(
-        "celements.classCollections.checkOnStart", "1"))) {
+    if (!remoteObservationManagerContext.isRemoteState()) {
       try {
           LOGGER.info("new wiki created [" + newDbName + "]. Checking all Class"
               + " Collections.");
@@ -75,9 +78,9 @@ public class WikiCreatedEventListener implements EventListener {
         getContext().setDatabase(saveDbName);
       }
     } else {
-      LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-          + newDbName + "] yet skipping checkAllClassCollections. It will be done"
-          + " on virtualInit.");
+      LOGGER.debug("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
+          + newDbName + "] yet skipping checkAllClassCollections because of remote "
+          + "state");
     }
   }
 

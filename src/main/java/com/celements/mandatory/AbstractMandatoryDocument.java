@@ -57,7 +57,7 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
       }
       saveDoc(doc, dirty);
     } else {
-      getLogger().debug("skipping '{}' for db '{}'", getName(), getWiki());
+      getLogger().debug("skipping mandatory '{}' for db '{}'", getName(), getWiki());
     }
     getLogger().debug("end mandatory '{}' for db '{}'", getName(), getWiki());
   }
