@@ -24,6 +24,10 @@ import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.classcollections.OldCoreLegacyClasses;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * @deprecated instead use {@link IClassesCompositorComponent}
+ */
+@Deprecated
 public class CheckClassesCommand {
 
 //  private static Log LOGGER = LogFactory.getFactory().getInstance(
@@ -42,6 +46,10 @@ public class CheckClassesCommand {
   public static final String MEDIALIB_CONFIG_CLASS =
       OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
+  /**
+   * @deprecated instead use {@link IClassesCompositorComponent#checkAllClassCollections()}
+   */
+  @Deprecated
   public void checkClasses() {
     IClassesCompositorComponent compComponent = Utils.getComponent(
         IClassesCompositorComponent.class);
