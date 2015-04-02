@@ -48,7 +48,7 @@ com.celements.navigation.listener.TreeNodeDocumentCreatedListener
 com.celements.navigation.listener.TreeNodeDocumentDeletedListener
 com.celements.navigation.listener.TreeNodeDocumentUpdatedListener
 com.celements.navigation.service.TreeNodeCacheListener
-com.celements.mandatory.WikiCreatedEventListener
+com.celements.mandatory.listener.WikiCreatedEventListener
 com.celements.mandatory.FileBaseTag0
 com.celements.mandatory.FileBaseTag1
 com.celements.mandatory.HTMLWebPreferences
@@ -98,3 +98,5 @@ com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
 com.celements.query.QueryExecutionService
+com.celements.common.classes.listener.ApplicationStartedEventListener
+com.celements.mandatory.listener.ApplicationStartedEventListener
