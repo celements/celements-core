@@ -22,8 +22,8 @@ package com.celements.common.classes.listener;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiEvent;
 import org.xwiki.component.annotation.Component;
@@ -36,11 +36,12 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import com.celements.common.classes.IClassesCompositorComponent;
 import com.xpn.xwiki.XWikiContext;
 
-@Component("celements.classes.WikiCreatedEventListener")
+@Component(WikiCreatedEventListener.NAME)
 public class WikiCreatedEventListener implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      WikiCreatedEventListener.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(WikiCreatedEventListener.class);
+
+  public static final String NAME = "celements.classes.WikiCreatedEventListener";
 
   @Requirement
   IClassesCompositorComponent classesCompositor;
@@ -51,36 +52,37 @@ public class WikiCreatedEventListener implements EventListener {
   @Requirement
   private Execution execution;
 
-  protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  private XWikiContext getContext() {
+    return (XWikiContext) execution.getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
   public List<Event> getEvents() {
     LOGGER.info("getEvents: registering for wiki created events.");
     return Arrays.<Event>asList(new WikiCreatedEvent());
   }
 
-  public String getName() {
-    return "celements.classes.WikiCreatedEventListener";
-  }
-
+  @Override
   public void onEvent(Event event, Object source, Object data) {
-    String saveDbName = getContext().getDatabase();
     WikiEvent wikiEvent = (WikiEvent) event;
-    String newDbName = wikiEvent.getWikiId();
+    String database = wikiEvent.getWikiId();
+    LOGGER.debug("received WikiCreatedEvent for database '{}', remote state '{}'", 
+        database, remoteObservationManagerContext.isRemoteState());
     if (!remoteObservationManagerContext.isRemoteState()) {
+      String dbBackup = getContext().getDatabase();
       try {
-          LOGGER.info("new wiki created [" + newDbName + "]. Checking all Class"
-              + " Collections.");
-          getContext().setDatabase(newDbName);
-          classesCompositor.checkAllClassCollections();
+        LOGGER.info("checking all class collections for db '{}'", database);
+        getContext().setDatabase(database);
+        classesCompositor.checkAllClassCollections();
       } finally {
-        getContext().setDatabase(saveDbName);
+        getContext().setDatabase(dbBackup);
       }
-    } else {
-      LOGGER.debug("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-          + newDbName + "] yet skipping checkAllClassCollections because of remote "
-          + "state");
     }
   }
 

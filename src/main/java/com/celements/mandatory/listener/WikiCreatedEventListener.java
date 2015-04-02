@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.mandatory;
+package com.celements.mandatory.listener;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiEvent;
 import org.xwiki.component.annotation.Component;
@@ -33,13 +33,15 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.xpn.xwiki.XWikiContext;
 
-@Component("celements.mandatory.WikiCreatedEventListener")
+@Component(WikiCreatedEventListener.NAME)
 public class WikiCreatedEventListener implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      WikiCreatedEventListener.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(WikiCreatedEventListener.class);
+
+  public static final String NAME = "celements.mandatory.WikiCreatedEventListener";
 
   @Requirement
   IMandatoryDocumentCompositorRole mandatoryDocCmp;
@@ -50,37 +52,37 @@ public class WikiCreatedEventListener implements EventListener {
   @Requirement
   private Execution execution;
 
-  protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  private XWikiContext getContext() {
+    return (XWikiContext) execution.getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
+  @Override
   public String getName() {
-    return "celements.mandatory.WikiCreatedEventListener";
+    return NAME;
   }
 
+  @Override
   public List<Event> getEvents() {
+    LOGGER.info("getEvents: registering for wiki created events.");
     return Arrays.<Event>asList(new WikiCreatedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
-    String saveDbName = getContext().getDatabase();
     WikiEvent wikiEvent = (WikiEvent) event;
-    String newDbName = wikiEvent.getWikiId();
+    String database = wikiEvent.getWikiId();
+    LOGGER.debug("received WikiCreatedEvent for database '{}', remote state '{}'", 
+        database, remoteObservationManagerContext.isRemoteState());
     if (!remoteObservationManagerContext.isRemoteState()) {
+      String dbBackup = getContext().getDatabase();
       try {
-        getContext().setDatabase(newDbName);
-        LOGGER.info("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-            + newDbName + "] now executing checkAllMandatoryDocuments.");
+        LOGGER.info("checking all mandatory documents for db '{}'", database);
+        getContext().setDatabase(database);
         mandatoryDocCmp.checkAllMandatoryDocuments();
       } finally {
-        LOGGER.debug("finishing onEvent in WikiCreatedEventListener for wikiId ["
-            + getContext().getDatabase() + "].");
-        getContext().setDatabase(saveDbName);
+        getContext().setDatabase(dbBackup);
       }
-    } else {
-      LOGGER.debug("received wikiEvent [" + wikiEvent.getClass() + "] for wikiId ["
-          + newDbName + "] yet skipping checkAllMandatoryDocuments because of remote "
-          + "state");
     }
   }
 
