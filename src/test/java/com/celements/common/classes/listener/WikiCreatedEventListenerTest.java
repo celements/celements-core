@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
@@ -43,13 +44,18 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testOnEvent() {
+    String database = "db";
+    Event event = new WikiCreatedEvent(database);
+    
     expect(remoteObsMngContextMock.isRemoteState()).andReturn(false).atLeastOnce();
     classesCmpMock.checkAllClassCollections();
-    expectLastCall().once();
+    expectLastCall().andDelegateTo(new TestClassesCompositor(database)).once();
     
+    String db = getContext().getDatabase();
     replayDefault();
-    listener.onEvent(new WikiCreatedEvent(), null, null);
+    listener.onEvent(event, null, null);
     verifyDefault();
+    assertEquals(db, getContext().getDatabase());
   }
 
   @Test
@@ -59,6 +65,21 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
     replayDefault();
     listener.onEvent(new WikiCreatedEvent(), null, null);
     verifyDefault();
+  }
+
+  private class TestClassesCompositor implements IClassesCompositorComponent {
+    
+    private final String database;
+    
+    TestClassesCompositor(String database) {
+      this.database = database;
+    }
+
+    @Override
+    public void checkAllClassCollections() {
+      assertEquals(database, getContext().getDatabase());
+    }
+    
   }
 
 }
