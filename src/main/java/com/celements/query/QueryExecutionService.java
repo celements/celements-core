@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.WikiReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
@@ -25,6 +27,9 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
       QueryExecutionService.class);
+
+  @Requirement
+  private IWebUtilsService webUtilsService;
 
   @Requirement
   private Execution execution;
@@ -56,8 +61,8 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
   }
 
   private Session getNewHibSession() throws XWikiException {
-    Session session = getStore().getSessionFactory().openSession();
-    getStore().setDatabase(session, getContext());
+    Session session = getHibStore().getSessionFactory().openSession();
+    getHibStore().setDatabase(session, getContext());
     return session;
   }
 
@@ -81,22 +86,24 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
   }
 
   @Override
-  public int executeWriteHQL(final String hql, final Map<String, Object> binds
-      ) throws XWikiException {
-    // TODO set wikiRef/database
-    return getStore().executeWrite(getContext(), true, new HibernateCallback<Integer>() {
-      @Override
-      public Integer doInHibernate(Session session) throws HibernateException {
-        org.hibernate.Query query = session.createQuery(hql);
-        for (String key : binds.keySet()) {
-          query.setParameter(key, binds.get(key));
-        }
-        return query.executeUpdate();
-      }
-    });
+  public int executeWriteHQL(String hql, Map<String, Object> binds) throws XWikiException {
+    return executeWriteHQL(hql, binds, null);
   }
 
-  private XWikiHibernateStore getStore() {
+  @Override
+  public int executeWriteHQL(String hql, Map<String, Object> binds, WikiReference wikiRef
+      ) throws XWikiException {
+    WikiReference curWikiRef = webUtilsService.getWikiRef();
+    try {
+      getContext().setDatabase(webUtilsService.getWikiRef(wikiRef).getName());
+      HibernateCallback<Integer> callback = new ExecuteWriteCallback(hql, binds);
+      return getHibStore().executeWrite(getContext(), true, callback);
+    } finally {
+      getContext().setDatabase(curWikiRef.getName());
+    }
+  }
+
+  private XWikiHibernateStore getHibStore() {
     return getContext().getWiki().getHibernateStore();
   }
 
