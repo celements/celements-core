@@ -45,6 +45,7 @@ import com.celements.navigation.Navigation;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
+import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -254,12 +255,12 @@ public class TreeNodeService implements ITreeNodeService {
     if ((nodeProviders != null) && (nodeProviders.values().size() > 0)) {
       TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<Integer, TreeNode>();
       for (TreeNode node : nodes) {
-        treeNodesMergedMap.put(new Integer(node.getPosition()), node);
+        treeNodesMergedMap.put(node.getPosition(), node);
       }
       for (ITreeNodeProvider tnProvider : nodeProviders.values()) {
         try {
           for (TreeNode node : tnProvider.getTreeNodesForParent(parentKey)) {
-            treeNodesMergedMap.put(new Integer(node.getPosition()), node);
+            treeNodesMergedMap.put(node.getPosition(), node);
           }
         } catch(Exception exp) {
           LOGGER.warn("Failed on provider [" + tnProvider.getClass()
@@ -302,12 +303,14 @@ public class TreeNodeService implements ITreeNodeService {
           + (end - starttotal));
       return notMappedmenuItems;
     } else {
+      //TODO refactor GetNotMappedMenuItemsForParentCommand and
+      //TODO GetMappedMenuItemsForParentCommandas to ITreeNodeProvider
       menuItemsMergedMap = new TreeMap<Integer, TreeNode>();
       for (TreeNode node : notMappedmenuItems) {
-        menuItemsMergedMap.put(new Integer(node.getPosition()), node);
+        menuItemsMergedMap.put(node.getPosition(), node);
       }
       for (TreeNode node : mappedTreeNodes) {
-        menuItemsMergedMap.put(new Integer(node.getPosition()), node);
+        menuItemsMergedMap.put(node.getPosition(), node);
       }
       end = System.currentTimeMillis();
       LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: "

@@ -6,10 +6,13 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.easymock.Capture;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
@@ -48,6 +51,7 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
   private GetNotMappedMenuItemsForParentCommand mockGetNotMenuItemCommand;
   private GetMappedMenuItemsForParentCommand mockGetMenuItemCommand;
   private XWikiRightService mockRightService;
+  private Map<String, ITreeNodeProvider> backupNodeProviders;
 
   @Before
   public void setUp_TreeNodeServiceTest() throws Exception {
@@ -69,6 +73,14 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
         GetMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getMappedMenuItemsForParentCmd()).andReturn(
         mockGetMenuItemCommand).anyTimes();
+    backupNodeProviders = treeNodeService.nodeProviders;
+    treeNodeService.nodeProviders = new HashMap<String, ITreeNodeProvider>(
+        backupNodeProviders);
+  }
+
+  @After
+  public void tearDown_TreeNodeServiceTest() throws Exception {
+    treeNodeService.nodeProviders = backupNodeProviders;
   }
 
   @Test
@@ -156,6 +168,97 @@ public class TreeNodeServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testFetchNodesForParentKey_merge_TreeNodeProviders() {
+    ITreeNodeProvider nodeProviderMock = createMockAndAddToDefault(
+        ITreeNodeProvider.class);
+    treeNodeService.nodeProviders.put("testNodeProvider", nodeProviderMock);
+
+    String wikiName = "myWiki";
+    String spaceName = "mySpace";
+    String docName = "myDoc";
+    String parentKey = wikiName + ":" + spaceName + "." + docName;
+    context.setDatabase(wikiName);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
+        docName);
+    
+    TreeNode menuItem1 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 1);
+    TreeNode menuItem2 = createTreeNode(spaceName, "myDoc2", spaceName, docName, 2);
+    TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
+    TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
+    List<TreeNode> mappedList = Collections.emptyList();
+    List<TreeNode> nodeProviderList = Arrays.asList(menuItem1, menuItem5);
+    List<TreeNode> notMappedList = Arrays.asList(menuItem2, menuItem3);
+    List<TreeNode> expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
+        menuItem5);
+    
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
+        ).andReturn(mappedList).once();
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+        same(context))).andReturn(notMappedList).once();
+    expect(nodeProviderMock.getTreeNodesForParent(eq(parentKey))).andReturn(
+        nodeProviderList).once();
+    
+    replayDefault();
+    List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
+    assertEquals("result array does not match expected size.", expectedList.size(),
+        menuItemsMerged.size());
+    int pos = 0;
+    for (TreeNode menuItem : menuItemsMerged) {
+      TreeNode expectedMenuitem = expectedList.get(pos++);
+      assertEquals("Array compare failed on item " + pos, expectedMenuitem.getPosition(),
+          menuItem.getPosition());
+      assertSame("Array compare failed on item " + pos, expectedMenuitem, menuItem);
+    }
+    verifyDefault();
+  }
+
+//FIXME
+//  @Test
+//  public void testFetchNodesForParentKey_merge_TreeNodeProviders_duplicate_pos() {
+//    ITreeNodeProvider nodeProviderMock = createMockAndAddToDefault(
+//        ITreeNodeProvider.class);
+//    treeNodeService.nodeProviders.put("testNodeProvider", nodeProviderMock);
+//
+//    String wikiName = "myWiki";
+//    String spaceName = "mySpace";
+//    String docName = "myDoc";
+//    String parentKey = wikiName + ":" + spaceName + "." + docName;
+//    context.setDatabase(wikiName);
+//    DocumentReference docRef = new DocumentReference(context.getDatabase(), spaceName, 
+//        docName);
+//    
+//    TreeNode menuItem1 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 1);
+//    TreeNode menuItem2 = createTreeNode(spaceName, "myDoc2", spaceName, docName, 2);
+//    TreeNode menuItem3 = createTreeNode(spaceName, "myDoc1", spaceName, docName, 3);
+//    TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 2);
+//    List<TreeNode> mappedList = Collections.emptyList();
+//    List<TreeNode> nodeProviderList = Arrays.asList(menuItem1, menuItem5);
+//    List<TreeNode> notMappedList = Arrays.asList(menuItem2, menuItem3);
+//    List<TreeNode> expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
+//        menuItem5);
+//    
+//    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))
+//        ).andReturn(mappedList).once();
+//    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey),
+//        same(context))).andReturn(notMappedList).once();
+//    expect(nodeProviderMock.getTreeNodesForParent(eq(parentKey))).andReturn(
+//        nodeProviderList).once();
+//    
+//    replayDefault();
+//    List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
+//    assertEquals("result array does not match expected size.", expectedList.size(),
+//        menuItemsMerged.size());
+//    int pos = 0;
+//    for (TreeNode menuItem : menuItemsMerged) {
+//      TreeNode expectedMenuitem = expectedList.get(pos++);
+//      assertEquals("Array compare failed on item " + pos, expectedMenuitem.getPosition(),
+//          menuItem.getPosition());
+//      assertSame("Array compare failed on item " + pos, expectedMenuitem, menuItem);
+//    }
+//    verifyDefault();
+//  }
+//
   @Test
   public void testFetchNodesForParentKey_onlyOldArray() throws Exception {
     String wikiName = "myWiki";
