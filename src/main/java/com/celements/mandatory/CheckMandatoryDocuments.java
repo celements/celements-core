@@ -21,8 +21,16 @@ package com.celements.mandatory;
 
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * @deprecated instead use {@link IMandatoryDocumentCompositorRole}
+ */
+@Deprecated
 public class CheckMandatoryDocuments {
 
+  /**
+   * @deprecated instead use {@link IMandatoryDocumentCompositorRole#checkAllMandatoryDocuments()}
+   */
+  @Deprecated
   public void checkMandatoryDocuments() {
     IMandatoryDocumentCompositorRole mandatoryDocCmp = Utils.getComponent(
         IMandatoryDocumentCompositorRole.class);

@@ -17,34 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.common.classes.listener;
+package com.celements.mandatory.listener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.WikiCreatedEvent;
-import org.xwiki.bridge.event.WikiEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.classes.IClassesCompositorComponent;
+import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
-@Component(WikiCreatedEventListener.NAME)
-public class WikiCreatedEventListener implements EventListener {
+@Component(ApplicationStartedEventListener.NAME)
+public class ApplicationStartedEventListener implements EventListener {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(WikiCreatedEventListener.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(
+      ApplicationStartedEventListener.class);
 
-  public static final String NAME = "celements.classes.WikiCreatedEventListener";
+  public static final String NAME = "celements.mandatory.ApplicationStartedEventListener";
 
   @Requirement
-  IClassesCompositorComponent classesCompositor;
+  IMandatoryDocumentCompositorRole mandatoryDocCmp;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -64,26 +66,44 @@ public class WikiCreatedEventListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    LOGGER.info("getEvents: registering for wiki created events.");
-    return Arrays.<Event>asList(new WikiCreatedEvent());
+    LOGGER.info("getEvents: registering for application started events");
+    return Arrays.<Event>asList(new ApplicationStartedEvent());
   }
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    WikiEvent wikiEvent = (WikiEvent) event;
-    String database = wikiEvent.getWikiId();
-    LOGGER.debug("received WikiCreatedEvent for database '{}', remote state '{}'", 
-        database, remoteObservationManagerContext.isRemoteState());
-    if (!remoteObservationManagerContext.isRemoteState()) {
+    LOGGER.debug("received ApplicationStartedEvent, remote state '{}', checkOnStart '{}'",
+        remoteObservationManagerContext.isRemoteState(), checkOnStart());
+    if (!remoteObservationManagerContext.isRemoteState() && checkOnStart()) {
       String dbBackup = getContext().getDatabase();
       try {
-        LOGGER.info("checking all class collections for db '{}'", database);
-        getContext().setDatabase(database);
-        classesCompositor.checkAllClassCollections();
+        for (String database : getAllDatabases()) {
+          LOGGER.info("checking all mandatory documents for db '{}'", database);
+          getContext().setDatabase(database);
+          mandatoryDocCmp.checkAllMandatoryDocuments();
+        }
       } finally {
         getContext().setDatabase(dbBackup);
       }
     }
+  }
+
+  private boolean checkOnStart() {
+    return getContext().getWiki().ParamAsLong("celements.mandatory.checkOnStart", 
+        1L) == 1L;
+  }
+
+  private List<String> getAllDatabases() {
+    List<String> ret = new ArrayList<String>();
+    try {
+      ret.add(getContext().getMainXWiki());
+      if (getContext().getWiki().isVirtualMode()) {
+        ret.addAll(getContext().getWiki().getVirtualWikisDatabaseNames(getContext()));
+      }
+    } catch (XWikiException xwe) {
+      LOGGER.error("Error getting virtual wiki names", xwe);
+    }
+    return ret;
   }
 
 }

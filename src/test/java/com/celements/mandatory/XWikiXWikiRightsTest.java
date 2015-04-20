@@ -26,54 +26,41 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 
-public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase {
+public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
 
-  private XWikiXWikiPreferences mandatoryXWikiPref;
-  private XWikiContext context;
-  private XWiki xwiki;
+  private XWikiXWikiRights mandatoryXWikiRights;
 
   @Before
   public void setUp_XWikiXWikiPreferencesTest() throws Exception {
-    context = getContext();
-    xwiki = getWikiMock();
-    mandatoryXWikiPref = (XWikiXWikiPreferences) getComponentManager().lookup(
-        IMandatoryDocumentRole.class, "celements.mandatory.wikipreferences");
+    mandatoryXWikiRights = (XWikiXWikiRights) getComponentManager().lookup(
+        IMandatoryDocumentRole.class, "celements.mandatory.wikirights");
   }
 
   @Test
   public void testDependsOnMandatoryDocuments() throws Exception {
-    assertEquals(0, mandatoryXWikiPref.dependsOnMandatoryDocuments().size());
+    assertEquals(1, mandatoryXWikiRights.dependsOnMandatoryDocuments().size());
+    assertEquals("celements.MandatoryGroups", 
+        mandatoryXWikiRights.dependsOnMandatoryDocuments().get(0));
   }
 
   @Test
-  public void testNotMainWiki_main() {
-    context.setDatabase("mainWiki");
-    context.setMainXWiki("mainWiki");
+  public void testSkip() {
+    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))
+        ).andReturn(1L).anyTimes();
     replayDefault();
-    assertFalse(mandatoryXWikiPref.notMainWiki());
-    verifyDefault();
-  }
-
-  @Test
-  public void testNotMainWiki_notMain() {
-    context.setDatabase("myWiki");
-    context.setMainXWiki("mainWiki");
-    replayDefault();
-    assertTrue(mandatoryXWikiPref.notMainWiki());
+    assertTrue(mandatoryXWikiRights.skip());
     verifyDefault();
   }
 
   @Test
   public void testSkip_illegalValue() {
-    expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"))).andThrow(
+    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"))).andThrow(
         new NumberFormatException(null)).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"), eq(0L))
+    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))
         ).andReturn(0L).anyTimes();
     replayDefault();
-    mandatoryXWikiPref.skip();
+    assertFalse(mandatoryXWikiRights.skip());
     verifyDefault();
   }
 

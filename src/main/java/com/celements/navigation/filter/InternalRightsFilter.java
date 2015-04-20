@@ -53,6 +53,9 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
   }
 
   public void setMenuPart(String menuPart) {
+    if (menuPart == null) {
+      menuPart = "";
+    }
     this.menuPart = menuPart;
   }
 

@@ -32,14 +32,12 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.auth.AuthenticationService;
 import com.celements.auth.IAuthenticationServiceRole;
-import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
-import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
@@ -96,33 +94,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   public String getName() {
     return getPrepareVelocityContextService().getVelocityName();
-  }
-
-  public void init(XWikiContext context) {
-    //TODO check if this is really needed for main-wiki or if we get a virtualInit on the
-    //TODO main wiki to. (if needed move to ApplicationStartedEvent listener)
-    LOGGER.trace("init called database [" + context.getDatabase() + "]");
-    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
-        "1"))) {
-      new CheckClassesCommand().checkClasses();
-    }
-    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
-      new CheckMandatoryDocuments().checkMandatoryDocuments();
-    }
-    super.init(context);
-  }
-
-  public void virtualInit(XWikiContext context) {
-    //TODO move to WikiReadyEvent listener (after migration to xwiki > 4.1-M1
-    LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
-    if ("1".equals(context.getWiki().Param("celements.classCollections.checkOnStart",
-        "1"))) {
-      new CheckClassesCommand().checkClasses();
-    }
-    if ("1".equals(context.getWiki().Param("celements.mandatory.checkOnStart", "1"))) {
-      new CheckMandatoryDocuments().checkMandatoryDocuments();
-    }
-    super.virtualInit(context);
   }
 
   public int queryCount() {

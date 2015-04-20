@@ -67,6 +67,14 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testSetMenuPart_null() {
+    String expectedMenuPart = "";
+    filter.setMenuPart(null);
+    assertNotNull(filter.getMenuPart());
+    assertEquals(expectedMenuPart, filter.getMenuPart());
+  }
+
+  @Test
   public void testConvertObject() {
     BaseObject baseObj = new BaseObject();
     assertSame(baseObj, filter.convertObject(baseObj, context));
