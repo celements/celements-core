@@ -211,5 +211,19 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
     verifyDefault();
   }
-  
+
+  @Test
+  public void testAddLazyExtJSfile() {
+    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
+    String expJSON = "{\"fullURL\" : "
+        + "\"" + jsFileURL + "\"}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), isNull(String.class), same(context))
+        ).andReturn(jsFileURL).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON
+        + "</span>", command.addLazyExtJSfile(jsFile));
+    verifyDefault();
+  }
+
 }

@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.sajson.Builder;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -67,6 +68,20 @@ public class ExternalJavaScriptFilesCommand {
     extJSAttUrlSet = new HashSet<String>();
     extJSfileList = new Vector<String>();
     extJSnotFoundList = new Vector<String>();
+  }
+
+  public String addLazyExtJSfile(String jsFile) {
+    return addLazyExtJSfile(jsFile, null);
+  }
+
+  public String addLazyExtJSfile(String jsFile, String action) {
+    String attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addStringProperty("fullURL", attUrl);
+    jsonBuilder.closeDictionary();
+    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
+        +"</span>";
   }
 
   public String addExtJSfileOnce(String jsFile) {

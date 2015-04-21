@@ -38,6 +38,14 @@ public class JSScriptService implements ScriptService {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
   
+  public String addLazyExtJSfile(String jsFile) {
+    return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile);
+  }
+
+  public String addLazyExtJSfile(String jsFile, String action) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+  }
+
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
     if (getContext().get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
       getContext().put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand(
