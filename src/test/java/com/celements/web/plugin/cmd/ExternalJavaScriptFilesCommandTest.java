@@ -217,7 +217,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
     String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
     String expJSON = "{\"fullURL\" : "
-        + "\"" + jsFileURL + "\"}";
+        + "\"" + jsFileURL + "\", \"initLoad\" : true}";
     expect(attUrlCmd.getAttachmentURL(eq(jsFile), isNull(String.class), same(context))
         ).andReturn(jsFileURL).once();
     replayDefault();

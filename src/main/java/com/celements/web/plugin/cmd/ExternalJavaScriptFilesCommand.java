@@ -79,6 +79,8 @@ public class ExternalJavaScriptFilesCommand {
     Builder jsonBuilder = new Builder();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("fullURL", attUrl);
+    jsonBuilder.openProperty("initLoad");
+    jsonBuilder.addBoolean(true);
     jsonBuilder.closeDictionary();
     return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
         +"</span>";
