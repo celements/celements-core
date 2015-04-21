@@ -75,7 +75,12 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String addLazyExtJSfile(String jsFile, String action) {
-    String attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
+    String attUrl;
+    if (!StringUtils.isEmpty(action)) {
+      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
+    } else {
+      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, context);
+    }
     Builder jsonBuilder = new Builder();
     jsonBuilder.openDictionary();
     jsonBuilder.addStringProperty("fullURL", attUrl);
