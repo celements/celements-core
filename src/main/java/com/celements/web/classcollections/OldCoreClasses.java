@@ -407,6 +407,9 @@ public class OldCoreClasses extends AbstractClassCollection {
         "grey|black|red|green|blue|gold|orange");
     needsUpdate |= bclass.addTextField(PHOTO_ALBUM_GALLERY_LAYOUT,
         "image gallery slideshow layout", 30);
+    needsUpdate |= bclass.addNumberField("initialdelay", "initialdelay", 30, "long");
+    needsUpdate |= bclass.addNumberField("frequency", "frequency", 30, "long");
+    needsUpdate |= bclass.addBooleanField("thumbDescription", "Thumbnail Description", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
