@@ -43,7 +43,7 @@ public class JSScriptService implements ScriptService {
   }
 
   public String addLazyExtJSfile(String jsFile, String action) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+    return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action);
   }
 
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
