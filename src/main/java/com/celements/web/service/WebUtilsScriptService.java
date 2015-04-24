@@ -169,8 +169,4 @@ public class WebUtilsScriptService implements ScriptService {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }
 
-  private boolean hasProgrammingRights() {
-    return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
-  }
-
 }
