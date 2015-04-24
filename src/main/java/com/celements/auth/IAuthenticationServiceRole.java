@@ -6,6 +6,7 @@ import org.xwiki.component.annotation.ComponentRole;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
+import org.xwiki.model.reference.DocumentReference;
 
 @ComponentRole
 public interface IAuthenticationServiceRole {
@@ -16,4 +17,8 @@ public interface IAuthenticationServiceRole {
   
   public XWikiUser checkAuth(String logincredential, String password,
       String rememberme, String possibleLogins, Boolean noRedirect) throws XWikiException;
-}
+
+  public boolean hasAccessLevel(String level, String user, boolean isUser,
+      DocumentReference docRef);
+
+  }
