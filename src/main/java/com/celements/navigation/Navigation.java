@@ -401,7 +401,7 @@ public class Navigation implements INavigation {
             + parentRef + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
             + getCurrentLevel(numMoreLevels) + "].");
         // is main Menu and no mainMenuItem found ; user has edit rights
-        outStream.append("<ul>");
+        outStream.append("<ul class=\"cel_nav_empty\">");
         openMenuItemOut(outStream, null, true, true, false, 1);
         outStream.append("<span " + addUniqueElementId(null)
             + " " + addCssClasses(null, true, true, true, false, 1)

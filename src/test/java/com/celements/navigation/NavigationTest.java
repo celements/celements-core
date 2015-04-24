@@ -1027,7 +1027,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     //set after calling replay
     context.setUser(myUserName);
     assertEquals("no menuitem for level 1. Yet with hasEdit, thus no empty string"
-        + " expected.", "<ul><li class=\"first last cel_nav_odd cel_nav_item1"
+        + " expected.", "<ul class=\"cel_nav_empty\">"
+        + "<li class=\"first last cel_nav_odd cel_nav_item1"
         + " cel_nav_hasChildren\">"
         + "<span id=\"N1:MySpace::\" "
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
