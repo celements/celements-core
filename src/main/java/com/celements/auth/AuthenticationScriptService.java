@@ -2,14 +2,7 @@ package com.celements.auth;
 
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.script.service.ScriptService;
+import java.util.logging.Logger;
 
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
@@ -17,11 +10,6 @@ import com.celements.web.plugin.cmd.RemoteUserValidator;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
 @Component("authentication")
 public class AuthenticationScriptService implements ScriptService {
@@ -253,19 +241,26 @@ public class AuthenticationScriptService implements ScriptService {
     return loginRedirectURL;
   }
   
+  /**
+   * API to check rights on a document for a given user or group
+   * 
+   * @param level right to check (view, edit, comment, delete)
+   * @param user user or group for which to check the right
+   * @param isUser true for users and false for group
+   * @param docname document on which to check the rights
+   * @return true if right is granted/false if not
+   */
   public boolean hasAccessLevel(String level, String user, boolean isUser,
       DocumentReference docRef) {
     try {
-      return ((XWikiRightServiceImpl) getContext().getWiki().getRightService()
-          ).hasAccessLevel(level, user, webUtilsService.getRefDefaultSerializer(
-              ).serialize(docRef), isUser, getContext());
+      return authenticationService.hasAccessLevel(level, user, isUser, docRef);
     } catch (Exception exp) {
       _LOGGER.warn("hasAccessLevel failed for level[" +level+"] user["+user+"] " +
       		"docRef["+docRef+"] isUser["+isUser+"]", exp);
       return false;
     }
   }
-  
+
   private boolean hasProgrammingRights() {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }

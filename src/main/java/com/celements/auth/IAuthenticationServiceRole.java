@@ -19,6 +19,6 @@ public interface IAuthenticationServiceRole {
       String rememberme, String possibleLogins, Boolean noRedirect) throws XWikiException;
 
   public boolean hasAccessLevel(String level, String user, boolean isUser,
-      DocumentReference docRef);
+      DocumentReference docRef) throws XWikiException;
 
   }

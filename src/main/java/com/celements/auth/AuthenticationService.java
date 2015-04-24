@@ -103,7 +103,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
    * @return true if right is granted/false if not
    */
   public boolean hasAccessLevel(String level, String user, boolean isUser,
-      DocumentReference docRef) {
+      DocumentReference docRef) throws XWikiException {
     return ((XWikiRightServiceImpl) getContext().getWiki().getRightService()
         ).hasAccessLevel(level, user, webUtilsService.getRefDefaultSerializer(
             ).serialize(docRef), isUser, getContext());
