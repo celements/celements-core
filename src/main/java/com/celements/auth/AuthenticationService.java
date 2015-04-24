@@ -2,10 +2,23 @@ package com.celements.auth;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
+import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 @Component
 public class AuthenticationService implements IAuthenticationServiceRole {
