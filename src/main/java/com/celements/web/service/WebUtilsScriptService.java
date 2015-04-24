@@ -140,8 +140,12 @@ public class WebUtilsScriptService implements ScriptService {
   }
 
   public String getJSONContent(DocumentReference docRef) {
-    if (authService.hasAccessLevel("view", getContext().getUser(), true, docRef)) {
-      return webUtilsService.getJSONContent(docRef);
+    try {
+      if (authService.hasAccessLevel("view", getContext().getUser(), true, docRef)) {
+        return webUtilsService.getJSONContent(docRef);
+      }
+    } catch (Exception exp) {
+      _LOGGER.warn("getJSONContent failed for docRef[" + docRef + "]. ", exp);
     }
     return "{}";
   }
