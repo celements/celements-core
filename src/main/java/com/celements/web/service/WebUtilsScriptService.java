@@ -140,8 +140,7 @@ public class WebUtilsScriptService implements ScriptService {
   }
 
   public String getJSONContent(DocumentReference docRef) {
-    if (authService.hasAccessLevel("view", getContext().getUser(), true,
-        webUtilsService.getRefLocalSerializer().serialize(docRef))) {
+    if (authService.hasAccessLevel("view", getContext().getUser(), true, docRef)) {
       return webUtilsService.getJSONContent(docRef);
     }
     return "{}";
