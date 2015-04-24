@@ -12,7 +12,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
-import com.celements.auth.AuthenticationService;
+import com.celements.auth.IAuthenticationServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -29,7 +29,7 @@ public class WebUtilsScriptService implements ScriptService {
   IWebUtilsService webUtilsService;
 
   @Requirement
-  AuthenticationService authService;
+  IAuthenticationServiceRole authService;
 
   @Requirement
   private Execution execution;
