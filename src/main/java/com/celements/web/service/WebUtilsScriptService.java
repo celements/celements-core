@@ -12,6 +12,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
+import com.celements.auth.AuthenticationService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -26,7 +27,10 @@ public class WebUtilsScriptService implements ScriptService {
 
   @Requirement
   IWebUtilsService webUtilsService;
-  
+
+  @Requirement
+  AuthenticationService authService;
+
   @Requirement
   private Execution execution;
 
@@ -134,7 +138,15 @@ public class WebUtilsScriptService implements ScriptService {
   public String getJSONContent(Document contentDoc) {
     return webUtilsService.getJSONContent(contentDoc.getDocument());
   }
-  
+
+  public String getJSONContent(DocumentReference docRef) {
+    if (authService.hasAccessLevel("view", getContext().getUser(), true,
+        webUtilsService.getRefLocalSerializer().serialize(docRef))) {
+      return webUtilsService.getJSONContent(docRef);
+    }
+    return "{}";
+  }
+
   /**
    * 
    * @param authorDocName
@@ -156,4 +168,9 @@ public class WebUtilsScriptService implements ScriptService {
   private boolean hasProgrammingRights() {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }
+
+  private boolean hasProgrammingRights() {
+    return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
+  }
+
 }

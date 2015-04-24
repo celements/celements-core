@@ -1074,6 +1074,10 @@ public class CelementsWebPluginApi extends Api {
     return getWebUtilsScriptService().getJSONContent(contentDoc);
   }
 
+  /**
+   * @deprecated since 2.63 instead use {@link WebUtilsScriptService
+   * #getJSONContent(DocumentReference)}
+   */
   public String getJSONContent(DocumentReference docRef) {
     if (hasAccessLevel("view", context.getUser(), true, getWebUtilsService(
         ).getRefLocalSerializer().serialize(docRef))) {

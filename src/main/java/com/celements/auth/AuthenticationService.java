@@ -2,23 +2,10 @@ package com.celements.auth;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
+import java.util.logging.Logger;
 
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
-import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.user.api.XWikiUser;
 
 @Component
 public class AuthenticationService implements IAuthenticationServiceRole {
@@ -91,4 +78,21 @@ public class AuthenticationService implements IAuthenticationServiceRole {
     return getContext().getWiki().getAuthService().checkAuth(loginname, password, 
         rememberme, getContext());
   }
+
+  /**
+   * API to check rights on a document for a given user or group
+   * 
+   * @param level right to check (view, edit, comment, delete)
+   * @param user user or group for which to check the right
+   * @param isUser true for users and false for group
+   * @param docname document on which to check the rights
+   * @return true if right is granted/false if not
+   */
+  public boolean hasAccessLevel(String level, String user, boolean isUser,
+      DocumentReference docRef) {
+    return ((XWikiRightServiceImpl) getContext().getWiki().getRightService()
+        ).hasAccessLevel(level, user, webUtilsService.getRefDefaultSerializer(
+            ).serialize(docRef), isUser, getContext());
+  }
+  
 }
