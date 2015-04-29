@@ -320,4 +320,16 @@ public interface IWebUtilsService {
    */
   public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException;
 
+
+  /**
+   * only used as an adapter for unstable 2
+   */
+  public <T> List<T> lookupList(Class<T> role) throws ComponentLookupException;
+
+
+  /**
+   * only used as an adapter for unstable 2
+   */
+  public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
+
 }
