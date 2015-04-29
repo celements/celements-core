@@ -45,7 +45,9 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
+import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
+import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
@@ -56,7 +58,6 @@ import com.celements.validation.ValidationType;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.plugin.cmd.CelementsRightsCommand;
-import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.DocMetaTagsCmd;
@@ -108,6 +109,12 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   IRTEConfigTemplateRole rteConfigTemplateService;
+
+  @Requirement
+  IClassesCompositorComponent classesComp;
+
+  @Requirement
+  IMandatoryDocumentCompositorRole mandatoryDocComp;
 
   @Requirement
   Execution execution;
@@ -706,11 +713,15 @@ public class CelementsWebScriptService implements ScriptService {
   public void flushMenuItemCache() {
     treeNodeCacheService.flushMenuItemCache();
   }
-  
+
   public void checkClasses()  {
-    new CheckClassesCommand().checkClasses();
+    classesComp.checkAllClassCollections();
   }
-  
+
+  public void checkMandatoryDocuments() {
+    mandatoryDocComp.checkAllMandatoryDocuments();
+  }
+
   public String getDefaultSpace() {
     return getContext().getWiki().getDefaultSpace(getContext());
   }
