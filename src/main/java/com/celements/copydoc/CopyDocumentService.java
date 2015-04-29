@@ -137,6 +137,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   DocumentReference getAsTargetClassRef(DocumentReference srcClassRef, 
       XWikiDocument trgDoc) {
     DocumentReference classRef = new DocumentReference(srcClassRef);
+    //FIXME setWikiReference does not exist on unstable-2.0 please replace
     classRef.setWikiReference(trgDoc.getDocumentReference().getWikiReference());
     return classRef;
   }
