@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -38,6 +37,7 @@ import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeCreatedEvent;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
 import com.celements.pagetype.xobject.event.XObjectPageTypeUpdatedEvent;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -52,7 +52,7 @@ public class XObjectPageTypeDocumentUpdatedListener
       XObjectPageTypeDocumentUpdatedListener.class);
 
   @Requirement
-  private ComponentManager componentManager;
+  private IWebUtilsService webUtilsService;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -191,8 +191,8 @@ public class XObjectPageTypeDocumentUpdatedListener
   }
 
   @Override
-  protected ComponentManager getComponentManager() {
-    return componentManager;
+  protected IWebUtilsService getWebUtilsService() {
+    return webUtilsService;
   }
 
   @Override

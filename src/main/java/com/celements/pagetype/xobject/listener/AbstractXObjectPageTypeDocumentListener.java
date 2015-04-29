@@ -22,7 +22,6 @@ package com.celements.pagetype.xobject.listener;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 
@@ -50,7 +49,7 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
   protected ObservationManager getObservationManager() {
     if (this.observationManager == null) {
       try {
-        this.observationManager = getComponentManager().lookup(ObservationManager.class);
+        this.observationManager = getWebUtilsService().lookup(ObservationManager.class);
       } catch (ComponentLookupException e) {
         throw new RuntimeException(
             "Cound not retrieve an Observation Manager against the component manager");
@@ -71,7 +70,7 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
         doc));
   }
 
-  abstract protected ComponentManager getComponentManager();
+  abstract protected IWebUtilsService getWebUtilsService();
   
   abstract protected Logger getLogger();
 
