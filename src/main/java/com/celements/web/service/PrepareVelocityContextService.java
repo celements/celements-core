@@ -11,9 +11,9 @@ import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -38,6 +38,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * TODO implement VelocityContextInitializer role
+ *      --> maybe XWiki overwrites later some vcontext variables ($language, $doc, $tdoc)
  * @author fabian
  *
  */
@@ -46,17 +47,12 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class PrepareVelocityContextService implements IPrepareVelocityContext {
 
-  public static final String CEL_SUPPRESS_INVALID_LANG = "celSuppressInvalidLang";
-
-  public static final String CFG_LANGUAGE_SUPPRESS_INVALID =
-    "celements.language.suppressInvalid";
-
-  public static final String ADD_LANGUAGE_COOKIE_DONE =
-    "celements.addLanguageCookie.done";
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger _LOGGER  = LoggerFactory.getLogger(
       PrepareVelocityContextService.class);
 
+  private String _CEL_PREPARE_VELOCITY_COUNTER = "celPrepareVelocityCounter";
+  private String _CEL_PREPARE_VELOCITY_TOTALTIME = "celPrepareVelocityTotelTime";
+  
   @Requirement
   Execution execution;
 
@@ -77,16 +73,40 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return execution.getContext();
   }
 
+  @Override
   public void prepareVelocityContext(VelocityContext vcontext) {
-    LOGGER.debug("prepareVelocityContext: with vcontext [" + vcontext + "].");
+    Integer count = 0;
+    if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER) != null) {
+      count = (Integer) getExecContext().getProperty(_CEL_PREPARE_VELOCITY_COUNTER);
+    }
+    count = count + 1;
+    long startMillis = System.currentTimeMillis();
+    _LOGGER.debug("prepareVelocityContext [" + count + "]: with vcontext ["
+        + vcontext + "].");
     fixLanguagePreference(vcontext);
-    LOGGER.trace("prepareVelocityContext: after fixLanguagePreference.");
+    _LOGGER.trace("prepareVelocityContext [" + count + "]: after fixLanguagePreference.");
     fixTdocForInvalidLanguage(vcontext);
-    LOGGER.trace("prepareVelocityContext: after fixTdocForInvalidLanguage.");
+    _LOGGER.trace("prepareVelocityContext [" + count
+        + "]: after fixTdocForInvalidLanguage.");
     initCelementsVelocity(vcontext);
-    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
+    _LOGGER.trace("prepareVelocityContext [" + count + "]: after initCelementsVelocity.");
     initPanelsVelocity(vcontext);
-    LOGGER.trace("prepareVelocityContext: after initCelementsVelocity.");
+    _LOGGER.trace("prepareVelocityContext [" + count + "]: after initCelementsVelocity.");
+    getExecContext().setProperty(_CEL_PREPARE_VELOCITY_COUNTER, count);
+    if (_LOGGER.isInfoEnabled()) {
+      long endMillis = System.currentTimeMillis();
+      long timeUsed = endMillis - startMillis;
+      Long totalTimeUsed = 0L;
+      if (getExecContext().getProperty(_CEL_PREPARE_VELOCITY_TOTALTIME) != null) {
+        totalTimeUsed = (Long) getExecContext().getProperty(
+            _CEL_PREPARE_VELOCITY_TOTALTIME);
+      }
+      totalTimeUsed += timeUsed;
+      getExecContext().setProperty(_CEL_PREPARE_VELOCITY_TOTALTIME, totalTimeUsed);
+      _LOGGER.info("prepareVelocityContext [" + count + "]: with vcontext ["
+          + vcontext + "] finished in [" + timeUsed + "], total time [" + totalTimeUsed
+          + "].");
+    }
   }
 
   /**
@@ -94,6 +114,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * 
    * @deprecated instead use prepareVelocityContext(VelocityContext)
    */
+  @Override
   @Deprecated
   public void prepareVelocityContext(XWikiContext context) {
     if (context != null) {
@@ -112,11 +133,11 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   void initPanelsVelocity(VelocityContext vcontext) {
     if (vcontext != null) {
       if (!vcontext.containsKey("rightPanels")) {
-        LOGGER.debug("setting rightPanels in vcontext: " + getRightPanels());
+        _LOGGER.debug("setting rightPanels in vcontext: " + getRightPanels());
         vcontext.put("rightPanels", getRightPanels());
       }
       if (!vcontext.containsKey("leftPanels")) {
-        LOGGER.debug("setting leftPanels in vcontext: " + getLeftPanels());
+        _LOGGER.debug("setting leftPanels in vcontext: " + getLeftPanels());
         vcontext.put("leftPanels", getLeftPanels());
       }
       if (!vcontext.containsKey("showRightPanels")) {
@@ -125,7 +146,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       if (!vcontext.containsKey("showLeftPanels")) {
         vcontext.put("showLeftPanels", Integer.toString(showLeftPanels()));
       }
-      LOGGER.debug("leftPanels [" + vcontext.get("leftPanels")
+      _LOGGER.debug("leftPanels [" + vcontext.get("leftPanels")
           + "] and rightPanels [" + vcontext.get("rightPanels")
           + "] after initPanelsVelocity.");
     }
@@ -153,7 +174,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
             vcontext.put("hasedit", new Boolean(false));
           }
         } catch (XWikiException exp) {
-          LOGGER.error("Failed to check edit Access Rights on "
+          _LOGGER.error("Failed to check edit Access Rights on "
               + getContext().getDoc().getDocumentReference(), exp);
           vcontext.put("hasedit", new Boolean(false));
         }
@@ -166,19 +187,18 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
               ).newDocument(getContext());
           vcontext.put("skin_doc", skinDoc);
         } catch (XWikiException e) {
-          LOGGER.error("Failed to get skin_doc");
+          _LOGGER.error("Failed to get skin_doc");
         }
       }
       if (!vcontext.containsKey("isAdmin")) {
         vcontext.put("isAdmin", webUtilsService.isAdminUser());
       }
       if (!vcontext.containsKey("isSuperAdmin")) {
-        vcontext.put("isSuperAdmin", (webUtilsService.isAdminUser()
-            && getContext().getUser().startsWith("xwiki:")));
+        vcontext.put("isSuperAdmin", webUtilsService.isSuperAdminUser());
       }
       if (!vcontext.containsKey("admin_language")) {
         vcontext.put("admin_language", webUtilsService.getAdminLanguage());
-        LOGGER.debug("added admin_language to vcontext: "
+        _LOGGER.debug("added admin_language to vcontext: "
             + webUtilsService.getAdminLanguage());
       }
       if (!vcontext.containsKey("adminMsg")) {
@@ -187,13 +207,18 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       if (!vcontext.containsKey("celements2_skin")) {
         vcontext.put("celements2_skin", getCelementsSkinDoc(getContext()));
       }
-      if (!vcontext.containsKey("celements2_baseurl")
-          && (getCelementsSkinDoc(getContext()) != null)) {
-        String celements2_baseurl = getCelementsSkinDoc(getContext()).getURL("view");
-        if (celements2_baseurl.indexOf("/",8) > 0) {
-          vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
-              celements2_baseurl.indexOf("/",8)));
+      try {
+        if (!vcontext.containsKey("celements2_baseurl")
+            && (getContext().getURLFactory() != null)) {
+          XWikiDocument celementsSkinXWikiDoc = getCelementsSkinXWikiDoc(getContext());
+          String celements2_baseurl = celementsSkinXWikiDoc.getURL("view", getContext());
+          if (celements2_baseurl.indexOf("/",8) > 0) {
+            vcontext.put("celements2_baseurl", celements2_baseurl.substring(0,
+                celements2_baseurl.indexOf("/",8)));
+          }
         }
+      } catch (XWikiException exp) {
+        _LOGGER.error("failed to get CelementsSkin XWikiDocument.", exp);
       }
       if (!vcontext.containsKey("page_type")) {
         PageTypeReference pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
@@ -248,17 +273,22 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   private Document getCelementsSkinDoc(XWikiContext context) {
     Document skinDoc = null;
     try {
-      skinDoc = context.getWiki(
-          ).getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"),
-              context).newDocument(context);
+      skinDoc = getCelementsSkinXWikiDoc(context).newDocument(context);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to load celements2_skin"
+      _LOGGER.error("Failed to load celements2_skin"
           + " (celements2web:XWiki.Celements2Skin) ", exp);
     }
     return skinDoc;
   }
 
+  private XWikiDocument getCelementsSkinXWikiDoc(XWikiContext context
+      ) throws XWikiException {
+    return context.getWiki(
+        ).getDocument(new DocumentReference("celements2web", "XWiki", "Celements2Skin"),
+            context);
+  }
 
+  @Override
   public int showRightPanels() {
     if (showRightPanelsBoolean(getContext()) && !getRightPanels().isEmpty()) {
       return 1;
@@ -271,6 +301,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return showPanelByConfigName(context, "showRightPanels");
   }
 
+  @Override
   public int showLeftPanels() {
     if (showLeftPanelsBoolean(getContext()) && !getLeftPanels().isEmpty()) {
       return 1;
@@ -283,6 +314,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return showPanelByConfigName(context, "showLeftPanels");
   }
 
+  @Override
   public List<String> getRightPanels() {
     if (showRightPanelsBoolean(getContext())) {
       return Arrays.asList(getPanelString(getContext(), "rightPanels").split(","));
@@ -291,6 +323,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     }
   }
 
+  @Override
   public List<String> getLeftPanels() {
     if (showLeftPanelsBoolean(getContext())) {
       return Arrays.asList(getPanelString(getContext(), "leftPanels").split(","));
@@ -307,39 +340,44 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         && isPageShowPanelOverwrite(configName, getPageTypeDoc(context))) {
       boolean showPanels = (1 == getPagePanelObj(configName, getPageTypeDoc(context)
           ).getIntValue("show_panels"));
-      LOGGER.debug("using pagetype for panels " + configName + " -> "+ showPanels);
+      _LOGGER.debug("using pagetype for panels " + configName + " -> "+ showPanels);
       return showPanels;
     } else if (isSpaceOverwrite(context)) {
       boolean showPanels = "1".equals(context.getWiki().getSpacePreference(configName,
           getSpaceOverwrite(context), "0", context));
-      LOGGER.debug("using spaceover webPrefs for panels " + configName
+      _LOGGER.debug("using spaceover webPrefs for panels " + configName
           + "," + getSpaceOverwrite(context) +" -> "+ showPanels);
       return showPanels;
     } else if (isGlobalPref(context)) {
       boolean showPanels = ("1".equals(context.getWiki().getXWikiPreference(configName,
           context)));
-      LOGGER.debug("using globalPref for panels " + configName + " -> "+ showPanels);
+      _LOGGER.debug("using globalPref for panels " + configName + " -> "+ showPanels);
       return showPanels;
     } else if (context.getWiki() != null) {
       boolean showPanels = ("1".equals(context.getWiki().getSpacePreference(configName,
           context)));
-      LOGGER.debug("using webPrefs for panels " + configName + " -> "+ showPanels);
+      _LOGGER.debug("using webPrefs for panels " + configName + " -> "+ showPanels);
       return showPanels;
     }
     return false;
   }
 
-  private XWikiDocument getPageTypeDoc(XWikiContext context) {
+  XWikiDocument getPageTypeDoc(XWikiContext context) {
     if(context.getDoc() != null) {
-      try {
-        XWikiDocument pageTypeDoc = new PageType(new DocumentReference(
-            context.getDatabase(), "PageTypes",
-            pageTypeResolver.getPageTypeRefForCurrentDoc().getConfigName())
-            ).getTemplateDocument(getContext());
-        LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
-        return pageTypeDoc;
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to getPageTypeDoc.", exp);
+      PageTypeReference pTRefForCurrDoc = pageTypeResolver.getPageTypeRefForCurrentDoc();
+      if (pTRefForCurrDoc != null) {
+        try {
+          DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
+              "PageTypes", pTRefForCurrDoc.getConfigName());
+          XWikiDocument pageTypeDoc = new PageType(pageTypeDocRef).getTemplateDocument(
+              getContext());
+          _LOGGER.debug("getPageTypeDoc: pageTypeDoc=" + pageTypeDoc);
+          return pageTypeDoc;
+        } catch (XWikiException exp) {
+          _LOGGER.error("Failed to getPageTypeDoc.", exp);
+        }
+      } else {
+        _LOGGER.info("no pageType reference for current document found.");
       }
     }
     return null;
@@ -360,8 +398,8 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       return ((getPagePanelObj(configName, theDoc) != null)
          && (((BaseProperty)getPagePanelObj(configName, theDoc
              ).get("show_panels")).getValue() != null));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      _LOGGER.error("", exp);
       return false;
     }
   }
@@ -397,13 +435,13 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
            getSpaceOverwrite(context), "", context);
     } else {
       panelsString = context.getWiki().getUserPreference(configName, context);
-      LOGGER.debug("else with panels in userPreferences: " + panelsString);
+      _LOGGER.debug("else with panels in userPreferences: " + panelsString);
       if("".equals(panelsString)) {
          panelsString = context.getWiki().getSpacePreference(configName, context);
-         LOGGER.debug("else with panels in webPreferences: " + panelsString);
+         _LOGGER.debug("else with panels in webPreferences: " + panelsString);
       }
     }
-    LOGGER.debug("panels for config " + configName + " ; " + panelsString);
+    _LOGGER.debug("panels for config " + configName + " ; " + panelsString);
     return panelsString;
   }
 
@@ -430,6 +468,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     return false;
   }
 
+  @Override
   public String getVelocityName() {
     return "celementsweb";
   }
@@ -450,10 +489,10 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * between spaces. XWiki does not!
    */
   String getLanguagePreference(XWikiContext context) {
-    LOGGER.debug("getLanguagePreference: start " + context.getLanguage());
+    _LOGGER.debug("getLanguagePreference: start " + context.getLanguage());
     String language = context.getLanguage();
 
-    LOGGER.debug("getLanguagePreference: isMultiLingual ["
+    _LOGGER.debug("getLanguagePreference: isMultiLingual ["
         + context.getWiki().isMultiLingual(context) + "] defaultLanguage ["
         + webUtilsService.getDefaultLanguage() + "].");
     // If the wiki is non multilingual then the language is the default
@@ -466,62 +505,62 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
       try {
         language = getLanguageInRequestParam();
         if (isValidLanguage(language)) {
-          LOGGER.debug("getLanguagePreference: found parameter language " + language);
+          _LOGGER.debug("getLanguagePreference: found parameter language " + language);
           return language;
         }
       } catch (Exception e) {
-        LOGGER.error("Failed to get the language paramter from the request.", e);
+        _LOGGER.error("Failed to get the language paramter from the request.", e);
       }
       // As no language parameter was passed in the request, try to get the
       // language to use from a cookie.
       try {
         language = getLanguageFromCookie();
         if (isValidLanguage(language)) {
-          LOGGER.debug("getLanguagePreference: found cookie language " + language);
+          _LOGGER.debug("getLanguagePreference: found cookie language " + language);
           return language;
         }
       } catch (Exception e) {
-        LOGGER.error("Failed to get the language from the cookie.", e);
+        _LOGGER.error("Failed to get the language from the cookie.", e);
       }
     } else {
-      LOGGER.info("getLanguagePreference: skip language parameter in request and"
+      _LOGGER.info("getLanguagePreference: skip language parameter in request and"
           + " language cookie check, because request is null.");
     }
 
-    LOGGER.trace("getLanguagePreference: Next from the default user preference.");
+    _LOGGER.trace("getLanguagePreference: Next from the default user preference.");
 
     // Next from the default user preference
     try {
       language = getLanguageFromUserPreferences();
       if (isValidLanguage(language)) {
-        LOGGER.debug("getLanguagePreference: found userpref language " + language);
+        _LOGGER.debug("getLanguagePreference: found userpref language " + language);
         return language;
       }
     } catch (XWikiException e) {
-      LOGGER.error("Failed to get the default language from the user preferences.", e);
+      _LOGGER.error("Failed to get the default language from the user preferences.", e);
     }
 
-    LOGGER.trace("getLanguagePreference: Next from preferDefault? ");
+    _LOGGER.trace("getLanguagePreference: Next from preferDefault? ");
 
     if (isConsiderBrowserAcceptLanguages()) {
-      LOGGER.trace("getLanguagePreference: Then from the navigator language setting.");
+      _LOGGER.trace("getLanguagePreference: Then from the navigator language setting.");
       // Then from the navigator language setting
       if (context.getRequest() != null) {
         language = getLanguageFromAcceptedHeaderLanguages();
         if (isValidLanguage(language)) {
-          LOGGER.debug("getLanguagePreference: found accepted language " + language);
+          _LOGGER.debug("getLanguagePreference: found accepted language " + language);
           return language;
         }
       } else {
-        LOGGER.info("getLanguagePreference: skip accept-language in request,"
+        _LOGGER.info("getLanguagePreference: skip accept-language in request,"
             + " because request is null.");
       }
     } else {
-      LOGGER.debug("getLanguagePreference: found preferDefault language " + language);
+      _LOGGER.debug("getLanguagePreference: found preferDefault language " + language);
     }
 
     // Finally, use the default language from the global preferences.
-    LOGGER.debug("getLanguagePreference: use default language " + language);
+    _LOGGER.debug("getLanguagePreference: use default language " + language);
     return webUtilsService.getDefaultLanguage();
   }
 
@@ -538,20 +577,20 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     // If the client didn't specify some languages, skip this phase
     if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
       List<String> acceptedLanguages = getAcceptedLanguages(getContext().getRequest());
-      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: getAcceptedLanguages "
+      _LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: getAcceptedLanguages "
           + acceptedLanguages);
-      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported "
+      _LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported "
           + xwiki.Param("xwiki.language.forceSupported", "0"));
       // We can force one of the configured languages to be accepted
       if (xwiki.Param("xwiki.language.forceSupported", "0").equals("1")) {
         List<String> available = webUtilsService.getAllowedLanguages();
-        LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported lang "
+        _LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: forceSupported lang "
             + " languages [" + Arrays.deepToString(available.toArray(new String[] {}))
             + "].");
         // Filter only configured languages
         acceptedLanguages.retainAll(available);
       }
-      LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: acceptedLanguages after "
+      _LOGGER.debug("getLanguageFromAcceptedHeaderLanguages: acceptedLanguages after "
           + acceptedLanguages);
       if (acceptedLanguages.size() > 0) {
         // Use the "most-preferred" language, as requested by the client.
@@ -654,7 +693,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
     Enumeration<Locale> e = request.getLocales();
     while (e.hasMoreElements()) {
       String language = e.nextElement().getLanguage().toLowerCase();
-      LOGGER.debug("getAcceptedLanguages: found language " + language);
+      _LOGGER.debug("getAcceptedLanguages: found language " + language);
       // All language codes should have 2 letters.
       if (StringUtils.isAlpha(language)) {
         result.add(language);
@@ -677,20 +716,20 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
                   tdoc = getContext().getWiki().getDocument(tdoc, rev, getContext());
               }
           } catch (Exception ex) {
-            LOGGER.debug("Invalid version, just use the most recent one.", ex);
+            _LOGGER.debug("Invalid version, just use the most recent one.", ex);
           }
           getContext().put("tdoc", tdoc);
           vcontext.put("tdoc", tdoc.newDocument(getContext()));
         } catch (XWikiException exp) {
-          LOGGER.error("Faild to get translated document for ["
+          _LOGGER.error("Faild to get translated document for ["
               + getContext().getDoc().getDocumentReference() + "].", exp);
         }
       } else {
-        LOGGER.debug("skip fixTdocForInvalidLanguage because vTdoc launguage is"
+        _LOGGER.debug("skip fixTdocForInvalidLanguage because vTdoc launguage is"
             + " correct.");
       }
     } else {
-      LOGGER.debug("skip fixTdocForInvalidLanguage doc [" + doc + "] vcontext ["
+      _LOGGER.debug("skip fixTdocForInvalidLanguage doc [" + doc + "] vcontext ["
           + vcontext + "].");
     }
   }

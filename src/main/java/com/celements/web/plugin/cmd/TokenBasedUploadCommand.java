@@ -21,8 +21,11 @@ package com.celements.web.plugin.cmd;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.web.service.IAttachmentServiceRole;
+import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,8 +40,25 @@ public class TokenBasedUploadCommand {
 
   private TokenLDAPAuthServiceImpl tokenAuthImpl = new TokenLDAPAuthServiceImpl();
 
+  IWebUtilsService webUtilsService;
+
   private IAttachmentServiceRole getAttService() {
     return Utils.getComponent(IAttachmentServiceRole.class);
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+  }
+
+  private Execution getExecution() {
+    return Utils.getComponent(Execution.class);
+  }
+
+  IWebUtilsService getWebUtilsService() {
+    if (webUtilsService != null) {
+      return webUtilsService;
+    }
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   @Deprecated
@@ -54,19 +74,31 @@ public class TokenBasedUploadCommand {
     }
     return 0;
   }
-  
+
+  /**
+   * @deprecated since 2.59.1 instead use tokenBasedUploadDocRef
+   */
+  @Deprecated
   public int tokenBasedUpload(String attachToDocFN, String fieldNamePrefix,
       String userToken,  Boolean createIfNotExists, XWikiContext context
       ) throws XWikiException {
-    String username = tokenAuthImpl.getUsernameForToken(userToken, context);
+    return tokenBasedUploadDocRef(webUtilsService.resolveDocumentReference(attachToDocFN),
+        fieldNamePrefix, userToken, createIfNotExists);
+  }
+
+  public int tokenBasedUploadDocRef(DocumentReference attachToDocRef,
+      String fieldNamePrefix, String userToken, Boolean createIfNotExists
+      ) throws XWikiException {
+    String username = tokenAuthImpl.getUsernameForToken(userToken, getContext());
     if((username != null) && !username.equals("")){
       LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
-      context.setUser(username);
-      XWikiDocument doc = context.getWiki().getDocument(attachToDocFN, context);
-      if (createIfNotExists || context.getWiki().exists(attachToDocFN,
-          context)) {
+      getContext().setUser(username);
+      XWikiDocument doc = getContext().getWiki().getDocument(attachToDocRef,
+          getContext());
+      if (createIfNotExists || getContext().getWiki().exists(attachToDocRef,
+          getContext())) {
         LOGGER.info("tokenBasedUpload: add attachment [" + fieldNamePrefix + "] to doc ["
-            + attachToDocFN + "].");
+            + attachToDocRef + "].");
         if (LOGGER.isTraceEnabled()) {
           for (XWikiAttachment origAttach : doc.getAttachmentList()) {
             LOGGER.trace("tokenBasedUpload - origialDoc before addAttachments: "
@@ -75,7 +107,7 @@ public class TokenBasedUploadCommand {
         }
         return getAttService().uploadMultipleAttachments(doc, fieldNamePrefix);
       } else {
-        LOGGER.warn("tokenBasedUpload: document " + attachToDocFN + " does not exist.");
+        LOGGER.warn("tokenBasedUpload: document " + attachToDocRef + " does not exist.");
       }
     } else {
       LOGGER.warn("tokenBasedUpload: username could not be identified by token");

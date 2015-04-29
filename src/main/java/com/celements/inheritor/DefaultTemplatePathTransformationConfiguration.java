@@ -60,6 +60,8 @@ public class DefaultTemplatePathTransformationConfiguration implements
     // Default Mappings
     this.defaultMappings.setProperty("Templates", "celTemplates");
     this.defaultMappings.setProperty("Ajax", "celAjax");
+    this.defaultMappings.setProperty("Mails", "celMails");
+    this.defaultMappings.setProperty("ActionTemplates", "celActionTemplates");
   }
 
   /**

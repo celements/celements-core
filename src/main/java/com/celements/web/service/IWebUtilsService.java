@@ -19,26 +19,40 @@
  */
 package com.celements.web.service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.rights.AccessLevel;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
 public interface IWebUtilsService {
   
+  public static final Date DATE_LOW = new Date(-62135773200000L);
+  
+  /**
+   * {@value #DATE_HIGH} has the value [Fri Dec 31 23:59:00 CET 9999]
+   */
+  public static final Date DATE_HIGH = new Date(253402297140000L);
+
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
    * corresponding DocumentReference or throws IndexOutOfBoundsException
@@ -47,14 +61,14 @@ public interface IWebUtilsService {
    * @throws IndexOutOfBoundsException - if level above root or below lowest
    */
   public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
-  
+
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc);
-  
-  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section 
+
+  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section
       ) throws XWikiException;
-  
-  public String getDocSection(String regex, DocumentReference docRef, int section 
+
+  public String getDocSection(String regex, DocumentReference docRef, int section
       ) throws XWikiException;
 
   public int countSections(String regex, DocumentReference docRef) throws XWikiException;
@@ -62,19 +76,27 @@ public interface IWebUtilsService {
   public List<String> getAllowedLanguages();
 
   public Date parseDate(String date, String format);
-  
+
   public XWikiMessageTool getMessageTool(String adminLanguage);
 
   public XWikiMessageTool getAdminMessageTool();
 
+  public String getDefaultAdminLanguage();
+
   public String getAdminLanguage();
 
+  /**
+   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
+   */
+  @Deprecated
   public String getAdminLanguage(String userFullName);
+
+  public String getAdminLanguage(DocumentReference userRef);
 
   public String getDefaultLanguage();
 
   public String getDefaultLanguage(String spaceName);
-  
+
   public boolean hasParentSpace();
 
   public boolean hasParentSpace(String spaceName);
@@ -85,26 +107,88 @@ public interface IWebUtilsService {
 
   public DocumentReference resolveDocumentReference(String fullName);
 
+  public DocumentReference resolveDocumentReference(String fullName, 
+      WikiReference wikiRef);
+
   public SpaceReference resolveSpaceReference(String spaceName);
+
+  public SpaceReference resolveSpaceReference(String spaceName, 
+      WikiReference wikiRef);
+
+  public AttachmentReference resolveAttachmentReference(String fullName);
+
+  public AttachmentReference resolveAttachmentReference(String fullName, 
+      WikiReference wikiRef);
+
+  public EntityReference resolveEntityReference(String name, EntityType type);
+
+  public EntityReference resolveEntityReference(String name, EntityType type, 
+      WikiReference wikiRef);
 
   public boolean isAdminUser();
 
   public boolean isAdvancedAdmin();
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
+  public boolean isSuperAdminUser();
+
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
+      ) throws XWikiException;
+
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
+      ) throws XWikiException;
+
+  public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
+
+  public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
+  
+  /**
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc,
       String comparator) throws ClassNotFoundException;
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator);
+
+  /**
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, 
+   * boolean)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly);
 
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator, boolean imagesOnly);
+
+  /**
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, 
+   * boolean, int, int)}
+   */
+  @Deprecated
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb);
+
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+      Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb);
+
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator, 
-      boolean imagesOnly, int start, int nb);
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
+
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb);
+
+  //TODO change signature requirement to XWikiDocument instead of document and mark
+  //     the old version as deprecated
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException;
 
   //TODO change signature requirement to XWikiDocument instead of document and mark
   //     the old version as deprecated
@@ -118,19 +202,27 @@ public interface IWebUtilsService {
 
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
-  
+
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2);
 
   public String[] splitStringByLength(String inStr, int maxLength);
-  
+
   public String getJSONContent(XWikiDocument cdoc);
   
+  public String getJSONContent(DocumentReference docRef);
+
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
-  
+
   public String getMajorVersion(XWikiDocument doc);
 
+  public WikiReference getWikiRef();
+
+  public WikiReference getWikiRef(XWikiDocument doc);
+
   public WikiReference getWikiRef(DocumentReference docRef);
+
+  public WikiReference getWikiRef(EntityReference ref);
 
   public List<String> getAllowedLanguages(String spaceName);
 
@@ -141,6 +233,10 @@ public interface IWebUtilsService {
   public EntityReferenceSerializer<String> getRefDefaultSerializer();
 
   public EntityReferenceSerializer<String> getRefLocalSerializer();
+
+  public String serializeRef(EntityReference entityRef);
+
+  public String serializeRef(EntityReference entityRef, boolean local);
   
   public Map<String, String[]> getRequestParameterMap();
 
@@ -152,5 +248,64 @@ public interface IWebUtilsService {
       ) throws XWikiException;
 
   public String getTemplatePathOnDisk(String renderTemplatePath);
+
+  public String getTemplatePathOnDisk(String renderTemplatePath, String lang);
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang
+      ) throws XWikiException;
+
+  public String renderInheritableDocument(DocumentReference docRef, String lang,
+      String defLang) throws XWikiException;
+
+  public boolean isLayoutEditor();
+
+  public String cleanupXHTMLtoHTML5(String xhtml);
+  
+  public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
+
+  public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
+  
+  public List<Attachment> getAttachmentsForDocs(List<String> docsFN);
+
+  public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
+      String defLang);
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang);
+
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang,
+      String defLang);
+
+  /**
+   * used to send an email if result of <param>jobMailName</param> is not empty
+   * 
+   * @param jobMailName inheritable Mails document name
+   * @param fromAddr sender address
+   * @param toAddr  recipients
+   * @param params list of strings passed through to dictionary subject resolving
+   */
+  public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
+      List<String> params);
+
+  public WikiReference getCentralWikiRef();
+
+  /**
+   * resolves the {@link EntityType} for the given fullName.<br>
+   * <br>
+   * Simple names will return {@link EntityType#WIKI}.
+   * 
+   * @param fullName
+   * @return
+   */
+  public EntityType resolveEntityTypeForFullName(String fullName);
+
+  /**
+   * resolves the {@link EntityType} for the given fullName.
+   * 
+   * @param fullName
+   * @param defaultNameType EntityType used if given fullName is just a simple name
+   * @return
+   */
+  public EntityType resolveEntityTypeForFullName(String fullName, 
+      EntityType defaultNameType);
 
 }

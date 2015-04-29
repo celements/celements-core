@@ -20,7 +20,6 @@
 package com.celements.web.plugin.cmd;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -47,11 +46,10 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CelementsWebPluginTest() throws Exception {
     renameCmd = new RenameCommand();
-    mockWebUtils = createMock(IWebUtils.class);
+    mockWebUtils = createMockAndAddToDefault(IWebUtils.class);
     renameCmd.inject_webUtils(mockWebUtils);
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
   }
 
   @Test
@@ -70,7 +68,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
   public void testRenameDoc_externalAccessWithFlushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMock(XWikiDocument.class);
+    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
@@ -78,16 +76,16 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expectLastCall().once();
     mockWebUtils.flushMenuItemCache(same(context));
     expectLastCall().once();
-    replay(xwiki, mockWebUtils, xDoc);
+    replayDefault();
     assertTrue(renameCmd.renameDoc(docName, newDocName, context));
-    verify(xwiki, mockWebUtils, xDoc);
+    verifyDefault();
   }
 
   @Test
   public void testRenameDoc_internalAccessWithFlushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMock(XWikiDocument.class);
+    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
@@ -95,25 +93,25 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expectLastCall().once();
     mockWebUtils.flushMenuItemCache(same(context));
     expectLastCall().once();
-    replay(xwiki, mockWebUtils, xDoc);
+    replayDefault();
     assertTrue(renameCmd.renameDoc(docName, newDocName, false, context));
-    verify(xwiki, mockWebUtils, xDoc);
+    verifyDefault();
   }
 
   @Test
   public void testRenameDoc_internalAccessWithOUTflushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMock(XWikiDocument.class);
+    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true
         ).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
     xDoc.rename(eq(newDocName), same(context));
     expectLastCall().once();
-    replay(xwiki, mockWebUtils, xDoc);
+    replayDefault();
     assertTrue(renameCmd.renameDoc(docName, newDocName, true, context));
-    verify(xwiki, mockWebUtils, xDoc);
+    verifyDefault();
   }
 
   @Test
@@ -123,9 +121,9 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true
         ).atLeastOnce();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(true).atLeastOnce();
-    replay(xwiki, mockWebUtils);
+    replayDefault();
     assertFalse(renameCmd.renameDoc(docName, newDocName, true, context));
-    verify(xwiki, mockWebUtils);
+    verifyDefault();
   }
 
   @Test
@@ -135,39 +133,39 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(docName), same(context))).andReturn(false
         ).atLeastOnce();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
-    replay(xwiki, mockWebUtils);
+    replayDefault();
     assertFalse(renameCmd.renameDoc(docName, newDocName, true, context));
-    verify(xwiki, mockWebUtils);
+    verifyDefault();
   }
 
   @Test
   public void testRenameDoc_Exception_on_getDocument() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMock(XWikiDocument.class);
+    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true
         ).atLeastOnce();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andThrow(new XWikiException());
-    replay(xwiki, mockWebUtils, xDoc);
+    replayDefault();
     assertFalse(renameCmd.renameDoc(docName, newDocName, true, context));
-    verify(xwiki, mockWebUtils, xDoc);
+    verifyDefault();
   }
 
   @Test
   public void testRenameDoc_Exception_on_rename_withFlushMenuCache() throws Exception {
     String docName = "mySpace.myDoc1";
     String newDocName = "myNewSpace.myDoc2";
-    XWikiDocument xDoc = createMock(XWikiDocument.class);
+    XWikiDocument xDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(docName), same(context))).andReturn(true
         ).atLeastOnce();
     expect(xwiki.getDocument(eq(docName), same(context))).andReturn(xDoc).once();
     expect(xwiki.exists(eq(newDocName), same(context))).andReturn(false).atLeastOnce();
     xDoc.rename(eq(newDocName), same(context));
     expectLastCall().andThrow(new XWikiException());
-    replay(xwiki, mockWebUtils, xDoc);
+    replayDefault();
     assertFalse(renameCmd.renameDoc(docName, newDocName, false, context));
-    verify(xwiki, mockWebUtils, xDoc);
+    verifyDefault();
   }
 
   @Test
@@ -175,7 +173,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     String spaceName = "mySpace";
     String newSpaceName = "myNewSpace";
     String firstDocName = "myDoc1";
-    XWikiDocument firstDoc = createMock(XWikiDocument.class);
+    XWikiDocument firstDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(spaceName + "." + firstDocName), same(context))).andReturn(true
         ).atLeastOnce();
     expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))
@@ -185,7 +183,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     firstDoc.rename(eq("myNewSpace.myDoc1"), same(context));
     expectLastCall().once();
     String firstDocName2 = "myDoc2";
-    XWikiDocument secondDoc = createMock(XWikiDocument.class);
+    XWikiDocument secondDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))
         ).andReturn(true).atLeastOnce();
     expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))
@@ -198,10 +196,10 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getSpaceDocsName(eq(spaceName), same(context))).andReturn(docNames);
     mockWebUtils.flushMenuItemCache(same(context));
     expectLastCall().once();
-    replay(xwiki, mockWebUtils, firstDoc, secondDoc);
+    replayDefault();
     List<String> renamedPages = renameCmd.renameSpace(spaceName, newSpaceName, context);
     assertEquals(docNames, renamedPages);
-    verify(xwiki, mockWebUtils, firstDoc, secondDoc);
+    verifyDefault();
   }
   
   @Test
@@ -216,7 +214,7 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(spaceName + "." + firstDocName), same(context))
       ).andThrow(new XWikiException());
     String firstDocName2 = "myDoc2";
-    XWikiDocument secondDoc = createMock(XWikiDocument.class);
+    XWikiDocument secondDoc = createMockAndAddToDefault(XWikiDocument.class);
     expect(xwiki.exists(eq(spaceName + "." + firstDocName2), same(context))
         ).andReturn(true).atLeastOnce();
     expect(xwiki.exists(eq(newSpaceName + "." + firstDocName2), same(context))
@@ -229,10 +227,10 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getSpaceDocsName(eq(spaceName), same(context))).andReturn(docNames);
     mockWebUtils.flushMenuItemCache(same(context));
     expectLastCall().once();
-    replay(xwiki, mockWebUtils, secondDoc);
+    replayDefault();
     List<String> renamedPages = renameCmd.renameSpace(spaceName, newSpaceName, context);
     assertEquals(Arrays.asList(firstDocName2), renamedPages);
-    verify(xwiki, mockWebUtils, secondDoc);
+    verifyDefault();
   }
   
   @Test
@@ -241,10 +239,10 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
     String newSpaceName = "myNewSpace";
     expect(xwiki.getSpaceDocsName(eq(spaceName), same(context))).andThrow(
         new XWikiException());
-    replay(xwiki, mockWebUtils);
+    replayDefault();
     List<String> renamedPages = renameCmd.renameSpace(spaceName, newSpaceName, context);
     assertTrue(renamedPages.isEmpty());
-    verify(xwiki, mockWebUtils);
+    verifyDefault();
   }
   
   @Test
@@ -263,10 +261,10 @@ public class RenameCommandTest extends AbstractBridgedComponentTestCase {
         ).andReturn(true).atLeastOnce();
     List<String> docNames = Arrays.asList(firstDocName, firstDocName2);
     expect(xwiki.getSpaceDocsName(eq(spaceName), same(context))).andReturn(docNames);
-    replay(xwiki, mockWebUtils);
+    replayDefault();
     List<String> renamedPages = renameCmd.renameSpace(spaceName, newSpaceName, context);
     assertTrue(renamedPages.isEmpty());
-    verify(xwiki, mockWebUtils);
+    verifyDefault();
   }
-  
+
 }

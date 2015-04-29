@@ -118,6 +118,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
 
   @Test
   public void testGetDependentDocumentReference() throws Exception {
+    context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyDoc");
@@ -138,6 +139,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
         leftParentDoc).atLeastOnce();
     expect(leftParentDoc.getContent()).andReturn("parent Content").atLeastOnce();
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
+    expect(leftParentDoc.getDefaultLanguage()).andReturn("en").anyTimes();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
         cellDocRef);
@@ -193,6 +195,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
 
   @Test
   public void testGetDependentDocumentReference_defaultContent_space() throws Exception {
+    context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(
         context.getDatabase(),
@@ -222,6 +225,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(xwiki.exists(eq(mySpaceLeftColumnDefaultFN), same(context))).andReturn(
         true).atLeastOnce();
     XWikiDocument spaceDefaultDocument = new XWikiDocument(expDepDocRef);
+    spaceDefaultDocument.setDefaultLanguage("en");
     spaceDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(mySpaceLeftColumnDefaultFN), same(context))).andReturn(
         spaceDefaultDocument);
@@ -240,6 +244,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
 
   @Test
   public void testGetDependentDocumentReference_defaultContent_wiki() throws Exception {
+    context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(
         context.getDatabase(),
@@ -276,6 +281,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(xwiki.exists(eq(wikiLeftColumnDefaultFN), same(context))).andReturn(
         true).atLeastOnce();
     XWikiDocument wikiDefaultDocument = new XWikiDocument(pdcWikiDefaultDocRef);
+    wikiDefaultDocument.setDefaultLanguage("en");
     wikiDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(wikiLeftColumnDefaultFN), same(context))).andReturn(
         wikiDefaultDocument);
@@ -289,6 +295,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
 
   @Test
   public void testGetDependentDocumentReference_defaultContent_layout() throws Exception {
+    context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(
         context.getDatabase(),
@@ -339,6 +346,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(xwiki.exists(eq(layoutDefaultFN), same(context))).andReturn(true
         ).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(layoutDefaultFN), same(context))).andReturn(
         layoutDefaultDocument);
@@ -352,6 +360,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   @Test
   public void testGetDependentDocumentReference_defaultContent_overwrite_layout(
       ) throws Exception {
+    context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(
         context.getDatabase(),
@@ -401,6 +410,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(xwiki.exists(eq(layoutDefaultFN), same(context))).andReturn(true
         ).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(layoutDefaultFN), same(context))).andReturn(
         layoutDefaultDocument);
@@ -414,6 +424,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
   @Test
   public void testGetDependentDocumentReference_defaultContent_centrallayout(
       ) throws Exception {
+    context.setLanguage("en");
     setDependentDocSpace("leftColumn", 1);
     DocumentReference pdcWikiDefaultDocRef = new DocumentReference(
         context.getDatabase(),
@@ -465,6 +476,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     expect(xwiki.exists(eq(layoutDefaultFN), same(context))).andReturn(true
         ).atLeastOnce();
     XWikiDocument layoutDefaultDocument = new XWikiDocument(expectedLayoutDefaultRef);
+    layoutDefaultDocument.setDefaultLanguage("en");
     layoutDefaultDocument.setContent("no empty content");
     expect(xwiki.getDocument(eq(layoutDefaultFN), same(context))).andReturn(
         layoutDefaultDocument);

@@ -74,11 +74,19 @@ public class CellsScriptService implements ScriptService {
     return currentDoc;
   }
 
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   private XWikiDocument getCurrentXWikiDoc(Document currentDoc) throws XWikiException {
     return getCurrentXWikiDocDef(currentDoc).getTranslatedDocument(
         currentDoc.getLanguage(), getContext());
   }
 
+  /*
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
+   */
   private XWikiDocument getCurrentXWikiDocDef(Document currentDoc) throws XWikiException {
     return getContext().getWiki().getDocument(currentDoc.getDocumentReference(),
         getContext());

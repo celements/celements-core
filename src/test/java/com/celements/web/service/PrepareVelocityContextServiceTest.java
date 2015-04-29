@@ -470,6 +470,69 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
   }
 
   @Test
+  public void testInitCelementsVelocity_checkNPEs_forMissingURLfactory(
+      ) throws XWikiException {
+    context.setURLFactory(null);
+    assertNull(context.getURLFactory());
+    VelocityContext vContext = new VelocityContext();
+    context.put("vcontext", vContext);
+    expect(xwiki.getPluginApi(eq(prepVeloContextService.getVelocityName()), same(context))
+        ).andReturn(null
+      ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("default_language"), same(context))).andReturn(""
+      ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("language"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("").anyTimes();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
+        ).andReturn("").anyTimes();
+    expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(""
+      ).anyTimes();
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("de"), same(context))
+      ).andReturn("").anyTimes();
+    DocumentReference userDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "myTestUser");
+    expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
+      new XWikiDocument(userDocRef)).anyTimes();
+    expect(skinDoc.getURL(eq("view"), same(context))).andThrow(
+        new NullPointerException()).anyTimes();
+    expect(xwiki.getSpacePreference(eq("editbox_width"), same(context))).andReturn("123"
+      ).anyTimes();
+    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
+      ).atLeastOnce();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(
+        new XWikiDocument()).atLeastOnce();
+    expect(xwiki.getSkin(same(context))).andReturn("celements2web:Skins.CellSkin"
+        ).anyTimes();
+    DocumentReference cellSkinDoc = new DocumentReference("celements2web","Skins",
+        "CellSkin");
+    expect(xwiki.getDocument(eq(cellSkinDoc), same(context))).andReturn(new XWikiDocument(
+        cellSkinDoc)).atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.myTestUser"), same(context))
+      ).andReturn(new User(context.getXWikiUser(), context)).atLeastOnce();
+    XWikiGroupService groupServiceMock = createMockAndAddToDefault(
+        XWikiGroupService.class);
+    expect(xwiki.getGroupService(same(context))).andReturn(groupServiceMock).anyTimes();
+    List<DocumentReference> groupRefList = Collections.emptyList();
+    expect(groupServiceMock.getAllGroupsReferencesForMember(eq(userDocRef), eq(0), eq(0),
+        same(context))).andReturn(groupRefList).atLeastOnce();
+    context.setWiki(xwiki);
+    expect(rightServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.myTestUser"),
+        eq("mySpace.myDoc"), same(context))).andReturn(false).anyTimes();
+    expect(rightServiceMock.hasAdminRights(same(context))).andReturn(false).anyTimes();
+    expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
+    PageTypeReference ptRef = new PageTypeReference("RichText", "testProvider",
+        Arrays.asList("cat1"));
+    expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(ptRef).atLeastOnce();
+    replayDefault();
+    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
+    //set after calling replay
+    context.setUser("XWiki.myTestUser");
+    prepVeloContextService.initCelementsVelocity(vContext);
+    assertEquals("expecting tinyMCE_width be set.", "123", vContext.get("tinyMCE_width"));
+    verifyDefault();
+  }
+
+  @Test
   public void testInitPanelsVelocity_checkNPEs_forEmptyVContext() {
     context.setDoc(null);
     context.put("vcontext", new VelocityContext());
@@ -595,6 +658,22 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         ).atLeastOnce();
     replayDefault();
     assertEquals(expectedPanels, prepVeloContextService.getLeftPanels());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetPaeTypeDoc_noContextDoc_NPE() {
+    context.setDoc(null);
+    replayDefault();
+    prepVeloContextService.getPageTypeDoc(context);
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetPaeTypeDoc_noPageTypeRef_NPE() {
+    expect(ptResolverMock.getPageTypeRefForCurrentDoc()).andReturn(null).atLeastOnce();
+    replayDefault();
+    prepVeloContextService.getPageTypeDoc(context);
     verifyDefault();
   }
 

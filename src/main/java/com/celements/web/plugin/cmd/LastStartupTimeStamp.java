@@ -36,6 +36,10 @@ public class LastStartupTimeStamp {
     return lastStartUpTimeStamp;
   }
 
+  public void resetLastStartupTimeStamp() {
+    lastStartUpTimeStamp = null;
+  }
+
   public String getLastChangedTimeStamp(Date lastChangeDate) {
     return new SimpleDateFormat("yyyyMMddHHmmss").format(lastChangeDate);
   }

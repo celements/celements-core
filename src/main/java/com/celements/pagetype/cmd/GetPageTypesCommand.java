@@ -27,18 +27,34 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 
 import com.celements.pagetype.PageType;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 public class GetPageTypesCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       GetPageTypesCommand.class);
 
+  private String _CEL_GETXOBJ_PAGETYPES_COUNTER = "celGetXObjectPageTypesCounter";
+  private String _CEL_GETXOBJ_PAGETYPES_TOTALTIME = "celGetXObjectPageTypesTotelTime";
+
+  private ExecutionContext getExecContext() {
+    return Utils.getComponent(Execution.class).getContext();
+  }
+
+  /**
+   * @deprecated since 1.100 instead use page type script service
+   *      com.celements.pagetype.service.PageTypeScriptService.getPageTypesByCategories()
+   */
+  @Deprecated
   public List<String> getPageTypesForCategories(Set<String> catList, boolean onlyVisible,
       XWikiContext context) {
+    LOGGER.warn("deprecated usage of getPageTypesForCategories.");
     Set<String> pageTypeSet = getXObjectPageTypes(catList, onlyVisible, context);
     if (doesContainEmptyCategory(catList)) {
       pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
@@ -54,6 +70,12 @@ public class GetPageTypesCommand {
       XWikiContext context) {
     Set<String> pageTypeSet = new HashSet<String>();
     String currentDatabase = context.getDatabase();
+    Integer count = 0;
+    if (getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_COUNTER) != null) {
+      count = (Integer) getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_COUNTER);
+    }
+    count = count + 1;
+    long startMillis = System.currentTimeMillis();
     try {
       context.setDatabase("celements2web");
       pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
@@ -61,6 +83,20 @@ public class GetPageTypesCommand {
       context.setDatabase(currentDatabase);
     }
     pageTypeSet.addAll(getPageTypesForOneDatabase(catList, onlyVisible, context));
+    getExecContext().setProperty(_CEL_GETXOBJ_PAGETYPES_COUNTER, count);
+    if (LOGGER.isInfoEnabled()) {
+      long endMillis = System.currentTimeMillis();
+      long timeUsed = endMillis - startMillis;
+      Long totalTimeUsed = 0L;
+      if (getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_TOTALTIME) != null) {
+        totalTimeUsed = (Long) getExecContext().getProperty(
+            _CEL_GETXOBJ_PAGETYPES_TOTALTIME);
+      }
+      totalTimeUsed += timeUsed;
+      getExecContext().setProperty(_CEL_GETXOBJ_PAGETYPES_TOTALTIME, totalTimeUsed);
+      LOGGER.info("getXObjectPageTypes [" + count + "]: finished in [" + timeUsed
+          + "], total time [" + totalTimeUsed + "].");
+    }
     return pageTypeSet;
   }
 

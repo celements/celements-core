@@ -19,10 +19,15 @@
  */
 package com.celements.navigation;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -54,6 +59,23 @@ public class TreeNode {
     setPosition(position);
   }
 
+  public TreeNode(DocumentReference docRef, DocumentReference parentRef, Integer position
+      ) {
+    setDocumentReference(docRef);
+    setParent(getWebUtilsService().getRefLocalSerializer().serialize(parentRef));
+    setPosition(position);
+  }
+
+  public TreeNode(DocumentReference docRef, SpaceReference parentRef, String partName,
+      Integer position) {
+    setDocumentReference(docRef);
+    setParent("");
+    setPosition(position);
+    if (!StringUtils.isEmpty(partName)) {
+      setPartName(partName);
+    }
+  }
+
   /**
    * 
    * @return fullName
@@ -73,6 +95,15 @@ public class TreeNode {
   void setFullName(String fullName) {
     setDocumentReference(new DocumentReference(databaseName, fullName.split("\\.")[0],
         fullName.split("\\.")[1]));
+  }
+
+  public EntityReference getParentRef() {
+    if ("".equals(parent)) {
+      return docRef.getLastSpaceReference();
+    } else {
+      return getWebUtilsService().resolveDocumentReference(parent,
+          (WikiReference) docRef.getLastSpaceReference().getParent());
+    }
   }
 
   public String getParent() {
@@ -156,6 +187,10 @@ public class TreeNode {
 
   private ExecutionContext getExecutionContext() {
     return Utils.getComponent(Execution.class).getContext();
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }

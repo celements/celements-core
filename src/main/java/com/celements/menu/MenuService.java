@@ -36,6 +36,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.menu.access.IMenuAccessServiceRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -51,6 +52,9 @@ public class MenuService implements IMenuService {
 
   @Requirement
   QueryManager queryManager;
+
+  @Requirement
+  IMenuAccessServiceRole accessService;
 
   @Requirement
   Execution execution;
@@ -76,42 +80,6 @@ public class MenuService implements IMenuService {
     return resultList;
   }
 
-  boolean hasview(DocumentReference menuBarDocRef) throws XWikiException {
-    String database = getContext().getDatabase();
-    getContext().setDatabase(getContext().getOriginalDatabase());
-    if (webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef
-        ).endsWith("Celements2.AdminMenu")) {
-      LOGGER.debug("hasview: AdminMenu [" + getContext().getUser() + "] isAdvancedAdmin ["
-          + webUtilsService.isAdvancedAdmin() + "].");
-      return webUtilsService.isAdvancedAdmin();
-    }
-    getContext().setDatabase("celements2web");
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        menuBarDocRef.getLastSpaceReference().getName(), menuBarDocRef.getName());
-    String menuBar2webFullName = webUtilsService.getRefDefaultSerializer(
-        ).serialize(menuBar2webDocRef);
-    boolean centralView = !getContext().getWiki().exists(menuBar2webDocRef, getContext())
-      || getContext().getWiki().getRightService().hasAccessLevel("view",
-          getContext().getUser(), menuBar2webFullName, getContext());
-    LOGGER.debug("hasview: centralView [" + menuBar2webFullName + "] for ["
-        + getContext().getUser() + "] -> [" + centralView + "] on database ["
-        + getContext().getDatabase() + "].");
-    getContext().setDatabase(getContext().getOriginalDatabase());
-    DocumentReference menuBarLocalDocRef = new DocumentReference(getContext(
-        ).getOriginalDatabase(), menuBarDocRef.getLastSpaceReference().getName(),
-        menuBarDocRef.getName());
-    String menuBarFullName = webUtilsService.getRefDefaultSerializer(
-        ).serialize(menuBarLocalDocRef);
-    boolean localView = !getContext().getWiki().exists(menuBarLocalDocRef, getContext())
-      || getContext().getWiki().getRightService().hasAccessLevel("view",
-          getContext().getUser(), menuBarFullName, getContext());
-    LOGGER.debug("hasview: localView [" + menuBarFullName + "] for ["
-        + getContext().getUser() + "] -> [" + localView + "] on database ["
-        + getContext().getDatabase() + "].");
-    getContext().setDatabase(database);
-    return centralView && localView;
-  }
-
   void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap) {
     try {
       List<String> result = queryManager.createQuery(getHeadersXWQL(), Query.XWQL
@@ -123,17 +91,19 @@ public class MenuService implements IMenuService {
       for(String fullName : new HashSet<String>(result)) {
         DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(
             fullName);
-        if (hasview(menuBarDocRef)) {
+        if (accessService.hasview(menuBarDocRef)) {
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(
               menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef(
                   menuBarDocRef.getWikiReference().getName()));
           LOGGER.trace("addMenuHeaders: hasview for [" + 
               webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + 
               "] adding items [" + ((headerObjList != null) ?headerObjList.size() : "null"
-              ) + ".");
+              ) + "].");
           if (headerObjList != null) {
             for (BaseObject obj : headerObjList) {
-              menuHeadersMap.put(obj.getIntValue("pos"), obj);
+              if (obj != null) {
+                menuHeadersMap.put(obj.getIntValue("pos"), obj);
+              }
             }
           }
         } else {
@@ -141,10 +111,10 @@ public class MenuService implements IMenuService {
               webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + "].");
         }
       }
-    } catch (XWikiException e) {
-      LOGGER.error(e);
-    } catch (QueryException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to addMenuHeaders.", exp);
+    } catch (QueryException queryExp) {
+      LOGGER.error("Failed to execute query in addMenuHeaders.", queryExp);
     }
   }
 
@@ -166,7 +136,8 @@ public class MenuService implements IMenuService {
   }
 
   String getHeadersXWQL() {
-    return "from doc.object(Celements.MenuBarHeaderItemClass) as mHeader";
+    return "from doc.object(Celements.MenuBarHeaderItemClass) as mHeader"
+        + " group by doc.fullName";
   }
 
   public List<BaseObject> getSubMenuItems(Integer headerId) {

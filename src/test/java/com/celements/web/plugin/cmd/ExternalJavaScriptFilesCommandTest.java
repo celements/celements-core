@@ -42,19 +42,20 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
   public void setUp_ExternalJavaScriptFilesCommandTest() throws Exception {
     context = getContext();
     command = new ExternalJavaScriptFilesCommand(context);
-    attUrlCmd = createMock(AttachmentURLCommand.class);
+    attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     command.injectAttUrlCmd(attUrlCmd);
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
   }
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll() {
-    String file = "celJS/prototype.js";
+    String file = ":celJS/prototype.js";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).once();
-    replay(xwiki, attUrlCmd);
+    expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(true).anyTimes();
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
   @Test
@@ -62,46 +63,80 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     String fileNotFound = "Content.WebHome;blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null
         ).once();
-    replay(xwiki, attUrlCmd);
+    expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
   @Test
   public void testAddExtJSfileOnce_afterGetAll() throws XWikiException {
-    String file = "celJS/prototype.js";
+    String file = "/skin/resources/celJS/prototype.js";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
-    replay(xwiki, attUrlCmd);
+    expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).anyTimes();
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>", 
         command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
 
   @Test
   public void testAddExtJSfileOnce_afterGetAll_versioning() throws XWikiException {
     String file = "celJS/prototype.js?version=20110401182200";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
-    replay(xwiki, attUrlCmd);
+    expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).anyTimes();
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>", 
         command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
+  }
+  
+  @Test
+  public void testGetExtStringForJsFile() {
+    String url = "http://www.xyz.com?hi=yes&by=no";
+    String urlEsc = "http://www.xyz.com?hi=yes&amp;by=no";
+    String scriptStart = "<script type=\"text/javascript\" src=\"";
+    String scriptEnd = "\"></script>";
+    assertEquals(scriptStart + urlEsc + scriptEnd, command.getExtStringForJsFile(url));
   }
 
   @Test
-  public void testAddExtJSfileOnce_afterGetAll_fileNotFound() throws XWikiException {
-    String fileNotFound = "Content.WebHome;blabla.js";
+  public void testAddExtJSfileOnce_afterGetAll_fileNotFound_url(
+      ) throws XWikiException {
+    String fileNotFound = "/download/Content/WebHome/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null
         ).times(2);
-    replay(xwiki, attUrlCmd);
+    expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
+    replayDefault();
     command.injectDisplayAll(true);
     assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->", 
         command.addExtJSfileOnce(fileNotFound));
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
+  }
+
+  @Test
+  public void testAddExtJSfileOnce_afterGetAll_fileNotFound_attUrl(
+      ) throws XWikiException {
+    String fileNotFound = "Content.WebHome;blabla.js";
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null
+        ).once();
+    expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(true).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(false).anyTimes();
+    replayDefault();
+    command.injectDisplayAll(true);
+    assertEquals("<!-- WARNING: js-file not found: " + fileNotFound + "-->", 
+        command.addExtJSfileOnce(fileNotFound));
+    assertEquals("", command.addExtJSfileOnce(fileNotFound));
+    verifyDefault();
   }
 
   @Test
@@ -111,8 +146,12 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     String fileNotFound = "celJS/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null
         ).once();
-    String file = "celJS/prototype.js?version=20110401120000";
+    expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(true).anyTimes();
+    String file = "/skin/resources/celJS/prototype.js?version=20110401120000";
     expect(attUrlCmd.getAttachmentURL(eq(file), same(context))).andReturn(file).times(2);
+    expect(attUrlCmd.isAttachmentLink(eq(file))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(file))).andReturn(false).anyTimes();
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
         "XWiki", "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
@@ -123,15 +162,83 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
     expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(
         mainPrefDoc).anyTimes();
-    replay(xwiki, attUrlCmd);
+    replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(fileNotFound));
     String allStr = command.getAllExternalJavaScriptFiles();
-    assertEquals("<script type=\"text/javascript\""
-        + " src=\"celJS/prototype.js?version=20110401120000\"></script>\n"
+    assertEquals("<script type=\"text/javascript\" src=\"" + file + "\"></script>\n"
         + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
-    verify(xwiki, attUrlCmd);
+    verifyDefault();
   }
   
+  @Test
+  public void testAddExtJSfileOnce_beforeGetAll_explicitAndImplicit_double(
+      ) throws Exception {
+    context.setDoc(new XWikiDocument(new DocumentReference(context.getDatabase(), "Main",
+        "WebHome")));
+    String fileNotFound = ":celJS/blabla.js";
+    expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null
+        ).once();
+    expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(fileNotFound))).andReturn(true).anyTimes();
+    String attFileURL = ":celJS/prototype.js";
+    String file = "/skin/celJS/prototype.js?version=20110401120000";
+    expect(attUrlCmd.getAttachmentURL(eq(attFileURL), same(context))).andReturn(file
+        ).anyTimes();
+    expect(attUrlCmd.isAttachmentLink(eq(attFileURL))).andReturn(false).anyTimes();
+    expect(attUrlCmd.isOnDiskLink(eq(attFileURL))).andReturn(true).anyTimes();
+    String file2 = "/file/celJS/prototype.js?version=20110401120000";
+    expect(attUrlCmd.getAttachmentURL(eq(attFileURL), eq("file"), same(context))
+        ).andReturn(file2).anyTimes();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
+        "XWiki", "XWikiPreferences");
+    XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
+    expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(
+        xwikiPrefDoc).anyTimes();
+    DocumentReference mainPrefDocRef = new DocumentReference(context.getDatabase(),
+        "Main", "WebPreferences");
+    XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
+    expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(
+        mainPrefDoc).anyTimes();
+    replayDefault();
+    assertEquals("", command.addExtJSfileOnce(attFileURL, "file"));
+    assertEquals("", command.addExtJSfileOnce(attFileURL));
+    assertEquals("", command.addExtJSfileOnce(fileNotFound));
+    String allStr = command.getAllExternalJavaScriptFiles();
+    assertEquals("<script type=\"text/javascript\""
+        + " src=\"/file/celJS/prototype.js?version=20110401120000\"></script>\n"
+        + "<!-- WARNING: js-file not found: " + fileNotFound + "-->\n", allStr);
+    verifyDefault();
+  }
+
+  @Test
+  public void testAddLazyExtJSfile() {
+    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
+    String expJSON = "{\"fullURL\" : "
+        + "\"" + jsFileURL + "\", \"initLoad\" : true}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), same(context))).andReturn(jsFileURL
+        ).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON
+        + "</span>", command.addLazyExtJSfile(jsFile));
+    verifyDefault();
+  }
+
+  @Test
+  public void testAddLazyExtJSfile_action() {
+    String jsFile = ":celJS/celTabMenu/loadTinyMCE-async.js";
+    String jsFileURL = "/file/resources/celJS/celTabMenu/loadTinyMCE-async.js";
+    String action = "file";
+    String expJSON = "{\"fullURL\" : "
+        + "\"" + jsFileURL + "\", \"initLoad\" : true}";
+    expect(attUrlCmd.getAttachmentURL(eq(jsFile), eq(action), same(context))).andReturn(
+        jsFileURL).once();
+    replayDefault();
+    assertEquals("<span class='cel_lazyloadJS' style='display: none;'>" + expJSON
+        + "</span>", command.addLazyExtJSfile(jsFile, action));
+    verifyDefault();
+  }
+
 }

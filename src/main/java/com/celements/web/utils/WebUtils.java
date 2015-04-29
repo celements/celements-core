@@ -53,6 +53,11 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
+/**
+ * 
+ * @deprecated since 2.59
+ */
+@Deprecated
 public class WebUtils implements IWebUtils {
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(WebUtils.class);
@@ -131,7 +136,9 @@ public class WebUtils implements IWebUtils {
    */
   @Deprecated
   public void flushMenuItemCache(XWikiContext context) {
-    getTreeNodeCache().flushMenuItemCache();
+    LOGGER.info("flushMenuItemCache called. Do not call flushMenuItemCache for MenuItem "
+        + " changes anymore. The TreeNodeDocument change listener take care of flushing "
+        + " the cache if needed.");
   }
 
   /**
@@ -488,6 +495,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use ImageService
    */
+  @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num,
       XWikiContext context) {
     try {

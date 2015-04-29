@@ -6,6 +6,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.INavigation;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -39,6 +40,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
       INavigation navigation) {
     try {
+      LOGGER.debug("writeNodeContent for [" + docRef + "].");
       appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem,
           navigation);
     } catch (XWikiException exp) {
@@ -84,6 +86,10 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   public String getEmptyDictionaryKey() {
     return "cel_nav_nomenuitems";
+  }
+
+  public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
+    return null;
   }
 
 }

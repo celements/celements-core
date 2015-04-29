@@ -19,14 +19,15 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.xwiki.observation.EventListener;
-
-import com.celements.common.classes.CompositorComponent;
+import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.classcollections.OldCoreLegacyClasses;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * @deprecated instead use {@link IClassesCompositorComponent}
+ */
+@Deprecated
 public class CheckClassesCommand {
 
 //  private static Log LOGGER = LogFactory.getFactory().getInstance(
@@ -45,9 +46,13 @@ public class CheckClassesCommand {
   public static final String MEDIALIB_CONFIG_CLASS =
       OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
-  public void checkClasses(XWikiContext context) {
-    CompositorComponent compComponent = (CompositorComponent) Utils.getComponent(
-        EventListener.class, "CompositerComponent");
+  /**
+   * @deprecated instead use {@link IClassesCompositorComponent#checkAllClassCollections()}
+   */
+  @Deprecated
+  public void checkClasses() {
+    IClassesCompositorComponent compComponent = Utils.getComponent(
+        IClassesCompositorComponent.class);
     if(compComponent != null) {
       compComponent.checkAllClassCollections();
     }

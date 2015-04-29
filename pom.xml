@@ -40,6 +40,17 @@
       <version>${xwiki.dependency.version}</version>
       <scope>provided</scope>
     </dependency>
+		<dependency>
+		  <groupId>commons-net</groupId>
+		  <artifactId>commons-net</artifactId>
+      <scope>provided</scope>
+		</dependency>
+  	<dependency>
+	    <groupId>org.mockftpserver</groupId>
+	    <artifactId>MockFtpServer</artifactId>
+	    <version>2.5</version>
+	    <scope>test</scope>
+	  </dependency>
   </dependencies>  
   <scm>
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>

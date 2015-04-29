@@ -24,8 +24,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.cells.DivWriter;
-
 public class DivWriterTest {
 
   private DivWriter divWriter;

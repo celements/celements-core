@@ -56,7 +56,6 @@ public class DocMetaTagsCmd {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private Map<String,Map<String,String>> getObjectsMappedByLanguage(String className,
       XWikiContext context) {
     Map<String,Map<String,String>> metaTagsLangMap =

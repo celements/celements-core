@@ -6,6 +6,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
+import com.celements.rteConfig.classes.RTEConfigClasses;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -14,12 +15,14 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.oldCoreClasses")
 public class OldCoreClasses extends AbstractClassCollection {
 
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreClasses.class);
 
   public static final String PHOTO_ALBUM_CLASS_DOC = "PhotoAlbumClass";
   public static final String PHOTO_ALBUM_CLASS_SPACE = "XWiki";
   public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "."
         + PHOTO_ALBUM_CLASS_DOC;
+  public static final String PHOTO_ALBUM_GALLERY_LAYOUT = "galleryLayout";
 
   public static final String XWIKI_USERS_CLASS_DOC = "XWikiUsers";
   public static final String XWIKI_USERS_CLASS_SPACE = "XWiki";
@@ -47,11 +50,15 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String RTE_CONFIG_TYPE_CLASS = RTE_CONFIG_TYPE_CLASS_SPACE + "."
         + RTE_CONFIG_TYPE_CLASS_DOC;
 
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC =
-      "RTEConfigTypePropertiesClass";
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = "Classes";
+      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+  @Deprecated
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE =
+      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE;
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS =
-      RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE + "." + RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
 
   public static final String KEY_VALUE_CLASS_DOC = "KeyValueClass";
   public static final String KEY_VALUE_CLASS_SPACE = "Classes";
@@ -129,6 +136,17 @@ public class OldCoreClasses extends AbstractClassCollection {
 
   @Override
   protected void initClasses() throws XWikiException {
+    //old core xwiki
+    getContext().getWiki().getPrefsClass(getContext());
+    getContext().getWiki().getUserClass(getContext());
+    getContext().getWiki().getTagClass(getContext());
+    getContext().getWiki().getGroupClass(getContext());
+    getContext().getWiki().getRightsClass(getContext());
+    getContext().getWiki().getCommentsClass(getContext());
+    getContext().getWiki().getSkinClass(getContext());
+    getContext().getWiki().getGlobalRightsClass(getContext());
+    getContext().getWiki().getSheetClass(getContext());
+    // old core celements
     getExtended_XWikiPreferencesClass();
     getXWikiUsersClass();
     getFormMailClass();
@@ -146,7 +164,6 @@ public class OldCoreClasses extends AbstractClassCollection {
     getContextMenuItemClass();
     getPanelConfigClass();
     getRTEConfigTypeClass();
-    getRTEConfigTypePropertiesClass();
     getTagValueClass();
     getTokenClass();
     getOverlayConfigClass();
@@ -174,7 +191,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("redirect", "Redirect", 30);
     needsUpdate |= bclass.addTextField("querystr", "Query String", 30);
-    needsUpdate |= addBooleanField(bclass, "show_included", "Query String", "yesno", 0);
+    needsUpdate |= addBooleanField(bclass, "show_included", "Show Included", "yesno", 0);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -271,6 +288,8 @@ public class OldCoreClasses extends AbstractClassCollection {
     // needsUpdate |= bclass.addTextField("plugins" , "Additional Plugins", 30);
     needsUpdate |= bclass.addTextField("activated_classcollections",
         "Activated Class Collections", 30);
+    needsUpdate |= bclass.addTextField("celGoogleAnalyticsAccount",
+        "Google Analytics Account Number", 30);
 
     // Ensure all needed Sendmail Plugin config fields are available
     needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
@@ -286,6 +305,8 @@ public class OldCoreClasses extends AbstractClassCollection {
         "Use Images for Navigation", "yesno");
     needsUpdate |= bclass.addBooleanField("publishdate_active",
         "Activate Publication Date", "yesno");
+    needsUpdate |= bclass.addBooleanField("extract_active", "Activate Document Extracts",
+        "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -313,8 +334,8 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass
-        .addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
+    needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change",
+        "yesno");
     needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language",
         4);
 
@@ -380,10 +401,15 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addNumberField("thumbWidth", "Thumbnail Width", 30, "integer");
     needsUpdate |= bclass.addNumberField("height2", "Photo Height", 30, "integer");
     needsUpdate |= bclass.addNumberField("photoWidth", "Photo Width", 30, "integer");
-    needsUpdate |= bclass.addTextField("id", "id", 30);
+    needsUpdate |= bclass.addNumberField("id", "id", 30, "integer");
     needsUpdate |= bclass.addBooleanField("hasOverview", "hasOverview", "yesno");
     needsUpdate |= bclass.addStaticListField("theme", "theme",
         "grey|black|red|green|blue|gold|orange");
+    needsUpdate |= bclass.addTextField(PHOTO_ALBUM_GALLERY_LAYOUT,
+        "image gallery slideshow layout", 30);
+    needsUpdate |= bclass.addNumberField("initialdelay", "initialdelay", 30, "long");
+    needsUpdate |= bclass.addNumberField("frequency", "frequency", 30, "long");
+    needsUpdate |= bclass.addBooleanField("thumbDescription", "Thumbnail Description", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -703,48 +729,13 @@ public class OldCoreClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  /**
+   * @deprecated instead use IRTEConfigClassConfig.getRTEConfigTypePropertiesClassRef
+   */
+  @Deprecated
   public DocumentReference getRTEConfigTypePropertiesClassRef(String wikiName) {
     return new DocumentReference(wikiName, RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE,
         RTE_CONFIG_TYPE_PRPOP_CLASS_DOC);
-  }
-
-  private BaseClass getRTEConfigTypePropertiesClass() throws XWikiException {
-    XWikiDocument doc;
-    boolean needsUpdate = false;
-    DocumentReference classRef = getRTEConfigTypePropertiesClassRef(
-        getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + RTE_CONFIG_TYPE_PRPOP_CLASS + " class document. ",
-          exp);
-      doc = new XWikiDocument(classRef);
-      needsUpdate = true;
-    }
-
-    BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("styles", "RichTextEditor Styles", 30);
-    needsUpdate |= bclass
-        .addTextField("plugins", "RichTextEditor Additional Plugins", 30);
-    needsUpdate |= bclass.addTextField("row_1", "RichTextEditor Layout Row 1", 30);
-    needsUpdate |= bclass.addTextField("row_2", "RichTextEditor Layout Row 2", 30);
-    needsUpdate |= bclass.addTextField("row_3", "RichTextEditor Layout Row 3", 30);
-    needsUpdate |= bclass
-        .addTextField("blockformats", "RichTextEditor Block Formats", 30);
-    needsUpdate |= bclass.addTextAreaField("valid_elements",
-        "RichTextEditor valid elements config", 80, 15);
-    needsUpdate |= bclass.addTextAreaField("invalid_elements",
-        "RichTextEditor invalid elements config", 80, 15);
-
-    if (!"internal".equals(bclass.getCustomMapping())) {
-      needsUpdate = true;
-      bclass.setCustomMapping("internal");
-    }
-
-    setContentAndSaveClassDocument(doc, needsUpdate);
-    return bclass;
   }
 
   public DocumentReference getTagValueClassRef(String wikiName) {

@@ -179,8 +179,19 @@ public class PageLayoutCommand {
         PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
   }
 
-  public boolean layoutExists(SpaceReference layoutSpaceRef){
+  /**
+   * checks if the layout exists locally (in terms of layoutSpaceRef)
+   * 
+   * @param layoutSpaceRef
+   * @return
+   */
+  public boolean layoutExists(SpaceReference layoutSpaceRef) {
       return (getLayoutPropDoc(layoutSpaceRef) != null);
+  }
+
+  public boolean canRenderLayout(SpaceReference layoutSpaceRef) {
+    layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    return (layoutSpaceRef != null);
   }
 
   public BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
@@ -236,7 +247,12 @@ public class PageLayoutCommand {
   }
 
   public String renderPageLayout() {
-    return renderPageLayout(getPageLayoutForCurrentDoc());
+    return renderPageLayoutLocal(getPageLayoutForCurrentDoc());
+  }
+
+  public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    return renderPageLayoutLocal(layoutSpaceRef);
   }
 
   /**
@@ -246,7 +262,8 @@ public class PageLayoutCommand {
    * @param layoutSpaceRef
    * @return
    */
-  public String renderPageLayout(SpaceReference layoutSpaceRef) {
+  public String renderPageLayoutLocal(SpaceReference layoutSpaceRef) {
+    long millisec = System.currentTimeMillis();
     LOGGER.debug("renderPageLayout for layout [" + layoutSpaceRef + "].");
     IRenderStrategy cellRenderer = new CellRenderStrategy(getContext()).setOutputWriter(
         new DivWriter());
@@ -256,6 +273,8 @@ public class PageLayoutCommand {
     renderEngine.renderPageLayout(layoutSpaceRef);
     getRenderingLayoutStack().pop();
     setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
+    LOGGER.info("renderPageLayout finishing. Time used in millisec: "
+        + (System.currentTimeMillis() - millisec));
     return cellRenderer.getAsString();
   }
 
@@ -320,6 +339,7 @@ public class PageLayoutCommand {
   }
 
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
+    long millisec = System.currentTimeMillis();
     LOGGER.debug("getPageLayoutForDoc: for [" + documentReference + "].");
     SpaceReference layoutSpaceRef = null;
     if (layoutExists(documentReference.getLastSpaceReference())) {
@@ -337,7 +357,8 @@ public class PageLayoutCommand {
       layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
     LOGGER.info("getPageLayoutForDoc: for [" + documentReference + "] returning ["
-        + layoutSpaceRef + "].");
+        + layoutSpaceRef + "].  Time used in millisec: "
+        + (System.currentTimeMillis() - millisec));
     return layoutSpaceRef;
   }
 

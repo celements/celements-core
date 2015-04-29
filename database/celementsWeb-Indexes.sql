@@ -21,3 +21,7 @@ ALTER TABLE xwikiattachment
 -- fix for big attachments
 alter table xwikiattachment_content modify column XWA_CONTENT LONGBLOB NOT NULL;
 alter table xwikiattachment_archive modify column XWA_ARCHIVE LONGBLOB NOT NULL;
+
+-- add newsletter receivers index
+ALTER TABLE cel_newsletterreceiverclass
+      ADD index `emailIDX` (NRC_EMAIL, NRC_ID);

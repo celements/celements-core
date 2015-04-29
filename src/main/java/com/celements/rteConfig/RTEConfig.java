@@ -44,14 +44,20 @@ public class RTEConfig {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfig.class);
 
+  /**@Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC **/
+  @Deprecated
   private static final String RTE_CONFIG_TYPE_PROP_CLASS_NAME =
         "RTEConfigTypePropertiesClass";
+  /**@Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE **/
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_PROP_CLASS_SPACE = "Classes";
   public static final String RTE_CONFIG_TYPE_CLASS_SPACE = "Classes";
   public static final String RTE_CONFIG_TYPE_CLASS_NAME = "RTEConfigTypeClass";
   public static final String CONFIG_CLASS_NAME = RTE_CONFIG_TYPE_CLASS_SPACE + "."
         + RTE_CONFIG_TYPE_CLASS_NAME;
   public static final String CONFIG_PROP_NAME = "rteconfig";
+  /**@Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS **/
+  @Deprecated
   public static final String PROP_CLASS_NAME = RTE_CONFIG_TYPE_PROP_CLASS_SPACE + "."
         + RTE_CONFIG_TYPE_PROP_CLASS_NAME;
 
@@ -71,6 +77,10 @@ public class RTEConfig {
     return Utils.getComponent(Execution.class);
   }
 
+  /**
+   * @deprecated use instead IRTEConfigClassConfig.getRTEConfigTypePropertiesClassRef
+   */
+  @Deprecated
   public DocumentReference getRTEConfigTypePropClassRef(String wikiName) {
     return new DocumentReference(wikiName, RTE_CONFIG_TYPE_PROP_CLASS_SPACE,
         RTE_CONFIG_TYPE_PROP_CLASS_NAME);
@@ -193,7 +203,7 @@ public class RTEConfig {
   }
 
   private String getRteConfigsXWQL() {
-    return "from doc.object(" + PROP_CLASS_NAME + ")"
+    return "from doc.object(" + PROP_CLASS_NAME + ") as rteConfig"
         + " where doc.translation = 0";
   }
 

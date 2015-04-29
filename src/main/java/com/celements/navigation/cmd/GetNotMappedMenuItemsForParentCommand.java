@@ -165,7 +165,7 @@ public class GetNotMappedMenuItemsForParentCommand {
      *  where obj.XWO_NAME=doc.XWD_FULLNAME and obj.XWO_CLASSNAME='Celements2.MenuItem'
      *   and obj.XWO_ID = pos.XWI_ID and pos.XWI_NAME = 'menu_position'
      *   and doc.XWD_TRANSLATION = 0 and doc.XWD_WEB <> 'Trash'
-     *   order by doc.XWD_WEB, doc.XWD_PARENT, pos.XWI_VALUE;
+     *   order by doc.XWD_PARENT, pos.XWI_VALUE;
      *   -> executed in onecprod_customizing
      *   ->1061 rows in set (0.20 sec) 
      */
@@ -177,7 +177,7 @@ public class GetNotMappedMenuItemsForParentCommand {
       + " and pos.id.name = 'menu_position'"
       + " and doc.translation = 0"
       + " and doc.space <> 'Trash'"
-      + " order by doc.space, doc.parent, pos.value";
+      + " order by doc.parent, pos.value";
   }
 
   String getCacheKey(String parentKey, XWikiContext context) {
@@ -217,8 +217,13 @@ public class GetNotMappedMenuItemsForParentCommand {
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   public void flushMenuItemCache(XWikiContext context) {
-    LOGGER.debug("Entered method flushMenuItemCache with context");
-    menuItems.remove(context.getDatabase());
+    if (context != null) {
+      LOGGER.debug("Entered method flushMenuItemCache with context db ["
+          + context.getDatabase() + "].");
+      menuItems.remove(context.getDatabase());
+    } else {
+      LOGGER.warn("skip flushMenuItemCache for context == null].");
+    }
   }
 
   private List<TreeNode> getMenuCacheForParent(

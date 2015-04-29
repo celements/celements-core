@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.appScript.AppScriptService;
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -120,7 +121,50 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     assertTrue(celWebService.isAppScriptRequest());
     verifyAll(mockRequest);
   }
+  
+  @Test
+  public void testGetCurrentPageURL_isAppScriptRequest() {
+    IAppScriptService appScriptServiceMock = createMock(AppScriptService.class);
+    celWebService.appScriptService = appScriptServiceMock;
+    String queryString = "myQueryString";
+    String scriptName = "myScript/Name";
+    
+    expect(appScriptServiceMock.isAppScriptRequest()).andReturn(true).once();
+    expect(appScriptServiceMock.getScriptNameFromURL()).andReturn(scriptName).once();
+    expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString))
+        ).andReturn("theURL").once();
+    
+    replayAll(appScriptServiceMock);
+    assertEquals("theURL", celWebService.getCurrentPageURL(queryString));
+    verifyAll(appScriptServiceMock);
+  }
+  
+  @Test
+  public void testGetCurrentPageURL_isNotAppScriptRequest() {
+    IAppScriptService appScriptServiceMock = createMock(AppScriptService.class);
+    celWebService.appScriptService = appScriptServiceMock;
+    String queryString = "my[Query}String";
+    
+    expect(appScriptServiceMock.isAppScriptRequest()).andReturn(false).once();
+    
+    replayAll(appScriptServiceMock);
+    assertEquals("?my%5BQuery%7DString", celWebService.getCurrentPageURL(queryString));
+    verifyAll(appScriptServiceMock);
+  }
 
+  @Test
+  public void testIsHighDate() {
+    replayAll();
+    assertTrue(celWebService.isHighDate(IWebUtilsService.DATE_HIGH));
+    verifyAll();
+  }
+
+  @Test
+  public void testIsHighDate_NPE() {
+    replayAll();
+    assertFalse(celWebService.isHighDate(null));
+    verifyAll();
+  }
 
   private void replayAll(Object ... mocks) {
     replay(xwiki, mockRightService);

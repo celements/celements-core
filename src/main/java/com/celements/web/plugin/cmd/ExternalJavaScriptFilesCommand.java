@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -33,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.sajson.Builder;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -53,6 +56,7 @@ public class ExternalJavaScriptFilesCommand {
 
   private XWikiContext context;
   private Set<String> extJSfileSet;
+  private Set<String> extJSAttUrlSet;
   private List<String> extJSfileList;
   private List<String> extJSnotFoundList;
   private boolean displayedAll = false;
@@ -61,18 +65,51 @@ public class ExternalJavaScriptFilesCommand {
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
     extJSfileSet = new HashSet<String>();
+    extJSAttUrlSet = new HashSet<String>();
     extJSfileList = new Vector<String>();
     extJSnotFoundList = new Vector<String>();
   }
 
+  public String addLazyExtJSfile(String jsFile) {
+    return addLazyExtJSfile(jsFile, null);
+  }
+
+  public String addLazyExtJSfile(String jsFile, String action) {
+    String attUrl;
+    if (!StringUtils.isEmpty(action)) {
+      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
+    } else {
+      attUrl = getAttUrlCmd().getAttachmentURL(jsFile, context);
+    }
+    Builder jsonBuilder = new Builder();
+    jsonBuilder.openDictionary();
+    jsonBuilder.addStringProperty("fullURL", attUrl);
+    jsonBuilder.openProperty("initLoad");
+    jsonBuilder.addBoolean(true);
+    jsonBuilder.closeDictionary();
+    return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
+        +"</span>";
+  }
+
   public String addExtJSfileOnce(String jsFile) {
-    return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
-        context));
+    return addExtJSfileOnce(jsFile, null);
   }
 
   public String addExtJSfileOnce(String jsFile, String action) {
-    return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
-        action, context));
+    if (!extJSAttUrlSet.contains(jsFile)) {
+      if (getAttUrlCmd().isAttachmentLink(jsFile)
+          || getAttUrlCmd().isOnDiskLink(jsFile)) {
+        extJSAttUrlSet.add(jsFile);
+      }
+      if (!StringUtils.isEmpty(action)) {
+        return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
+            action, context));
+      } else {
+        return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
+            context));
+      }
+    }
+    return "";
   }
 
   private String addExtJSfileOnce_internal(String jsFile, String jsFileUrl) {
@@ -111,8 +148,9 @@ public class ExternalJavaScriptFilesCommand {
     this.displayedAll = displayedAll;
   }
 
-  private String getExtStringForJsFile(String jsFile) {
-    return "<script type=\"text/javascript\" src=\"" + jsFile + "\"></script>";
+  String getExtStringForJsFile(String jsFile) {
+    return "<script type=\"text/javascript\" src=\"" 
+        + StringEscapeUtils.escapeHtml(jsFile) + "\"></script>";
   }
 
   public String getAllExternalJavaScriptFiles() throws XWikiException {

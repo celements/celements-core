@@ -259,6 +259,18 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
   }
 
   @Test
+  public void testIsPublishActive_docNull() {
+    expect(xwiki.getSpacePreference(eq("publishdate_active"), same((String)null), 
+        eq("-1"), same(getContext()))).andReturn("-1").once();
+    expect(xwiki.getXWikiPreference(eq("publishdate_active"), 
+        eq("celements.publishdate.active"), eq("0"), same(getContext()))).andReturn("0"
+        ).once();
+    replay(xwiki);
+    assertEquals(false, rightService.isPublishActive(getContext()));
+    verify(xwiki);
+  }
+
+  @Test
   public void testIsPublishActive_notSet() {
     expect(xwiki.getSpacePreference(eq("publishdate_active"), eq("TestSpace"), eq("-1"), 
         same(getContext()))).andReturn("-1").once();

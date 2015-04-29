@@ -35,6 +35,9 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentDetailsClasses.class);
 
+  public static final String FIELD_DOC_EXTRACT_CONTENT = "extract";
+  public static final String FIELD_DOC_EXTRACT_LANGUAGE = "language";
+
   @Override
   protected Log getLogger() {
     return LOGGER;
@@ -46,11 +49,15 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     getDocumentExtractClass();
   }
   
+  public DocumentReference getDocumentPublicationClassRef(String wikiName) {
+    return new DocumentReference(wikiName, "Classes", "DocumentPublication");
+  }
+
   BaseClass getDocumentPublicationClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "DocumentPublication");
+    DocumentReference classRef = getDocumentPublicationClassRef(getContext(
+        ).getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
@@ -76,11 +83,14 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  public DocumentReference getDocumentExtractClassRef(String wikiName) {
+    return new DocumentReference(wikiName, "Classes", "DocumentExtract");
+  }
+
   BaseClass getDocumentExtractClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "DocumentExtract");
+    DocumentReference classRef = getDocumentExtractClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
@@ -92,8 +102,8 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("language", "Language", 30);
-    needsUpdate |= bclass.addTextAreaField("extract", "Extract", 80, 7);
+    needsUpdate |= bclass.addTextField(FIELD_DOC_EXTRACT_LANGUAGE, "Language", 30);
+    needsUpdate |= bclass.addTextAreaField(FIELD_DOC_EXTRACT_CONTENT, "Extract", 80, 7);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

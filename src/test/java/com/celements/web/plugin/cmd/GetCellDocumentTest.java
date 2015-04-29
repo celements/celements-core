@@ -20,7 +20,6 @@
 package com.celements.web.plugin.cmd;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;

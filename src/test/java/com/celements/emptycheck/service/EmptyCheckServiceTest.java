@@ -72,7 +72,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCheckImplNamesConfig_bugReturningNull() {
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(null
             ).anyTimes();
     replayDefault();
@@ -82,7 +82,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCheckImplNamesConfig_bugReturningEmtpy() {
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(""
             ).anyTimes();
     replayDefault();
@@ -92,7 +92,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCheckImplNamesConfig_noConfig() {
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
@@ -102,7 +102,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCheckImplNamesConfig_commaSeparated() {
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default,sharedContent").anyTimes();
     replayDefault();
@@ -113,7 +113,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetCheckImplNames_semicolonSeparated() {
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default;sharedContent").anyTimes();
     replayDefault();
@@ -139,7 +139,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyDoc");
     expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(false).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "testOne;testTwo;;wrongTest;").anyTimes();
     replayDefault();
@@ -165,7 +165,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
         "MyDoc");
     expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
     expect(testTwoMock.isEmptyRTEDocument(eq(docRef))).andReturn(false).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "testOne;testTwo;;wrongTest;").anyTimes();
     replayDefault();
@@ -191,7 +191,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
         "MyDoc");
     expect(testOneMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
     expect(testTwoMock.isEmptyRTEDocument(eq(docRef))).andReturn(true).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "testOne;testTwo;;wrongTest;").anyTimes();
     replayDefault();
@@ -216,7 +216,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "MyDoc");
     expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(false).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "testOne;testTwo;;wrongTest;").anyTimes();
     replayDefault();
@@ -242,7 +242,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
         "MyDoc");
     expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
     expect(testTwoMock.isEmptyDocument(eq(docRef))).andReturn(false).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "testOne;testTwo;;wrongTest;").anyTimes();
     replayDefault();
@@ -268,7 +268,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
         "MyDoc");
     expect(testOneMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
     expect(testTwoMock.isEmptyDocument(eq(docRef))).andReturn(true).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "testOne;testTwo;;wrongTest;").anyTimes();
     replayDefault();
@@ -283,7 +283,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     XWikiDocument myXdoc = new XWikiDocument(documentRef);
     myXdoc.setContent("test content not empty");
     expect(xwiki.getDocument(eq(documentRef), same(context))).andReturn(myXdoc).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
@@ -299,7 +299,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> noChildrenList = Collections.emptyList();
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))
         ).andReturn(noChildrenList).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
@@ -324,7 +324,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     childXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(childXdoc 
         ).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
@@ -360,7 +360,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
     childChildXdoc.setContent("non empty child content");
     expect(xwiki.getDocument(eq(expectedChildDocRef), same(context))).andReturn(
         childChildXdoc).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();
@@ -405,7 +405,7 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
         ).andReturn(Collections.<TreeNode>emptyList()).once();
     expect(treeNodeService.getSubNodesForParent(eq(childChild2DocRef), eq(""))
         ).andReturn(Collections.<TreeNode>emptyList()).once();
-    expect(xwiki.getXWikiPreference(eq("ceL_emptycheck_moduls"),
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
         eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayDefault();

@@ -20,15 +20,14 @@
 package com.celements.navigation.cmd;
 
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
-
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;

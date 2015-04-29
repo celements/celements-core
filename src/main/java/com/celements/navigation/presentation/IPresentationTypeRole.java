@@ -2,6 +2,7 @@ package com.celements.navigation.presentation;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.INavigation;
 
@@ -15,5 +16,7 @@ public interface IPresentationTypeRole {
   public String getDefaultCssClass();
 
   public String getEmptyDictionaryKey();
+
+  public SpaceReference getPageLayoutForDoc(DocumentReference docRef);
 
 }

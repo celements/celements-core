@@ -19,10 +19,7 @@
  */
 package com.celements.web.plugin.api;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,83 +29,94 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.emptycheck.service.IEmptyCheckRole;
+import com.celements.appScript.AppScriptScriptService;
+import com.celements.auth.AuthenticationScriptService;
+import com.celements.captcha.CaptchaScriptService;
+import com.celements.css.CSSScriptService;
+import com.celements.emptycheck.service.EmptyCheckScriptService;
+import com.celements.filebase.FileBaseScriptService;
+import com.celements.javascript.JSScriptService;
+import com.celements.mailsender.CelMailScriptService;
 import com.celements.menu.MenuScriptService;
-import com.celements.navigation.NavContextMenuApi;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
-import com.celements.navigation.cmd.ReorderSaveCommand;
-import com.celements.navigation.service.ITreeNodeService;
+import com.celements.navigation.service.TreeNodeCache;
+import com.celements.navigation.service.TreeNodeScriptService;
+import com.celements.nextfreedoc.NextFreeDocScriptService;
+import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageTypeApi;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
-import com.celements.rendering.RenderCommand;
-import com.celements.rteConfig.RTEConfig;
+import com.celements.rteConfig.RTEConfigScriptService;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
-import com.celements.web.plugin.cmd.AddTranslationCommand;
-import com.celements.web.plugin.cmd.CaptchaCommand;
-import com.celements.web.plugin.cmd.CelementsRightsCommand;
-import com.celements.web.plugin.cmd.CheckClassesCommand;
-import com.celements.web.plugin.cmd.CssCommand;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
-import com.celements.web.plugin.cmd.DocMetaTagsCmd;
-import com.celements.web.plugin.cmd.EmptyCheckCommand;
-import com.celements.web.plugin.cmd.ExternalJavaScriptFilesCommand;
-import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ISynCustom;
-import com.celements.web.plugin.cmd.LastStartupTimeStamp;
-import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.plugin.cmd.ParseObjStoreCommand;
-import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
-import com.celements.web.plugin.cmd.RemoteUserValidator;
-import com.celements.web.plugin.cmd.RenameCommand;
-import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
-import com.celements.web.plugin.cmd.SuggestListCommand;
-import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.ContextMenuScriptService;
-import com.celements.web.service.IPrepareVelocityContext;
+import com.celements.web.service.EditorSupportScriptService;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.token.NewCelementsTokenForUserCommand;
+import com.celements.web.service.LegacySkinScriptService;
+import com.celements.web.service.WebUtilsScriptService;
+import com.celements.web.service.WebUtilsService;
 import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
 import com.celements.web.utils.WebUtils;
-import com.xpn.xwiki.XWiki;
+import com.celements.webform.ActionScriptService;
+import com.celements.webform.DocFormScriptService;
+import com.celements.webform.WebFormScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
+/**
+ * @Deprecated: since 2.59 instead use class {@link 
+ * CelementsWebScriptService} or a special named ScriptService
+ *  
+ */
+@Deprecated
 public class CelementsWebPluginApi extends Api {
 
-  public static final String CELEMENTS_CSSCOMMAND = "com.celements.web.CssCommand";
+  
+  /**
+   * @Deprecated: since 2.59 instead use variable in {@link CSSScriptService}
+   *  
+   */
+  @Deprecated
+  public static final String CELEMENTS_CSSCOMMAND = CSSScriptService.CELEMENTS_CSSCOMMAND;
 
-  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY =
-      "com.celements.web.ExternalJavaScriptFilesCommand";
+  /**
+   * @Deprecated: since 2.59 instead use variable in {@link JSScriptService}
+   *  
+   */
+  @Deprecated
+  public static final String JAVA_SCRIPT_FILES_COMMAND_KEY = 
+      JSScriptService.JAVA_SCRIPT_FILES_COMMAND_KEY;
 
-  public static final String CELEMENTS_PAGE_LAYOUT_COMMAND =
-      "com.celements.web.PageLayoutCommand";
+  /**
+   * @Deprecated: since 2.59 instead use variable in {@link 
+   * IWebUtilsService}
+   *  
+   */
+  @Deprecated
+  public static final String CELEMENTS_PAGE_LAYOUT_COMMAND = 
+      LayoutScriptService.CELEMENTS_PAGE_LAYOUT_COMMAND;
 
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
 
@@ -117,6 +125,10 @@ public class CelementsWebPluginApi extends Api {
 
   private CelementsWebPlugin plugin;
 
+  /**
+   * @deprecated since 2.59
+   */
+  @Deprecated
   public CelementsWebPluginApi(
       CelementsWebPlugin plugin,
       XWikiContext context) {
@@ -124,28 +136,52 @@ public class CelementsWebPluginApi extends Api {
     setPlugin(plugin);
   }
 
+  /**
+   * @deprecated since 2.59
+   */
+  @Deprecated
   //FIXME must check programming Rights!!!
   public CelementsWebPlugin getPlugin(){
     return plugin;
   }
 
+  /**
+   * @deprecated since 2.59
+   */
+  @Deprecated
   //FIXME must not be public! why do we need it in the API class anyway?
   public void setPlugin(CelementsWebPlugin plugin) {
     this.plugin = plugin;
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link TreeNodeCache}
+   * Do not call flushCache for MenuItem changes anymore.  
+   * The TreeNodeDocument change listener take care of flushing the cache if needed.
+   */
+  @Deprecated
   public void flushCache() {
-    plugin.flushCache(context);
+    LOGGER.warn("flushCache called. Do not call flushCache for MenuItem "
+        + " changes anymore. The TreeNodeDocument change listener take care of flushing "
+        + " the cache if needed.");
   }
 
   /**
-   * getLastStartupTimeStamp
-   * 
-   *  to solve browser caching issues with files on disk e.g. tinymce
-   * @return
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getLastStartupTimeStamp()}
    */
-  public String getLastStartupTimeStamp(){
-    return new LastStartupTimeStamp().getLastStartupTimeStamp();
+  @Deprecated
+  public String getLastStartupTimeStamp() {
+    return getScriptService().getLastStartupTimeStamp();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #resetLastStartupTimeStamp()}
+   */
+  @Deprecated
+  public boolean resetLastStartupTimeStamp() {
+    return getScriptService().resetLastStartupTimeStamp();
   }
 
   /**
@@ -153,7 +189,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public ContextMenuBuilderApi getContextMenuBuilder() {
-    return getCMService().getContextMenuBuilder();
+    return getContextMenuScriptService().getContextMenuBuilder();
   }
 
   /**
@@ -161,59 +197,95 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getAllContextMenuCSSClassesAsJSON() {
-    return getCMService().getAllContextMenuCSSClassesAsJSON();
+    return getContextMenuScriptService().getAllContextMenuCSSClassesAsJSON();
   }
 
+  /**
+   * @deprecated since 2.33.0
+   */
+  @Deprecated
   public ContextMenuItemApi getWrapper(com.xpn.xwiki.api.Object menuItem,
       String elemId) {
     return new ContextMenuItemApi(menuItem, elemId, context);
   }
 
-  public NavContextMenuApi getNavContextMenu() {
-    return NavContextMenuApi.getNavContextMenu(context);
-  }
-
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #createNavigation()}
+   */
+  @Deprecated
   public NavigationApi createNavigation() {
-    return NavigationApi.createNavigation(context);
-  }
-
-  public void enableMappedMenuItems() {
-    plugin.enableMappedMenuItems(context);
-  }
-
-  public int getMaxConfiguredNavigationLevel() {
-    return getTreeNodeService().getMaxConfiguredNavigationLevel();
+    return getTreeNodeScriptService().createNavigation();
   }
 
   /**
-   * since 2.24.0
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #enableMappedMenuItems()}
    */
+  @Deprecated
+  public void enableMappedMenuItems() {
+    getTreeNodeScriptService().enableMappedMenuItems();
+  }
+
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getMaxConfiguredNavigationLevel()}
+   */
+  @Deprecated
+  public int getMaxConfiguredNavigationLevel() {
+    return getTreeNodeScriptService().getMaxConfiguredNavigationLevel();
+  }
+
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #isTreeNode(DocumentReference)}
+   */
+  @Deprecated
   public boolean isTreeNode(DocumentReference docRef) {
-    return getTreeNodeService().isTreeNode(docRef);
+    return getTreeNodeScriptService().isTreeNode(docRef);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #isNavigationEnabled(String)}
+   */
+  @Deprecated
   public boolean isNavigationEnabled(String configName) {
-    NavigationApi nav = NavigationApi.createNavigation(context);
-    nav.loadConfigByName(configName);
-    return nav.isNavigationEnabled();
+    return getTreeNodeScriptService().isNavigationEnabled(configName);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getNavigation(String)}
+   */
+  @Deprecated
   public NavigationApi getNavigation(String configName) {
-    NavigationApi nav = NavigationApi.createNavigation(context);
-    nav.loadConfigByName(configName);
-    return nav;
+    return getTreeNodeScriptService().getNavigation(configName);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #includeNavigation(String)}
+   */
+  @Deprecated
   public String includeNavigation(String configName) {
-    return getNavigation(configName).includeNavigation();
+    return getTreeNodeScriptService().includeNavigation(configName);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
+   */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
       String parent, String menuSpace) {
     return plugin.getSubMenuItemsForParent(parent, menuSpace, "", context);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
+   */
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(
       String parent, String menuSpace, String menuPart) {
@@ -221,30 +293,26 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * getSubNodesForParent
-   * @param parent
-   * @param menuSpace
-   * @return
-   * 
-   * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference)
+   * @deprecated since 2.24.0 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace) {
     return WebUtils.getInstance().getSubNodesForParent(parent, menuSpace, "", context);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
+   */
+  @Deprecated
   public List<TreeNode> getSubNodesForParentRef(EntityReference parentRef) {
-    return getTreeNodeService().getSubNodesForParent(parentRef, "");
+    return getTreeNodeScriptService().getSubNodesForParent(parentRef, "");
   }
 
   /**
-   * 
-   * @param parent
-   * @param menuSpace
-   * @param menuPart
-   * @return
-   * 
-   * @deprecated since 2.24.0 instead use getSubNodesForParentRef(EntityReference, String)
+   * @deprecated since 2.24.0 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParentRef(EntityReference)}
    */
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
@@ -253,221 +321,279 @@ public class CelementsWebPluginApi extends Api {
         context);
   }
 
+  /**
+   * @deprecated since 2.2 instead use {@link TreeNodeScriptService
+   * #getSubNodesForParent(EntityReference, String)}
+   */
+  @Deprecated
   public List<TreeNode> getSubNodesForParent(EntityReference parentRef, String menuPart) {
-    return getTreeNodeService().getSubNodesForParent(parentRef, menuPart);
+    return getTreeNodeScriptService().getSubNodesForParent(parentRef, menuPart);
   }
 
+  /**
+   * @deprecated since 2.33.0 instead use {@link TreeNodeScriptService
+   * #queryCount()}
+   */
+  @Deprecated
   public int queryCount() {
-    return plugin.queryCount();
+    return getTreeNodeScriptService().queryCount();
   }
 
-  public Map<String, String> getDocMetaTags(String language,
-      String defaultLanguage) {
-    return new DocMetaTagsCmd().getDocMetaTags(language, defaultLanguage, context);
+  /**
+   * @deprecated since 2.33.0 instead use {@link CelementsWebScriptService
+   * #getDocMetaTags(String, String)}
+   */
+  @Deprecated
+  public Map<String, String> getDocMetaTags(String language, String defaultLanguage) {
+    return getScriptService().getDocMetaTags(language, defaultLanguage);
+  }
+
+  /**
+   * @Deprecated since 2.59 instead use {@link WebUtilsService
+   * #getAttachmentListSortedSpace(String, String, boolean, int, int)}
+   */
+  @Deprecated
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
+      String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListSortedSpace(spaceName, comparator, 
+        imagesOnly, start, nb);
+  }
+
+  /**
+   * @deprecated since 2.33.0 instead use {@link WebUtilsService
+   * #getAttachmentListSorted(Document, String)}
+   */
+  @Deprecated
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
+      String tagName, String comparator, boolean imagesOnly, int start, int nb
+      ) throws ClassNotFoundException {
+    return getWebUtilsService().getAttachmentListForTagSortedSpace(spaceName, tagName, 
+        comparator, imagesOnly, start, nb);
   }
 
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator
       ) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSorted(doc, comparator);
+    return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator);
   }
 
+  /**
+   * @deprecated since 2.33.0 instead use {@link WebUtilsService
+   * #getAttachmentListSorted(Document, String, boolean, int, int)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSorted(doc, comparator, imagesOnly,
+    return getWebUtilsScriptService().getAttachmentListSorted(doc, comparator, imagesOnly,
         start, nb);
   }
-
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly) throws ClassNotFoundException{
-    return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
-  }
-
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator,
+  
+  public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb) {
+    return getWebUtilsService().getAttachmentListForTagSorted(doc, tagName, comparator,
         imagesOnly, start, nb);
   }
 
+  /**
+   * @deprecated since 2.33.0 instead use {@link WebUtilsService
+   * #getAttachmentListSortedAsJSON(Document, String, boolean)}
+   */
+  @Deprecated
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly) throws ClassNotFoundException{
+    return getWebUtilsScriptService().getAttachmentListSortedAsJSON(doc, comparator,
+        imagesOnly);
+  }
+
+  /**
+   * @deprecated since 2.33.0 use instead use {@link WebUtilsService
+   * #getAttachmentListSortedAsJSON(Document, String, boolean, int, int)}
+   */
+  @Deprecated
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
+    return getWebUtilsScriptService().getAttachmentListSortedAsJSON(doc, comparator,
+        imagesOnly, start, nb);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link ImageScriptService
+   * #getRandomImages(String, int)} in the celements-photo-component Component
+   */
+  @Deprecated
   public List<Attachment> getRandomImages(String fullName,
       int num) throws ClassNotFoundException{
     return WebUtils.getInstance().getRandomImages(fullName, num, context);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getMessageTool(String)}
+   */
+  @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage) {
-    return getWebUtilsService().getMessageTool(adminLanguage);
+    return getWebUtilsScriptService().getMessageTool(adminLanguage);
   }
 
+  /**
+   * @deprecated since 2.59 always celements3 mode by now
+   */
+  @Deprecated
   public String getVersionMode() {
     return plugin.getVersionMode(context);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link JSScriptService
+   * #getAllExternalJavaScriptFiles()}
+   */
+  @Deprecated
   public String getAllExternalJavaScriptFiles() throws XWikiException {
-    return getExtJavaScriptFileCmd().getAllExternalJavaScriptFiles();
-  }
-
-  private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
-    if (context.get(JAVA_SCRIPT_FILES_COMMAND_KEY) == null) {
-      context.put(JAVA_SCRIPT_FILES_COMMAND_KEY, new ExternalJavaScriptFilesCommand(
-          context));
-    }
-    return (ExternalJavaScriptFilesCommand) context.get(JAVA_SCRIPT_FILES_COMMAND_KEY);
+    return getJSScriptService().getAllExternalJavaScriptFiles();
   }
 
   /**
-   * @deprecated since 2.11.3 instead use celementsweb script service
+   * @deprecated since 2.11.3 instead use {@link CelementsWebScriptService
+   * #addImageMapConfig(String)}
    */
   @Deprecated
   public void addImageMapConfig(String configName) {
-    getService().addImageMapConfig(configName);
+    getScriptService().addImageMapConfig(configName);
   }
 
   /**
-   * @deprecated since 2.11.3 instead use celementsweb script service
+   * @deprecated since 2.11.3 instead use {@link CelementsWebScriptService
+   * #displayImageMapConfigs()}
    */
   @Deprecated
   public String displayImageMapConfigs() {
-    return getService().displayImageMapConfigs();
+    return getScriptService().displayImageMapConfigs();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link JSScriptService
+   * #addExtJSfileOnce(String)}
+   */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile);
+    return getJSScriptService().addExtJSfileOnce(jsFile);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link JSScriptService
+   * #addExtJSfileOnce(String, String)}
+   */
+  @Deprecated
   public String addExtJSfileOnce(String jsFile, String action) {
-    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
+    return getJSScriptService().addExtJSfileOnce(jsFile, action);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getUsernameForUserData(String)}
+   */
+  @Deprecated
   public String getUsernameForUserData(String login) {
-    String possibleLogins = plugin.getPossibleLogins(context);
-    String account = "";
-    try {
-      LOGGER.debug("executing getUsernameForUserData in plugin");
-      account = new UserNameForUserDataCommand().getUsernameForUserData(login,
-          possibleLogins, context);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get usernameForUserData for login [" + login
-          + "] and possibleLogins [" + possibleLogins + "].", exp);
-    }
-    return account;
+    return getAuthenticationScriptService().getUsernameForUserData(login);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getUsernameForUserData(String, String)}
+   */
+  @Deprecated
   public String getUsernameForUserData(String login, String possibleLogins) {
-    String account = "";
-    if(hasProgrammingRights() || hasAdminRights()) {
-      try {
-        LOGGER.debug("executing getUsernameForUserData in plugin");
-        account = new UserNameForUserDataCommand().getUsernameForUserData(login,
-            possibleLogins, context);
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to get usernameForUserData for login [" + login
-            + "] and possibleLogins [" + possibleLogins + "].", exp);
-      }
-    } else {
-      LOGGER.debug("missing ProgrammingRights for [" + context.get("sdoc")
-          + "]: getUsernameForUserData cannot be executed!");
-    }
-    return account;
+    return getAuthenticationScriptService().getUsernameForUserData(login, possibleLogins);
   }
 
-  public int getNextObjPageId(String spacename, String classname, String propertyName) throws XWikiException{
-    String sql = ", BaseObject as obj, IntegerProperty as art_id";
-    sql += " where obj.name=doc.fullName";
-    sql += " and obj.className='" + classname + "'";
-    sql += " and doc.space='" + spacename + "' and obj.id = art_id.id.id";
-    sql += " and art_id.id.name='" + propertyName + "' order by art_id.value desc";
-
-    int nextId = 1;
-
-    List<XWikiDocument> docs = context.getWiki().getStore().searchDocuments(sql, context);
-    if(docs.size() > 0){
-      nextId = 1 + docs.get(0).getObject(classname).getIntValue(propertyName);
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getNextObjPageId(SpaceReference, DocumentReference, String)}
+   */
+  @Deprecated  
+  public int getNextObjPageId(String spacename, String classname, String propertyName) 
+      throws XWikiException{
+    SpaceReference spaceRef = getWebUtilsService().resolveSpaceReference(spacename);
+    if (spaceRef != null) {
+      return getScriptService().getNextObjPageId(spaceRef, getWebUtilsService(
+          ).resolveDocumentReference(classname), propertyName);
     }
-
-    return nextId;
+    return 1;
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getPasswordHash(String, String)}
+   */
+  @Deprecated
   public String encryptString(String encoding, String str){
-    return plugin.encryptString(encoding, str);
+    return getAuthenticationScriptService().getPasswordHash(encoding, str);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getPasswordHash(String)}
+   */
+  @Deprecated
   public String encryptString(String str){
-    return encryptString("hash:SHA-512:", str);
+    return getAuthenticationScriptService().getPasswordHash(str);
   }
 
-  public void sendNewValidation(String user, String possibleFields) {
-    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
-        && (user.trim().length() > 0)) {
-      LOGGER.debug("sendNewValidation for user [" + user + "].");
-      try {
-        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
-            possibleFields);
-      } catch (XWikiException exp) {
-        LOGGER.error("sendNewValidation: failed.", exp);
-      }
-    }
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #sendNewValidation(String, String)}
+   */
+  @Deprecated
+  public boolean sendNewValidation(String user, String possibleFields) {
+    return getAuthenticationScriptService().sendNewValidation(user, possibleFields);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #sendNewValidation(String, String, DocumentReference)}
+   */
+  @Deprecated
   public void sendNewValidation(String user, String possibleFields,
       DocumentReference mailContentDocRef) {
-    if ((hasAdminRights() || hasProgrammingRights()) && (user != null)
-        && (user.trim().length() > 0)) {
-      LOGGER.debug("sendNewValidation for user [" + user + "] using mail ["
-          + mailContentDocRef + "].");
-      try {
-        new PasswordRecoveryAndEmailValidationCommand().sendNewValidation(user,
-            possibleFields, mailContentDocRef);
-      } catch (XWikiException exp) {
-        LOGGER.error("sendNewValidation: failed.", exp);
-      }
-    } else {
-      LOGGER.warn("sendNewValidation: new validation email for user [" + user
-          + "] not sent.");
-    }
+    getAuthenticationScriptService().sendNewValidation(user, possibleFields, 
+        mailContentDocRef);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getNewValidationTokenForUser()}
+   */
+  @Deprecated
   public String getNewValidationTokenForUser() {
-    if(hasProgrammingRights() && (context.getUser() != null)) {
-      try {
-        return new PasswordRecoveryAndEmailValidationCommand(
-            ).getNewValidationTokenForUser(context.getUser(), context);
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to create new validation Token for user: "
-            + context.getUser(), exp);
-      }
-    }
-    return null;
+    return getAuthenticationScriptService().getNewValidationTokenForUser();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getNewCelementsTokenForUser()}
+   */
+  @Deprecated
   public String getNewCelementsTokenForUser() {
-    return getNewCelementsTokenForUser(false);
+    return getAuthenticationScriptService().getNewCelementsTokenForUser();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getNewCelementsTokenForUser(Boolean)}
+   */
+  @Deprecated
   public String getNewCelementsTokenForUser(Boolean guestPlus) {
-    if(context.getUser() != null) {
-      try {
-        return new NewCelementsTokenForUserCommand(
-            ).getNewCelementsTokenForUserWithAuthentication(context.getUser(), guestPlus,
-                context);
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to create new validation Token for user: "
-            + context.getUser(), exp);
-      }
-    }
-    return null;
+    return getAuthenticationScriptService().getNewCelementsTokenForUser(guestPlus);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getNewCelementsTokenForUser(Boolean, int)}
+   */
+  @Deprecated
   public String getNewCelementsTokenForUser(Boolean guestPlus, int minutesValid) {
-    if(context.getUser() != null) {
-      try {
-        return new NewCelementsTokenForUserCommand(
-            ).getNewCelementsTokenForUserWithAuthentication(context.getUser(), guestPlus,
-                minutesValid, context);
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to create new validation Token for user: "
-            + context.getUser(), exp);
-      }
-    }
-    return null;
+    return getAuthenticationScriptService().getNewCelementsTokenForUser(guestPlus, 
+        minutesValid);
   }
 
   //  /**
@@ -484,72 +610,104 @@ public class CelementsWebPluginApi extends Api {
   //        || ((context.get("sdoc") == null) && (context.get("idoc") == null)));
   //  }
 
-  private CssCommand getCssCmd() {
-    if (!context.containsKey(CELEMENTS_CSSCOMMAND)) {
-      context.put(CELEMENTS_CSSCOMMAND, new CssCommand());
-    }
-    return (CssCommand) context.get(CELEMENTS_CSSCOMMAND);
-  }
-
+  /**
+   * @deprecated since 2.59 instead use {@link CSSScriptService
+   * #getAllCSS()}
+   */
+  @Deprecated
   public List<CSS> getAllCSS() throws XWikiException{
-    return getCssCmd().getAllCSS(context);
-  }
-
-  public String displayAllCSS() throws XWikiException{
-    return getCssCmd().displayAllCSS(context);
-  }
-
-  public List<CSS> getRTEContentCSS() throws XWikiException{
-    return getCssCmd().getRTEContentCSS(context);
-  }
-
-  public void includeCSSPage(String css) {
-    getCssCmd().includeCSSPage(css, context);
-  }
-
-  public void includeCSSAfterPreferences(String css) throws XWikiException{
-    getCssCmd().includeCSSAfterPreferences(css, context);
-  }
-
-  public void includeCSSAfterSkin(String css){
-    getCssCmd().includeCSSAfterSkin(css, context);
+    return getCSSScriptService().getAllCSS();
   }
 
   /**
-   * @deprecated since 2.9.4 use instead isEmptyRTEDocument(DocumentReference)
+   * @deprecated since 2.59 instead use {@link CSSScriptService
+   * #displayAllCSS()}
+   */
+  @Deprecated
+  public String displayAllCSS() throws XWikiException{
+    return getCSSScriptService().displayAllCSS();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CSSScriptService
+   * #getRTEContentCSS()}
+   */
+  @Deprecated
+  public List<CSS> getRTEContentCSS() throws XWikiException{
+    return getCSSScriptService().getRTEContentCSS();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CSSScriptService
+   * #includeCSSPage(String)}
+   */
+  @Deprecated
+  public void includeCSSPage(String css) {
+    getCSSScriptService().includeCSSPage(css);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CSSScriptService
+   * #includeCSSAfterPreferences(String)}
+   */
+  @Deprecated
+  public void includeCSSAfterPreferences(String css) throws XWikiException{
+    getCSSScriptService().includeCSSAfterPreferences(css);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CSSScriptService
+   * #includeCSSAfterSkin(String)}
+   */
+  @Deprecated
+  public void includeCSSAfterSkin(String css){
+    getCSSScriptService().includeCSSAfterSkin(css);
+  }
+
+  /**
+   * @deprecated since 2.9.4 instead use {@link EmptyCheckScriptService
+   * #isEmptyRTEDocument(DocumentReference)}
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullName) {
-    DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("usage of deprecated isEmptyRTEDocument(String) on ["
-        + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
-        + docRef.getName() + "].");
-    return new EmptyCheckCommand().isEmptyRTEDocument(fullName, context);
+    return getEmptyCheckScriptService().isEmptyRTEDocument(getWebUtilsService(
+        ).resolveDocumentReference(fullName));
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link EmptyCheckScriptService
+   * #isEmptyRTEDocument(DocumentReference)}
+   */
+  @Deprecated  
   public boolean isEmptyRTEDocument(DocumentReference documentRef) {
-    return getEmptyCheckService().isEmptyRTEDocument(documentRef);
+    return getEmptyCheckScriptService().isEmptyRTEDocument(documentRef);
   }
-
+  
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getEmailAdressForCurrentUser()}
+   */
+  @Deprecated  
   public String getEmailAdressForCurrentUser() {
-    return plugin.getEmailAdressForUser(context.getUser(), context);
+    return getScriptService().getEmailAdressForCurrentUser();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getEmailAdressForUser(String)}
+   */
+  @Deprecated
   public String getEmailAdressForUser(String username) {
-    if (hasProgrammingRights()) {
-      return plugin.getEmailAdressForUser(username, context);
-    } else {
-      return null;
-    }
+    return getScriptService().getEmailAdressForUser(username);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #activateAccount(String)}
+   */
+  @Deprecated
   public Map<String, String> activateAccount(String activationCode) throws XWikiException{
-    Map<String, String> result = new HashMap<String, String>();
-    //TODO Why do we need Programming rights here? and do we realy need them?
-    //    if(hasProgrammingRights()){
-    result = plugin.activateAccount(activationCode, context);
-    //    }
-    return result;
+    return getAuthenticationScriptService().activateAccount(activationCode);
   }
 
   /**
@@ -558,11 +716,30 @@ public class CelementsWebPluginApi extends Api {
    * @param fullName
    * @param includeDoc
    * @return List of all parents, starting at the specified doc (bottom up)
+   * 
+   * @deprecated since 2.41.0 instead use {@link WebUtilsScriptService
+   * #getDocumentParentsDocRefList(DocumentReference, boolean)}
    */
-  public List<String> getDocumentParentsList(String fullName,
-      boolean includeDoc) {
+  @Deprecated
+  public List<String> getDocumentParentsList(String fullName, boolean includeDoc) {
     return WebUtils.getInstance().getDocumentParentsList(fullName, includeDoc,
         context);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getDocumentParentsDocRefList(DocumentReference, boolean)}
+   * 
+   * Returns a list of all parent for a specified doc
+   * 
+   * @param fullName
+   * @param includeDoc
+   * @return List of all parents, starting at the specified doc (bottom up)
+   */
+  @Deprecated
+  public List<DocumentReference> getDocumentParentsDocRefList(DocumentReference docRef,
+      boolean includeDoc) {
+    return getWebUtilsScriptService().getDocumentParentsDocRefList(docRef, includeDoc);
   }
 
   /**
@@ -583,36 +760,40 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * 
-   * @deprecated since 2.29.0 instead use celementsweb script service
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
+   * #getSkinConfigObj()}
    */
   @Deprecated
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
-    return getService().getSkinConfigObj();
+    return getLegacySkinScriptService().getSkinConfigObj();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelMailScriptService
+   * #sendMail(String, String, String, String, String, String, String, String, List, Map)}
+   */
+  @Deprecated
   public int sendMail(
       String from, String replyTo,
       String to, String cc, String bcc,
       String subject, String htmlContent, String textContent,
       List<Attachment> attachments, Map<String, String> others) {
-    return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent,
-        textContent, attachments, others, context);
+    return getCelMailScriptService().sendMail(from, replyTo, to, cc, bcc, subject, 
+        htmlContent, textContent, attachments, others);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getAttachmentsForDocs(List)}
+   */
+  @Deprecated
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
-    List<Attachment> attachments = Collections.emptyList();
-    if (hasProgrammingRights()){
-      LOGGER.info("getAttachmentsForDocs: fetching attachments...");
-      attachments = plugin.getAttachmentsForDocs(docsFN, context);
-    }
-    else {
-      LOGGER.info("getAttachmentsForDocs: no programming rights");
-    }
-    return attachments;
+    return getWebUtilsScriptService().getAttachmentsForDocs(docsFN);
   }
 
-  // TODO Propabely can be removed as soon as all installations are on xwiki 2+
+  /**
+   * @deprecated since 2.59
+   */
   @Deprecated
   public int sendLatin1Mail(
       String from, String replyTo,
@@ -626,64 +807,99 @@ public class CelementsWebPluginApi extends Api {
     return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent,
         attachments, others, true, context);
   }
-
+  
+  /**
+   * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
+   * #getNextTitledPageDocRef(String, String)}
+   */
+  @Deprecated
   public DocumentReference getNextTitledPageDocRef(String space, String title) {
-    if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
-      return new NextFreeDocNameCommand().getNextTitledPageDocRef(space, title, context);
-    }
-    return null;
+    return getNextFreeDocScriptService().getNextTitledPageDocRef(space, title);
   }
 
   /**
-   * @deprecated since 2.30.0 instead use
-   *             DocumentReference getNextTitledPageDocRef(String, String)
+   * @deprecated since 2.30.0 instead use {@link NextFreeDocScriptService
+   * #getNextTitledPageDocRef(String, String)}
    */
   @Deprecated
   public String getNextTitledPageFullName(String space, String title) {
-    if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
-      return new NextFreeDocNameCommand().getNextTitledPageFullName(space, title,
-          context);
-    }
-    return "";
+    return getWebUtilsService().getRefLocalSerializer().serialize(
+        getNextTitledPageDocRef(space, title));
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
+   * #getNextUntitledPageFullName(String)}
+   */
+  @Deprecated
   public String getNextUntitledPageFullName(String space) {
-    if ((space != null) && !"".equals(space)) {
-      return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, context);
-    }
-    return "";
+    return getNextFreeDocScriptService().getNextUntitledPageFullName(space);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link NextFreeDocScriptService
+   * #getNextUntitledPageName(String)}
+   */
+  @Deprecated
   public String getNextUntitledPageName(String space) {
-    if ((space != null) && !"".equals(space)) {
-      return new NextFreeDocNameCommand().getNextUntitledPageName(space, context);
-    }
-    return "";
+    return getNextFreeDocScriptService().getNextUntitledPageName(space);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
+   * #showRightPanels()}
+   */
+  @Deprecated
   public int showRightPanels() {
-    return getPrepareVelocityContextService().showRightPanels();
+    return getLegacySkinScriptService().showRightPanels();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
+   * #showLeftPanels()}
+   */
+  @Deprecated
   public int showLeftPanels() {
-    return getPrepareVelocityContextService().showLeftPanels();
+    return getLegacySkinScriptService().showLeftPanels();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
+   * #getRightPanels()}
+   */
+  @Deprecated
   public List<String> getRightPanels() {
-    return getPrepareVelocityContextService().getRightPanels();
+    return getLegacySkinScriptService().getRightPanels();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService
+   * #getLeftPanels()}
+   */
+  @Deprecated
   public List<String> getLeftPanels() {
-    return getPrepareVelocityContextService().getLeftPanels();
+    return getLegacySkinScriptService().getLeftPanels();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getDocSectionAsJSON(String, DocumentReference, int)}
+   */
+  @Deprecated
   public String getDocSectionAsJSON(String regex, String fullName, int part
       ) throws XWikiException {
-    return WebUtils.getInstance().getDocSectionAsJSON(regex, fullName, part, context);
+    return getWebUtilsScriptService().getDocSectionAsJSON(regex, getWebUtilsService(
+        ).resolveDocumentReference(fullName), part);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #countSections(String, DocumentReference)}
+   */
+  @Deprecated
   public int countSections(String regex, String fullName) throws XWikiException {
-    return WebUtils.getInstance().countSections(regex, fullName, context);
+    return getWebUtilsScriptService().countSections(regex, getWebUtilsService(
+        ).resolveDocumentReference(fullName));
   }
 
   /**
@@ -702,33 +918,67 @@ public class CelementsWebPluginApi extends Api {
     return getSynCustom().getFormatedEarlyBirdDate(date, format);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getAllowedLanguages()}
+   */
+  @Deprecated
   public List<String> getAllowedLanguages() {
-    return getWebUtilsService().getAllowedLanguages();
+    return getWebUtilsScriptService().getAllowedLanguages();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getAllowedLanguages(String)}
+   */
+  @Deprecated
   public List<String> getAllowedLanguages(String spaceName) {
-    return getWebUtilsService().getAllowedLanguages(spaceName);
+    return getWebUtilsScriptService().getAllowedLanguages(spaceName);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #createUser()}
+   */
+  @Deprecated
   public int createUser() throws XWikiException {
-    return plugin.createUser(true, context);
+    return getScriptService().createUser(true);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #createUser(boolean)}
+   */
+  @Deprecated
   public int createUser(boolean validate) throws XWikiException {
-    return plugin.createUser(validate, context);
+    return getScriptService().createUser(validate);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getUniqueValidationKey()}
+   */
+  @Deprecated
   public String getUniqueValidationKey() throws XWikiException {
-    return new NewCelementsTokenForUserCommand().getUniqueValidationKey(context);
+    return getAuthenticationScriptService().getUniqueValidationKey();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #recoverPassword()}
+   */
+  @Deprecated
   public String recoverPassword() throws XWikiException {
-    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
+    return getAuthenticationScriptService().recoverPassword();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #recoverPassword(String)}
+   */
+  @Deprecated
   public String recoverPassword(String account) throws XWikiException {
-    return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account,
-        account);
+    return getAuthenticationScriptService().recoverPassword(account);
   }
 
   /**
@@ -780,29 +1030,60 @@ public class CelementsWebPluginApi extends Api {
     getSynCustom().sendCallbackNotificationMail(data, recipients);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link RTEConfigScriptService
+   * #isEmptyRTEString(String)}
+   */
+  @Deprecated
   public boolean isEmptyRTEString(String rteContent) {
-    return new EmptyCheckCommand().isEmptyRTEString(rteContent);
+    return getRTEConfigScriptService().isEmptyRTEString(rteContent);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getParentSpace()}
+   */
+  @Deprecated
   public String getParentSpace() {
-    return getWebUtilsService().getParentSpace();
+    return getWebUtilsScriptService().getParentSpace();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link RTEConfigScriptService
+   * #getRTEConfigsList()}
+   */
+  @Deprecated
   public List<DocumentReference> getRTEConfigsList() {
-    return new RTEConfig().getRTEConfigsList();
+    return getRTEConfigScriptService().getRTEConfigsList();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link RTEConfigScriptService
+   * #getRTEConfigField(String)}
+   */
+  @Deprecated
   public String getRTEConfigField(String name) {
-    try {
-      return new RTEConfig().getRTEConfigField(name);
-    } catch (XWikiException exp) {
-      LOGGER.error("getRTEConfigField for name [" + name + "] failed.", exp);
-    }
-    return "";
+    return getRTEConfigScriptService().getRTEConfigField(name);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getJSONContent(Document)}
+   */
   public String getJSONContent(Document contentDoc) {
-    return getWebUtilsService().getJSONContent(contentDoc.getDocument());
+    return getWebUtilsScriptService().getJSONContent(contentDoc);
+  }
+
+  /**
+   * @deprecated since 2.63 instead use {@link WebUtilsScriptService
+   * #getJSONContent(DocumentReference)}
+   */
+  public String getJSONContent(DocumentReference docRef) {
+    if (hasAccessLevel("view", context.getUser(), true, getWebUtilsService(
+        ).getRefLocalSerializer().serialize(docRef))) {
+      return getWebUtilsService().getJSONContent(docRef);
+    }
+    return "{}";
   }
 
   /**
@@ -811,56 +1092,53 @@ public class CelementsWebPluginApi extends Api {
    * @return returns the name of the user in the form "lastname, first name"
    * @throws XWikiException
    * 
-   * @Deprecated since 2.18.0 instead use getUserNameForDocRef(DocumentReference)
+   * @Deprecated since 2.18.0 instead use {@link WebUtilsScriptService
+   * #getUserNameForDocRef(DocumentReference)}
    */
   @Deprecated
   public String getUserNameForDocName(String authorDocName) throws XWikiException{
-    return WebUtils.getInstance().getUserNameForDocName(authorDocName, context);
+    return this.getUserNameForDocRef(getWebUtilsService().resolveDocumentReference(
+        authorDocName));
   }
 
   /**
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getUserNameForDocRef(DocumentReference)}
    * 
    * @param authorDocName
    * @return returns the name of the user in the form "lastname, first name"
    */
+  @Deprecated
   public String getUserNameForDocRef(DocumentReference userDocRef) {
-    try {
-      return getWebUtilsService().getUserNameForDocRef(userDocRef);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get user document [" + userDocRef + "].", exp);
-    }
-    return "N/A";
-  }
-
-  public String getMajorVersion(Document doc) {
-    return getWebUtilsService().getMajorVersion(doc.getDocument());
+    return getWebUtilsScriptService().getUserNameForDocRef(userDocRef);
   }
 
   /**
-   * @deprecated since 2.11.5 use $services.celMenu.getMenuBar() instead
+   * @deprecated since 2.59 instead use {@link WebUtilsScriptService
+   * #getMajorVersion(DocumentReference)}
+   */
+  @Deprecated
+  public String getMajorVersion(Document doc) {
+    return getWebUtilsScriptService().getMajorVersion(doc);
+  }
+
+  /**
+   * @deprecated since 2.11.5 use $services.celMenu instead
    */
   @Deprecated
   public MenuScriptService getMenuBar() {
     return (MenuScriptService) Utils.getComponent(ScriptService.class, "celMenu");
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link DocFormScriptService
+   * #updateDocFromMap(String, Map)}
+   */
+  @Deprecated
   public Set<Document> updateDocFromMap(String fullname, Map<String, ?> map
       ) throws XWikiException {
-    Map<String, String[]> recompMap = new HashMap<String, String[]>();
-    for (String key : map.keySet()) {
-      if(map.get(key) instanceof String[]) {
-        recompMap.put(key, (String[])map.get(key));
-      } else if(map.get(key) instanceof String) {
-        recompMap.put(key, new String[]{(String)map.get(key)});
-      }
-    }
-    Set<Document> docs = new HashSet<Document>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(fullname,
-        recompMap, context);
-    for (XWikiDocument xdoc : xdocs) {
-      docs.add(xdoc.newDocument(context));
-    }
-    return docs;
+    return getDocFormScriptService().updateDocFromMap(getWebUtilsService(
+        ).resolveDocumentReference(fullname), map);
   }
 
   private DocFormCommand getDocFormCommand() {
@@ -870,20 +1148,24 @@ public class CelementsWebPluginApi extends Api {
     return (DocFormCommand) context.get(_DOC_FORM_COMMAND_OBJECT);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link DocFormScriptService
+   * #updateDocFromRequest()}
+   */
+  @Deprecated
   public Set<Document> updateDocFromRequest() throws XWikiException {
-    return updateDocFromRequest(null);
+    return getDocFormScriptService().updateDocFromRequest();
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated since 2.59 instead use {@link DocFormScriptService
+   * #updateDocFromRequest(String)}
+   */
+  @Deprecated
   public Set<Document> updateDocFromRequest(String fullname
       ) throws XWikiException {
-    Set<Document> docs = new HashSet<Document>();
-    Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(fullname,
-        context.getRequest().getParameterMap(), context);
-    for (XWikiDocument xdoc : xdocs) {
-      docs.add(xdoc.newDocument(context));
-    }
-    return docs;
+    return getDocFormScriptService().updateDocFromRequest(getWebUtilsService(
+        ).resolveDocumentReference(fullname));
   }
 
   /**
@@ -904,23 +1186,33 @@ public class CelementsWebPluginApi extends Api {
     }
     return 0;
   }
-
+  
+  /**
+   * @deprecated since 2.59 instead use {@link FileBaseScriptService
+   * #tokenBasedUpload(String, String, String)}
+   */
+  @Deprecated
   public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken) {
-    return tokenBasedUpload(attachToDocFN, fieldName, userToken, false);
-  }
-
-  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken,
-      Boolean createIfNotExists) {
-    try {
-      return plugin.tokenBasedUpload(attachToDocFN, fieldName, userToken,
-          createIfNotExists, context);
-    } catch (XWikiException exp) {
-      LOGGER.error("token based attachment upload failed: ", exp);
-    }
-    return 0;
+    return getFileBaseScriptService().tokenBasedUpload(getWebUtilsService(
+        ).resolveDocumentReference(attachToDocFN), fieldName, userToken);
   }
 
   /**
+   * @deprecated since 2.59 instead use {@link FileBaseScriptService
+   * #tokenBasedUpload(String, String, String, Boolean)}
+   */
+  @Deprecated
+  public int tokenBasedUpload(String attachToDocFN, String fieldName, String userToken,
+      Boolean createIfNotExists) {
+    return getFileBaseScriptService().tokenBasedUpload(getWebUtilsService(
+        ).resolveDocumentReference(attachToDocFN), fieldName, 
+        userToken, createIfNotExists);
+  }
+
+  /**
+   * @deprecated since 2.59 method dropped. Login happens automated, when token and 
+   *    username are set in request 
+   * 
    * Check authentication from logincredential and password and set according persitent
    * login information If it fails user is unlogged
    * 
@@ -928,6 +1220,7 @@ public class CelementsWebPluginApi extends Api {
    * @return null if failed, non null XWikiUser if sucess
    * @throws XWikiException
    */
+  @Deprecated
   public XWikiUser checkAuthByToken(String userToken) throws XWikiException {
     if(hasProgrammingRights()){
       LOGGER.debug("checkAuthByToken: executing checkAuthByToken in plugin");
@@ -938,8 +1231,11 @@ public class CelementsWebPluginApi extends Api {
     }
     return null;
   }
-
+  
   /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #checkAuth(String, String, String, String)}
+   * 
    * Check authentication from logincredential and password and set according persitent
    * login information If it fails user is unlogged
    * 
@@ -949,13 +1245,17 @@ public class CelementsWebPluginApi extends Api {
    * @return null if failed, non null XWikiUser if sucess
    * @throws XWikiException
    */
+  @Deprecated
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
-    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins, null,
-        context);
+    return getAuthenticationScriptService().checkAuth(logincredential, password, 
+        rememberme, possibleLogins);
   }
 
   /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #checkAuth(String, String, String, String, boolean)}
+   * 
    * Check authentication from logincredential and password and set according persitent
    * login information If it fails user is unlogged
    * 
@@ -966,28 +1266,35 @@ public class CelementsWebPluginApi extends Api {
    * @return null if failed, non null XWikiUser if sucess
    * @throws XWikiException
    */
+  @Deprecated
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins, boolean noRedirect) throws XWikiException {
-    return plugin.checkAuth(logincredential, password, rememberme, possibleLogins,
-        noRedirect, context);
+    return getAuthenticationScriptService().checkAuth(logincredential, password, rememberme, possibleLogins,
+        noRedirect);
   }
 
   /**
-   * 
+   * @deprecated: since 2.59 instead use {@link EditorSupportScriptService
+   * #validateField(String, String, String)}, Note: the validateField Method has an other
+   * return parameter (Map<ValidationType, Set<String>> instead of String)
+   *
    * @return null means the validation has been successful. Otherwise the
    *         validation message configured in the class is returned.
    */
+  @Deprecated
   public String validateField(String className, String fieldName, String value) {
     return getDocFormCommand().validateField(className, fieldName, value, context);
   }
 
   /**
-   * @deprecated since 2.2.0 instead use celementsweb script service
+   * @deprecated since 2.2.0 instead use {@link EditorSupportScriptService
+   * #validateRequest()}, Note: the validateRequest Method has an other
+   * return parameter (Map<String, Map<ValidationType, Set<String>>>)
    */
   @Deprecated
   public Map<String, String> validateRequest() {
     Map<String, String> ret = new HashMap<String, String>();
-    Map<String, Map<ValidationType, Set<String>>> validateMap = getService(
+    Map<String, Map<ValidationType, Set<String>>> validateMap = getScriptService(
         ).validateRequest();
     for (String key : validateMap.keySet()) {
       Set<String> set = validateMap.get(key).get(ValidationType.ERROR);
@@ -1005,50 +1312,94 @@ public class CelementsWebPluginApi extends Api {
     return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
-  public String renderPageLayout(SpaceReference spaceRef) {
-    return getPageLayoutCmd().renderPageLayout(spaceRef);
+  public boolean canRenderLayout(SpaceReference spaceRef) {
+    return getPageLayoutCmd().canRenderLayout(spaceRef);
   }
-
-  public SpaceReference getCurrentRenderingLayout() {
-    return getPageLayoutCmd().getCurrentRenderingLayout();
+  
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #renderPageLayout(SpaceReference)}
+   */
+  @Deprecated
+  public String renderPageLayout(SpaceReference spaceRef) {
+    return getLayoutScriptService().renderPageLayout(spaceRef);
   }
 
   /**
-   * @deprecated since 2.18.0 instead use renderPageLayout(SpaceReference)
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #renderCelementsDocumentWithLayout(DocumentReference, SpaceReference)}
+   */
+  @Deprecated
+  public String renderCelementsDocumentWithLayout(DocumentReference docRef,
+      SpaceReference layoutSpaceRef) {
+    return getLayoutScriptService().renderCelementsDocumentWithLayout(docRef, 
+        layoutSpaceRef);
+  }
+  
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #getCurrentRenderingLayout()}
+   */
+  @Deprecated
+  public SpaceReference getCurrentRenderingLayout() {
+    return getLayoutScriptService().getCurrentRenderingLayout();
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use {@link LayoutScriptService
+   * #renderPageLayout(SpaceReference)}
    */
   @Deprecated
   public String renderPageLayout(String spaceName) {
-    return getPageLayoutCmd().renderPageLayout(
+    return getPageLayoutCmd().renderPageLayoutLocal(
         getWebUtilsService().resolveSpaceReference(spaceName));
   }
 
   /**
-   * @deprecated since 2.18.0 instead use getPageLayoutForDoc(DocumentReference)
+   * @deprecated since 2.18.0 instead use {@link LayoutScriptService
+   * #getPageLayoutForDoc(DocumentReference)}
    */
   @Deprecated
   public String getPageLayoutForDoc(String fullName) {
-    return getPageLayoutCmd().getPageLayoutForDoc(
-        getWebUtilsService().resolveDocumentReference(fullName)).getName();
-  }
-
-  public String getPageLayoutForDoc(DocumentReference docRef) {
-    return getPageLayoutCmd().getPageLayoutForDoc(docRef).getName();
-  }
-
-  public String renderPageLayout() {
-    return getPageLayoutCmd().renderPageLayout();
+    return this.getPageLayoutForDoc(
+        getWebUtilsService().resolveDocumentReference(fullName));
   }
 
   /**
-   * @deprecated since 2.18.0 instead use addTranslation(DocumentReference, String)
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #getPageLayoutForDoc(DocumentReference)}
+   */
+  @Deprecated
+  public String getPageLayoutForDoc(DocumentReference docRef) {
+    return getLayoutScriptService().getPageLayoutForDoc(docRef);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #renderPageLayout()}
+   */
+  @Deprecated
+  public String renderPageLayout() {
+    return getLayoutScriptService().renderPageLayout();
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use {@link CelementsWebScriptService
+   * #addTranslation(DocumentReference, String)}
    */
   @Deprecated
   public boolean addTranslation(String fullName, String language) {
-    return new AddTranslationCommand().addTranslation(fullName, language, context);
+    return getScriptService().addTranslation(getWebUtilsService(
+        ).resolveDocumentReference(fullName), language);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #addTranslation(DocumentReference, String)}
+   */
+  @Deprecated
   public boolean addTranslation(DocumentReference docRef, String language) {
-    return new AddTranslationCommand().addTranslation(docRef, language);
+    return getScriptService().addTranslation(docRef, language);
   }
 
   /**
@@ -1062,20 +1413,41 @@ public class CelementsWebPluginApi extends Api {
     return getSynCustom().getBMI();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #renameSpace(String, String)}
+   */
+  @Deprecated
   public List<String> renameSpace(String spaceName, String newSpaceName) {
-    return new RenameCommand().renameSpace(spaceName, newSpaceName, context);
+    return getScriptService().renameSpace(spaceName, newSpaceName);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #renameDoc(String, String)}
+   */
+  @Deprecated
   public boolean renameDoc(String fullName, String newDocName) {
-    return new RenameCommand().renameDoc(fullName, newDocName, context);
+    return getScriptService().renameDoc(getWebUtilsService().resolveDocumentReference(
+        fullName), newDocName);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getSupportedAdminLanguages()}
+   */
+  @Deprecated
   public List<String> getSupportedAdminLanguages() {
-    return plugin.getSupportedAdminLanguages();
+    return getScriptService().getSupportedAdminLanguages();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #writeUTF8Response(String, String)}
+   */
+  @Deprecated
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
-    return plugin.writeUTF8Response(filename, renderDocFullName, context);
+    return getScriptService().writeUTF8Response(filename, renderDocFullName);
   }
 
   /**
@@ -1115,103 +1487,132 @@ public class CelementsWebPluginApi extends Api {
     return getSynCustom().getExportMapping(mappingStr, congress);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getCelementsWebAppVersion()}
+   */
+  @Deprecated
   public String getCelementsWebAppVersion() {
-    DocumentReference centralAppDocRef = new DocumentReference("celements2web", "XApp",
-        "XWikiApplicationCelements2web");
-    DocumentReference xappClassDocRef = new DocumentReference("celements2web",
-        "XAppClasses", "XWikiApplicationClass");
-    try {
-      XWikiDocument appReceiptDoc = context.getWiki().getDocument(centralAppDocRef,
-          context);
-      BaseObject appClassObj = appReceiptDoc.getXObject(xappClassDocRef);
-      if (appClassObj != null) {
-        return appClassObj.getStringValue("appversion");
-      }
-    } catch (XWikiException exp) {
-      LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
-    }
-    return "N/A";
+    return getScriptService().getCelementsWebAppVersion();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getCelementsWebCoreVersion()}
+   */
+  @Deprecated
   public String getCelementsWebCoreVersion() {
-    return context.getWiki().Param("com.celements.version");
+    return getScriptService().getCelementsWebCoreVersion();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #getActivePageLayouts()}
+   */
+  @Deprecated
   public Map<String,String> getActivePageLayouts() {
-    return getPageLayoutCmd().getActivePageLyouts();
+    return getLayoutScriptService().getActivePageLayouts();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #getAllPageLayouts()}
+   */
+  @Deprecated
   public Map<String,String> getAllPageLayouts() {
-    return getPageLayoutCmd().getAllPageLayouts();
+    return getLayoutScriptService().getAllPageLayouts();
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated since 2.59 instead use {@link WebFormScriptService
+   * #isFormFilled()}
+   */
+  @Deprecated
   public boolean isFormFilled() {
-    return plugin.isFormFilled(context.getRequest().getParameterMap(),
-        Collections.<String>emptySet());
+    return getWebFormScriptService().isFormFilled();
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated since 2.59 instead use {@link WebFormScriptService
+   * #isFormFilled(String)}
+   */
+  @Deprecated
   public boolean isFormFilled(String excludeFields) {
-    Set<String> excludeSet = new HashSet<String>();
-    for (String field : excludeFields.split(",")) {
-      if(!"".equals(field.trim()) && (field.trim().length() > 0)) {
-        excludeSet.add(field);
-      }
-    }
-    return plugin.isFormFilled(context.getRequest().getParameterMap(), excludeSet);
+    return getWebFormScriptService().isFormFilled(excludeFields);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #resetProgrammingRights()}
+   */
+  @Deprecated
   public boolean resetProgrammingRights() {
-    if (hasAdminRights()) {
-      return new ResetProgrammingRightsCommand().resetCelements2webRigths(context);
-    } else {
-      LOGGER.warn("user [" + context.getUser() + "] tried to reset programming rights,"
-          + " but has no admin rights.");
-    }
-    return false;
+    return getScriptService().resetProgrammingRights();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #createNewLayout(String)}
+   */
+  @Deprecated
   public String createNewLayout(String layoutSpaceName) {
-    return getPageLayoutCmd().createNew(getWebUtilsService().resolveSpaceReference(
-        layoutSpaceName));
+    return getLayoutScriptService().createNewLayout(layoutSpaceName);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #deleteLayout(String)}
+   */
+  @Deprecated
   public boolean deleteLayout(String layoutSpaceName) {
-    SpaceReference layoutSpaceRef = getWebUtilsService().resolveSpaceReference(
-        layoutSpaceName);
-    String layoutPropDocName = getEntitySerializer().serialize(getPageLayoutCmd(
-        ).standardPropDocRef(layoutSpaceRef));
-    try {
-      if (hasAccessLevel("delete", layoutPropDocName)) {
-        return getPageLayoutCmd().deleteLayout(layoutSpaceRef);
-      } else {
-        LOGGER.warn("NO delete rights on [" + layoutPropDocName
-            + "] for user [" + context.getUser() + "].");
-      }
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to check delete rights on [" + layoutSpaceName + "] for user ["
-          + context.getUser() + "].");
-    }
-    return false;
+    return getLayoutScriptService().deleteLayout(layoutSpaceName);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #getPageLayoutApiForName(String)}
+   */
+  @Deprecated
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
-    return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
-        context);
+    return getLayoutScriptService().getPageLayoutApiForName(layoutSpaceName);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link TreeNodeScriptService
+   * #navReorderSave(String, String)}
+   */
+  @Deprecated
   public String navReorderSave(String fullName, String structureJSON) {
-    return new ReorderSaveCommand().reorderSave(fullName, structureJSON, context);
+    return getTreeNodeScriptService().navReorderSave(getWebUtilsService(
+        ).resolveDocumentReference(fullName), structureJSON);
   }
 
+  /**
+   * @deprecated since 2.34.0 instead use {@link LayoutScriptService
+   * #layoutExists(SpaceReference)}
+   */
+  @Deprecated
   public boolean layoutExists(String layoutSpaceName) {
-    return getPageLayoutCmd().layoutExists(getWebUtilsService().resolveSpaceReference(
+    return this.layoutExists(getWebUtilsService().resolveSpaceReference(
         layoutSpaceName));
   }
 
+  /**
+   * @deprecated since 2.34.0 instead use {@link LayoutScriptService
+   * #layoutExists(SpaceReference)}
+   */
+  @Deprecated
+  public boolean layoutExists(SpaceReference layoutSpaceRef) {
+    return getLayoutScriptService().layoutExists(layoutSpaceRef);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #layoutEditorAvailable()}
+   */
+  @Deprecated
   public boolean layoutEditorAvailable() {
-    return getPageLayoutCmd().layoutEditorAvailable();
+    return getLayoutScriptService().layoutEditorAvailable();
   }
 
   /**
@@ -1266,7 +1667,8 @@ public class CelementsWebPluginApi extends Api {
    * @param elementFullName
    * @return
    * 
-   * @deprecated since 2.11.2 use renderCelementsDocument(DocumentReference) instead
+   * @deprecated since 2.11.2 use {@link CelementsWebScriptService
+   * #renderCelementsDocument(DocumentReference)}instead
    */
   @Deprecated
   public String renderCelementsDocument(String elementFullName) {
@@ -1279,122 +1681,151 @@ public class CelementsWebPluginApi extends Api {
    * @param renderMode
    * @return
    * 
-   * @deprecated since 2.11.2 use renderCelementsDocument(DocumentReference, String) instead
+   * @deprecated since 2.11.2 use {@link CelementsWebScriptService
+   * #renderCelementsDocument(DocumentReference, String)}
    */
   @Deprecated
   public String renderCelementsDocument(String elementFullName, String renderMode) {
-    try {
-      return getCelementsRenderCmd().renderCelementsDocument(context.getWiki(
-          ).getDocument(elementFullName, context), renderMode);
-    } catch (XWikiException exp) {
-      LOGGER.error("renderCelementsDocument: Failed to render " + elementFullName, exp);
-    }
-    return "";
+    return getScriptService().renderCelementsDocument(getWebUtilsService(
+        ).resolveDocumentReference(elementFullName), renderMode);
   }
 
   /**
-   * @deprecated since 2.11.7 instead use celementsweb script service
+   * @deprecated since 2.11.7 instead use {@link CelementsWebScriptService
+   * #renderCelementsDocument(DocumentReference)}
    */
   @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef) {
-    return getService().renderCelementsDocument(elementDocRef);
+    return getScriptService().renderCelementsDocument(elementDocRef);
   }
 
   /**
-   * @deprecated since 2.11.7 instead use celementsweb script service
+   * @deprecated since 2.11.7 instead use {@link CelementsWebScriptService
+   * #renderCelementsDocument(DocumentReference, String)}
    */
   @Deprecated
   public String renderCelementsDocument(DocumentReference elementDocRef,
       String renderMode) {
-    return getService().renderCelementsDocument(elementDocRef, renderMode);
+    return getScriptService().renderCelementsDocument(elementDocRef, renderMode);
   }
 
   /**
    * @deprecated since 2.17.0
-   *             instead use renderDocument in CelementsWebScriptService
+   *             instead use {@link CelementsWebScriptService#renderDocument(Document)}
    */
   @Deprecated
   public String renderDocument(Document renderDoc) {
-    return getService().renderDocument(renderDoc);
+    return getScriptService().renderDocument(renderDoc);
   }
 
   /**
-   * @deprecated since 2.17.0
-   *             instead use renderDocument in CelementsWebScriptService
+   * @deprecated since 2.17.0 instead use {@link CelementsWebScriptService
+   * #renderDocument(Document, boolean, List)}
    */
   @Deprecated
   public String renderDocument(Document renderDoc, boolean removePre,
       List<String> rendererNameList) {
-    return getService().renderDocument(renderDoc, removePre, rendererNameList);
+    return getScriptService().renderDocument(renderDoc, removePre, rendererNameList);
   }
 
-  private RenderCommand getCelementsRenderCmd() {
-    RenderCommand renderCommand = new RenderCommand();
-    renderCommand.setDefaultPageType("RichText");
-    return renderCommand;
-  }
-
+  /**
+   * @deprecated since 2.17.0 instead use {@link CelementsWebScriptService
+   * #renderCelementsDocument(Document)}
+   */
+  @Deprecated
   public String renderCelementsDocument(Document renderDoc) {
     return renderCelementsDocument(renderDoc, "view");
   }
 
   /**
-   * @deprecated since 2.17.0
-   *             instead use renderCelementsDocument in CelementsWebScriptService
+   * @deprecated since 2.17.0 instead use {@link CelementsWebScriptService
+   * #renderCelementsDocument(Document, String)}
    */
   @Deprecated
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
-    return getService().renderCelementsDocument(renderDoc, renderMode);
+    return getScriptService().renderCelementsDocument(renderDoc, renderMode);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getEditURL(Document)}
+   */
+  @Deprecated
   public String getEditURL(Document doc) {
-    if(!context.getWiki().exists(doc.getDocumentReference(), context)
-        || !isValidLanguage() || !isTranslationAvailable(doc, context.getLanguage())) {
-      return doc.getURL("edit", "language=" + getWebUtilsService().getDefaultLanguage());
-    } else {
-      return doc.getURL("edit", "language=" + context.getLanguage());
-    }
+    return getScriptService().getEditURL(doc);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #isTranslationAvailable(Document, String)}
+   */
+  @Deprecated
   public boolean isTranslationAvailable(Document doc, String language) {
-    try {
-      return doc.getTranslationList().contains(language);
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].",
-          exp);
-      return (language.equals(getWebUtilsService().getDefaultLanguage())
-          && context.getWiki().exists(doc.getDocumentReference(), context));
-    }
+    return getScriptService().isTranslationAvailable(doc, language);
   }
-
+  
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #isValidLanguage()}
+   */
+  @Deprecated
   public boolean isValidLanguage() {
-    return getAllowedLanguages().contains(context.getLanguage());
+    return getScriptService().isValidLanguage();
   }
 
+  /**
+   * @deprecated since 2.59 without replacement
+   */
+  @Deprecated
   public DocumentCreationWorkerControlApi getTestDocumentCreationWorker() {
     return new DocumentCreationWorkerControlApi(context);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #clearFileName(String)}
+   */
+  @Deprecated
   public String clearFileName(String fileName) {
-    return context.getWiki().clearName(fileName, false, true, context);
+    return getScriptService().clearFileName(fileName);
   }
 
+  /**
+   * @deprecated since 2.41.0
+   *             instead use getDocHeaderTitle(DocumentReference)
+   */
+  @Deprecated
   public String getDocHeaderTitle(String fullName) {
     return new DocHeaderTitleCommand().getDocHeaderTitle(fullName, context);
   }
-
-  public void logDeprecatedVelocityScript(String logMessage) {
-    LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
+  
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getDocHeaderTitle(DocumentReference)}
+   */
+  @Deprecated
+  public String getDocHeaderTitle(DocumentReference docRef) {
+    return getScriptService().getDocHeaderTitle(docRef);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #logDeprecatedVelocityScript(String)}
+   */
+  @Deprecated
+  public void logDeprecatedVelocityScript(String logMessage) {
+    getScriptService().logDeprecatedVelocityScript(logMessage);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #isValidUserJSON(String, String, String, List)}
+   */
+  @Deprecated
   public String isValidUserJSON(String username, String password, String memberOfGroup,
       List<String> returnGroupMemberships) {
-    RemoteUserValidator validater = new RemoteUserValidator();
-    if(hasProgrammingRights()) {
-      return validater.isValidUserJSON(username, password, memberOfGroup,
-          returnGroupMemberships, context);
-    }
-    return null;
+    return getAuthenticationScriptService().isValidUserJSON(username, password,
+        memberOfGroup, returnGroupMemberships);
   }
 
   /**
@@ -1412,94 +1843,110 @@ public class CelementsWebPluginApi extends Api {
   public boolean congressRegistrationPlausibility(Document document) {
     return getSynCustom().congressRegistrationPlausibility(document);
   }
-
+  
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #newObjectForFormStorage(Document, String)}
+   */
+  @Deprecated
   public com.xpn.xwiki.api.Object newObjectForFormStorage(Document storageDoc,
       String className) {
-    if (hasProgrammingRights()) {
-      BaseObject newStoreObj = new FormObjStorageCommand().newObject(
-          storageDoc.getDocument(), className, context);
-      if (newStoreObj != null) {
-        return newStoreObj.newObjectApi(newStoreObj, context);
-      }
-    }
-    return null;
-  }
-
-  public boolean checkCaptcha() {
-    return new CaptchaCommand().checkCaptcha(context);
-  }
-
-  public String getCaptchaId() {
-    return new CaptchaCommand().getCaptchaId(context);
+    return getScriptService().newObjectForFormStorage(storageDoc, className);
   }
 
   /**
+   * @deprecated since 2.59 instead use {@link CaptchaScriptService
+   * #checkCaptcha()}
+   */
+  @Deprecated   
+  public boolean checkCaptcha() {
+    return getCaptchaScriptService().checkCaptcha();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CaptchaScriptService
+   * #getCaptchaId()}
+   */
+  @Deprecated 
+  public String getCaptchaId() {
+    return getCaptchaScriptService().getCaptchaId();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getObjStoreOptionsMap(String)}
+   * 
    * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as
    * a Map.
    * @param options The String saved in the store object
    * @return Map containing all the
    */
+  @Deprecated
   public Map<String, String> getObjStoreOptionsMap(String options) {
-    return (new ParseObjStoreCommand()).getObjStoreOptionsMap(options, context);
+    return getScriptService().getObjStoreOptionsMap(options);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link LayoutScriptService
+   * #useXWikiLoginLayout()}
+   */
+  @Deprecated 
   public boolean useXWikiLoginLayout() {
-    return "1".equals(context.getWiki().getSpacePreference("xwikiLoginLayout",
-        "celements.xwikiLoginLayout", "1", context));
+    return getLayoutScriptService().useXWikiLoginLayout();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getLogoutRedirectURL()}
+   */
+  @Deprecated
   public String getLogoutRedirectURL() {
-    XWiki xwiki = context.getWiki();
-    String logoutRedirectConf = xwiki.getSpacePreference("LogoutRedirect",
-        "celements.logoutRedirect", xwiki.getDefaultSpace(context) + ".WebHome", context);
-    String logoutRedirectURL = logoutRedirectConf;
-    if (!logoutRedirectConf.startsWith("http://")
-        && !logoutRedirectConf.startsWith("https://")) {
-      logoutRedirectURL = xwiki.getURL(logoutRedirectConf, "view", "logout=1", context);
-    }
-    return logoutRedirectURL;
+    return getAuthenticationScriptService().getLogoutRedirectURL();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #getLoginRedirectURL()}
+   */
+  @Deprecated
   public String getLoginRedirectURL() {
-    XWiki xwiki = context.getWiki();
-    String loginRedirectConf = xwiki.getSpacePreference("LoginRedirect",
-        "celements.loginRedirect", xwiki.getDefaultSpace(context) + ".WebHome", context);
-    String loginRedirectURL = loginRedirectConf;
-    if (!loginRedirectConf.startsWith("http://")
-        && !loginRedirectConf.startsWith("https://")) {
-      loginRedirectURL = xwiki.getURL(loginRedirectConf, "view", "", context);
-    }
-    return loginRedirectURL;
+    return getAuthenticationScriptService().getLoginRedirectURL();
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #isCelementsRights(String)}
+   */
+  @Deprecated
   public boolean isCelementsRights(String fullName) {
-    return new CelementsRightsCommand().isCelementsRights(fullName, context);
+    return getScriptService().isCelementsRights(getWebUtilsService(
+        ).resolveDocumentReference(fullName));
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated since 2.59 instead use {@link ActionScriptService
+   * #executeAction(Document)}
+   */
+  @Deprecated
   public boolean executeAction(Document actionDoc) {
-    return plugin.executeAction(actionDoc, context.getRequest().getParameterMap(),
-        context.getDoc(), context);
+    return getActionScriptService().executeAction(actionDoc);
   }
 
+  /**
+   * @deprecated since 2.59 instead use {@link ActionScriptService
+   * #executeAction(Document, Map)}
+   */
+  @Deprecated
   public boolean executeAction(Document actionDoc,
       Map<String, List<Object>> fakeRequestMap) {
-    Map<String, String[]> requestMap = new HashMap<String, String[]>();
-    for (String key : fakeRequestMap.keySet()) {
-      if (fakeRequestMap.get(key) != null) {
-        ArrayList<String> stringArray = new ArrayList<String>(fakeRequestMap.get(key
-            ).size());
-        for (Object value : fakeRequestMap.get(key)) {
-          stringArray.add(value.toString());
-        }
-        requestMap.put(key, stringArray.toArray(new String[0]));
-      }
-    }
-    return plugin.executeAction(actionDoc, requestMap, context.getDoc(), context);
+    return getActionScriptService().executeAction(actionDoc, fakeRequestMap);
   }
 
   /**
    * API to check rights on a document for a given user or group
+   * 
+   * @deprecated since 2.59 instead use {@link AuthenticationScriptService
+   * #hasAccessLevel(String, String, boolean, String)}
    * 
    * @param level right to check (view, edit, comment, delete)
    * @param user user or group for which to check the right
@@ -1507,15 +1954,11 @@ public class CelementsWebPluginApi extends Api {
    * @param docname document on which to check the rights
    * @return true if right is granted/false if not
    */
+  @Deprecated
   public boolean hasAccessLevel(String level, String user, boolean isUser,
       String docname) {
-    try {
-      //XXX add extended hasAccessLevel to interface asap
-      return ((XWikiRightServiceImpl)context.getWiki().getRightService()).hasAccessLevel(
-          level, user, docname, isUser, getXWikiContext());
-    } catch (Exception e) {
-      return false;
-    }
+    return getAuthenticationScriptService().hasAccessLevel(level, user, isUser, 
+        getWebUtilsService().resolveDocumentReference(docname));
   }
 
   /**
@@ -1523,7 +1966,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getSkinFile(String fileName) {
-    return getService().getSkinFile(fileName);
+    return getScriptService().getSkinFile(fileName);
   }
 
   /**
@@ -1531,89 +1974,130 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String getSkinFile(String fileName, String action) {
-    return getService().getSkinFile(fileName, action);
-  }
-
-  public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference,
-      String fieldname) {
-    return new SuggestBaseClass(classreference, fieldname, context);
-  }
-
-  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
-      String input) {
-    return new SuggestListCommand().getSuggestList(classRef, fieldname, null, input, "",
-        "", 0, context);
-  }
-
-  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
-      List<String> excludes, String input, String firstCol, String secCol, int limit) {
-    return new SuggestListCommand().getSuggestList(classRef, fieldname, excludes,
-        input, firstCol, secCol, limit, context);
-  }
-
-  public String getDefaultSpace() {
-    return context.getWiki().getDefaultSpace(context);
-  }
-
-  public void checkClasses()  {
-    new CheckClassesCommand().checkClasses(context);
-  }
-
-  public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
-  }
-
-  public boolean useImageAnimations() {
-    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation",
-        "celements.celImageAnimation", "0", context));
+    return getScriptService().getSkinFile(fileName, action);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
+   * #getSuggestBaseClass(DocumentReference, String)}
+   */
+  @Deprecated
+  public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference,
+      String fieldname) {
+    return getEditorSupportScriptService().getSuggestBaseClass(classreference, fieldname);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
+   * #getSuggestList(DocumentReference, String, String)}
+   */
+  @Deprecated
+  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
+      String input) {
+    return getEditorSupportScriptService().getSuggestList(classRef, fieldname, input);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService
+   * #getSuggestList(DocumentReference, String, List, String, String, String, int))}
+   */
+  @Deprecated
+  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
+      List<String> excludes, String input, String firstCol, String secCol, int limit) {
+    return getEditorSupportScriptService().getSuggestList(classRef, fieldname, excludes, 
+        input, firstCol, secCol, limit);
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #getDefaultSpace()}
+   */
+  @Deprecated
+  public String getDefaultSpace() {
+    return getScriptService().getDefaultSpace();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link CelementsWebScriptService
+   * #checkClasses()}
+   */
+  @Deprecated
+  public void checkClasses() {
+    getScriptService().checkClasses();
+  }
+
+  /**
+   * @deprecated since 2.59 instead use {@link TreeNodeScriptService
+   * #getNextNonEmptyChildren(DocumentReference)}
+   */
+  @Deprecated
+  public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
+    return getTreeNodeScriptService().getNextNonEmptyChildren(documentRef);
+  }
+
+  /**
+   * @deprecated since 2.11.2 instead use {@link ImageScriptService
+   * #useImageAnimations()} in the celements-photo-component Component
+   */
+  @Deprecated
+  public boolean useImageAnimations() {
+    String defaultValue = context.getWiki().Param("celements.celImageAnimation", "0");
+    return "1".equals(context.getWiki().getSpacePreference("celImageAnimation",
+        defaultValue, context));
+  }
+
+  /**
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getAppScriptURL(String)}
    */
   @Deprecated
   public String getAppScriptURL(String scriptName) {
-    return getService().getAppScriptURL(scriptName);
+    return getAppScriptScriptService().getAppScriptURL(scriptName);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getAppScriptURL(String, String)}
    */
   @Deprecated
   public String getAppScriptURL(String scriptName, String queryString) {
-    return getService().getAppScriptURL(scriptName, queryString);
+    return getAppScriptScriptService().getAppScriptURL(scriptName, queryString);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #isAppScriptCurrentPage(String)}
    */
   @Deprecated
   public boolean isAppScriptCurrentPage(String scriptName) {
-    return getService().isAppScriptCurrentPage(scriptName);
+    return getAppScriptScriptService().isAppScriptCurrentPage(scriptName);
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getScriptNameFromURL()}
    */
   @Deprecated
   public String getScriptNameFromURL() {
-    return getService().getScriptNameFromURL();
+    return getAppScriptScriptService().getScriptNameFromURL();
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #isAppScriptRequest()}
    */
   @Deprecated
   public boolean isAppScriptRequest() {
-    return getService().isAppScriptRequest();
+    return getAppScriptScriptService().isAppScriptRequest();
   }
 
   /**
-   * @deprecated since 2.11.2 instead use celementsweb script service
+   * @deprecated since 2.11.2 instead use {@link AppScriptScriptService
+   * #getCurrentPageURL(String)}
    */
   @Deprecated
   public String getCurrentPageURL(String queryString) {
-    return getService().getCurrentPageURL(queryString);
+    return getAppScriptScriptService().getCurrentPageURL(queryString);
   }
 
   /**
@@ -1621,7 +2105,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public String convertToPlainText(String htmlContent) {
-    return getService().convertToPlainText(htmlContent);
+    return getScriptService().convertToPlainText(htmlContent);
   }
 
   /**
@@ -1629,38 +2113,96 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Builder getNewJSONBuilder() {
-    return getService().getNewJSONBuilder();
+    return getScriptService().getNewJSONBuilder();
   }
 
-  private CelementsWebScriptService getService() {
+  private CelementsWebScriptService getScriptService() {
     return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
         "celementsweb");
   }
 
-  private ContextMenuScriptService getCMService() {
+  private WebUtilsScriptService getWebUtilsScriptService() {
+    return (WebUtilsScriptService) Utils.getComponent(ScriptService.class, "webUtils");
+  }
+
+  private ContextMenuScriptService getContextMenuScriptService() {
     return (ContextMenuScriptService) Utils.getComponent(ScriptService.class,
         "contextMenu");
+  }
+
+  private TreeNodeScriptService getTreeNodeScriptService() {
+    return (TreeNodeScriptService) Utils.getComponent(ScriptService.class, "treeNode");
   }
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  private IPrepareVelocityContext getPrepareVelocityContextService() {
-    return Utils.getComponent(IPrepareVelocityContext.class);
+  private AuthenticationScriptService getAuthenticationScriptService() {
+    return (AuthenticationScriptService) Utils.getComponent(ScriptService.class, 
+        "authentication");
   }
-
-  private DefaultStringEntityReferenceSerializer getEntitySerializer() {
-    return ((DefaultStringEntityReferenceSerializer)Utils.getComponent(
-        EntityReferenceSerializer.class));
+  
+  private EditorSupportScriptService getEditorSupportScriptService() {
+    return (EditorSupportScriptService) Utils.getComponent(ScriptService.class, 
+        "editorsupport");
   }
-
-  private ITreeNodeService getTreeNodeService() {
-    return Utils.getComponent(ITreeNodeService.class);
+  
+  private ActionScriptService getActionScriptService() {
+    return (ActionScriptService) Utils.getComponent(ScriptService.class, "action");
   }
-
-  private IEmptyCheckRole getEmptyCheckService() {
-    return Utils.getComponent(IEmptyCheckRole.class);
+  
+  private LayoutScriptService getLayoutScriptService() {
+    return (LayoutScriptService) Utils.getComponent(ScriptService.class, "layout");
   }
-
+  
+  private CaptchaScriptService getCaptchaScriptService() {
+    return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captcha");
+  }
+  
+  private CSSScriptService getCSSScriptService() {
+    return (CSSScriptService) Utils.getComponent(ScriptService.class, "css");
+  }
+  
+  private LegacySkinScriptService getLegacySkinScriptService() {
+    return (LegacySkinScriptService) Utils.getComponent(ScriptService.class, 
+        "legacyskin");
+  }
+  
+  private DocFormScriptService getDocFormScriptService() {
+    return (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
+  }
+  
+  private FileBaseScriptService getFileBaseScriptService() {
+    return (FileBaseScriptService) Utils.getComponent(ScriptService.class, "filebase");
+  }
+  
+  private RTEConfigScriptService getRTEConfigScriptService() {
+    return (RTEConfigScriptService) Utils.getComponent(ScriptService.class, "rteconfig");
+  }
+  
+  private NextFreeDocScriptService getNextFreeDocScriptService() {
+    return (NextFreeDocScriptService) Utils.getComponent(ScriptService.class, 
+        "nextfreedoc");
+  }
+  
+  private CelMailScriptService getCelMailScriptService() {
+    return (CelMailScriptService) Utils.getComponent(ScriptService.class, "celmail");
+  }
+  
+  private JSScriptService getJSScriptService() {
+    return (JSScriptService) Utils.getComponent(ScriptService.class, "javascript");
+  }
+  
+  private AppScriptScriptService getAppScriptScriptService() {
+    return (AppScriptScriptService) Utils.getComponent(ScriptService.class, "appscript");
+  }
+  
+  private WebFormScriptService getWebFormScriptService() {
+    return (WebFormScriptService) Utils.getComponent(ScriptService.class, "webform");
+  }
+  
+  private EmptyCheckScriptService getEmptyCheckScriptService() {
+    return (EmptyCheckScriptService) Utils.getComponent(ScriptService.class, "emptycheck");
+  }
 }

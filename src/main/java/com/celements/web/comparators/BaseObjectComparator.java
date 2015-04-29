@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
@@ -52,20 +53,13 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
   public int compare(BaseObject obj1, BaseObject obj2) {
     Object val1 = getValue(obj1, orderField1);
     Object val2 = getValue(obj2, orderField1);
+
     int firstLarger = 0;
-    if(val1 instanceof StringProperty) {
-      firstLarger = compareField((StringProperty)val1, (StringProperty)val2);
-    } else if(val1 instanceof IntegerProperty) {
-      firstLarger = compareField((IntegerProperty)val1, (IntegerProperty)val2);
-    } else if(val1 instanceof LongProperty) {
-      firstLarger = compareField((LongProperty)val1, (LongProperty)val2);
-    } else if(val1 instanceof DateProperty) {
-      firstLarger = compareField((DateProperty)val1, (DateProperty)val2);
-    }
-    if((firstLarger == 0) && (orderField2 != null) && (orderField2.trim().length() > 0)
-        ) {
-      val1 = getValue(obj1, orderField2);
-      val2 = getValue(obj2, orderField2);
+
+    short resultWithNull = compareWithNullValue(val1, val2);
+    if(resultWithNull != Short.MIN_VALUE) {
+      firstLarger = resultWithNull;
+    } else {
       if(val1 instanceof StringProperty) {
         firstLarger = compareField((StringProperty)val1, (StringProperty)val2);
       } else if(val1 instanceof IntegerProperty) {
@@ -74,6 +68,25 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
         firstLarger = compareField((LongProperty)val1, (LongProperty)val2);
       } else if(val1 instanceof DateProperty) {
         firstLarger = compareField((DateProperty)val1, (DateProperty)val2);
+      }
+    }
+    if((firstLarger == 0) && (orderField2 != null) && (orderField2.trim().length() > 0)) {
+      val1 = getValue(obj1, orderField2);
+      val2 = getValue(obj2, orderField2);
+      
+      resultWithNull = compareWithNullValue(val1, val2);
+      if(resultWithNull != Short.MIN_VALUE) {
+        firstLarger = resultWithNull;
+      } else {
+        if(val1 instanceof StringProperty) {
+          firstLarger = compareField((StringProperty)val1, (StringProperty)val2);
+        } else if(val1 instanceof IntegerProperty) {
+          firstLarger = compareField((IntegerProperty)val1, (IntegerProperty)val2);
+        } else if(val1 instanceof LongProperty) {
+          firstLarger = compareField((LongProperty)val1, (LongProperty)val2);
+        } else if(val1 instanceof DateProperty) {
+          firstLarger = compareField((DateProperty)val1, (DateProperty)val2);
+        }
       }
       firstLarger *= asc2?1:-1;
     } else {
@@ -105,13 +118,29 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
   }
 
   short compareField(DateProperty value, DateProperty value2) {
-    if(((Date)value.getValue()).getTime() > ((Date)value2.getValue()).getTime()) {
+    if(((Date) value.getValue()).getTime() > ((Date) value2.getValue()).getTime()) {
       return 1;
-    } else if(((Date)value.getValue()).getTime() < ((Date)value2.getValue()).getTime()
+    } else if(((Date) value.getValue()).getTime() < ((Date) value2.getValue()).getTime()
         ) {
       return -1;
     }
     return 0;
+  }
+
+  short compareWithNullValue(Object val1, Object val2) {
+    if((val1 == null) || ((val1 instanceof BaseProperty) 
+        && (((BaseProperty) val1).getValue() == null))) {
+      if((val2 == null) || ((val2 instanceof BaseProperty) 
+          && (((BaseProperty) val2).getValue() == null))) {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else if((val2 == null) || ((val2 instanceof BaseProperty) 
+        && (((BaseProperty) val2).getValue() == null))) {
+      return 1;
+    }
+    return Short.MIN_VALUE;
   }
 
   Object getValue(BaseObject obj, String field) {
