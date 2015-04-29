@@ -873,7 +873,9 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     ComponentManager mockComponentManager = createMockAndAddToDefault(
         ComponentManager.class);
     Utils.setComponentManager(mockComponentManager);
-    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+    expect(mockComponentManager.lookup(eq(IWebUtilsService.class), eq("default"))
+        ).andReturn(wUServiceMock);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class),
         eq("testPresentationType"))).andReturn(componentInstance);
     replayDefault();
     nav.loadConfigFromObject(navConfigObj);
@@ -888,7 +890,9 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     ComponentManager mockComponentManager = createMockAndAddToDefault(
         ComponentManager.class);
     Utils.setComponentManager(mockComponentManager);
-    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+    expect(mockComponentManager.lookup(eq(IWebUtilsService.class), eq("default"))
+        ).andReturn(wUServiceMock);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class),
         eq("testPresentationType"))).andReturn(componentInstance);
     replayDefault();
     nav.setPresentationType("testPresentationType");
@@ -913,7 +917,9 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     ComponentManager mockComponentManager = createMockAndAddToDefault(
         ComponentManager.class);
     Utils.setComponentManager(mockComponentManager);
-    expect(mockComponentManager.lookup(eq(IPresentationTypeRole.class),
+    expect(mockComponentManager.lookup(eq(IWebUtilsService.class), eq("default"))
+        ).andReturn(wUServiceMock);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class),
         eq("testNotFoundPresentationType"))).andThrow(new ComponentLookupException(
             "not found"));
     replayDefault();

@@ -37,7 +37,6 @@ import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.xobject.event.XObjectPageTypeCreatedEvent;
 import com.celements.pagetype.xobject.event.XObjectPageTypeDeletedEvent;
 import com.celements.pagetype.xobject.event.XObjectPageTypeUpdatedEvent;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -50,9 +49,6 @@ public class XObjectPageTypeDocumentUpdatedListener
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentUpdatedListener.class);
-
-  @Requirement
-  private IWebUtilsService webUtilsService;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -188,11 +184,6 @@ public class XObjectPageTypeDocumentUpdatedListener
     LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
         + "] new value [" + newValue + "], old value [" + oldValue + "]");
     return (newValue != oldValue);
-  }
-
-  @Override
-  protected IWebUtilsService getWebUtilsService() {
-    return webUtilsService;
   }
 
   @Override

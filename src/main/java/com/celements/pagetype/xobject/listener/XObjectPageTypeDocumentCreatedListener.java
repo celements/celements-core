@@ -33,7 +33,6 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.pagetype.xobject.event.XObjectPageTypeCreatedEvent;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -46,9 +45,6 @@ public class XObjectPageTypeDocumentCreatedListener
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentCreatedListener.class);
-
-  @Requirement
-  private IWebUtilsService webUtilsService;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -87,11 +83,6 @@ public class XObjectPageTypeDocumentCreatedListener
           + source + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
-  }
-
-  @Override
-  protected IWebUtilsService getWebUtilsService() {
-    return webUtilsService;
   }
 
   @Override

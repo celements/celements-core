@@ -49,7 +49,7 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
   protected ObservationManager getObservationManager() {
     if (this.observationManager == null) {
       try {
-        this.observationManager = getWebUtilsService().lookup(ObservationManager.class);
+        this.observationManager = webUtilsService.lookup(ObservationManager.class);
       } catch (ComponentLookupException e) {
         throw new RuntimeException(
             "Cound not retrieve an Observation Manager against the component manager");
@@ -70,7 +70,9 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
         doc));
   }
 
-  abstract protected IWebUtilsService getWebUtilsService();
+  final protected IWebUtilsService getWebUtilsService() {
+    return webUtilsService;
+  };
   
   abstract protected Logger getLogger();
 
