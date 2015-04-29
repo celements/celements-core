@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -46,9 +45,6 @@ public class XObjectPageTypeDocumentCreatedListener
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentCreatedListener.class);
-
-  @Requirement
-  private ComponentManager componentManager;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -87,11 +83,6 @@ public class XObjectPageTypeDocumentCreatedListener
           + source + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
-  }
-
-  @Override
-  protected ComponentManager getComponentManager() {
-    return componentManager;
   }
 
   @Override

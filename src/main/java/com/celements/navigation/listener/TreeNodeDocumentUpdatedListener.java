@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
@@ -40,6 +39,7 @@ import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.event.TreeNodeCreatedEvent;
 import com.celements.navigation.event.TreeNodeDeletedEvent;
 import com.celements.navigation.event.TreeNodeUpdatedEvent;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -52,7 +52,7 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
       TreeNodeDocumentUpdatedListener.class);
 
   @Requirement
-  private ComponentManager componentManager;
+  private IWebUtilsService webUtilsService;
 
   @Requirement("celements.celNavigationClasses")
   IClassCollectionRole navClasses;
@@ -178,8 +178,8 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
   }
 
   @Override
-  protected ComponentManager getComponentManager() {
-    return componentManager;
+  protected IWebUtilsService getWebUtilsService() {
+    return webUtilsService;
   }
 
   @Override

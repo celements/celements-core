@@ -54,6 +54,11 @@ public class XObjectPageTypeDocumentUpdatedListenerTest
   }
 
   @Test
+  public void testGetWebUtilsService() {
+    assertNotNull(eventListener.getWebUtilsService());
+  }
+
+  @Test
   public void testComponentSingleton() {
     assertSame(eventListener, getXObjPageTypeDocUpdatedListener());
   }

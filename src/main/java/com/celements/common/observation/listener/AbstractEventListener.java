@@ -2,12 +2,12 @@ package com.celements.common.observation.listener;
 
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 
 public abstract class AbstractEventListener implements EventListener {
@@ -16,7 +16,7 @@ public abstract class AbstractEventListener implements EventListener {
   private RemoteObservationManagerContext remoteObsManagerContext;
 
   @Requirement
-  private ComponentManager componentManager;
+  private IWebUtilsService webUtilsService;
 
   @Requirement
   private Execution execution;
@@ -33,7 +33,7 @@ public abstract class AbstractEventListener implements EventListener {
   protected ObservationManager getObservationManager() {
     if (this.observationManager == null) {
       try {
-        this.observationManager = componentManager.lookup(ObservationManager.class);  
+        this.observationManager = webUtilsService.lookup(ObservationManager.class);  
       } catch (ComponentLookupException exc) {
         throw new RuntimeException("Cound not retrieve an Observation Manager against "
             + "the component manager", exc);

@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -50,9 +49,6 @@ public class XObjectPageTypeDocumentUpdatedListener
 
   private static Logger LOGGER = LoggerFactory.getLogger(
       XObjectPageTypeDocumentUpdatedListener.class);
-
-  @Requirement
-  private ComponentManager componentManager;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -188,11 +184,6 @@ public class XObjectPageTypeDocumentUpdatedListener
     LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
         + "] new value [" + newValue + "], old value [" + oldValue + "]");
     return (newValue != oldValue);
-  }
-
-  @Override
-  protected ComponentManager getComponentManager() {
-    return componentManager;
   }
 
   @Override

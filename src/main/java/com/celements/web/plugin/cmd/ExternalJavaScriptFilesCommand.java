@@ -191,7 +191,8 @@ public class ExternalJavaScriptFilesCommand {
 
   private Map<String, IExtJSFilesListener> getListenerMap() {
     try {
-      return Utils.getComponentManager().getInstanceMap(IExtJSFilesListener.class);
+      return Utils.getComponent(IWebUtilsService.class).lookupMap(
+          IExtJSFilesListener.class);
     } catch (ComponentLookupException exp) {
       LOGGER.error("Failed to get IExtJSFilesListener components.", exp);
     }

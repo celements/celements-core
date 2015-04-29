@@ -21,8 +21,9 @@ package com.celements.navigation.listener;
 
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
+
+import com.celements.web.service.IWebUtilsService;
 
 public abstract class AbstractTreeNodeDocumentListener {
 
@@ -38,7 +39,7 @@ public abstract class AbstractTreeNodeDocumentListener {
   protected ObservationManager getObservationManager() {
     if (this.observationManager == null) {
       try {
-        this.observationManager = getComponentManager().lookup(ObservationManager.class);
+        this.observationManager = getWebUtilsService().lookup(ObservationManager.class);
   
       } catch (ComponentLookupException e) {
         throw new RuntimeException(
@@ -48,7 +49,7 @@ public abstract class AbstractTreeNodeDocumentListener {
     return this.observationManager;
   }
 
-  abstract protected ComponentManager getComponentManager();
+  abstract protected IWebUtilsService getWebUtilsService();
   
   abstract protected Logger getLogger();
 
