@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -307,5 +308,16 @@ public interface IWebUtilsService {
    */
   public EntityType resolveEntityTypeForFullName(String fullName, 
       EntityType defaultNameType);
+
+  /**
+   * only used as an adapter for unstable 2
+   */
+  public <T> T lookup(Class<T> role) throws ComponentLookupException;
+
+
+  /**
+   * only used as an adapter for unstable 2
+   */
+  public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException;
 
 }

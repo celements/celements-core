@@ -43,6 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -94,6 +96,9 @@ public class WebUtilsService implements IWebUtilsService {
   private static final String REGEX_ATT = REGEX_DOC + "\\@.*";
 
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
+
+  @Requirement
+  ComponentManager componentManager;
 
   @Requirement("default")
   EntityReferenceSerializer<String> serializer_default;
@@ -1403,6 +1408,16 @@ public class WebUtilsService implements IWebUtilsService {
     _LOGGER.debug("resolveEntityTypeForFullName: got '" + ret + "' for fullName '" 
         + fullName + "' and default '" + defaultNameType + "'");
     return ret;
+  }
+
+  @Override
+  public <T> T lookup(Class<T> role) throws ComponentLookupException {
+    return componentManager.lookup(role);
+  }
+
+  @Override
+  public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException {
+    return componentManager.lookup(role, roleHint);
   }
 
 }
