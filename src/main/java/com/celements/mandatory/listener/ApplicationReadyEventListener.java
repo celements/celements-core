@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.common.classes.listener;
+package com.celements.mandatory.listener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,28 +25,28 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.classes.IClassesCompositorComponent;
+import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-@Component(ApplicationStartedEventListener.NAME)
-public class ApplicationStartedEventListener implements EventListener {
+@Component(ApplicationReadyEventListener.NAME)
+public class ApplicationReadyEventListener implements EventListener {
 
   private static Logger LOGGER = LoggerFactory.getLogger(
-      ApplicationStartedEventListener.class);
+      ApplicationReadyEventListener.class);
 
-  public static final String NAME = "celements.classes.ApplicationStartedEventListener";
+  public static final String NAME = "celements.mandatory.ApplicationReadyEventListener";
 
   @Requirement
-  IClassesCompositorComponent classesCompositor;
+  IMandatoryDocumentCompositorRole mandatoryDocCmp;
 
   @Requirement
   RemoteObservationManagerContext remoteObservationManagerContext;
@@ -66,21 +66,21 @@ public class ApplicationStartedEventListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    LOGGER.info("getEvents: registering for application started events");
-    return Arrays.<Event>asList(new ApplicationStartedEvent());
+    LOGGER.info("getEvents: registering for application ready events");
+    return Arrays.<Event>asList(new ApplicationReadyEvent());
   }
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    LOGGER.debug("received ApplicationStartedEvent, remote state '{}', checkOnStart '{}'",
+    LOGGER.debug("received ApplicationReadyEvent, remote state '{}', checkOnStart '{}'",
         remoteObservationManagerContext.isRemoteState(), checkOnStart());
     if (!remoteObservationManagerContext.isRemoteState() && checkOnStart()) {
       String dbBackup = getContext().getDatabase();
       try {
         for (String database : getAllDatabases()) {
-          LOGGER.info("checking all class collections for db '{}'", database);
+          LOGGER.info("checking all mandatory documents for db '{}'", database);
           getContext().setDatabase(database);
-          classesCompositor.checkAllClassCollections();
+          mandatoryDocCmp.checkAllMandatoryDocuments();
         }
       } finally {
         getContext().setDatabase(dbBackup);
@@ -89,7 +89,7 @@ public class ApplicationStartedEventListener implements EventListener {
   }
 
   private boolean checkOnStart() {
-    return getContext().getWiki().ParamAsLong("celements.classCollections.checkOnStart", 
+    return getContext().getWiki().ParamAsLong("celements.mandatory.checkOnStart", 
         1L) == 1L;
   }
 

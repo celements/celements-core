@@ -96,6 +96,6 @@ com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
 com.celements.query.QueryExecutionService
-com.celements.common.classes.listener.ApplicationStartedEventListener
-com.celements.mandatory.listener.ApplicationStartedEventListener
+com.celements.common.classes.listener.ApplicationReadyEventListener
+com.celements.mandatory.listener.ApplicationReadyEventListener
 com.celements.common.observation.converter.AnnotationEventConverter

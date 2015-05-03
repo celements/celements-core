@@ -8,24 +8,24 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 
-public class ApplicationStartedEventListenerTest extends AbstractBridgedComponentTestCase {
+public class ApplicationReadyEventListenerTest extends AbstractBridgedComponentTestCase {
 
-  private ApplicationStartedEventListener listener;
+  private ApplicationReadyEventListener listener;
 
   private RemoteObservationManagerContext remoteObsMngContextMock;
   private IMandatoryDocumentCompositorRole mandatoryDocCmpMock;
 
   @Before
-  public void setUp_ApplicationStartedEventListenerTest() throws Exception {
-    listener = (ApplicationStartedEventListener) getComponentManager().lookup(
-        EventListener.class, "celements.mandatory.ApplicationStartedEventListener");
+  public void setUp_ApplicationReadyEventListenerTest() throws Exception {
+    listener = (ApplicationReadyEventListener) getComponentManager().lookup(
+        EventListener.class, "celements.mandatory.ApplicationReadyEventListener");
     remoteObsMngContextMock = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;
@@ -36,13 +36,13 @@ public class ApplicationStartedEventListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testGetName() {
-    assertEquals("celements.mandatory.ApplicationStartedEventListener", listener.getName());
+    assertEquals("celements.mandatory.ApplicationReadyEventListener", listener.getName());
   }
 
   @Test
   public void testGetEvents() {
     assertEquals(1, listener.getEvents().size());
-    assertSame(ApplicationStartedEvent.class, listener.getEvents().get(0).getClass());
+    assertSame(ApplicationReadyEvent.class, listener.getEvents().get(0).getClass());
   }
 
   @Test
@@ -67,7 +67,7 @@ public class ApplicationStartedEventListenerTest extends AbstractBridgedComponen
     
     String db = getContext().getDatabase();
     replayDefault();
-    listener.onEvent(new ApplicationStartedEvent(), null, null);
+    listener.onEvent(new ApplicationReadyEvent(), null, null);
     verifyDefault();
     assertEquals(db, getContext().getDatabase());
   }
@@ -79,7 +79,7 @@ public class ApplicationStartedEventListenerTest extends AbstractBridgedComponen
         ).andReturn(0L).atLeastOnce();
     
     replayDefault();
-    listener.onEvent(new ApplicationStartedEvent(), null, null);
+    listener.onEvent(new ApplicationReadyEvent(), null, null);
     verifyDefault();
   }
 
@@ -90,7 +90,7 @@ public class ApplicationStartedEventListenerTest extends AbstractBridgedComponen
         ).andReturn(1L).atLeastOnce();
     
     replayDefault();
-    listener.onEvent(new ApplicationStartedEvent(), null, null);
+    listener.onEvent(new ApplicationReadyEvent(), null, null);
     verifyDefault();
   }
 
