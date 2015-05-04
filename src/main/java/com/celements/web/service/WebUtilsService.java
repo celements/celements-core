@@ -110,9 +110,6 @@ public class WebUtilsService implements IWebUtilsService {
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
 
-  @Requirement
-  private IDocumentParentsListerRole docParentLister;
-
   /**
    * Used to get the template path mapping information.
    */
@@ -176,7 +173,10 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated 
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    return docParentLister.getDocumentParentsList(docRef, includeDoc);
+    //IMPORTANT: IDocumentParentsListerRole must not be required, because of possible
+    // cyclic dependencies. Get IDocumentParentsListerRole component lazyly instead!!!
+    return Utils.getComponent(IDocumentParentsListerRole.class).getDocumentParentsList(
+        docRef, includeDoc);
   }
 
   @Override
