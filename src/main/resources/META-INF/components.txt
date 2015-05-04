@@ -56,7 +56,6 @@ com.celements.mandatory.Robots_TXT
 com.celements.web.service.MobileLoggingScriptService
 com.celements.rendering.XHTMLtoHTML5cleanup
 com.celements.navigation.presentation.LayoutEditorPresentationType
-com.celements.navigation.event.converter.TreeNodeEventConverter
 com.celements.rteConfig.classes.RTEConfigClasses
 com.celements.rteConfig.classes.RTEConfigClassConfig
 com.celements.rteConfig.RTEConfigTemplateService
@@ -84,7 +83,6 @@ com.celements.cells.CellsClassConfig
 com.celements.navigation.presentation.RenderedExtractPresentationType
 com.celements.captcha.CaptchaService
 com.celements.pagetype.xobject.XObjectPageTypeCache
-com.celements.pagetype.xobject.event.converter.XObjectPageTypeEventConverter
 com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentDeletedListener
 com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentUpdatedListener
 com.celements.pagetype.xobject.listener.XObjectPageTypeDocumentCreatedListener
@@ -98,7 +96,6 @@ com.celements.webform.WebFormScriptService
 com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
 com.celements.query.QueryExecutionService
-com.celements.common.classes.listener.ApplicationStartedEventListener
-com.celements.mandatory.listener.ApplicationStartedEventListener
+com.celements.common.observation.converter.AnnotationEventConverter
 com.celements.parents.XDocParents
 com.celements.parents.DocumentParentsLister
