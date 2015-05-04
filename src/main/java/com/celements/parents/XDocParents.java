@@ -5,13 +5,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component(XDocParents.DOC_PROVIDER_NAME)
 public class XDocParents implements IDocParentProviderRole {
@@ -21,15 +21,19 @@ public class XDocParents implements IDocParentProviderRole {
   public static final String DOC_PROVIDER_NAME = "xwiki";
 
   @Requirement
-  private DocumentAccessBridge docAccessBridge;
+  private Execution execution;
+
+  private XWikiContext getContext() {
+    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
 
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef) {
     ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
     try {
       DocumentReference nextParent = getParentRef(docRef);
-      while ((nextParent != null)
-          && docAccessBridge.exists(nextParent) && !docParents.contains(nextParent)) {
+      while ((nextParent != null) && getContext().getWiki().exists(nextParent,
+          getContext()) && !docParents.contains(nextParent)) {
         docParents.add(nextParent);
         nextParent = getParentRef(nextParent);
       }
@@ -40,15 +44,8 @@ public class XDocParents implements IDocParentProviderRole {
   }
 
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
-    try {
-      return ((XWikiDocument)docAccessBridge.getDocument(docRef)).getParentReference();
-    } catch (Exception exp) {
-      _LOGGER.error("Failed to get document [" + docRef + "].", exp);
-      throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-          XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to get document [" + docRef + "].",
-          exp);
-    }
-
+      return getContext().getWiki().getDocument(docRef, getContext()
+          ).getParentReference();
   }
 
 }
