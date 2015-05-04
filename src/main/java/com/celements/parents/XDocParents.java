@@ -33,8 +33,8 @@ public class XDocParents implements IDocParentProviderRole {
         docParents.add(nextParent);
         nextParent = getParentRef(nextParent);
       }
-    } catch (XWikiException e) {
-      _LOGGER.error("Failed to get parent reference. ", e);
+    } catch (XWikiException exp) {
+      _LOGGER.error("Failed to get parent reference. ", exp);
     }
     return docParents;
   }
