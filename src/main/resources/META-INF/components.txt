@@ -97,3 +97,5 @@ com.celements.appScript.AppScriptScriptService
 com.celements.mandatory.XWikiXWikiRights
 com.celements.query.QueryExecutionService
 com.celements.common.observation.converter.AnnotationEventConverter
+com.celements.parents.XDocParents
+com.celements.parents.DocumentParentsLister
