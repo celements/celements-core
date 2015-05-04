@@ -7,9 +7,9 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
 import com.celements.web.service.IWebUtilsService;
@@ -17,9 +17,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public abstract class AbstractDocumentListener extends AbstractEventListener {
-
-  @Requirement
-  protected IWebUtilsService webUtilsService;
 
   @Override
   public void onEvent(Event event, Object source, Object data) {

@@ -13,10 +13,10 @@ import com.xpn.xwiki.XWikiContext;
 public abstract class AbstractEventListener implements EventListener {
 
   @Requirement
-  private RemoteObservationManagerContext remoteObsManagerContext;
+  protected IWebUtilsService webUtilsService;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private RemoteObservationManagerContext remoteObsManagerContext;
 
   @Requirement
   private Execution execution;
