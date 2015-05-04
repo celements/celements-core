@@ -38,13 +38,15 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
       do {
         List<DocumentReference> parentList = docParentProviderMap.get(firstKey
             ).getDocumentParentsList(docRef);
-        joinParentLists(docParents, parentList);
-        docRef = docParents.get(docParents.size() - 1);
+        if (parentList.size() > 0) {
+          joinParentLists(docParents, parentList);
+          docRef = docParents.get(docParents.size() - 1);
+        }
         hasMore = false;
         if (secondKeys.size() > 0) {
           int secKeyIndex = -1;
           parentList = Collections.emptyList();
-          while ((secKeyIndex < secondKeys.size()) && ((parentList == null)
+          while (((secKeyIndex + 1) < secondKeys.size()) && ((parentList == null)
               || parentList.isEmpty())) {
             secKeyIndex = secKeyIndex + 1;
             parentList = docParentProviderMap.get(secondKeys.get(secKeyIndex)

@@ -3,8 +3,8 @@ package com.celements.parents;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
@@ -44,7 +43,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList() throws XWikiException {
+  public void testGetDocumentParentsList_not_include() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
     DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
@@ -68,7 +67,54 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_includeDoc() throws XWikiException {
+  public void testGetDocumentParentsList_not_include_testProvider_empty(
+      ) throws Exception {
+    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+        IDocParentProviderRole.class);
+    docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
+
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(
+        Collections.<DocumentReference>emptyList()).once();
+    List<DocumentReference> docParentsList = Collections.emptyList();
+    replayDefault();
+    assertEquals(docParentsList, docParentsLister.getDocumentParentsList(docRef, false));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetDocumentParentsList_not_include_testProvider_hasParent(
+      ) throws Exception {
+    IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
+        IDocParentProviderRole.class);
+    docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
+
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "myDoc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+
+    DocumentReference testProviderParentRef = new DocumentReference(context.getDatabase(),
+        "MySpaceTest", "TestProviderDoc");
+    XWikiDocument testProviderParentDoc = new XWikiDocument(testProviderParentRef);
+    expect(xwiki.getDocument(eq(testProviderParentRef), same(context))).andReturn(
+        testProviderParentDoc).once();
+    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(true
+        ).anyTimes();
+
+    expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(Arrays.asList(
+        testProviderParentRef)).once();
+    List<DocumentReference> docParentsList = Arrays.asList(testProviderParentRef);
+    replayDefault();
+    assertEquals(docParentsList, docParentsLister.getDocumentParentsList(docRef, false));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetDocumentParentsList_includeDoc() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
     DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
@@ -97,7 +143,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_includeDoc_testProvider() throws XWikiException {
+  public void testGetDocumentParentsList_includeDoc_testProvider() throws Exception {
     IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
@@ -143,7 +189,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_includeDoc_notexist() throws XWikiException {
+  public void testGetDocumentParentsList_includeDoc_notexist() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
 
@@ -159,7 +205,8 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_testProvider() throws XWikiException {
+  public void testGetDocumentParentsList_includeDoc_notexist_testProvider(
+      ) throws Exception {
     IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
