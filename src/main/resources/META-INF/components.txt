@@ -100,3 +100,5 @@ com.celements.mandatory.XWikiXWikiRights
 com.celements.query.QueryExecutionService
 com.celements.common.classes.listener.ApplicationStartedEventListener
 com.celements.mandatory.listener.ApplicationStartedEventListener
+com.celements.parents.XDocParents
+com.celements.parents.DocumentParentsLister

@@ -131,6 +131,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testGetDocumentParentsList() throws XWikiException {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
@@ -155,6 +156,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testGetDocumentParentsList_includeDoc() throws XWikiException {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
@@ -184,6 +186,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testGetDocumentParentsList_includeDoc_notexist() throws XWikiException {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDoc");
@@ -450,6 +453,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testGetAdminLanguage_notContextUser() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";
@@ -472,6 +476,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testGetAdminLanguage_defaultToWebPreferences() throws XWikiException {
     context.setLanguage("de");
     String userName = "XWiki.MyUser";

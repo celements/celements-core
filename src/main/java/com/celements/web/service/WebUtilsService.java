@@ -62,6 +62,7 @@ import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.rights.AccessLevel;
@@ -108,6 +109,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement
   EntityReferenceResolver<String> referenceResolver;
+
+  @Requirement
+  private IDocumentParentsListerRole docParentLister;
 
   /**
    * Used to get the template path mapping information.
@@ -163,30 +167,16 @@ public class WebUtilsService implements IWebUtilsService {
     return parent;
   }
 
+  /**
+   * @deprecated since 2.63.0
+   * @deprecated instead use IDocumentParentsListerRole.getDocumentParentsList(
+      DocumentReference docRef, boolean includeDoc)
+   */
   @Override
+  @Deprecated 
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
-    try {
-      DocumentReference nextParent;
-      if (includeDoc) {
-        docParents.add(docRef);
-      }
-      nextParent = getParentRef(docRef);
-      while ((nextParent != null)
-          && getContext().getWiki().exists(nextParent, getContext())
-          && !docParents.contains(nextParent)) {
-        docParents.add(nextParent);
-        nextParent = getParentRef(nextParent);
-      }
-    } catch (XWikiException e) {
-      _LOGGER.error("Failed to get parent reference. ", e);
-    }
-    return docParents;
-  }
-
-  private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
-    return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
+    return docParentLister.getDocumentParentsList(docRef, includeDoc);
   }
 
   @Override
