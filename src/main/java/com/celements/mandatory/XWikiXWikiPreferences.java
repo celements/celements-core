@@ -66,12 +66,16 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   protected boolean checkDocuments(XWikiDocument doc) throws XWikiException {
-    return checkPageType(doc) || checkWikiPreferences(doc);
+    boolean dirty = checkPageType(doc);
+    dirty |= checkWikiPreferences(doc);
+    return dirty;
   }
 
   @Override
   protected boolean checkDocumentsMain(XWikiDocument doc) throws XWikiException {
-    return checkPageType(doc) ||  checkWikiPreferencesForMainWiki(doc);
+    boolean dirty = checkPageType(doc);
+    dirty |= checkWikiPreferencesForMainWiki(doc);
+    return dirty;
   }
 
   private boolean checkWikiPreferences(XWikiDocument wikiPrefDoc) throws XWikiException {
@@ -175,6 +179,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
   }
 
   private boolean checkPageType(XWikiDocument wikiPrefDoc) throws XWikiException {
+    boolean dirty = false;
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
         webUtilsService.getWikiRef());
     BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false,
@@ -184,9 +189,9 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
       pageTypeObj.setStringValue("page_type", "WikiPreference");
       LOGGER.debug("XWikiPreferences missing page type object fixed for database ["
           + getWiki() + "].");
-      return true;
+      dirty = true;
     }
-    return false;
+    return dirty;
   }
 
   @Override
