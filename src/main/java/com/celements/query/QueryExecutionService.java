@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -14,7 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -81,7 +85,7 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
       }
     }
     LOGGER.info("executing sql '{}' for db '{}' returned '{}'", sql, getContext(
-        ).getDatabase(),  result);
+        ).getDatabase(), result);
     return result;
   }
 
@@ -101,6 +105,35 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
     } finally {
       getContext().setDatabase(curWikiRef.getName());
     }
+  }
+
+  @Override
+  public DocumentReference executeAndGetDocRef(Query query) throws QueryException {
+    DocumentReference ret = null;
+    List<DocumentReference> list = executeAndGetDocRefs(query);
+    if (list.size() > 0) {
+      ret = list.get(0);
+    }
+    return ret;
+  }
+
+  @Override
+  public List<DocumentReference> executeAndGetDocRefs(Query query) throws QueryException {
+    List<DocumentReference> ret = new ArrayList<DocumentReference>();
+    WikiReference wikiRef = webUtilsService.getWikiRef();
+    if (StringUtils.isNotBlank(query.getWiki())) {
+      wikiRef = new WikiReference(query.getWiki());
+    }
+    for (Object fullName : query.execute()) {
+      if ((fullName instanceof String) && StringUtils.isNotBlank((String) fullName)) {
+        ret.add(webUtilsService.resolveDocumentReference((String) fullName, wikiRef));
+      } else {
+        LOGGER.debug("executeAndGetDocRefs: received invalid fullName '{}'", fullName);
+      }
+    }
+    LOGGER.info("executeAndGetDocRefs: {} results for query '{}' and wiki '{}'", 
+        ret.size(), query.getStatement(), wikiRef);
+    return ret;
   }
 
   private XWikiHibernateStore getHibStore() {
