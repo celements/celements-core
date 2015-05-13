@@ -79,11 +79,11 @@ public class DocFormCommand {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     String template = context.getRequest().getParameter("template");
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}'", doc, 
-          template);
-    } else {
       LOGGER.debug("updateDocFromMap: updating doc '{}' with template '{}' and request "
           + "'{}'", doc, template, context.getRequest().getParameterMap());
+    } else {
+      LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}'", doc, 
+          template);
     }
     if(doc.isNew() && !"".equals(template.trim())) {
       DocumentReference templRef = getWebUtilsService().resolveDocumentReference(template);
