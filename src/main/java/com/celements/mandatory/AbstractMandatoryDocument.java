@@ -19,8 +19,10 @@
  */
 package com.celements.mandatory;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -29,11 +31,16 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiUser;
 
+// TODO add unit tests
 public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRole {
 
   @Requirement
   protected IWebUtilsService webUtilsService;
+
+  @Requirement("xwikiproperties")
+  protected ConfigurationSource xwikiPropConfigSource;
 
   @Requirement
   private Execution execution;
@@ -72,13 +79,27 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
   private XWikiDocument getDoc() throws XWikiException {
     XWikiDocument doc;
     if (!getContext().getWiki().exists(getDocRef(), getContext())) {
-      doc = new CreateDocumentCommand().createDocument(getDocRef(), null);
-      getLogger().info("created doc '{}'", doc);
+      XWikiUser originalUser = getContext().getXWikiUser();
+      try {
+        setUserInContext(getUser());
+        doc = new CreateDocumentCommand().createDocument(getDocRef(), null);
+        getLogger().info("created doc '{}'", doc);
+      } finally {
+        setUserInContext(originalUser);
+      }
     } else {
       doc = getContext().getWiki().getDocument(getDocRef(), getContext());
       getLogger().debug("already exists doc '{}'", doc);
     }
     return doc;
+  }
+
+  private void setUserInContext(XWikiUser user) {
+    if (user != null) {
+      getContext().setUser(user.getUser(), user.isMain());
+    } else {
+      getContext().setUser(null);
+    }
   }
 
   protected void saveDoc(XWikiDocument doc, boolean dirty) throws XWikiException {
@@ -102,6 +123,16 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
 
   protected String getWiki() {
     return getContext().getDatabase();
+  }
+
+  protected XWikiUser getUser() {
+    XWikiUser user = getContext().getXWikiUser();
+    String defaultUserName = xwikiPropConfigSource.getProperty(
+        "celements.mandatory.defaultGlobalUserName");
+    if (StringUtils.isNotBlank(defaultUserName)) {
+      user = new XWikiUser(defaultUserName, true);
+    }
+    return user;
   }
 
 }
