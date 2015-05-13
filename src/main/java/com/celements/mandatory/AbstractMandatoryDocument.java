@@ -82,7 +82,7 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
       XWikiUser originalUser = getContext().getXWikiUser();
       try {
         setUserInContext(getUser());
-        doc = new CreateDocumentCommand().createDocument(getDocRef(), null);
+        doc = new CreateDocumentCommand().createDocument(getDocRef(), null, false);
         getLogger().info("created doc '{}'", doc);
       } finally {
         setUserInContext(originalUser);
@@ -105,7 +105,8 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
   protected void saveDoc(XWikiDocument doc, boolean dirty) throws XWikiException {
     if (dirty) {
       getLogger().info("updated doc '{}' for '{}'", doc, getName());
-      getContext().getWiki().saveDocument(doc, "autocreate " + getName(), getContext());
+      getContext().getWiki().saveDocument(doc, "autocreate mandatory " + getName(), 
+          getContext());
     } else {
       getLogger().debug("is uptodate '{}' for '{}'", doc, getName());
     }
