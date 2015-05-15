@@ -19,6 +19,8 @@
  */
 package com.celements.web.css;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -43,15 +45,19 @@ public abstract class CSS extends Api {
   public String displayInclude(XWikiContext context){
     String cssPath = getCSS(context);
     if (cssPath != null) {
+      String media = getMedia();
+      if (StringUtils.isBlank(media)) {
+        media = "all";
+      }
       return "<link rel=\"" + (isAlternate() ? "alternate " : "") + "stylesheet\" "
-          + "title=\"" + getTitle() + "\" media=\"" + getMedia() + "\" type=\"text/css\" "
+          + "title=\"" + getTitle() + "\" media=\"" + media + "\" type=\"text/css\" "
           + "href=\"" + cssPath + "\" />\n";
     } else {
       return "<!-- WARNING: css file not found: " + getCssBasePath() + " -->\n";
     }
   }
 
-  public String toString(XWikiContext context){
+  public String toString (XWikiContext context){
     return getMedia() + " - " + getCSS(context);
   }
 
