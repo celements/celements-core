@@ -51,6 +51,15 @@ public class CSSBaseObject extends CSS {
   }
 
   @Override
+  public boolean isAlternate() {
+    if(obj != null) {
+      return obj.getIntValue("alternate", -1) == 1;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public String getTitle() {
     if(obj != null) {
       return obj.getStringValue("title");

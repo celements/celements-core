@@ -62,6 +62,20 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testIsAlternate() {
+    CSSString cssFile = new CSSString("", false, "", "", false, context);
+    assertFalse(cssFile.isAlternate());
+    cssFile = new CSSString("", true, "", "", false, context);
+    assertTrue(cssFile.isAlternate());
+  }
+
+  @Test
+  public void testGetTitle() {
+    CSSString cssFile = new CSSString("", false, "myTitle", "", false, context);
+    assertEquals("myTitle", cssFile.getTitle());
+  }
+
+  @Test
   public void testGetMedia() {
     CSSString cssFile = new CSSString("", "print", context);
     assertEquals("print", cssFile.getMedia());

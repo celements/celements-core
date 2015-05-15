@@ -50,6 +50,7 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     bo = new BaseObject();
     docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     bo.setDocumentReference(docRef);
+    bo.setStringValue("title", "myTitle");
     bo.setStringValue("media", "print");
     bo.setIntValue("is_rte_content", 0);
     xwiki = createMock(XWiki.class);
@@ -95,6 +96,22 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     replay(webutils);
     assertEquals(url, cssFile.getCSS(context));
     verify(webutils);
+  }
+
+  @Test
+  public void testIsAlternate() {
+    CSSBaseObject cssFile = new CSSBaseObject(bo, context);
+    assertFalse(cssFile.isAlternate());
+    bo.setIntValue("alternate", 0);
+    assertFalse(cssFile.isAlternate());
+    bo.setIntValue("alternate", 1);
+    assertTrue(cssFile.isAlternate());
+  }
+
+  @Test
+  public void testGetTitle() {
+    CSSBaseObject cssFile = new CSSBaseObject(bo, context);
+    assertEquals("myTitle", cssFile.getTitle());
   }
 
   @Test

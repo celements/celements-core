@@ -47,10 +47,24 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
   public void testDisplayInclude_createCSSinclude() {
     String url = "/skin/Content/WebHome/myCSSFile.css";
     expect(cssMock.getCSS(same(context))).andReturn(url);
+    expect(cssMock.isAlternate()).andReturn(false);
     expect(cssMock.getTitle()).andReturn("myTitle");
     expect(cssMock.getMedia()).andReturn("all");
     replay(cssMock);
     assertEquals("<link rel=\"stylesheet\" title=\"myTitle\" media=\"all\" "
+        + "type=\"text/css\" href=\"" + url + "\" />\n", css.displayInclude(context));
+    verify(cssMock);
+  }
+
+  @Test
+  public void testDisplayInclude_createCSSinclude_alternate() {
+    String url = "/skin/Content/WebHome/myCSSFile.css";
+    expect(cssMock.getCSS(same(context))).andReturn(url);
+    expect(cssMock.isAlternate()).andReturn(true);
+    expect(cssMock.getTitle()).andReturn("myTitle");
+    expect(cssMock.getMedia()).andReturn("all");
+    replay(cssMock);
+    assertEquals("<link rel=\"alternate stylesheet\" title=\"myTitle\" media=\"all\" "
         + "type=\"text/css\" href=\"" + url + "\" />\n", css.displayInclude(context));
     verify(cssMock);
   }
@@ -100,6 +114,11 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
     @Override
     public String getCSS(XWikiContext context) {
       return cssMock.getCSS(context);
+    }
+
+    @Override
+    public boolean isAlternate() {
+      return cssMock.isAlternate();
     }
 
     @Override

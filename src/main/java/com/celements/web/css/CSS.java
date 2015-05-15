@@ -43,13 +43,14 @@ public abstract class CSS extends Api {
   public String displayInclude(XWikiContext context){
     String cssPath = getCSS(context);
     if (cssPath != null) {
-      return "<link rel=\"stylesheet\" title=\"" + getTitle() + "\" media=\"" 
-          + getMedia() + "\" type=\"text/css\" href=\"" + cssPath + "\" />\n";
+      return "<link rel=\"" + (isAlternate() ? "alternate " : "") + "stylesheet\" "
+          + "title=\"" + getTitle() + "\" media=\"" + getMedia() + "\" type=\"text/css\" "
+          + "href=\"" + cssPath + "\" />\n";
     } else {
       return "<!-- WARNING: css file not found: " + getCssBasePath() + " -->\n";
     }
   }
-  
+
   public String toString(XWikiContext context){
     return getMedia() + " - " + getCSS(context);
   }
@@ -59,6 +60,8 @@ public abstract class CSS extends Api {
   }
 
   public abstract String getCSS(XWikiContext context);
+
+  public abstract boolean isAlternate();
 
   public abstract String getTitle();
 
