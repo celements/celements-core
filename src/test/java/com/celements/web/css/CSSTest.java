@@ -47,10 +47,11 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
   public void testDisplayInclude_createCSSinclude() {
     String url = "/skin/Content/WebHome/myCSSFile.css";
     expect(cssMock.getCSS(same(context))).andReturn(url);
+    expect(cssMock.getTitle()).andReturn("myTitle");
     expect(cssMock.getMedia()).andReturn("all");
     replay(cssMock);
-    assertEquals("<link rel=\"stylesheet\" media=\"all\" type=\"text/css\" href=\""
-        + url + "\" />\n", css.displayInclude(context));
+    assertEquals("<link rel=\"stylesheet\" title=\"myTitle\" media=\"all\" "
+        + "type=\"text/css\" href=\"" + url + "\" />\n", css.displayInclude(context));
     verify(cssMock);
   }
 
@@ -99,6 +100,11 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
     @Override
     public String getCSS(XWikiContext context) {
       return cssMock.getCSS(context);
+    }
+
+    @Override
+    public String getTitle() {
+      return cssMock.getTitle();
     }
 
     @Override

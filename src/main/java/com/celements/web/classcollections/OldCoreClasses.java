@@ -494,6 +494,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
+    needsUpdate |= bclass.addTextField("title", "Title", 30);
     needsUpdate |= bclass.addBooleanField("is_rte_content", "is_rte_content", "yesno");
     needsUpdate |= bclass.addStaticListField("media", "Media",
         "all|aural|braille|embossed|handheld|print|projection|screen|tty|tv");

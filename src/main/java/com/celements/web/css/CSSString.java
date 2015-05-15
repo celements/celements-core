@@ -34,6 +34,7 @@ public class CSSString extends CSS {
   private static Log mLogger = LogFactory.getFactory().getInstance(CSSString.class);
 
   private String file;
+  private String title;
   /* existing media: all, aural, braille, embossed, handheld, print, projection, screen, tty, tv */
   private String media;
   private boolean isContentCSS;
@@ -42,33 +43,43 @@ public class CSSString extends CSS {
     super(context);
     boolean contentCSS = (file.endsWith("-content.css")
         || file.endsWith("_content.css"));
-    initFields(file, "all", contentCSS);
+    initFields(file, "", "all", contentCSS);
   }
   
   public CSSString(String file, String media, XWikiContext context){
     super(context);
-    initFields(file, media, false);
+    initFields(file, "", media, false);
   }
   
-  public CSSString(String file, String media, boolean isContentCSS, XWikiContext context){
+  public CSSString(String file, String title, String media, boolean isContentCSS, 
+      XWikiContext context){
     super(context);
-    initFields(file, media, isContentCSS);
+    initFields(file, title, media, isContentCSS);
   }
   
-  private void initFields(String file, String media, boolean isContentCSS){
+  private void initFields(String file, String title, String media, boolean isContentCSS){
     this.file = file;
+    this.title = title;
     this.media = media;
     this.isContentCSS = isContentCSS;
   }
-  
+
+  @Override
   public String getCSS(XWikiContext context){
     return getURLFromString(getCssBasePath(), context);
   }
-  
-  public String getMedia(){
-    return (media != null)?media:"";
+
+  @Override
+  public String getTitle() {
+    return (title != null) ? title : "";
   }
-  
+
+  @Override
+  public String getMedia(){
+    return (media != null) ? media : "";
+  }
+
+  @Override
   public boolean isContentCSS(){
     return isContentCSS;
   }
@@ -97,4 +108,5 @@ public class CSSString extends CSS {
   public String getCssBasePath() {
     return (file != null)?file:"";
   }
+
 }
