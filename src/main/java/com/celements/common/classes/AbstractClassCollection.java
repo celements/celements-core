@@ -52,6 +52,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   final public void runUpdate() throws XWikiException {
     if (isActivated()) {
       getLogger().debug("calling initClasses for database: " + getContext().getDatabase()
@@ -62,6 +63,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     }
   }
 
+  @Override
   public boolean isActivated() {
     return ("," + getContext().getWiki().getXWikiPreference("activated_classcollections",
         getContext()) + "," + getContext().getWiki().Param("celements.classcollections",
