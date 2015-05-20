@@ -34,6 +34,7 @@ public interface INavigationClassConfig {
   public static final String CM_CSS_CLASS_FIELD = "cm_css_class";
   public static final String LAYOUT_TYPE_FIELD = "layout_type";
   public static final String PRESENTATION_TYPE_FIELD = "presentation_type";
+  public static final String ITEMS_PER_PAGE = "itemsPerPage";
 
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
   public static final String MENU_ITEM_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
