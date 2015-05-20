@@ -301,4 +301,20 @@ public class NavigationApi extends Api {
     return isEmpty;
   }
 
+  public void setOffset(int offset) {
+    navigation.setOffset(offset);
+  }
+
+  public int getOffset() {
+    return navigation.getOffset();
+  }
+
+  public void setNumberOfItem(int nrOfItem) {
+    navigation.setNumberOfItem(nrOfItem);
+  }
+
+  public int getNumberOfItem() {
+    return navigation.getNumberOfItem();
+  }
+
 }
