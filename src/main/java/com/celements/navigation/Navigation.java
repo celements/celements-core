@@ -101,6 +101,8 @@ public class Navigation implements INavigation {
   String menuPart;
   SpaceReference nodeSpaceRef;
   private int showInactiveToLevel;
+  private int offset = 0;
+  private int nrOfItemsPerPage = -1;
 
   private String cmCssClass;
 
@@ -381,6 +383,13 @@ public class Navigation implements INavigation {
       List<TreeNode> currentMenuItems =
         getTreeNodeService().getSubNodesForParent(parent, getMenuSpace(getContext()),
             getNavFilter());
+      if(offset > 0) {
+        int endIdx = currentMenuItems.size() - 1;
+        if(nrOfItemsPerPage > 0) {
+          endIdx = Math.min(endIdx, offset + nrOfItemsPerPage);
+        }
+        currentMenuItems = currentMenuItems.subList(offset, endIdx);
+      }
       if (currentMenuItems.size() > 0) {
         outStream.append("<ul " + addUniqueContainerId(parent) + " "
             + getMainUlCSSClasses() + ">");
@@ -930,6 +939,16 @@ public class Navigation implements INavigation {
       return injected_PageTypeResolverService;
     }
     return Utils.getComponent(IPageTypeResolverRole.class);
+  }
+
+  @Override
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
+
+  @Override
+  public void setNumberOfItem(int nrOfItem) {
+    this.nrOfItemsPerPage = nrOfItem;
   }
 
 }

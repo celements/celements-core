@@ -137,5 +137,9 @@ public interface INavigation {
       boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem);
 
   public void setPresentationType(String presentationTypeHint);
+  
+  public void setOffset(int offset);
+  
+  public void setNumberOfItem(int nrOfItem);
 
 }
