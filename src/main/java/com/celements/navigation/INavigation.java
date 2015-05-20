@@ -140,6 +140,10 @@ public interface INavigation {
   
   public void setOffset(int offset);
   
+  public int getOffset();
+
   public void setNumberOfItem(int nrOfItem);
+
+  public int getNumberOfItem();
 
 }
