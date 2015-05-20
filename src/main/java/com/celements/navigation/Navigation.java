@@ -805,6 +805,10 @@ public class Navigation implements INavigation {
           LOGGER.error(exp, exp);
         }
       }
+      int itemsPerPage = prefObj.getIntValue(INavigationClassConfig.ITEMS_PER_PAGE);
+      if(itemsPerPage > 0) {
+        nrOfItemsPerPage = itemsPerPage;
+      }
       String presentationTypeStr = prefObj.getStringValue(
           NavigationClasses.PRESENTATION_TYPE_FIELD);
       if (!"".equals(presentationTypeStr)) {
