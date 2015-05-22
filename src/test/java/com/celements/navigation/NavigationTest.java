@@ -1421,6 +1421,41 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testGetCurrentMenuItems_NoPaging_mainMenu_NONzeroOffset() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(-1);
+    nav.setOffset(3);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode4, treeNode5);
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
