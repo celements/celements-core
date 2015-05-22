@@ -202,6 +202,8 @@ public class NavigationClasses extends AbstractClassCollection {
         "Navigation Layout Type (empty for html list)", 30);
     needsUpdate |= bclass.addTextField(PRESENTATION_TYPE_FIELD,
         "Navigation Presentation Type (empty for menu name links)", 30);
+    needsUpdate |= bclass.addNumberField(INavigationClassConfig.ITEMS_PER_PAGE, "Number"
+        + " of items showed per page when using pageing", 30, "integer");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;

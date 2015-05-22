@@ -101,6 +101,8 @@ public class Navigation implements INavigation {
   String menuPart;
   SpaceReference nodeSpaceRef;
   private int showInactiveToLevel;
+  private int offset = 0;
+  private int nrOfItemsPerPage = -1;
 
   private String cmCssClass;
 
@@ -373,14 +375,11 @@ public class Navigation implements INavigation {
     LOGGER.debug("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
         + numMoreLevels + "].");
     if (numMoreLevels > 0) {
-      getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
       String parent = "";
       if (parentRef != null) {
         parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
       }
-      List<TreeNode> currentMenuItems =
-        getTreeNodeService().getSubNodesForParent(parent, getMenuSpace(getContext()),
-            getNavFilter());
+      List<TreeNode> currentMenuItems = getCurrentMenuItems(numMoreLevels, parent);
       if (currentMenuItems.size() > 0) {
         outStream.append("<ul " + addUniqueContainerId(parent) + " "
             + getMainUlCSSClasses() + ">");
@@ -415,6 +414,20 @@ public class Navigation implements INavigation {
                 numMoreLevels) + "], hasEdit [" + hasedit() + "].");
       }
     }
+  }
+
+  List<TreeNode> getCurrentMenuItems(int numMoreLevels, String parent) {
+    getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
+    List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(parent,
+        getMenuSpace(getContext()), getNavFilter());
+    if ((offset > 0) || (nrOfItemsPerPage > 0)) {
+      int endIdx = currentMenuItems.size();
+      if (nrOfItemsPerPage > 0) {
+        endIdx = Math.min(endIdx, offset + nrOfItemsPerPage);
+      }
+      currentMenuItems = currentMenuItems.subList(offset, endIdx);
+    }
+    return currentMenuItems;
   }
 
   @Override
@@ -796,6 +809,10 @@ public class Navigation implements INavigation {
           LOGGER.error(exp, exp);
         }
       }
+      int itemsPerPage = prefObj.getIntValue(INavigationClassConfig.ITEMS_PER_PAGE);
+      if(itemsPerPage > 0) {
+        nrOfItemsPerPage = itemsPerPage;
+      }
       String presentationTypeStr = prefObj.getStringValue(
           NavigationClasses.PRESENTATION_TYPE_FIELD);
       if (!"".equals(presentationTypeStr)) {
@@ -930,6 +947,34 @@ public class Navigation implements INavigation {
       return injected_PageTypeResolverService;
     }
     return Utils.getComponent(IPageTypeResolverRole.class);
+  }
+
+  @Override
+  public void setOffset(int offset) {
+    if (offset >= 0) {
+      this.offset = offset;
+    } else {
+      this.offset = 0;
+    }
+  }
+
+  @Override
+  public int getOffset() {
+    return this.offset;
+  }
+
+  @Override
+  public void setNumberOfItem(int nrOfItem) {
+    if (nrOfItem > 0) {
+      this.nrOfItemsPerPage = nrOfItem;
+    } else {
+      this.nrOfItemsPerPage = -1;
+    }
+  }
+
+  @Override
+  public int getNumberOfItem() {
+    return this.nrOfItemsPerPage;
   }
 
 }
