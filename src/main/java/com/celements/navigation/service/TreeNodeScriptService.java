@@ -2,6 +2,8 @@ package com.celements.navigation.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -15,10 +17,13 @@ import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
 
 @Component("treeNode")
 public class TreeNodeScriptService implements ScriptService {
+
+  private static Logger _LOGGER  = LoggerFactory.getLogger(TreeNodeScriptService.class);
 
   @Requirement
   ITreeNodeService treeNodeService;
@@ -93,4 +98,14 @@ public class TreeNodeScriptService implements ScriptService {
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
+
+  public void moveTreeDocAfter(DocumentReference moveDocRef,
+      DocumentReference insertAfterDocRef) {
+    try {
+      treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
+    } catch (XWikiException exp) {
+      _LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
+    }
+  }
+
 }

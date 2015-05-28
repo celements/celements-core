@@ -51,6 +51,7 @@ import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
@@ -106,6 +107,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   ITreeNodeService treeNodeService;
+
+  @Requirement("treeNode")
+  ScriptService treeNodeScriptService;
 
   @Requirement
   IRTEConfigTemplateRole rteConfigTemplateService;
@@ -922,13 +926,13 @@ public class CelementsWebScriptService implements ScriptService {
     return treeNodeService.getParentReference(docRef);
   }
 
+  /**
+   * @deprecated since 2.64.0 instead use TreeNodeScriptService.moveTreeDocAfter
+   */
+  @Deprecated
   public void moveTreeDocAfter(DocumentReference moveDocRef,
       DocumentReference insertAfterDocRef) {
-    try {
-      treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
-    } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
-    }
+    getTreeNodeScriptService().moveTreeDocAfter(moveDocRef, insertAfterDocRef);
   }
   
   private boolean hasAdminRights() {
@@ -974,4 +978,9 @@ public class CelementsWebScriptService implements ScriptService {
     return getContext().getWiki().getXWikiPreference("celGoogleAnalyticsAccount", "",
         getContext());
   }
+
+  private TreeNodeScriptService getTreeNodeScriptService() {
+    return (TreeNodeScriptService) treeNodeScriptService;
+  }
+
 }
