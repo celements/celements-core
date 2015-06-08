@@ -8,7 +8,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -57,9 +59,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     localEvent.setData(getContext());
     RemoteEventData remoteEvent = new RemoteEventData();
     
-    replayDefault();
     assertTrue(localEventConverter.toRemote(localEvent, remoteEvent));
-    verifyDefault();
     
     assertSame(localEvent.getEvent(), remoteEvent.getEvent());
     assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get("docname"));
@@ -84,13 +84,55 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     remoteEvent.setData(getContext());
     LocalEventData localEvent = new LocalEventData();
     
-    replayDefault();
     assertTrue(localEventConverter.fromRemote(remoteEvent, localEvent));
-    verifyDefault();
     
     assertSame(localEvent.getEvent(), localEvent.getEvent());
     assertEquals(docRef, ((XWikiDocument) localEvent.getSource()).getDocumentReference());
     assertNotNull(localEvent.getData());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testSerializeXWikiDocument_parent() {
+    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
+    EntityReference parentRef = new DocumentReference("wiki", "space", "parent");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setParentReference(parentRef);
+    HashMap<String, Serializable> map = (HashMap<String, Serializable>
+        ) localEventConverter.serializeXWikiDocument(doc);
+    assertEquals("wiki:space.parent", map.get(AnnotationEventConverter.DOC_PARENT));
+    XWikiDocument ret = localEventConverter.unserializeDocument(map);
+    assertEquals(parentRef, ret.getParentReference());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testSerializeXWikiDocument_origParent() {
+    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
+    EntityReference parentRef = new DocumentReference("wiki", "space", "parent");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiDocument origDoc = new XWikiDocument(docRef);
+    origDoc.setParentReference(parentRef);
+    doc.setOriginalDocument(origDoc);
+    HashMap<String, Serializable> map = (HashMap<String, Serializable>
+        ) localEventConverter.serializeXWikiDocument(doc);
+    assertEquals("wiki:space.parent", map.get(AnnotationEventConverter.ORIGDOC_PARENT));
+    XWikiDocument ret = localEventConverter.unserializeDocument(map);
+    assertEquals(parentRef, ret.getOriginalDocument().getParentReference());
+  }
+
+  @Test
+  @SuppressWarnings({ "unchecked", "deprecation" })
+  public void testSerializeXWikiDocument_relative() {
+    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
+    EntityReference parentRef = new EntityReference("parent", EntityType.DOCUMENT);
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setParentReference(parentRef);
+    HashMap<String, Serializable> map = (HashMap<String, Serializable>
+        ) localEventConverter.serializeXWikiDocument(doc);
+    assertEquals("parent", map.get(AnnotationEventConverter.DOC_PARENT));
+    XWikiDocument ret = localEventConverter.unserializeDocument(map);
+    assertEquals("parent", ret.getParent());
   }
 
   private AnnotationEventConverter getAnnotationLocalEventConverter() throws Exception {
