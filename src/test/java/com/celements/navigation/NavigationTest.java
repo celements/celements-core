@@ -307,6 +307,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyMenuItemDoc"
         + " myUltimativePageType\">", outStream.toString());
     verifyDefault();
   }
@@ -344,7 +345,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
-        + " myUltimativePageType cel_nav_restricted_rights\">", outStream.toString());
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyMenuItemDoc myUltimativePageType"
+        + " cel_nav_restricted_rights\">", outStream.toString());
     verifyDefault();
   }
 
@@ -370,8 +372,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
-        + " myUltimativePageType active\">",
-        outStream.toString());
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyMenuItemDoc myUltimativePageType"
+        + " active\">", outStream.toString());
     verifyDefault();
   }
 
@@ -509,6 +511,60 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     assertTrue("Expected to found pageLayout in css classes. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" layout_MyLayout "));
+  }
+
+  @Test
+  public void testGetCssClasses_pageSpace() throws XWikiException {
+    String pageType = "myUltimativePageType";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 2);
+    verifyDefault();
+    assertTrue("Expected to found page-space in css classes. ["
+        + cssClasses + "]",
+        (" " + cssClasses + " ").contains(" cel_nav_nodeSpace_MySpace"));
+  }
+
+  @Test
+  public void testGetCssClasses_pageName() throws XWikiException {
+    String pageType = "myUltimativePageType";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 2);
+    verifyDefault();
+    assertTrue("Expected to found page-space in css classes. ["
+        + cssClasses + "]",
+        (" " + cssClasses + " ").contains(" cel_nav_nodeName_MyMenuItemDoc"));
   }
 
   @Test
@@ -1090,10 +1146,11 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     replayDefault();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
         + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"
-        + " cel_nav_isLeaf RichText\">"
-        + "<a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last cel_nav_odd"
-        + " cel_nav_item1 cel_nav_isLeaf"
-        + " RichText\" id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
+        + " cel_nav_isLeaf cel_nav_nodeSpace_MySpace cel_nav_nodeName_Home"
+        + " RichText\"><a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last"
+        + " cel_nav_odd cel_nav_item1 cel_nav_isLeaf"
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_Home RichText\""
+        + " id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
         nav.includeNavigation());
     verifyDefault();
   }

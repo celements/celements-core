@@ -145,9 +145,10 @@ public class LayoutEditorPresentationTypeTest extends AbstractBridgedComponentTe
         menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
-        + " cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
-        + ">My Current Doc</a>", outStream.toString());
+        + " cel_nav_hasChildren cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc"
+        + " currentPage myUltimativePageType active\""
+        + " id=\"N1:MySpace:MySpace.MyCurrentDoc\">My Current Doc</a>",
+        outStream.toString());
     verifyDefault();
   }
 
@@ -200,9 +201,10 @@ public class LayoutEditorPresentationTypeTest extends AbstractBridgedComponentTe
         menuItem.getDocumentReference(), false, 1, nav);
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
-        + " cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
-        + ">My Current Doc (#cellTestId)</a>", outStream.toString());
+        + " cel_nav_hasChildren cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc"
+        + " currentPage myUltimativePageType active\""
+        + " id=\"N1:MySpace:MySpace.MyCurrentDoc\">My Current Doc (#cellTestId)</a>",
+        outStream.toString());
     verifyDefault();
   }
 
@@ -254,9 +256,10 @@ public class LayoutEditorPresentationTypeTest extends AbstractBridgedComponentTe
     assertEquals("<a href=\"/MySpace/MyCurrentDoc\""
         + " style=\"background-image:url(abc);\""
         + " class=\"cel_cm_navigation_menuitem first last cel_nav_odd cel_nav_item1"
-        + " cel_nav_hasChildren currentPage"
-        + " myUltimativePageType active\" id=\"N1:MySpace:MySpace.MyCurrentDoc\""
-        + ">My Current Doc</a>", outStream.toString());
+        + " cel_nav_hasChildren cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyCurrentDoc"
+        + " currentPage myUltimativePageType active\""
+        + " id=\"N1:MySpace:MySpace.MyCurrentDoc\">My Current Doc</a>",
+        outStream.toString());
     verifyDefault();
   }
 
@@ -302,9 +305,10 @@ public class LayoutEditorPresentationTypeTest extends AbstractBridgedComponentTe
     layoutEditorPresType.appendMenuItemLink(outStream, isFirstItem, isLastItem,
         menuItem.getDocumentReference(), true, 1, nav);
     assertEquals("<span class=\"cel_cm_navigation_menuitem first last cel_nav_odd"
-        + " cel_nav_item1 cel_nav_isLeaf"
-        + " currentPage myUltimativePageType active\" id=\"N1:MySpace:MySpace."
-        + "MyCurrentDoc\">My Current Doc</span>", outStream.toString());
+        + " cel_nav_item1 cel_nav_isLeaf cel_nav_nodeSpace_MySpace"
+        + " cel_nav_nodeName_MyCurrentDoc currentPage myUltimativePageType active\""
+        + " id=\"N1:MySpace:MySpace.MyCurrentDoc\">My Current Doc</span>",
+        outStream.toString());
     verifyDefault();
   }
 

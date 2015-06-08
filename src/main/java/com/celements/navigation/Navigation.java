@@ -611,6 +611,8 @@ public class Navigation implements INavigation {
       cssClass += " cel_nav_hasChildren";
     }
     if (docRef != null) {
+      cssClass += " cel_nav_nodeSpace_" + docRef.getLastSpaceReference().getName();
+      cssClass += " cel_nav_nodeName_" + docRef.getName();
       if (docRef.equals(getContext().getDoc().getDocumentReference())) {
         cssClass += " currentPage";
       }
