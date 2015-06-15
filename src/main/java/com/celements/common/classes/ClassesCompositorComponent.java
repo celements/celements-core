@@ -84,6 +84,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public boolean isActivated(String name) {
+    // TODO build map in initialize with key name and value hint to avoid loop here
     for (IClassCollectionRole classCollection : classCollectionMap.values()) {
       if (classCollection.getConfigName().equals(name)) {
         return classCollection.isActivated();

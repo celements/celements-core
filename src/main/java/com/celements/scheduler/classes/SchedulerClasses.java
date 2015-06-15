@@ -35,7 +35,7 @@ public class SchedulerClasses extends AbstractClassCollection {
     getSchedulerJobClass();
   }
 
-  protected BaseClass getSchedulerJobClass() throws XWikiException {
+  private BaseClass getSchedulerJobClass() throws XWikiException {
     DocumentReference docRef = classConf.getSchedulerJobClassRef();
     XWikiDocument doc;
     boolean needsUpdate = false;
