@@ -722,6 +722,10 @@ public class CelementsWebScriptService implements ScriptService {
     classesComp.checkAllClassCollections();
   }
 
+  public boolean isClassCollectionActivated(String name) {
+    return classesComp.isActivated(name);
+  }
+
   public void checkMandatoryDocuments() {
     mandatoryDocComp.checkAllMandatoryDocuments();
   }
