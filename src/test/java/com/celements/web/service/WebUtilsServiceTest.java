@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -1565,13 +1567,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testFilterAttachmentsByTag_filterHasNoTagLists() throws XWikiException {
     String tagName = "Tag.Tags";
-    String docName = "Content_attachments.Filebase";
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), 
-        "Content_attachments", "Filebase");
     List<Attachment> attachments = new ArrayList<Attachment>();
     attachments.add(new Attachment(null, null, getContext()));
     attachments.add(new Attachment(null, null, getContext()));
-    XWikiDocument theDoc = new XWikiDocument(docRef);
     DocumentReference tagRef = webUtilsService.resolveDocumentReference(tagName);
     DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), 
         "Classes", "FilebaseTag");
@@ -1964,6 +1962,52 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(2, ret.size());
     assertSame(att2, ret.get(0));
     assertSame(att3, ret.get(1));
+  }
+
+  @Test
+  public void testGetDefaultLanguage() {
+    String lang = "en";
+    webUtilsService.defaultConfigSrc = createMockAndAddToDefault(
+        ConfigurationSource.class);
+    
+    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"))
+        ).andReturn(lang).once();
+    
+    replayDefault();
+    assertEquals(lang, webUtilsService.getDefaultLanguage());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetDefaultLanguage_withSpaceRef() throws Exception {
+    final String lang = "en";
+    final WikiReference wikiRef = new WikiReference("wiki");
+    final SpaceReference spaceRef = new SpaceReference("space", wikiRef);
+    DocumentReference webPrefDocRef = new DocumentReference("WebPreferences", spaceRef);
+    webUtilsService.defaultConfigSrc = createMockAndAddToDefault(
+        ConfigurationSource.class);
+    
+    expect(xwiki.exists(eq(webPrefDocRef), same(context))).andReturn(true).once();
+    expect(xwiki.getDocument(eq(webPrefDocRef), same(context))).andReturn(
+        new XWikiDocument(webPrefDocRef)).once();
+    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"))
+        ).andAnswer(new IAnswer<String>() {
+          @Override
+          public String answer() throws Throwable {
+            assertEquals(wikiRef.getName(), getContext().getDatabase());
+            assertEquals(spaceRef, getContext().getDoc().getDocumentReference(
+                  ).getLastSpaceReference());
+            return lang;
+          }
+        }).once();
+
+    assertEquals("xwikidb", getContext().getDatabase());
+    assertNull(getContext().getDoc());
+    replayDefault();
+    assertEquals(lang, webUtilsService.getDefaultLanguage(spaceRef));
+    verifyDefault();
+    assertEquals("xwikidb", getContext().getDatabase());
+    assertNull(getContext().getDoc());
   }
 
   //*****************************************************************

@@ -45,6 +45,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -140,6 +141,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement
   INextFreeDocRole nextFreeDocService;
+
+  @Requirement
+  ConfigurationSource defaultConfigSrc;
 
   @Requirement
   Execution execution;
@@ -371,13 +375,42 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getDefaultLanguage() {
-    return getContext().getWiki().getSpacePreference("default_language", getContext());
+    return getDefaultLanguage((SpaceReference) null);
+  }
+
+  @Deprecated
+  @Override
+  public String getDefaultLanguage(String spaceName) {
+    SpaceReference spaceRef = null;
+    if (StringUtils.isNotBlank(spaceName)) {
+      spaceRef = resolveSpaceReference(spaceName);
+    }
+    return getDefaultLanguage(spaceRef);
   }
 
   @Override
-  public String getDefaultLanguage(String spaceName) {
-    return getContext().getWiki().getSpacePreference("default_language", spaceName, "",
-        getContext());
+  public String getDefaultLanguage(SpaceReference spaceRef) {
+    String defaultLang = "";
+    String dbbackup = getContext().getDatabase();
+    XWikiDocument docBackup = getContext().getDoc();
+    try {
+      if (spaceRef != null) {
+        DocumentReference docRef = new DocumentReference("WebPreferences", spaceRef);
+        if (getContext().getWiki().exists(docRef, getContext())) {
+          getContext().setDatabase(spaceRef.getParent().getName());
+          getContext().setDoc(getContext().getWiki().getDocument(docRef, getContext()));
+        }
+      }
+      defaultLang = defaultConfigSrc.getProperty("default_language");
+    } catch (XWikiException xwe) {
+      _LOGGER.error("failed getting WebPreferences for space '{}'", spaceRef, xwe);
+    } finally {
+      getContext().setDatabase(dbbackup);
+      getContext().setDoc(docBackup);
+    }
+    _LOGGER.trace("getDefaultLanguage: for spaceRef '{}' got lang '{}' ", spaceRef, 
+        defaultLang);
+    return defaultLang;
   }
 
   @Override
