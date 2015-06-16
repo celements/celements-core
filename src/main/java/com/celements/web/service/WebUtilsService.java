@@ -401,7 +401,7 @@ public class WebUtilsService implements IWebUtilsService {
           getContext().setDoc(getContext().getWiki().getDocument(docRef, getContext()));
         }
       }
-      defaultLang = defaultConfigSrc.getProperty("default_language");
+      defaultLang = defaultConfigSrc.getProperty("default_language", "");
     } catch (XWikiException xwe) {
       _LOGGER.error("failed getting WebPreferences for space '{}'", spaceRef, xwe);
     } finally {

@@ -1970,7 +1970,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     webUtilsService.defaultConfigSrc = createMockAndAddToDefault(
         ConfigurationSource.class);
     
-    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"))
+    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(""))
         ).andReturn(lang).once();
     
     replayDefault();
@@ -1990,7 +1990,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(webPrefDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(webPrefDocRef), same(context))).andReturn(
         new XWikiDocument(webPrefDocRef)).once();
-    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"))
+    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(""))
         ).andAnswer(new IAnswer<String>() {
           @Override
           public String answer() throws Throwable {
