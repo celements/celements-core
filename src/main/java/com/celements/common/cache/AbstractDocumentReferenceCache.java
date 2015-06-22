@@ -1,5 +1,6 @@
 package com.celements.common.cache;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +11,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -22,27 +22,28 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.query.IQueryExecutionServiceRole;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public abstract class AbstractDocumentReferenceCache 
-    implements IDocumentReferenceCache, EventListener {
+public abstract class AbstractDocumentReferenceCache<K> 
+    implements IDocumentReferenceCache<K>, EventListener {
 
-  private Map<WikiReference, Map<EntityReference, Set<DocumentReference>>> cache = 
-      new HashMap<>();
-
-  @Requirement
-  private QueryManager queryManager;
+  private Map<WikiReference, Map<K, Set<DocumentReference>>> cache = new HashMap<>();
 
   @Requirement
-  private IQueryExecutionServiceRole queryExecService;
+  protected QueryManager queryManager;
 
   @Requirement
-  protected IWebUtilsService webUtilsService;
+  protected IQueryExecutionServiceRole queryExecService;
 
   @Requirement
-  private Execution execution;
+  protected IWebUtilsService webUtils;
+
+  @Requirement
+  protected Execution execution;
 
   protected XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty(
@@ -50,10 +51,30 @@ public abstract class AbstractDocumentReferenceCache
   }
 
   @Override
-  public Set<DocumentReference> getCachedDocRefs(EntityReference ref
+  public Set<DocumentReference> getCachedDocRefs(K key) throws CacheLoadingException {
+    WikiReference wikiRef = null;
+    if (key instanceof EntityReference) {
+      wikiRef = webUtils.getWikiRef((EntityReference) key);
+    }
+    return getCachedDocRefs(wikiRef, key);
+  }
+
+  @Override
+  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef
       ) throws CacheLoadingException {
-    WikiReference wikiRef = (WikiReference) ref.extractReference(EntityType.WIKI);
-    Set<DocumentReference> ret = getCache(wikiRef).get(ref);
+    if (wikiRef == null) {
+      wikiRef = webUtils.getWikiRef();
+    }
+    return ImmutableSet.copyOf(Iterables.concat(getCache(wikiRef).values()));
+  }
+
+  @Override
+  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef, K key
+      ) throws CacheLoadingException {
+    if (wikiRef == null) {
+      wikiRef = webUtils.getWikiRef();
+    }
+    Set<DocumentReference> ret = getCache(wikiRef).get(key);
     if (ret != null) {
       ret = Collections.unmodifiableSet(ret);
     } else {
@@ -70,7 +91,7 @@ public abstract class AbstractDocumentReferenceCache
     }
   }
 
-  private synchronized Map<EntityReference, Set<DocumentReference>> getCache(
+  private synchronized Map<K, Set<DocumentReference>> getCache(
       WikiReference wikiRef) throws CacheLoadingException {
     if (!cache.containsKey(wikiRef)) {
       try {
@@ -82,12 +103,11 @@ public abstract class AbstractDocumentReferenceCache
     return cache.get(wikiRef);
   }
 
-  private Map<EntityReference, Set<DocumentReference>> loadCache(WikiReference wikiRef
+  private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef
       ) throws QueryException, XWikiException {
-    Map<EntityReference, Set<DocumentReference>> cache = new HashMap<>();
+    Map<K, Set<DocumentReference>> cache = new HashMap<>();
     for (DocumentReference docRef : executeXWQL(wikiRef)) {
-      EntityReference ref = getMergeRefForResult(docRef);
-      if (ref != null) {
+      for (K ref : getKeysForResult(docRef)) {
         if (!cache.containsKey(ref)) {
           cache.put(ref, new HashSet<DocumentReference>());
         }
@@ -100,31 +120,26 @@ public abstract class AbstractDocumentReferenceCache
 
   List<DocumentReference> executeXWQL(WikiReference wikiRef) throws QueryException {
     String xwql = "select distinct doc.fullName from Document doc, doc.object("
-        + webUtilsService.serializeRef(getCacheClassRef(), true) + ") as obj";
+        + webUtils.serializeRef(getCacheClassRef(wikiRef), true) + ") as obj";
     Query query = queryManager.createQuery(xwql, Query.XWQL);
     query.setWiki(wikiRef.getName());
     return queryExecService.executeAndGetDocRefs(query);
   }
 
   /**
-   * NOTE: the contained wiki ref isn't relevant
-   * 
    * @return the class ref that documents will be cached for.
    */
-  protected abstract DocumentReference getCacheClassRef();
+  protected abstract DocumentReference getCacheClassRef(WikiReference wikiRef);
 
   /**
    * 
    * @param docRef
    *          a result element
-   * @return the ref for the given result to merge with other results, used as key for the
-   *         cache
+   * @return the keys for the given result
    * @throws XWikiException
    */
-  protected EntityReference getMergeRefForResult(DocumentReference docRef
-      ) throws XWikiException {
-    return webUtilsService.getWikiRef(docRef);
-  }
+  protected abstract Collection<K> getKeysForResult(DocumentReference docRef
+      ) throws XWikiException;
 
   @Override
   public List<Event> getEvents() {
@@ -139,7 +154,7 @@ public abstract class AbstractDocumentReferenceCache
   @Override
   public void onEvent(Event event, Object source, Object data) {
     if (source instanceof XWikiDocument) {
-      flush(webUtilsService.getWikiRef((XWikiDocument) source));
+      flush(webUtils.getWikiRef((XWikiDocument) source));
     } else {
       getLogger().error("unable to flush cache for source '{}'", source);
     }
