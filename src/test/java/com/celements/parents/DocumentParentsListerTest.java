@@ -124,6 +124,8 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(Arrays.asList(
         testProviderParentRef)).once();
     expectParentPageType(testProviderParentRef, true);
+    expect(testProviderMock.getDocumentParentsList(eq(testProviderParentRef))).andReturn(
+        Collections.<DocumentReference>emptyList()).once();
     
     List<DocumentReference> docParentsList = Arrays.asList(testProviderParentRef);
     replayDefault();
@@ -200,6 +202,8 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
         Arrays.asList(testProviderParentRef, testProviderParentRef2)).once();
     expectParentPageType(testProviderParentRef, true);
     expectParentPageType(testProviderParentRef2, true);
+    expect(testProviderMock.getDocumentParentsList(eq(testProviderParentRef))).andReturn(
+        Collections.<DocumentReference>emptyList()).once();
 
     List<DocumentReference> docParentsList = Arrays.asList(docRef, parentRef1,
         parentRef2, testProviderParentRef);
@@ -248,6 +252,8 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(Arrays.asList(
         testProviderParentRef)).once();
     expectParentPageType(testProviderParentRef, true);
+    expect(testProviderMock.getDocumentParentsList(eq(testProviderParentRef))).andReturn(
+        Collections.<DocumentReference>emptyList()).once();
 
     List<DocumentReference> docParentsList = Arrays.asList(docRef, testProviderParentRef);
     replayDefault();

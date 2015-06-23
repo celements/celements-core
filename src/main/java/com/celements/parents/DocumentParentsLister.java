@@ -19,6 +19,7 @@ import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeProvider;
 import com.celements.web.service.XDocRecursionException;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 @Component
@@ -28,9 +29,6 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
 
   @Requirement
   Map<String, IDocParentProviderRole> docParentProviderMap;
-
-  @Requirement(XDocParents.DOC_PROVIDER_NAME)
-  IDocParentProviderRole xDocParents;
 
   @Requirement
   IPageTypeResolverRole pageTypeResolver;
@@ -44,11 +42,10 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     ArrayList<DocumentReference> parents = new ArrayList<DocumentReference>();
     try {
       setParent(parents, docRef);
-      Set<String> providers = getProvidersWithout(null);
       boolean hasMore = true;
       while (hasMore) {
-        setXDocParents(parents);
-        hasMore = setNextProviderParent(parents, providers);
+        setPrimaryParents(parents);
+        hasMore = setSecondaryProviderParent(parents);
       }
       if (!includeDoc) {
         parents.remove(0);
@@ -59,43 +56,35 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     return parents;
   }
 
-  public void setXDocParents(List<DocumentReference> ret) throws XDocRecursionException {
-    DocumentReference docRef = Iterables.getLast(ret);
-    for (DocumentReference parentRef : xDocParents.getDocumentParentsList(docRef)) {
-      setParent(ret, parentRef);
+  public void setPrimaryParents(List<DocumentReference> parents
+      ) throws XDocRecursionException {
+    for (String providerName : getPrimaryProviderNames()) {
+      IDocParentProviderRole provider = docParentProviderMap.get(providerName);
+      DocumentReference docRef = Iterables.getLast(parents);
+      for (DocumentReference parentRef : provider.getDocumentParentsList(docRef)) {
+        setParent(parents, parentRef);
+      }
     }
   }
 
-  public boolean setNextProviderParent(List<DocumentReference> parents, 
-      Set<String> providers) throws XDocRecursionException {
+  public boolean setSecondaryProviderParent(List<DocumentReference> parents
+      ) throws XDocRecursionException {
     DocumentReference docRef = Iterables.getLast(parents);
     List<DocumentReference> nextParents = Collections.emptyList();
-    String provider = null;
-    Iterator<String> iter = providers.iterator();
+    Iterator<String> iter = getSecondaryProviderNames().iterator();
     while (nextParents.isEmpty() && iter.hasNext()) {
-      provider = iter.next();
-      nextParents = docParentProviderMap.get(provider).getDocumentParentsList(docRef);
+      nextParents = docParentProviderMap.get(iter.next()).getDocumentParentsList(docRef);
       nextParents = checkPageTypes(nextParents);
     }
     if (!nextParents.isEmpty()) {
-      providers.clear();
-      providers.addAll(getProvidersWithout(provider));
       setParent(parents, nextParents.get(0));
       if (nextParents.size() > 1) {
-        _LOGGER.warn("Received multiple parents for '{}' from provider '{}': {}", docRef,
-            provider, nextParents);
+        _LOGGER.warn("Received multiple parents for '{}': {}", docRef, nextParents);
       }
       return true;
     } else {
       return false;
     }
-  }
-
-  private Set<String> getProvidersWithout(String provider) {
-    Set<String> ret = new HashSet<>(docParentProviderMap.keySet());
-    ret.remove(XDocParents.DOC_PROVIDER_NAME);
-    ret.remove(provider);
-    return ret;
   }
 
   private List<DocumentReference> checkPageTypes(List<DocumentReference> parents) {
@@ -117,6 +106,16 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     } else {
       throw new XDocRecursionException(toAdd);
     }
+  }
+
+  private Set<String> getPrimaryProviderNames() {
+    return ImmutableSet.of(XDocParents.DOC_PROVIDER_NAME);
+  }
+
+  private Set<String> getSecondaryProviderNames() {
+    Set<String> ret = new HashSet<>(docParentProviderMap.keySet());
+    ret.removeAll(getPrimaryProviderNames());
+    return ret;
   }
 
 }
