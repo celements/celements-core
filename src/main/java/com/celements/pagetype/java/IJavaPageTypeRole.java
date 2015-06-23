@@ -23,4 +23,6 @@ public interface IJavaPageTypeRole {
 
   public boolean isVisible();
 
+  public boolean isUnconnectedParent();
+
 }

@@ -25,7 +25,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageType;
 import com.xpn.xwiki.XWikiContext;
@@ -48,14 +50,24 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
     return Utils.getComponent(Execution.class);
   }
 
+  /**
+   * @deprecated instead use XObjectPageTypeConfig(DocumentReference)
+   */
+  @Deprecated
   public XObjectPageTypeConfig(String pageTypeFN) {
     pageType = new PageType(pageTypeFN);
   }
 
+  public XObjectPageTypeConfig(DocumentReference pageTypeDocRef) {
+    pageType = new PageType(pageTypeDocRef);
+  }
+
+  @Override
   public boolean displayInFrameLayout() {
     return pageType.showFrame(getContext());
   }
 
+  @Override
   public List<String> getCategories() {
     List<String> categories = pageType.getCategories(getContext());
     if (categories.isEmpty()) {
@@ -69,18 +81,22 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
     }
   }
 
+  @Override
   public String getName() {
     return pageType.getConfigName(getContext());
   }
 
+  @Override
   public String getPrettyName() {
     return pageType.getPrettyName(getContext());
   }
 
+  @Override
   public boolean hasPageTitle() {
     return pageType.hasPageTitle(getContext());
   }
 
+  @Override
   public String getRenderTemplateForRenderMode(String renderMode) {
     try {
       return pageType.getRenderTemplate(renderMode, getContext());
@@ -92,10 +108,22 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
     return null;
   }
 
+  @Override
   public boolean isVisible() {
     BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
     if (pageTypePropertiesObj != null) {
-      return (pageTypePropertiesObj.getIntValue("visible", 0) > 0);
+      return (pageTypePropertiesObj.getIntValue(
+          IPageTypeClassConfig.PAGETYPE_PROP_VISIBLE, 0) > 0);
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isUnconnectedParent() {
+    BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
+    if (pageTypePropertiesObj != null) {
+      return (pageTypePropertiesObj.getIntValue(
+          IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT, 0) > 0);
     }
     return false;
   }

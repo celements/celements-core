@@ -145,6 +145,11 @@ public class WebUtilsService implements IWebUtilsService {
   @Requirement
   ConfigurationSource defaultConfigSrc;
 
+  /*
+   * not loaded as requirement due to cyclic dependency
+   */
+  IDocumentParentsListerRole docParentsLister;
+
   @Requirement
   Execution execution;
 
@@ -177,10 +182,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated 
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    //IMPORTANT: IDocumentParentsListerRole must not be required, because of possible
-    // cyclic dependencies. Get IDocumentParentsListerRole component lazyly instead!!!
-    return Utils.getComponent(IDocumentParentsListerRole.class).getDocumentParentsList(
-        docRef, includeDoc);
+    return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
   }
 
   @Override
@@ -1457,6 +1459,13 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException {
     return componentManager.lookupMap(role);
+  }
+
+  private IDocumentParentsListerRole getDocumentParentsLister() {
+    if (docParentsLister == null) {
+      docParentsLister = Utils.getComponent(IDocumentParentsListerRole.class);
+    }
+    return docParentsLister;
   }
 
 }

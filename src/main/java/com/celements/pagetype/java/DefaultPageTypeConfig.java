@@ -76,4 +76,9 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   public boolean isVisible() {
     return pageTypeImpl.isVisible();
   }
+
+  @Override
+  public boolean isUnconnectedParent() {
+    return pageTypeImpl.isUnconnectedParent();
+  }
 }
