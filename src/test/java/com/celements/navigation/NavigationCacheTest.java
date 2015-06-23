@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.easymock.IExpectationSetters;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -43,6 +44,12 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     cache.injectQueryManager(queryManagerMock);
     queryExecServiceMock = createMockAndAddToDefault(IQueryExecutionServiceRole.class);
     cache.injectQueryExecService(queryExecServiceMock);
+  }
+
+  @After
+  public void tearDown_NavigationCacheTest() {
+    cache.injectQueryManager(Utils.getComponent(QueryManager.class));
+    cache.injectQueryExecService(Utils.getComponent(IQueryExecutionServiceRole.class));
   }
 
   @Test

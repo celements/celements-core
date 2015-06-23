@@ -105,3 +105,4 @@ com.celements.navigation.listener.NavigationCreateListener
 com.celements.navigation.listener.NavigationUpdateListener
 com.celements.navigation.listener.NavigationDeleteListener
 com.celements.navigation.NavigationCache
+com.celements.parents.NavigationParents
