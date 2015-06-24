@@ -32,6 +32,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ *TODO merge/move with/to XObjectPageTypeConfig or PageTypeService
+ */
 public class PageType {
 
 //  private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
