@@ -93,6 +93,7 @@ public abstract class AbstractDocumentReferenceCache<K>
 
   private synchronized Map<K, Set<DocumentReference>> getCache(
       WikiReference wikiRef) throws CacheLoadingException {
+    getLogger().debug("getCache: for wiki '{}'", wikiRef);
     if (!cache.containsKey(wikiRef)) {
       try {
         cache.put(wikiRef, loadCache(wikiRef));
