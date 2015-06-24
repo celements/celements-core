@@ -2,8 +2,8 @@ package com.celements.emptycheck.internal;
 
 import javax.inject.Singleton;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -19,8 +19,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     IDefaultEmptyDocStrategyRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      DefaultEmptyDocStrategy.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(DefaultEmptyDocStrategy.class);
 
   @Requirement
   Execution execution;
@@ -61,8 +60,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
       return isEmptyRTEDocument(getContext().getWiki(
           ).getDocument(docRef, getContext()).getTranslatedDocument(
               getContext().getLanguage(), getContext()));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("isEmptyRTEDocumentTranslated failed getting document. ", exp);
     }
     return true;
   }
@@ -80,8 +79,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     try {
       return isEmptyDocument(getContext().getWiki(
           ).getDocument(docRef, getContext()));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("isEmptyDocumentDefault failed getting document. ", exp);
     }
     return true;
   }
@@ -91,8 +90,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
       return isEmptyDocument(getContext().getWiki(
           ).getDocument(docRef, getContext()).getTranslatedDocument(
               getContext().getLanguage(), getContext()));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("isEmptyDocumentTranslated failed getting document", exp);
     }
     return true;
   }
