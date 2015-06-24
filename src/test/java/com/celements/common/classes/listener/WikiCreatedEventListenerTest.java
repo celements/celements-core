@@ -79,6 +79,11 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
     public void checkAllClassCollections() {
       assertEquals(database, getContext().getDatabase());
     }
+
+    @Override
+    public boolean isActivated(String name) {
+      throw new UnsupportedOperationException();
+    }
     
   }
 

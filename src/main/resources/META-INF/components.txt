@@ -99,3 +99,10 @@ com.celements.query.QueryExecutionService
 com.celements.common.observation.converter.AnnotationEventConverter
 com.celements.parents.XDocParents
 com.celements.parents.DocumentParentsLister
+com.celements.scheduler.classes.SchedulerClassConfig
+com.celements.scheduler.classes.SchedulerClasses
+com.celements.navigation.listener.NavigationCreateListener
+com.celements.navigation.listener.NavigationUpdateListener
+com.celements.navigation.listener.NavigationDeleteListener
+com.celements.navigation.NavigationCache
+com.celements.parents.NavigationParents

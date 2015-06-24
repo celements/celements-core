@@ -21,8 +21,8 @@ package com.celements.common.classes;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -33,29 +33,30 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       ClassesCompositorComponent.class);
-  
+
   @Requirement
   private Map<String, IClassCollectionRole> classCollectionMap;
-  
+
   @Requirement
   private Map<String, ICelementsClassCollection> classCollectionMap_old;
-  
+
   @Requirement
   private Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public void checkAllClassCollections() {
-    LOGGER.info("start checkAllClassCollections for wiki [" + getContext().getDatabase()
-        + "].");
+    LOGGER.info("start checkAllClassCollections for wiki '{}'", getContext(
+        ).getDatabase());
     checkClassCollections();
     checkOldClassCollections();
-    LOGGER.debug("finish checkAllClassCollections for wiki [" + getContext().getDatabase()
-        + "].");
+    LOGGER.debug("finish checkAllClassCollections for wiki '{}'", getContext(
+        ).getDatabase());
   }
 
   @Deprecated
@@ -63,9 +64,9 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
     for (ICelementsClassCollection classCollection : classCollectionMap_old.values()) {
       try {
         classCollection.runUpdate(getContext());
-      } catch (XWikiException e) {
-        LOGGER.error("Exception checking class collection " 
-            + classCollection.getConfigName(), e);
+      } catch (XWikiException xwe) {
+        LOGGER.error("Exception checking class collection '{}'", 
+            classCollection.getConfigName(), xwe);
       }
     }
   }
@@ -74,11 +75,22 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
     for (IClassCollectionRole classCollection : classCollectionMap.values()) {
       try {
         classCollection.runUpdate();
-      } catch (XWikiException e) {
-        LOGGER.error("Exception checking class collection " 
-            + classCollection.getConfigName(), e);
+      } catch (XWikiException xwe) {
+        LOGGER.error("Exception checking class collection '{}'",
+            classCollection.getConfigName(), xwe);
       }
     }
+  }
+
+  @Override
+  public boolean isActivated(String name) {
+    // TODO build map in initialize with key name and value hint to avoid loop here
+    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
+      if (classCollection.getConfigName().equals(name)) {
+        return classCollection.isActivated();
+      }
+    }
+    return false;
   }
 
 }

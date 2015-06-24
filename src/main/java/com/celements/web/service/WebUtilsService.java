@@ -45,6 +45,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -142,6 +143,14 @@ public class WebUtilsService implements IWebUtilsService {
   INextFreeDocRole nextFreeDocService;
 
   @Requirement
+  ConfigurationSource defaultConfigSrc;
+
+  /*
+   * not loaded as requirement due to cyclic dependency
+   */
+  IDocumentParentsListerRole docParentsLister;
+
+  @Requirement
   Execution execution;
 
   XWikiRenderingEngine injectedRenderingEngine;
@@ -173,10 +182,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated 
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    //IMPORTANT: IDocumentParentsListerRole must not be required, because of possible
-    // cyclic dependencies. Get IDocumentParentsListerRole component lazyly instead!!!
-    return Utils.getComponent(IDocumentParentsListerRole.class).getDocumentParentsList(
-        docRef, includeDoc);
+    return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
   }
 
   @Override
@@ -371,13 +377,42 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getDefaultLanguage() {
-    return getContext().getWiki().getSpacePreference("default_language", getContext());
+    return getDefaultLanguage((SpaceReference) null);
+  }
+
+  @Deprecated
+  @Override
+  public String getDefaultLanguage(String spaceName) {
+    SpaceReference spaceRef = null;
+    if (StringUtils.isNotBlank(spaceName)) {
+      spaceRef = resolveSpaceReference(spaceName);
+    }
+    return getDefaultLanguage(spaceRef);
   }
 
   @Override
-  public String getDefaultLanguage(String spaceName) {
-    return getContext().getWiki().getSpacePreference("default_language", spaceName, "",
-        getContext());
+  public String getDefaultLanguage(SpaceReference spaceRef) {
+    String defaultLang = "";
+    String dbbackup = getContext().getDatabase();
+    XWikiDocument docBackup = getContext().getDoc();
+    try {
+      if (spaceRef != null) {
+        DocumentReference docRef = new DocumentReference("WebPreferences", spaceRef);
+        if (getContext().getWiki().exists(docRef, getContext())) {
+          getContext().setDatabase(spaceRef.getParent().getName());
+          getContext().setDoc(getContext().getWiki().getDocument(docRef, getContext()));
+        }
+      }
+      defaultLang = defaultConfigSrc.getProperty("default_language", "");
+    } catch (XWikiException xwe) {
+      _LOGGER.error("failed getting WebPreferences for space '{}'", spaceRef, xwe);
+    } finally {
+      getContext().setDatabase(dbbackup);
+      getContext().setDoc(docBackup);
+    }
+    _LOGGER.trace("getDefaultLanguage: for spaceRef '{}' got lang '{}' ", spaceRef, 
+        defaultLang);
+    return defaultLang;
   }
 
   @Override
@@ -1424,6 +1459,13 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException {
     return componentManager.lookupMap(role);
+  }
+
+  private IDocumentParentsListerRole getDocumentParentsLister() {
+    if (docParentsLister == null) {
+      docParentsLister = Utils.getComponent(IDocumentParentsListerRole.class);
+    }
+    return docParentsLister;
   }
 
 }

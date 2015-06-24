@@ -2,8 +2,11 @@ package com.celements.parents;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +14,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.pagetype.IPageTypeConfig;
+import com.celements.pagetype.IPageTypeProviderRole;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.xobject.XObjectPageTypeProvider;
 import com.celements.web.service.XDocRecursionException;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 @Component
 public class DocumentParentsLister implements IDocumentParentsListerRole {
@@ -21,61 +30,92 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
   @Requirement
   Map<String, IDocParentProviderRole> docParentProviderMap;
 
+  @Requirement
+  IPageTypeResolverRole pageTypeResolver;
+
+  @Requirement(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
+  IPageTypeProviderRole pageTypeProvider;
+
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
-    ArrayList<String> secondKeyMaster = new ArrayList<String>(
-        docParentProviderMap.keySet());
-    secondKeyMaster.remove(XDocParents.DOC_PROVIDER_NAME);
-    ArrayList<String> secondKeys = new ArrayList<String>(secondKeyMaster);
-    String firstKey = XDocParents.DOC_PROVIDER_NAME;
+    ArrayList<DocumentReference> parents = new ArrayList<DocumentReference>();
     try {
-      if (includeDoc) {
-        docParents.add(docRef);
+      setParent(parents, docRef);
+      boolean hasMore = true;
+      while (hasMore) {
+        setPrimaryParents(parents);
+        hasMore = setSecondaryProviderParent(parents);
       }
-      boolean hasMore = false;
-      do {
-        List<DocumentReference> parentList = docParentProviderMap.get(firstKey
-            ).getDocumentParentsList(docRef);
-        if (parentList.size() > 0) {
-          joinParentLists(docParents, parentList);
-          docRef = docParents.get(docParents.size() - 1);
-        }
-        hasMore = false;
-        if (secondKeys.size() > 0) {
-          int secKeyIndex = -1;
-          parentList = Collections.emptyList();
-          while (((secKeyIndex + 1) < secondKeys.size()) && ((parentList == null)
-              || parentList.isEmpty())) {
-            secKeyIndex = secKeyIndex + 1;
-            parentList = docParentProviderMap.get(secondKeys.get(secKeyIndex)
-                ).getDocumentParentsList(docRef);
-          }
-          hasMore = ((parentList != null) && !parentList.isEmpty());
-          if (hasMore) {
-            joinParentLists(docParents, parentList);
-            docRef = docParents.get(docParents.size() - 1);
-            secondKeys = new ArrayList<String>(secondKeyMaster);
-            secondKeys.remove(secKeyIndex);
-          }
-        }
-      } while (hasMore);
+      if (!includeDoc) {
+        parents.remove(0);
+      }
     } catch (XDocRecursionException recExp) {
       _LOGGER.info("Recursion in document parents found [" + recExp + "].");
     }
-    return docParents;
+    return parents;
   }
 
-  private void joinParentLists(ArrayList<DocumentReference> docParents,
-      List<DocumentReference> parentList) throws XDocRecursionException {
-    for (DocumentReference parentRef : parentList) {
-      if (!docParents.contains(parentRef)) {
-        docParents.add(parentRef);
-      } else {
-        throw new XDocRecursionException(parentRef);
+  public void setPrimaryParents(List<DocumentReference> parents
+      ) throws XDocRecursionException {
+    for (String providerName : getPrimaryProviderNames()) {
+      IDocParentProviderRole provider = docParentProviderMap.get(providerName);
+      DocumentReference docRef = Iterables.getLast(parents);
+      for (DocumentReference parentRef : provider.getDocumentParentsList(docRef)) {
+        setParent(parents, parentRef);
       }
     }
+  }
+
+  public boolean setSecondaryProviderParent(List<DocumentReference> parents
+      ) throws XDocRecursionException {
+    DocumentReference docRef = Iterables.getLast(parents);
+    List<DocumentReference> nextParents = Collections.emptyList();
+    Iterator<String> iter = getSecondaryProviderNames().iterator();
+    while (nextParents.isEmpty() && iter.hasNext()) {
+      nextParents = docParentProviderMap.get(iter.next()).getDocumentParentsList(docRef);
+      nextParents = checkPageTypes(nextParents);
+    }
+    if (!nextParents.isEmpty()) {
+      setParent(parents, nextParents.get(0));
+      if (nextParents.size() > 1) {
+        _LOGGER.warn("Received multiple parents for '{}': {}", docRef, nextParents);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private List<DocumentReference> checkPageTypes(List<DocumentReference> parents) {
+    List<DocumentReference> ret = new ArrayList<>();
+    for (DocumentReference parent : parents) {
+      IPageTypeConfig pageTypeConf = pageTypeProvider.getPageTypeByReference(
+          pageTypeResolver.getPageTypeRefForDocWithDefault(parent));
+      if (pageTypeConf.isUnconnectedParent()) {
+        ret.add(parent);
+      }
+    }
+    return ret;
+  }
+
+  private void setParent(List<DocumentReference> parents, DocumentReference toAdd
+      ) throws XDocRecursionException {
+    if (!parents.contains(toAdd)) {
+      parents.add(toAdd);
+    } else {
+      throw new XDocRecursionException(toAdd);
+    }
+  }
+
+  private Set<String> getPrimaryProviderNames() {
+    return ImmutableSet.of(XDocParents.DOC_PROVIDER_NAME);
+  }
+
+  private Set<String> getSecondaryProviderNames() {
+    Set<String> ret = new HashSet<>(docParentProviderMap.keySet());
+    ret.removeAll(getPrimaryProviderNames());
+    return ret;
   }
 
 }

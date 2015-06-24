@@ -2,6 +2,7 @@ package com.celements.navigation;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 @ComponentRole
 public interface INavigationClassConfig {
@@ -45,8 +46,13 @@ public interface INavigationClassConfig {
   public static final String TARGET_FIELD = "link_target";
 
   public DocumentReference getMenuNameClassRef(String wikiName);
+
   public DocumentReference getNavigationConfigClassRef(String wikiName);
+
+  public DocumentReference getNavigationConfigClassRef(WikiReference wikiRef);
+
   public DocumentReference getMenuItemClassRef(String wikiName);
+
   public DocumentReference getNewMenuItemClassRef(String wikiName);
 
 }

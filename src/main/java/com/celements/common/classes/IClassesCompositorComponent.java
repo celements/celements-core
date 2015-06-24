@@ -7,4 +7,6 @@ public interface IClassesCompositorComponent {
 
   public void checkAllClassCollections();
 
+  public boolean isActivated(String name);
+
 }

@@ -40,4 +40,6 @@ public interface IPageTypeConfig {
 
   public boolean isVisible();
 
+  public boolean isUnconnectedParent();
+
 }

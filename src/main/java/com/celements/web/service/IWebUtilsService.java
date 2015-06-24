@@ -96,7 +96,13 @@ public interface IWebUtilsService {
 
   public String getDefaultLanguage();
 
+  /**
+   * @deprecated instead use {@link #getDefaultLanguage(SpaceReference)}
+   */
+  @Deprecated
   public String getDefaultLanguage(String spaceName);
+
+  public String getDefaultLanguage(SpaceReference spaceRef);
 
   public boolean hasParentSpace();
 

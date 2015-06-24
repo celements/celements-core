@@ -139,6 +139,9 @@ public class PageTypeClasses extends AbstractClassCollection {
         "integer");
     needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_HASPAGETITLE,
         "Has Page Title", "yesno");
+    needsUpdate |= bclass.addBooleanField(
+        IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT, "Is Unconnected Parent",
+        "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
