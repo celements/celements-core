@@ -25,16 +25,14 @@ import static org.easymock.EasyMock.*;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.pagetype.PageTypeReference;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,13 +63,10 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     context.setWiki(xwiki);
     request = createMock(XWikiRequest.class);
     context.setRequest(request);
-    pageTypeResolver = new PageTypeResolverService();
+    pageTypeResolver = (PageTypeResolverService) Utils.getComponent(
+        IPageTypeResolverRole.class);
     pageTypeServiceMock = createMock(IPageTypeRole.class);
     pageTypeResolver.pageTypeService = pageTypeServiceMock;
-    pageTypeResolver.webUtilsService = Utils.getComponent(IWebUtilsService.class);
-    pageTypeResolver.execution = Utils.getComponent(Execution.class);
-    pageTypeResolver.pageTypeClasses = Utils.getComponent(IClassCollectionRole.class,
-        "celements.celPageTypeClasses");
     richTextPTref = new PageTypeReference("RichText", "xObjectProvider",
         Arrays.asList(""));
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq("RichText"))).andReturn(
@@ -88,6 +83,11 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
     xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
     expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(xwikiPrefDoc
         ).anyTimes();
+  }
+
+  @After
+  public void tearDown_PageTypeResolverServiceTest() {
+    pageTypeResolver.pageTypeService = Utils.getComponent(IPageTypeRole.class);
   }
 
   @Test
