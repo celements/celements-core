@@ -105,16 +105,17 @@ public abstract class AbstractDocumentReferenceCache<K>
 
   private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef
       ) throws QueryException, XWikiException {
+    getLogger().debug("loadCache: for wiki '{}'", wikiRef);
     Map<K, Set<DocumentReference>> cache = new HashMap<>();
     for (DocumentReference docRef : executeXWQL(wikiRef)) {
-      for (K ref : getKeysForResult(docRef)) {
-        if (!cache.containsKey(ref)) {
-          cache.put(ref, new HashSet<DocumentReference>());
+      for (K key : getKeysForResult(docRef)) {
+        if (!cache.containsKey(key)) {
+          cache.put(key, new HashSet<DocumentReference>());
         }
-        cache.get(ref).add(docRef);
+        cache.get(key).add(docRef);
+        getLogger().trace("loadCache: put '{}' - '{}'", key, docRef);
       }
     }
-    getLogger().trace("loadCacheForWiki: '{}': {}", wikiRef, cache);
     return cache;
   }
 

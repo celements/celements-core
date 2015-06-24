@@ -57,7 +57,6 @@ public class NavigationCache extends AbstractDocumentReferenceCache<String> {
         }
       }
     }
-    LOGGER.debug("getKeysForResult: resolved for '{}' spaces: {}", docRef, ret);
     return ret;
   }
 
