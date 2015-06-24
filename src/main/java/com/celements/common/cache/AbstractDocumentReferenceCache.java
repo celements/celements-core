@@ -86,14 +86,17 @@ public abstract class AbstractDocumentReferenceCache<K>
   @Override
   public synchronized void flush(WikiReference wikiRef) {
     if (wikiRef != null) {
-      cache.remove(wikiRef);
-      getLogger().info("flush: for wiki '{}'", wikiRef);
+      Map<K, Set<DocumentReference>> oldCache = cache.remove(wikiRef);
+      if (getLogger().isTraceEnabled()) {
+        getLogger().trace("flush: for wiki '{}': {}", wikiRef, oldCache);
+      } else {
+        getLogger().info("flush: for wiki '{}'", wikiRef);
+      }
     }
   }
 
-  private synchronized Map<K, Set<DocumentReference>> getCache(
-      WikiReference wikiRef) throws CacheLoadingException {
-    getLogger().debug("getCache: for wiki '{}'", wikiRef);
+  private synchronized Map<K, Set<DocumentReference>> getCache(WikiReference wikiRef
+      ) throws CacheLoadingException {
     if (!cache.containsKey(wikiRef)) {
       try {
         cache.put(wikiRef, loadCache(wikiRef));
@@ -106,7 +109,7 @@ public abstract class AbstractDocumentReferenceCache<K>
 
   private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef
       ) throws QueryException, XWikiException {
-    getLogger().debug("loadCache: for wiki '{}'", wikiRef);
+    getLogger().debug("loadCache: start for wiki '{}'", wikiRef);
     Map<K, Set<DocumentReference>> cache = new HashMap<>();
     for (DocumentReference docRef : executeXWQL(wikiRef)) {
       for (K key : getKeysForResult(docRef)) {
