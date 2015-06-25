@@ -1,6 +1,5 @@
 package com.celements.navigation;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -11,13 +10,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryManager;
 
 import com.celements.common.cache.AbstractDocumentReferenceCache;
-import com.celements.navigation.event.NavigationCreatedEvent;
-import com.celements.navigation.event.NavigationDeletedEvent;
-import com.celements.navigation.event.NavigationUpdatedEvent;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiException;
@@ -32,11 +27,6 @@ public class NavigationCache extends AbstractDocumentReferenceCache<String> {
 
   @Requirement
   private INavigationClassConfig navClassConf;
-
-  @Override
-  public String getName() {
-    return NAME;
-  }
 
   @Override
   protected DocumentReference getCacheClassRef(WikiReference wikiRef) {
@@ -58,12 +48,6 @@ public class NavigationCache extends AbstractDocumentReferenceCache<String> {
       }
     }
     return ret;
-  }
-
-  @Override
-  protected List<Event> getFlushingEvents() {
-    return Arrays.<Event> asList(new NavigationCreatedEvent(), 
-        new NavigationUpdatedEvent(), new NavigationDeletedEvent());
   }
 
   @Override

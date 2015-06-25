@@ -1,7 +1,6 @@
 package com.celements.common.cache;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,8 +13,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -26,10 +23,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractDocumentReferenceCache<K> 
-    implements IDocumentReferenceCache<K>, EventListener {
+    implements IDocumentReferenceCache<K> {
 
   private Map<WikiReference, Map<K, Set<DocumentReference>>> cache = new HashMap<>();
 
@@ -62,23 +58,17 @@ public abstract class AbstractDocumentReferenceCache<K>
   @Override
   public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef
       ) throws CacheLoadingException {
-    if (wikiRef == null) {
-      wikiRef = webUtils.getWikiRef();
-    }
     return ImmutableSet.copyOf(Iterables.concat(getCache(wikiRef).values()));
   }
 
   @Override
   public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef, K key
       ) throws CacheLoadingException {
-    if (wikiRef == null) {
-      wikiRef = webUtils.getWikiRef();
-    }
     Set<DocumentReference> ret = getCache(wikiRef).get(key);
     if (ret != null) {
-      ret = Collections.unmodifiableSet(ret);
+      ret = ImmutableSet.copyOf(ret);
     } else {
-      ret = Collections.emptySet();
+      ret = ImmutableSet.of();
     }
     return ret;
   }
@@ -97,6 +87,9 @@ public abstract class AbstractDocumentReferenceCache<K>
 
   private synchronized Map<K, Set<DocumentReference>> getCache(WikiReference wikiRef
       ) throws CacheLoadingException {
+    if (wikiRef == null) {
+      wikiRef = webUtils.getWikiRef();
+    }
     if (!cache.containsKey(wikiRef)) {
       try {
         cache.put(wikiRef, loadCache(wikiRef));
@@ -145,25 +138,6 @@ public abstract class AbstractDocumentReferenceCache<K>
    */
   protected abstract Collection<K> getKeysForResult(DocumentReference docRef
       ) throws XWikiException;
-
-  @Override
-  public List<Event> getEvents() {
-    return getFlushingEvents();
-  }
-
-  /**
-   * @return a list of events that will flush the cache when notified
-   */
-  protected abstract List<Event> getFlushingEvents();
-
-  @Override
-  public void onEvent(Event event, Object source, Object data) {
-    if (source instanceof XWikiDocument) {
-      flush(webUtils.getWikiRef((XWikiDocument) source));
-    } else {
-      getLogger().error("unable to flush cache for source '{}'", source);
-    }
-  }
 
   protected abstract Logger getLogger();
 

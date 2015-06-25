@@ -20,9 +20,6 @@ import org.xwiki.query.QueryManager;
 import com.celements.common.cache.CacheLoadingException;
 import com.celements.common.cache.IDocumentReferenceCache;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.navigation.event.NavigationCreatedEvent;
-import com.celements.navigation.event.NavigationDeletedEvent;
-import com.celements.navigation.event.NavigationUpdatedEvent;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiException;
@@ -50,11 +47,6 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
   public void tearDown_NavigationCacheTest() {
     cache.injectQueryManager(Utils.getComponent(QueryManager.class));
     cache.injectQueryExecService(Utils.getComponent(IQueryExecutionServiceRole.class));
-  }
-
-  @Test
-  public void testGetName() {
-    assertEquals(NavigationCache.NAME, cache.getName());
   }
 
   @Test
@@ -199,37 +191,6 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     cache.flush(wikiRef); // this flushes docRef
     assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
     cache.flush(otherWikiRef); // this doesnt flush docRef
-    assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
-    verifyDefault();
-  }
-
-  @Test
-  public void testGetFlushingEvents() {
-    assertEquals(3, cache.getFlushingEvents().size());
-    assertEquals(NavigationCreatedEvent.class, cache.getFlushingEvents().get(0).getClass());
-    assertEquals(NavigationUpdatedEvent.class, cache.getFlushingEvents().get(1).getClass());
-    assertEquals(NavigationDeletedEvent.class, cache.getFlushingEvents().get(2).getClass());
-  }
-
-  @Test
-  public void testOnEvent() throws Exception {
-    WikiReference wikiRef = new WikiReference("wiki");
-    String space = "menuSpace";
-    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "nav");
-    WikiReference otherWikiRef = new WikiReference("otherWiki");
-    DocumentReference otherDocRef = new DocumentReference(otherWikiRef.getName(), "space",
-        "nav");
-    
-    expectXWQL(wikiRef, Arrays.asList(docRef));
-    expectMenuSpace(docRef, space);
-    expectXWQL(wikiRef, Arrays.asList(docRef));
-    expectMenuSpace(docRef, space);
-
-    replayDefault();
-    assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
-    cache.onEvent(null, new XWikiDocument(docRef), null); // this flushes docRef
-    assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
-    cache.onEvent(null, new XWikiDocument(otherDocRef), null); // this doesnt flush docRef
     assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
     verifyDefault();
   }

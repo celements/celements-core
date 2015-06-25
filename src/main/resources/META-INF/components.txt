@@ -106,3 +106,4 @@ com.celements.navigation.listener.NavigationUpdateListener
 com.celements.navigation.listener.NavigationDeleteListener
 com.celements.navigation.NavigationCache
 com.celements.parents.NavigationParents
+com.celements.navigation.listener.NavigationCacheFlushingListener
