@@ -120,6 +120,9 @@ public class CelementsWebScriptService implements ScriptService {
   @Requirement
   IMandatoryDocumentCompositorRole mandatoryDocComp;
 
+  @Requirement("deprecated")
+  ScriptService deprecatedUsage;
+
   @Requirement
   Execution execution;
 
@@ -754,9 +757,14 @@ public class CelementsWebScriptService implements ScriptService {
     }
     return null;
   }
-  
+
+  /**
+   * @deprecated since 2.65.0 instead use logDeprecatedVelocityScript in
+   *             DeprecatedUsageScriptService: $services.deprecated.logVelocityScript
+   */
+  @Deprecated
   public void logDeprecatedVelocityScript(String logMessage) {
-    _LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
+    ((DeprecatedUsageScriptService)deprecatedUsage).logVelocityScript(logMessage);
   }
   
   public String getDocHeaderTitle(DocumentReference docRef) {
