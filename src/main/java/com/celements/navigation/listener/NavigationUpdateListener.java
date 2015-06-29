@@ -64,13 +64,13 @@ public class NavigationUpdateListener extends AbstractDocumentUpdateListener {
   }
 
   @Override
-  protected Logger getLogger() {
-    return LOGGER;
+  protected boolean includeDocFields() {
+    return false;
   }
 
   @Override
-  protected boolean includeDocFields() {
-    return false;
+  protected Logger getLogger() {
+    return LOGGER;
   }
 
 }

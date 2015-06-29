@@ -51,6 +51,11 @@ public class NavigationUpdateListenerTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
+  public void testIncludeDocFields() {
+    assertFalse(listener.includeDocFields());
+  }
+
+  @Test
   public void testGetLogger() {
     assertNotNull(listener.getLogger());
   }
