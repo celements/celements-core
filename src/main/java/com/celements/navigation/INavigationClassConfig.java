@@ -47,11 +47,13 @@ public interface INavigationClassConfig {
 
   public DocumentReference getMenuNameClassRef(String wikiName);
 
+  public DocumentReference getNavigationConfigClassRef();
   public DocumentReference getNavigationConfigClassRef(String wikiName);
-
   public DocumentReference getNavigationConfigClassRef(WikiReference wikiRef);
 
+  public DocumentReference getMenuItemClassRef();
   public DocumentReference getMenuItemClassRef(String wikiName);
+  public DocumentReference getMenuItemClassRef(WikiReference wikiRef);
 
   public DocumentReference getNewMenuItemClassRef(String wikiName);
 
