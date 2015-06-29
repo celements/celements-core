@@ -357,6 +357,64 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     verifyDefault();
   }
 
+  @Test
+  public void testOnEvent_update_ed_includeDocFields_title() {
+    Event event = new DocumentUpdatedEvent();
+    listener.includeDocFields = true;
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(docMock.getTitle()).andReturn("title").once();
+    expect(origDocMock.getTitle()).andReturn("").once();
+    expect(docMock.getContent()).andReturn("").once();
+    expect(origDocMock.getContent()).andReturn("").once();
+    obsManagerMock.notify(same(updatedEventMock), same(docMock), same(context));
+    expectLastCall().once();
+    
+    replayDefault();
+    listener.onEvent(event, docMock, context);
+    verifyDefault();
+  }
+
+  @Test
+  public void testOnEvent_update_ed_includeDocFields_content() {
+    Event event = new DocumentUpdatedEvent();
+    listener.includeDocFields = true;
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(docMock.getTitle()).andReturn("").once();
+    expect(origDocMock.getTitle()).andReturn("").once();
+    expect(docMock.getContent()).andReturn("content").once();
+    expect(origDocMock.getContent()).andReturn("").once();
+    obsManagerMock.notify(same(updatedEventMock), same(docMock), same(context));
+    expectLastCall().once();
+    
+    replayDefault();
+    listener.onEvent(event, docMock, context);
+    verifyDefault();
+  }
+
+  @Test
+  public void testOnEvent_update_ed_includeDocFields_noChange() {
+    Event event = new DocumentUpdatedEvent();
+    listener.includeDocFields = true;
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
+    expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
+    expect(docMock.getTitle()).andReturn("").once();
+    expect(origDocMock.getTitle()).andReturn("").once();
+    expect(docMock.getContent()).andReturn("").once();
+    expect(origDocMock.getContent()).andReturn("").once();
+    
+    replayDefault();
+    listener.onEvent(event, docMock, context);
+    verifyDefault();
+  }
+
   private BaseObject getBaseObject1() {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue(fields.get(0), "val");
@@ -375,6 +433,8 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
     Logger LOGGER = LoggerFactory.getLogger(TestDocumentUpdateListener.class);
     static final String NAME = "TestDocumentUpdateListener";
+    
+    boolean includeDocFields = false;
 
     @Override
     public String getName() {
@@ -425,6 +485,11 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     protected Event getDeletedEvent(DocumentReference docRef) {
       assertEquals(AbstractDocumentUpdateListenerTest.this.docRef, docRef);
       return deletedEventMock;
+    }
+
+    @Override
+    protected boolean includeDocFields() {
+      return includeDocFields;
     }
     
   }

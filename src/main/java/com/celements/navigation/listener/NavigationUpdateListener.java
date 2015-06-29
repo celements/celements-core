@@ -68,4 +68,9 @@ public class NavigationUpdateListener extends AbstractDocumentUpdateListener {
     return LOGGER;
   }
 
+  @Override
+  protected boolean includeDocFields() {
+    return false;
+  }
+
 }
