@@ -8,11 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
 import com.celements.auth.IAuthenticationServiceRole;
+import com.celements.rights.AccessLevel;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -48,6 +50,17 @@ public class WebUtilsScriptService implements ScriptService {
 
   public String getDefaultLanguage(String spaceName) {
     return webUtilsService.getDefaultLanguage(spaceName);
+  }
+
+  public Attachment getAttachment(AttachmentReference attRef) {
+    try {
+      if (webUtilsService.hasAccessLevel(attRef, AccessLevel.VIEW)) {
+        return webUtilsService.getAttachmentApi(attRef);
+      }
+    } catch (XWikiException xwe) {
+      _LOGGER.error("failed getting attachment for ref '{}'", attRef, xwe);
+    }
+    return null;
   }
 
   /*
