@@ -37,6 +37,18 @@ public class JSScriptService implements ScriptService {
   public String addExtJSfileOnce(String jsFile, String action) {
     return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action);
   }
+
+  /**
+   * addExtJSfileOnce
+   * 
+   * @param jsFile
+   * @param action   use empty string for default action
+   * @param params
+   * @return
+   */
+  public String addExtJSfileOnce(String jsFile, String action, String params) {
+    return getExtJavaScriptFileCmd().addExtJSfileOnce(jsFile, action, params);
+  }
   
   public String addLazyExtJSfile(String jsFile) {
     return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile);
@@ -44,6 +56,18 @@ public class JSScriptService implements ScriptService {
 
   public String addLazyExtJSfile(String jsFile, String action) {
     return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action);
+  }
+
+  /**
+   * addLazyExtJSfile
+   * 
+   * @param jsFile
+   * @param action   use empty string for default action
+   * @param params
+   * @return
+   */
+  public String addLazyExtJSfile(String jsFile, String action, String params) {
+    return getExtJavaScriptFileCmd().addLazyExtJSfile(jsFile, action, params);
   }
 
   private ExternalJavaScriptFilesCommand getExtJavaScriptFileCmd() {
