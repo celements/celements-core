@@ -91,11 +91,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class WebUtilsService implements IWebUtilsService {
   
   private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
-  
-  private static final String REGEX_WORD = "[a-zA-Z0-9]*";
-  private static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
-  private static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
-  private static final String REGEX_ATT = REGEX_DOC + "\\@.*";
 
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
