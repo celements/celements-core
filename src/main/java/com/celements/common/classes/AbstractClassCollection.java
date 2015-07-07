@@ -22,7 +22,9 @@ package com.celements.common.classes;
 import org.apache.commons.logging.Log;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,14 +51,13 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   protected Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   @Override
   final public void runUpdate() throws XWikiException {
     if (isActivated()) {
-      getLogger().debug("calling initClasses for database: " + getContext().getDatabase()
-          );
+      getLogger().debug("calling initClasses for database: " + getContext().getDatabase());
       initClasses();
     } else {
       getLogger().info("skipping not activated class collection: " + getConfigName());
@@ -70,15 +71,22 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
             "") + ",").contains("," + getConfigName() + ",");
   }
 
-  protected void setContentAndSaveClassDocument(XWikiDocument doc,
-      boolean needsUpdate) throws XWikiException {
-    String content = doc.getContent();
-    if ((content == null) || (content.equals(""))) {
+  protected XWikiDocument getClassDoc(DocumentReference classRef) {
+    try {
+      return getContext().getWiki().getDocument(classRef, getContext());
+    } catch (XWikiException xwe) {
+      getLogger().error("Failed getting classDoc for classRef '" + classRef + "'", xwe);
+      return new XWikiDocument(classRef);
+    }
+  }
+
+  protected void setContentAndSaveClassDocument(XWikiDocument doc, boolean needsUpdate
+      ) throws XWikiException {
+    if (Strings.nullToEmpty(doc.getContent()).isEmpty()) {
       needsUpdate = true;
       doc.setContent(" ");
     }
-
-    if (needsUpdate){
+    if (needsUpdate) {
       getContext().getWiki().saveDocument(doc, getContext());
     }
   }
@@ -89,7 +97,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   protected final boolean addBooleanField(BaseClass bclass, String name,
       String prettyName, String displayType, int defaultValue) {
-    if(bclass.get(name) == null) {
+    if (bclass.get(name) == null) {
       BooleanClass element = new BooleanClass();
       element.setName(name);
       element.setPrettyName(prettyName);
@@ -104,7 +112,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   protected final boolean addTextField(BaseClass bclass, String name, String prettyName,
       int size, String validationRegExp, String validationMessage) {
-    if(bclass.get(name) == null) {
+    if (bclass.get(name) == null) {
       StringClass element = new StringClass();
       element.setName(name);
       element.setPrettyName(prettyName);
@@ -121,7 +129,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   protected final boolean addTextAreaField(BaseClass bclass, String name,
       String prettyName, int cols, int rows, String validationRegExp,
       String validationMessage) {
-    if(bclass.get(name) == null) {
+    if (bclass.get(name) == null) {
       TextAreaClass element = new TextAreaClass();
       element.setName(name);
       element.setPrettyName(prettyName);
@@ -155,7 +163,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   protected final boolean addDateField(BaseClass bclass, String name, String prettyName,
       String dateFormat, int size, int emptyIsToday, String validationRegExp,
       String validationMessage) {
-    if(bclass.get(name) == null) {
+    if (bclass.get(name) == null) {
       DateClass element = new DateClass();
       element.setName(name);
       element.setPrettyName(prettyName);
@@ -177,7 +185,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   protected final boolean addDBListField(BaseClass bclass, String name,
       String prettyName, int size, boolean multiSelect, boolean useSuggest, String sql,
       String validationRegExp, String validationMessage) {
-    if(bclass.get(name) == null) {
+    if (bclass.get(name) == null) {
       DBListClass element = new DBListClass();
       element.setName(name);
       element.setPrettyName(prettyName);
