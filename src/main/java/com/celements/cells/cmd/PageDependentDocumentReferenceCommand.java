@@ -21,7 +21,6 @@ package com.celements.cells.cmd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -55,8 +54,12 @@ public class PageDependentDocumentReferenceCommand {
 
   private static Logger _LOGGER = LoggerFactory.getLogger(
       PageDependentDocumentReferenceCommand.class);
+
   PageLayoutCommand pageLayoutCmd;
+
   private SpaceReference currentLayoutRef;
+
+  IWebUtilsService inject_WebUtilsService;
 
   /**
    * @deprecated since 2.29.0 instead use getDocumentReference(DocumentReference,
@@ -421,6 +424,9 @@ public class PageDependentDocumentReferenceCommand {
   }
 
   private IWebUtilsService getWebUtilsService() {
+    if (inject_WebUtilsService != null) {
+      return inject_WebUtilsService;
+    }
     return Utils.getComponent(IWebUtilsService.class);
   }
   
