@@ -1936,27 +1936,27 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
-  @Test
-  public void testGetDefaultLanguage_webPref_overwrites_wikiPref() throws Exception {
-    String expectedLang = "en";
-    ((MockConfigurationSource)webUtilsService.defaultConfigSrc).setProperty(
-        "default_language", expectedLang);
-    String mySpace = "mySpace";
-    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), mySpace,
-        "myDoc");
-    XWikiDocument curDoc = new XWikiDocument(curDocRef);
-    context.setDoc(curDoc);
-    DocumentReference webPrefRef = new DocumentReference(context.getDatabase(), mySpace,
-        "WebPreferences");
-    expect(xwiki.exists(eq(webPrefRef), same(context))).andReturn(true).atLeastOnce();
-    XWikiDocument webPrefDoc = new XWikiDocument(webPrefRef);
-    expect(xwiki.getDocument(eq(webPrefRef), same(context))).andReturn(webPrefDoc
-        ).atLeastOnce();
-    replayDefault();
-    assertEquals(expectedLang, webUtilsService.getDefaultLanguage());
-    verifyDefault();
-  }
-
+//  @Test
+//  public void testGetDefaultLanguage_webPref_overwrites_wikiPref() throws Exception {
+//    String expectedLang = "en";
+//    ((MockConfigurationSource)webUtilsService.defaultConfigSrc).setProperty(
+//        "default_language", expectedLang);
+//    String mySpace = "mySpace";
+//    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), mySpace,
+//        "myDoc");
+//    XWikiDocument curDoc = new XWikiDocument(curDocRef);
+//    context.setDoc(curDoc);
+//    DocumentReference webPrefRef = new DocumentReference(context.getDatabase(), mySpace,
+//        "WebPreferences");
+//    expect(xwiki.exists(eq(webPrefRef), same(context))).andReturn(true).atLeastOnce();
+//    XWikiDocument webPrefDoc = new XWikiDocument(webPrefRef);
+//    expect(xwiki.getDocument(eq(webPrefRef), same(context))).andReturn(webPrefDoc
+//        ).atLeastOnce();
+//    replayDefault();
+//    assertEquals(expectedLang, webUtilsService.getDefaultLanguage());
+//    verifyDefault();
+//  }
+//
   @Test
   public void testGetDefaultLanguage_withSpaceRef() throws Exception {
     final String lang = "en";

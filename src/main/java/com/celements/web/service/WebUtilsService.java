@@ -375,12 +375,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getDefaultLanguage() {
-    SpaceReference lastSpaceReference = null;
-    if (getContext().getDoc() != null) {
-      lastSpaceReference = getContext().getDoc().getDocumentReference(
-          ).getLastSpaceReference();
-    }
-    return getDefaultLanguage(lastSpaceReference);
+    return getDefaultLanguage((SpaceReference)null);
   }
 
   @Deprecated
@@ -413,8 +408,8 @@ public class WebUtilsService implements IWebUtilsService {
       getContext().setDatabase(dbbackup);
       getContext().setDoc(docBackup);
     }
-    _LOGGER.trace("getDefaultLanguage: for spaceRef '{}' got lang '{}' ", spaceRef, 
-        defaultLang);
+    _LOGGER.trace("getDefaultLanguage: for currentDoc '{}' and spaceRef '{}' got lang"
+        + " '{}' ", getContext().getDoc(), spaceRef, defaultLang);
     return defaultLang;
   }
 
