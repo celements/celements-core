@@ -272,10 +272,13 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<String> getAllowedLanguages(String spaceName) {
     List<String> languages = new ArrayList<String>();
-    languages.addAll(Arrays.asList(getContext().getWiki(
-        ).getSpacePreference("languages", spaceName, "", getContext()).split("[ ,]")));
+    String spaceLanguages = getContext().getWiki().getSpacePreference("languages",
+        spaceName, "", getContext());
+    languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
+      _LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space ["
+          + spaceName + "]");
       return languages;
     }
     _LOGGER.warn("Deprecated usage of Preferences field 'language'."
