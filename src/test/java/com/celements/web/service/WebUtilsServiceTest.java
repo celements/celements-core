@@ -23,6 +23,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.MockConfigurationSource;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.nextfreedoc.INextFreeDocRole;
@@ -51,12 +52,14 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private XWiki xwiki;
   private WebUtilsService webUtilsService;
+  private ConfigurationSource backupDefConfSrc;
 
   @Before
   public void setUp_WebUtilsServiceTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
+    backupDefConfSrc = webUtilsService.defaultConfigSrc;
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     webUtilsService.docParentsLister = createMockAndAddToDefault(
         IDocumentParentsListerRole.class);
@@ -65,6 +68,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   @After
   public void tearDown_WebUtilsServiceTest() throws Exception {
     webUtilsService.docParentsLister = null;
+    webUtilsService.defaultConfigSrc = backupDefConfSrc;
   }
 
   @Test
@@ -1925,12 +1929,31 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     String lang = "en";
     webUtilsService.defaultConfigSrc = createMockAndAddToDefault(
         ConfigurationSource.class);
-    
     expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(""))
-        ).andReturn(lang).once();
-    
+        ).andReturn(lang).atLeastOnce();
     replayDefault();
     assertEquals(lang, webUtilsService.getDefaultLanguage());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetDefaultLanguage_webPref_overwrites_wikiPref() throws Exception {
+    String expectedLang = "en";
+    ((MockConfigurationSource)webUtilsService.defaultConfigSrc).setProperty(
+        "default_language", expectedLang);
+    String mySpace = "mySpace";
+    DocumentReference curDocRef = new DocumentReference(context.getDatabase(), mySpace,
+        "myDoc");
+    XWikiDocument curDoc = new XWikiDocument(curDocRef);
+    context.setDoc(curDoc);
+    DocumentReference webPrefRef = new DocumentReference(context.getDatabase(), mySpace,
+        "WebPreferences");
+    expect(xwiki.exists(eq(webPrefRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument webPrefDoc = new XWikiDocument(webPrefRef);
+    expect(xwiki.getDocument(eq(webPrefRef), same(context))).andReturn(webPrefDoc
+        ).atLeastOnce();
+    replayDefault();
+    assertEquals(expectedLang, webUtilsService.getDefaultLanguage());
     verifyDefault();
   }
 

@@ -375,7 +375,12 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public String getDefaultLanguage() {
-    return getDefaultLanguage((SpaceReference) null);
+    SpaceReference lastSpaceReference = null;
+    if (getContext().getDoc() != null) {
+      lastSpaceReference = getContext().getDoc().getDocumentReference(
+          ).getLastSpaceReference();
+    }
+    return getDefaultLanguage(lastSpaceReference);
   }
 
   @Deprecated
