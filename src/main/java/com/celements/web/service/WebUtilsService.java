@@ -408,8 +408,10 @@ public class WebUtilsService implements IWebUtilsService {
       getContext().setDatabase(dbbackup);
       getContext().setDoc(docBackup);
     }
+    ConfigurationSource spaceConfig = Utils.getComponent(ConfigurationSource.class, "space");
     _LOGGER.trace("getDefaultLanguage: for currentDoc '{}' and spaceRef '{}' got lang"
-        + " '{}' ", getContext().getDoc(), spaceRef, defaultLang);
+        + " '{}' direct spaceConfig '{}'", getContext().getDoc(), spaceRef, defaultLang,
+        spaceConfig.getProperty("default_language", ""));
     return defaultLang;
   }
 
