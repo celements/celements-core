@@ -108,3 +108,4 @@ com.celements.navigation.NavigationCache
 com.celements.parents.NavigationParents
 com.celements.navigation.listener.NavigationCacheFlushingListener
 com.celements.web.service.DeprecatedUsageScriptService
+com.celements.xwikiPatches.SpacePreferencesConfigurationSource
