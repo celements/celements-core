@@ -78,8 +78,8 @@ public abstract class AbstractDocumentConfigurationSource
    */
   protected WikiReference getCurrentWikiReference() {
     if (this.modelContext.getCurrentEntityReference() != null) {
-      return (WikiReference) this.modelContext.getCurrentEntityReference()
-          .extractReference(EntityType.WIKI);
+      return (WikiReference) this.modelContext.getCurrentEntityReference(
+          ).extractReference(EntityType.WIKI);
     }
 
     return new WikiReference(this.modelConfig.getDefaultReferenceValue(EntityType.WIKI));
