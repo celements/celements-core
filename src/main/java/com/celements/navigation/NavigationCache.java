@@ -41,13 +41,22 @@ public class NavigationCache extends AbstractDocumentReferenceCache<String> {
         ).getXObjects(getCacheClassRef(webUtils.getWikiRef(docRef)));
     if (navConfObjs != null) {
       for (BaseObject obj : navConfObjs) {
-        String spaceName = obj.getStringValue(INavigationClassConfig.MENU_SPACE_FIELD);
-        if (!Strings.isNullOrEmpty(spaceName)) {
+        String spaceName = getMenuSpaceName(obj);
+        if (!spaceName.isEmpty()) {
           ret.add(spaceName);
         }
       }
     }
     return ret;
+  }
+
+  private String getMenuSpaceName(BaseObject obj) {
+    String spaceName = "";
+    if (obj != null) {
+      spaceName = Strings.nullToEmpty(obj.getStringValue(
+          INavigationClassConfig.MENU_SPACE_FIELD));
+    }
+    return spaceName;
   }
 
   @Override
