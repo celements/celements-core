@@ -59,8 +59,8 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef2 = new DocumentReference(wikiRef.getName(), "space", "nav2");
     
     expectXWQL(wikiRef, Arrays.asList(docRef1, docRef2));
-    expectMenuSpace(docRef1, space1);
-    expectMenuSpace(docRef2, space2);
+    expectMenuSpace(docRef1, space1, 0);
+    expectMenuSpace(docRef2, space2, 0);
 
     replayDefault();
     assertEquals(ImmutableSet.of(docRef1), cache.getCachedDocRefs(wikiRef, space1));
@@ -78,12 +78,26 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef2 = new DocumentReference(wikiRef.getName(), "space", "nav2");
     
     expectXWQL(wikiRef, Arrays.asList(docRef1, docRef2));
-    expectMenuSpace(docRef1, space);
-    expectMenuSpace(docRef2, space);
+    expectMenuSpace(docRef1, space, 0);
+    expectMenuSpace(docRef2, space, 0);
 
     replayDefault();
     assertEquals(ImmutableSet.of(docRef1, docRef2), cache.getCachedDocRefs(wikiRef, space));
     assertEquals(ImmutableSet.of(docRef1, docRef2), cache.getCachedDocRefs(wikiRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCachedDocRefs_withNullObj() throws Exception {
+    WikiReference wikiRef = new WikiReference("wiki");
+    String space = "menuSpace";
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "nav");
+    
+    expectXWQL(wikiRef, Arrays.asList(docRef));
+    expectMenuSpace(docRef, space, 1);
+
+    replayDefault();
+    assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
     verifyDefault();
   }
 
@@ -110,9 +124,9 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     String space3 = "menuSpace3";
     
     expectXWQL(wikiRef1, Arrays.asList(docRef1));
-    expectMenuSpace(docRef1, space1);
+    expectMenuSpace(docRef1, space1, 0);
     expectXWQL(wikiRef2, Arrays.asList(docRef2));
-    expectMenuSpace(docRef2, space2);
+    expectMenuSpace(docRef2, space2, 0);
 
     replayDefault();
     assertEquals(ImmutableSet.of(docRef1), cache.getCachedDocRefs(wikiRef1, space1));
@@ -130,7 +144,7 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "nav");
     
     expectXWQL(wikiRef, Arrays.asList(docRef));
-    expectMenuSpace(docRef, "");
+    expectMenuSpace(docRef, "", 0);
 
     replayDefault();
     assertEquals(ImmutableSet.of(), cache.getCachedDocRefs(wikiRef));
@@ -182,9 +196,9 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     WikiReference otherWikiRef = new WikiReference("otherWiki");
     
     expectXWQL(wikiRef, Arrays.asList(docRef));
-    expectMenuSpace(docRef, space);
+    expectMenuSpace(docRef, space, 0);
     expectXWQL(wikiRef, Arrays.asList(docRef));
-    expectMenuSpace(docRef, space);
+    expectMenuSpace(docRef, space, 0);
 
     replayDefault();
     assertEquals(ImmutableSet.of(docRef), cache.getCachedDocRefs(wikiRef, space));
@@ -212,13 +226,14 @@ public class NavigationCacheTest extends AbstractBridgedComponentTestCase {
     }
   }
 
-  private void expectMenuSpace(DocumentReference docRef, String space) throws Exception {
+  private void expectMenuSpace(DocumentReference docRef, String space, int nb
+      ) throws Exception {
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject obj = new BaseObject();
     obj.setXClassReference(Utils.getComponent(INavigationClassConfig.class
         ).getNavigationConfigClassRef(docRef.getWikiReference()));
     obj.setStringValue(INavigationClassConfig.MENU_SPACE_FIELD, space);
-    doc.addXObject(obj);
+    doc.setXObject(nb, obj);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc
         ).once();
   }
