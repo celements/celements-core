@@ -73,8 +73,7 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
     if (extractObj == null) {
       extractObj = contentDoc.getXObject(documentExtractClassRef,
           DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE,
-          webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference().getName()),
-          false);
+          webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference()), false);
     }
     if (extractObj != null) {
       return extractObj.getStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_CONTENT);
