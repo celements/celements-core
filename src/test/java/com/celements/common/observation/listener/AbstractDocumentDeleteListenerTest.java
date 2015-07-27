@@ -83,6 +83,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
   @Test
   public void testOnEvent_nullDoc_ing() {
     Event event = new DocumentDeletingEvent();
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     
     replayDefault();
     listener.onEvent(event, null, context);
@@ -92,6 +94,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
   @Test
   public void testOnEvent_nullDoc_ed() {
     Event event = new DocumentDeletedEvent();
+
+    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     
     replayDefault();
     listener.onEvent(event, null, context);
