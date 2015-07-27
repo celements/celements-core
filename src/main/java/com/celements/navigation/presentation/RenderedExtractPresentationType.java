@@ -68,6 +68,9 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
         getImageGalleryOverviewRef());
     try {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      vcontext.put("extractDocRef", docRef);
+      XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
+      vcontext.put("extractDoc", contentDoc.newDocument(getContext()));
       vcontext.put("extractContent", getDocExtract(docRef));
       return getRenderCommand().renderTemplatePath(templatePath, getContext(
           ).getLanguage());

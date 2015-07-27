@@ -39,6 +39,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderer;
@@ -126,7 +127,7 @@ public class RenderedExtractPresentationTypeTest
         eq(isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc
-        ).once();
+        ).atLeastOnce();
     DocumentReference templateDocRef = new DocumentReference(context.getDatabase(),
         "Templates", "RenderedExtract");
     String templateDiskPath = ":celTemplates/RenderedExtract.vm";
@@ -140,8 +141,12 @@ public class RenderedExtractPresentationTypeTest
         + expectedNodeExtract + "</div>\n";
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf,
         1, nav);
-    assertEquals(expectedRenderedExtract,
-        outStream.toString());
+    assertEquals(expectedRenderedExtract, outStream.toString());
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    assertEquals(expectedNodeExtract, vcontext.get("extractContent"));
+    assertEquals(currentDocRef, vcontext.get("extractDocRef"));
+    assertEquals(currentDocRef, ((Document)vcontext.get("extractDoc")
+        ).getDocumentReference());
     verifyDefault();
   }
 
