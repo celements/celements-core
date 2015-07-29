@@ -155,7 +155,7 @@ public class XObjectUtils {
    * @return true if doc has changed
    */
   public static boolean removeXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, List<Object> values) {
+      String key, Collection<?> values) {
     return removeXObjects(doc, getXObjects(doc, classRef, key, values));
   }
 
