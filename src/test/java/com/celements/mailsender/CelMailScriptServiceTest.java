@@ -1,9 +1,9 @@
+package com.celements.mailsender;
+
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import com.celements.mailsender.CelMailScriptService;
 
 
 public class CelMailScriptServiceTest {
