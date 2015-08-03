@@ -163,6 +163,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef)
       throws XWikiException {
     Preconditions.checkNotNull(doc);
+    Preconditions.checkNotNull(classRef);
     return doc.newXObject(classRef, getContext());
   }
 

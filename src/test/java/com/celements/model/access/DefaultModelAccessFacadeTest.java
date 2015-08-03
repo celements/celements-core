@@ -202,7 +202,57 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     replayDefault();
     List<BaseObject> ret = modelAccess.getXObjects(doc.getDocumentReference(), classRef);
     verifyDefault();
-    assertEquals(ret.size(), 0);
+    assertEquals(0, ret.size());
+  }
+
+  @Test
+  public void test_newXObject() throws Exception {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    BaseObject obj = new BaseObject();
+    expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
+    replayDefault();
+    BaseObject ret = modelAccess.newXObject(docMock, classRef);
+    verifyDefault();
+    assertEquals(obj, ret);
+  }
+
+  @Test
+  public void test_newXObject_XWE() throws Exception {
+    Throwable cause = new XWikiException();
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    expect(docMock.newXObject(eq(classRef), same(getContext()))).andThrow(cause).once();
+    replayDefault();
+    try {
+      modelAccess.newXObject(docMock, classRef);
+      fail("expecting XWikiException");
+    } catch (XWikiException xwe) {
+      assertSame(cause, xwe);
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_newXObject_nullDoc() throws Exception {
+    replayDefault();
+    try {
+      modelAccess.newXObject((XWikiDocument) null, classRef);
+      fail("expecting NullPointerException");
+    } catch (NullPointerException npe) {
+      // expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_newXObject_nullClassRef() throws Exception {
+    replayDefault();
+    try {
+      modelAccess.newXObject(doc, null);
+      fail("expecting NullPointerException");
+    } catch (NullPointerException npe) {
+      // expected
+    }
+    verifyDefault();
   }
 
   @Test
