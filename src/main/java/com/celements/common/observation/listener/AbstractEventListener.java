@@ -10,11 +10,15 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractEventListener implements EventListener {
+
+  @Requirement
+  protected IModelAccessFacade modelAccess;
 
   @Requirement
   protected IWebUtilsService webUtilsService;
