@@ -429,7 +429,7 @@ public class Navigation implements INavigation {
     getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
     List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(parent,
         getMenuSpace(getContext()), getNavFilter());
-    if ((offset > 0) || (nrOfItemsPerPage > 0)) {
+    if (((offset > 0) || (nrOfItemsPerPage > 0)) && (offset < currentMenuItems.size())) {
       int endIdx = currentMenuItems.size();
       if (nrOfItemsPerPage > 0) {
         endIdx = Math.min(endIdx, offset + nrOfItemsPerPage);

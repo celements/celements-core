@@ -1444,6 +1444,30 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testGetCurrentMenuItems_withPaging_offsetOutOfBounds() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(3);
+    nav.setOffset(8);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false).once();
+    List<TreeNode> allMenuItemsList = Arrays.asList();
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    assertEquals(0, nav.getCurrentMenuItems(1, "").size());
+    verifyDefault();
+  }
+
+  @Test
   public void testGetCurrentMenuItems_withPaging_mainMenu_negativOffset() {
     nav.fromHierarchyLevel = 1;
     nav.toHierarchyLevel = 1;
