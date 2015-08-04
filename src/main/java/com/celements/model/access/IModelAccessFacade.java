@@ -152,17 +152,6 @@ public interface IModelAccessFacade {
       String key, Collection<?> values);
 
   /**
-   * @param docRef
-   *          to get new xobject on (may not be null)
-   * @param classRef
-   *          type of xobjects to create (may not be null)
-   * @return newly created xobject
-   * @throws XWikiException
-   */
-  public BaseObject newXObject(DocumentReference docRef, DocumentReference classRef)
-      throws XWikiException;
-
-  /**
    * @param doc
    *          to get new xobject on (may not be null)
    * @param classRef

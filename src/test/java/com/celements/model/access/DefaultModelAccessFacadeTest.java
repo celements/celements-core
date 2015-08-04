@@ -303,6 +303,8 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     addObj(classRef, null, null);
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(doc).once();
+    getWikiMock().saveDocument(same(doc), eq("removed XObjects"), same(getContext()));
+    expectLastCall().once();
     replayDefault();
     assertTrue(modelAccess.removeXObjects(doc.getDocumentReference(), classRef));
     verifyDefault();

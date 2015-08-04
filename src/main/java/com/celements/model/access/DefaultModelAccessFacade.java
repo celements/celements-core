@@ -163,12 +163,6 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public BaseObject newXObject(DocumentReference docRef, DocumentReference classRef)
-      throws XWikiException {
-    return getDocument(docRef).newXObject(classRef, getContext());
-  }
-
-  @Override
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef)
       throws XWikiException {
     Preconditions.checkNotNull(doc);
@@ -179,7 +173,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public boolean removeXObject(DocumentReference docRef, BaseObject objToRemove)
       throws XWikiException {
-    return removeXObjects(getDocument(docRef), Arrays.asList(objToRemove));
+    return removeXObjects(docRef, Arrays.asList(objToRemove));
   }
 
   @Override
@@ -190,7 +184,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public boolean removeXObjects(DocumentReference docRef, List<BaseObject> objsToRemove)
       throws XWikiException {
-    return removeXObjects(getDocument(docRef), objsToRemove);
+    XWikiDocument doc = getDocument(docRef);
+    boolean changed = removeXObjects(doc, objsToRemove);
+    if (changed) {
+      saveDocument(doc, "removed XObjects");
+    }
+    return changed;
   }
 
   @Override
@@ -208,30 +207,35 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef)
       throws XWikiException {
-    return removeXObjects(getDocument(docRef), classRef);
+    return removeXObjects(docRef, classRef, null, null);
   }
 
   @Override
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return removeXObjects(doc, getXObjects(doc, classRef));
+    return removeXObjects(doc, classRef, null, null);
   }
 
   @Override
   public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws XWikiException {
-    return removeXObjects(getDocument(docRef), classRef, key, value);
+    return removeXObjects(docRef, classRef, key, Arrays.asList(value));
   }
 
   @Override
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef,
       String key, Object value) {
-    return removeXObjects(doc, getXObjects(doc, classRef, key, value));
+    return removeXObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   @Override
   public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Collection<?> values) throws XWikiException {
-    return removeXObjects(getDocument(docRef), classRef, key, values);
+    XWikiDocument doc = getDocument(docRef);
+    boolean changed = removeXObjects(doc, getXObjects(doc, classRef, key, values));
+    if (changed) {
+      saveDocument(doc, "removed XObjects");
+    }
+    return changed;
   }
 
   @Override
