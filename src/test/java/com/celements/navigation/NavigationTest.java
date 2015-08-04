@@ -1456,8 +1456,18 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     String wikiName = context.getDatabase();
     SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
         wikiName));
-    expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false).once();
-    List<TreeNode> allMenuItemsList = Arrays.asList();
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
         ).andReturn(allMenuItemsList).once();
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))

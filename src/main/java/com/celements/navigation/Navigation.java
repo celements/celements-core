@@ -21,6 +21,7 @@ package com.celements.navigation;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -429,12 +430,14 @@ public class Navigation implements INavigation {
     getNavFilter().setMenuPart(getMenuPartForLevel(getCurrentLevel(numMoreLevels)));
     List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(parent,
         getMenuSpace(getContext()), getNavFilter());
-    if (((offset > 0) || (nrOfItemsPerPage > 0)) && (offset < currentMenuItems.size())) {
-      int endIdx = currentMenuItems.size();
+    int endIdx = currentMenuItems.size();
+    if (((offset > 0) || (nrOfItemsPerPage > 0)) && (offset < endIdx)) {
       if (nrOfItemsPerPage > 0) {
         endIdx = Math.min(endIdx, offset + nrOfItemsPerPage);
       }
       currentMenuItems = currentMenuItems.subList(offset, endIdx);
+    } else if (offset >= endIdx) {
+      currentMenuItems = Collections.emptyList();
     }
     return currentMenuItems;
   }
