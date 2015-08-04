@@ -145,5 +145,7 @@ public interface INavigation {
   public void setNumberOfItem(int nrOfItem);
 
   public int getNumberOfItem();
+  
+  public int getEffectiveNumberOfItems();
 
 }

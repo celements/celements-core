@@ -19,11 +19,16 @@
  */
 package com.celements.navigation;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.tidy.Tidy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -111,6 +116,8 @@ public class Navigation implements INavigation {
   private String emptyDictKeySuffix;
 
   private String dataType;
+  
+  private String navInclude = null;
 
   private IPresentationTypeRole presentationType = null;
 
@@ -278,22 +285,25 @@ public class Navigation implements INavigation {
   @Override
   public String includeNavigation(DocumentReference parentRef) {
     LOGGER.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
-    if(navigationEnabled){
-      StringBuilder outStream = new StringBuilder();
-      if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
-          try {
-            addNavigationForParent(outStream, parentRef, getNumLevels());
-          } catch (XWikiException e) {
-            LOGGER.error("addNavigationForParent failed for [" + parentRef + "].", e);
-          }
-      } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
-        navBuilder.useStream(outStream);
-        generateLanguageMenu(navBuilder, getContext());
+    if(navInclude == null) {
+      if(navigationEnabled){
+        StringBuilder outStream = new StringBuilder();
+        if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
+            try {
+              addNavigationForParent(outStream, parentRef, getNumLevels());
+            } catch (XWikiException e) {
+              LOGGER.error("addNavigationForParent failed for [" + parentRef + "].", e);
+            }
+        } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
+          navBuilder.useStream(outStream);
+          generateLanguageMenu(navBuilder, getContext());
+        }
+        navInclude = outStream.toString();
+      } else{
+        navInclude = "";
       }
-      return outStream.toString();
-    } else{
-      return "";
     }
+    return navInclude;
   }
 
   /**
@@ -977,6 +987,27 @@ public class Navigation implements INavigation {
   @Override
   public int getNumberOfItem() {
     return this.nrOfItemsPerPage;
+  }
+  
+  //FIXME change implementation, there has to be a better / more efficient implementation 
+  //      than parsing dom
+  @Override
+  public int getEffectiveNumberOfItems() {
+    Tidy tidy = new Tidy();
+    tidy.setXHTML(true);
+    ByteArrayInputStream includeIn = new ByteArrayInputStream(includeNavigation(
+        ).getBytes());
+    Document dom = tidy.parseDOM(includeIn, null);
+    NodeList uls = dom.getElementsByTagName("ul");
+    int elems = 0;
+    if(uls.getLength() > 0) {
+      elems = uls.item(0).getChildNodes().getLength();
+    }
+    return elems;
+  }
+  
+  void inject_navInclude(String navInclude) {
+    this.navInclude = navInclude;
   }
 
 }

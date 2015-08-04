@@ -1513,6 +1513,24 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testGetEffectiveNumberOfItems_empty() {
+    nav.inject_navInclude("");
+    assertEquals(0, nav.getEffectiveNumberOfItems());
+  }
+
+  @Test
+  public void testGetEffectiveNumberOfItems_noItems() {
+    nav.inject_navInclude("<div>xyz</div>");
+    assertEquals(0, nav.getEffectiveNumberOfItems());
+  }
+
+  @Test
+  public void testGetEffectiveNumberOfItems_hasElems() {
+    nav.inject_navInclude("<ul><li><ul><li>x</li></ul></li><li><div>xyz</div></li></ul>");
+    assertEquals(2, nav.getEffectiveNumberOfItems());
+  }
+
 
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *

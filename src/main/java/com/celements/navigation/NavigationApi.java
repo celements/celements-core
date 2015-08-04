@@ -317,4 +317,7 @@ public class NavigationApi extends Api {
     return navigation.getNumberOfItem();
   }
 
+  public int getEffectiveNumberOfItems() {
+    return navigation.getEffectiveNumberOfItems();
+  }
 }
