@@ -155,7 +155,7 @@ public interface IModelAccessFacade {
    * @param docRef
    *          to get new xobject on (may not be null)
    * @param classRef
-   *          type of xobjects to create
+   *          type of xobjects to create (may not be null)
    * @return newly created xobject
    * @throws XWikiException
    */
@@ -166,7 +166,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to get new xobject on (may not be null)
    * @param classRef
-   *          type of xobjects to create
+   *          type of xobjects to create (may not be null)
    * @return newly created xobject
    * @throws XWikiException
    */
