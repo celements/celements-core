@@ -44,6 +44,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public boolean exists(DocumentReference docRef) {
+    boolean exists = false;
+    if (docRef != null) {
+      exists = getContext().getWiki().exists(docRef, getContext());
+    }
+    return exists;
+  }
+
+  @Override
   public void saveDocument(XWikiDocument doc) throws XWikiException {
     Preconditions.checkNotNull(doc);
     getContext().getWiki().saveDocument(doc, getContext());

@@ -67,6 +67,24 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
+  public void test_exists() {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    replayDefault();
+    boolean ret = modelAccess.exists(doc.getDocumentReference());
+    verifyDefault();
+    assertTrue(ret);
+  }
+
+  @Test
+  public void test_exists_null() {
+    replayDefault();
+    boolean ret = modelAccess.exists(null);
+    verifyDefault();
+    assertFalse(ret);
+  }
+
+  @Test
   public void test_saveDocument() throws Exception {
     getWikiMock().saveDocument(same(doc), same(getContext()));
     expectLastCall().once();
