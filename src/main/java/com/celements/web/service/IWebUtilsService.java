@@ -143,11 +143,9 @@ public interface IWebUtilsService {
 
   public boolean isSuperAdminUser();
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
-      ) throws XWikiException;
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level);
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
-      ) throws XWikiException;
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user);
 
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
