@@ -163,17 +163,6 @@ public interface IModelAccessFacade {
       throws XWikiException;
 
   /**
-   * @param docRef
-   *          to remove xobject on (may not be null)
-   * @param objsToRemove
-   *          xobject to remove
-   * @return true if doc has changed
-   * @throws XWikiException
-   */
-  public boolean removeXObject(DocumentReference docRef, BaseObject objToRemove)
-      throws XWikiException;
-
-  /**
    * @param doc
    *          to remove xobject on (may not be null)
    * @param objsToRemove
@@ -183,17 +172,6 @@ public interface IModelAccessFacade {
   public boolean removeXObject(XWikiDocument doc, BaseObject objToRemove);
 
   /**
-   * @param docRef
-   *          to remove xobjects on (may not be null)
-   * @param objsToRemove
-   *          xobjects to remove
-   * @return true if doc has changed
-   * @throws XWikiException
-   */
-  public boolean removeXObjects(DocumentReference docRef, List<BaseObject> objsToRemove)
-      throws XWikiException;
-
-  /**
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param objsToRemove
@@ -201,47 +179,6 @@ public interface IModelAccessFacade {
    * @return true if doc has changed
    */
   public boolean removeXObjects(XWikiDocument doc, List<BaseObject> objsToRemove);
-
-  /**
-   * @param docRef
-   *          to remove xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to remove
-   * @return true if doc has changed
-   * @throws XWikiException
-   */
-  public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef)
-      throws XWikiException;
-
-  /**
-   * @param docRef
-   *          to remove xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to remove
-   * @param key
-   *          for field specific xobjects filtering (null means no filtering)
-   * @param value
-   *          for field specific xobjects filtering
-   * @return true if doc has changed
-   * @throws XWikiException
-   */
-  public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef,
-      String key, Object value) throws XWikiException;
-
-  /**
-   * @param docRef
-   *          to remove xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to remove
-   * @param key
-   *          for field specific xobjects filtering (null means no filtering)
-   * @param values
-   *          for field specific xobjects filtering
-   * @return true if doc has changed
-   * @throws XWikiException
-   */
-  public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef,
-      String key, Collection<?> values) throws XWikiException;
 
   /**
    * @param doc

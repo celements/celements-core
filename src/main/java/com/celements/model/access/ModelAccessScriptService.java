@@ -21,7 +21,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 @Component("modelAccess")
 public class ModelAccessScriptService implements ScriptService {
@@ -65,10 +64,6 @@ public class ModelAccessScriptService implements ScriptService {
     return getObject(docRef, classRef, null, null);
   }
 
-  public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef) {
-    return getObject(doc, classRef, null, null);
-  }
-
   public com.xpn.xwiki.api.Object getObject(DocumentReference docRef,
       DocumentReference classRef, String key, Object value) {
     com.xpn.xwiki.api.Object ret = null;
@@ -82,6 +77,10 @@ public class ModelAccessScriptService implements ScriptService {
     return ret;
   }
 
+  public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef) {
+    return getObject(doc, classRef, null, null);
+  }
+
   public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef,
       String key, Object value) {
     return toObjectApi(modelAccess.getXObject(doc.getDocument(), classRef, key, value));
@@ -92,19 +91,9 @@ public class ModelAccessScriptService implements ScriptService {
     return getObjects(docRef, classRef, null, null);
   }
 
-  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
-      DocumentReference classRef) {
-    return getObjects(doc, classRef, null, null);
-  }
-
   public List<com.xpn.xwiki.api.Object> getObjects(DocumentReference docRef,
       DocumentReference classRef, String key, Object value) {
     return getObjects(docRef, classRef, key, Arrays.asList(value));
-  }
-
-  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
-      DocumentReference classRef, String key, Object value) {
-    return getObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   public List<com.xpn.xwiki.api.Object> getObjects(DocumentReference docRef,
@@ -121,41 +110,60 @@ public class ModelAccessScriptService implements ScriptService {
   }
 
   public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
+      DocumentReference classRef) {
+    return getObjects(doc, classRef, null, null);
+  }
+
+  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
+      DocumentReference classRef, String key, Object value) {
+    return getObjects(doc, classRef, key, Arrays.asList(value));
+  }
+
+  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
       DocumentReference classRef, String key, Collection<?> values) {
     return toObjectApi(modelAccess.getXObjects(doc.getDocument(), classRef, key, values));
   }
 
-//  TODO
-//  public com.xpn.xwiki.api.Object newObject(DocumentReference docRef,
-//      DocumentReference classRef);
-//
-//  public com.xpn.xwiki.api.Object newObject(Document doc, DocumentReference classRef);
-//
-//  public boolean removeObject(DocumentReference docRef,
-//      com.xpn.xwiki.api.Object objToRemove);
-//
-//  public boolean removeObject(Document doc, com.xpn.xwiki.api.Object objToRemove);
-//
-//  public boolean removeObjects(DocumentReference docRef,
-//      List<com.xpn.xwiki.api.Object> objsToRemove);
-//
-//  public boolean removeObjects(Document doc, List<com.xpn.xwiki.api.Object> objsToRemove);
-//
-//  public boolean removeObjects(DocumentReference docRef, DocumentReference classRef);
-//
-//  public boolean removeObjects(Document doc, DocumentReference classRef);
-//
-//  public boolean removeObjects(DocumentReference docRef, DocumentReference classRef,
-//      String key, Object value);
-//
-//  public boolean removeObjects(Document doc, DocumentReference classRef, String key,
-//      Object value);
-//
-//  public boolean removeObjects(DocumentReference docRef, DocumentReference classRef,
-//      String key, Collection<?> values);
-//
-//  public boolean removeObjects(Document doc, DocumentReference classRef, String key,
-//      Collection<?> values);
+  public com.xpn.xwiki.api.Object newObject(Document doc, DocumentReference classRef) {
+    com.xpn.xwiki.api.Object ret = null;
+    try {
+      ret = toObjectApi(modelAccess.newXObject(doc.getDocument(), classRef));
+    } catch (XWikiException xwe) {
+      LOGGER.error("Failed to create object '{}' on doc '{}'", classRef, doc, xwe);
+    }
+    return ret;
+  }
+
+  public boolean removeObject(Document doc, com.xpn.xwiki.api.Object objToRemove) {
+    return modelAccess.removeXObject(doc.getDocument(), objToRemove.getXWikiObject());
+  }
+
+  public boolean removeObjects(Document doc,
+      List<com.xpn.xwiki.api.Object> objsToRemove) {
+    return modelAccess.removeXObjects(doc.getDocument(), toXObject(objsToRemove));
+  }
+
+  public boolean removeObjects(Document doc, DocumentReference classRef) {
+    return removeObjects(doc, classRef, null, null);
+  }
+
+  public boolean removeObjects(Document doc, DocumentReference classRef, String key,
+      Object value) {
+    return removeObjects(doc, classRef, key, Arrays.asList(value));
+  }
+
+  public boolean removeObjects(Document doc, DocumentReference classRef, String key,
+      Collection<?> values) {
+    return modelAccess.removeXObjects(doc.getDocument(), classRef, key, values);
+  }
+
+  private List<BaseObject> toXObject(List<com.xpn.xwiki.api.Object> objs) {
+    List<BaseObject> ret = new ArrayList<>();
+    for (com.xpn.xwiki.api.Object obj : objs) {
+      ret.add(obj.getXWikiObject());
+    }
+    return ret;
+  }
 
   private com.xpn.xwiki.api.Object toObjectApi(BaseObject obj) {
     return obj.newObjectApi(obj, getContext());
@@ -167,14 +175,6 @@ public class ModelAccessScriptService implements ScriptService {
       ret.add(toObjectApi(obj));
     }
     return ret;
-  }
-
-  private String getCurrentUser() {
-    if (getContext().getXWikiUser() != null) {
-      return getContext().getXWikiUser().getUser();
-    } else {
-      return XWikiRightService.GUEST_USER_FULLNAME;
-    }
   }
 
 }

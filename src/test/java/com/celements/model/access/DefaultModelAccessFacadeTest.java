@@ -298,18 +298,6 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     assertEquals(1, modelAccess.getXObjects(doc, classRef2).size());
   }
 
-  @Test
-  public void test_removeXObjects_docRef() throws Exception {
-    addObj(classRef, null, null);
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
-        ).andReturn(doc).once();
-    getWikiMock().saveDocument(same(doc), eq("removed XObjects"), same(getContext()));
-    expectLastCall().once();
-    replayDefault();
-    assertTrue(modelAccess.removeXObjects(doc.getDocumentReference(), classRef));
-    verifyDefault();
-  }
-
   private BaseObject addObj(DocumentReference classRef, String key, String value) {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
