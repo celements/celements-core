@@ -22,20 +22,22 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("modelAccess")
+@Component(ModelAccessScriptService.NAME)
 public class ModelAccessScriptService implements ScriptService {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(ModelAccessScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+      ModelAccessScriptService.class);
+
+  public static final String NAME = "modelAccess";
 
   @Requirement
-  private IModelAccessFacade modelAccess;
+  IModelAccessFacade modelAccess;
 
   @Requirement
-  private IWebUtilsService webUtils;
+  IWebUtilsService webUtils;
 
   @Requirement
-  private Execution execution;
+  Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext()
