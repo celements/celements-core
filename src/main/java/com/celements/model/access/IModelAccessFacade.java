@@ -36,15 +36,6 @@ public interface IModelAccessFacade {
       throws XWikiException;
 
   /**
-   * @param doc
-   *          to get xobject on (may not be null)
-   * @param classRef
-   *          type of xobject to get
-   * @return the xobject or null
-   */
-  public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef);
-
-  /**
    * @param docRef
    *          to get xobject on (may not be null)
    * @param classRef
@@ -58,6 +49,15 @@ public interface IModelAccessFacade {
    */
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws XWikiException;
+
+  /**
+   * @param doc
+   *          to get xobject on (may not be null)
+   * @param classRef
+   *          type of xobject to get
+   * @return the xobject or null
+   */
+  public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
    * @param doc
@@ -85,15 +85,6 @@ public interface IModelAccessFacade {
       throws XWikiException;
 
   /**
-   * @param doc
-   *          to get xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to get
-   * @return a list of xobjects (without null values) or empty list
-   */
-  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef);
-
-  /**
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -109,20 +100,6 @@ public interface IModelAccessFacade {
       DocumentReference classRef, String key, Object value) throws XWikiException;
 
   /**
-   * @param doc
-   *          to get xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to get
-   * @param key
-   *          for field specific xobjects filtering (null means no filtering)
-   * @param value
-   *          for field specific xobjects filtering
-   * @return a list of xobjects (without null values) or empty list
-   */
-  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, Object value);
-
-  /**
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -136,6 +113,29 @@ public interface IModelAccessFacade {
    */
   public List<BaseObject> getXObjects(DocumentReference docRef,
       DocumentReference classRef, String key, Collection<?> values) throws XWikiException;
+
+  /**
+   * @param doc
+   *          to get xobjects on (may not be null)
+   * @param classRef
+   *          type of xobjects to get
+   * @return a list of xobjects (without null values) or empty list
+   */
+  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef);
+
+  /**
+   * @param doc
+   *          to get xobjects on (may not be null)
+   * @param classRef
+   *          type of xobjects to get
+   * @param key
+   *          for field specific xobjects filtering (null means no filtering)
+   * @param value
+   *          for field specific xobjects filtering
+   * @return a list of xobjects (without null values) or empty list
+   */
+  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
+      String key, Object value);
 
   /**
    * @param doc
@@ -214,15 +214,6 @@ public interface IModelAccessFacade {
       throws XWikiException;
 
   /**
-   * @param doc
-   *          to remove xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to remove
-   * @return true if doc has changed
-   */
-  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef);
-
-  /**
    * @param docRef
    *          to remove xobjects on (may not be null)
    * @param classRef
@@ -238,20 +229,6 @@ public interface IModelAccessFacade {
       String key, Object value) throws XWikiException;
 
   /**
-   * @param doc
-   *          to remove xobjects on (may not be null)
-   * @param classRef
-   *          type of xobjects to remove
-   * @param key
-   *          for field specific xobjects filtering (null means no filtering)
-   * @param value
-   *          for field specific xobjects filtering
-   * @return true if doc has changed
-   */
-  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, Object value);
-
-  /**
    * @param docRef
    *          to remove xobjects on (may not be null)
    * @param classRef
@@ -265,6 +242,29 @@ public interface IModelAccessFacade {
    */
   public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Collection<?> values) throws XWikiException;
+
+  /**
+   * @param doc
+   *          to remove xobjects on (may not be null)
+   * @param classRef
+   *          type of xobjects to remove
+   * @return true if doc has changed
+   */
+  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef);
+
+  /**
+   * @param doc
+   *          to remove xobjects on (may not be null)
+   * @param classRef
+   *          type of xobjects to remove
+   * @param key
+   *          for field specific xobjects filtering (null means no filtering)
+   * @param value
+   *          for field specific xobjects filtering
+   * @return true if doc has changed
+   */
+  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef,
+      String key, Object value);
 
   /**
    * @param doc

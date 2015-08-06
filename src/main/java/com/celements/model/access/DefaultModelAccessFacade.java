@@ -78,15 +78,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef) {
-    return Iterables.getFirst(getXObjects(doc, classRef), null);
-  }
-
-  @Override
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws XWikiException {
     return Iterables.getFirst(getXObjects(getDocument(docRef), classRef, key, value),
         null);
+  }
+
+  @Override
+  public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef) {
+    return Iterables.getFirst(getXObjects(doc, classRef), null);
   }
 
   @Override
@@ -102,26 +102,26 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return getXObjects(doc, classRef, null, null);
-  }
-
-  @Override
   public List<BaseObject> getXObjects(DocumentReference docRef,
       DocumentReference classRef, String key, Object value) throws XWikiException {
     return getXObjects(getDocument(docRef), classRef, key, value);
   }
 
   @Override
-  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, Object value) {
-    return getXObjects(doc, classRef, key, Arrays.asList(value));
-  }
-
-  @Override
   public List<BaseObject> getXObjects(DocumentReference docRef,
       DocumentReference classRef, String key, Collection<?> values) throws XWikiException {
     return getXObjects(getDocument(docRef), classRef, key, values);
+  }
+
+  @Override
+  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef) {
+    return getXObjects(doc, classRef, null, null);
+  }
+
+  @Override
+  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
+      String key, Object value) {
+    return getXObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   @Override
@@ -211,20 +211,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return removeXObjects(doc, classRef, null, null);
-  }
-
-  @Override
   public boolean removeXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws XWikiException {
     return removeXObjects(docRef, classRef, key, Arrays.asList(value));
-  }
-
-  @Override
-  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, Object value) {
-    return removeXObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   @Override
@@ -236,6 +225,17 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       saveDocument(doc, "removed XObjects");
     }
     return changed;
+  }
+
+  @Override
+  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
+    return removeXObjects(doc, classRef, null, null);
+  }
+
+  @Override
+  public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef,
+      String key, Object value) {
+    return removeXObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   @Override
