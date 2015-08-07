@@ -555,14 +555,12 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
-      ) throws XWikiException {
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level) {
     return hasAccessLevel(ref, level, getContext().getXWikiUser());
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
-      ) throws XWikiException {
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user) {
     boolean ret = false;
     DocumentReference docRef = null;
     if (ref instanceof SpaceReference) {
@@ -573,9 +571,14 @@ public class WebUtilsService implements IWebUtilsService {
       docRef = ((AttachmentReference) ref).getDocumentReference();
     }
     if (docRef != null) {
-      ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
-          (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
-          serializeRef(docRef), getContext());
+      try {
+        ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
+            (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
+            serializeRef(docRef), getContext());
+      } catch (XWikiException xwe) {
+        // already being catched in XWikiRightServiceImpl.hasAccessLevel()
+        _LOGGER.error("should not happen");
+      }
     }
     _LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", 
         ref, level, user, ret);
