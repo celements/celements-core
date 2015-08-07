@@ -106,7 +106,7 @@ public class Navigation implements INavigation {
   SpaceReference nodeSpaceRef;
   private int showInactiveToLevel;
   private int offset = 0;
-  private int nrOfItemsPerPage = -1;
+  private int nrOfItemsPerPage = -1; 
 
   private String cmCssClass;
 
@@ -394,6 +394,9 @@ public class Navigation implements INavigation {
             + getMainUlCSSClasses() + ">");
         boolean isFirstItem = true;
         int numItem = 0;
+        if (this.getOffset() > 0) {
+          numItem = this.getOffset();
+        }
         for (TreeNode treeNode : currentMenuItems) {
           numItem = numItem + 1;
           DocumentReference nodeRef = treeNode.getDocumentReference();
