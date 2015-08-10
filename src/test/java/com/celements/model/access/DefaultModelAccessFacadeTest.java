@@ -9,9 +9,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.MockConfigurationSource;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.exception.ClassDocumentLoadException;
@@ -95,8 +93,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_createDocument() throws Exception {
-    ((MockConfigurationSource) Utils.getComponent(ConfigurationSource.class)
-        ).setProperty("default_language", "de");
+    getConfigurationSource().setProperty("default_language", "de");
     Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
     String userName = "XWiki.TestUser";
     getContext().setUser(userName);

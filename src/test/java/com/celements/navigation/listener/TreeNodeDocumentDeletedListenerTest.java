@@ -52,8 +52,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
   @Before
   public void setUp_TreeNodeDocumentDeletedListenerTest() throws Exception {
     context = getContext();
-    eventListener = getTreeNodeDocumentDeletedListener();
     obsManagerMock = registerComponentMock(ObservationManager.class, "default");
+    eventListener = getTreeNodeDocumentDeletedListener();
   }
 
   @Test
