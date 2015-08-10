@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -47,6 +48,25 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public XWikiDocument getDocument(DocumentReference docRef) throws XWikiException {
     checkNotNull(docRef);
     return getContext().getWiki().getDocument(docRef, getContext());
+  }
+
+  public XWikiDocument createDocument(DocumentReference docRef) throws XWikiException {
+    if (!exists(docRef)) {
+      XWikiDocument doc = getDocument(docRef);
+      Date creationDate = new Date();
+      doc.setDefaultLanguage(webUtilsService.getDefaultLanguage());
+      doc.setLanguage("");
+      doc.setCreationDate(creationDate);
+      doc.setContentUpdateDate(creationDate);
+      doc.setDate(creationDate);
+      doc.setCreator(getContext().getUser());
+      doc.setAuthor(getContext().getUser());
+      doc.setTranslation(0);
+      doc.setContent("");
+      doc.setMetaDataDirty(true);
+      return doc;
+    }
+    return null;
   }
 
   @Override

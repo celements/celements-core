@@ -15,6 +15,8 @@ public interface IModelAccessFacade {
 
   public XWikiDocument getDocument(DocumentReference docRef) throws XWikiException;
 
+  public XWikiDocument createDocument(DocumentReference docRef) throws XWikiException;
+
   public boolean exists(DocumentReference docRef);
 
   public void saveDocument(XWikiDocument doc) throws XWikiException;
