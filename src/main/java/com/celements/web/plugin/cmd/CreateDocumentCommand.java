@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.pagetype.PageTypeClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
@@ -36,6 +37,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+// TODO move part for adding a page type to a doc (e.g. to PageTypeService) and then 
+// deprecate this class since doc creation should be done via IModelAccessFacade
 public class CreateDocumentCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
@@ -46,6 +49,9 @@ public class CreateDocumentCommand {
   IWebUtilsService injected_webService;
 
   /**
+   * NOTE: use {@link IModelAccessFacade#createDocument(DocumentReference)} if page type 
+   * isn't required.<br>
+   * <br>
    * createDocument creates a new document if it does not exist
    * @param docRef
    * @param pageType
@@ -61,6 +67,9 @@ public class CreateDocumentCommand {
   }
 
   /**
+   * NOTE: use {@link IModelAccessFacade#createDocument(DocumentReference)} if page type 
+   * isn't required.<br>
+   * <br>
    * createDocument creates a new document if it does not exist
    * @param docRef
    * @param pageType
