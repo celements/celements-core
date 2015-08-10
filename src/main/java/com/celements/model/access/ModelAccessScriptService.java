@@ -13,11 +13,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.access.exception.DocumentAccessException;
 import com.celements.rights.AccessLevel;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -40,8 +41,8 @@ public class ModelAccessScriptService implements ScriptService {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext()
-        .getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   public Document getDocument(DocumentReference docRef) {
@@ -51,8 +52,8 @@ public class ModelAccessScriptService implements ScriptService {
         XWikiDocument doc = modelAccess.getDocument(docRef);
         ret = doc.newDocument(getContext());
       }
-    } catch (XWikiException xwe) {
-      LOGGER.error("Failed to load doc '{}'", docRef, xwe);
+    } catch (DocumentAccessException dae) {
+      LOGGER.error("Failed to load doc '{}'", docRef, dae);
     }
     return ret;
   }
@@ -73,8 +74,8 @@ public class ModelAccessScriptService implements ScriptService {
       if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
         ret = toObjectApi(modelAccess.getXObject(docRef, classRef));
       }
-    } catch (XWikiException xwe) {
-      LOGGER.error("Failed to load doc '{}'", docRef, xwe);
+    } catch (DocumentAccessException dae) {
+      LOGGER.error("Failed to load doc '{}'", docRef, dae);
     }
     return ret;
   }
@@ -105,8 +106,8 @@ public class ModelAccessScriptService implements ScriptService {
       if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
         ret = toObjectApi(modelAccess.getXObjects(docRef, classRef, key, values));
       }
-    } catch (XWikiException xwe) {
-      LOGGER.error("Failed to load doc '{}'", docRef, xwe);
+    } catch (DocumentAccessException dae) {
+      LOGGER.error("Failed to load doc '{}'", docRef, dae);
     }
     return ret;
   }
@@ -130,8 +131,8 @@ public class ModelAccessScriptService implements ScriptService {
     com.xpn.xwiki.api.Object ret = null;
     try {
       ret = toObjectApi(modelAccess.newXObject(doc.getDocument(), classRef));
-    } catch (XWikiException xwe) {
-      LOGGER.error("Failed to create object '{}' on doc '{}'", classRef, doc, xwe);
+    } catch (ClassDocumentLoadException exc) {
+      LOGGER.error("Failed to create object '{}' on doc '{}'", classRef, doc, exc);
     }
     return ret;
   }

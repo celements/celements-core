@@ -136,8 +136,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     } catch (XWikiException xwe) {
-      throw new DocumentSaveException(
-          "Failed to save doc " + toString(doc.getDocumentReference()));
+      throw new DocumentSaveException("Failed to save doc " 
+          + toString(doc.getDocumentReference()), xwe);
     }
   }
 

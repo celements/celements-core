@@ -9,9 +9,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.rights.AccessLevel;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -50,11 +50,11 @@ public class ModelAccessScriptServiceTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void test_getDocument_XWE() throws Exception {
+  public void test_getDocument_loadException() throws Exception {
     expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(AccessLevel.VIEW))
         ).andReturn(true).once();
-    expect(modelAccess.modelAccess.getDocument(eq(docRef))).andThrow(new XWikiException()
-        ).once();
+    expect(modelAccess.modelAccess.getDocument(eq(docRef))).andThrow(
+        new DocumentLoadException()).once();
     replayDefault();
     Document ret = modelAccess.getDocument(docRef);
     verifyDefault();

@@ -4,13 +4,21 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.MockConfigurationSource;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.access.exception.DocumentAlreadyExistsException;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -27,12 +35,15 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void setUp_DefaultModelAccessFacadeTest() {
     modelAccess = (DefaultModelAccessFacade) Utils.getComponent(IModelAccessFacade.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
+    doc.setMetaDataDirty(false);
     classRef = new DocumentReference("db", "class", "any");
     classRef2 = new DocumentReference("db", "class", "other");
   }
 
   @Test
   public void test_getDocument() throws Exception {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(doc).once();
     replayDefault();
@@ -42,16 +53,32 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void test_getDocument_XWE() throws Exception {
+  public void test_getDocument_failed() throws Exception {
     Throwable cause = new XWikiException();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
         ).andThrow(cause).once();
     replayDefault();
     try {
       modelAccess.getDocument(doc.getDocumentReference());
-      fail("expecting XWikiException");
-    } catch (XWikiException xwe) {
-      assertSame(cause, xwe);
+      fail("expecting DocumentLoadException");
+    } catch (DocumentLoadException exc) {
+      assertSame(cause, exc.getCause());
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getDocument_notExists() throws Exception {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    replayDefault();
+    try {
+      modelAccess.getDocument(doc.getDocumentReference());
+      fail("expecting DocumentNotExistsException");
+    } catch (DocumentNotExistsException exc) {
+      // expected
     }
     verifyDefault();
   }
@@ -67,13 +94,161 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void test_exists() {
+  public void test_createDocument() throws Exception {
+    ((MockConfigurationSource) Utils.getComponent(ConfigurationSource.class)
+        ).setProperty("default_language", "de");
+    Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
+    String userName = "XWiki.TestUser";
+    getContext().setUser(userName);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    XWikiDocument ret = modelAccess.createDocument(doc.getDocumentReference());
+    verifyDefault();
+    assertSame(doc, ret);
+    assertEquals("de", doc.getDefaultLanguage());
+    assertEquals("", doc.getLanguage());
+    assertTrue(beforeCreationDate.before(doc.getCreationDate()));
+    assertTrue(beforeCreationDate.before(doc.getContentUpdateDate()));
+    assertTrue(beforeCreationDate.before(doc.getDate()));
+    assertEquals(userName, doc.getCreator());
+    assertEquals(userName, doc.getAuthor());
+    assertEquals(0, doc.getTranslation());
+    assertEquals("", doc.getContent());
+    assertTrue(doc.isMetaDataDirty());
+  }
+
+  @Test
+  public void test_createDocument_failed() throws Exception {
+    Throwable cause = new XWikiException();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andThrow(cause).once();
+    replayDefault();
+    try {
+      modelAccess.createDocument(doc.getDocumentReference());
+      fail("expecting DocumentLoadException");
+    } catch (DocumentLoadException exc) {
+      assertSame(cause, exc.getCause());
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_createDocument_alreadyExists() throws Exception {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    replayDefault();
+    try {
+      modelAccess.createDocument(doc.getDocumentReference());
+      fail("expecting DocumentAlreadyExistsException");
+    } catch (DocumentAlreadyExistsException exc) {
+      // expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_createDocument_null() throws Exception {
+    try {
+      modelAccess.createDocument(null);
+      fail("expecting NullPointerException");
+    } catch (NullPointerException npe) {
+      // expected
+    }
+  }
+
+  @Test
+  public void test_getOrCreateDocument_get() throws Exception {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
+    verifyDefault();
+    assertSame(doc, ret);
+    assertFalse(doc.isMetaDataDirty());
+  }
+
+  @Test
+  public void test_getOrCreateDocument_get_failed() throws Exception {
+    Throwable cause = new XWikiException();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andThrow(cause).once();
+    replayDefault();
+    try {
+      modelAccess.getOrCreateDocument(doc.getDocumentReference());
+      fail("expecting DocumentLoadException");
+    } catch (DocumentLoadException exc) {
+      assertSame(cause, exc.getCause());
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getOrCreateDocument_create() throws Exception {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
+    verifyDefault();
+    assertSame(doc, ret);
+    assertTrue(doc.isMetaDataDirty());
+  }
+
+  @Test
+  public void test_getOrCreateDocument_create_failed() throws Exception {
+    Throwable cause = new XWikiException();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andThrow(cause).once();
+    replayDefault();
+    try {
+      modelAccess.getOrCreateDocument(doc.getDocumentReference());
+      fail("expecting DocumentLoadException");
+    } catch (DocumentLoadException exc) {
+      assertSame(cause, exc.getCause());
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getOrCreateDocument_null() throws Exception {
+    try {
+      modelAccess.getOrCreateDocument(null);
+      fail("expecting NullPointerException");
+    } catch (NullPointerException npe) {
+      // expected
+    }
+  }
+
+  @Test
+  public void test_exists_true() {
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(true).once();
     replayDefault();
     boolean ret = modelAccess.exists(doc.getDocumentReference());
     verifyDefault();
     assertTrue(ret);
+  }
+
+  @Test
+  public void test_exists_false() {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    replayDefault();
+    boolean ret = modelAccess.exists(doc.getDocumentReference());
+    verifyDefault();
+    assertFalse(ret);
   }
 
   @Test
@@ -86,7 +261,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_saveDocument() throws Exception {
-    getWikiMock().saveDocument(same(doc), same(getContext()));
+    getWikiMock().saveDocument(same(doc), eq(""), eq(false), same(getContext()));
     expectLastCall().once();
     replayDefault();
     modelAccess.saveDocument(doc);
@@ -94,16 +269,16 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void test_saveDocument_XWE() throws Exception {
+  public void test_saveDocument_saveException() throws Exception {
     Throwable cause = new XWikiException();
-    getWikiMock().saveDocument(same(doc), same(getContext()));
+    getWikiMock().saveDocument(same(doc), eq(""), eq(false), same(getContext()));
     expectLastCall().andThrow(cause).once();
     replayDefault();
     try {
       modelAccess.saveDocument(doc);
-      fail("expecting XWikiException");
-    } catch (XWikiException xwe) {
-      assertSame(cause, xwe);
+      fail("expecting DocumentSaveException");
+    } catch (DocumentSaveException exc) {
+      assertSame(cause, exc.getCause());
     }
     verifyDefault();
   }
@@ -121,7 +296,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   @Test
   public void test_saveDocument_comment() throws Exception {
     String comment = "myComment";
-    getWikiMock().saveDocument(same(doc), eq(comment), same(getContext()));
+    getWikiMock().saveDocument(same(doc), eq(comment), eq(false), same(getContext()));
     expectLastCall().once();
     replayDefault();
     modelAccess.saveDocument(doc, comment);
@@ -215,6 +390,8 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_getXObjects_docRef() throws Exception {
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(doc).once();
     replayDefault();
@@ -235,16 +412,16 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void test_newXObject_XWE() throws Exception {
+  public void test_newXObject_loadException() throws Exception {
     Throwable cause = new XWikiException();
     XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andThrow(cause).once();
     replayDefault();
     try {
       modelAccess.newXObject(docMock, classRef);
-      fail("expecting XWikiException");
-    } catch (XWikiException xwe) {
-      assertSame(cause, xwe);
+      fail("expecting ClassDocumentLoadException");
+    } catch (ClassDocumentLoadException exc) {
+      assertSame(cause, exc.getCause());
     }
     verifyDefault();
   }
