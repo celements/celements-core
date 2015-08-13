@@ -169,7 +169,11 @@ public class ModelAccessScriptService implements ScriptService {
   }
 
   private com.xpn.xwiki.api.Object toObjectApi(BaseObject obj) {
-    return obj.newObjectApi(obj, getContext());
+    com.xpn.xwiki.api.Object ret = null;
+    if (obj != null) {
+      ret = obj.newObjectApi(obj, getContext());
+    }
+    return ret;
   }
 
   private List<com.xpn.xwiki.api.Object> toObjectApi(List<BaseObject> objs) {
