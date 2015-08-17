@@ -58,6 +58,8 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagelayout.LayoutScriptService;
@@ -1184,35 +1186,38 @@ public class WebUtilsService implements IWebUtilsService {
     return centralTemplateRef;
   }
 
+  /**
+   *  @deprecated instead use {@link IModelAccessFacade#
+   *  deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
+   */
+  @Deprecated
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
-    /** deleteDocument in XWiki does NOT set context and store database to doc database
-     * Thus deleting the doc fails if it is not in the current context database. Hence we
-     * need to fix the context database before deleting.
-     */
-    String dbBefore = getContext().getDatabase();
     try {
-      getContext().setDatabase(doc.getDocumentReference().getLastSpaceReference().getParent(
-          ).getName());
-      _LOGGER.debug("deleteDocument: doc [" + getRefDefaultSerializer().serialize(
-          doc.getDocumentReference()) + "," + doc.getLanguage() + "] totrash [" + totrash
-          + "] dbBefore [" + dbBefore + "] db now [" + getContext().getDatabase() + "].");
-      getContext().getWiki().deleteDocument(doc, totrash, getContext());
-    } finally {
-      getContext().setDatabase(dbBefore);
+      getModelAccess().deleteDocumentWithoutTranslations(doc, totrash);
+    } catch (DocumentDeleteException exc) {
+      throw (XWikiException) exc.getCause();
     }
   }
 
+  /**
+   *  @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument,
+   *  boolean)}
+   */
+  @Deprecated
   @Override
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash
       ) throws XWikiException {
-    // Delete all documents
-    for (String lang : doc.getTranslationList(getContext())) {
-      XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
-      deleteDocument(tdoc, totrash);
+    try {
+      getModelAccess().deleteDocument(doc, totrash);
+    } catch (DocumentDeleteException exc) {
+      throw (XWikiException) exc.getCause();
     }
+  }
 
-    deleteDocument(doc, totrash);
+  private IModelAccessFacade getModelAccess() {
+    // not as requirement due to cyclic dependency
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
   @Override

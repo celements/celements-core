@@ -8,6 +8,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
@@ -34,6 +35,12 @@ public interface IModelAccessFacade {
 
   public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit
       ) throws DocumentSaveException;
+
+  public void deleteDocument(XWikiDocument doc, boolean totrash
+      ) throws DocumentDeleteException;
+
+  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash
+      ) throws DocumentDeleteException;
 
   /**
    * @param docRef

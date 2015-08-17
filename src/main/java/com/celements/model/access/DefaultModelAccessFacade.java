@@ -19,6 +19,7 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
@@ -140,6 +141,47 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     } catch (XWikiException xwe) {
       throw new DocumentSaveException("Failed to save doc " 
           + toString(doc.getDocumentReference()), xwe);
+    }
+  }
+
+  @Override
+  public void deleteDocument(XWikiDocument doc, boolean totrash
+      ) throws DocumentDeleteException {
+    checkNotNull(doc);
+    List<XWikiDocument> toDelDocs = new ArrayList<>();
+    try {
+      for (String lang : doc.getTranslationList(getContext())) {
+        XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
+        if ((tdoc != null) && (tdoc != doc)) {
+          toDelDocs.add(tdoc);
+        }
+      }
+    } catch (XWikiException xwe) {
+      throw new DocumentDeleteException("Failed to load translations " 
+          + toString(doc.getDocumentReference()), xwe);
+    }
+    toDelDocs.add(doc);
+    for (XWikiDocument toDel : toDelDocs) {
+      deleteDocumentWithoutTranslations(toDel, totrash);
+    }
+  }
+
+  @Override
+  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash
+      ) throws DocumentDeleteException {
+    String dbBefore = getContext().getDatabase();
+    try {
+      getContext().setDatabase(webUtilsService.getWikiRef(doc).getName());
+      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'",
+          doc, doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
+      try {
+        getContext().getWiki().deleteDocument(doc, totrash, getContext());
+      } catch (XWikiException xwe) {
+        throw new DocumentDeleteException("Failed to delete doc "
+            + toString(doc.getDocumentReference()), xwe);
+      }
+    } finally {
+      getContext().setDatabase(dbBefore);
     }
   }
 
