@@ -23,8 +23,10 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -210,28 +212,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   private boolean checkPropertyKeyValues(BaseObject obj, String key,
-      Collection<?> values) {
+      Collection<?> checkValues) {
     boolean valid = (key == null);
     if (!valid) {
-      BaseProperty prop = getProperty(obj, key);
-      if (prop != null) {
-        for (Object val : MoreObjects.firstNonNull(values, Collections.emptyList())) {
-          valid |= Objects.equal(val, prop.getValue());
-        }
+      checkValues = MoreObjects.firstNonNull(checkValues, Collections.emptyList());
+      Object val = getProperty(obj, key);
+      for (Object checkVal : checkValues) {
+        valid |= Objects.equal(val, checkVal);
       }
     }
     return valid;
-  }
-
-  private BaseProperty getProperty(BaseObject obj, String key) {
-    BaseProperty prop = null;
-    try {
-      prop = (BaseProperty) obj.get(key);
-    } catch (XWikiException xwe) {
-      // does not happen since XWikiException is never thrown in BaseObject.get()
-      LOGGER.error("should not happen", xwe);
-    }
-    return prop;
   }
 
   @Override
@@ -279,6 +269,57 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values) {
     return removeXObjects(doc, getXObjects(doc, classRef, key, values));
+  }
+
+  @Override
+  public Object getProperty(DocumentReference docRef, DocumentReference classRef,
+      String name) throws DocumentLoadException, DocumentNotExistsException {
+    return getProperty(getDocument(classRef), classRef, name);
+  }
+
+  @Override
+  public Object getProperty(XWikiDocument doc, DocumentReference classRef, String name) {
+    return getProperty(getXObject(doc, classRef), name);
+  }
+
+  @Override
+  public Object getProperty(BaseObject obj, String name) {
+    Object value = null;
+    BaseProperty prop = getBaseProperty(obj, name);
+    if (prop != null) {
+      value = prop.getValue();
+      if (value instanceof String) {
+        // avoid comparing empty string to null
+        value = Strings.emptyToNull(value.toString().trim());
+      } else if (value instanceof Date) {
+        // avoid returning Timestamp since Timestamp.equals(Date) always returns false
+        value = new Date(((Date) value).getTime());
+      }
+    }
+    return value;
+  }
+
+  private BaseProperty getBaseProperty(BaseObject obj, String key) {
+    BaseProperty prop = null;
+    try {
+      if (obj != null) {
+        prop = (BaseProperty) obj.get(key);
+      }
+    } catch (XWikiException | ClassCastException exc) {
+      // does not happen since
+      // XWikiException is never thrown in BaseObject.get()
+      // BaseObject only contains BaseProperties
+      LOGGER.error("should not happen", exc);
+    }
+    return prop;
+  }
+
+  @Override
+  public void setProperty(BaseObject obj, String name, Object value) {
+    if (value instanceof Collection) {
+      value = Joiner.on('|').join((Iterable<?>) value);
+    }
+    obj.set(name, value, getContext());
   }
 
   private String toString(EntityReference ref) {

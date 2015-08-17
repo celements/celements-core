@@ -239,4 +239,19 @@ public interface IModelAccessFacade {
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values);
 
+  public Object getProperty(DocumentReference docRef, DocumentReference classRef,
+      String name) throws DocumentLoadException, DocumentNotExistsException;
+
+  public Object getProperty(XWikiDocument doc, DocumentReference classRef, String name);
+
+  /**
+   * Reads out the property value for the given BaseObject and name
+   * @param obj
+   * @param name
+   * @return
+   */
+  public Object getProperty(BaseObject obj, String name);
+
+  public void setProperty(BaseObject obj, String name, Object value);
+
 }

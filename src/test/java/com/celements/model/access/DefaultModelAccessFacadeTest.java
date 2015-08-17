@@ -3,6 +3,7 @@ package com.celements.model.access;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,12 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
 public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCase {
@@ -480,6 +487,155 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     }
     doc.addXObject(obj);
     return obj;
+  }
+
+  
+  @Test
+  public void testGetProperty_String() throws Exception {
+    BaseObject obj = new BaseObject();
+    String name = "name";
+    String val = "val";
+    obj.setStringValue(name, val);
+    
+    replayDefault();
+    Object ret = modelAccess.getProperty(obj, name);
+    verifyDefault();
+
+    assertEquals(val, ret);
+  }
+  
+  @Test
+  public void testGetProperty_String_emptyString() throws Exception {
+    BaseObject obj = new BaseObject();
+    String name = "name";
+    String val = "";
+    obj.setStringValue(name, val);
+    
+    replayDefault();
+    Object ret = modelAccess.getProperty(obj, name);
+    verifyDefault();
+
+    assertNull(ret);
+  }
+  
+  @Test
+  public void testGetProperty_Number() throws Exception {
+    BaseObject obj = new BaseObject();
+    String name = "name";
+    int val = 5;
+    obj.setIntValue(name, val);
+    
+    replayDefault();
+    Object ret = modelAccess.getProperty(obj, name);
+    verifyDefault();
+
+    assertEquals(val, ret);
+  }
+  
+  @Test
+  public void testGetProperty_Date() throws Exception {
+    BaseObject obj = new BaseObject();
+    String name = "name";
+    Date val = new Date();
+    obj.setDateValue(name, val);
+    
+    replayDefault();
+    Object ret = modelAccess.getProperty(obj, name);
+    verifyDefault();
+
+    assertEquals(val, ret);
+  }
+  
+  @Test
+  public void testGetProperty_Date_Timestamp() throws Exception {
+    BaseObject obj = new BaseObject();
+    String name = "name";
+    Date date = new Date();
+    Timestamp val = new Timestamp(date.getTime());
+    obj.setDateValue(name, val);
+    
+    replayDefault();
+    Object ret = modelAccess.getProperty(obj, name);
+    verifyDefault();
+
+    assertEquals(date, ret);
+  }
+  
+  @Test
+  public void testSetProperty_String() throws Exception {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(classRef);
+    PropertyInterface propClass = new StringClass();
+    String name = "name";
+    String val = "val";
+    
+    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    
+    replayDefault();
+    modelAccess.setProperty(obj, name, val);
+    verifyDefault();
+    
+    assertEquals(1, obj.getFieldList().size());
+    assertEquals(val, ((BaseProperty) obj.get(name)).getValue());
+  }
+  
+  @Test
+  public void testSetProperty_Number() throws Exception {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(classRef);
+    PropertyInterface propClass = new NumberClass();
+    String name = "name";
+    long val = 5;
+    
+    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    
+    replayDefault();
+    modelAccess.setProperty(obj, name, val);
+    verifyDefault();
+    
+    assertEquals(1, obj.getFieldList().size());
+    assertEquals(val, ((BaseProperty) obj.get(name)).getValue());
+  }
+  
+  @Test
+  public void testSetProperty_Date() throws Exception {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(classRef);
+    PropertyInterface propClass = new DateClass();
+    String name = "name";
+    Date val = new Date();
+    
+    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    
+    replayDefault();
+    modelAccess.setProperty(obj, name, val);
+    verifyDefault();
+    
+    assertEquals(1, obj.getFieldList().size());
+    assertEquals(val, ((BaseProperty) obj.get(name)).getValue());
+  }
+  
+  @Test
+  public void testSetProperty_List() throws Exception {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(classRef);
+    PropertyInterface propClass = new StringClass();
+    String name = "name";
+    
+    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    
+    replayDefault();
+    modelAccess.setProperty(obj, name, Arrays.asList("A", "B"));
+    verifyDefault();
+    
+    assertEquals(1, obj.getFieldList().size());
+    assertEquals("A|B", ((BaseProperty) obj.get(name)).getValue());
+  }
+
+  private BaseClass getBaseClass(DocumentReference classRef) throws Exception {
+    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
+    expect(getWikiMock().getXClass(eq(classRef), same(getContext()))).andReturn(bClass);
+    return bClass;
   }
 
 }
