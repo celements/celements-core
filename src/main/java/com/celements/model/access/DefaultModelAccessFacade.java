@@ -145,6 +145,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public void deleteDocument(DocumentReference docRef, boolean totrash
+      ) throws DocumentLoadException, DocumentDeleteException {
+    try {
+      deleteDocument(getDocument(docRef), totrash);
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.debug("doc trying to delete does not exist '{}'", docRef, exc);
+    }
+  }
+
+  @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash
       ) throws DocumentDeleteException {
     checkNotNull(doc);

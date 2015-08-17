@@ -36,6 +36,9 @@ public interface IModelAccessFacade {
   public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit
       ) throws DocumentSaveException;
 
+  public void deleteDocument(DocumentReference docRef, boolean totrash
+      ) throws DocumentLoadException, DocumentDeleteException;
+
   public void deleteDocument(XWikiDocument doc, boolean totrash
       ) throws DocumentDeleteException;
 
