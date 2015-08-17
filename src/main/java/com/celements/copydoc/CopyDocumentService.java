@@ -2,7 +2,6 @@ package com.celements.copydoc;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,10 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -33,10 +36,18 @@ public class CopyDocumentService implements ICopyDocumentRole {
   @Requirement
   private IModelAccessFacade modelAccess;
 
+  @Requirement
+  private IWebUtilsService webUtils;
+
   @Override
   public boolean check(XWikiDocument doc1, XWikiDocument doc2) {
+    return check(doc1, doc2, null);
+  }
+
+  @Override
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2, Set<BaseObject> toIgnore) {
     try {
-      return copyInternal(doc1, doc2, false);
+      return copyInternal(doc1, doc2, toIgnore, false);
     } catch (ClassDocumentLoadException exc) {
       LOGGER.error("should not happen", exc); // since set is false
       throw new RuntimeException("ClassDocumentLoadException should not happen");
@@ -56,14 +67,20 @@ public class CopyDocumentService implements ICopyDocumentRole {
   @Override
   public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc
       ) throws ClassDocumentLoadException {
-    return copyInternal(srcDoc, trgDoc, true);
+    return copy(srcDoc, trgDoc, null);
   }
 
-  private boolean copyInternal(XWikiDocument srcDoc, XWikiDocument trgDoc, boolean set
+  @Override
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore
       ) throws ClassDocumentLoadException {
+    return copyInternal(srcDoc, trgDoc, toIgnore, true);
+  }
+
+  private boolean copyInternal(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Set<BaseObject> toIgnore, boolean set) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
-    hasChanged |= copyObjects(srcDoc, trgDoc, set);
+    hasChanged |= copyObjects(srcDoc, trgDoc, toIgnore, set);
     LOGGER.info("for source '" + srcDoc + "', target '" + trgDoc  + "', set '" + set 
         + "' has changed: " + hasChanged);
     return hasChanged;
@@ -114,11 +131,13 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return hasChanged;
   }
 
-  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, boolean set
-      ) throws ClassDocumentLoadException {
+  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore,
+      boolean set) throws ClassDocumentLoadException {
     boolean hasChanged = false;
-    Map<DocumentReference, List<BaseObject>> srcObjMap = copyListMap(srcDoc.getXObjects());
-    Map<DocumentReference, List<BaseObject>> trgObjMap = copyListMap(trgDoc.getXObjects());
+    Map<DocumentReference, List<BaseObject>> srcObjMap = copyListMap(srcDoc.getXObjects(),
+        toIgnore);
+    Map<DocumentReference, List<BaseObject>> trgObjMap = copyListMap(trgDoc.getXObjects(),
+        toIgnore);
     for (DocumentReference srcClassRef : srcObjMap.keySet()) {
       DocumentReference trgClassRef = getAsTargetClassRef(srcClassRef, trgDoc);
       Iterator<BaseObject> srcObjIter = getIter(srcObjMap.get(srcClassRef));
@@ -132,12 +151,10 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return hasChanged;
   }
 
-  DocumentReference getAsTargetClassRef(DocumentReference srcClassRef, 
+  DocumentReference getAsTargetClassRef(DocumentReference srcClassRef,
       XWikiDocument trgDoc) {
-    DocumentReference classRef = new DocumentReference(srcClassRef);
-    //FIXME setWikiReference does not exist on unstable-2.0 please replace
-    classRef.setWikiReference(trgDoc.getDocumentReference().getWikiReference());
-    return classRef;
+    return new DocumentReference(srcClassRef.getName(), new SpaceReference(
+        srcClassRef.getLastSpaceReference().getName(), webUtils.getWikiRef(trgDoc)));
   }
 
   boolean createOrUpdateObjects(XWikiDocument doc, DocumentReference classRef, 
@@ -211,7 +228,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   boolean copyObject(BaseObject srcObj, BaseObject trgObj, boolean set) {
     boolean hasChanged = false;
     Set<String> srcProps = srcObj.getPropertyList();
-    Set<String> trgProps = new HashSet<String>(trgObj.getPropertyList());
+    Set<String> trgProps = new HashSet<>(trgObj.getPropertyList());
     for (String name : srcProps) {
       Object srcVal = modelAccess.getProperty(srcObj, name);
       Object trgVal = modelAccess.getProperty(trgObj, name);
@@ -234,28 +251,30 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return hasChanged;
   }
 
-  private <K, V> Map<K, List<V>> copyListMap(Map<K, List<V>> map) {
-    Map<K, List<V>> ret = new HashMap<K, List<V>>();
+  private <K, V> Map<K, List<V>> copyListMap(Map<K, List<V>> map, Set<V> toIgnore) {
+    Map<K, List<V>> ret = new HashMap<>();
     if (map != null) {
       for (K key : map.keySet()) {
-        if (map.get(key) != null) {
-          List<V> list = new ArrayList<V>(map.get(key));
-          list.removeAll(Collections.singleton(null));
-          if (list.size() > 0) {
-            ret.put(key, list);
+        List<V> list = new ArrayList<>();
+        for (V elem : MoreObjects.firstNonNull(map.get(key), ImmutableList.<V>of())) {
+          if ((elem != null) && !toIgnore.contains(elem)) {
+            list.add(elem);
           }
+        }
+        if (!list.isEmpty()) {
+          ret.put(key, list);
         }
       }
     }
     return ret;
   }
 
-  private <T> Iterator<T> getIter(List<T> list) {
+  private <T> Iterator<T> getIter(Iterable<T> iterable) {
     Iterator<T> iter;
-    if (list != null) {
-      iter = list.iterator();
+    if (iterable != null) {
+      iter = iterable.iterator();
     } else {
-      iter = Collections.<T>emptyList().iterator();
+      iter = ImmutableList.<T>of().iterator();
     }
     return iter;
   }

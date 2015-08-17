@@ -1,10 +1,11 @@
 package com.celements.copydoc;
 
+import java.util.Set;
+
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -16,9 +17,10 @@ public interface ICopyDocumentRole {
    * @param doc1 may not be null
    * @param doc2 may not be null
    * @return true if the given docs are different
-   * @throws XWikiException
    */
-  public boolean check(XWikiDocument doc1, XWikiDocument doc2) throws XWikiException;
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2);
+
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2, Set<BaseObject> toIgnore);
 
   /**
    * Copies given source doc to given target doc and saves target if it has changed
@@ -40,6 +42,9 @@ public interface ICopyDocumentRole {
    * @throws ClassDocumentLoadException
    */
   public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc
+      ) throws ClassDocumentLoadException;
+
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore
       ) throws ClassDocumentLoadException;
 
   public boolean checkObject(BaseObject obj1, BaseObject obj2);
