@@ -3,13 +3,11 @@ package com.celements.copydoc;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -23,7 +21,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -37,7 +34,6 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
   private DocumentReference docRef;
   private XWikiDocument docMock;
   private DocumentReference classRef;
-  private BaseClass bClass;
 
   @Before
   public void setUp_CopyDocumentServiceTest() throws Exception {
@@ -49,8 +45,6 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
-    bClass = createMockAndAddToDefault(BaseClass.class);
-    expect(xwiki.getXClass(eq(classRef), same(context))).andReturn(bClass).anyTimes();
   }
   
   @Test
@@ -172,7 +166,9 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     BaseObject trgObj = new BaseObject();
     trgObj.setXClassReference(classRef);
     PropertyInterface propClass = new StringClass();
+    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
     
+    expect(xwiki.getXClass(eq(classRef), same(context))).andReturn(bClass);    
     expect(bClass.get(eq(name))).andReturn(propClass).once();
     
     replayDefault();
@@ -382,7 +378,9 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     srcObj.setDateValue(name2, val2);
     BaseObject trgObj = new BaseObject();
     trgObj.setXClassReference(classRef);
+    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
     
+    expect(xwiki.getXClass(eq(classRef), same(context))).andReturn(bClass).times(2);    
     expect(bClass.get(eq(name1))).andReturn(new StringClass()).once();
     expect(bClass.get(eq(name2))).andReturn(new DateClass()).once();
     
@@ -442,167 +440,6 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     assertFalse(ret);
     assertEquals(1, trgObj.getFieldList().size());
     assertEquals(val, ((BaseProperty) trgObj.get(name)).getValue());
-  }
-  
-  @Test
-  public void testGetValue_String() throws Exception {
-    BaseObject obj = new BaseObject();
-    String name = "name";
-    String val = "val";
-    obj.setStringValue(name, val);
-    
-    replayDefault();
-    Object ret = copyDocService.getValue(obj, name);
-    verifyDefault();
-
-    assertEquals(val, ret);
-  }
-  
-  @Test
-  public void testGetValue_String_emptyString() throws Exception {
-    BaseObject obj = new BaseObject();
-    String name = "name";
-    String val = "";
-    obj.setStringValue(name, val);
-    
-    replayDefault();
-    Object ret = copyDocService.getValue(obj, name);
-    verifyDefault();
-
-    assertNull(ret);
-  }
-  
-  @Test
-  public void testGetValue_Number() throws Exception {
-    BaseObject obj = new BaseObject();
-    String name = "name";
-    int val = 5;
-    obj.setIntValue(name, val);
-    
-    replayDefault();
-    Object ret = copyDocService.getValue(obj, name);
-    verifyDefault();
-
-    assertEquals(val, ret);
-  }
-  
-  @Test
-  public void testGetValue_Date() throws Exception {
-    BaseObject obj = new BaseObject();
-    String name = "name";
-    Date val = new Date();
-    obj.setDateValue(name, val);
-    
-    replayDefault();
-    Object ret = copyDocService.getValue(obj, name);
-    verifyDefault();
-
-    assertEquals(val, ret);
-  }
-  
-  @Test
-  public void testGetValue_Date_Timestamp() throws Exception {
-    BaseObject obj = new BaseObject();
-    String name = "name";
-    Date date = new Date();
-    Timestamp val = new Timestamp(date.getTime());
-    obj.setDateValue(name, val);
-    
-    replayDefault();
-    Object ret = copyDocService.getValue(obj, name);
-    verifyDefault();
-
-    assertEquals(date, ret);
-  }
-  
-  @Test
-  public void testSetValue_noSet() throws Exception {
-    boolean set = false;
-    BaseObject obj = new BaseObject();
-    String name = "name";
-    String val = "val";
-    
-    replayDefault();
-    copyDocService.setValue(obj, name, val, set);
-    verifyDefault();
-
-    assertEquals(0, obj.getFieldList().size());
-  }
-  
-  @Test
-  public void testSetValue_String() throws Exception {
-    boolean set = true;
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
-    PropertyInterface propClass = new StringClass();
-    String name = "name";
-    String val = "val";
-    
-    expect(bClass.get(eq(name))).andReturn(propClass).once();
-    
-    replayDefault();
-    copyDocService.setValue(obj, name, val, set);
-    verifyDefault();
-    
-    assertEquals(1, obj.getFieldList().size());
-    assertEquals(val, ((BaseProperty) obj.get(name)).getValue());
-  }
-  
-  @Test
-  public void testSetValue_Number() throws Exception {
-    boolean set = true;
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
-    PropertyInterface propClass = new NumberClass();
-    String name = "name";
-    long val = 5;
-    
-    expect(bClass.get(eq(name))).andReturn(propClass).once();
-    
-    replayDefault();
-    copyDocService.setValue(obj, name, val, set);
-    verifyDefault();
-    
-    assertEquals(1, obj.getFieldList().size());
-    assertEquals(val, ((BaseProperty) obj.get(name)).getValue());
-  }
-  
-  @Test
-  public void testSetValue_Date() throws Exception {
-    boolean set = true;
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
-    PropertyInterface propClass = new DateClass();
-    String name = "name";
-    Date val = new Date();
-    
-    expect(bClass.get(eq(name))).andReturn(propClass).once();
-    
-    replayDefault();
-    copyDocService.setValue(obj, name, val, set);
-    verifyDefault();
-    
-    assertEquals(1, obj.getFieldList().size());
-    assertEquals(val, ((BaseProperty) obj.get(name)).getValue());
-  }
-  
-  @Test
-  public void testSetValue_List() throws Exception {
-    boolean set = true;
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
-    PropertyInterface propClass = new StringClass();
-    String name = "name";
-    List<String> val = Arrays.asList("A", "B");
-    
-    expect(bClass.get(eq(name))).andReturn(propClass).once();
-    
-    replayDefault();
-    copyDocService.setValue(obj, name, val, set);
-    verifyDefault();
-    
-    assertEquals(1, obj.getFieldList().size());
-    assertEquals(StringUtils.join(val, "|"), ((BaseProperty) obj.get(name)).getValue());
   }
 
 }

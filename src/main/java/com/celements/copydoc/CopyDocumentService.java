@@ -3,7 +3,6 @@ package com.celements.copydoc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,55 +13,54 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 
 @Component
 public class CopyDocumentService implements ICopyDocumentRole {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      CopyDocumentService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CopyDocumentService.class);
 
   @Requirement
-  private Execution execution;
+  private IModelAccessFacade modelAccess;
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+  @Override
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2) {
+    try {
+      return copyInternal(doc1, doc2, false);
+    } catch (ClassDocumentLoadException exc) {
+      LOGGER.error("should not happen", exc); // since set is false
+      throw new RuntimeException("ClassDocumentLoadException should not happen");
+    }
   }
 
   @Override
-  public boolean check(XWikiDocument doc1, XWikiDocument doc2) throws XWikiException {
-    return copyInternal(doc1, doc2, false);
-  }
-
-  @Override
-  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc)
-      throws XWikiException {
+  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc
+      ) throws ClassDocumentLoadException, DocumentSaveException {
     boolean hasChanged = copy(srcDoc, trgDoc);
     if (hasChanged) {
-      getContext().getWiki().saveDocument(trgDoc, "copy from " + srcDoc, getContext());
+      modelAccess.saveDocument(trgDoc, "copy from " + srcDoc);
     }
     return hasChanged;
   }
 
   @Override
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc) throws XWikiException {
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc
+      ) throws ClassDocumentLoadException {
     return copyInternal(srcDoc, trgDoc, true);
   }
 
   private boolean copyInternal(XWikiDocument srcDoc, XWikiDocument trgDoc, boolean set
-      ) throws XWikiException {
+      ) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
     hasChanged |= copyObjects(srcDoc, trgDoc, set);
@@ -117,7 +115,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, boolean set
-      ) throws XWikiException {
+      ) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     Map<DocumentReference, List<BaseObject>> srcObjMap = copyListMap(srcDoc.getXObjects());
     Map<DocumentReference, List<BaseObject>> trgObjMap = copyListMap(trgDoc.getXObjects());
@@ -144,7 +142,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
 
   boolean createOrUpdateObjects(XWikiDocument doc, DocumentReference classRef, 
       Iterator<BaseObject> srcObjIter, Iterator<BaseObject> trgObjIter, boolean set
-      ) throws XWikiException {
+      ) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     while (srcObjIter.hasNext()) {
       BaseObject srcObj = srcObjIter.next();
@@ -152,7 +150,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
       if (trgObj == null) {
         // obj does not exist on doc, creating new
         if (set) {
-          trgObj = doc.newXObject(classRef, getContext());
+          trgObj = modelAccess.newXObject(doc, classRef);
         } else {
           trgObj = new BaseObject();
           trgObj.setDocumentReference(doc.getDocumentReference());
@@ -215,10 +213,12 @@ public class CopyDocumentService implements ICopyDocumentRole {
     Set<String> srcProps = srcObj.getPropertyList();
     Set<String> trgProps = new HashSet<String>(trgObj.getPropertyList());
     for (String name : srcProps) {
-      Object srcVal = getValue(srcObj, name);
-      Object trgVal = getValue(trgObj, name);
+      Object srcVal = modelAccess.getProperty(srcObj, name);
+      Object trgVal = modelAccess.getProperty(trgObj, name);
       if (!ObjectUtils.equals(srcVal, trgVal)) {
-        setValue(trgObj, name, srcVal, set);
+        if (set) {
+          modelAccess.setProperty(trgObj, name, srcVal);
+        }
         hasChanged = true;
         LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name 
             + "' changed from '" + trgVal + "' to '" + srcVal + "'");
@@ -232,36 +232,6 @@ public class CopyDocumentService implements ICopyDocumentRole {
           + "' set to null");
     }
     return hasChanged;
-  }
-
-  @Override
-  public Object getValue(BaseObject bObj, String name) {
-    Object value = null;
-    try {
-      if ((bObj != null) && (bObj.get(name) instanceof BaseProperty)) {
-          value = ((BaseProperty) bObj.get(name)).getValue();
-      }
-      // avoid comparing empty string to null
-      if ((value instanceof String) && StringUtils.isBlank((String) value)) {
-        value = null;
-      }
-      // assure to not return Timestamp since Timestamp.equals(Date) always returns false
-      if (value instanceof Date) {
-        value = new Date(((Date) value).getTime());
-      }
-    } catch (XWikiException xwe) {
-      LOGGER.error("Should never happen", xwe);
-    }
-    return value;
-  }
-
-  void setValue(BaseObject bObj, String name, Object val, boolean set) {
-    if (set) {
-      if (val instanceof Collection) {
-        val = StringUtils.join((Collection<?>) val, "|");
-      }
-      bObj.set(name, val, getContext());
-    }
   }
 
   private <K, V> Map<K, List<V>> copyListMap(Map<K, List<V>> map) {
