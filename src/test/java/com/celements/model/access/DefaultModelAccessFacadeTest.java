@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -393,6 +394,19 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
+  public void test_getXObjects_undmodifiable() throws Exception {
+    addObj(classRef, null, null);
+    List<BaseObject> ret = modelAccess.getXObjects(doc, classRef);
+    assertEquals(1, ret.size());
+    try {
+      ret.remove(0);
+      fail("expecting UnsupportedOperationException");
+    } catch (UnsupportedOperationException exc) {
+      // expected
+    }
+  }
+
+  @Test
   public void test_getXObjects_docRef() throws Exception {
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(true).once();
@@ -402,6 +416,30 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     List<BaseObject> ret = modelAccess.getXObjects(doc.getDocumentReference(), classRef);
     verifyDefault();
     assertEquals(0, ret.size());
+  }
+
+  @Test
+  public void test_getXObjects_map() throws Exception {
+    BaseObject obj1 = addObj(classRef, null, null);
+    BaseObject obj2 = addObj(classRef, null, null);
+    BaseObject obj3 = addObj(classRef, null, null);
+    BaseObject obj4 = addObj(classRef2, null, null);
+    Map<DocumentReference, List<BaseObject>> ret = modelAccess.getXObjects(doc);
+    assertEquals(2, ret.size());
+    assertTrue(ret.containsKey(classRef));
+    assertEquals(3, ret.get(classRef).size());
+    assertEquals(obj1, ret.get(classRef).get(0));
+    assertEquals(obj2, ret.get(classRef).get(1));
+    assertEquals(obj3, ret.get(classRef).get(2));
+    assertTrue(ret.containsKey(classRef2));
+    assertEquals(1, ret.get(classRef2).size());
+    assertEquals(obj4, ret.get(classRef2).get(0));
+    try {
+      ret.remove(classRef);
+      fail("expecting UnsupportedOperationException");
+    } catch (UnsupportedOperationException exc) {
+      // expected
+    }
   }
 
   @Test

@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -260,7 +262,19 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         ret.add(obj);
       }
     }
-    return ret;
+    return Collections.unmodifiableList(ret);
+  }
+
+  @Override
+  public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
+    Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
+    for (DocumentReference classRef : doc.getXObjects().keySet()) {
+      List<BaseObject> objs = getXObjects(doc, classRef);
+      if (!objs.isEmpty()) {
+        ret.put(classRef, objs);
+      }
+    }
+    return Collections.unmodifiableMap(ret);
   }
 
   private boolean checkPropertyKeyValues(BaseObject obj, String key,

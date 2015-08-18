@@ -2,6 +2,7 @@ package com.celements.model.access;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
@@ -105,7 +106,7 @@ public interface IModelAccessFacade {
    *          to get xobjects on (may not be null)
    * @param classRef
    *          type of xobjects to get
-   * @return a list of xobjects (without null values) or empty list
+   * @return an unmodifiable list of xobjects (without null values) or empty list
    * @throws DocumentLoadException if unable to load the document
    * @throws DocumentNotExistsException if the document does not exist
    */
@@ -121,7 +122,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering (null means no filtering)
    * @param value
    *          for field specific xobjects filtering
-   * @return a list of xobjects (without null values) or empty list
+   * @return an unmodifiable list of xobjects (without null values) or empty list
    * @throws DocumentLoadException if unable to load the document
    * @throws DocumentNotExistsException if the document does not exist
    */
@@ -137,7 +138,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering (null means no filtering)
    * @param values
    *          for field specific xobjects filtering
-   * @return a list of xobjects (without null values) or empty list
+   * @return an unmodifiable list of xobjects (without null values) or empty list
    * @throws DocumentLoadException if unable to load the document
    * @throws DocumentNotExistsException if the document does not exist
    */
@@ -150,7 +151,7 @@ public interface IModelAccessFacade {
    *          to get xobjects on (may not be null)
    * @param classRef
    *          type of xobjects to get
-   * @return a list of xobjects (without null values) or empty list
+   * @return an unmodifiable list of xobjects (without null values) or empty list
    */
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef);
 
@@ -163,7 +164,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering (null means no filtering)
    * @param value
    *          for field specific xobjects filtering
-   * @return a list of xobjects (without null values) or empty list
+   * @return an unmodifiable list of xobjects (without null values) or empty list
    */
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
       String key, Object value);
@@ -177,10 +178,18 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering (null means no filtering)
    * @param values
    *          for field specific xobjects filtering
-   * @return a list of xobjects (without null values) or empty list
+   * @return an unmodifiable list of xobjects (without null values) or empty list
    */
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
       String key, Collection<?> values);
+
+  /**
+   * @param doc
+   *          to get xobjects on (may not be null)
+   * @return
+   * @return an unmodifiable map of all xobjects list
+   */
+  public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc);
 
   /**
    * @param doc
