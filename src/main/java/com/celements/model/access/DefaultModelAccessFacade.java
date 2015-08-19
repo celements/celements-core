@@ -62,7 +62,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (exists(docRef)) {
       return getDocumentInternal(docRef);
     } else {
-      throw new DocumentNotExistsException("Doc does not exist " + toString(docRef));
+      throw new DocumentNotExistsException(docRef, "doc doesn't exist '"
+          + serialize(docRef) + "'");
     }
   }
 
@@ -71,7 +72,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       return getContext().getWiki().getDocument(docRef, getContext());
     } catch (XWikiException xwe) {
-      throw new DocumentLoadException("Failed to load doc " + toString(docRef), xwe);
+      throw new DocumentLoadException(docRef, "doc failed to load '" + serialize(docRef)
+        + "'", xwe);
     }
   }
 
@@ -82,7 +84,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (!exists(docRef)) {
       return createDocumentInternal(docRef);
     } else {
-      throw new DocumentAlreadyExistsException("Doc already exists " + toString(docRef));
+      throw new DocumentAlreadyExistsException(docRef, "doc already exists '"
+          + serialize(docRef) + "'");
     }
   }
 
@@ -142,8 +145,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     } catch (XWikiException xwe) {
-      throw new DocumentSaveException("Failed to save doc " 
-          + toString(doc.getDocumentReference()), xwe);
+      throw new DocumentSaveException(doc.getDocumentReference(), "doc failed to save '"
+          + serialize(doc.getDocumentReference()) + "'", xwe);
     }
   }
 
@@ -170,8 +173,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         }
       }
     } catch (XWikiException xwe) {
-      throw new DocumentDeleteException("Failed to load translations " 
-          + toString(doc.getDocumentReference()), xwe);
+      throw new DocumentDeleteException(doc.getDocumentReference(), "doc translations"
+          + "failed to load '" + serialize(doc.getDocumentReference()) + "'", xwe);
     }
     toDelDocs.add(doc);
     for (XWikiDocument toDel : toDelDocs) {
@@ -190,8 +193,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       try {
         getContext().getWiki().deleteDocument(doc, totrash, getContext());
       } catch (XWikiException xwe) {
-        throw new DocumentDeleteException("Failed to delete doc "
-            + toString(doc.getDocumentReference()), xwe);
+        throw new DocumentDeleteException(doc.getDocumentReference(),
+            "doc failed to delete '" + serialize(doc.getDocumentReference()) + "'", xwe);
       }
     } finally {
       getContext().setDatabase(dbBefore);
@@ -302,8 +305,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       return doc.newXObject(classRef, getContext());
     } catch (XWikiException xwe) {
-      throw new ClassDocumentLoadException("Failed to load class " + toString(classRef),
-          xwe);
+      throw new ClassDocumentLoadException(classRef, "class doc failed to load '"
+          + serialize(classRef) + "'", xwe);
     }
   }
 
@@ -392,7 +395,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     obj.set(name, value, getContext());
   }
 
-  private String toString(EntityReference ref) {
+  private String serialize(EntityReference ref) {
     return "'" + webUtilsService.serializeRef(ref) + "'";
   }
 
