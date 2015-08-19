@@ -9,12 +9,12 @@ public class DocumentAccessException extends Exception {
   private final DocumentReference docRef;
 
   public DocumentAccessException(DocumentReference docRef) {
-    super(docRef.toString());
+    super(docRef != null ? docRef.toString() : "null");
     this.docRef = docRef;
   }
 
   public DocumentAccessException(DocumentReference docRef, Throwable cause) {
-    super(docRef.toString(), cause);
+    super(docRef != null ? docRef.toString() : "null", cause);
     this.docRef = docRef;
   }
 
