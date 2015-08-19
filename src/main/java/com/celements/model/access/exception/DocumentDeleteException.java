@@ -10,15 +10,6 @@ public class DocumentDeleteException extends DocumentAccessException {
     super(docRef);
   }
 
-  public DocumentDeleteException(DocumentReference docRef, String message) {
-    super(docRef, message);
-  }
-
-  public DocumentDeleteException(DocumentReference docRef, String message,
-      Throwable cause) {
-    super(docRef, message, cause);
-  }
-
   public DocumentDeleteException(DocumentReference docRef, Throwable cause) {
     super(docRef, cause);
   }

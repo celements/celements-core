@@ -10,15 +10,6 @@ public class DocumentSaveException extends DocumentAccessException {
     super(docRef);
   }
 
-  public DocumentSaveException(DocumentReference docRef, String message) {
-    super(docRef, message);
-  }
-
-  public DocumentSaveException(DocumentReference docRef, String message,
-      Throwable cause) {
-    super(docRef, message, cause);
-  }
-
   public DocumentSaveException(DocumentReference docRef, Throwable cause) {
     super(docRef, cause);
   }

@@ -10,15 +10,6 @@ public class DocumentLoadException extends DocumentAccessException {
     super(docRef);
   }
 
-  public DocumentLoadException(DocumentReference docRef, String message) {
-    super(docRef, message);
-  }
-
-  public DocumentLoadException(DocumentReference docRef, String message,
-      Throwable cause) {
-    super(docRef, message, cause);
-  }
-
   public DocumentLoadException(DocumentReference docRef, Throwable cause) {
     super(docRef, cause);
   }
