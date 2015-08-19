@@ -30,6 +30,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -255,9 +256,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
       String key, Collection<?> values) {
     checkNotNull(doc);
+    checkNotNull(classRef);
+    classRef = webUtilsService.checkWikiRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
-        Collections.<BaseObject>emptyList())) {
+        ImmutableList.<BaseObject>of())) {
       if ((obj != null) && checkPropertyKeyValues(obj, key, values)) {
         ret.add(obj);
       }
@@ -295,6 +298,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       ) throws ClassDocumentLoadException {
     checkNotNull(doc);
     checkNotNull(classRef);
+    classRef = webUtilsService.checkWikiRef(classRef, doc);
     try {
       return doc.newXObject(classRef, getContext());
     } catch (XWikiException xwe) {
