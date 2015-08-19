@@ -341,4 +341,20 @@ public interface IWebUtilsService {
    */
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
 
+  /**
+   * checks and corrects the WikiReference on docRef compared to toDoc.
+   * @param docRef
+   * @param toDoc
+   * @return
+   */
+  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc);
+
+  /**
+   * checks and corrects the WikiReference on docRef compared to toDoc.
+   * @param docRef
+   * @param toRef
+   * @return
+   */
+  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
+
 }
