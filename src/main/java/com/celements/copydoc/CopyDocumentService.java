@@ -50,7 +50,13 @@ public class CopyDocumentService implements ICopyDocumentRole {
   @Override
   public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc
       ) throws ClassDocumentLoadException, DocumentSaveException {
-    boolean hasChanged = copy(srcDoc, trgDoc);
+    return copyAndSave(srcDoc, trgDoc, null);
+  }
+
+  @Override
+  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Set<BaseObject> toIgnore) throws ClassDocumentLoadException, DocumentSaveException {
+    boolean hasChanged = copy(srcDoc, trgDoc, toIgnore);
     if (hasChanged) {
       modelAccess.saveDocument(trgDoc, "copy from " + srcDoc);
     }
