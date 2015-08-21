@@ -60,10 +60,14 @@ public abstract class AbstractEventListener implements EventListener {
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    if (isLocalEvent()) {
-      onLocalEvent(event, source, data);
+    if ((event != null) && (source != null)) {
+      if (isLocalEvent()) {
+        onLocalEvent(event, source, data);
+      } else {
+        onRemoteEvent(event, source, data);
+      }
     } else {
-      onRemoteEvent(event, source, data);
+      getLogger().warn("onEvent: got null values, event '{}', source '{}'", event,source);
     }
   }
 
