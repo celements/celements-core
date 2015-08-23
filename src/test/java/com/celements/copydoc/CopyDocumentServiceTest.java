@@ -3,22 +3,24 @@ package com.celements.copydoc;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
+import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.model.access.IModelAccessFacade;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -27,8 +29,6 @@ import com.xpn.xwiki.web.Utils;
 public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
 
   private CopyDocumentService copyDocService;
-  private XWikiContext context;
-  private XWiki xwiki;
   
   private List<BaseObject> emptyList;
   private DocumentReference docRef;
@@ -38,58 +38,263 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CopyDocumentServiceTest() throws Exception {
     copyDocService = (CopyDocumentService) Utils.getComponent(ICopyDocumentRole.class);
-    context = getContext();
-    xwiki = getWikiMock();
-    emptyList = Collections.emptyList();
-    docRef = new DocumentReference("wiki", "Space", "SomeDoc");
+    emptyList = new ArrayList<>();
+    docRef = new DocumentReference("db", "Space", "SomeDoc");
     docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
-    classRef = new DocumentReference("wiki", "Classes", "SomeClass");
+    classRef = new DocumentReference("db", "Classes", "SomeClass");
   }
   
   @Test
-  public void testCopyObjects() throws Exception {
-//    TODO
-//    boolean set = false;
-//    XWikiDocument srcDocMock = createMockAndAddToDefault(XWikiDocument.class);
-//    
-//    replayDefault();
-//    boolean ret = copyDocService.copyObjects(srcDocMock, docMock, set);
-//    verifyDefault();
-//    
-//    assertFalse(ret);
+  public void testCopyObjects_none() throws Exception {
+    boolean set = true;
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertFalse(ret);
   }
   
   @Test
-  public void testGetAsTargetClassRef_sameDB() {
-    DocumentReference trgDocRef = new DocumentReference("wiki", "Space", "SomeDoc");
-    XWikiDocument trgDoc = new XWikiDocument(trgDocRef);
-    DocumentReference trgClassRef = copyDocService.getAsTargetClassRef(classRef, trgDoc);
-    assertEquals(classRef, trgClassRef);
+  public void testCopyObjects_added() throws Exception {
+    boolean set = true;
+    String name = "name";
+    String val = "val";
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef, name, val));
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    BaseClass bClass = expectBaseClass(classRef);
+    expect(bClass.get(eq(name))).andReturn(new StringClass()).once();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(1, getModelAccess().getXObjects(trgDoc, classRef, name, val).size());
   }
   
   @Test
-  public void testGetAsTargetClassRef_otherDB() {
-    DocumentReference srcClassRef = new DocumentReference("wikiA", "Classes", "SomeClass");
-    DocumentReference trgDocRef = new DocumentReference("wikiB", "Space", "SomeDoc");
-    XWikiDocument trgDoc = new XWikiDocument(trgDocRef);
-    DocumentReference trgClassRef = copyDocService.getAsTargetClassRef(srcClassRef, trgDoc);
-    assertFalse(srcClassRef.equals(trgClassRef));
-    assertEquals(srcClassRef.getName(), trgClassRef.getName());
-    assertEquals(srcClassRef.getLastSpaceReference().getName(), 
-        trgClassRef.getLastSpaceReference().getName());
-    assertEquals("wikiA", srcClassRef.getLastSpaceReference().getParent().getName());
-    assertEquals("wikiB", trgClassRef.getLastSpaceReference().getParent().getName());
+  public void testCopyObjects_added_notSet() throws Exception {
+    boolean set = false;
+    String name = "name";
+    String val = "val";
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef, name, val));
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    expectBaseClass(classRef);
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(0, getModelAccess().getXObjects(trgDoc, classRef).size());
+  }
+  
+  @Test
+  public void testCopyObjects_removed() throws Exception {
+    boolean set = true;
+    String name1 = "name1";
+    String val1 = "val1";
+    String name2 = "name2";
+    String val2 = "val2";
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef, name1, val1));
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef, name1, val1));
+    trgDoc.addXObject(createObj(classRef, name2, val2));
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(1, getModelAccess().getXObjects(trgDoc, classRef).size());
+    assertEquals(1, getModelAccess().getXObjects(trgDoc, classRef, name1, val1).size());
+  }
+  
+  @Test
+  public void testCopyObjects_removed_notSet() throws Exception {
+    boolean set = false;
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef));
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef));
+    trgDoc.addXObject(createObj(classRef));
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(2, getModelAccess().getXObjects(trgDoc, classRef).size());
+  }
+  
+  @Test
+  public void testCopyObjects_removed_multiple() throws Exception {
+    boolean set = true;
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef));
+    trgDoc.addXObject(createObj(classRef));
+    trgDoc.addXObject(createObj(classRef));
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(0, getModelAccess().getXObjects(trgDoc, classRef).size());
+  }
+  
+  @Test
+  public void testCopyObjects_removed_multiple_notSet() throws Exception {
+    boolean set = false;
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef));
+    trgDoc.addXObject(createObj(classRef));
+    trgDoc.addXObject(createObj(classRef));
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(3, getModelAccess().getXObjects(trgDoc, classRef).size());
+  }
+  
+  @Test
+  public void testCopyObjects_noChange() throws Exception {
+    boolean set = true;
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef));
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef));
+    Set<BaseObject> toIgnore = Sets.newHashSet();
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertFalse(ret);
+    assertEquals(1, getModelAccess().getXObjects(srcDoc, srcClassRef).size());
+    assertEquals(1, getModelAccess().getXObjects(trgDoc, classRef).size());
+  }
+  
+  @Test
+  public void testCopyObjects_toIgnore_add() throws Exception {
+    boolean set = true;
+    String name = "name";
+    String val = "val";
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef, name, val));
+    BaseObject ignoreObj = createObj(srcClassRef);
+    srcDoc.addXObject(ignoreObj);
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef, name, val));
+    Set<BaseObject> toIgnore = Sets.newHashSet(ignoreObj);
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertFalse(ret);
+    assertEquals(1, getModelAccess().getXObjects(trgDoc, classRef).size());
+    assertFalse(getModelAccess().getXObjects(trgDoc, classRef).contains(ignoreObj));
+  }
+  
+  @Test
+  public void testCopyObjects_toIgnore_remove() throws Exception {
+    boolean set = true;
+    String name = "name";
+    String val = "val";
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    DocumentReference srcClassRef = new DocumentReference(classRef);
+    srcClassRef.setWikiReference(new WikiReference("odb"));
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    srcDoc.addXObject(createObj(srcClassRef, name, val));
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    trgDoc.addXObject(createObj(classRef, name, val));
+    BaseObject ignoreObj = createObj(classRef);
+    trgDoc.addXObject(ignoreObj);
+    Set<BaseObject> toIgnore = Sets.newHashSet(ignoreObj);
+    
+    replayDefault();
+    boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
+    verifyDefault();
+    
+    assertFalse(ret);
+    assertEquals(2, getModelAccess().getXObjects(trgDoc, classRef).size());
+    assertTrue(getModelAccess().getXObjects(trgDoc, classRef).contains(ignoreObj));
+  }
+  
+  @Test
+  public void testGetAllClassRefs() throws Exception {
+    DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
+    XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
+    DocumentReference classRef1 = new DocumentReference("odb", "Classes", "SomeClass1");
+    srcDoc.addXObject(createObj(classRef1));
+    DocumentReference classRef2 = new DocumentReference("odb", "Classes", "SomeClass2");
+    srcDoc.addXObject(createObj(classRef2));
+    
+    XWikiDocument trgDoc = new XWikiDocument(docRef);
+    DocumentReference classRef3 = new DocumentReference("db", "Classes", "SomeClass3");
+    trgDoc.addXObject(createObj(classRef3));
+    DocumentReference classRef4 = new DocumentReference("db", "Classes", "SomeClass1");
+    trgDoc.addXObject(createObj(classRef4));
+    
+    replayDefault();
+    Set<DocumentReference> ret = copyDocService.getAllClassRefs(srcDoc, trgDoc);
+    verifyDefault();
+    
+    assertEquals(3, ret.size());
+    assertTrue(ret.contains(classRef3));
+    assertTrue(ret.contains(classRef4));
+    classRef2.setWikiReference(new WikiReference("db"));
+    assertTrue(ret.contains(classRef2));
   }
   
   @Test
   public void testCreateOrUpdateObjects_none() throws Exception {
-    boolean set = false;
-    BaseObject obj = new BaseObject();
+    boolean set = true;
+    BaseObject obj = createObj(classRef);
     
     replayDefault();
-    boolean ret = copyDocService.createOrUpdateObjects(docMock, classRef, 
-        emptyList.iterator(), Arrays.asList(obj).iterator(), set);
+    boolean ret = copyDocService.createOrUpdateObjects(docMock, emptyList,
+        Lists.newArrayList(obj), set);
     verifyDefault();
     
     assertFalse(ret);
@@ -97,13 +302,27 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testCreateOrUpdateObjects_create() throws Exception {
-    boolean set = false;
-    BaseObject obj = new BaseObject();
+    boolean set = true;
+    BaseObject obj = createObj(classRef);
     
+    expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
     
     replayDefault();
-    boolean ret = copyDocService.createOrUpdateObjects(docMock, classRef, Arrays.asList(
-        obj).iterator(), emptyList.iterator(), set);
+    boolean ret = copyDocService.createOrUpdateObjects(docMock, Lists.newArrayList(obj),
+        emptyList, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+  }
+  
+  @Test
+  public void testCreateOrUpdateObjects_create_notSet() throws Exception {
+    boolean set = false;
+    BaseObject obj = createObj(classRef);
+    
+    replayDefault();
+    boolean ret = copyDocService.createOrUpdateObjects(docMock, Lists.newArrayList(obj),
+        emptyList, set);
     verifyDefault();
     
     assertTrue(ret);
@@ -111,16 +330,37 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testCreateOrUpdateObjects_update() throws Exception {
-    boolean set = false;
-    BaseObject srcObj = new BaseObject();
+    boolean set = true;
     String name = "name";
     String val = "val";
-    srcObj.setStringValue(name, val);
-    BaseObject trgObj = new BaseObject();
+    BaseObject srcObj = createObj(classRef, name, val);
+    List<BaseObject> srcObjs = Lists.newArrayList(srcObj);
+    BaseObject trgObj = createObj(classRef);
+    List<BaseObject> trgObjs = Lists.newArrayList(trgObj);
+    BaseClass bClass = expectBaseClass(classRef);       
+    expect(bClass.get(eq(name))).andReturn(new StringClass()).once();
     
     replayDefault();
-    boolean ret = copyDocService.createOrUpdateObjects(docMock, classRef, Arrays.asList(
-        srcObj).iterator(), Arrays.asList(trgObj).iterator(), set);
+    boolean ret = copyDocService.createOrUpdateObjects(docMock, srcObjs, trgObjs, set);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(val, trgObj.getStringValue(name));
+    assertEquals(1, srcObjs.size());
+    assertEquals(0, trgObjs.size());
+  }
+  
+  @Test
+  public void testCreateOrUpdateObjects_update_notSet() throws Exception {
+    boolean set = false;
+    String name = "name";
+    String val = "val";
+    BaseObject srcObj = createObj(classRef, name, val);
+    BaseObject trgObj = createObj(classRef);
+    
+    replayDefault();
+    boolean ret = copyDocService.createOrUpdateObjects(docMock, Lists.newArrayList(srcObj),
+        Lists.newArrayList(trgObj), set);
     verifyDefault();
     
     assertTrue(ret);
@@ -128,259 +368,17 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testCreateOrUpdateObjects_set_none() throws Exception {
-    boolean set = true;
-    BaseObject obj = new BaseObject();
-    
-    replayDefault();
-    boolean ret = copyDocService.createOrUpdateObjects(docMock, classRef, 
-        emptyList.iterator(), Arrays.asList(obj).iterator(), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testCreateOrUpdateObjects_set_create() throws Exception {
-    boolean set = true;
-    BaseObject obj = new BaseObject();
-    
-    expect(docMock.newXObject(eq(classRef), same(context))).andReturn(obj).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.createOrUpdateObjects(docMock, classRef, Arrays.asList(
-        obj).iterator(), emptyList.iterator(), set);
-    verifyDefault();
-    
-    assertTrue(ret);
-  }
-  
-  @Test
-  public void testCreateOrUpdateObjects_set_update() throws Exception {
-    boolean set = true;
-    BaseObject srcObj = new BaseObject();
-    srcObj.setXClassReference(classRef);
-    String name = "name";
-    String val = "val";
-    srcObj.setStringValue(name, val);
-    BaseObject trgObj = new BaseObject();
-    trgObj.setXClassReference(classRef);
-    PropertyInterface propClass = new StringClass();
-    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
-    
-    expect(xwiki.getXClass(eq(classRef), same(context))).andReturn(bClass);    
-    expect(bClass.get(eq(name))).andReturn(propClass).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.createOrUpdateObjects(docMock, classRef, Arrays.asList(
-        srcObj).iterator(), Arrays.asList(trgObj).iterator(), set);
-    verifyDefault();
-    
-    assertTrue(ret);
-    assertEquals(val, trgObj.getStringValue(name));
-  }
-  
-  @Test
-  public void testRemoveObjects_noObjs() {
-    boolean set = false;
-    
-    replayDefault();
-    boolean ret = copyDocService.removeObjects(docMock, emptyList.iterator(), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveObjects_notChanged_null() {
-    boolean set = false;
-    BaseObject obj1 = new BaseObject();
-    obj1.setXClassReference(classRef);
-    BaseObject obj2 = new BaseObject();
-    obj2.setXClassReference(classRef);
-    
-    expect(docMock.getXObjects(eq(classRef))).andReturn(null).times(2);
-    
-    replayDefault();
-    boolean ret = copyDocService.removeObjects(docMock, Arrays.asList(obj1, obj2
-        ).iterator(), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveObjects_notChanged_otherObj() {
-    boolean set = false;
-    BaseObject obj1 = new BaseObject();
-    obj1.setXClassReference(classRef);
-    BaseObject obj2 = new BaseObject();
-    obj2.setXClassReference(classRef);
-    
-    expect(docMock.getXObjects(eq(classRef))).andReturn(Arrays.asList(new BaseObject())
-        ).times(2);
-    
-    replayDefault();
-    boolean ret = copyDocService.removeObjects(docMock, Arrays.asList(obj1, obj2
-        ).iterator(), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveObjects_changed() {
-    boolean set = false;
-    BaseObject obj1 = new BaseObject();
-    obj1.setXClassReference(classRef);
-    BaseObject obj2 = new BaseObject();
-    obj2.setXClassReference(classRef);
-    
-    expect(docMock.getXObjects(eq(classRef))).andReturn(Arrays.asList(obj2)).times(2);
-    
-    replayDefault();
-    boolean ret = copyDocService.removeObjects(docMock, Arrays.asList(obj1, obj2
-        ).iterator(), set);
-    verifyDefault();
-    
-    assertTrue(ret);
-  }
-  
-  @Test
-  public void testRemoveObjects_set_notChanged() {
-    boolean set = true;
-    BaseObject obj1 = new BaseObject();
-    obj1.setXClassReference(classRef);
-    BaseObject obj2 = new BaseObject();
-    obj2.setXClassReference(classRef);
-    
-    expect(docMock.removeXObject(same(obj1))).andReturn(false).once();
-    expect(docMock.removeXObject(same(obj2))).andReturn(false).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.removeObjects(docMock, Arrays.asList(obj1, obj2
-        ).iterator(), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveObjects_set_canged() {
-    boolean set = true;
-    BaseObject obj1 = new BaseObject();
-    obj1.setXClassReference(classRef);
-    BaseObject obj2 = new BaseObject();
-    obj2.setXClassReference(classRef);
-    
-    expect(docMock.removeXObject(same(obj1))).andReturn(false).once();
-    expect(docMock.removeXObject(same(obj2))).andReturn(true).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.removeObjects(docMock, Arrays.asList(obj1, obj2
-        ).iterator(), set);
-    verifyDefault();
-    
-    assertTrue(ret);
-  }
-  
-  @Test
-  public void testRemoveRemainingObjects_noClassRefs() {
-    boolean set = false;
-    
-    replayDefault();
-    boolean ret = copyDocService.removeRemainingObjects(docMock, 
-        Collections.<DocumentReference>emptyList(), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveRemainingObjects_notChanged() {
-    boolean set = false;
-    DocumentReference classRef1 = new DocumentReference("wiki", "Classes", "Class1");
-    DocumentReference classRef2 = new DocumentReference("wiki", "Classes", "Class2");
-    
-    expect(docMock.getXObjects(eq(classRef1))).andReturn(null).once();
-    expect(docMock.getXObjects(eq(classRef2))).andReturn(emptyList).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.removeRemainingObjects(docMock, Arrays.asList(classRef1, 
-        classRef2), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveRemainingObjects_changed() {
-    boolean set = false;
-    DocumentReference classRef1 = new DocumentReference("wiki", "Classes", "Class1");
-    DocumentReference classRef2 = new DocumentReference("wiki", "Classes", "Class2");
-    
-    expect(docMock.getXObjects(eq(classRef1))).andReturn(null).once();
-    expect(docMock.getXObjects(eq(classRef2))).andReturn(Arrays.asList(new BaseObject())
-        ).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.removeRemainingObjects(docMock, Arrays.asList(classRef1, 
-        classRef2), set);
-    verifyDefault();
-    
-    assertTrue(ret);
-  }
-  
-  @Test
-  public void testRemoveRemainingObjects_set_notChanged() {
-    boolean set = true;
-    DocumentReference classRef1 = new DocumentReference("wiki", "Classes", "Class1");
-    DocumentReference classRef2 = new DocumentReference("wiki", "Classes", "Class2");
-    
-    expect(docMock.removeXObjects(eq(classRef1))).andReturn(false).once();
-    expect(docMock.removeXObjects(eq(classRef2))).andReturn(false).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.removeRemainingObjects(docMock, Arrays.asList(classRef1, 
-        classRef2), set);
-    verifyDefault();
-    
-    assertFalse(ret);
-  }
-  
-  @Test
-  public void testRemoveRemainingObjects_set_changed() {
-    boolean set = true;
-    DocumentReference classRef1 = new DocumentReference("wiki", "Classes", "Class1");
-    DocumentReference classRef2 = new DocumentReference("wiki", "Classes", "Class2");
-    
-    expect(docMock.removeXObjects(eq(classRef1))).andReturn(false).once();
-    expect(docMock.removeXObjects(eq(classRef2))).andReturn(true).once();
-    
-    replayDefault();
-    boolean ret = copyDocService.removeRemainingObjects(docMock, Arrays.asList(classRef1, 
-        classRef2), set);
-    verifyDefault();
-    
-    assertTrue(ret);
-  }
-  
-  @Test
   public void testCopyObject_added() throws Exception {
     boolean set = true;
-    BaseObject srcObj = new BaseObject();
-    srcObj.setXClassReference(classRef);
     String name1 = "name1";
     String val1 = "val1";
-    srcObj.setStringValue(name1, val1);
+    BaseObject srcObj = createObj(classRef, name1, val1);
     String name2 = "name2";
     Date val2 = new Date();
     srcObj.setDateValue(name2, val2);
-    BaseObject trgObj = new BaseObject();
-    trgObj.setXClassReference(classRef);
-    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
+    BaseObject trgObj = createObj(classRef);
+    BaseClass bClass = expectBaseClass(classRef);
     
-    expect(xwiki.getXClass(eq(classRef), same(context))).andReturn(bClass).times(2);    
     expect(bClass.get(eq(name1))).andReturn(new StringClass()).once();
     expect(bClass.get(eq(name2))).andReturn(new DateClass()).once();
     
@@ -390,21 +388,17 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     
     assertTrue(ret);
     assertEquals(2, trgObj.getFieldList().size());
-    assertEquals(val1, ((BaseProperty) trgObj.get(name1)).getValue());
-    assertEquals(val2, ((BaseProperty) trgObj.get(name2)).getValue());
+    assertEquals(val1, trgObj.getStringValue(name1));
+    assertEquals(val2, trgObj.getDateValue(name2));
   }
   
   @Test
   public void testCopyObject_removed() throws Exception {
     boolean set = true;
-    BaseObject srcObj = new BaseObject();
-    srcObj.setXClassReference(classRef);
     String name1 = "name1";
     String val1 = "val1";
-    srcObj.setStringValue(name1, val1);
-    BaseObject trgObj = new BaseObject();
-    trgObj.setXClassReference(classRef);
-    trgObj.setStringValue(name1, val1);
+    BaseObject srcObj = createObj(classRef, name1, val1);
+    BaseObject trgObj = createObj(classRef, name1, val1);
     String name2 = "name2";
     String val2 = "val2";
     trgObj.setStringValue(name2, val2);
@@ -417,21 +411,17 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     
     assertTrue(ret);
     assertEquals(1, trgObj.getFieldList().size());
-    assertEquals(val1, ((BaseProperty) trgObj.get(name1)).getValue());
+    assertEquals(val1, trgObj.getStringValue(name1));
     assertNull(trgObj.get(name2));
   }
   
   @Test
   public void testCopyObject_noChange() throws Exception {
     boolean set = true;
-    BaseObject srcObj = new BaseObject();
-    srcObj.setXClassReference(classRef);
     String name = "name";
     String val = "val";
-    srcObj.setStringValue(name, val);
-    BaseObject trgObj = new BaseObject();
-    trgObj.setXClassReference(classRef);
-    trgObj.setStringValue(name, val);
+    BaseObject srcObj = createObj(classRef, name, val);
+    BaseObject trgObj = createObj(classRef, name, val);
     
     replayDefault();
     boolean ret = copyDocService.copyObject(srcObj, trgObj, set);
@@ -439,7 +429,36 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
 
     assertFalse(ret);
     assertEquals(1, trgObj.getFieldList().size());
-    assertEquals(val, ((BaseProperty) trgObj.get(name)).getValue());
+    assertEquals(val, trgObj.getStringValue(name));
+  }
+
+  private BaseObject createObj(DocumentReference classRef, String name, Object val) {
+    BaseObject obj = createObj(classRef);
+    obj.setStringValue(name, val.toString());
+    return obj;
+  }
+
+  private BaseObject createObj(DocumentReference classRef) {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(classRef);
+    return obj;
+  }
+
+  private BaseClass expectBaseClass(final DocumentReference classRef) throws XWikiException {
+    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
+    expect(getWikiMock().getXClass(eq(classRef), same(getContext()))).andReturn(bClass
+        ).anyTimes();
+    expect(bClass.newCustomClassInstance(same(getContext()))).andAnswer(new IAnswer<BaseObject>() {
+      @Override
+      public BaseObject answer() throws Throwable {
+        return new BaseObject();
+      }
+    }).anyTimes();
+    return bClass;
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
 }

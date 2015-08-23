@@ -1,23 +1,25 @@
 package com.celements.model.access.exception;
 
+import org.xwiki.model.reference.DocumentReference;
+
 public class DocumentAccessException extends Exception {
 
   private static final long serialVersionUID = -8302055770293965958L;
 
-  public DocumentAccessException() {
-    super();
+  private final DocumentReference docRef;
+
+  public DocumentAccessException(DocumentReference docRef) {
+    super(docRef != null ? docRef.toString() : "null");
+    this.docRef = docRef;
   }
 
-  public DocumentAccessException(String message) {
-    super(message);
+  public DocumentAccessException(DocumentReference docRef, Throwable cause) {
+    super(docRef != null ? docRef.toString() : "null", cause);
+    this.docRef = docRef;
   }
 
-  public DocumentAccessException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public DocumentAccessException(Throwable cause) {
-    super(cause);
+  public DocumentReference getDocumentReference() {
+    return docRef;
   }
 
 }

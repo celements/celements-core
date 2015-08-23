@@ -50,7 +50,7 @@ public interface IModelAccessFacade {
    * @param docRef
    *          to get xobject on (may not be null)
    * @param classRef
-   *          type of xobject to get
+   *          type of xobject to get (may not be null)
    * @return the xobject or null
    * @throws DocumentLoadException
    *           if unable to load the document
@@ -64,7 +64,7 @@ public interface IModelAccessFacade {
    * @param docRef
    *          to get xobject on (may not be null)
    * @param classRef
-   *          type of xobject to get
+   *          type of xobject to get (may not be null)
    * @param key
    *          for field specific xobject filtering (null means no filtering)
    * @param value
@@ -82,7 +82,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to get xobject on (may not be null)
    * @param classRef
-   *          type of xobject to get
+   *          type of xobject to get (may not be null)
    * @return the xobject or null
    */
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef);
@@ -91,7 +91,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to get xobject on (may not be null)
    * @param classRef
-   *          type of xobject to get
+   *          type of xobject to get (may not be null)
    * @param key
    *          for field specific xobject filtering (null means no filtering)
    * @param value
@@ -105,7 +105,7 @@ public interface IModelAccessFacade {
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to get
+   *          type of xobjects to get (may not be null)
    * @return an unmodifiable list of xobjects (without null values) or empty list
    * @throws DocumentLoadException if unable to load the document
    * @throws DocumentNotExistsException if the document does not exist
@@ -117,7 +117,7 @@ public interface IModelAccessFacade {
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to get
+   *          type of xobjects to get (may not be null)
    * @param key
    *          for field specific xobjects filtering (null means no filtering)
    * @param value
@@ -133,7 +133,7 @@ public interface IModelAccessFacade {
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to get
+   *          type of xobjects to get (may not be null)
    * @param key
    *          for field specific xobjects filtering (null means no filtering)
    * @param values
@@ -150,7 +150,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to get xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to get
+   *          type of xobjects to get (may not be null)
    * @return an unmodifiable list of xobjects (without null values) or empty list
    */
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef);
@@ -159,7 +159,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to get xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to get
+   *          type of xobjects to get (may not be null)
    * @param key
    *          for field specific xobjects filtering (null means no filtering)
    * @param value
@@ -173,7 +173,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to get xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to get
+   *          type of xobjects to get (may not be null)
    * @param key
    *          for field specific xobjects filtering (null means no filtering)
    * @param values
@@ -234,7 +234,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to remove
+   *          type of xobjects to remove (may not be null)
    * @param key
    *          for field specific xobjects filtering (null means no filtering)
    * @param value
@@ -248,7 +248,7 @@ public interface IModelAccessFacade {
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param classRef
-   *          type of xobjects to remove
+   *          type of xobjects to remove (may not be null)
    * @param key
    *          for field specific xobjects filtering (null means no filtering)
    * @param values

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.exception.ClassDocumentLoadException;
@@ -332,8 +333,12 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_getXObjects_nullClassRef() {
-    List<BaseObject> ret = modelAccess.getXObjects(doc, null);
-    assertEquals(ret.size(), 0);
+    try {
+      modelAccess.getXObjects(doc, null);
+      fail("expecting NullPointerException");
+    } catch (NullPointerException npe) {
+      // expected
+    }
   }
 
   @Test
@@ -359,6 +364,15 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
     assertSame(obj2, ret.get(1));
+  }
+
+  @Test
+  public void test_getXObjects_otherWikiRef() {
+    BaseObject obj = addObj(classRef, null, null);
+    classRef.setWikiReference(new WikiReference("otherWiki"));
+    List<BaseObject> ret = modelAccess.getXObjects(doc, classRef);
+    assertEquals(1, ret.size());
+    assertSame(obj, ret.get(0));
   }
 
   @Test
@@ -445,6 +459,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   @Test
   public void test_newXObject() throws Exception {
     XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
     BaseObject obj = new BaseObject();
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
     replayDefault();
@@ -457,6 +472,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void test_newXObject_loadException() throws Exception {
     Throwable cause = new XWikiException();
     XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andThrow(cause).once();
     replayDefault();
     try {
@@ -466,6 +482,20 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
       assertSame(cause, exc.getCause());
     }
     verifyDefault();
+  }
+
+  @Test
+  public void test_newXObject_otherWikiRef() throws Exception {
+    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
+    BaseObject obj = new BaseObject();
+    expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
+    classRef = new DocumentReference(classRef);
+    classRef.setWikiReference(new WikiReference("otherWiki"));
+    replayDefault();
+    BaseObject ret = modelAccess.newXObject(docMock, classRef);
+    verifyDefault();
+    assertEquals(obj, ret);
   }
 
   @Test

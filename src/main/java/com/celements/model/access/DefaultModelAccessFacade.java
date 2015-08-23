@@ -17,7 +17,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
@@ -30,6 +29,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -61,7 +61,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (exists(docRef)) {
       return getDocumentInternal(docRef);
     } else {
-      throw new DocumentNotExistsException("Doc does not exist " + toString(docRef));
+      throw new DocumentNotExistsException(docRef);
     }
   }
 
@@ -70,7 +70,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       return getContext().getWiki().getDocument(docRef, getContext());
     } catch (XWikiException xwe) {
-      throw new DocumentLoadException("Failed to load doc " + toString(docRef), xwe);
+      throw new DocumentLoadException(docRef, xwe);
     }
   }
 
@@ -81,7 +81,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (!exists(docRef)) {
       return createDocumentInternal(docRef);
     } else {
-      throw new DocumentAlreadyExistsException("Doc already exists " + toString(docRef));
+      throw new DocumentAlreadyExistsException(docRef);
     }
   }
 
@@ -141,8 +141,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     } catch (XWikiException xwe) {
-      throw new DocumentSaveException("Failed to save doc " 
-          + toString(doc.getDocumentReference()), xwe);
+      throw new DocumentSaveException(doc.getDocumentReference(), xwe);
     }
   }
 
@@ -169,8 +168,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         }
       }
     } catch (XWikiException xwe) {
-      throw new DocumentDeleteException("Failed to load translations " 
-          + toString(doc.getDocumentReference()), xwe);
+      throw new DocumentDeleteException(doc.getDocumentReference(), xwe);
     }
     toDelDocs.add(doc);
     for (XWikiDocument toDel : toDelDocs) {
@@ -189,8 +187,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       try {
         getContext().getWiki().deleteDocument(doc, totrash, getContext());
       } catch (XWikiException xwe) {
-        throw new DocumentDeleteException("Failed to delete doc "
-            + toString(doc.getDocumentReference()), xwe);
+        throw new DocumentDeleteException(doc.getDocumentReference(), xwe);
       }
     } finally {
       getContext().setDatabase(dbBefore);
@@ -255,9 +252,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
       String key, Collection<?> values) {
     checkNotNull(doc);
+    checkNotNull(classRef);
+    classRef = webUtilsService.checkWikiRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
-        Collections.<BaseObject>emptyList())) {
+        ImmutableList.<BaseObject>of())) {
       if ((obj != null) && checkPropertyKeyValues(obj, key, values)) {
         ret.add(obj);
       }
@@ -295,11 +294,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       ) throws ClassDocumentLoadException {
     checkNotNull(doc);
     checkNotNull(classRef);
+    classRef = webUtilsService.checkWikiRef(classRef, doc);
     try {
       return doc.newXObject(classRef, getContext());
     } catch (XWikiException xwe) {
-      throw new ClassDocumentLoadException("Failed to load class " + toString(classRef),
-          xwe);
+      throw new ClassDocumentLoadException(classRef, xwe);
     }
   }
 
@@ -386,10 +385,6 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       value = Joiner.on('|').join((Iterable<?>) value);
     }
     obj.set(name, value, getContext());
-  }
-
-  private String toString(EntityReference ref) {
-    return "'" + webUtilsService.serializeRef(ref) + "'";
   }
 
 }

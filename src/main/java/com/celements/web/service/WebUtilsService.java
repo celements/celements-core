@@ -1467,6 +1467,21 @@ public class WebUtilsService implements IWebUtilsService {
     return componentManager.lookupMap(role);
   }
 
+  @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
+    return checkWikiRef(docRef, toDoc.getDocumentReference());
+  }
+
+  @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
+    WikiReference wikiRef = getWikiRef(toRef);
+    if (!docRef.getWikiReference().equals(wikiRef)) {
+      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
+          docRef.getLastSpaceReference().getName(), wikiRef));
+    }
+    return docRef;
+  }
+
   private IDocumentParentsListerRole getDocumentParentsLister() {
     if (docParentsLister == null) {
       docParentsLister = Utils.getComponent(IDocumentParentsListerRole.class);

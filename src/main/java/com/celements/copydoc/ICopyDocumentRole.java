@@ -32,6 +32,9 @@ public interface ICopyDocumentRole {
    */
   public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc
       ) throws ClassDocumentLoadException, DocumentSaveException;
+
+  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Set<BaseObject> toIgnore) throws ClassDocumentLoadException, DocumentSaveException;
   
   /**
    * Copies given source doc to given target doc
