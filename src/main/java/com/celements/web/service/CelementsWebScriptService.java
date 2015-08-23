@@ -941,11 +941,14 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void setGlobalContextValue(String key, Object value) {
+    _LOGGER.debug("setGlobalContextValue: key '{}', value '{}'", key, value);
     execution.getContext().setProperty(CEL_GLOBALVAL_PREFIX + key, value);
   }
 
   public Object getGlobalContextValue(String key) {
-    return execution.getContext().getProperty(CEL_GLOBALVAL_PREFIX + key);
+    Object value = execution.getContext().getProperty(CEL_GLOBALVAL_PREFIX + key);
+    _LOGGER.debug("getGlobalContextValue: key '{}', value '{}'", key, value);
+    return value;
   }
 
   /**
