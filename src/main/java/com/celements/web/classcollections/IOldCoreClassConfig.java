@@ -1,8 +1,10 @@
 package com.celements.web.classcollections;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
+@ComponentRole
 public interface IOldCoreClassConfig {
 
   public static final String PHOTO_ALBUM_CLASS_DOC = "PhotoAlbumClass";
