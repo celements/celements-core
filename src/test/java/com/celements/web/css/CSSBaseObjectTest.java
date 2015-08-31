@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.utils.IWebUtils;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -53,8 +53,7 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     bo.setStringValue("title", "myTitle");
     bo.setStringValue("media", "print");
     bo.setIntValue("is_rte_content", 0);
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
   }
 
   @Test
@@ -63,24 +62,26 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     String url = "http://celements2web.testhost/skin/Space/Doc/file.txt";
     bo.setStringValue("cssname", attLink);
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    IWebUtils webutils = createMock(IWebUtils.class);
-    cssFile.testInjectUtils(webutils);
-    expect(webutils.getAttachmentURL(eq(attLink), same(context))).andReturn(url).once();
-    replay(webutils);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
+    cssFile.testInjectAttURLcmd(attURLcmd);
+    expect(attURLcmd.getAttachmentURL(eq(attLink), same(context))).andReturn(url).once();
+    replayDefault();
     assertEquals(url, cssFile.getCSS(context));
-    verify(webutils);
+    verifyDefault();
   }
   
   @Test
   public void testGetCSS_emptyObjField() {
     bo.setStringValue("cssname", "");
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    IWebUtils webutils = createMock(IWebUtils.class);
-    cssFile.testInjectUtils(webutils);
-    expect(webutils.getAttachmentURL(eq(""), same(context))).andReturn("").once();
-    replay(webutils);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
+    cssFile.testInjectAttURLcmd(attURLcmd);
+    expect(attURLcmd.getAttachmentURL(eq(""), same(context))).andReturn("").once();
+    replayDefault();
     assertEquals("", cssFile.getCSS(context));
-    verify(webutils);
+    verifyDefault();
   }
 
   @Test
@@ -89,13 +90,14 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     String url = "/skin/Space/Doc/file.txt";
     bo.setStringValue("cssname", attLink);
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    IWebUtils webutils = createMock(IWebUtils.class);
-    cssFile.testInjectUtils(webutils);
-    expect(webutils.getAttachmentURL(eq(context.getDatabase() + ":" + attLink),
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
+    cssFile.testInjectAttURLcmd(attURLcmd);
+    expect(attURLcmd.getAttachmentURL(eq(context.getDatabase() + ":" + attLink),
         same(context))).andReturn(url).once();
-    replay(webutils);
+    replayDefault();
     assertEquals(url, cssFile.getCSS(context));
-    verify(webutils);
+    verifyDefault();
   }
 
   @Test
@@ -151,49 +153,52 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAttachment() throws Exception {
-    IWebUtils mockUtils = createMock(IWebUtils.class);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
         "XWiki", "XWikiPreferences");
     bo.setStringValue("cssname", "XWiki.XWikiPreferences;myAttachment.css");
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    expect(mockUtils.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
-    cssFile.testInjectUtils(mockUtils);
+    expect(attURLcmd.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
+    cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(xwikiPrefDocRef);
     List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);
     expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(doc);
-    replay(xwiki, mockUtils);
+    replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
-    verify(xwiki, mockUtils);
+    verifyDefault();
   }
 
   @Test
   public void testGetAttachment_Null() throws Exception {
-    IWebUtils mockUtils = createMock(IWebUtils.class);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     String fullName = "XWiki.XWikiPreferences";
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
         "XWiki", "XWikiPreferences");
     bo.setStringValue("cssname", "XWiki.XWikiPreferences;myAttachment.css");
     CSSBaseObject cssFile = new CSSBaseObject(bo, context);
-    expect(mockUtils.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
-    cssFile.testInjectUtils(mockUtils);
+    expect(attURLcmd.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
+    cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(xwikiPrefDocRef);
     List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
     doc.setAttachmentList(attList);
     expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(doc);
-    replay(xwiki, mockUtils);
+    replayDefault();
     assertNull("attachment must be null, if attachment does not exist",
         cssFile.getAttachment());
-    verify(xwiki, mockUtils);
+    verifyDefault();
   }
 
   @Test
   public void testGetAttachment_centralDb() throws Exception {
-    IWebUtils mockUtils = createMock(IWebUtils.class);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     DocumentReference xwikiPrefDocRef = new DocumentReference("celements2web", "XWiki",
         "XWikiPreferences");
@@ -205,17 +210,17 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     centrBo.setIntValue("is_rte_content", 0);
     centrBo.setStringValue("cssname", "XWiki.XWikiPreferences;myAttachment.css");
     CSSBaseObject cssFile = new CSSBaseObject(centrBo, context);
-    expect(mockUtils.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
-    cssFile.testInjectUtils(mockUtils);
+    expect(attURLcmd.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
+    cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(xwikiPrefDocRef);
     List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);
     expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(doc);
-    replay(xwiki, mockUtils);
+    replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
-    verify(xwiki, mockUtils);
+    verifyDefault();
   }
 
   @Test

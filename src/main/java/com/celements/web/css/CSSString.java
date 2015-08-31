@@ -96,9 +96,10 @@ public class CSSString extends CSS {
   public Attachment getAttachment() {
     if (isAttachment()) {
       try {
-        XWikiDocument attDoc = context.getWiki().getDocument(getWebUtils(
+        XWikiDocument attDoc = context.getWiki().getDocument(getAttachmentURLcmd(
             ).getPageFullName(file), context);
-        XWikiAttachment att = attDoc.getAttachment(getWebUtils().getAttachmentName(file));
+        XWikiAttachment att = attDoc.getAttachment(getAttachmentURLcmd(
+            ).getAttachmentName(file));
         return new Attachment(new Document(attDoc, context), att, context);
       } catch (XWikiException e) {
         mLogger.error(e);
@@ -109,7 +110,7 @@ public class CSSString extends CSS {
 
   @Override
   public boolean isAttachment() {
-    return getWebUtils().isAttachmentLink(file);
+    return getAttachmentURLcmd().isAttachmentLink(file);
   }
 
   @Override
