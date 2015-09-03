@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class RenderCommand {
   
-  private static Log LOGGER = LogFactory.getFactory().getInstance(RenderCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(RenderCommand.class);
 
   private PageTypeReference defaultPageTypeRef = null;
 
@@ -144,7 +144,8 @@ public class RenderCommand {
         + "] lang [" + lang + "] renderMode [" + renderMode + "].");
     String cellDocFN = getWebUtilsService().getRefDefaultSerializer().serialize(
         cellDoc.getDocumentReference());
-    if (getContext().getWiki().getRightService().hasAccessLevel(renderMode,
+    if ((getContext() != null) && (getContext().get("vcontext") != null)
+        && getContext().getWiki().getRightService().hasAccessLevel(renderMode,
         getContext().getUser(), cellDocFN, getContext())) {
       VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
       vcontext.put("celldoc", cellDoc.newDocument(getContext()));
@@ -157,6 +158,10 @@ public class RenderCommand {
       return renderTemplatePath(getRenderTemplatePath(cellType, cellDocFN, renderMode),
           lang);
     } else {
+      if ((getContext() == null) || (getContext().get("vcontext") == null)) {
+        LOGGER.error("Failed to renderCelementsDocument '{}', because velocity context "
+            + " or context is null.", cellDoc.getDocumentReference());
+      }
       return "";
     }
   }
