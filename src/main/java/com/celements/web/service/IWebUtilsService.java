@@ -143,11 +143,9 @@ public interface IWebUtilsService {
 
   public boolean isSuperAdminUser();
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
-      ) throws XWikiException;
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level);
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
-      ) throws XWikiException;
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user);
 
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
@@ -342,5 +340,21 @@ public interface IWebUtilsService {
    * only used as an adapter for unstable 2
    */
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
+
+  /**
+   * checks and corrects the WikiReference on docRef compared to toDoc.
+   * @param docRef
+   * @param toDoc
+   * @return
+   */
+  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc);
+
+  /**
+   * checks and corrects the WikiReference on docRef compared to toDoc.
+   * @param docRef
+   * @param toRef
+   * @return
+   */
+  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
 
 }

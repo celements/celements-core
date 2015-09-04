@@ -25,12 +25,9 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -50,29 +47,13 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
   private static final String _COMPONENT_NAME = "TreeNodeDocumentDeletedListener";
   private TreeNodeDocumentDeletedListener eventListener;
   private XWikiContext context;
-  private ObservationManager defaultObservationManager;
-  private ComponentManager componentManager;
   private ObservationManager obsManagerMock;
 
   @Before
   public void setUp_TreeNodeDocumentDeletedListenerTest() throws Exception {
-    componentManager = Utils.getComponentManager();
     context = getContext();
+    obsManagerMock = registerComponentMock(ObservationManager.class);
     eventListener = getTreeNodeDocumentDeletedListener();
-    defaultObservationManager = getComponentManager().lookup(ObservationManager.class);
-    componentManager.release(defaultObservationManager);
-    ComponentDescriptor<ObservationManager> obsManagDesc =
-      componentManager.getComponentDescriptor(ObservationManager.class, "default");
-    obsManagerMock = createMockAndAddToDefault(ObservationManager.class);
-    componentManager.registerComponent(obsManagDesc, obsManagerMock);
-  }
-
-  @After
-  public void tearDown_TreeNodeDocumentDeletedListenerTest() throws Exception {
-    componentManager.release(obsManagerMock);
-    ComponentDescriptor<ObservationManager> obsManagDesc =
-      componentManager.getComponentDescriptor(ObservationManager.class, "default");
-    componentManager.registerComponent(obsManagDesc, defaultObservationManager);
   }
 
   @Test

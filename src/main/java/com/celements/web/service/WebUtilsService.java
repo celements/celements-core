@@ -58,6 +58,8 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagelayout.LayoutScriptService;
@@ -555,14 +557,12 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
-      ) throws XWikiException {
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level) {
     return hasAccessLevel(ref, level, getContext().getXWikiUser());
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
-      ) throws XWikiException {
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user) {
     boolean ret = false;
     DocumentReference docRef = null;
     if (ref instanceof SpaceReference) {
@@ -573,9 +573,14 @@ public class WebUtilsService implements IWebUtilsService {
       docRef = ((AttachmentReference) ref).getDocumentReference();
     }
     if (docRef != null) {
-      ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
-          (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
-          serializeRef(docRef), getContext());
+      try {
+        ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
+            (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
+            serializeRef(docRef), getContext());
+      } catch (XWikiException xwe) {
+        // already being catched in XWikiRightServiceImpl.hasAccessLevel()
+        _LOGGER.error("should not happen");
+      }
     }
     _LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", 
         ref, level, user, ret);
@@ -1181,35 +1186,38 @@ public class WebUtilsService implements IWebUtilsService {
     return centralTemplateRef;
   }
 
+  /**
+   *  @deprecated instead use {@link IModelAccessFacade#
+   *  deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
+   */
+  @Deprecated
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
-    /** deleteDocument in XWiki does NOT set context and store database to doc database
-     * Thus deleting the doc fails if it is not in the current context database. Hence we
-     * need to fix the context database before deleting.
-     */
-    String dbBefore = getContext().getDatabase();
     try {
-      getContext().setDatabase(doc.getDocumentReference().getLastSpaceReference().getParent(
-          ).getName());
-      _LOGGER.debug("deleteDocument: doc [" + getRefDefaultSerializer().serialize(
-          doc.getDocumentReference()) + "," + doc.getLanguage() + "] totrash [" + totrash
-          + "] dbBefore [" + dbBefore + "] db now [" + getContext().getDatabase() + "].");
-      getContext().getWiki().deleteDocument(doc, totrash, getContext());
-    } finally {
-      getContext().setDatabase(dbBefore);
+      getModelAccess().deleteDocumentWithoutTranslations(doc, totrash);
+    } catch (DocumentDeleteException exc) {
+      throw (XWikiException) exc.getCause();
     }
   }
 
+  /**
+   *  @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument,
+   *  boolean)}
+   */
+  @Deprecated
   @Override
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash
       ) throws XWikiException {
-    // Delete all documents
-    for (String lang : doc.getTranslationList(getContext())) {
-      XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
-      deleteDocument(tdoc, totrash);
+    try {
+      getModelAccess().deleteDocument(doc, totrash);
+    } catch (DocumentDeleteException exc) {
+      throw (XWikiException) exc.getCause();
     }
+  }
 
-    deleteDocument(doc, totrash);
+  private IModelAccessFacade getModelAccess() {
+    // not as requirement due to cyclic dependency
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
   @Override
@@ -1457,6 +1465,21 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException {
     return componentManager.lookupMap(role);
+  }
+
+  @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
+    return checkWikiRef(docRef, toDoc.getDocumentReference());
+  }
+
+  @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
+    WikiReference wikiRef = getWikiRef(toRef);
+    if (!docRef.getWikiReference().equals(wikiRef)) {
+      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
+          docRef.getLastSpaceReference().getName(), wikiRef));
+    }
+    return docRef;
   }
 
   private IDocumentParentsListerRole getDocumentParentsLister() {

@@ -109,3 +109,6 @@ com.celements.parents.NavigationParents
 com.celements.navigation.listener.NavigationCacheFlushingListener
 com.celements.web.service.DeprecatedUsageScriptService
 com.celements.xwikiPatches.SpacePreferencesConfigurationSource
+com.celements.model.access.DefaultModelAccessFacade
+com.celements.model.access.ModelAccessScriptService
+com.celements.web.classcollections.OldCoreClassConfig

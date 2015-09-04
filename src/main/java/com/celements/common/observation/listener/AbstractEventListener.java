@@ -10,11 +10,15 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractEventListener implements EventListener {
+
+  @Requirement
+  protected IModelAccessFacade modelAccess;
 
   @Requirement
   protected IWebUtilsService webUtilsService;
@@ -56,10 +60,14 @@ public abstract class AbstractEventListener implements EventListener {
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    if (isLocalEvent()) {
-      onLocalEvent(event, source, data);
+    if ((event != null) && (source != null)) {
+      if (isLocalEvent()) {
+        onLocalEvent(event, source, data);
+      } else {
+        onRemoteEvent(event, source, data);
+      }
     } else {
-      onRemoteEvent(event, source, data);
+      getLogger().warn("onEvent: got null values, event '{}', source '{}'", event,source);
     }
   }
 

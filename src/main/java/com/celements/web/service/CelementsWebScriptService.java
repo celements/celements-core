@@ -85,6 +85,8 @@ import com.xpn.xwiki.web.Utils;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
+  private static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
+
   private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Logger _LOGGER  = LoggerFactory.getLogger(
@@ -936,6 +938,17 @@ public class CelementsWebScriptService implements ScriptService {
 
   public EntityReference getParentReference(DocumentReference docRef) {
     return treeNodeService.getParentReference(docRef);
+  }
+
+  public void setGlobalContextValue(String key, Object value) {
+    _LOGGER.debug("setGlobalContextValue: key '{}', value '{}'", key, value);
+    execution.getContext().setProperty(CEL_GLOBALVAL_PREFIX + key, value);
+  }
+
+  public Object getGlobalContextValue(String key) {
+    Object value = execution.getContext().getProperty(CEL_GLOBALVAL_PREFIX + key);
+    _LOGGER.debug("getGlobalContextValue: key '{}', value '{}'", key, value);
+    return value;
   }
 
   /**

@@ -94,8 +94,6 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
   @Test
   public void testOnEvent_nullDoc_ing() {
     Event event = new DocumentUpdatingEvent();
-
-    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     
     replayDefault();
     listener.onEvent(event, null, context);
@@ -105,8 +103,6 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
   @Test
   public void testOnEvent_nullDoc_ed() {
     Event event = new DocumentUpdatedEvent();
-
-    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     
     replayDefault();
     listener.onEvent(event, null, context);
