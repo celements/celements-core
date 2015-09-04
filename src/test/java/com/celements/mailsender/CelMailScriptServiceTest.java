@@ -25,6 +25,9 @@ public class CelMailScriptServiceTest {
     assertFalse(cmss.isValidEmail("a b@abc.com"));
     assertFalse(cmss.isValidEmail("a@abc.com com"));
     assertFalse(cmss.isValidEmail("abc.com"));
+    assertFalse(cmss.isValidEmail("a@abc.com b@abc.com"));
+    assertFalse(cmss.isValidEmail("a@abc.com,b@abc.com"));
+    assertFalse(cmss.isValidEmail("a@abc.com, b@abc.com"));
   }
 
   @Test
