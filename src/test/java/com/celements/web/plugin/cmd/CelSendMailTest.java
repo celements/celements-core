@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
+import com.xpn.xwiki.web.Utils;
 
 public class CelSendMailTest extends AbstractBridgedComponentTestCase {
   XWikiContext context;
@@ -44,7 +45,12 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CelSendMailTest() throws Exception {
     context = getContext();
-    sendMail = new CelSendMail();
+    sendMail = (CelSendMail) Utils.getComponent(IMailObjectRole.class);
+  }
+
+  @Test
+  public void testCelSendMail_PerLookup() {
+    assertNotSame(sendMail, Utils.getComponent(IMailObjectRole.class));
   }
 
   @Test
