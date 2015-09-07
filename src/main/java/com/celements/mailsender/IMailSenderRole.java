@@ -18,4 +18,6 @@ public interface IMailSenderRole {
       String subject, String htmlContent, String textContent,
       List<Attachment> attachments, Map<String, String> others, boolean isLatin1);
 
+  public boolean isValidEmail(String email);
+
 }

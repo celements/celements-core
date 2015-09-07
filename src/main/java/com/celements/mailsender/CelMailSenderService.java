@@ -44,6 +44,15 @@ public class CelMailSenderService implements IMailSenderRole {
     return sender.sendMail();
   }
 
+  @Override
+  public boolean isValidEmail(String email) {
+    //chars - a-z A-Z 0-9 œ à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ø ù ú û ü ý þ ÿ
+    String wordChars = "\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF";
+    String regex = "^[" + wordChars + "\\.\\+]+[@][" + wordChars + "]+([.]([" + wordChars 
+        + "]+))+$";
+    return email.matches(regex);
+  }
+  
   /**
    * use for tests only!!!
    */
