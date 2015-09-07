@@ -271,7 +271,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   
   //TODO Delegation can be removed as soon as latin1 flag can be removed
   /**
-   * @deprecated since 2.19.0 instead use CelSendMail class directly.
+   * @deprecated since 2.19.0 instead use IMailSenderRole service directly.
    */
   @Deprecated
   public int sendMail(
@@ -285,7 +285,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
   
   /**
-   * @deprecated since 2.19.0 instead use CelSendMail class directly.
+   * @deprecated since 2.19.0 instead use IMailSenderRole service directly.
    */
   @Deprecated
   public int sendMail(
