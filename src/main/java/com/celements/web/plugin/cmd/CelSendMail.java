@@ -56,6 +56,10 @@ public class CelSendMail implements IMailObjectRole {
   public CelSendMail(XWikiContext context) {
   }
   
+  /**
+   * @deprecated since 2.67.0 instead use Component Manager access to IMailObjectRole
+   */
+  @Deprecated
   public CelSendMail() {}
   
   @Override
