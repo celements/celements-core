@@ -113,3 +113,4 @@ com.celements.model.access.DefaultModelAccessFacade
 com.celements.model.access.ModelAccessScriptService
 com.celements.web.classcollections.OldCoreClassConfig
 com.celements.web.plugin.cmd.CelSendMail
+com.celements.mailsender.CelMailSenderService
