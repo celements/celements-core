@@ -38,6 +38,12 @@ import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Do not use this class directly. Instead use IMailSenderRole to send emails.
+ * In the future it is planned, that IMailSenderRole will buffer, store and allow to
+ * resent email messages, if temporary failure occur. You wont be able to take advantage
+ * from this features if you directly access IMailObjectRole.
+ */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class CelSendMail implements IMailObjectRole {
