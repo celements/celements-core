@@ -4,15 +4,19 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.script.service.ScriptService;
+
+import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.web.Utils;
 
 
-public class CelMailScriptServiceTest {
+public class CelMailScriptServiceTest extends AbstractBridgedComponentTestCase {
   
   private CelMailScriptService cmss;
   
   @Before
-  public void setUp() throws Exception {
-    cmss = new CelMailScriptService();
+  public void setUp_CelMailScriptServiceTest() throws Exception {
+    cmss = (CelMailScriptService) Utils.getComponent(ScriptService.class, "celmail");
   }
 
   @Test

@@ -35,7 +35,6 @@ import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
-import com.celements.web.plugin.cmd.CelSendMail;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -165,24 +164,6 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     plugin.setSupportedAdminLanguages(injectedLangList);
     assertNotNull(plugin.getSupportedAdminLanguages());
     assertEquals(injectedLangList, plugin.getSupportedAdminLanguages());
-  }
-
-  @Test
-  public void injectCelSendMail() {
-    CelSendMail csm = new CelSendMail(context);
-    plugin.injectCelSendMail(csm);
-    assertSame(csm, plugin.getCelSendMail(context));
-  }
-  
-  @Test
-  public void testGetCelSendMail_notNull() {
-    assertNotNull(plugin.getCelSendMail(context));
-  }
-  
-  @Test
-  public void testGetCelSendMail_notSingleton() {
-    CelSendMail csm = plugin.getCelSendMail(context);
-    assertNotSame(csm, plugin.getCelSendMail(context));
   }
 
   @Test

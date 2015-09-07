@@ -26,19 +26,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.auth.AuthenticationService;
 import com.celements.auth.IAuthenticationServiceRole;
+import com.celements.mailsender.IMailSenderRole;
 import com.celements.mandatory.CheckMandatoryDocuments;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.pagetype.IPageType;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.plugin.cmd.AddTranslationCommand;
-import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.CheckClassesCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
@@ -71,8 +71,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CelementsWebPlugin.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebPlugin.class);
 
   private final static IWebUtils util = WebUtils.getInstance();
 
@@ -82,8 +81,6 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   final String PARAM_SKIN = "skin";
   final String PARAM_LANGUAGE = "language";
   final String PARAM_XREDIRECT = "xredirect";
-
-  private CelSendMail injectedCelSendMail;
 
   public CelementsWebPlugin(
       String name, String className, XWikiContext context) {
@@ -297,31 +294,14 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
         String subject, String htmlContent, String textContent, 
         List<Attachment> attachments, Map<String, String> others, boolean isLatin1,
         XWikiContext context){
-    CelSendMail sender = getCelSendMail(context);
-    sender.setFrom(from);
-    sender.setReplyTo(replyTo);
-    sender.setTo(to);
-    sender.setCc(cc);
-    sender.setBcc(bcc);
-    sender.setSubject(subject);
-    sender.setHtmlContent(htmlContent, isLatin1);
-    sender.setTextContent(textContent);
-    sender.setAttachments(attachments);
-    sender.setOthers(others);
-    return sender.sendMail();
+    return getMailSenderService().sendMail(from, replyTo, to, cc, bcc, subject,
+        htmlContent, textContent, attachments, others, isLatin1);
   }
 
-  void injectCelSendMail(CelSendMail celSendMail) {
-    this.injectedCelSendMail = celSendMail;
+  private IMailSenderRole getMailSenderService() {
+    return Utils.getComponent(IMailSenderRole.class);
   }
-  
-  CelSendMail getCelSendMail(XWikiContext context) {
-    if(injectedCelSendMail != null) {
-      return injectedCelSendMail;
-    }
-    return new CelSendMail(context);
-  }
-  
+
   /**
    * @deprecated since 2.59 instead use {@link WebUtilsService
    * #getAttachmentsForDocs(List)}
