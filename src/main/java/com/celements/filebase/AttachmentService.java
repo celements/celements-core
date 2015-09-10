@@ -76,7 +76,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   }
 
   @Override
-  public XWikiAttachment addAtachment(XWikiDocument doc, InputStream in, String filename,
+  public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
         AddingAttachmentContentFailedException, DocumentSaveException {
     //We do not want to change the document in xwiki cache in case an exception happens
@@ -165,7 +165,7 @@ public class AttachmentService implements IAttachmentServiceRole {
     }
     try {
       InputStream in = fileupload.getFileItemInputStream(fieldName, getContext());
-      addAtachment(doc, in, filename, username, null);
+      addAttachment(doc, in, filename, username, null);
     } catch (AddingAttachmentContentFailedException|IOException exp) {
       throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
           XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,

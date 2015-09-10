@@ -39,7 +39,7 @@ public interface IAttachmentServiceRole {
   public boolean uploadAttachment(String fieldName, String filename,
       FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException;
 
-  public XWikiAttachment addAtachment(XWikiDocument doc, InputStream in, String filename,
+  public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
         AddingAttachmentContentFailedException, DocumentSaveException;
 
