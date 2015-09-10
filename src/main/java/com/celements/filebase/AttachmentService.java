@@ -19,6 +19,7 @@
  */
 package com.celements.filebase;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -74,7 +75,26 @@ public class AttachmentService implements IAttachmentServiceRole {
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
-
+  
+  @Override
+  public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename, 
+      String username, String comment) throws AttachmentToBigException,
+        AddingAttachmentContentFailedException, DocumentSaveException {
+    ByteArrayInputStream in = null;
+    try {
+      in = new ByteArrayInputStream(data);
+      return addAttachment(doc, in, filename, username, comment);
+    } finally {
+      if(in != null) {
+        try {
+          in.close();
+        } catch (IOException ioe) {
+          _LOGGER.error("Exception in byte[] to InputStream", ioe);
+        }
+      }
+    }
+  }
+  
   @Override
   public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
