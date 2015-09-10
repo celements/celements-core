@@ -20,6 +20,7 @@
 package com.celements.filebase;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,6 +39,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -63,10 +66,73 @@ public class AttachmentService implements IAttachmentServiceRole {
   private static final String FILENAME_FIELD_NAME = "filename";
 
   @Requirement
+  IModelAccessFacade modelAccess;
+
+  @Requirement
   Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+  }
+
+  @Override
+  public XWikiAttachment addAtachment(XWikiDocument doc, InputStream in, String filename,
+      String username, String comment) throws AttachmentToBigException,
+        AddingAttachmentContentFailedException, DocumentSaveException {
+    //We do not want to change the document in xwiki cache in case an exception happens
+    //those not saved changes would be left in memory
+    XWikiDocument theDoc = (XWikiDocument) doc.clone();
+    // Read XWikiAttachment
+    XWikiAttachment attachment = theDoc.getAttachment(filename);
+
+    if (attachment == null) {
+      attachment = new XWikiAttachment();
+      theDoc.getAttachmentList().add(attachment);
+    }
+
+    try {
+      attachment.setContent(in);
+    } catch (IOException exp) {
+      throw new AddingAttachmentContentFailedException(exp);
+    }
+
+    attachment.setFilename(filename);
+    attachment.setAuthor(username);
+
+    // Add the attachment to the document
+    attachment.setDoc(theDoc);
+    theDoc.setAuthor(username);
+
+    // Adding a comment with a link to the download URL
+    String nextRev = attachment.getNextVersion();
+    ArrayList<String> params = new ArrayList<String>();
+    params.add(filename);
+    params.add(theDoc.getAttachmentRevisionURL(filename, nextRev, getContext()));
+    if (comment == null) {
+      if (attachment.isImage(getContext())) {
+        comment = getContext().getMessageTool().get("core.comment.uploadImageComment", 
+            params);
+      } else {
+        comment = getContext().getMessageTool().get("core.comment.uploadAttachmentComment", 
+            params);
+      }
+    }
+
+    // Save the document.
+    try {
+      _LOGGER.debug("uploadAttachment: save document [" + theDoc.getDocumentReference()
+          + "] after adding filename [" + filename + "] in revision [" + nextRev + "].");
+      modelAccess.saveDocument(theDoc, comment);
+    } catch (DocumentSaveException exp) {
+      // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving
+      // Attachment
+      XWikiException xwe = (XWikiException)exp.getCause();
+      if (xwe.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {
+        throw new AttachmentToBigException(xwe);
+      }
+      throw exp;
+    }
+    return attachment;
   }
 
   /**
@@ -94,61 +160,23 @@ public class AttachmentService implements IAttachmentServiceRole {
         + "], context username [" + username + "], doc [" + doc.getDocumentReference()
         + "].");
 
-    // Read XWikiAttachment
-    XWikiAttachment attachment = doc.getAttachment(filename);
-
-    if (attachment == null) {
-      attachment = new XWikiAttachment();
-      doc.getAttachmentList().add(attachment);
-    }
-
-    try {
-      attachment.setContent(fileupload.getFileItemInputStream(fieldName, getContext()));
-    } catch (IOException e) {
-      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-          XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,
-          "Exception while reading uploaded parsed file", e);
-    }
-
-    attachment.setFilename(filename);
-    attachment.setAuthor(username);
-
-    // Add the attachment to the document
-    attachment.setDoc(doc);
-
-    doc.setAuthor(username);
     if (doc.isNew()) {
       doc.setCreator(username);
     }
-
-    // Adding a comment with a link to the download URL
-    String comment;
-    String nextRev = attachment.getNextVersion();
-    ArrayList<String> params = new ArrayList<String>();
-    params.add(filename);
-    params.add(doc.getAttachmentRevisionURL(filename, nextRev, getContext()));
-    if (attachment.isImage(getContext())) {
-      comment = getContext().getMessageTool().get("core.comment.uploadImageComment", 
-          params);
-    } else {
-      comment = getContext().getMessageTool().get("core.comment.uploadAttachmentComment", 
-          params);
-    }
-
-    // Save the document.
     try {
-      _LOGGER.debug("uploadAttachment: save document [" + doc.getDocumentReference()
-          + "] after adding filename [" + filename + "] in revision [" + nextRev + "].");
-      getContext().getWiki().saveDocument(doc, comment, getContext());
-    } catch (XWikiException e) {
-      // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving
-      // Attachment
-      if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        getContext().put("message", "javaheapspace");
-        return true;
-      }
-      throw e;
+      InputStream in = fileupload.getFileItemInputStream(fieldName, getContext());
+      addAtachment(doc, in, filename, username, null);
+    } catch (AddingAttachmentContentFailedException|IOException exp) {
+      throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+          XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,
+          "Exception while reading uploaded parsed file", exp);
+    } catch (AttachmentToBigException exp) {
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      getContext().put("message", "javaheapspace");
+      return true;
+    } catch (DocumentSaveException exp) {
+      XWikiException xwe = (XWikiException)exp.getCause();
+      throw xwe;
     }
     return false;
   }
