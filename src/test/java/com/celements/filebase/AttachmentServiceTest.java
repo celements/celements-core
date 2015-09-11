@@ -1,12 +1,7 @@
 package com.celements.filebase;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.same;
-import static org.junit.Assert.assertEquals;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,11 +15,11 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.XWiki;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -207,6 +202,34 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(2, attMap.keySet().size());
     assertEquals(3, attMap.get(docRef).size());
     assertEquals(2, attMap.get(docRef2).size());
+  }
+  
+  @Test
+  public void testAddAttachment() throws DocumentSaveException, AttachmentToBigException, 
+      AddingAttachmentContentFailedException, XWikiException {
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att = new XWikiAttachment();
+    String comment = "comment";
+    String filename = "file.txt";
+    String author = "XWiki.test";
+    expect(doc.clone()).andReturn(doc).once();
+    expect(doc.getAttachment(eq(filename))).andReturn(att);
+    expect(doc.getAttachmentRevisionURL(eq(filename), (String)anyObject(), 
+        same(getContext()))).andReturn("").once();
+    expect(doc.getDocumentReference()).andReturn(new DocumentReference(getContext(
+        ).getDatabase(), "Spc", "Doc")).once();
+    IModelAccessFacade modelAccess = createMockAndAddToDefault(IModelAccessFacade.class);
+    attService.modelAccess = modelAccess;
+    modelAccess.saveDocument(same(doc), eq(comment));
+    expectLastCall();
+    doc.setAuthor(eq(author));
+    expectLastCall();
+    replayDefault();
+    XWikiAttachment retAtt = attService.addAttachment(doc, new byte[]{'x'}, filename, 
+        author, comment);
+    assertSame(att, retAtt);
+    verifyDefault();
+    assertEquals(filename, retAtt.getFilename());
   }
 
 }

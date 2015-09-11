@@ -19,6 +19,7 @@
  */
 package com.celements.filebase;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +76,20 @@ public class AttachmentService implements IAttachmentServiceRole {
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
-
+  
+  @Override
+  public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename, 
+      String username, String comment) throws AttachmentToBigException,
+        AddingAttachmentContentFailedException, DocumentSaveException {
+    ByteArrayInputStream dataStream = null;
+    try {
+      dataStream = new ByteArrayInputStream(data);
+      return addAttachment(doc, dataStream, filename, username, comment);
+    } finally {
+      IOUtils.closeQuietly(dataStream);
+    }
+  }
+  
   @Override
   public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
