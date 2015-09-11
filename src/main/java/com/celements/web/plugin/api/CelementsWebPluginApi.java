@@ -801,9 +801,8 @@ public class CelementsWebPluginApi extends Api {
       String subject, String htmlContent, String textContent,
       List<Attachment> attachments, Map<String, String> others){
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("usage of deprecated sendLatin1Mail on ["
-        + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
-        + docRef.getName() + "].");
+    LOGGER.warn("usage of deprecated sendLatin1Mail on [" + getWebUtilsService(
+        ).serializeRef(docRef) + "].");
     return plugin.sendMail(from, replyTo, to, cc, bcc, subject, htmlContent, textContent,
         attachments, others, true, context);
   }
@@ -1001,8 +1000,7 @@ public class CelementsWebPluginApi extends Api {
   public void processRegistrationsWithoutCallback(List<String> recipients) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
     LOGGER.warn("deprecated usage of processRegistrationsWithoutCallback on ["
-        + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
-        + docRef.getName() + "].");
+        + getWebUtilsService().serializeRef(docRef) + "].");
     getSynCustom().processRegistrationsWithoutCallback(recipients);
   }
 
@@ -1012,8 +1010,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public void paymentCallback() throws XWikiException {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("deprecated usage of paymentCallback on [" + docRef.getWikiReference()
-        + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
+    LOGGER.warn("deprecated usage of paymentCallback on [" + getWebUtilsService(
+        ).serializeRef(docRef) + "].");
     getSynCustom().paymentCallback();
   }
 
@@ -1025,8 +1023,7 @@ public class CelementsWebPluginApi extends Api {
       List<String> recipients) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
     LOGGER.warn("deprecated usage of sendCallbackNotificationMail on ["
-        + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
-        + docRef.getName() + "].");
+        + getWebUtilsService().serializeRef(docRef) + "].");
     getSynCustom().sendCallbackNotificationMail(data, recipients);
   }
 
@@ -1408,8 +1405,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public float getBMI() {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("deprecated usage of getBMI on [" + docRef.getWikiReference() + ":"
-        + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
+    LOGGER.warn("deprecated usage of getBMI on [" + getWebUtilsService().serializeRef(
+        docRef) + "].");
     return getSynCustom().getBMI();
   }
 
@@ -1457,8 +1454,8 @@ public class CelementsWebPluginApi extends Api {
   public int countObjsWithField(String fullName, String className, String fieldName,
       String value, String valueEnd) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("deprecated usage of countObjsWithField on [" + docRef.getWikiReference()
-        + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
+    LOGGER.warn("deprecated usage of countObjsWithField on [" + getWebUtilsService(
+        ).serializeRef(docRef) + "].");
     return getSynCustom().countObjsWithField(fullName, className, fieldName, value,
         valueEnd);
   }
@@ -1471,8 +1468,7 @@ public class CelementsWebPluginApi extends Api {
       String congressName) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
     LOGGER.warn("deprecated usage of getRegistrationStatistics on ["
-        + docRef.getWikiReference() + ":" + docRef.getLastSpaceReference() + "."
-        + docRef.getName() + "].");
+        + getWebUtilsService().serializeRef(docRef) + "].");
     return getSynCustom().getRegistrationStatistics(mappingDoc, congressName);
   }
 
@@ -1482,8 +1478,8 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public Map<String, String> getExportMapping(String mappingStr, String congress) {
     DocumentReference docRef = context.getDoc().getDocumentReference();
-    LOGGER.warn("deprecated usage of getExportMapping on [" + docRef.getWikiReference()
-        + ":" + docRef.getLastSpaceReference() + "." + docRef.getName() + "].");
+    LOGGER.warn("deprecated usage of getExportMapping on [" + getWebUtilsService(
+        ).serializeRef(docRef) + "].");
     return getSynCustom().getExportMapping(mappingStr, congress);
   }
 
