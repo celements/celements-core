@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,18 +81,12 @@ public class AttachmentService implements IAttachmentServiceRole {
   public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename, 
       String username, String comment) throws AttachmentToBigException,
         AddingAttachmentContentFailedException, DocumentSaveException {
-    ByteArrayInputStream in = null;
+    ByteArrayInputStream dataStream = null;
     try {
-      in = new ByteArrayInputStream(data);
-      return addAttachment(doc, in, filename, username, comment);
+      dataStream = new ByteArrayInputStream(data);
+      return addAttachment(doc, dataStream, filename, username, comment);
     } finally {
-      if(in != null) {
-        try {
-          in.close();
-        } catch (IOException ioe) {
-          _LOGGER.error("Exception in byte[] to InputStream", ioe);
-        }
-      }
+      IOUtils.closeQuietly(dataStream);
     }
   }
   
