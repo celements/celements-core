@@ -19,12 +19,15 @@
  */
 package com.celements.filebase;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
 
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
@@ -35,8 +38,17 @@ public interface IAttachmentServiceRole {
 
   public boolean uploadAttachment(String fieldName, String filename,
       FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException;
+  
+  public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename, 
+      String username, String comment) throws AttachmentToBigException,
+        AddingAttachmentContentFailedException, DocumentSaveException;
+  
+  public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
+      String username, String comment) throws AttachmentToBigException,
+        AddingAttachmentContentFailedException, DocumentSaveException;
 
   public String clearFileName(String fileName);
 
   public int deleteAttachmentList(List<AttachmentReference> attachmentRefList);
+
 }
