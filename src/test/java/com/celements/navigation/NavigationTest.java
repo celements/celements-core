@@ -307,6 +307,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyMenuItemDoc"
         + " myUltimativePageType\">", outStream.toString());
     verifyDefault();
   }
@@ -344,7 +345,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
-        + " myUltimativePageType cel_nav_restricted_rights\">", outStream.toString());
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyMenuItemDoc myUltimativePageType"
+        + " cel_nav_restricted_rights\">", outStream.toString());
     verifyDefault();
   }
 
@@ -370,8 +372,8 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     nav.openMenuItemOut(outStream, menuItem.getDocumentReference(), false, false, false,
         2);
     assertEquals("<li class=\"cel_nav_even cel_nav_item2 cel_nav_hasChildren"
-        + " myUltimativePageType active\">",
-        outStream.toString());
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_MyMenuItemDoc myUltimativePageType"
+        + " active\">", outStream.toString());
     verifyDefault();
   }
 
@@ -509,6 +511,60 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     assertTrue("Expected to found pageLayout in css classes. ["
         + cssClasses + "]",
         (" " + cssClasses + " ").contains(" layout_MyLayout "));
+  }
+
+  @Test
+  public void testGetCssClasses_pageSpace() throws XWikiException {
+    String pageType = "myUltimativePageType";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 2);
+    verifyDefault();
+    assertTrue("Expected to found page-space in css classes. ["
+        + cssClasses + "]",
+        (" " + cssClasses + " ").contains(" cel_nav_nodeSpace_MySpace"));
+  }
+
+  @Test
+  public void testGetCssClasses_pageName() throws XWikiException {
+    String pageType = "myUltimativePageType";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyMenuItemDoc");
+    PageTypeReference pageTypeRef = createMockAndAddToDefault(PageTypeReference.class);
+    expect(ptResolverServiceMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef);
+    expect(pageTypeRef.getConfigName()).andReturn(pageType);
+    expect(wUServiceMock.getDocumentParentsList(isA(DocumentReference.class), anyBoolean()
+        )).andReturn(Arrays.asList(getDocRefForDocName("bla"), getDocRefForDocName("bli"),
+            getDocRefForDocName("blu")));
+    BaseObject menuItem = new BaseObject();
+    menuItem.setDocumentReference(docRef);
+    SpaceReference layoutRef = new SpaceReference("MyLayout", new WikiReference(
+        context.getDatabase()));
+    expect(mockLayoutCmd.getPageLayoutForDoc(eq(docRef))).andReturn(layoutRef).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("MySpace.MyMenuItemDoc"), same(context))).andReturn(true).atLeastOnce();
+    replayDefault();
+    String cssClasses = nav.getCssClasses(docRef, true, false, false, false, 2);
+    verifyDefault();
+    assertTrue("Expected to found page-space in css classes. ["
+        + cssClasses + "]",
+        (" " + cssClasses + " ").contains(" cel_nav_nodeName_MyMenuItemDoc"));
   }
 
   @Test
@@ -1069,7 +1125,7 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     List<TreeNode> mainNodeList = Arrays.asList(new TreeNode(homeDocRef, "", 1));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
         ).andReturn(mainNodeList);
-    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName),same(navFilterMock))
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
         ).andReturn(mainNodeList);
     expect(tNServiceMock.getSubNodesForParent(eq("MySpace.Home"), eq(spaceName),
         same(navFilterMock))).andReturn(Collections.<TreeNode>emptyList());
@@ -1090,10 +1146,11 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     replayDefault();
     assertEquals("one tree node for level 1. Thus output expected.", "<ul"
         + " id=\"CN1:MySpace::\" ><li class=\"first last cel_nav_odd cel_nav_item1"
-        + " cel_nav_isLeaf RichText\">"
-        + "<a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last cel_nav_odd"
-        + " cel_nav_item1 cel_nav_isLeaf"
-        + " RichText\" id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
+        + " cel_nav_isLeaf cel_nav_nodeSpace_MySpace cel_nav_nodeName_Home"
+        + " RichText\"><a href=\"/Home\" class=\"cel_cm_navigation_menuitem first last"
+        + " cel_nav_odd cel_nav_item1 cel_nav_isLeaf"
+        + " cel_nav_nodeSpace_MySpace cel_nav_nodeName_Home RichText\""
+        + " id=\"N1:MySpace:MySpace.Home\">Home</a><!-- IE6 --></li></ul>",
         nav.includeNavigation());
     verifyDefault();
   }
@@ -1182,6 +1239,330 @@ public class NavigationTest extends AbstractBridgedComponentTestCase {
     replayDefault();
     assertTrue(nav.isEmpty());
     verifyDefault();
+  }
+
+  @Test
+  public void testGetOffset_default() {
+    replayDefault();
+    assertEquals(0, nav.getOffset());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetOffset_resetZero() {
+    nav.setOffset(2);
+    nav.setOffset(0);
+    replayDefault();
+    assertEquals(0, nav.getOffset());
+    verifyDefault();
+  }
+
+  @Test
+  public void testSetOffset_positiv() {
+    nav.setOffset(2);
+    replayDefault();
+    assertEquals(2, nav.getOffset());
+    verifyDefault();
+  }
+
+  @Test
+  public void testSetOffset_negativ() {
+    nav.setOffset(2);
+    nav.setOffset(-2);
+    replayDefault();
+    assertEquals(0, nav.getOffset());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetNumberOfItem_default() {
+    replayDefault();
+    assertEquals(-1, nav.getNumberOfItem());
+    verifyDefault();
+  }
+
+  @Test
+  public void testSetNumberOfItem_positiv() {
+    nav.setNumberOfItem(5);
+    replayDefault();
+    assertEquals(5, nav.getNumberOfItem());
+    verifyDefault();
+  }
+
+  @Test
+  public void testSetNumberOfItem_negativ() {
+    nav.setNumberOfItem(5);
+    nav.setNumberOfItem(-5);
+    replayDefault();
+    assertEquals(-1, nav.getNumberOfItem());
+    verifyDefault();
+  }
+
+  @Test
+  public void testSetNumberOfItem_zero() {
+    nav.setNumberOfItem(5);
+    nav.setNumberOfItem(0);
+    replayDefault();
+    assertEquals(-1, nav.getNumberOfItem());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_noPaging_mainMenu() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(expectedMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(expectedMenuItemsList).once();
+    replayDefault();
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_withPaging_mainMenu_zeroOffset() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(3);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_withPaging_mainMenu_NONzeroOffset() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(3);
+    nav.setOffset(1);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode2, treeNode3, treeNode4);
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_withPaging_mainMenu_OverflowEnd() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(3);
+    nav.setOffset(3);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode4, treeNode5);
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_withPaging_offsetOutOfBounds() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(3);
+    nav.setOffset(8);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    assertEquals(0, nav.getCurrentMenuItems(1, "").size());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_withPaging_mainMenu_negativOffset() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(3);
+    nav.setOffset(-3);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3);
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetCurrentMenuItems_NoPaging_mainMenu_NONzeroOffset() {
+    nav.fromHierarchyLevel = 1;
+    nav.toHierarchyLevel = 1;
+    nav.setMenuPart("");
+    nav.setNumberOfItem(-1);
+    nav.setOffset(3);
+    navFilterMock.setMenuPart(eq(""));
+    expectLastCall().anyTimes();
+    String spaceName = "MySpace";
+    String wikiName = context.getDatabase();
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        wikiName));
+    DocumentReference docRef1 = new DocumentReference(wikiName, spaceName, "myPage1");
+    DocumentReference docRef2 = new DocumentReference(wikiName, spaceName, "myPage2");
+    DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
+    DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
+    DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3,
+        treeNode4, treeNode5);
+    expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))
+        ).andReturn(allMenuItemsList).once();
+    replayDefault();
+    List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode4, treeNode5);
+    assertEquals(expectedMenuItemsList, nav.getCurrentMenuItems(1, ""));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetEffectiveNumberOfItems_empty() {
+    nav.inject_navInclude("");
+    assertEquals(0, nav.getEffectiveNumberOfItems());
+  }
+
+  @Test
+  public void testGetEffectiveNumberOfItems_noItems() {
+    nav.inject_navInclude("<div>xyz</div>");
+    assertEquals(0, nav.getEffectiveNumberOfItems());
+  }
+
+  @Test
+  public void testGetEffectiveNumberOfItems_hasElems() {
+    nav.inject_navInclude("<ul><li><ul><li>x</li></ul></li><li><div>xyz</div></li></ul>");
+    assertEquals(2, nav.getEffectiveNumberOfItems());
   }
 
 

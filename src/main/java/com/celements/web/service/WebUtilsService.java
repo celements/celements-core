@@ -48,6 +48,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -60,11 +61,14 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.rights.AccessLevel;
@@ -93,11 +97,6 @@ public class WebUtilsService implements IWebUtilsService {
 
   private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
   
-  private static final String REGEX_WORD = "[a-zA-Z0-9]*";
-  private static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
-  private static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
-  private static final String REGEX_ATT = REGEX_DOC + "\\@.*";
-
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
   @Requirement
@@ -117,7 +116,7 @@ public class WebUtilsService implements IWebUtilsService {
   /**
    * Used to get the template path mapping information.
    */
-  @Requirement
+  @Inject
   private TemplatePathTransformationConfiguration tempPathConfig;
 
   /**
@@ -139,13 +138,21 @@ public class WebUtilsService implements IWebUtilsService {
    *  Source: http://extensions.xwiki.org/xwiki/bin/view/Extension/Configuration+Module
    */
 
-  @Requirement
+  @Inject
   IDefaultEmptyDocStrategyRole emptyChecker;
 
-  @Requirement
+  @Inject
   INextFreeDocRole nextFreeDocService;
 
-  @Requirement
+  @Inject
+  ConfigurationSource defaultConfigSrc;
+
+  /*
+   * not loaded as requirement due to cyclic dependency
+   */
+  IDocumentParentsListerRole docParentsLister;
+
+  @Inject
   Execution execution;
 
   XWikiRenderingEngine injectedRenderingEngine;
@@ -168,30 +175,16 @@ public class WebUtilsService implements IWebUtilsService {
     return parent;
   }
   
+  /**
+   * @deprecated since 2.63.0
+   * @deprecated instead use IDocumentParentsListerRole.getDocumentParentsList(
+      DocumentReference docRef, boolean includeDoc)
+   */
   @Override
+  @Deprecated 
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
-    try {
-      DocumentReference nextParent;
-      if (includeDoc) {
-        docParents.add(docRef);
-      }
-        nextParent = getParentRef(docRef);
-      while ((nextParent != null)
-          && getContext().getWiki().exists(nextParent, getContext())
-          && !docParents.contains(nextParent)) {
-        docParents.add(nextParent);
-        nextParent = getParentRef(nextParent);
-      }
-    } catch (XWikiException e) {
-      _LOGGER.error("Failed to get parent reference. ", e);
-    }
-    return docParents;
-  }
-  
-  private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
-    return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
+    return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
   }
   
   @Override
@@ -286,16 +279,19 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<String> getAllowedLanguages(String spaceName) {
     List<String> languages = new ArrayList<String>();
-    languages.addAll(Arrays.asList(getContext().getWiki(
-      ).getSpacePreference("languages", spaceName, "", getContext()).split("[ ,]")));
+    String spaceLanguages = getContext().getWiki().getSpacePreference("languages",
+        spaceName, "", getContext());
+    languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
+      _LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space ["
+          + spaceName + "]");
       return languages;
     }
     _LOGGER.warn("Deprecated usage of Preferences field 'language'."
         + " Instead use 'languages'.");
     return Arrays.asList(getContext().getWiki(
-      ).getSpacePreference("language", spaceName, "", getContext()).split("[ ,]"));
+        ).getSpacePreference("language", spaceName, "", getContext()).split("[ ,]"));
   }
 
   @Override
@@ -386,13 +382,42 @@ public class WebUtilsService implements IWebUtilsService {
   
   @Override
   public String getDefaultLanguage() {
-    return getContext().getWiki().getSpacePreference("default_language", getContext());
+    return getDefaultLanguage((SpaceReference)null);
+  }
+
+  @Deprecated
+  @Override
+  public String getDefaultLanguage(String spaceName) {
+    SpaceReference spaceRef = null;
+    if (StringUtils.isNotBlank(spaceName)) {
+      spaceRef = resolveSpaceReference(spaceName);
+    }
+    return getDefaultLanguage(spaceRef);
   }
 
   @Override
-  public String getDefaultLanguage(String spaceName) {
-    return getContext().getWiki().getSpacePreference("default_language", spaceName, "",
-        getContext());
+  public String getDefaultLanguage(SpaceReference spaceRef) {
+    String defaultLang = "";
+    String dbbackup = getContext().getDatabase();
+    XWikiDocument docBackup = getContext().getDoc();
+    try {
+      if (spaceRef != null) {
+        DocumentReference docRef = new DocumentReference("WebPreferences", spaceRef);
+        if (getContext().getWiki().exists(docRef, getContext())) {
+          getContext().setDatabase(spaceRef.getParent().getName());
+          getContext().setDoc(getContext().getWiki().getDocument(docRef, getContext()));
+        }
+      }
+      defaultLang = defaultConfigSrc.getProperty("default_language", "");
+    } catch (XWikiException xwe) {
+      _LOGGER.error("failed getting WebPreferences for space '{}'", spaceRef, xwe);
+    } finally {
+      getContext().setDatabase(dbbackup);
+      getContext().setDoc(docBackup);
+    }
+    _LOGGER.trace("getDefaultLanguage: for currentDoc '{}' and spaceRef '{}' got lang"
+        + " '{}'", getContext().getDoc(), spaceRef, defaultLang);
+    return defaultLang;
   }
 
   @Override
@@ -537,14 +562,12 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
-      ) throws XWikiException {
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level) {
     return hasAccessLevel(ref, level, getContext().getXWikiUser());
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
-      ) throws XWikiException {
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user) {
     boolean ret = false;
     DocumentReference docRef = null;
     if (ref instanceof SpaceReference) {
@@ -555,9 +578,14 @@ public class WebUtilsService implements IWebUtilsService {
       docRef = ((AttachmentReference) ref).getDocumentReference();
     }
     if (docRef != null) {
-      ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
-          (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
-          serializeRef(docRef), getContext());
+      try {
+        ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
+            (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
+            serializeRef(docRef), getContext());
+      } catch (XWikiException xwe) {
+        // already being catched in XWikiRightServiceImpl.hasAccessLevel()
+        _LOGGER.error("should not happen");
+      }
     }
     _LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", 
         ref, level, user, ret);
@@ -795,11 +823,17 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
     docData.put("translation", "" + xwikiDoc.getTranslation());
     docData.put("defaultLanguage", xwikiDoc.getDefaultLanguage());
-    docData.put("parent", serializer_default.serialize(xwikiDoc.getParentReference()));
+    List<DocumentReference> documentParentsList = getDocumentParentsList(docRef, false);
+    String docParentStr = "";
+    if (!documentParentsList.isEmpty()) {
+      DocumentReference docParentRef = documentParentsList.get(0);
+      docParentStr = serializer_default.serialize(docParentRef);
+    }
+    docData.put("parent", docParentStr);
     String parentsListStr = "";
     String parentsListMNStr = "";
     MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
-    for(DocumentReference parentDocRef : getDocumentParentsList(docRef, false)) {
+    for(DocumentReference parentDocRef : documentParentsList) {
       String parentDocFN = serializer_default.serialize(parentDocRef);
       parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN, getContext(
           ).getLanguage(), getContext()) + ",";
@@ -1157,35 +1191,38 @@ public class WebUtilsService implements IWebUtilsService {
     return centralTemplateRef;
   }
 
+  /**
+   *  @deprecated instead use {@link IModelAccessFacade#
+   *  deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
+   */
+  @Deprecated
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
-    /** deleteDocument in XWiki does NOT set context and store database to doc database
-     * Thus deleting the doc fails if it is not in the current context database. Hence we
-     * need to fix the context database before deleting.
-     */
-    String dbBefore = getContext().getDatabase();
     try {
-      getContext().setDatabase(doc.getDocumentReference().getLastSpaceReference().getParent(
-          ).getName());
-      _LOGGER.debug("deleteDocument: doc [" + getRefDefaultSerializer().serialize(
-          doc.getDocumentReference()) + "," + doc.getLanguage() + "] totrash [" + totrash
-          + "] dbBefore [" + dbBefore + "] db now [" + getContext().getDatabase() + "].");
-      getContext().getWiki().deleteDocument(doc, totrash, getContext());
-    } finally {
-      getContext().setDatabase(dbBefore);
+      getModelAccess().deleteDocumentWithoutTranslations(doc, totrash);
+    } catch (DocumentDeleteException exc) {
+      throw (XWikiException) exc.getCause();
     }
   }
 
+  /**
+   *  @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument,
+   *  boolean)}
+   */
+  @Deprecated
   @Override
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash
       ) throws XWikiException {
-    // Delete all documents
-    for (String lang : doc.getTranslationList(getContext())) {
-      XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
-      deleteDocument(tdoc, totrash);
+    try {
+      getModelAccess().deleteDocument(doc, totrash);
+    } catch (DocumentDeleteException exc) {
+      throw (XWikiException) exc.getCause();
     }
+  }
 
-    deleteDocument(doc, totrash);
+  private IModelAccessFacade getModelAccess() {
+    // not as requirement due to cyclic dependency
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
   @Override
@@ -1433,6 +1470,28 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException {
     return componentManager.lookupMap(role);
+  }
+
+  @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
+    return checkWikiRef(docRef, toDoc.getDocumentReference());
+  }
+
+  @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
+    WikiReference wikiRef = getWikiRef(toRef);
+    if (!docRef.getWikiReference().equals(wikiRef)) {
+      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
+          docRef.getLastSpaceReference().getName(), wikiRef));
+    }
+    return docRef;
+  }
+
+  private IDocumentParentsListerRole getDocumentParentsLister() {
+    if (docParentsLister == null) {
+      docParentsLister = Utils.getComponent(IDocumentParentsListerRole.class);
+    }
+    return docParentsLister;
   }
 
 }

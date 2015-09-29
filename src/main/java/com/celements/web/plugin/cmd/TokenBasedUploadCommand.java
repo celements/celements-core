@@ -93,6 +93,8 @@ public class TokenBasedUploadCommand {
     if((username != null) && !username.equals("")){
       LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       getContext().setUser(username);
+      //FIXME use IModelAccessFacade to access the document to ensure that new documents
+      //FIXME get created correctly. (JIRA: CELDEV-132)
       XWikiDocument doc = getContext().getWiki().getDocument(attachToDocRef,
           getContext());
       if (createIfNotExists || getContext().getWiki().exists(attachToDocRef,

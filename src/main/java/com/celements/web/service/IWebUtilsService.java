@@ -46,13 +46,18 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 @ComponentRole
 public interface IWebUtilsService {
-  
+
   public static final Date DATE_LOW = new Date(-62135773200000L);
-  
+
   /**
    * {@value #DATE_HIGH} has the value [Fri Dec 31 23:59:00 CET 9999]
    */
   public static final Date DATE_HIGH = new Date(253402297140000L);
+
+  public static final String REGEX_WORD = "[a-zA-Z0-9]*";
+  public static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
+  public static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
+  public static final String REGEX_ATT = REGEX_DOC + "\\@.*";
 
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
@@ -96,7 +101,13 @@ public interface IWebUtilsService {
 
   public String getDefaultLanguage();
 
+  /**
+   * @deprecated instead use {@link #getDefaultLanguage(SpaceReference)}
+   */
+  @Deprecated
   public String getDefaultLanguage(String spaceName);
+
+  public String getDefaultLanguage(SpaceReference spaceRef);
 
   public boolean hasParentSpace();
 
@@ -132,11 +143,9 @@ public interface IWebUtilsService {
 
   public boolean isSuperAdminUser();
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level
-      ) throws XWikiException;
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level);
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user
-      ) throws XWikiException;
+  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user);
 
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
@@ -331,5 +340,21 @@ public interface IWebUtilsService {
    * only used as an adapter for unstable 2
    */
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
+
+  /**
+   * checks and corrects the WikiReference on docRef compared to toDoc.
+   * @param docRef
+   * @param toDoc
+   * @return
+   */
+  public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc);
+
+  /**
+   * checks and corrects the WikiReference on docRef compared to toDoc.
+   * @param docRef
+   * @param toRef
+   * @return
+   */
+  public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
 
 }

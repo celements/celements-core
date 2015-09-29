@@ -30,4 +30,6 @@ public interface IClassCollectionRole {
   
   public String getConfigName();
 
+  public boolean isActivated();
+
 }

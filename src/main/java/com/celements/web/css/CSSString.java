@@ -34,6 +34,8 @@ public class CSSString extends CSS {
   private static Log mLogger = LogFactory.getFactory().getInstance(CSSString.class);
 
   private String file;
+  private boolean alternate;
+  private String title;
   /* existing media: all, aural, braille, embossed, handheld, print, projection, screen, tty, tv */
   private String media;
   private boolean isContentCSS;
@@ -42,33 +44,50 @@ public class CSSString extends CSS {
     super(context);
     boolean contentCSS = (file.endsWith("-content.css")
         || file.endsWith("_content.css"));
-    initFields(file, "all", contentCSS);
+    initFields(file, false, "", "all", contentCSS);
   }
   
   public CSSString(String file, String media, XWikiContext context){
     super(context);
-    initFields(file, media, false);
+    initFields(file, false, "", media, false);
   }
   
-  public CSSString(String file, String media, boolean isContentCSS, XWikiContext context){
+  public CSSString(String file, boolean alternate, String title, String media, 
+      boolean isContentCSS, XWikiContext context){
     super(context);
-    initFields(file, media, isContentCSS);
+    initFields(file, alternate, title, media, isContentCSS);
   }
   
-  private void initFields(String file, String media, boolean isContentCSS){
+  private void initFields(String file, boolean alternate, String title, String media, 
+      boolean isContentCSS){
     this.file = file;
+    this.alternate = alternate;
+    this.title = title;
     this.media = media;
     this.isContentCSS = isContentCSS;
   }
-  
+
+  @Override
   public String getCSS(XWikiContext context){
     return getURLFromString(getCssBasePath(), context);
   }
-  
-  public String getMedia(){
-    return (media != null)?media:"";
+
+  @Override
+  public boolean isAlternate() {
+    return alternate;
   }
-  
+
+  @Override
+  public String getTitle() {
+    return (title != null) ? title : "";
+  }
+
+  @Override
+  public String getMedia(){
+    return (media != null) ? media : "";
+  }
+
+  @Override
   public boolean isContentCSS(){
     return isContentCSS;
   }
@@ -77,9 +96,10 @@ public class CSSString extends CSS {
   public Attachment getAttachment() {
     if (isAttachment()) {
       try {
-        XWikiDocument attDoc = context.getWiki().getDocument(getWebUtils(
+        XWikiDocument attDoc = context.getWiki().getDocument(getAttachmentURLcmd(
             ).getPageFullName(file), context);
-        XWikiAttachment att = attDoc.getAttachment(getWebUtils().getAttachmentName(file));
+        XWikiAttachment att = attDoc.getAttachment(getAttachmentURLcmd(
+            ).getAttachmentName(file));
         return new Attachment(new Document(attDoc, context), att, context);
       } catch (XWikiException e) {
         mLogger.error(e);
@@ -90,11 +110,12 @@ public class CSSString extends CSS {
 
   @Override
   public boolean isAttachment() {
-    return getWebUtils().isAttachmentLink(file);
+    return getAttachmentURLcmd().isAttachmentLink(file);
   }
 
   @Override
   public String getCssBasePath() {
     return (file != null)?file:"";
   }
+
 }

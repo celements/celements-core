@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -19,7 +21,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("docform")
-public class DocFormScriptService implements ScriptService{
+public class DocFormScriptService implements ScriptService {
+
+  private static Logger LOGGER = LoggerFactory.getLogger(DocFormCommand.class);
   
   private static final String _DOC_FORM_COMMAND_OBJECT = "com.celements.DocFormCommand";
   
@@ -43,6 +47,9 @@ public class DocFormScriptService implements ScriptService{
       } else if(map.get(key) instanceof String) {
         recompMap.put(key, new String[]{(String)map.get(key)});
       }
+    }
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("recompiled map '{}' to '{}'", map, recompMap);
     }
     Set<Document> docs = new HashSet<Document>();
     Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,

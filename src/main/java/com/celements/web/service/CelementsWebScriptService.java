@@ -51,6 +51,7 @@ import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
+import com.celements.navigation.service.TreeNodeScriptService;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
@@ -84,6 +85,8 @@ import com.xpn.xwiki.web.Utils;
 @Component("celementsweb")
 public class CelementsWebScriptService implements ScriptService {
 
+  private static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
+
   private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
   private static Logger _LOGGER  = LoggerFactory.getLogger(
@@ -107,6 +110,9 @@ public class CelementsWebScriptService implements ScriptService {
   @Requirement
   ITreeNodeService treeNodeService;
 
+  @Requirement("treeNode")
+  ScriptService treeNodeScriptService;
+
   @Requirement
   IRTEConfigTemplateRole rteConfigTemplateService;
 
@@ -115,6 +121,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   IMandatoryDocumentCompositorRole mandatoryDocComp;
+
+  @Requirement("deprecated")
+  ScriptService deprecatedUsage;
 
   @Requirement
   Execution execution;
@@ -718,6 +727,10 @@ public class CelementsWebScriptService implements ScriptService {
     classesComp.checkAllClassCollections();
   }
 
+  public boolean isClassCollectionActivated(String name) {
+    return classesComp.isActivated(name);
+  }
+
   public void checkMandatoryDocuments() {
     mandatoryDocComp.checkAllMandatoryDocuments();
   }
@@ -746,9 +759,14 @@ public class CelementsWebScriptService implements ScriptService {
     }
     return null;
   }
-  
+
+  /**
+   * @deprecated since 2.65.0 instead use logDeprecatedVelocityScript in
+   *             DeprecatedUsageScriptService: $services.deprecated.logVelocityScript
+   */
+  @Deprecated
   public void logDeprecatedVelocityScript(String logMessage) {
-    _LOGGER.warn("deprecated usage of velocity Script: " + logMessage);
+    ((DeprecatedUsageScriptService)deprecatedUsage).logVelocityScript(logMessage);
   }
   
   public String getDocHeaderTitle(DocumentReference docRef) {
@@ -922,13 +940,24 @@ public class CelementsWebScriptService implements ScriptService {
     return treeNodeService.getParentReference(docRef);
   }
 
+  public void setGlobalContextValue(String key, Object value) {
+    _LOGGER.debug("setGlobalContextValue: key '{}', value '{}'", key, value);
+    execution.getContext().setProperty(CEL_GLOBALVAL_PREFIX + key, value);
+  }
+
+  public Object getGlobalContextValue(String key) {
+    Object value = execution.getContext().getProperty(CEL_GLOBALVAL_PREFIX + key);
+    _LOGGER.debug("getGlobalContextValue: key '{}', value '{}'", key, value);
+    return value;
+  }
+
+  /**
+   * @deprecated since 2.64.0 instead use TreeNodeScriptService.moveTreeDocAfter
+   */
+  @Deprecated
   public void moveTreeDocAfter(DocumentReference moveDocRef,
       DocumentReference insertAfterDocRef) {
-    try {
-      treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
-    } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get moveDoc [" + moveDocRef + "]", exp);
-    }
+    getTreeNodeScriptService().moveTreeDocAfter(moveDocRef, insertAfterDocRef);
   }
   
   private boolean hasAdminRights() {
@@ -974,4 +1003,9 @@ public class CelementsWebScriptService implements ScriptService {
     return getContext().getWiki().getXWikiPreference("celGoogleAnalyticsAccount", "",
         getContext());
   }
+
+  private TreeNodeScriptService getTreeNodeScriptService() {
+    return (TreeNodeScriptService) treeNodeScriptService;
+  }
+
 }

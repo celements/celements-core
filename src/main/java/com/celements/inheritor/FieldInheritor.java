@@ -19,48 +19,47 @@
  */
 package com.celements.inheritor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.iterator.XObjectIterator;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 
-public class FieldInheritor extends AbstractObjectInheritor{
+public class FieldInheritor extends AbstractObjectInheritor {
+
+  private static Logger LOGGER = LoggerFactory.getLogger(FieldInheritor.class);
 
   private IEmptyFieldChecker _emptyFieldChecker;
-  private static Log mLogger = LogFactory.getFactory().getInstance(FieldInheritor.class);
-  
-  public FieldInheritor(){
-  }
-  
-  public BaseCollection getObject(String key){
+
+  public BaseCollection getObject(String key) {
     if (getIteratorFactory() == null) {
       throw new IllegalStateException("No IteratorFactory given.");
     }
     XObjectIterator iterator = getIteratorFactory().createIterator();
-    while (iterator.hasNext()){
+    while (iterator.hasNext()) {
       try {
         BaseProperty property = (BaseProperty) iterator.next().get(key);
         if (!getEmptyFieldChecker().isEmpty(property)) {
           return property.getObject();
         }
       } catch (XWikiException exp) {
-        mLogger.warn("failed to get [" + key + "] field.", exp);
+        LOGGER.warn("failed to get [" + key + "] field.", exp);
       }
     }
     return null;
   }
-  
-  public void setEmptyFieldChecker(IEmptyFieldChecker emptyFieldChecker){
+
+  public void setEmptyFieldChecker(IEmptyFieldChecker emptyFieldChecker) {
     _emptyFieldChecker = emptyFieldChecker;
   }
-  
-  IEmptyFieldChecker getEmptyFieldChecker(){
-    if (_emptyFieldChecker == null){
+
+  IEmptyFieldChecker getEmptyFieldChecker() {
+    if (_emptyFieldChecker == null) {
       _emptyFieldChecker = new DefaultEmptyFieldChecker();
     }
     return _emptyFieldChecker;
   }
+
 }

@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,9 +35,11 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.navigation.INavigation;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.classcollections.DocumentDetailsClasses;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderer;
@@ -73,6 +76,11 @@ public class RenderedExtractPresentationTypeTest
     vtPresType.renderCmd = renderCmdMock;
   }
 
+  @After
+  public void tearDown_() {
+    vtPresType.webUtilsService = Utils.getComponent(IWebUtilsService.class);
+  }
+
   @Test
   public void testComponentLoaded() {
     assertNotNull(Utils.getComponent(IPresentationTypeRole.class, "renderedExtract"));
@@ -93,6 +101,10 @@ public class RenderedExtractPresentationTypeTest
 
   @Test
   public void testWriteNodeContent() throws Exception {
+    IWebUtilsService webUtilsServiceMock = createMockAndAddToDefault(
+        IWebUtilsService.class);
+    vtPresType.webUtilsService = webUtilsServiceMock;
+    context.put("vcontext", new VelocityContext());
     DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
         "Content", "MyPage");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
@@ -115,13 +127,26 @@ public class RenderedExtractPresentationTypeTest
         eq(isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc
-        ).once();
+        ).atLeastOnce();
+    DocumentReference templateDocRef = new DocumentReference(context.getDatabase(),
+        "Templates", "RenderedExtract");
+    String templateDiskPath = ":celTemplates/RenderedExtract.vm";
+    expect(webUtilsServiceMock.getInheritedTemplatedPath(eq(templateDocRef))).andReturn(
+        templateDiskPath);
+    expect(renderCmdMock.renderTemplatePath(eq(templateDiskPath), eq("de"))).andReturn(
+        expectedNodeExtract);
     replayDefault();
+    String expectedRenderedExtract = "<div class=\"cel_cm_navigation_menuitem first"
+        + " cel_nav_isLeaf RichText\" id=\"N3:Content:Content.MyPage\">\n"
+        + expectedNodeExtract + "</div>\n";
     vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf,
         1, nav);
-    assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
-        + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeExtract + "</div>\n",
-        outStream.toString());
+    assertEquals(expectedRenderedExtract, outStream.toString());
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+    assertEquals(expectedNodeExtract, vcontext.get("extractContent"));
+    assertEquals(currentDocRef, vcontext.get("extractDocRef"));
+    assertEquals(currentDocRef, ((Document)vcontext.get("extractDoc")
+        ).getDocumentReference());
     verifyDefault();
   }
 

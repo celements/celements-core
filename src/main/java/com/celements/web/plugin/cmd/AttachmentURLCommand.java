@@ -21,8 +21,8 @@ package com.celements.web.plugin.cmd;
 
 import java.net.MalformedURLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
@@ -33,8 +33,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class AttachmentURLCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      AttachmentURLCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(AttachmentURLCommand.class);
 
   public String getAttachmentURL(String link, XWikiContext context) {
     return getAttachmentURL(link, getDefaultAction(), context);

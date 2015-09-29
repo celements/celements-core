@@ -1,44 +1,44 @@
 package com.celements.common.observation.listener;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public abstract class AbstractDocumentListener extends AbstractEventListener {
 
-  @Requirement
-  protected IWebUtilsService webUtilsService;
-
   @Override
-  public void onEvent(Event event, Object source, Object data) {
+  protected void onLocalEvent(Event event, Object source, Object data) {
     XWikiDocument doc = (XWikiDocument) source;
-    if ((doc != null) && isLocalEvent()) {
-      getLogger().debug("onEvent: got event '{}' on doc '{}'", event.getClass(), 
+    if (doc != null) {
+      getLogger().debug("onLocalEvent: got event '{}' on doc '{}'", event.getClass(), 
           doc.getDocumentReference());
       Event notifyEvent = getNotifyEvent(event, doc);
       if (notifyEvent != null) {
-        getLogger().debug("onEvent: notifying event '{}' on doc '{}'", 
+        getLogger().debug("onLocalEvent: notifying event '{}' on doc '{}'", 
             notifyEvent.getClass(), doc.getDocumentReference());
         getObservationManager().notify(notifyEvent, source, getContext());
       } else {
-        getLogger().trace("onEvent: skipped notifying event for event '{}' on doc '{}'", 
-            event.getClass(), doc.getDocumentReference());
+        getLogger().trace("onLocalEvent: skipped notifying event for event '{}' "
+            + "on doc '{}'", event.getClass(), doc.getDocumentReference());
       }
-    } else if (getLogger().isTraceEnabled()) {
-      getLogger().trace("onEvent: skipped event '{}' on source '{}', data '{}', "
-          + "isLocalEvent '{}'", event.getClass(), source, data, isLocalEvent());
+    }
+  }
+
+  @Override
+  protected void onRemoteEvent(Event event, Object source, Object data) {
+    if (getLogger().isTraceEnabled()) {
+      getLogger().trace("onRemoteEvent: skipped event '{}' on source '{}', data '{}'", 
+          event.getClass(), source, data);
     }
   }
 
@@ -154,12 +154,6 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
     return (event instanceof DocumentCreatedEvent) 
         || (event instanceof DocumentUpdatedEvent)
         || (event instanceof DocumentDeletedEvent);
-  }
-
-  protected abstract Logger getLogger();
-
-  void injectWebUtilsService(IWebUtilsService webUtilsService) {
-    this.webUtilsService = webUtilsService;
   }
 
 }

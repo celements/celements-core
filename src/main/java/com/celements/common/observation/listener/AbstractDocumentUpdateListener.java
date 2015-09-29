@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.Event;
 
 import com.celements.copydoc.ICopyDocumentRole;
+import com.google.common.base.Objects;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -46,28 +47,32 @@ public abstract class AbstractDocumentUpdateListener extends AbstractDocumentLis
     Event notifyEvent = null;
     BaseObject bObj = getRequiredObj(doc);
     BaseObject origBObj = getRequiredObj(doc.getOriginalDocument());
-    if (isEventCreate(bObj, origBObj)) {
+    if ((bObj != null) && (origBObj == null)) {
       notifyEvent = getCreateEvent(event, doc.getDocumentReference());
-    } else if (isEventDelete(bObj, origBObj)) {
+    } else if ((bObj == null) && (origBObj != null)) {
       notifyEvent = getDeleteEvent(event, doc.getDocumentReference());
-    } else if (isEventUpdate(bObj, origBObj)) {
+    } else if ((bObj != null) && (origBObj != null)
+        && (copyDocService.checkObject(bObj, origBObj) || checkDocFields(doc))) {
       notifyEvent = getUpdateEvent(event, doc.getDocumentReference());
     }
     return notifyEvent;
   }
 
-  protected boolean isEventCreate(BaseObject bObj, BaseObject origBObj) {
-    return (bObj != null) && (origBObj == null);
+  private boolean checkDocFields(XWikiDocument doc) {
+    boolean changed = false;
+    XWikiDocument origDoc = doc.getOriginalDocument();
+    if ((origDoc != null) && includeDocFields()) {
+      changed |= !Objects.equal(doc.getTitle(), origDoc.getTitle());
+      changed |= !Objects.equal(doc.getContent(), origDoc.getContent());
+      getLogger().debug("checkDocFields: changed '{}'", changed);
+    }
+    return changed;
   }
 
-  protected boolean isEventDelete(BaseObject bObj, BaseObject origBObj) {
-    return (bObj == null) && (origBObj != null);
-  }
-
-  protected boolean isEventUpdate(BaseObject bObj, BaseObject origBObj) {
-    return (bObj != null) && (origBObj != null) 
-        && copyDocService.checkObject(bObj, origBObj);
-  }
+  /**
+   * @return true if doc fields (title and content) should also be checked for changes
+   */
+  protected abstract boolean includeDocFields();
 
   void injectCopyDocService(ICopyDocumentRole copyDocService) {
     this.copyDocService = copyDocService;

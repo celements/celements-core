@@ -27,6 +27,7 @@ import java.util.Stack;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -140,6 +141,7 @@ public class PageLayoutCommand {
               getContext());
           layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName()
               + " Layout");
+          layoutPropObj.setStringValue("doctype", getDocType());
           getContext().getWiki().saveDocument(propXdoc, "Creating page layout", false,
               getContext());
           return "cel_layout_create_successful";
@@ -149,6 +151,11 @@ public class PageLayoutCommand {
       }
     }
     return "cel_layout_empty_name_msg";
+  }
+
+  private String getDocType() {
+    return Utils.getComponent(ConfigurationSource.class).getProperty(
+        "celements.layout.docType", "HTML 5");
   }
 
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {

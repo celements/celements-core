@@ -2,6 +2,7 @@ package com.celements.navigation.presentation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -55,11 +56,34 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
         numItem) + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     try {
-      outStream.append(getDocExtract(docRef));
+      outStream.append(getRenderedExtract(docRef));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document for [" + docRef + "].", exp);
     }
     outStream.append("</div>\n");
+  }
+
+  String getRenderedExtract(DocumentReference docRef) throws XWikiException {
+    String templatePath = webUtilsService.getInheritedTemplatedPath(
+        getImageGalleryOverviewRef());
+    try {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      vcontext.put("extractDocRef", docRef);
+      XWikiDocument contentDoc = getContext().getWiki().getDocument(docRef, getContext());
+      vcontext.put("extractDoc", contentDoc.newDocument(getContext()));
+      vcontext.put("extractContent", getDocExtract(docRef));
+      return getRenderCommand().renderTemplatePath(templatePath, getContext(
+          ).getLanguage());
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to render template path [" + templatePath + "] for ["
+          + docRef + "].", exp);
+    }
+    return "";
+  }
+
+  private DocumentReference getImageGalleryOverviewRef() {
+    return new DocumentReference(getContext().getDatabase(), "Templates",
+        "RenderedExtract");
   }
 
   private String getDocExtract(DocumentReference docRef) throws XWikiException {
@@ -73,8 +97,7 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
     if (extractObj == null) {
       extractObj = contentDoc.getXObject(documentExtractClassRef,
           DocumentDetailsClasses.FIELD_DOC_EXTRACT_LANGUAGE,
-          webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference().getName()),
-          false);
+          webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference()), false);
     }
     if (extractObj != null) {
       return extractObj.getStringValue(DocumentDetailsClasses.FIELD_DOC_EXTRACT_CONTENT);

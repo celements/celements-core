@@ -2,6 +2,7 @@ package com.celements.navigation;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 @ComponentRole
 public interface INavigationClassConfig {
@@ -34,6 +35,7 @@ public interface INavigationClassConfig {
   public static final String CM_CSS_CLASS_FIELD = "cm_css_class";
   public static final String LAYOUT_TYPE_FIELD = "layout_type";
   public static final String PRESENTATION_TYPE_FIELD = "presentation_type";
+  public static final String ITEMS_PER_PAGE = "itemsPerPage";
 
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
   public static final String MENU_ITEM_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
@@ -44,8 +46,15 @@ public interface INavigationClassConfig {
   public static final String TARGET_FIELD = "link_target";
 
   public DocumentReference getMenuNameClassRef(String wikiName);
+
+  public DocumentReference getNavigationConfigClassRef();
   public DocumentReference getNavigationConfigClassRef(String wikiName);
+  public DocumentReference getNavigationConfigClassRef(WikiReference wikiRef);
+
+  public DocumentReference getMenuItemClassRef();
   public DocumentReference getMenuItemClassRef(String wikiName);
+  public DocumentReference getMenuItemClassRef(WikiReference wikiRef);
+
   public DocumentReference getNewMenuItemClassRef(String wikiName);
 
 }

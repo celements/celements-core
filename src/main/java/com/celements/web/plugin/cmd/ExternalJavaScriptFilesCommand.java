@@ -75,11 +75,22 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String addLazyExtJSfile(String jsFile, String action) {
+    return addLazyExtJSfile(jsFile, action, null);
+  }
+
+  public String addLazyExtJSfile(String jsFile, String action, String params) {
     String attUrl;
     if (!StringUtils.isEmpty(action)) {
       attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
     } else {
       attUrl = getAttUrlCmd().getAttachmentURL(jsFile, context);
+    }
+    if (!StringUtils.isEmpty(params)) {
+      if (attUrl.indexOf("?") > -1) {
+        attUrl += "&" + params;
+      } else {
+        attUrl += "?" + params;
+      }
     }
     Builder jsonBuilder = new Builder();
     jsonBuilder.openDictionary();
@@ -96,18 +107,29 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String addExtJSfileOnce(String jsFile, String action) {
+    return addExtJSfileOnce(jsFile, action, null);
+  }
+
+  public String addExtJSfileOnce(String jsFile, String action, String params) {
     if (!extJSAttUrlSet.contains(jsFile)) {
       if (getAttUrlCmd().isAttachmentLink(jsFile)
           || getAttUrlCmd().isOnDiskLink(jsFile)) {
         extJSAttUrlSet.add(jsFile);
       }
+      String attUrl;
       if (!StringUtils.isEmpty(action)) {
-        return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
-            action, context));
+        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, action, context);
       } else {
-        return addExtJSfileOnce_internal(jsFile, getAttUrlCmd().getAttachmentURL(jsFile,
-            context));
+        attUrl = getAttUrlCmd().getAttachmentURL(jsFile, context);
       }
+      if (!StringUtils.isEmpty(params)) {
+        if (attUrl.indexOf("?") > -1) {
+          attUrl += "&" + params;
+        } else {
+          attUrl += "?" + params;
+        }
+      }
+      return addExtJSfileOnce_internal(jsFile, attUrl);
     }
     return "";
   }

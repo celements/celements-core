@@ -45,10 +45,30 @@ public class CSSBaseObject extends CSS {
     this.obj = obj;
   }
 
+  @Override
   public String getCSS(XWikiContext context) {
     return getURLFromString(getCssBasePath(), context);
   }
 
+  @Override
+  public boolean isAlternate() {
+    if(obj != null) {
+      return obj.getIntValue("alternate", -1) == 1;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public String getTitle() {
+    if(obj != null) {
+      return obj.getStringValue("title");
+    } else {
+      return "";
+    }
+  }
+
+  @Override
   public String getMedia() {
     if(obj != null) {
       return obj.getStringValue("media");
@@ -57,6 +77,7 @@ public class CSSBaseObject extends CSS {
     }
   }
 
+  @Override
   public boolean isContentCSS() {
     if((obj != null) && 
         ((obj.getIntValue("is_rte_content") == 1) || 

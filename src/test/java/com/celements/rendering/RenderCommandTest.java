@@ -1009,6 +1009,35 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  @Test
+  public void testRenderCelementsDocument_vContext_null() throws Exception {
+    renderCmd.setDefaultPageTypeReference(null);
+    XWikiDocument myDoc = createMockAndAddToDefault(XWikiDocument.class);
+    DocumentReference myDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "myPage");
+    expect(myDoc.getDocumentReference()).andReturn(myDocRef).anyTimes();
+    expect(mockPageTypeResolver.getPageTypeRefForDocWithDefault(same(myDoc),
+        (PageTypeReference)isNull())).andReturn(null).anyTimes();
+    expect(xwiki.getDocument(eq(myDocRef), same(context))).andReturn(myDoc).anyTimes();
+    String expectedContent = "expected Content $doc.fullName";
+    expect(myDoc.getTranslatedContent(eq("de"), same(context))).andReturn(expectedContent
+        ).anyTimes();
+    expect(renderingEngineMock.renderText(eq(expectedContent), same(myDoc),
+       same(currentDoc), same(context))).andReturn("Topic Content.MyPage does not exist"
+           ).anyTimes();
+    expect(myDoc.newDocument(same(context))).andReturn(new Document(myDoc, context)
+          ).anyTimes();
+    expect(renderingEngineMock.getRendererNames()).andReturn(Arrays.asList("velocity",
+      "groovy")).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
+        eq("xwikidb:Content.myPage"), same(context))).andReturn(true).anyTimes();
+    context.remove("vcontext");
+    replayDefault();
+    assertEquals("expecting empty because velocity context is null.", "",
+        renderCmd.renderCelementsDocument(myDoc, "de", "view"));
+    verifyDefault();
+  }
+
   //*****************************************************************
   //*                  H E L P E R  - M E T H O D S                 *
   //*****************************************************************/

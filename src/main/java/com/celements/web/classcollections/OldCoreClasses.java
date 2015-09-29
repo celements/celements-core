@@ -18,35 +18,65 @@ public class OldCoreClasses extends AbstractClassCollection {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreClasses.class);
 
-  public static final String PHOTO_ALBUM_CLASS_DOC = "PhotoAlbumClass";
-  public static final String PHOTO_ALBUM_CLASS_SPACE = "XWiki";
+  @Deprecated
+  public static final String PHOTO_ALBUM_CLASS_DOC =
+      IOldCoreClassConfig.PHOTO_ALBUM_CLASS_DOC;
+  @Deprecated
+  public static final String PHOTO_ALBUM_CLASS_SPACE =
+      IOldCoreClassConfig.PHOTO_ALBUM_CLASS_SPACE;
+  @Deprecated
   public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "."
-        + PHOTO_ALBUM_CLASS_DOC;
-  public static final String PHOTO_ALBUM_GALLERY_LAYOUT = "galleryLayout";
+      + PHOTO_ALBUM_CLASS_DOC;
+  @Deprecated
+  public static final String PHOTO_ALBUM_GALLERY_LAYOUT =
+      IOldCoreClassConfig.PHOTO_ALBUM_GALLERY_LAYOUT;
 
-  public static final String XWIKI_USERS_CLASS_DOC = "XWikiUsers";
-  public static final String XWIKI_USERS_CLASS_SPACE = "XWiki";
+  @Deprecated
+  public static final String XWIKI_USERS_CLASS_DOC =
+      IOldCoreClassConfig.XWIKI_USERS_CLASS_DOC;
+  @Deprecated
+  public static final String XWIKI_USERS_CLASS_SPACE =
+      IOldCoreClassConfig.XWIKI_USERS_CLASS_SPACE;
+  @Deprecated
   public static final String XWIKI_USERS_CLASS = XWIKI_USERS_CLASS_SPACE + "."
-        + XWIKI_USERS_CLASS_DOC;
+      + XWIKI_USERS_CLASS_DOC;
 
-  public static final String XWIKI_PREFERENCES_CLASS_DOC = "XWikiPreferences";
-  public static final String XWIKI_PREFERENCES_CLASS_SPACE = "XWiki";
+  @Deprecated
+  public static final String XWIKI_PREFERENCES_CLASS_DOC =
+      IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC;
+  @Deprecated
+  public static final String XWIKI_PREFERENCES_CLASS_SPACE =
+      IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_SPACE;
+  @Deprecated
   public static final String XWIKI_PREFERENCES_CLASS = XWIKI_PREFERENCES_CLASS_SPACE + "."
         + XWIKI_PREFERENCES_CLASS_DOC;
-  public static final String XWIKI_PREFERENCES_CELLOGIN_PROPERTY = "cellogin";
+  @Deprecated
+  public static final String XWIKI_PREFERENCES_CELLOGIN_PROPERTY =
+      IOldCoreClassConfig.XWIKI_PREFERENCES_CELLOGIN_PROPERTY;
 
-  public static final String IMPORT_CLASS_DOC = "ImportClass";
-  public static final String IMPORT_CLASS_SPACE = "Classes";
+  @Deprecated
+  public static final String IMPORT_CLASS_DOC = IOldCoreClassConfig.IMPORT_CLASS_DOC;
+  @Deprecated
+  public static final String IMPORT_CLASS_SPACE = IOldCoreClassConfig.IMPORT_CLASS_SPACE;
+  @Deprecated
   public static final String IMPORT_CLASS = IMPORT_CLASS_SPACE + "."
         + IMPORT_CLASS_DOC;
 
-  public static final String FILEBASE_TAG_CLASS_DOC = "FilebaseTag";
-  public static final String FILEBASE_TAG_CLASS_SPACE = "Classes";
+  @Deprecated
+  public static final String FILEBASE_TAG_CLASS_DOC =
+      IOldCoreClassConfig.FILEBASE_TAG_CLASS_DOC;
+  @Deprecated
+  public static final String FILEBASE_TAG_CLASS_SPACE =
+      IOldCoreClassConfig.FILEBASE_TAG_CLASS_SPACE;
+  @Deprecated
   public static final String FILEBASE_TAG_CLASS = FILEBASE_TAG_CLASS_SPACE + "."
         + FILEBASE_TAG_CLASS_DOC;
 
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_CLASS_DOC = "RTEConfigTypeClass";
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_CLASS_SPACE = "Classes";
+  @Deprecated
   public static final String RTE_CONFIG_TYPE_CLASS = RTE_CONFIG_TYPE_CLASS_SPACE + "."
         + RTE_CONFIG_TYPE_CLASS_DOC;
 
@@ -60,67 +90,106 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS =
       RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
 
+  @Deprecated
   public static final String KEY_VALUE_CLASS_DOC = "KeyValueClass";
+  @Deprecated
   public static final String KEY_VALUE_CLASS_SPACE = "Classes";
+  @Deprecated
   public static final String KEY_VALUE_CLASS = KEY_VALUE_CLASS_SPACE + "."
         + KEY_VALUE_CLASS_DOC;
 
+  @Deprecated
   public static final String TOKEN_CLASS_DOC = "TokenClass";
+  @Deprecated
   public static final String TOKEN_CLASS_SPACE = "Classes";
+  @Deprecated
   public static final String TOKEN_CLASS = TOKEN_CLASS_SPACE + "." + TOKEN_CLASS_DOC;
 
+  @Deprecated
   public static final String OVERLAY_CONFIG_CLASS_DOC = "OverlayConfigClass";
+  @Deprecated
   public static final String OVERLAY_CONFIG_CLASS_SPACE = "Classes";
+  @Deprecated
   public static final String OVERLAY_CONFIG_CLASS = OVERLAY_CONFIG_CLASS_SPACE + "."
       + OVERLAY_CONFIG_CLASS_DOC;
 
+  @Deprecated
   public static final String PANEL_CONFIG_CLASS_DOC = "PanelConfigClass";
+  @Deprecated
   public static final String PANEL_CONFIG_CLASS_SPACE = "Class";
+  @Deprecated
   public static final String PANEL_CONFIG_CLASS = PANEL_CONFIG_CLASS_SPACE + "."
         + PANEL_CONFIG_CLASS_DOC;
 
+  @Deprecated
   public static final String FORM_MAIL_CLASS_DOC = "FormMailClass";
+  @Deprecated
   public static final String FORM_MAIL_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String FORM_MAIL_CLASS = FORM_MAIL_CLASS_SPACE + "."
         + FORM_MAIL_CLASS_DOC;
 
+  @Deprecated
   public static final String FORM_ACTION_CLASS_DOC = "FormActionClass";
+  @Deprecated
   public static final String FORM_ACTION_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String FORM_ACTION_CLASS = FORM_ACTION_CLASS_SPACE + "."
         + FORM_ACTION_CLASS_DOC;
 
+  @Deprecated
   public static final String FORM_CONFIG_CLASS_DOC = "FormConfigClass";
+  @Deprecated
   public static final String FORM_CONFIG_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String FORM_CONFIG_CLASS = FORM_CONFIG_CLASS_SPACE + "."
         + FORM_CONFIG_CLASS_DOC;
 
+  @Deprecated
   public static final String ACTION_TYPE_CLASS_DOC = "ActionTypeClass";
+  @Deprecated
   public static final String ACTION_TYPE_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String ACTION_TYPE_CLASS = ACTION_TYPE_CLASS_SPACE + "."
         + ACTION_TYPE_CLASS_DOC;
 
+  @Deprecated
   public static final String ACTION_TYPE_PROP_CLASS_DOC = "ActionTypeProperties";
+  @Deprecated
   public static final String ACTION_TYPE_PROP_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String ACTION_TYPE_PROP_CLASS = ACTION_TYPE_PROP_CLASS_SPACE + "."
         + ACTION_TYPE_PROP_CLASS_DOC;
 
+  @Deprecated
   public static final String FORM_STORAGE_CLASS_DOC = "FormStorageClass";
+  @Deprecated
   public static final String FORM_STORAGE_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String FORM_STORAGE_CLASS = FORM_STORAGE_CLASS_SPACE + "."
         + FORM_STORAGE_CLASS_DOC;
 
+  @Deprecated
   public static final String RECEIVER_EMAIL_CLASS_DOC = "ReceiverEMail";
+  @Deprecated
   public static final String RECEIVER_EMAIL_CLASS_SPACE = "Celements2";
+  @Deprecated
   public static final String RECEIVER_EMAIL_CLASS = RECEIVER_EMAIL_CLASS_SPACE + "."
         + RECEIVER_EMAIL_CLASS_DOC;
 
+  @Deprecated
   public static final String USER_CSS_CLASS_DOC = "UserCSS";
+  @Deprecated
   public static final String USER_CSS_CLASS_SPACE = "Skins";
+  @Deprecated
   public static final String USER_CSS_CLASS = USER_CSS_CLASS_SPACE + "."
         + USER_CSS_CLASS_DOC;
 
+  @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
+  @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
+  @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS =
       JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE + "."
           + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
@@ -494,6 +563,8 @@ public class OldCoreClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("cssname", "CSS Filename", 30);
+    needsUpdate |= bclass.addBooleanField("alternate", "alternate", "yesno");
+    needsUpdate |= bclass.addTextField("title", "Title", 30);
     needsUpdate |= bclass.addBooleanField("is_rte_content", "is_rte_content", "yesno");
     needsUpdate |= bclass.addStaticListField("media", "Media",
         "all|aural|braille|embossed|handheld|print|projection|screen|tty|tv");
@@ -614,6 +685,10 @@ public class OldCoreClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  /**
+   * @Deprecated instead use IOldCoreClassConfig.getFormStorageClassRef
+   */
+  @Deprecated
   public DocumentReference getFromStorageClassRef(String wikiName) {
     return new DocumentReference(wikiName, FORM_STORAGE_CLASS_SPACE,
         FORM_STORAGE_CLASS_DOC);

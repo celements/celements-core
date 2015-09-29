@@ -27,6 +27,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
@@ -35,7 +38,15 @@ import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 import com.xpn.xwiki.web.Utils;
 
-public class CelSendMail {
+/**
+ * Do not use this class directly. Instead use IMailSenderRole to send emails.
+ * In the future it is planned, that IMailSenderRole will buffer, store and allow to
+ * resent email messages, if temporary failure occur. You wont be able to take advantage
+ * from this features if you directly access IMailObjectRole.
+ */
+@Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class CelSendMail implements IMailObjectRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(CelSendMail.class);
   
@@ -51,34 +62,45 @@ public class CelSendMail {
   public CelSendMail(XWikiContext context) {
   }
   
+  /**
+   * @deprecated since 2.67.0 instead use Component Manager access to IMailObjectRole
+   */
+  @Deprecated
   public CelSendMail() {}
   
+  @Override
   public void setFrom(String from) {
     getMailObject().setFrom(from);
   }
   
+  @Override
   public void setReplyTo(String replyTo) {
     if((replyTo != null) && (replyTo.trim().length() > 0)) {
       getMailObject().setHeader("reply-to", replyTo);
     }
   }
   
+  @Override
   public void setTo(String to) {
     getMailObject().setTo(to);
   }
   
+  @Override
   public void setCc(String cc) {
     getMailObject().setCc(cc);
   }
   
+  @Override
   public void setBcc(String bcc) {
     getMailObject().setBcc(bcc);
   }
   
+  @Override
   public void setSubject(String subject) {
     getMailObject().setSubject(subject);
   }
 
+  @Override
   public CelMailConfiguration getMailConfiguration() {
     if (mailConfiguration == null) {
       mailConfiguration = new CelMailConfiguration();
@@ -86,6 +108,7 @@ public class CelSendMail {
     return mailConfiguration;
   }
 
+  @Override
   public void setHtmlContent(String htmlContent, boolean isLatin1) {
     // TODO Probabely can be removed as soon as all installations are on xwiki 2+
     if(isLatin1) {
@@ -105,12 +128,14 @@ public class CelSendMail {
     }
   }
   
+  @Override
   public void setTextContent(String textContent) {
     if((textContent != null) && (!"".equals(textContent))) {
       getMailObject().setTextPart(textContent);
     }
   }
   
+  @Override
   public void setAttachments(List<Attachment> attachments) {
     if(attachments == null) {
       attachments = Collections.emptyList();
@@ -118,6 +143,7 @@ public class CelSendMail {
     getMailObject().setAttachments(attachments);
   }
   
+  @Override
   public void setOthers(Map<String, String> others) {
     if(others != null){
       for (String other : others.keySet()) {
@@ -127,6 +153,7 @@ public class CelSendMail {
   }
   
   //TODO check if minimum required fields are set?
+  @Override
   public int sendMail() {
     int sendResult = -999;
     if(mail != null) {

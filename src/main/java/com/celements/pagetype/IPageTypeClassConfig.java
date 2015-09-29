@@ -27,6 +27,7 @@ public interface IPageTypeClassConfig {
   public static final String PAGETYPE_PROP_PAGE_EDIT = "page_edit";
   public static final String PAGETYPE_PROP_CATEGORY = "category";
   public static final String PAGETYPE_PROP_TYPE_NAME = "type_name";
+  public static final String PAGETYPE_PROP_IS_UNCONNECTED_PARENT = "unconnected_parent";
 
   public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef);
 

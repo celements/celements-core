@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.web.utils.IWebUtils;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
 
@@ -39,7 +39,7 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_CSSTest() throws Exception {
     context = getContext();
-    cssMock = createMock(CSS.class);
+    cssMock = createMockAndAddToDefault(CSS.class);
     css = new CSSMock(context, cssMock);
   }
 
@@ -47,11 +47,26 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
   public void testDisplayInclude_createCSSinclude() {
     String url = "/skin/Content/WebHome/myCSSFile.css";
     expect(cssMock.getCSS(same(context))).andReturn(url);
+    expect(cssMock.isAlternate()).andReturn(false);
+    expect(cssMock.getTitle()).andReturn("myTitle");
     expect(cssMock.getMedia()).andReturn("all");
-    replay(cssMock);
-    assertEquals("<link rel=\"stylesheet\" media=\"all\" type=\"text/css\" href=\""
-        + url + "\" />\n", css.displayInclude(context));
-    verify(cssMock);
+    replayDefault();
+    assertEquals("<link rel=\"stylesheet\" title=\"myTitle\" media=\"all\" "
+        + "type=\"text/css\" href=\"" + url + "\" />\n", css.displayInclude(context));
+    verifyDefault();
+  }
+
+  @Test
+  public void testDisplayInclude_createCSSinclude_alternate() {
+    String url = "/skin/Content/WebHome/myCSSFile.css";
+    expect(cssMock.getCSS(same(context))).andReturn(url);
+    expect(cssMock.isAlternate()).andReturn(true);
+    expect(cssMock.getTitle()).andReturn("myTitle");
+    expect(cssMock.getMedia()).andReturn("all");
+    replayDefault();
+    assertEquals("<link rel=\"alternate stylesheet\" title=\"myTitle\" media=\"all\" "
+        + "type=\"text/css\" href=\"" + url + "\" />\n", css.displayInclude(context));
+    verifyDefault();
   }
 
   @Test
@@ -60,22 +75,23 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
     String basePath = "Content.WebHome;myCSSFile.css";
     expect(cssMock.getCSS(same(context))).andReturn(url);
     expect(cssMock.getCssBasePath()).andReturn(basePath);
-    replay(cssMock);
+    replayDefault();
     assertEquals("<!-- WARNING: css file not found: " + basePath + " -->\n",
         css.displayInclude(context)); 
-    verify(cssMock);
+    verifyDefault();
   }
 
   @Test
   public void testGetURLFromString() {
-    IWebUtils utils = createMock(IWebUtils.class);
-    css.testInjectUtils(utils);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
+        AttachmentURLCommand.class);
+    css.testInjectAttURLcmd(attURLcmd);
     String cssPath = ":celRes/celements2.css";
     String urlPath = "/skin/resources/celRes/celements2.css";
-    expect(utils.getAttachmentURL(eq(cssPath), same(context))).andReturn(urlPath);
-    replay(cssMock, utils);
+    expect(attURLcmd.getAttachmentURL(eq(cssPath), same(context))).andReturn(urlPath);
+    replayDefault();
     assertEquals(urlPath, css.getURLFromString(cssPath, context));
-    verify(cssMock, utils);
+    verifyDefault();
   }
 
   //*****************************************************************
@@ -99,6 +115,16 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
     @Override
     public String getCSS(XWikiContext context) {
       return cssMock.getCSS(context);
+    }
+
+    @Override
+    public boolean isAlternate() {
+      return cssMock.isAlternate();
+    }
+
+    @Override
+    public String getTitle() {
+      return cssMock.getTitle();
     }
 
     @Override

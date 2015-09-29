@@ -19,6 +19,9 @@
  */
 package com.celements.web.css;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
@@ -38,18 +41,27 @@ public abstract class CSS extends Api {
     super(context);
   }
 
+  @Deprecated
   protected IWebUtils utils;
+
+  protected AttachmentURLCommand attURLcmd;
 
   public String displayInclude(XWikiContext context){
     String cssPath = getCSS(context);
     if (cssPath != null) {
-      return "<link rel=\"stylesheet\" media=\"" + getMedia() + "\" type=\"text/css\" href=\"" + cssPath + "\" />\n";
+      String media = getMedia();
+      if (StringUtils.isBlank(media)) {
+        media = "all";
+      }
+      return "<link rel=\"" + (isAlternate() ? "alternate " : "") + "stylesheet\" "
+          + "title=\"" + getTitle() + "\" media=\"" + media + "\" type=\"text/css\" "
+          + "href=\"" + cssPath + "\" />\n";
     } else {
       return "<!-- WARNING: css file not found: " + getCssBasePath() + " -->\n";
     }
   }
-  
-  public String toString(XWikiContext context){
+
+  public String toString (XWikiContext context){
     return getMedia() + " - " + getCSS(context);
   }
 
@@ -58,6 +70,10 @@ public abstract class CSS extends Api {
   }
 
   public abstract String getCSS(XWikiContext context);
+
+  public abstract boolean isAlternate();
+
+  public abstract String getTitle();
 
   public abstract String getMedia();
 
@@ -70,21 +86,40 @@ public abstract class CSS extends Api {
   public abstract String getCssBasePath();
 
   protected String getURLFromString(String str, XWikiContext context) {
-    return getWebUtils().getAttachmentURL(str, context);
+    return getAttachmentURLcmd().getAttachmentURL(str, context);
   }
   
   /**
    *  for Tests only !!!
    **/
+  @Deprecated
   void testInjectUtils(IWebUtils utils) {
     this.utils = utils;
   }
 
+  /**
+   * @deprecated instead use WebUtilsService directly
+   */
+  @Deprecated
   protected IWebUtils getWebUtils() {
     if (utils == null) {
       utils = WebUtils.getInstance();
     }
     return utils;
+  }
+
+  /**
+   *  for Tests only !!!
+   **/
+  void testInjectAttURLcmd(AttachmentURLCommand attURLcmd) {
+    this.attURLcmd = attURLcmd;
+  }
+
+  protected AttachmentURLCommand getAttachmentURLcmd() {
+    if (attURLcmd == null) {
+      attURLcmd = new AttachmentURLCommand();
+    }
+    return attURLcmd;
   }
 
   protected IWebUtilsService getWebUtilsService() {
