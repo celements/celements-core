@@ -357,4 +357,6 @@ public interface IWebUtilsService {
    */
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
 
+  public void setUser(DocumentReference userReference, boolean main);
+
 }
