@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.celements.web.plugin.cmd.CreateDocumentCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -32,6 +33,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 
 // TODO add unit tests
 public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRole {
@@ -94,9 +96,12 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
     return doc;
   }
 
+  @SuppressWarnings("unchecked")
   private void setUserInContext(XWikiUser user) {
     if (user != null) {
-      getContext().setUser(user.getUser(), user.isMain());
+      DocumentReference userRef = Utils.getComponent(DocumentReferenceResolver.class,
+          "currentmixed").resolve(user.getUser());
+      webUtilsService.setUser(userRef, user.isMain());
     } else {
       getContext().setUser(null);
     }

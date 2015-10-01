@@ -1494,4 +1494,8 @@ public class WebUtilsService implements IWebUtilsService {
     return docParentsLister;
   }
 
+  public void setUser(DocumentReference userReference, boolean main) {
+    getContext().setUser("XWiki." + userReference.getName(), main);
+  }
+
 }
