@@ -72,8 +72,10 @@ public class NextFreeDocService implements INextFreeDocRole {
   }
 
   private DocumentReference createDocRef(DocumentReference baseDocRef, long num) {
-    DocumentReference ret = new DocumentReference(baseDocRef);
-    ret.setName(baseDocRef.getName() + num);
+    //IMPORTANT do no use setName on DocumentReference
+    //          -> it does not exist on xwiki 4.5.4
+    DocumentReference ret = new DocumentReference(baseDocRef.getName() + num,
+        baseDocRef.getLastSpaceReference());
     return ret;
   }
   
