@@ -108,8 +108,12 @@ public class DocFormRequestKeyParserTest extends AbstractBridgedComponentTestCas
         + serialize(classRef) + DocFormRequestKeyParser.KEY_DELIM + objNb 
         + DocFormRequestKeyParser.KEY_DELIM + fieldName;
     DocFormRequestKey key = parser.parse(keyString, null);
-    docRef.setWikiReference(new WikiReference("xwikidb"));
-    classRef.setWikiReference(new WikiReference("xwikidb"));
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    docRef = new DocumentReference("xwikidb", docRef.getLastSpaceReference().getName(),
+        docRef.getName());
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    classRef = new DocumentReference("xwikidb", classRef.getLastSpaceReference(
+        ).getName(), classRef.getName());
     assertKey(key, keyString, docRef, classRef, false, objNb, fieldName);
   }
 
