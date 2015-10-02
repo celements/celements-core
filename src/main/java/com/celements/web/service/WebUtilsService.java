@@ -1495,7 +1495,12 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   public void setUser(DocumentReference userReference, boolean main) {
-    getContext().setUser("XWiki." + userReference.getName(), main);
+    //IMPORTANT setUser does not exist in XWiki 4.5.4. Instead use setUserReference
+    if (main) {
+      userReference = new DocumentReference(getContext().getMainXWiki(),
+          userReference.getLastSpaceReference().getName(), userReference.getName());
+    }
+    getContext().setUserReference(userReference);
   }
 
 }
