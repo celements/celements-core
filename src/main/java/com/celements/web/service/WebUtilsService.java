@@ -1454,22 +1454,22 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public <T> T lookup(Class<T> role) throws ComponentLookupException {
-    return componentManager.lookup(role);
+    return componentManager.getInstance(role);
   }
 
   @Override
   public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException {
-    return componentManager.lookup(role, roleHint);
+    return componentManager.getInstance(role, roleHint);
   }
 
   @Override
   public <T> List<T> lookupList(Class<T> role) throws ComponentLookupException {
-    return componentManager.lookupList(role);
+    return componentManager.getInstanceList(role);
   }
 
   @Override
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException {
-    return componentManager.lookupMap(role);
+    return componentManager.getInstanceMap(role);
   }
 
   @Override
