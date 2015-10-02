@@ -66,8 +66,9 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     String name = "name";
     String val = "val";
     DocumentReference srcDocRef = new DocumentReference("odb", "Space", "SomeSrcDoc");
-    DocumentReference srcClassRef = new DocumentReference(classRef);
-    srcClassRef.setWikiReference(new WikiReference("odb"));
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    DocumentReference srcClassRef = new DocumentReference("odb",
+        classRef.getLastSpaceReference().getName(), classRef.getName());
     XWikiDocument srcDoc = new XWikiDocument(srcDocRef);
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
