@@ -14,6 +14,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.web.Utils;
 
 public class ApplicationReadyEventListenerTest extends AbstractBridgedComponentTestCase {
 
@@ -24,8 +25,8 @@ public class ApplicationReadyEventListenerTest extends AbstractBridgedComponentT
 
   @Before
   public void setUp_ApplicationReadyEventListenerTest() throws Exception {
-    listener = (ApplicationReadyEventListener) getComponentManager().lookup(
-        EventListener.class, "celements.classes.ApplicationReadyEventListener");
+    listener = (ApplicationReadyEventListener) Utils.getComponent(EventListener.class,
+        "celements.classes.ApplicationReadyEventListener");
     remoteObsMngContextMock = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;
