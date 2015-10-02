@@ -34,7 +34,7 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     componentManager = Utils.getComponentManager();
     pageTypeImplMock = createMockAndAddToDefault(IJavaPageTypeRole.class);
     testPageType = new DefaultPageTypeConfig(pageTypeImplMock);
-    webUtilsService = getComponentManager().lookup(IWebUtilsService.class);
+    webUtilsService = Utils.getComponent(IWebUtilsService.class);
     componentManager.release(webUtilsService);
     webUtilsManagDesc = componentManager.getComponentDescriptor(IWebUtilsService.class,
         "default");

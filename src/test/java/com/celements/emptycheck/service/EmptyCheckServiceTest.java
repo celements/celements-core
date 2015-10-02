@@ -40,6 +40,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -54,12 +55,11 @@ public class EmptyCheckServiceTest extends AbstractBridgedComponentTestCase {
   public void setUp_EmptyCheckCommandTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    emptyCheckService = (EmptyCheckService) getComponentManager().lookup(
-        IEmptyCheckRole.class);
+    emptyCheckService = (EmptyCheckService) Utils.getComponent(IEmptyCheckRole.class);
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
-    savedTreeNodeService = getComponentManager().lookup(ITreeNodeService.class);
+    savedTreeNodeService = Utils.getComponent(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
   }

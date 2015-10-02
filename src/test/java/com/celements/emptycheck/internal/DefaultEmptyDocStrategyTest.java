@@ -12,6 +12,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCase {
 
@@ -23,7 +24,7 @@ public class DefaultEmptyDocStrategyTest extends AbstractBridgedComponentTestCas
   public void setUp_DefaultEmptyDocStrategyTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    defEmptyDocStrategy = (DefaultEmptyDocStrategy) getComponentManager().lookup(
+    defEmptyDocStrategy = (DefaultEmptyDocStrategy) Utils.getComponent(
         IDefaultEmptyDocStrategyRole.class, "default");
   }
 

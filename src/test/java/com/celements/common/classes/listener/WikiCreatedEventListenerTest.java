@@ -12,6 +12,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.web.Utils;
 
 public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCase {
 
@@ -22,8 +23,8 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
 
   @Before
   public void setUp_WikiCreatedEventListenerTest() throws Exception {
-    listener = (WikiCreatedEventListener) getComponentManager().lookup(
-        EventListener.class, "celements.classes.WikiCreatedEventListener");
+    listener = (WikiCreatedEventListener) Utils.getComponent(EventListener.class,
+        "celements.classes.WikiCreatedEventListener");
     remoteObsMngContextMock = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;

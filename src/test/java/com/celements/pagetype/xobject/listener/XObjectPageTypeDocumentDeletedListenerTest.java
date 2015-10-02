@@ -61,7 +61,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest
     componentManager = Utils.getComponentManager();
     context = getContext();
     eventListener = getXObjPageTypeDocUpdatedListener();
-    defaultObservationManager = getComponentManager().lookup(ObservationManager.class);
+    defaultObservationManager = Utils.getComponent(ObservationManager.class);
     componentManager.release(defaultObservationManager);
     ComponentDescriptor<ObservationManager> obsManagDesc =
       componentManager.getComponentDescriptor(ObservationManager.class, "default");
