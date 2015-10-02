@@ -290,8 +290,8 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     assertTrue(ret.contains(classRef3));
     assertTrue(ret.contains(classRef4));
     //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    classRef2 = new DocumentReference("db", classRef.getLastSpaceReference().getName(),
-        classRef.getName());
+    classRef2 = new DocumentReference("db", classRef2.getLastSpaceReference().getName(),
+        classRef2.getName());
     assertTrue(ret.contains(classRef2));
   }
   
