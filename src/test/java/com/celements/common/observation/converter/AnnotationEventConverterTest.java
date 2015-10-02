@@ -19,6 +19,7 @@ import org.xwiki.observation.remote.converter.RemoteEventConverter;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCase {
   
@@ -136,13 +137,13 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
   }
 
   private AnnotationEventConverter getAnnotationLocalEventConverter() throws Exception {
-    return (AnnotationEventConverter) getComponentManager().lookup(
-        LocalEventConverter.class, "Annotation");
+    return (AnnotationEventConverter) Utils.getComponent(LocalEventConverter.class,
+        "Annotation");
   }
 
   private AnnotationEventConverter getAnnotationRemoteEventConverter() throws Exception {
-    return (AnnotationEventConverter) getComponentManager().lookup(
-        RemoteEventConverter.class, "Annotation");
+    return (AnnotationEventConverter) Utils.getComponent(RemoteEventConverter.class,
+        "Annotation");
   }
 
   private class LocalTestEvent implements Event, Serializable {

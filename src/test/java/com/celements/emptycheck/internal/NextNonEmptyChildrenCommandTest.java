@@ -40,6 +40,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTestCase {
 
@@ -58,7 +59,7 @@ public class NextNonEmptyChildrenCommandTest extends AbstractBridgedComponentTes
     treeNodeService = createMockAndAddToDefault(ITreeNodeService.class);
     treeNodeServiceDesc = getComponentManager().getComponentDescriptor(
         ITreeNodeService.class, "default");
-    savedTreeNodeServiceDesc = getComponentManager().getInstance(ITreeNodeService.class);
+    savedTreeNodeServiceDesc = Utils.getComponent(ITreeNodeService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(treeNodeServiceDesc, treeNodeService);
     context.setLanguage("de");

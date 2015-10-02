@@ -25,6 +25,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class PageDependentDocumentReferenceCommandTest
   extends AbstractBridgedComponentTestCase {
@@ -51,7 +52,7 @@ public class PageDependentDocumentReferenceCommandTest
     pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
     defaultValueProviderDesc = getComponentManager().getComponentDescriptor(
         EntityReferenceValueProvider.class, "default");
-    savedDefaultValueProviderService = getComponentManager().getInstance(
+    savedDefaultValueProviderService = Utils.getComponent(
         EntityReferenceValueProvider.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     defValueProviderMock = createMockAndAddToDefault(EntityReferenceValueProvider.class);

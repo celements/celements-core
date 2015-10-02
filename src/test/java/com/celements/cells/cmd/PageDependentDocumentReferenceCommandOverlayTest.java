@@ -24,6 +24,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class PageDependentDocumentReferenceCommandOverlayTest
     extends AbstractBridgedComponentTestCase {
@@ -52,7 +53,7 @@ public class PageDependentDocumentReferenceCommandOverlayTest
     webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     webUtilsServiceDesc = getComponentManager().getComponentDescriptor(
         IWebUtilsService.class, "default");
-    savedWebUtilsService = getComponentManager().getInstance(IWebUtilsService.class);
+    savedWebUtilsService = Utils.getComponent(IWebUtilsService.class);
     getComponentManager().unregisterComponent(ITreeNodeService.class, "default");
     getComponentManager().registerComponent(webUtilsServiceDesc, webUtilsMock);
     refLocalSerializerMock = createMockAndAddToDefault(EntityReferenceSerializer.class);

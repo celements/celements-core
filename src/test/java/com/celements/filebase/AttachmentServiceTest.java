@@ -20,6 +20,7 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -27,8 +28,7 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
   
   @Before
   public void setUp_AttachmentServiceTest() throws ComponentLookupException, Exception {
-    attService = (AttachmentService) getComponentManager().lookup(
-        IAttachmentServiceRole.class);
+    attService = (AttachmentService) Utils.getComponent(IAttachmentServiceRole.class);
   }
   
   @Test
