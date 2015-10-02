@@ -105,6 +105,12 @@ public class ApplicationReadyEventListenerTest extends AbstractBridgedComponentT
     public void checkAllClassCollections() {
       assertEquals(database, getContext().getDatabase());
     }
+
+    @Override
+    public boolean isActivated(String name) {
+      // TODO Auto-generated method stub
+      return false;
+    }
     
   }
 
