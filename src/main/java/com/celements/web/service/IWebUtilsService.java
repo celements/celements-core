@@ -359,4 +359,9 @@ public interface IWebUtilsService {
 
   public void setUser(DocumentReference userReference, boolean main);
 
+  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName);
+
+  public DocumentReference setWikiReference(DocumentReference docRef,
+      WikiReference wikiRef);
+
 }

@@ -369,7 +369,9 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   @Test
   public void test_getXObjects_otherWikiRef() {
     BaseObject obj = addObj(classRef, null, null);
-    classRef.setWikiReference(new WikiReference("otherWiki"));
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    classRef = new DocumentReference("otherWiki", classRef.getLastSpaceReference(
+        ).getName(), classRef.getName());
     List<BaseObject> ret = modelAccess.getXObjects(doc, classRef);
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(0));
@@ -490,8 +492,9 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
     BaseObject obj = new BaseObject();
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
-    classRef = new DocumentReference(classRef);
-    classRef.setWikiReference(new WikiReference("otherWiki"));
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    classRef = new DocumentReference("otherWiki", classRef.getLastSpaceReference(
+        ).getName(), classRef.getName());
     replayDefault();
     BaseObject ret = modelAccess.newXObject(docMock, classRef);
     verifyDefault();

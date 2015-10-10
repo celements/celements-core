@@ -1503,4 +1503,18 @@ public class WebUtilsService implements IWebUtilsService {
     getContext().setUserReference(userReference);
   }
 
+  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName) {
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    return new DocumentReference(wikiName, docRef.getLastSpaceReference(
+        ).getName(), docRef.getName());
+  }
+
+  public DocumentReference setWikiReference(DocumentReference docRef,
+      WikiReference wikiRef) {
+    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
+    SpaceReference spaceRef = new SpaceReference(docRef.getLastSpaceReference().getName(),
+        wikiRef);
+    return new DocumentReference(docRef.getName(), spaceRef);
+  }
+
 }
