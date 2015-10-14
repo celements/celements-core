@@ -24,7 +24,7 @@ public class ApplicationReadyEventListenerTest extends AbstractBridgedComponentT
 
   @Before
   public void setUp_ApplicationReadyEventListenerTest() throws Exception {
-    listener = (ApplicationReadyEventListener) getComponentManager().lookup(
+    listener = (ApplicationReadyEventListener) getComponentManager().getInstance(
         EventListener.class, "celements.mandatory.ApplicationReadyEventListener");
     remoteObsMngContextMock = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
