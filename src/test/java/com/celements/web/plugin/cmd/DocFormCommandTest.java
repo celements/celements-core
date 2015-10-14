@@ -143,8 +143,6 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     String value = "value";
     objMock.set(eq("hi"), eq(value), same(context));
     expectLastCall().once();
-    obj.setOwnerDocument(same(doc));
-    expectLastCall().once();
     
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key, value, context);
