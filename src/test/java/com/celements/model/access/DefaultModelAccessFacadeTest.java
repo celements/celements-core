@@ -104,13 +104,16 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void test_createDocument() throws Exception {
     getConfigurationSource().setProperty("default_language", "de");
     Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
-    String userName = "XWiki.TestUser";
-    getContext().setUser(userName);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(false).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
         ).andReturn(doc).once();
+    expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
     replayDefault();
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    String userName = "XWiki.TestUser";
+    getContext().setUser(userName);
     XWikiDocument ret = modelAccess.createDocument(doc.getDocumentReference());
     verifyDefault();
     assertSame(doc, ret);
