@@ -75,6 +75,7 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -403,7 +404,8 @@ public class WebUtilsService implements IWebUtilsService {
           getContext().setDoc(getContext().getWiki().getDocument(docRef, getContext()));
         }
       }
-      defaultLang = defaultConfigSrc.getProperty("default_language", "");
+      //IMPORTANT: in unstable-2.0 defaultLanguage may never be empty 
+      defaultLang = defaultConfigSrc.getProperty("default_language", "en");
     } catch (XWikiException xwe) {
       _LOGGER.error("failed getting WebPreferences for space '{}'", spaceRef, xwe);
     } finally {

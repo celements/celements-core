@@ -121,7 +121,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         "myTestUser");
     expect(xwiki.getDocument(eq(userDocRef), same(context))).andReturn(
         new XWikiDocument(userDocRef)).anyTimes();
-    expect(xwiki.getSpacePreference(eq("admin_language"), eq(""), same(context))
+    expect(xwiki.getSpacePreference(eq("admin_language"), eq("en"), same(context))
         ).andReturn("").anyTimes();
     expect(xwiki.Param("celements.admin_language")).andReturn("").anyTimes();
     expect(skinDoc.getURL(eq("view"), same(context))).andReturn("").anyTimes();
@@ -271,8 +271,8 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1"
         ).atLeastOnce();
-    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(context))
-        ).andReturn("en").atLeastOnce();
+    expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""),
+        same(context))).andReturn("en").atLeastOnce();
     replayDefault();
     //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5 thus why it must be
     //set after calling replay
@@ -281,7 +281,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     vContext.put("language", "de");
     prepVeloContextService.fixLanguagePreference(vContext);
     verifyDefault();
-    assertEquals("", vContext.get("language"));
+    assertEquals("default language must never be empty", "en", vContext.get("language"));
   }
 
   @Test
@@ -318,7 +318,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     vContext.put("language", "de");
     prepVeloContextService.fixLanguagePreference(vContext);
     verifyDefault();
-    assertEquals("", vContext.get("language"));
+    assertEquals("default language must never be empty", "en", vContext.get("language"));
   }
 
   @Test

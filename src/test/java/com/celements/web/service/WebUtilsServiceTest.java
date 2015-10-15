@@ -1929,7 +1929,8 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     String lang = "en";
     webUtilsService.defaultConfigSrc = createMockAndAddToDefault(
         ConfigurationSource.class);
-    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(""))
+    //IMPORTANT: in unstable-2.0 defaultLanguage may never be empty 
+    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq("en"))
         ).andReturn(lang).atLeastOnce();
     replayDefault();
     assertEquals(lang, webUtilsService.getDefaultLanguage());
@@ -1948,7 +1949,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(webPrefDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(webPrefDocRef), same(context))).andReturn(
         new XWikiDocument(webPrefDocRef)).once();
-    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(""))
+    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq("en"))
         ).andAnswer(new IAnswer<String>() {
           @Override
           public String answer() throws Throwable {
