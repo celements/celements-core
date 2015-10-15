@@ -42,6 +42,8 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     docMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     classRef = new DocumentReference("db", "Classes", "SomeClass");
+    //important for unstable-2.0 set database because class references are checked for db
+    getContext().setDatabase("db");
   }
   
   @Test
