@@ -45,6 +45,8 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     doc.setMetaDataDirty(false);
     classRef = new DocumentReference("db", "class", "any");
     classRef2 = new DocumentReference("db", "class", "other");
+    //important for unstable-2.0 set database because class references are checked for db
+    getContext().setDatabase("db");
   }
 
   @Test
