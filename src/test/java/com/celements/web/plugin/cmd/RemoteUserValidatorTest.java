@@ -96,7 +96,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     context.setWiki(xwiki);
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
@@ -107,8 +107,8 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     User user = createMock(User.class);
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
     expect(user.isUserInGroup(eq("grp"))).andReturn(false);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-        .andReturn("email,loginname").once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))
+        ).andReturn("email,loginname").once();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
     expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
@@ -129,7 +129,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     context.setWiki(xwiki);
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
@@ -166,7 +166,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     context.setWiki(xwiki);
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
@@ -207,7 +207,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     expect(context.getWiki()).andReturn(xwiki).anyTimes();
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
@@ -271,7 +271,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsGroupMember_notInGroup() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     context.setWiki(xwiki);
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
@@ -290,7 +290,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsGroupMember_inGroup() throws XWikiException {
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     context.setWiki(xwiki);
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
@@ -330,7 +330,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetResultJSON_withReturnGroups() throws XWikiException {
     XWikiContext context = createMock(XWikiContext.class);
-    XWiki xwiki = createMock(XWiki.class);
+    XWiki xwiki = getWikiMock();
     expect(context.getWiki()).andReturn(xwiki).anyTimes();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
