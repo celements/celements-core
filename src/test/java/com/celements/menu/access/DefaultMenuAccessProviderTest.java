@@ -60,7 +60,6 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
   @Test
   public void testHasview_notLocal_central_hasAccess_user() throws Exception {
     String myUserName = "XWiki.myUser";
-    context.setUser(myUserName);
     DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
         "Celements", "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
@@ -70,6 +69,9 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
     expect(rightsMock.hasAccessLevel(eq("view"), eq(myUserName),
             eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
     replayDefault();
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    getContext().setUser(myUserName);
     assertTrue(defMenuAccessProvider.hasview(menuBarDocRef));
     verifyDefault();
   }
