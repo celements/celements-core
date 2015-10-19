@@ -28,6 +28,7 @@ public class MenuAccessServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getRightService()).andReturn(rightsMock).anyTimes();
     menuAccessService = (MenuAccessService) Utils.getComponent(
         IMenuAccessServiceRole.class);
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test

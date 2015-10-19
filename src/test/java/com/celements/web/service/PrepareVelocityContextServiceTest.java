@@ -69,7 +69,6 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     expect(xwiki.getDocument(eq(new DocumentReference("celements2web", "XWiki",
         "Celements2Skin")), same(context))
       ).andReturn(skinDoc).anyTimes();
-    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     ptResolverMock = createMockAndAddToDefault(IPageTypeResolverRole.class);
     prepVeloContextService.pageTypeResolver = ptResolverMock;
     ptServiceMock = createMockAndAddToDefault(IPageTypeRole.class);
@@ -77,6 +76,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     curDocRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     currentDoc = new XWikiDocument(curDocRef);
     context.setDoc(currentDoc);
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test

@@ -28,6 +28,7 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
     expect(xwiki.getRightService()).andReturn(rightsMock).anyTimes();
     defMenuAccessProvider = (DefaultMenuAccessProvider) Utils.getComponent(
         IMenuAccessProviderRole.class, "celements.defaultMenuAccess");
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test

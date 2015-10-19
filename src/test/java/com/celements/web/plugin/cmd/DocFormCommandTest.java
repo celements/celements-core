@@ -63,6 +63,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd = new DocFormCommand();
     db = "db";
     context.setDatabase(db);
+    expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test
