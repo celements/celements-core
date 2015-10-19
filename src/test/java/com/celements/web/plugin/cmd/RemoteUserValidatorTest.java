@@ -68,7 +68,6 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsValidUserJSON_principalNull() throws XWikiException {
-    context.setUser("xwiki:XWiki.superadmin");
     XWikiRequest request = createMock(XWikiRequest.class);
     context.setRequest(request);
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
@@ -81,6 +80,9 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
         eq("loginname"), same(context))).andReturn("").once();
     replay(celementsweb, httpRequest, request);
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_username_password\"}", 
         cmd.isValidUserJSON("blabla@mail.com", "", "", null, context));
     verify(celementsweb, httpRequest, request);
@@ -88,7 +90,6 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsValidUserJSON_validUser_wrongGroup() throws XWikiException {
-    context.setUser("xwiki:XWiki.superadmin");
     XWikiRequest request = createMock(XWikiRequest.class);
     context.setRequest(request);
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
@@ -112,6 +113,9 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
         eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
     replay(auth, celementsweb, httpRequest, principal, request, user, xwiki);
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"false\", \"error\" : \"user_not_in_group\"}", 
         cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
     verify(auth, celementsweb, httpRequest, principal, request, user, xwiki);
@@ -119,7 +123,6 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsValidUserJSON_validUser_isInGroup_inactiveUser() throws XWikiException {
-    context.setUser("xwiki:XWiki.superadmin");
     XWikiRequest request = createMock(XWikiRequest.class);
     context.setRequest(request);
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
@@ -147,6 +150,9 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
         eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
     replay(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"false\", \"error\" : \"useraccount_inactive\"}", 
         cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
     verify(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
@@ -154,7 +160,6 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsValidUserJSON_validUser_isInGroup_noRetGroup() throws XWikiException {
-    context.setUser("xwiki:XWiki.superadmin");
     XWikiRequest request = createMock(XWikiRequest.class);
     context.setRequest(request);
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
@@ -183,6 +188,9 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
         eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
     replay(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("xwiki:XWiki.superadmin");
     assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", " +
         "\"group_membership\" : {}}", cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp",
         null, context));
@@ -353,13 +361,15 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testValidationAllowed_superadmin() {
-    context.setUser("xwiki:XWiki.superadmin");
     XWikiRequest request = createMock(XWikiRequest.class);
     context.setRequest(request);
     HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     replay(httpRequest, request);
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("xwiki:XWiki.superadmin");
     assertTrue(cmd.validationAllowed(context));
     verify(httpRequest, request);
   }

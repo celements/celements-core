@@ -1482,7 +1482,6 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsSuperAdminUser() throws Exception {
-    context.setUser("XWiki.MyAdmin");
     context.setMainXWiki("main");
     context.setDatabase("main");
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
@@ -1495,6 +1494,9 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAdminRights(same(context))).andReturn(true).atLeastOnce();
     replayDefault();
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
+    context.setUser("XWiki.MyAdmin");
     assertNotNull("check precondition", context.getXWikiUser());
     assertNotNull("check precondition", context.getDoc());
     assertTrue("check precondition", context.isMainWiki());

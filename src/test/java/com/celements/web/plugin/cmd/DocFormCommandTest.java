@@ -277,10 +277,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
         ).getDatabase(), "Test", "Doc"));
     doc.setCreationDate(new Date(0));
     doc.setCreator("");
+    replayDefault();
+    // important only call setUser after replayDefault. In unstable-2.0 branch setUser
+    // calls xwiki.isVirtualMode
     getContext().setUser("Hans.Wurscht");
     docFormCmd.applyCreationDateFix(doc, getContext());
     assertTrue(doc.getCreationDate().getTime() > 0);
     assertEquals("Hans.Wurscht", doc.getCreator());
+    verifyDefault();
   }
 
   @Test
