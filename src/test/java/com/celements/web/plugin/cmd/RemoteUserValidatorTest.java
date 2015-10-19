@@ -51,6 +51,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
   public void setUp_RemoteUserValidatorTest() throws Exception {
     cmd = new RemoteUserValidator();
     context = getContext();
+    expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
   }
 
   @Test
