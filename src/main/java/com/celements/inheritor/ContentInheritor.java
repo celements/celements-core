@@ -125,7 +125,7 @@ public class ContentInheritor {
       try {
         XWikiDocument doc = iterator.next();
         _LOGGER.debug("ContentInheritor getDoc next: " + doc);
-        if (getLanguage() != doc.getDefaultLanguage()){
+        if (!getLanguage().equals(doc.getDefaultLanguage())) {
           doc = doc.getTranslatedDocument(getLanguage(), getContext());
         }
         if (!getEmptyDocumentChecker().isEmpty(doc)) {
