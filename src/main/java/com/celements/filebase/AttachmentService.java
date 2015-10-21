@@ -19,6 +19,8 @@
  */
 package com.celements.filebase;
 
+import static org.easymock.EasyMock.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,6 +118,8 @@ public class AttachmentService implements IAttachmentServiceRole {
 
     // Add the attachment to the document
     attachment.setDoc(theDoc);
+    doc.setMetaDataDirty(true);
+    doc.setContentDirty(true);
     theDoc.setAuthor(username);
 
     // Adding a comment with a link to the download URL
