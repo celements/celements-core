@@ -75,7 +75,6 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
-import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -107,7 +106,10 @@ public class WebUtilsService implements IWebUtilsService {
   EntityReferenceSerializer<String> serializer_local;
 
   @Requirement
-  EntityReferenceResolver<String> referenceResolver;
+  EntityReferenceResolver<String> refResolver;
+
+  @Requirement("relative")
+  EntityReferenceResolver<String> refResolver_relative;
 
   /**
    * Used to get the template path mapping information.
@@ -484,8 +486,17 @@ public class WebUtilsService implements IWebUtilsService {
     if (wikiRef == null) {
       wikiRef = new WikiReference(getContext().getDatabase());
     }
-    EntityReference ref = referenceResolver.resolve(name, type, wikiRef);
-    _LOGGER.debug("resolveEntityReference: for [" + name + "] got reference [" + ref + "]");
+    EntityReference ref = refResolver.resolve(name, type, wikiRef);
+    _LOGGER.debug("resolveEntityReference: for [" + name + "] got reference [" + ref
+        + "]");
+    return ref;
+  }
+
+  @Override
+  public EntityReference resolveRelativeEntityReference(String name, EntityType type) {
+    EntityReference ref = refResolver_relative.resolve(name, type);
+    _LOGGER.debug("resolveRelativeEntityReference: for [" + name + "] got reference ["
+        + ref + "]");
     return ref;
   }
 

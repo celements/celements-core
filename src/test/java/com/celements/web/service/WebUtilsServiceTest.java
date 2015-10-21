@@ -23,7 +23,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.MockConfigurationSource;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.nextfreedoc.INextFreeDocRole;
@@ -840,6 +839,17 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
         EntityType.SPACE, null);
     assertEquals(new WikiReference(context.getDatabase()), webUtilsService.getWikiRef(
         ret));
+  }
+
+  @Test
+  public void testResolveRelativeEntityReference() {
+    EntityReference relativeEntityRef = webUtilsService.resolveRelativeEntityReference(
+        "MySpace.ParentDoc", EntityType.DOCUMENT);
+    assertEquals(relativeEntityRef.getClass(), EntityReference.class);
+    assertNull(relativeEntityRef.extractReference(EntityType.WIKI));
+    assertEquals("ParentDoc", relativeEntityRef.getName());
+    assertEquals("MySpace", relativeEntityRef.extractReference(EntityType.SPACE
+        ).getName());
   }
 
   @Test

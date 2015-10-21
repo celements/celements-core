@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.sajson.AbstractEventHandler;
@@ -172,10 +171,8 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
   }
 
   EntityReference getRelativeParentReference() {
-    @SuppressWarnings("unchecked")
-    EntityReferenceResolver<String> relativResolver = Utils.getComponent(
-        EntityReferenceResolver.class, "relative");
-    return relativResolver.resolve(getParentFN(), EntityType.DOCUMENT);
+    return getWebUtils().resolveRelativeEntityReference(getParentFN(),
+        EntityType.DOCUMENT);
   }
 
   boolean hasDiffParentReferences(EntityReference parentReference) {
