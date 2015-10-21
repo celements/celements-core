@@ -224,6 +224,10 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     expectLastCall();
     doc.setAuthor(eq(author));
     expectLastCall();
+    doc.setMetaDataDirty(eq(true));
+    expectLastCall().atLeastOnce();
+    doc.setContentDirty(eq(true));
+    expectLastCall().atLeastOnce();
     replayDefault();
     XWikiAttachment retAtt = attService.addAttachment(doc, new byte[]{'x'}, filename, 
         author, comment);
