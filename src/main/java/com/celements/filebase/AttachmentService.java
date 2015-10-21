@@ -19,8 +19,6 @@
  */
 package com.celements.filebase;
 
-import static org.easymock.EasyMock.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
