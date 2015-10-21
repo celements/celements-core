@@ -45,7 +45,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
@@ -78,7 +77,6 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
-import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -100,7 +98,7 @@ public class WebUtilsService implements IWebUtilsService {
   
   private static Logger _LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
 
-  @Requirement
+  @Inject
   ComponentManager componentManager;
 
   @Inject
@@ -113,6 +111,10 @@ public class WebUtilsService implements IWebUtilsService {
   
   @Inject
   EntityReferenceResolver<String> referenceResolver;
+
+  @Inject
+  @Named("relative")
+  EntityReferenceResolver<String> refResolver_relative;
 
   /**
    * Used to get the template path mapping information.
@@ -491,6 +493,14 @@ public class WebUtilsService implements IWebUtilsService {
     }
     EntityReference ref = referenceResolver.resolve(name, type, wikiRef);
     _LOGGER.debug("resolveEntityReference: for [" + name + "] got reference [" + ref + "]");
+    return ref;
+  }
+
+  @Override
+  public EntityReference resolveRelativeEntityReference(String name, EntityType type) {
+    EntityReference ref = refResolver_relative.resolve(name, type);
+    _LOGGER.debug("resolveRelativeEntityReference: for [" + name + "] got reference ["
+        + ref + "]");
     return ref;
   }
 

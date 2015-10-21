@@ -858,6 +858,17 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void testResolveRelativeEntityReference() {
+    EntityReference relativeEntityRef = webUtilsService.resolveRelativeEntityReference(
+        "MySpace.ParentDoc", EntityType.DOCUMENT);
+    assertEquals(relativeEntityRef.getClass(), EntityReference.class);
+    assertNull(relativeEntityRef.extractReference(EntityType.WIKI));
+    assertEquals("ParentDoc", relativeEntityRef.getName());
+    assertEquals("MySpace", relativeEntityRef.extractReference(EntityType.SPACE
+        ).getName());
+  }
+
+  @Test
   public void testResolveSpaceReference() {
     WikiReference wikiRef = new WikiReference("db");
     SpaceReference spaceRef = new SpaceReference("mySpace", wikiRef);

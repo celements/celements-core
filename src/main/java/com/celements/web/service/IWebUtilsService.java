@@ -122,6 +122,8 @@ public interface IWebUtilsService {
   public DocumentReference resolveDocumentReference(String fullName, 
       WikiReference wikiRef);
 
+  public EntityReference resolveRelativeEntityReference(String name, EntityType type);
+
   public SpaceReference resolveSpaceReference(String spaceName);
 
   public SpaceReference resolveSpaceReference(String spaceName, 
