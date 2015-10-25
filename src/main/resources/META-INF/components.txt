@@ -114,3 +114,5 @@ com.celements.model.access.ModelAccessScriptService
 com.celements.web.classcollections.OldCoreClassConfig
 com.celements.web.plugin.cmd.CelSendMail
 com.celements.mailsender.CelMailSenderService
+com.celements.rights.access.DefaultRightsAccessFacade
+com.celements.rights.access.EntityReferenceRandomCompleter
