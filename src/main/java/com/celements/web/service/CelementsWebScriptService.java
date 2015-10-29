@@ -1019,7 +1019,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String getVersion(String systemComponentName) {
-    if (this.versionMap.get(systemComponentName) == null) {
+    if (!this.versionMap.containsKey(systemComponentName)) {
       String versionFile = "/WEB-INF/versions/" + systemComponentName + ".properties";
       try {
         InputStream is = getContext().getWiki().getResourceAsStream(versionFile);
@@ -1033,7 +1033,7 @@ public class CelementsWebScriptService implements ScriptService {
         return "Unknown version";
       }
     }
-    return this.versionMap.get("systemComponentName");
+    return this.versionMap.get(systemComponentName);
   }
 
 }
