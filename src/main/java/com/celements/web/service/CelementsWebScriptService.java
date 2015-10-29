@@ -19,12 +19,15 @@
  */
 package com.celements.web.service;
 
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -127,6 +130,13 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   Execution execution;
+
+  /**
+   * Property containing the version value in the {@link #VERSION_FILE} file.
+   */
+  private static final String VERSION_FILE_PROPERTY = "version";
+
+  private HashMap<String, String> versionMap = new HashMap<>();
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -1006,6 +1016,24 @@ public class CelementsWebScriptService implements ScriptService {
 
   private TreeNodeScriptService getTreeNodeScriptService() {
     return (TreeNodeScriptService) treeNodeScriptService;
+  }
+
+  public String getVersion(String systemComponentName) {
+    if (this.versionMap.get(systemComponentName) == null) {
+      String versionFile = "/WEB-INF/versions/" + systemComponentName + ".properties";
+      try {
+        InputStream is = getContext().getWiki().getResourceAsStream(versionFile);
+        XWikiConfig properties = new XWikiConfig(is);
+        this.versionMap.put(systemComponentName, properties.getProperty(
+            VERSION_FILE_PROPERTY));
+      } catch(MalformedURLException | XWikiException exp) {
+        // Failed to retrieve the version, log a warning and default to "Unknown"
+        _LOGGER.warn("Failed to retrieve XWiki's version from [" + versionFile
+            + "], using the [" + VERSION_FILE_PROPERTY + "] property.", exp);
+        return "Unknown version";
+      }
+    }
+    return this.versionMap.get("systemComponentName");
   }
 
 }
