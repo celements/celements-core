@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -130,6 +131,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   Execution execution;
+
+  @Requirement("xwikiproperties")
+  private ConfigurationSource xwikiPropertiesSource;
 
   /**
    * Property containing the version value in the {@link #VERSION_FILE} file.
@@ -834,6 +838,10 @@ public class CelementsWebScriptService implements ScriptService {
   @Deprecated
   public String getCelementsWebCoreVersion() {
     return getContext().getWiki().Param("com.celements.version");
+  }
+  
+  public String getCelementsMainAppName() {
+    return xwikiPropertiesSource.getProperty("celements.appname", "");
   }
   
   public String getCelementsWebAppVersion() {
