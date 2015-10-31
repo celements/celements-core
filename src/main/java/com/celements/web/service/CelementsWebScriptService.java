@@ -828,6 +828,10 @@ public class CelementsWebScriptService implements ScriptService {
     return false;
   }
   
+  /**
+   * @deprecated instead use versions directory and getVersion(String)
+   */
+  @Deprecated
   public String getCelementsWebCoreVersion() {
     return getContext().getWiki().Param("com.celements.version");
   }
