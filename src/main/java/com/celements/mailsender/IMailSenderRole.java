@@ -20,4 +20,6 @@ public interface IMailSenderRole {
 
   public boolean isValidEmail(String email);
 
+  public String getEmailValidationRegex();
+
 }

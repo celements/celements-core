@@ -28,4 +28,8 @@ public class CelMailScriptService implements ScriptService {
     return mailSender.isValidEmail(email);
   }
   
+  public String getEmailValidationRegex() {
+    return mailSender.getEmailValidationRegex();
+  }
+  
 }
