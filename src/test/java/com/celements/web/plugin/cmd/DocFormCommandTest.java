@@ -561,6 +561,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
   public void testSaveXWikiDocCollection_saveDoc() throws XWikiException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
+    doc.setNew(false);
     xdocs.add(doc);
     xwiki.saveDocument(eq(doc), (String)anyObject(), same(getContext()));
     expectLastCall();
@@ -568,6 +569,9 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
     expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
         eq("w:S.D"), same(getContext()))).andReturn(true);
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    expect(request.get(eq("createIfNotExists"))).andReturn("false").anyTimes();
+    context.setRequest(request);
     replayDefault();
     Map<String, Set<DocumentReference>> result = docFormCmd.saveXWikiDocCollection(xdocs);
     verifyDefault();
@@ -593,6 +597,9 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
         eq("w:S." + docName1), same(getContext()))).andReturn(true);
     expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
         eq("w:S." + docName2), same(getContext()))).andReturn(false);
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
+    context.setRequest(request);
     replayDefault();
     Map<String, Set<DocumentReference>> result = docFormCmd.saveXWikiDocCollection(xdocs);
     verifyDefault();

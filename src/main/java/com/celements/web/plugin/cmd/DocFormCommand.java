@@ -139,18 +139,22 @@ public class DocFormCommand {
     Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
     Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
     for (XWikiDocument xdoc : xdocs) {
-      try {
-        if(getContext().getWiki().getRightService().hasAccessLevel("edit", 
-            getContext().getUser(), getWebUtilsService().serializeRef(
-                xdoc.getDocumentReference()), getContext())) {
-          getContext().getWiki().saveDocument(xdoc, "updateAndSaveDocFromRequest", 
-              getContext());
-          savedSuccessfully.add(xdoc.getDocumentReference());
-        } else {
+      if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
+        try {
+          if(getContext().getWiki().getRightService().hasAccessLevel("edit", 
+              getContext().getUser(), getWebUtilsService().serializeRef(
+                  xdoc.getDocumentReference()), getContext())) {
+            getContext().getWiki().saveDocument(xdoc, "updateAndSaveDocFromRequest", 
+                getContext());
+            savedSuccessfully.add(xdoc.getDocumentReference());
+          } else {
+            saveFailed.add(xdoc.getDocumentReference());
+          }
+        } catch(XWikiException xwe) {
+          LOGGER.error("Exception saving document {}.", xdoc, xwe);
           saveFailed.add(xdoc.getDocumentReference());
         }
-      } catch(XWikiException xwe) {
-        LOGGER.error("Exception saving document {}.", xdoc, xwe);
+      } else {
         saveFailed.add(xdoc.getDocumentReference());
       }
     }
