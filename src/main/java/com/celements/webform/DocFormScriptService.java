@@ -23,7 +23,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 @Component("docform")
 public class DocFormScriptService implements ScriptService {
@@ -34,6 +33,12 @@ public class DocFormScriptService implements ScriptService {
   
   @Requirement
   private Execution execution;
+  
+  @Requirement
+  IModelAccessFacade modelAccessFacade;
+  
+  @Requirement
+  IWebUtilsService webUtilsService;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -126,9 +131,10 @@ public class DocFormScriptService implements ScriptService {
       Collection<XWikiDocument> xdocs) throws XWikiException {
     boolean hasEditOnAllDocs = true;
     for (XWikiDocument xdoc : xdocs) {
-      if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
+      if(!xdoc.isNew() || "true".equals(getContext().getRequest(
+          ).get("createIfNotExists"))) {
         hasEditOnAllDocs &= getContext().getWiki().getRightService().hasAccessLevel(
-            "edit", getContext().getUser(), getWebUtilsService().serializeRef(
+            "edit", getContext().getUser(), webUtilsService.serializeRef(
                 xdoc.getDocumentReference()), getContext());
       }
     }
@@ -136,9 +142,10 @@ public class DocFormScriptService implements ScriptService {
     Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
     for (XWikiDocument xdoc : xdocs) {
       if(hasEditOnAllDocs) {
-        if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
+        if(!xdoc.isNew() || "true".equals(getContext().getRequest(
+            ).get("createIfNotExists"))) {
           try {
-              getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+              modelAccessFacade.saveDocument(xdoc, "updateAndSaveDocFromRequest");
               savedSuccessfully.add(xdoc.getDocumentReference());
           } catch(DocumentSaveException dse) {
             LOGGER.error("Exception saving document {}.", xdoc, dse);
@@ -156,13 +163,5 @@ public class DocFormScriptService implements ScriptService {
     docs.put("successful", savedSuccessfully);
     docs.put("failed", saveFailed);
     return docs;
-  }
-  
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
-  }
-  
-  private IModelAccessFacade getModelAccessFacade() {
-    return Utils.getComponent(IModelAccessFacade.class);
   }
 }

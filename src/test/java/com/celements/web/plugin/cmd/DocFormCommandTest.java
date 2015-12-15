@@ -537,6 +537,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     String val2 = "Value2";
     inMap.put(key1, val1);
     inMap.put(key2, new String[]{ val1, val2 });
+    inMap.put("key3", new Object());
     Map<String, String[]> result = docFormCmd.prepareMapForDocUpdate(inMap);
     assertEquals(2, result.size());
     assertEquals(val1, result.get(key1)[0]);
