@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.oro.text.perl.MalformedPerl5PatternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.docform.DocFormRequestKey;
@@ -115,6 +117,48 @@ public class DocFormCommand {
       }
     }
     return new HashSet<XWikiDocument>(changedDocs.values());
+  }
+  
+  public Map<String, String[]> prepareMapForDocUpdate(Map<String, ?> map) {
+    Map<String, String[]> recompMap = new HashMap<String, String[]>();
+    for (String key : map.keySet()) {
+      if(map.get(key) instanceof String[]) {
+        recompMap.put(key, (String[])map.get(key));
+      } else if(map.get(key) instanceof String) {
+        recompMap.put(key, new String[]{(String)map.get(key)});
+      }
+    }
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("recompiled map '{}' to '{}'", map, recompMap);
+    }
+    return recompMap;
+  }
+
+  public Map<String, Set<DocumentReference>> saveXWikiDocCollection(
+      Collection<XWikiDocument> xdocs) {
+    Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
+    Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
+    for (XWikiDocument xdoc : xdocs) {
+      try {
+        if(getContext().getWiki().getRightService().hasAccessLevel("edit", 
+            getContext().getUser(), getWebUtilsService().serializeRef(
+                xdoc.getDocumentReference()), getContext())) {
+          getContext().getWiki().saveDocument(xdoc, "updateAndSaveDocFromRequest", 
+              getContext());
+          savedSuccessfully.add(xdoc.getDocumentReference());
+        } else {
+          saveFailed.add(xdoc.getDocumentReference());
+        }
+      } catch(XWikiException xwe) {
+        LOGGER.error("Exception saving document {}.", xdoc, xwe);
+        saveFailed.add(xdoc.getDocumentReference());
+      }
+    }
+    Map<String, Set<DocumentReference>> docs = 
+        new HashMap<String, Set<DocumentReference>>();
+    docs.put("successful", savedSuccessfully);
+    docs.put("failed", saveFailed);
+    return docs;
   }
 
   XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context
@@ -312,6 +356,11 @@ public class DocFormCommand {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private XWikiContext getContext() {
+    return (XWikiContext)((Execution)Utils.getComponent(Execution.class)).getContext(
+        ).getProperty("xwikicontext"); 
   }
 
 }
