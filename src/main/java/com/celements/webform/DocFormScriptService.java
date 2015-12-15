@@ -2,6 +2,7 @@ package com.celements.webform;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,11 +15,15 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.plugin.cmd.DocFormCommand;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 @Component("docform")
 public class DocFormScriptService implements ScriptService {
@@ -61,7 +66,7 @@ public class DocFormScriptService implements ScriptService {
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
     }
-    return getDocFormCommand().saveXWikiDocCollection(xdocs);
+    return saveXWikiDocCollection(xdocs);
   }
   
   /*
@@ -105,7 +110,7 @@ public class DocFormScriptService implements ScriptService {
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
     }
-    return getDocFormCommand().saveXWikiDocCollection(xdocs);
+    return saveXWikiDocCollection(xdocs);
   }
   
   private DocFormCommand getDocFormCommand() {
@@ -113,5 +118,46 @@ public class DocFormScriptService implements ScriptService {
       getContext().put(_DOC_FORM_COMMAND_OBJECT, new DocFormCommand());
     }
     return (DocFormCommand) getContext().get(_DOC_FORM_COMMAND_OBJECT);
+  }
+
+  Map<String, Set<DocumentReference>> saveXWikiDocCollection(
+      Collection<XWikiDocument> xdocs) {
+    Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
+    Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
+    for (XWikiDocument xdoc : xdocs) {
+      if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
+        try {
+          if(getContext().getWiki().getRightService().hasAccessLevel("edit", 
+              getContext().getUser(), getWebUtilsService().serializeRef(
+                  xdoc.getDocumentReference()), getContext())) {
+            getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+            savedSuccessfully.add(xdoc.getDocumentReference());
+          } else {
+            saveFailed.add(xdoc.getDocumentReference());
+          }
+        } catch(XWikiException xwe) {
+          LOGGER.error("Exception checking edit rights for {}.", xdoc, xwe);
+          saveFailed.add(xdoc.getDocumentReference());
+        } catch(DocumentSaveException dse) {
+          LOGGER.error("Exception saving document {}.", xdoc, dse);
+          saveFailed.add(xdoc.getDocumentReference());
+        }
+      } else {
+        saveFailed.add(xdoc.getDocumentReference());
+      }
+    }
+    Map<String, Set<DocumentReference>> docs = 
+        new HashMap<String, Set<DocumentReference>>();
+    docs.put("successful", savedSuccessfully);
+    docs.put("failed", saveFailed);
+    return docs;
+  }
+  
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private IModelAccessFacade getModelAccessFacade() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 }

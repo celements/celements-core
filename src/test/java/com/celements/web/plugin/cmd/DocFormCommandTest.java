@@ -22,10 +22,7 @@ package com.celements.web.plugin.cmd;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +46,6 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -547,69 +543,4 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     assertEquals(val1, result.get(key2)[0]);
     assertEquals(val2, result.get(key2)[1]);
   }
-
-  @Test
-  public void testSaveXWikiDocCollection_empty() {
-    Map<String, Set<DocumentReference>> result = docFormCmd.saveXWikiDocCollection(
-        Collections.<XWikiDocument>emptyList());
-    assertEquals(2, result.size());
-    assertEquals(0, result.get("successful").size());
-    assertEquals(0, result.get("failed").size());
-  }
-
-  @Test
-  public void testSaveXWikiDocCollection_saveDoc() throws XWikiException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
-    XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
-    doc.setNew(false);
-    xdocs.add(doc);
-    xwiki.saveDocument(eq(doc), (String)anyObject(), eq(false), same(getContext()));
-    expectLastCall();
-    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
-        eq("w:S.D"), same(getContext()))).andReturn(true);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("false").anyTimes();
-    context.setRequest(request);
-    replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormCmd.saveXWikiDocCollection(xdocs);
-    verifyDefault();
-    assertEquals(2, result.size());
-    assertEquals(1, result.get("successful").size());
-    assertEquals(0, result.get("failed").size());
-  }
-
-  @Test
-  public void testSaveXWikiDocCollection_saveDoc_Multiple() throws XWikiException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
-    String docName1 = "HasRight";
-    String docName2 = "NoRight";
-    XWikiDocument doc1 = new XWikiDocument(new DocumentReference("w", "S", docName1));
-    xdocs.add(doc1);
-    XWikiDocument doc2 = new XWikiDocument(new DocumentReference("w", "S", docName2));
-    xdocs.add(doc2);
-    xwiki.saveDocument(eq(doc1), (String)anyObject(), eq(false), same(getContext()));
-    expectLastCall();
-    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
-        eq("w:S." + docName1), same(getContext()))).andReturn(true);
-    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
-        eq("w:S." + docName2), same(getContext()))).andReturn(false);
-    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
-    expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
-    context.setRequest(request);
-    replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormCmd.saveXWikiDocCollection(xdocs);
-    verifyDefault();
-    assertEquals(2, result.size());
-    assertEquals(1, result.get("successful").size());
-    assertEquals(docName1, ((DocumentReference) result.get("successful").toArray()[0]
-        ).getName());
-    assertEquals(1, result.get("failed").size());
-    assertEquals(docName2, ((DocumentReference) result.get("failed").toArray()[0]
-        ).getName());
-  }
-
 }
