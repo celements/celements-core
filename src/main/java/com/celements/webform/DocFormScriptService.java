@@ -63,10 +63,11 @@ public class DocFormScriptService implements ScriptService {
     try {
       xdocs = getDocFormCommand().updateDocFromMap(docRef, getDocFormCommand(
           ).prepareMapForDocUpdate(map), getContext());
+      return saveXWikiDocCollection(xdocs);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
     }
-    return saveXWikiDocCollection(xdocs);
+    return Collections.emptyMap();
   }
   
   /*
@@ -107,10 +108,11 @@ public class DocFormScriptService implements ScriptService {
     try {
       xdocs = getDocFormCommand().updateDocFromMap(docRef,
           getContext().getRequest().getParameterMap(), getContext());
+      return saveXWikiDocCollection(xdocs);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
     }
-    return saveXWikiDocCollection(xdocs);
+    return Collections.emptyMap();
   }
   
   private DocFormCommand getDocFormCommand() {
