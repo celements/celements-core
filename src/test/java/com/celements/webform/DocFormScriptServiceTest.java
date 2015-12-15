@@ -37,7 +37,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
   }
 
   @Test
-  public void testSaveXWikiDocCollection_empty() {
+  public void testSaveXWikiDocCollection_empty() throws XWikiException {
     Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
         Collections.<XWikiDocument>emptyList());
     assertEquals(2, result.size());
@@ -70,7 +70,8 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
   }
 
   @Test
-  public void testSaveXWikiDocCollection_saveDoc_Multiple() throws XWikiException {
+  public void testSaveXWikiDocCollection_saveDoc_multiple_notRightsOnAll(
+      ) throws XWikiException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     String docName1 = "HasRight";
     String docName2 = "NoRight";
@@ -78,8 +79,6 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     xdocs.add(doc1);
     XWikiDocument doc2 = new XWikiDocument(new DocumentReference("w", "S", docName2));
     xdocs.add(doc2);
-    xwiki.saveDocument(eq(doc1), (String)anyObject(), eq(false), same(getContext()));
-    expectLastCall();
     XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
     expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
@@ -94,11 +93,53 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
         xdocs);
     verifyDefault();
     assertEquals(2, result.size());
-    assertEquals(1, result.get("successful").size());
-    assertEquals(docName1, ((DocumentReference) result.get("successful").toArray()[0]
-        ).getName());
-    assertEquals(1, result.get("failed").size());
-    assertEquals(docName2, ((DocumentReference) result.get("failed").toArray()[0]
-        ).getName());
+    assertEquals(0, result.get("successful").size());
+    assertEquals(2, result.get("failed").size());
+    DocumentReference[] failed = new DocumentReference[] { null, null };
+    failed = result.get("failed").toArray(failed);
+    assertTrue((docName1.equals(failed[0].getName()) 
+        && docName2.equals(failed[1].getName())) 
+        || (docName1.equals(failed[1].getName()) 
+        && docName2.equals(failed[0].getName())));
+  }
+
+  @Test
+  public void testSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll(
+      ) throws XWikiException {
+    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
+    String docName1 = "HasRight1";
+    String docName2 = "HasRight2";
+    XWikiDocument doc1 = new XWikiDocument(new DocumentReference("w", "S", docName1));
+    xdocs.add(doc1);
+    XWikiDocument doc2 = new XWikiDocument(new DocumentReference("w", "S", docName2));
+    xdocs.add(doc2);
+    xwiki.saveDocument(eq(doc1), (String)anyObject(), eq(false), 
+        same(getContext()));
+    expectLastCall();
+    xwiki.saveDocument(eq(doc2), (String)anyObject(), eq(false), 
+        same(getContext()));
+    expectLastCall();
+    XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
+    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
+        eq("w:S." + docName1), same(getContext()))).andReturn(true);
+    expect(rightService.hasAccessLevel(eq("edit"), eq(getContext().getUser()), 
+        eq("w:S." + docName2), same(getContext()))).andReturn(true);
+    XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
+    expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
+    context.setRequest(request);
+    replayDefault();
+    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
+        xdocs);
+    verifyDefault();
+    assertEquals(2, result.size());
+    assertEquals(2, result.get("successful").size());
+    DocumentReference[] success = new DocumentReference[] { null, null };
+    success = result.get("successful").toArray(success);
+    assertTrue((docName1.equals(success[0].getName()) 
+        && docName2.equals(success[1].getName())) 
+        || (docName1.equals(success[1].getName()) 
+        && docName2.equals(success[0].getName())));
+    assertEquals(0, result.get("failed").size());
   }
 }

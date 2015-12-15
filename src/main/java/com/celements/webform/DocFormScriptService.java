@@ -123,25 +123,28 @@ public class DocFormScriptService implements ScriptService {
   }
 
   Map<String, Set<DocumentReference>> saveXWikiDocCollection(
-      Collection<XWikiDocument> xdocs) {
+      Collection<XWikiDocument> xdocs) throws XWikiException {
+    boolean hasEditOnAllDocs = true;
+    for (XWikiDocument xdoc : xdocs) {
+      if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
+        hasEditOnAllDocs &= getContext().getWiki().getRightService().hasAccessLevel(
+            "edit", getContext().getUser(), getWebUtilsService().serializeRef(
+                xdoc.getDocumentReference()), getContext());
+      }
+    }
     Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
     Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
     for (XWikiDocument xdoc : xdocs) {
-      if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
-        try {
-          if(getContext().getWiki().getRightService().hasAccessLevel("edit", 
-              getContext().getUser(), getWebUtilsService().serializeRef(
-                  xdoc.getDocumentReference()), getContext())) {
-            getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
-            savedSuccessfully.add(xdoc.getDocumentReference());
-          } else {
+      if(hasEditOnAllDocs) {
+        if(!xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"))) {
+          try {
+              getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+              savedSuccessfully.add(xdoc.getDocumentReference());
+          } catch(DocumentSaveException dse) {
+            LOGGER.error("Exception saving document {}.", xdoc, dse);
             saveFailed.add(xdoc.getDocumentReference());
           }
-        } catch(XWikiException xwe) {
-          LOGGER.error("Exception checking edit rights for {}.", xdoc, xwe);
-          saveFailed.add(xdoc.getDocumentReference());
-        } catch(DocumentSaveException dse) {
-          LOGGER.error("Exception saving document {}.", xdoc, dse);
+        } else {
           saveFailed.add(xdoc.getDocumentReference());
         }
       } else {
