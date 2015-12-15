@@ -563,7 +563,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
     doc.setNew(false);
     xdocs.add(doc);
-    xwiki.saveDocument(eq(doc), (String)anyObject(), same(getContext()));
+    xwiki.saveDocument(eq(doc), (String)anyObject(), eq(false), same(getContext()));
     expectLastCall();
     XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightService).anyTimes();
@@ -589,7 +589,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     xdocs.add(doc1);
     XWikiDocument doc2 = new XWikiDocument(new DocumentReference("w", "S", docName2));
     xdocs.add(doc2);
-    xwiki.saveDocument(eq(doc1), (String)anyObject(), same(getContext()));
+    xwiki.saveDocument(eq(doc1), (String)anyObject(), eq(false), same(getContext()));
     expectLastCall();
     XWikiRightService rightService = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightService).anyTimes();

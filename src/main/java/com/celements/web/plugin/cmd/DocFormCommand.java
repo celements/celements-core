@@ -38,6 +38,8 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.docform.DocFormRequestKey;
 import com.celements.docform.DocFormRequestKeyParser;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -144,14 +146,16 @@ public class DocFormCommand {
           if(getContext().getWiki().getRightService().hasAccessLevel("edit", 
               getContext().getUser(), getWebUtilsService().serializeRef(
                   xdoc.getDocumentReference()), getContext())) {
-            getContext().getWiki().saveDocument(xdoc, "updateAndSaveDocFromRequest", 
-                getContext());
+            getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
             savedSuccessfully.add(xdoc.getDocumentReference());
           } else {
             saveFailed.add(xdoc.getDocumentReference());
           }
         } catch(XWikiException xwe) {
-          LOGGER.error("Exception saving document {}.", xdoc, xwe);
+          LOGGER.error("Exception checking edit rights for {}.", xdoc, xwe);
+          saveFailed.add(xdoc.getDocumentReference());
+        } catch(DocumentSaveException dse) {
+          LOGGER.error("Exception saving document {}.", xdoc, dse);
           saveFailed.add(xdoc.getDocumentReference());
         }
       } else {
@@ -365,6 +369,10 @@ public class DocFormCommand {
   private XWikiContext getContext() {
     return (XWikiContext)((Execution)Utils.getComponent(Execution.class)).getContext(
         ).getProperty("xwikicontext"); 
+  }
+  
+  private IModelAccessFacade getModelAccessFacade() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
 }
