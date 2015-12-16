@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -38,20 +39,26 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     docFormService = (DocFormScriptService) Utils.getComponent(ScriptService.class, 
         "docform");
     modelAccessFacade = createMockAndAddToDefault(IModelAccessFacade.class);
-    docFormService.modelAccessFacade = modelAccessFacade;
+    DefaultComponentDescriptor<IModelAccessFacade> descriptor = 
+        new DefaultComponentDescriptor<IModelAccessFacade>();
+    descriptor.setRole(IModelAccessFacade.class);
+    descriptor.setRoleHint("default");
+    Utils.getComponentManager().registerComponent(descriptor, modelAccessFacade);
   }
 
   @Test
-  public void testSaveXWikiDocCollection_empty() throws XWikiException {
-    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
-        Collections.<XWikiDocument>emptyList());
+  public void testCheckRightsAndSaveXWikiDocCollection_empty() throws XWikiException {
+    Map<String, Set<DocumentReference>> result = 
+        docFormService.checkRightsAndSaveXWikiDocCollection(
+            Collections.<XWikiDocument>emptyList());
     assertEquals(2, result.size());
     assertEquals(0, result.get("successful").size());
     assertEquals(0, result.get("failed").size());
   }
 
   @Test
-  public void testSaveXWikiDocCollection_saveDoc() throws XWikiException, DocumentSaveException {
+  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc(
+      ) throws XWikiException, DocumentSaveException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
     doc.setNew(false);
@@ -66,8 +73,8 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     expect(request.get(eq("createIfNotExists"))).andReturn("false").anyTimes();
     context.setRequest(request);
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = 
+        docFormService.checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(1, result.get("successful").size());
@@ -75,7 +82,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
   }
 
   @Test
-  public void testSaveXWikiDocCollection_newWithoutCreateIfNotExists(
+  public void testCheckRightsAndSaveXWikiDocCollection_newWithoutCreateIfNotExists(
       ) throws XWikiException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
@@ -84,8 +91,8 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     expect(request.get(eq("createIfNotExists"))).andReturn("false").anyTimes();
     context.setRequest(request);
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = 
+        docFormService.checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(0, result.get("successful").size());
@@ -93,7 +100,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
   }
 
   @Test
-  public void testSaveXWikiDocCollection_saveDoc_multiple_notRightsOnAll(
+  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_notRightsOnAll(
       ) throws XWikiException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     String docName1 = "HasRight";
@@ -113,8 +120,8 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
     context.setRequest(request);
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = 
+        docFormService.checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(0, result.get("successful").size());
@@ -128,7 +135,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
   }
 
   @Test
-  public void testSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll(
+  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll(
       ) throws XWikiException, DocumentSaveException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     String docName1 = "HasRight1";
@@ -151,8 +158,8 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
     context.setRequest(request);
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = 
+        docFormService.checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(2, result.get("successful").size());
@@ -166,7 +173,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
   }
 
   @Test
-  public void testSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll_exception(
+  public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll_exception(
       ) throws XWikiException, DocumentSaveException {
     Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
     String docName1 = "HasRight1";
@@ -190,8 +197,8 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase  
     expect(request.get(eq("createIfNotExists"))).andReturn("true").anyTimes();
     context.setRequest(request);
     replayDefault();
-    Map<String, Set<DocumentReference>> result = docFormService.saveXWikiDocCollection(
-        xdocs);
+    Map<String, Set<DocumentReference>> result = 
+        docFormService.checkRightsAndSaveXWikiDocCollection(xdocs);
     verifyDefault();
     assertEquals(2, result.size());
     assertEquals(1, result.get("successful").size());

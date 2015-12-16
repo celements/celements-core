@@ -15,8 +15,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.plugin.cmd.DocFormCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -33,9 +31,6 @@ public class DocFormScriptService implements ScriptService {
   
   @Requirement
   private Execution execution;
-  
-  @Requirement
-  IModelAccessFacade modelAccessFacade;
   
   @Requirement
   IWebUtilsService webUtilsService;
@@ -68,7 +63,7 @@ public class DocFormScriptService implements ScriptService {
     try {
       xdocs = getDocFormCommand().updateDocFromMap(docRef, getDocFormCommand(
           ).prepareMapForDocUpdate(map), getContext());
-      return saveXWikiDocCollection(xdocs);
+      return checkRightsAndSaveXWikiDocCollection(xdocs);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
     }
@@ -113,7 +108,7 @@ public class DocFormScriptService implements ScriptService {
     try {
       xdocs = getDocFormCommand().updateDocFromMap(docRef,
           getContext().getRequest().getParameterMap(), getContext());
-      return saveXWikiDocCollection(xdocs);
+      return checkRightsAndSaveXWikiDocCollection(xdocs);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception in getDocFormCommand().updateDocFromMap()", xwe);
     }
@@ -127,41 +122,33 @@ public class DocFormScriptService implements ScriptService {
     return (DocFormCommand) getContext().get(_DOC_FORM_COMMAND_OBJECT);
   }
 
-  Map<String, Set<DocumentReference>> saveXWikiDocCollection(
+  Map<String, Set<DocumentReference>> checkRightsAndSaveXWikiDocCollection(
       Collection<XWikiDocument> xdocs) throws XWikiException {
+    boolean hasEditOnAllDocs = hasEditOnAllDocs(xdocs);
+    Map<String, Set<DocumentReference>> docs;
+    if(hasEditOnAllDocs) {
+      docs = getDocFormCommand().saveXWikiDocCollection(xdocs);
+    } else {
+      Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
+      for (XWikiDocument xdoc : xdocs) {
+        saveFailed.add(xdoc.getDocumentReference());
+      }
+      docs = new HashMap<String, Set<DocumentReference>>();
+      docs.put("successful", new HashSet<DocumentReference>());
+      docs.put("failed", saveFailed);
+    }
+    return docs;
+  }
+
+  boolean hasEditOnAllDocs(Collection<XWikiDocument> xdocs) throws XWikiException {
     boolean hasEditOnAllDocs = true;
     for (XWikiDocument xdoc : xdocs) {
-      if(!xdoc.isNew() || "true".equals(getContext().getRequest(
-          ).get("createIfNotExists"))) {
+      if(getDocFormCommand().notNewOrCreatAllowed(xdoc)) {
         hasEditOnAllDocs &= getContext().getWiki().getRightService().hasAccessLevel(
             "edit", getContext().getUser(), webUtilsService.serializeRef(
                 xdoc.getDocumentReference()), getContext());
       }
     }
-    Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
-    Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
-    for (XWikiDocument xdoc : xdocs) {
-      if(hasEditOnAllDocs) {
-        if(!xdoc.isNew() || "true".equals(getContext().getRequest(
-            ).get("createIfNotExists"))) {
-          try {
-              modelAccessFacade.saveDocument(xdoc, "updateAndSaveDocFromRequest");
-              savedSuccessfully.add(xdoc.getDocumentReference());
-          } catch(DocumentSaveException dse) {
-            LOGGER.error("Exception saving document {}.", xdoc, dse);
-            saveFailed.add(xdoc.getDocumentReference());
-          }
-        } else {
-          saveFailed.add(xdoc.getDocumentReference());
-        }
-      } else {
-        saveFailed.add(xdoc.getDocumentReference());
-      }
-    }
-    Map<String, Set<DocumentReference>> docs = 
-        new HashMap<String, Set<DocumentReference>>();
-    docs.put("successful", savedSuccessfully);
-    docs.put("failed", saveFailed);
-    return docs;
+    return hasEditOnAllDocs;
   }
 }

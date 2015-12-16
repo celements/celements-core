@@ -21,6 +21,7 @@ package com.celements.web.plugin.cmd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,10 +33,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.oro.text.perl.MalformedPerl5PatternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.docform.DocFormRequestKey;
 import com.celements.docform.DocFormRequestKeyParser;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -132,6 +136,35 @@ public class DocFormCommand {
     return recompMap;
   }
 
+  public Map<String, Set<DocumentReference>> saveXWikiDocCollection(
+      Collection<XWikiDocument> xdocs) {
+    Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
+    Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
+    for (XWikiDocument xdoc : xdocs) {
+      if(notNewOrCreatAllowed(xdoc)) {
+        try {
+          getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+          savedSuccessfully.add(xdoc.getDocumentReference());
+        } catch(DocumentSaveException dse) {
+          LOGGER.error("Exception saving document {}.", xdoc, dse);
+          saveFailed.add(xdoc.getDocumentReference());
+        }
+      } else {
+        saveFailed.add(xdoc.getDocumentReference());
+      }
+    }
+    Map<String, Set<DocumentReference>> docs = 
+        new HashMap<String, Set<DocumentReference>>();
+    docs.put("successful", savedSuccessfully);
+    docs.put("failed", saveFailed);
+    return docs;
+  }
+
+  public boolean notNewOrCreatAllowed(XWikiDocument xdoc) {
+    return !xdoc.isNew() || "true".equals(getContext().getRequest().get(
+        "createIfNotExists"));
+  }
+  
   XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context
       ) throws XWikiException {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
@@ -327,6 +360,15 @@ public class DocFormCommand {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private IModelAccessFacade getModelAccessFacade() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+  
+  private XWikiContext getContext() {
+    return (XWikiContext)((Execution)Utils.getComponent(Execution.class)).getContext(
+        ).getProperty("xwikicontext"); 
   }
 
 }
