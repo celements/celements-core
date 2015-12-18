@@ -141,7 +141,7 @@ public class DocFormCommand {
     Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
     Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
     for (XWikiDocument xdoc : xdocs) {
-      if(notNewOrCreatAllowed(xdoc)) {
+      if(notNewOrCreateAllowed(xdoc)) {
         try {
           getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
           savedSuccessfully.add(xdoc.getDocumentReference());
@@ -160,7 +160,7 @@ public class DocFormCommand {
     return docs;
   }
 
-  public boolean notNewOrCreatAllowed(XWikiDocument xdoc) {
+  public boolean notNewOrCreateAllowed(XWikiDocument xdoc) {
     return !xdoc.isNew() || "true".equals(getContext().getRequest().get(
         "createIfNotExists"));
   }

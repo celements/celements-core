@@ -143,7 +143,7 @@ public class DocFormScriptService implements ScriptService {
   boolean hasEditOnAllDocs(Collection<XWikiDocument> xdocs) throws XWikiException {
     boolean hasEditOnAllDocs = true;
     for (XWikiDocument xdoc : xdocs) {
-      if(getDocFormCommand().notNewOrCreatAllowed(xdoc)) {
+      if(getDocFormCommand().notNewOrCreateAllowed(xdoc)) {
         hasEditOnAllDocs &= getContext().getWiki().getRightService().hasAccessLevel(
             "edit", getContext().getUser(), webUtilsService.serializeRef(
                 xdoc.getDocumentReference()), getContext());
