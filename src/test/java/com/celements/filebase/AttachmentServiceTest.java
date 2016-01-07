@@ -3,6 +3,8 @@ package com.celements.filebase;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +15,8 @@ import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.IModelAccessFacade;
@@ -21,6 +25,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
 
@@ -212,6 +217,7 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     String comment = "comment";
     String filename = "file.txt";
     String author = "XWiki.test";
+    att.setFilename(filename);
     expect(doc.clone()).andReturn(doc).once();
     expect(doc.getAttachment(eq(filename))).andReturn(att);
     expect(doc.getAttachmentRevisionURL(eq(filename), (String)anyObject(), 
@@ -233,6 +239,43 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
         author, comment);
     assertSame(att, retAtt);
     verifyDefault();
+    assertEquals(filename, retAtt.getFilename());
+  }
+  
+  @Test
+  public void testAddAttachment_newFileNameIsPrefixOfExisting(
+      ) throws DocumentSaveException, AttachmentToBigException, 
+      AddingAttachmentContentFailedException, XWikiException, MalformedURLException {
+    String comment = "comment";
+    String filename = "file.txt";
+    String author = "XWiki.test";
+    String spc = "Spc";
+    String docName = "Doc";
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), spc, 
+        docName);
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setSyntax(new Syntax(SyntaxType.XWIKI, "1.0"));
+    XWikiURLFactory URLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
+    URL url = null;
+    expect(URLFactory.createAttachmentRevisionURL(eq(filename), eq(spc), eq(docName), 
+        (String)anyObject(), (String)anyObject(), eq(getContext().getDatabase()), 
+        same(getContext()))).andReturn(url);
+    expect(URLFactory.getURL(eq(url), same(getContext()))).andReturn("");
+    getContext().setURLFactory(URLFactory);
+    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    XWikiAttachment att = new XWikiAttachment();
+    att.setFilename(filename + ".zip");
+    attList.add(att);
+    doc.setAttachmentList(attList);
+    IModelAccessFacade modelAccess = createMockAndAddToDefault(IModelAccessFacade.class);
+    attService.modelAccess = modelAccess;
+    modelAccess.saveDocument((XWikiDocument)anyObject(), eq(comment));
+    expectLastCall();
+    replayDefault();
+    XWikiAttachment retAtt = attService.addAttachment(doc, new byte[]{'x'}, filename, 
+        author, comment);
+    verifyDefault();
+    assertEquals(2, retAtt.getDoc().getAttachmentList().size());
     assertEquals(filename, retAtt.getFilename());
   }
 

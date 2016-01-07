@@ -100,7 +100,7 @@ public class AttachmentService implements IAttachmentServiceRole {
     // Read XWikiAttachment
     XWikiAttachment attachment = theDoc.getAttachment(filename);
 
-    if (attachment == null) {
+    if ((attachment == null) || !filename.equals(attachment.getFilename())) {
       attachment = new XWikiAttachment();
       theDoc.getAttachmentList().add(attachment);
     }
