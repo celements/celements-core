@@ -116,3 +116,4 @@ com.celements.web.plugin.cmd.CelSendMail
 com.celements.mailsender.CelMailSenderService
 com.celements.rights.access.DefaultRightsAccessFacade
 com.celements.rights.access.EntityReferenceRandomCompleter
+com.celements.model.util.DefaultXObjectUpdateService

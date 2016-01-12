@@ -202,6 +202,18 @@ public interface IModelAccessFacade {
    */
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef
       ) throws ClassDocumentLoadException;
+  
+  /**
+   * @param doc
+   *          to get or create new xobject on (may not be null)
+   * @param classRef
+   *          type of xobjects to create (may not be null)
+   * @return already existing or newly created xobject
+   * @throws ClassDocumentLoadException
+   *           if unable to load class document
+   */
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef
+      ) throws ClassDocumentLoadException;
 
   /**
    * @param doc
