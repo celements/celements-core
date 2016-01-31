@@ -5,14 +5,15 @@ import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.exception.ClassDocumentLoadException;
@@ -20,6 +21,8 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -29,6 +32,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCase {
@@ -37,12 +41,17 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   private XWikiDocument doc;
   private DocumentReference classRef;
   private DocumentReference classRef2;
+  private XWikiStoreInterface xwikiStoreMock;
 
   @Before
   public void setUp_DefaultModelAccessFacadeTest() {
     modelAccess = (DefaultModelAccessFacade) Utils.getComponent(IModelAccessFacade.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
     doc.setMetaDataDirty(false);
+    xwikiStoreMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    doc.setStore(xwikiStoreMock);
+    doc.setNew(false);
+    expect(getWikiMock().getStore()).andReturn(xwikiStoreMock).anyTimes();
     classRef = new DocumentReference("db", "class", "any");
     classRef2 = new DocumentReference("db", "class", "other");
     //important for unstable-2.0 set database because class references are checked for db
@@ -100,6 +109,79 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     } catch (NullPointerException npe) {
       // expected
     }
+  }
+
+  @Test
+  public void test_getDocument_translatedDocument_defaultLanguage_empty(
+      ) throws Exception {
+    doc.setDefaultLanguage("");
+    doc.setLanguage("");
+    IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
+    modelAccess.webUtilsService = webUtilsMock;
+    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference(
+        ).getLastSpaceReference()))).andReturn("de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "de");
+    verifyDefault();
+    assertSame(doc, theDoc);
+  }
+
+  @Test
+  public void test_getDocument_translatedDocument_noTranslation() throws Exception {
+    doc.setDefaultLanguage("de");
+    doc.setLanguage("");
+    IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
+    modelAccess.webUtilsService = webUtilsMock;
+    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference(
+        ).getLastSpaceReference()))).andReturn("de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
+        Collections.<String>emptyList());
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    try {
+      modelAccess.getDocument(doc.getDocumentReference(), "en");
+      fail("expecting TranslationNotExistsException");
+    } catch (TranslationNotExistsException exc) {
+      // expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getDocument_translatedDocument() throws Exception {
+    doc.setDefaultLanguage("de");
+    doc.setLanguage("");
+    IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
+    modelAccess.webUtilsService = webUtilsMock;
+    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference(
+        ).getLastSpaceReference()))).andReturn("de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
+        Arrays.asList("en", "fr"));
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    Capture<XWikiDocument> tdocCapture = new Capture<>();
+    XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
+    theTdoc.setDefaultLanguage("de");
+    theTdoc.setLanguage("en");
+    theTdoc.setNew(false);
+    expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))
+        ).andReturn(theTdoc).once();
+    replayDefault();
+    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "en");
+    verifyDefault();
+    assertSame(theTdoc, theDoc);
+    XWikiDocument loadedTdoc = tdocCapture.getValue();
+    assertEquals(doc.getDocumentReference(), loadedTdoc.getDocumentReference());
+    assertEquals("en", loadedTdoc.getLanguage());
   }
 
   @Test

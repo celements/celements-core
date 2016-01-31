@@ -45,7 +45,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       DefaultModelAccessFacade.class);
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  IWebUtilsService webUtilsService;
 
   @Requirement
   private Execution execution;
@@ -77,7 +77,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkState(!Strings.isNullOrEmpty(lang));
     if (exists(docRef)) {
       XWikiDocument translatedDocument = getDocumentInternal(docRef);
-      if (!lang.equals(translatedDocument.getDefaultLanguage())) {
+      String defaultLanguage = webUtilsService.getDefaultLanguage(
+          docRef.getLastSpaceReference());
+      String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
+      if (!lang.equals(docDefLang) && (!"".equals(docDefLang)
+          || !lang.equals(defaultLanguage))) {
         try {
           if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
             translatedDocument = translatedDocument.getTranslatedDocument(lang,
