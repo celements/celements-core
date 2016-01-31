@@ -255,6 +255,10 @@ public class CelementsWebScriptService implements ScriptService {
     return lastChangedSrv.getLastUpdatedDate(spaceRef);
   }
 
+  public Date getLastUpdatedDate(List<SpaceReference> spaceRefList) {
+    return lastChangedSrv.getLastUpdatedDate(spaceRefList);
+  }
+
   public List<Object[]> getLastChangedDocuments(int numEntries) {
     return lastChangedSrv.getLastChangedDocuments(numEntries);
   }
