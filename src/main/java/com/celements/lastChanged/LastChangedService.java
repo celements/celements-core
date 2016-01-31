@@ -52,7 +52,23 @@ public class LastChangedService implements ILastChangedRole {
 
   @Override
   public Date getLastUpdatedDate() {
-    return getLastUpdatedDate(null);
+    return getLastUpdatedDate((SpaceReference)null);
+  }
+
+  @Override
+  public Date getLastUpdatedDate(List<SpaceReference> spaceRefList) {
+    if (spaceRefList.isEmpty()) {
+      return getLastUpdatedDate();
+    } else {
+      Date lastUpdatedDate = null;
+      for (SpaceReference spaceRef : spaceRefList) {
+        Date spaceLastUpdatedDate = getLastUpdatedDate(spaceRef);
+        if ((lastUpdatedDate == null) || lastUpdatedDate.before(spaceLastUpdatedDate)) {
+          lastUpdatedDate = spaceLastUpdatedDate;
+        }
+      }
+      return lastUpdatedDate;
+    }
   }
 
   @Override

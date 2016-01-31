@@ -23,4 +23,6 @@ public interface ILastChangedRole {
   @Deprecated
   public List<Object[]> getLastChangedDocuments(int numEntries, String space);
 
+  public Date getLastUpdatedDate(List<SpaceReference> spaceRefList);
+
 }
