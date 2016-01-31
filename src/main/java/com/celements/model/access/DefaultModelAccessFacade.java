@@ -24,6 +24,7 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -60,6 +61,35 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkNotNull(docRef);
     if (exists(docRef)) {
       return getDocumentInternal(docRef);
+    } else {
+      throw new DocumentNotExistsException(docRef);
+    }
+  }
+
+  /**
+   * TODO unit test
+   */
+  @Override
+  public XWikiDocument getDocument(DocumentReference docRef, String lang
+      ) throws DocumentLoadException, DocumentNotExistsException,
+        TranslationNotExistsException {
+    checkNotNull(docRef);
+    checkState(!Strings.isNullOrEmpty(lang));
+    if (exists(docRef)) {
+      XWikiDocument translatedDocument = getDocumentInternal(docRef);
+      if (!lang.equals(translatedDocument.getDefaultLanguage())) {
+        try {
+          if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
+            translatedDocument = translatedDocument.getTranslatedDocument(lang,
+                getContext());
+          } else {
+            throw new TranslationNotExistsException(docRef, lang);
+          }
+        } catch (XWikiException xwe) {
+          throw new DocumentLoadException(docRef, xwe);
+        }
+      }
+      return translatedDocument;
     } else {
       throw new DocumentNotExistsException(docRef);
     }

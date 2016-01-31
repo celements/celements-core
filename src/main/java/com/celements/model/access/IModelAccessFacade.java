@@ -13,6 +13,7 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.TranslationNotExistsException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -21,6 +22,10 @@ public interface IModelAccessFacade {
 
   public XWikiDocument getDocument(DocumentReference docRef) throws DocumentLoadException,
       DocumentNotExistsException;
+
+  public XWikiDocument getDocument(DocumentReference docRef, String lang)
+      throws DocumentLoadException, DocumentNotExistsException,
+      TranslationNotExistsException;
 
   public XWikiDocument createDocument(DocumentReference docRef
       ) throws DocumentLoadException, DocumentAlreadyExistsException;

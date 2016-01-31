@@ -51,6 +51,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
+import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
@@ -128,6 +129,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement("deprecated")
   ScriptService deprecatedUsage;
+
+  @Requirement
+  ILastChangedRole lastChangedSrv;
 
   @Requirement
   Execution execution;
@@ -243,29 +247,28 @@ public class CelementsWebScriptService implements ScriptService {
     return false;
   }
 
-  public List<String[]> getLastChangedDocuments(int numEntries) {
-    return getLastChangedDocuments(numEntries, "");
+  public Date getLastUpdatedDate() {
+    return lastChangedSrv.getLastUpdatedDate();
   }
 
-  //TODO write unit tests
+  public Date getLastUpdatedDate(SpaceReference spaceRef) {
+    return lastChangedSrv.getLastUpdatedDate(spaceRef);
+  }
+
+  public List<String[]> getLastChangedDocuments(int numEntries) {
+    return lastChangedSrv.getLastChangedDocuments(numEntries);
+  }
+
+  /**
+   * @deprecated instead use List<String[]> getLastChangedDocuments(int, SpaceReference)
+   */
+  @Deprecated
   public List<String[]> getLastChangedDocuments(int numEntries, String space) {
-    String xwql = "select doc.fullName, doc.language from XWikiDocument doc";
-    boolean hasSpaceRestriction = (!"".equals(space));
-    if (hasSpaceRestriction) {
-      xwql = xwql + " where doc.space = :spaceName";
-    }
-    xwql = xwql + " order by doc.date desc";
-    Query query;
-    try {
-      query = queryManager.createQuery(xwql, Query.XWQL);
-      if (hasSpaceRestriction) {
-        query = query.bindValue("spaceName", space);
-      }
-      return query.setLimit(numEntries).execute();
-    } catch (QueryException exp) {
-      _LOGGER.error("Failed to create whats-new query for space [" + space + "].", exp);
-    }
-    return Collections.emptyList();
+    return lastChangedSrv.getLastChangedDocuments(numEntries, space);
+  }
+
+  public List<String[]> getLastChangedDocuments(int numEntries, SpaceReference spaceRef) {
+    return lastChangedSrv.getLastChangedDocuments(numEntries, spaceRef);
   }
 
   public String getHumanReadableSize(int bytes, boolean si) {
