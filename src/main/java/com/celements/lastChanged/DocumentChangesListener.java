@@ -14,6 +14,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 @Component("lastChange-DocumentChangesListener")
 public class DocumentChangesListener implements EventListener {
 
@@ -35,8 +37,9 @@ public class DocumentChangesListener implements EventListener {
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    if ((source != null) && (source instanceof DocumentReference)) {
-      DocumentReference docRef = (DocumentReference) source;
+    if ((source != null) && (source instanceof XWikiDocument)) {
+      XWikiDocument doc = (XWikiDocument) source;
+      DocumentReference docRef = doc.getDocumentReference();
       ((LastChangedService)lastChangedSrv).invalidateCacheForSpaceRef(
           docRef.getLastSpaceReference());
     } else {
