@@ -93,7 +93,12 @@ public class LastChangedService implements ILastChangedRole {
       } catch (DocumentAccessException exp) {
         _LOGGER.error("Failed to load last updated document.", exp);
       }
+    } else {
+      _LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for"
+          + " space '{}'", spaceRef);
     }
+    _LOGGER.debug("internal_getLastChangeDate: return '{}' for space '{}'",
+        lastChangedDate, spaceRef);
     return lastChangedDate;
   }
 
