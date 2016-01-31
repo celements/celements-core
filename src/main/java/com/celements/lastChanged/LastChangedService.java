@@ -91,7 +91,8 @@ public class LastChangedService implements ILastChangedRole {
         lastChangedDate = lastChangedDoc.getDate();
         updateCachedDate(spaceRef, lastChangedDate, lastChangedDocRef);
       } catch (DocumentAccessException exp) {
-        _LOGGER.error("Failed to load last updated document.", exp);
+        _LOGGER.error("Failed to load last updated document '{}', '{}'.",
+            lastChangedDocRef, lastChangedDocLang, exp);
       }
     } else {
       _LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for"
