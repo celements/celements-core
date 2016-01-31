@@ -23,10 +23,10 @@ import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component
 /**
  * TODO write unit tests
  */
+@Component
 public class LastChangedService implements ILastChangedRole {
 
   private static Logger _LOGGER  = LoggerFactory.getLogger(LastChangedService.class);
@@ -43,7 +43,7 @@ public class LastChangedService implements ILastChangedRole {
   private Map<WikiReference, Date> lastUpdatedWikiCache;
   private Map<SpaceReference, Date> lastUpdatedSpaceCache;
 
-  void invalidateCacheForSpaceRef(SpaceReference spaceRef) {
+  synchronized void invalidateCacheForSpaceRef(SpaceReference spaceRef) {
     if (hasSpaceRestriction(spaceRef)) {
       getLastUpdatedSpaceCache().remove(spaceRef);
       getLastUpdatedWikiCache().remove(webUtilsService.getWikiRef(spaceRef));
@@ -70,20 +70,36 @@ public class LastChangedService implements ILastChangedRole {
     return internal_getLastChangeDate(spaceRef);
   }
 
-  private Date internal_getLastChangeDate(SpaceReference spaceRef) {
+  Date internal_getLastChangeDate(SpaceReference spaceRef) {
     Date lastChangedDate = null;
-    List<String[]> lastChangedDocuments = getLastChangedDocuments(1, spaceRef);
-    String lastChangedDocFN = lastChangedDocuments.get(0)[0];
-    String lastChangedDocLang = lastChangedDocuments.get(0)[1];
-    DocumentReference lastChangedDocRef = webUtilsService.resolveDocumentReference(
-        lastChangedDocFN);
-    XWikiDocument lastChangedDoc;
-    try {
-      if (Strings.isNullOrEmpty(lastChangedDocLang)) {
-        lastChangedDocLang = webUtilsService.getDefaultLanguage(spaceRef);
+    List<Object[]> lastChangedDocuments = getLastChangedDocuments(1, spaceRef);
+    if (lastChangedDocuments.size() > 0) {
+      Object[] firstRow = lastChangedDocuments.get(0);
+      String lastChangedDocFN = firstRow[0].toString();
+      String lastChangedDocLang = "";
+      if (firstRow[1] != null) {
+        lastChangedDocLang = firstRow[1].toString();
       }
-      lastChangedDoc = modelAccess.getDocument(lastChangedDocRef, lastChangedDocLang);
-      lastChangedDate = lastChangedDoc.getDate();
+      DocumentReference lastChangedDocRef = webUtilsService.resolveDocumentReference(
+          lastChangedDocFN);
+      XWikiDocument lastChangedDoc;
+      try {
+        if (Strings.isNullOrEmpty(lastChangedDocLang)) {
+          lastChangedDocLang = webUtilsService.getDefaultLanguage(spaceRef);
+        }
+        lastChangedDoc = modelAccess.getDocument(lastChangedDocRef, lastChangedDocLang);
+        lastChangedDate = lastChangedDoc.getDate();
+        updateCachedDate(spaceRef, lastChangedDate, lastChangedDocRef);
+      } catch (DocumentAccessException exp) {
+        _LOGGER.error("Failed to load last updated document.", exp);
+      }
+    }
+    return lastChangedDate;
+  }
+
+  synchronized void updateCachedDate(SpaceReference spaceRef, Date lastChangedDate,
+      DocumentReference lastChangedDocRef) {
+    if (lastChangedDate != null) {
       if (hasSpaceRestriction(spaceRef)) {
         getLastUpdatedSpaceCache().put(spaceRef, lastChangedDate);
       } else {
@@ -92,20 +108,17 @@ public class LastChangedService implements ILastChangedRole {
         getLastUpdatedSpaceCache().put(lastChangedDocRef.getLastSpaceReference(),
             lastChangedDate);
       }
-    } catch (DocumentAccessException exp) {
-      _LOGGER.error("Failed to load last updated document.", exp);
     }
-    return lastChangedDate;
   }
 
-  private Map<SpaceReference, Date> getLastUpdatedSpaceCache() {
+  Map<SpaceReference, Date> getLastUpdatedSpaceCache() {
     if (lastUpdatedSpaceCache == null) {
       lastUpdatedSpaceCache = new HashMap<>();
     }
     return lastUpdatedSpaceCache;
   }
 
-  private Map<WikiReference, Date> getLastUpdatedWikiCache() {
+  Map<WikiReference, Date> getLastUpdatedWikiCache() {
     if (lastUpdatedWikiCache == null) {
       lastUpdatedWikiCache = new HashMap<>();
     }
@@ -113,7 +126,7 @@ public class LastChangedService implements ILastChangedRole {
   }
 
   @Override
-  public List<String[]> getLastChangedDocuments(int numEntries) {
+  public List<Object[]> getLastChangedDocuments(int numEntries) {
     return getLastChangedDocuments(numEntries, "");
   }
 
@@ -122,7 +135,7 @@ public class LastChangedService implements ILastChangedRole {
   }
 
   @Override
-  public List<String[]> getLastChangedDocuments(int numEntries, SpaceReference spaceRef) {
+  public List<Object[]> getLastChangedDocuments(int numEntries, SpaceReference spaceRef) {
     if (hasSpaceRestriction(spaceRef)) {
       return getLastChangedDocuments(numEntries, spaceRef.getName());
     } else {
@@ -132,7 +145,7 @@ public class LastChangedService implements ILastChangedRole {
 
   @Override
   @Deprecated
-  public List<String[]> getLastChangedDocuments(int numEntries, String space) {
+  public List<Object[]> getLastChangedDocuments(int numEntries, String space) {
     String xwql = "select doc.fullName, doc.language from XWikiDocument doc";
     boolean hasSpaceRestriction = (!"".equals(space));
     if (hasSpaceRestriction) {

@@ -255,7 +255,7 @@ public class CelementsWebScriptService implements ScriptService {
     return lastChangedSrv.getLastUpdatedDate(spaceRef);
   }
 
-  public List<String[]> getLastChangedDocuments(int numEntries) {
+  public List<Object[]> getLastChangedDocuments(int numEntries) {
     return lastChangedSrv.getLastChangedDocuments(numEntries);
   }
 
@@ -263,11 +263,11 @@ public class CelementsWebScriptService implements ScriptService {
    * @deprecated instead use List<String[]> getLastChangedDocuments(int, SpaceReference)
    */
   @Deprecated
-  public List<String[]> getLastChangedDocuments(int numEntries, String space) {
+  public List<Object[]> getLastChangedDocuments(int numEntries, String space) {
     return lastChangedSrv.getLastChangedDocuments(numEntries, space);
   }
 
-  public List<String[]> getLastChangedDocuments(int numEntries, SpaceReference spaceRef) {
+  public List<Object[]> getLastChangedDocuments(int numEntries, SpaceReference spaceRef) {
     return lastChangedSrv.getLastChangedDocuments(numEntries, spaceRef);
   }
 
