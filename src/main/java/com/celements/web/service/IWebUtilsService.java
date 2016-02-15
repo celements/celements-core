@@ -149,6 +149,14 @@ public interface IWebUtilsService {
 
   public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user);
 
+  /**
+   * CAUTION: this method returns attachments which start with the attRef.name if no
+   * exact match exists.
+   * 
+   * @deprecated instead use IAttachmentServiceRole.getAttachmentNameEqual
+   *             or IAttachmentServiceRole.getAttachmentsNameMatch
+   */
+  @Deprecated
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
   public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
