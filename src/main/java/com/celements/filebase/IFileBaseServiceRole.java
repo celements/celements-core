@@ -12,8 +12,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 @ComponentRole
 public interface IFileBaseServiceRole {
 
-  public static final String FILEBASE_SERVICE_IMPL_CFG = "filebase_service_impl";
-
   public static final String FILEBASE_CONFIG_FIELD = "cel_centralfilebase";
 
   public boolean existsFileNameEqual(String filename) throws FileBaseLoadException;

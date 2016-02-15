@@ -121,4 +121,4 @@ com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener
 com.celements.filebase.matcher.AttNameWithoutExtMatcher
 com.celements.filebase.SingleDocFileBaseService
-com.celements.filebase.DefaultFileBaseService
+com.celements.filebase.FileBaseAccessService
