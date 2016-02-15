@@ -119,3 +119,4 @@ com.celements.rights.access.EntityReferenceRandomCompleter
 com.celements.model.util.DefaultXObjectUpdateService
 com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener
+com.celements.filebase.matcher.AttNameWithoutExtMatcher

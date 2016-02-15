@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
@@ -34,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -429,6 +432,18 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       value = Joiner.on('|').join((Iterable<?>) value);
     }
     obj.set(name, value, getContext());
+  }
+
+  @Override
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
+      ) throws AttachmentNotExistsException {
+    for (XWikiAttachment attach : document.getAttachmentList()) {
+      if ((attach != null) && attach.getFilename().equals(filename)) {
+          return attach;
+      }
+    }
+    throw new AttachmentNotExistsException(new AttachmentReference(filename,
+        document.getDocumentReference()));
   }
 
 }

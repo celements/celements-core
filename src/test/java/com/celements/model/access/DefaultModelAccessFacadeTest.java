@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
@@ -24,6 +25,7 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -788,6 +790,38 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     
     assertEquals(1, obj.getFieldList().size());
     assertEquals("A|B", ((BaseProperty) obj.get(name)).getValue());
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual() throws Exception {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    XWikiAttachment att = modelAccess.getAttachmentNameEqual(doc, filename);
+    verifyDefault();
+    assertNotNull("Expected image.jpg attachment - not null", att);
+    assertEquals(filename, att.getFilename());
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual_not_exists() {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    try {
+      modelAccess.getAttachmentNameEqual(doc, filename);
+      fail("AttachmentNotExistsException expected");
+    } catch (AttachmentNotExistsException exp) {
+      //expected
+    }
+    verifyDefault();
   }
 
   private BaseClass getBaseClass(DocumentReference classRef) throws Exception {

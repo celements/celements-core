@@ -7,6 +7,7 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
@@ -14,6 +15,7 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -289,5 +291,17 @@ public interface IModelAccessFacade {
   public Object getProperty(BaseObject obj, String name);
 
   public void setProperty(BaseObject obj, String name, Object value);
+
+  /**
+   * CAUTION: document.getAttachment returns "startWith" matches.
+   * Instead use getAttachmentNameEqual or methods on IAttachmentServiceRole
+   * 
+   * @param document
+   * @param filename
+   * @return
+   * @throws AttachmentNotExistsException
+   */
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
+      ) throws AttachmentNotExistsException;
 
 }

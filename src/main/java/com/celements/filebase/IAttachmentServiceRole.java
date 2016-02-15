@@ -25,6 +25,10 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
 
+import com.celements.filebase.matcher.IAttachmentMatcher;
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -50,5 +54,20 @@ public interface IAttachmentServiceRole {
   public String clearFileName(String fileName);
 
   public int deleteAttachmentList(List<AttachmentReference> attachmentRefList);
+
+  public boolean existsAttachmentNameEqual(XWikiDocument document, String filename);
+
+  public boolean existsAttachmentNameEqual(AttachmentReference attachmentRef)
+      throws DocumentLoadException;
+
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename)
+      throws AttachmentNotExistsException;
+
+  public XWikiAttachment getAttachmentNameEqual(AttachmentReference attachmentRef)
+      throws DocumentLoadException, AttachmentNotExistsException,
+      DocumentNotExistsException;
+
+  public List<XWikiAttachment> getAttachmentsNameMatch(XWikiDocument document,
+      IAttachmentMatcher attMatcher);
 
 }
