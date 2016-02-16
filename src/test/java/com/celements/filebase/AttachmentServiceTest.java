@@ -19,21 +19,34 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.filebase.matcher.IAttachmentMatcher;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
 
   private AttachmentService attService;
+  private XWikiDocument doc;
+  private XWikiStoreInterface xwikiStoreMock;
   
   @Before
   public void setUp_AttachmentServiceTest() throws ComponentLookupException, Exception {
     attService = (AttachmentService) Utils.getComponent(IAttachmentServiceRole.class);
+    doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
+    doc.setMetaDataDirty(false);
+    xwikiStoreMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    doc.setStore(xwikiStoreMock);
+    doc.setNew(false);
+    expect(getWikiMock().getStore()).andReturn(xwikiStoreMock).anyTimes();
   }
   
   @Test
@@ -277,6 +290,262 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
     assertEquals(2, retAtt.getDoc().getAttachmentList().size());
     assertEquals(filename, retAtt.getFilename());
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual() throws Exception {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    XWikiAttachment att = attService.getAttachmentNameEqual(doc, filename);
+    verifyDefault();
+    assertNotNull("Expected image.jpg attachment - not null", att);
+    assertEquals(filename, att.getFilename());
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual_not_exists() {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    try {
+      attService.getAttachmentNameEqual(doc, filename);
+      fail("AttachmentNotExistsException expected");
+    } catch (AttachmentNotExistsException exp) {
+      //expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual_attRef() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    XWikiAttachment att = attService.getAttachmentNameEqual(attRef);
+    verifyDefault();
+    assertNotNull("Expected image.jpg attachment - not null", att);
+    assertEquals(filename, att.getFilename());
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual_attRef_not_exists() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    try {
+      attService.getAttachmentNameEqual(attRef);
+      fail("AttachmentNotExistsException expected");
+    } catch (AttachmentNotExistsException exp) {
+      //expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentNameEqual_attRef_doc_not_exists() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    replayDefault();
+    try {
+      attService.getAttachmentNameEqual(attRef);
+      fail("AttachmentNotExistsException expected");
+    } catch (DocumentNotExistsException exp) {
+      //expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_existsAttachmentNameEqual() {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    assertTrue(attService.existsAttachmentNameEqual(doc, filename));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_existsAttachmentNameEqual_not_exists() {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    assertFalse(attService.existsAttachmentNameEqual(doc, filename));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_existsAttachmentNameEqual_attRef() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    assertTrue(attService.existsAttachmentNameEqual(attRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_existsAttachmentNameEqual_attRef_doc_not_exists() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(false).once();
+    replayDefault();
+    assertFalse(attService.existsAttachmentNameEqual(attRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_existsAttachmentNameEqual_attRef_not_exists() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(doc).once();
+    replayDefault();
+    assertFalse(attService.existsAttachmentNameEqual(attRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_existsAttachmentNameEqual_attRef_docLoadExp() throws Exception {
+    String filename = "image.jpg";
+    AttachmentReference attRef = new AttachmentReference(filename,
+        doc.getDocumentReference());
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))
+        ).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))
+        ).andThrow(new XWikiException()).once();
+    replayDefault();
+    try {
+      attService.existsAttachmentNameEqual(attRef);
+      fail("DocumentLoadException expected to be passed on.");
+    } catch (DocumentLoadException exp) {
+      //expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentsNameMatch() throws Exception {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    IAttachmentMatcher mockMatcher = createMockAndAddToDefault(
+        IAttachmentMatcher.class);
+    expect(mockMatcher.accept(firstAtt)).andReturn(true).anyTimes();
+    expect(mockMatcher.accept(imageAtt)).andReturn(true).anyTimes();
+    expect(mockMatcher.accept(lastAtt)).andReturn(false).anyTimes();
+    replayDefault();
+    List<XWikiAttachment> resAttList = attService.getAttachmentsNameMatch(doc,
+        mockMatcher);
+    verifyDefault();
+    assertNotNull("Expected emptyList - not null", resAttList);
+    assertEquals(2, resAttList.size());
+    XWikiAttachment resFirstImage = resAttList.get(0);
+    assertEquals(firstAtt.getFilename(), resFirstImage.getFilename());
+    XWikiAttachment resSecondImage = resAttList.get(1);
+    assertEquals(imageAtt.getFilename(), resSecondImage.getFilename());
+  }
+
+  @Test
+  public void test_getAttachmentsNameMatch_noMatch_emptyList() {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    IAttachmentMatcher mockMatcher = createMockAndAddToDefault(
+        IAttachmentMatcher.class);
+    expect(mockMatcher.accept(firstAtt)).andReturn(false).anyTimes();
+    expect(mockMatcher.accept(imageAtt)).andReturn(false).anyTimes();
+    expect(mockMatcher.accept(lastAtt)).andReturn(false).anyTimes();
+    replayDefault();
+    List<XWikiAttachment> resAttList = attService.getAttachmentsNameMatch(doc,
+        mockMatcher);
+    assertNotNull("Expected emptyList - not null", resAttList);
+    assertTrue(resAttList.isEmpty());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getAttachmentsNameMatch_null_matcher() {
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(lastAtt);
+    doc.setAttachmentList(attList);
+    replayDefault();
+    List<XWikiAttachment> resAttList = attService.getAttachmentsNameMatch(doc, null);
+    assertNotNull("Expected emptyList - not null", resAttList);
+    assertTrue(resAttList.isEmpty());
+    verifyDefault();
   }
 
 }

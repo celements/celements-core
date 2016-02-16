@@ -16,14 +16,17 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -33,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -44,7 +48,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       DefaultModelAccessFacade.class);
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  IWebUtilsService webUtilsService;
 
   @Requirement
   private Execution execution;
@@ -60,6 +64,39 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkNotNull(docRef);
     if (exists(docRef)) {
       return getDocumentInternal(docRef);
+    } else {
+      throw new DocumentNotExistsException(docRef);
+    }
+  }
+
+  /**
+   * TODO unit test
+   */
+  @Override
+  public XWikiDocument getDocument(DocumentReference docRef, String lang
+      ) throws DocumentLoadException, DocumentNotExistsException,
+        TranslationNotExistsException {
+    checkNotNull(docRef);
+    checkState(!Strings.isNullOrEmpty(lang));
+    if (exists(docRef)) {
+      XWikiDocument translatedDocument = getDocumentInternal(docRef);
+      String defaultLanguage = webUtilsService.getDefaultLanguage(
+          docRef.getLastSpaceReference());
+      String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
+      if (!lang.equals(docDefLang) && (!"".equals(docDefLang)
+          || !lang.equals(defaultLanguage))) {
+        try {
+          if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
+            translatedDocument = translatedDocument.getTranslatedDocument(lang,
+                getContext());
+          } else {
+            throw new TranslationNotExistsException(docRef, lang);
+          }
+        } catch (XWikiException xwe) {
+          throw new DocumentLoadException(docRef, xwe);
+        }
+      }
+      return translatedDocument;
     } else {
       throw new DocumentNotExistsException(docRef);
     }
@@ -303,6 +340,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef
+      ) throws ClassDocumentLoadException {
+    BaseObject obj = getXObject(doc, classRef);
+    if (obj == null) {
+      obj = newXObject(doc, classRef);
+    }
+    return obj;
+  }
+
+  @Override
   public boolean removeXObject(XWikiDocument doc, BaseObject objToRemove) {
     return removeXObjects(doc, Arrays.asList(objToRemove));
   }
@@ -385,6 +432,18 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       value = Joiner.on('|').join((Iterable<?>) value);
     }
     obj.set(name, value, getContext());
+  }
+
+  @Override
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
+      ) throws AttachmentNotExistsException {
+    for (XWikiAttachment attach : document.getAttachmentList()) {
+      if ((attach != null) && attach.getFilename().equals(filename)) {
+          return attach;
+      }
+    }
+    throw new AttachmentNotExistsException(new AttachmentReference(filename,
+        document.getDocumentReference()));
   }
 
 }

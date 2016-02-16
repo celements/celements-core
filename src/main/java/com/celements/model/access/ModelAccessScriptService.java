@@ -14,7 +14,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.model.access.exception.ClassDocumentLoadException;
-import com.celements.model.access.exception.DocumentAccessException;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.rights.AccessLevel;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableList;
@@ -52,8 +53,10 @@ public class ModelAccessScriptService implements ScriptService {
         XWikiDocument doc = modelAccess.getDocument(docRef);
         ret = doc.newDocument(getContext());
       }
-    } catch (DocumentAccessException dae) {
-      LOGGER.error("Failed to load doc '{}'", docRef, dae);
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.info("Doc does not exist '{}'", docRef, exc);
+    } catch (DocumentLoadException exc) {
+      LOGGER.error("Failed to load doc '{}'", docRef, exc);
     }
     return ret;
   }
@@ -74,8 +77,10 @@ public class ModelAccessScriptService implements ScriptService {
       if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
         ret = toObjectApi(modelAccess.getXObject(docRef, classRef));
       }
-    } catch (DocumentAccessException dae) {
-      LOGGER.error("Failed to load doc '{}'", docRef, dae);
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.info("Doc does not exist '{}'", docRef, exc);
+    } catch (DocumentLoadException exc) {
+      LOGGER.error("Failed to load doc '{}'", docRef, exc);
     }
     return ret;
   }
@@ -106,8 +111,10 @@ public class ModelAccessScriptService implements ScriptService {
       if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
         ret = toObjectApi(modelAccess.getXObjects(docRef, classRef, key, values));
       }
-    } catch (DocumentAccessException dae) {
-      LOGGER.error("Failed to load doc '{}'", docRef, dae);
+    } catch (DocumentNotExistsException exc) {
+      LOGGER.info("Doc does not exist '{}'", docRef, exc);
+    } catch (DocumentLoadException exc) {
+      LOGGER.error("Failed to load doc '{}'", docRef, exc);
     }
     return ret;
   }

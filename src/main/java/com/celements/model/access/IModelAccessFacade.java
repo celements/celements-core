@@ -7,12 +7,15 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.TranslationNotExistsException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -21,6 +24,10 @@ public interface IModelAccessFacade {
 
   public XWikiDocument getDocument(DocumentReference docRef) throws DocumentLoadException,
       DocumentNotExistsException;
+
+  public XWikiDocument getDocument(DocumentReference docRef, String lang)
+      throws DocumentLoadException, DocumentNotExistsException,
+      TranslationNotExistsException;
 
   public XWikiDocument createDocument(DocumentReference docRef
       ) throws DocumentLoadException, DocumentAlreadyExistsException;
@@ -202,6 +209,18 @@ public interface IModelAccessFacade {
    */
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef
       ) throws ClassDocumentLoadException;
+  
+  /**
+   * @param doc
+   *          to get or create new xobject on (may not be null)
+   * @param classRef
+   *          type of xobjects to create (may not be null)
+   * @return already existing or newly created xobject
+   * @throws ClassDocumentLoadException
+   *           if unable to load class document
+   */
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef
+      ) throws ClassDocumentLoadException;
 
   /**
    * @param doc
@@ -272,5 +291,17 @@ public interface IModelAccessFacade {
   public Object getProperty(BaseObject obj, String name);
 
   public void setProperty(BaseObject obj, String name, Object value);
+
+  /**
+   * CAUTION: document.getAttachment returns "startWith" matches.
+   * Instead use getAttachmentNameEqual or methods on IAttachmentServiceRole
+   * 
+   * @param document
+   * @param filename
+   * @return
+   * @throws AttachmentNotExistsException
+   */
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
+      ) throws AttachmentNotExistsException;
 
 }

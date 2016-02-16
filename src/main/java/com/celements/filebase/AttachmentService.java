@@ -38,10 +38,15 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.filebase.matcher.IAttachmentMatcher;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -447,6 +452,59 @@ public class AttachmentService implements IAttachmentServiceRole {
       }
     }
     return nrDeleted;
+  }
+
+  @Override
+  public boolean existsAttachmentNameEqual(XWikiDocument document, String filename) {
+    try {
+      getAttachmentNameEqual(document, filename);
+      return true;
+    } catch (AttachmentNotExistsException attNotExistExp) {
+      _LOGGER.trace("existsAttachmentNameEqual not exist", attNotExistExp);
+      return false;
+    }
+  }
+
+  @Override
+  public boolean existsAttachmentNameEqual(AttachmentReference attachmentRef
+      ) throws DocumentLoadException {
+    try {
+      getAttachmentNameEqual(attachmentRef);
+      return true;
+    } catch (AttachmentNotExistsException | DocumentNotExistsException attNotExistExp) {
+      _LOGGER.trace("existsAttachmentNameEqual not exist", attNotExistExp);
+      return false;
+    }
+  }
+
+  @Override
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
+      ) throws AttachmentNotExistsException {
+    return modelAccess.getAttachmentNameEqual(document, filename);
+  }
+
+  @Override
+  public XWikiAttachment getAttachmentNameEqual(AttachmentReference attachmentRef
+      ) throws DocumentLoadException, AttachmentNotExistsException,
+  DocumentNotExistsException {
+    DocumentReference docRef = new DocumentReference(attachmentRef.extractReference(
+        EntityType.DOCUMENT));
+    XWikiDocument doc = modelAccess.getDocument(docRef);
+    return getAttachmentNameEqual(doc, attachmentRef.getName());
+  }
+
+  @Override
+  public List<XWikiAttachment> getAttachmentsNameMatch(XWikiDocument document,
+      IAttachmentMatcher attMatcher) {
+    List<XWikiAttachment> attList = new ArrayList<>();
+    if (attMatcher != null) {
+      for (XWikiAttachment attach : document.getAttachmentList()) {
+        if ((attach != null) && attMatcher.accept(attach)) {
+          attList.add(attach);
+        }
+      }
+    }
+    return attList;
   }
 
 }
