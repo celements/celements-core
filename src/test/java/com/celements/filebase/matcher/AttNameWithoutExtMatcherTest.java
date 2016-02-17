@@ -32,29 +32,28 @@ public class AttNameWithoutExtMatcherTest extends AbstractBridgedComponentTestCa
     assertEquals("image.jpg", nameSplit[0]);
   }
 
-//TODO implement "accept"
-//  @Test
-//  public void testAccept_match() {
-//    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-//        "mySpace", "myDoc");
-//    XWikiDocument doc = new XWikiDocument(docRef);
-//    XWikiAttachment imgAtt = new XWikiAttachment(doc, "image.jpg");
-//    attNameWOextMatcher.setFileNamePattern("image");
-//    replayDefault();
-//    assertTrue(attNameWOextMatcher.accept(imgAtt));
-//    verifyDefault();
-//  }
-//
-//  @Test
-//  public void testAccept_noMatch() {
-//    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-//        "mySpace", "myDoc");
-//    XWikiDocument doc = new XWikiDocument(docRef);
-//    XWikiAttachment imgAtt = new XWikiAttachment(doc, "image.jpg.zip");
-//    attNameWOextMatcher.setFileNamePattern("image");
-//    replayDefault();
-//    assertFalse(attNameWOextMatcher.accept(imgAtt));
-//    verifyDefault();
-//  }
-//
+  @Test
+  public void testAccept_match() {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
+        "mySpace", "myDoc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiAttachment imgAtt = new XWikiAttachment(doc, "image.jpg");
+    attNameWOextMatcher.setFileNamePattern("image");
+    replayDefault();
+    assertTrue(attNameWOextMatcher.accept(imgAtt));
+    verifyDefault();
+  }
+
+  @Test
+  public void testAccept_noMatch() {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
+        "mySpace", "myDoc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiAttachment imgAtt = new XWikiAttachment(doc, "image.jpg.zip");
+    attNameWOextMatcher.setFileNamePattern("image");
+    replayDefault();
+    assertFalse(attNameWOextMatcher.accept(imgAtt));
+    verifyDefault();
+  }
+
 }
