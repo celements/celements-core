@@ -39,8 +39,7 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
   @Requirement
   ConfigurationSource configuration;
 
-  //TODO write unit test
-  private XWikiDocument getFileBaseDoc() throws FileBaseLoadException {
+  XWikiDocument getFileBaseDoc() throws FileBaseLoadException {
     String fileBaseDocFN = configuration.getProperty(FILEBASE_CONFIG_FIELD);
     if (!Strings.isNullOrEmpty(fileBaseDocFN) && !"-".equals(fileBaseDocFN)) {
       try {
