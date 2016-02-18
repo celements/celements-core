@@ -6,13 +6,13 @@ import static org.easymock.EasyMock.*;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.model.access.IModelAccessFacade;
 import com.celements.rights.access.internal.EntityReferenceRandomCompleter;
 import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
 import com.xpn.xwiki.XWikiContext;
@@ -22,11 +22,11 @@ public class EntityReferenceRandomCompleterTest extends AbstractBridgedComponent
 
   private EntityReferenceRandomCompleter randomCompleter;
   private XWikiContext context;
-  private IModelAccessFacade modelAccessMock;
+  private DocumentAccessBridge docAccessBridgeMock;
 
   @Before
   public void setUp_EntityReferenceRandomCompleterTest() throws Exception {
-    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
+    docAccessBridgeMock = registerComponentMock(DocumentAccessBridge.class);
     context = getContext();
     randomCompleter = (EntityReferenceRandomCompleter) Utils.getComponent(
         IEntityReferenceRandomCompleterRole.class);
@@ -54,7 +54,8 @@ public class EntityReferenceRandomCompleterTest extends AbstractBridgedComponent
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     SpaceReference entityRef = new SpaceReference("mySpace", wikiRef);
     Capture<DocumentReference> randomDocRefCapture = new Capture<>();
-    expect(modelAccessMock.exists(capture(randomDocRefCapture))).andReturn(false).once();
+    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture))).andReturn(false
+        ).once();
     replayDefault();
     DocumentReference randomDocRef =
         (DocumentReference) randomCompleter.randomCompleteSpaceRef(entityRef);
@@ -68,9 +69,11 @@ public class EntityReferenceRandomCompleterTest extends AbstractBridgedComponent
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     SpaceReference entityRef = new SpaceReference("mySpace", wikiRef);
     Capture<DocumentReference> randomDocRefCapture = new Capture<>();
-    expect(modelAccessMock.exists(capture(randomDocRefCapture))).andReturn(true).once();
+    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture))).andReturn(true
+        ).once();
     Capture<DocumentReference> randomDocRefCapture2 = new Capture<>();
-    expect(modelAccessMock.exists(capture(randomDocRefCapture2))).andReturn(false).once();
+    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture2))).andReturn(false
+        ).once();
     replayDefault();
     EntityReference randomDocRef = randomCompleter.randomCompleteSpaceRef(entityRef);
     verifyDefault();
