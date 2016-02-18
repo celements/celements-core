@@ -43,10 +43,12 @@ public class ModelAccessScriptServiceTest extends AbstractBridgedComponentTestCa
     expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(AccessLevel.VIEW))
         ).andReturn(true).once();
     expect(modelAccess.modelAccess.getDocument(eq(docRef))).andReturn(doc).once();
+    Document apiDoc = new Document(doc, getContext());
+    expect(modelAccess.modelAccess.getApiDocument(same(doc))).andReturn(apiDoc).once();
     replayDefault();
     Document ret = modelAccess.getDocument(docRef);
     verifyDefault();
-    assertSame(doc, ret.getDocument());
+    assertSame(ret, apiDoc);
   }
 
   @Test
