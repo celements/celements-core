@@ -298,6 +298,20 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
     assertFalse(pubService.isUnpubOverride());
   }
 
+  @Test
+  public void test_overridePubUnpub_PUBLISHED() {
+    pubService.overridePubUnpub(EPubUnpub.PUBLISHED);
+    assertEquals(EPubUnpub.PUBLISHED, getExecutionContext().getProperty(
+        IPublicationServiceRole.OVERRIDE_PUB_CHECK));
+  }
+
+  @Test
+  public void test_overridePubUnpub_UNPUBLISHED() {
+    pubService.overridePubUnpub(EPubUnpub.UNPUBLISHED);
+    assertEquals(EPubUnpub.UNPUBLISHED, getExecutionContext().getProperty(
+        IPublicationServiceRole.OVERRIDE_PUB_CHECK));
+  }
+
   private ExecutionContext getExecutionContext() {
     return Utils.getComponent(Execution.class).getContext();
   }
