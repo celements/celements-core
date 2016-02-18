@@ -14,7 +14,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.filebase.exceptions.FileBaseLoadException;
 import com.celements.filebase.exceptions.FileNotExistsException;
 import com.celements.filebase.matcher.IAttachmentMatcher;
-import com.celements.model.access.exception.NoAccessRightsException;
+import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
@@ -71,7 +71,7 @@ public class FileBaseScriptService implements ScriptService {
       _LOGGER.trace("Filebase could not find file [" + filename + "]");
     } catch (NoAccessRightsException nare) {
       _LOGGER.info("User {} was refused {} access on file base document {}", 
-          nare.getUser(), nare.getExpectedAccessLevel(), nare.getDocumentReference());
+          nare.getUser(), nare.getExpectedAccessLevel(), nare.getEntityRef());
     }
     return null;
   }
@@ -85,7 +85,7 @@ public class FileBaseScriptService implements ScriptService {
         attList.add(attachmentService.getApiAttachment(xwikiAtt));
       } catch (NoAccessRightsException nare) {
         _LOGGER.info("User {} was refused {} access on file base document {}", 
-            nare.getUser(), nare.getExpectedAccessLevel(), nare.getDocumentReference());
+            nare.getUser(), nare.getExpectedAccessLevel(), nare.getEntityRef());
       }
     }
     return attList;
