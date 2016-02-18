@@ -1,6 +1,7 @@
 package com.celements.rights.access.internal;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
@@ -8,14 +9,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.model.access.IModelAccessFacade;
-
 @Component
 public class EntityReferenceRandomCompleter
   implements IEntityReferenceRandomCompleterRole {
 
   @Requirement
-  private IModelAccessFacade modelAccess;
+  private DocumentAccessBridge documentAccessBridge;
 
   public EntityReference randomCompleteSpaceRef(EntityReference entityRef) {
     if (entityRef.getType() == EntityType.SPACE) {
@@ -24,7 +23,7 @@ public class EntityReferenceRandomCompleter
       do {
         String randomDocName = RandomStringUtils.randomAlphanumeric(50);
         randomDocRef = new DocumentReference(randomDocName, spaceRef);
-      } while (modelAccess.exists(randomDocRef));
+      } while (documentAccessBridge.exists(randomDocRef));
       entityRef = randomDocRef;
     }
     return entityRef;
