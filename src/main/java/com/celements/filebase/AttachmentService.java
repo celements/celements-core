@@ -48,8 +48,13 @@ import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.NoAccessRightsException;
+import com.celements.rights.AccessLevel;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -77,6 +82,9 @@ public class AttachmentService implements IAttachmentServiceRole {
 
   @Requirement
   Execution execution;
+
+  @Requirement
+  IWebUtilsService webUtilsService;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -505,6 +513,18 @@ public class AttachmentService implements IAttachmentServiceRole {
       }
     }
     return attList;
+  }
+
+  @Override
+  public Attachment getApiAttachment(XWikiAttachment attachment
+      ) throws NoAccessRightsException {
+    XWikiDocument doc = attachment.getDoc();
+    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), AccessLevel.VIEW)) {
+      Document fbDoc = doc.newDocument(getContext());
+      return new Attachment(fbDoc, attachment, getContext());
+    }
+    throw new NoAccessRightsException(doc.getDocumentReference(),
+        getContext().getXWikiUser(), AccessLevel.VIEW);
   }
 
 }

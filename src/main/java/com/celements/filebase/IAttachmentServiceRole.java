@@ -30,7 +30,9 @@ import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -69,5 +71,8 @@ public interface IAttachmentServiceRole {
 
   public List<XWikiAttachment> getAttachmentsNameMatch(XWikiDocument document,
       IAttachmentMatcher attMatcher);
+
+  public Attachment getApiAttachment(XWikiAttachment attachment
+      ) throws NoAccessRightsException;
 
 }

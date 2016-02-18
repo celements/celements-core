@@ -25,10 +25,13 @@ import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -545,6 +548,36 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     List<XWikiAttachment> resAttList = attService.getAttachmentsNameMatch(doc, null);
     assertNotNull("Expected emptyList - not null", resAttList);
     assertTrue(resAttList.isEmpty());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getApiAttachment_hasAccess() throws Exception {
+    XWikiRightService mockRightSrv = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(mockRightSrv).anyTimes();
+    XWikiAttachment xwikiAtt = new XWikiAttachment(doc, "bli.gaga");
+    expect(mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()),
+        eq("db:space.doc"), same(getContext()))).andReturn(true).atLeastOnce();
+    replayDefault();
+    Attachment attachment = attService.getApiAttachment(xwikiAtt);
+    assertNotNull("Expected Attachment api object - not null", attachment);
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getApiAttachment_noAccess() throws Exception {
+    XWikiRightService mockRightSrv = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(mockRightSrv).anyTimes();
+    XWikiAttachment xwikiAtt = new XWikiAttachment(doc, "bli.gaga");
+    expect(mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()),
+        eq("db:space.doc"), same(getContext()))).andReturn(false).atLeastOnce();
+    replayDefault();
+    try {
+      attService.getApiAttachment(xwikiAtt);
+      fail("NoAccessRightsException expected");
+    } catch (NoAccessRightsException exp) {
+      //expected
+    }
     verifyDefault();
   }
 
