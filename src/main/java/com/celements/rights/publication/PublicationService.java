@@ -1,6 +1,7 @@
 package com.celements.rights.publication;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -12,9 +13,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.rights.CelementsRightServiceImpl.PubUnpub;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.web.classcollections.DocumentDetailsClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -22,9 +24,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component
-public class PublicationService implements IPublicationServiceRole{
-
-  public static final String OVERRIDE_PUB_CHECK = "overridePubCheck";
+public class PublicationService implements IPublicationServiceRole {
 
   private static Logger LOGGER = LoggerFactory.getLogger(PublicationService.class);
 
@@ -38,6 +38,9 @@ public class PublicationService implements IPublicationServiceRole{
   private DocumentAccessBridge documentAccessBridge;
 
   @Requirement
+  IModelAccessFacade modelAccess;
+
+  @Requirement
   private Execution execution;
 
   private XWikiContext getContext() {
@@ -47,38 +50,49 @@ public class PublicationService implements IPublicationServiceRole{
 
   @Override
   public boolean isPubUnpubOverride() {
-    PubUnpub val = getPubUnpubFromContext();
-    return PubUnpub.PUBLISHED == val || PubUnpub.UNPUBLISHED == val;
+    EPubUnpub val = getPubUnpubFromContext();
+    return EPubUnpub.PUBLISHED == val || EPubUnpub.UNPUBLISHED == val;
   }
   
   @Override
   public boolean isPubOverride() {
-    return PubUnpub.PUBLISHED == getPubUnpubFromContext();
+    return EPubUnpub.PUBLISHED == getPubUnpubFromContext();
   }
   
   @Override
   public boolean isUnpubOverride() {
-    return PubUnpub.UNPUBLISHED == getPubUnpubFromContext();
+    return EPubUnpub.UNPUBLISHED == getPubUnpubFromContext();
   }
   
-  PubUnpub getPubUnpubFromContext() {
-    PubUnpub val = null;
+  EPubUnpub getPubUnpubFromContext() {
+    EPubUnpub val = null;
     Object valObj = execution.getContext().getProperty(OVERRIDE_PUB_CHECK);
-    if((valObj != null) && (valObj instanceof PubUnpub)) {
-      val = (PubUnpub)execution.getContext().getProperty(OVERRIDE_PUB_CHECK);
+    if((valObj != null) && (valObj instanceof EPubUnpub)) {
+      val = (EPubUnpub)execution.getContext().getProperty(OVERRIDE_PUB_CHECK);
     }
     return val;
   }
 
   @Override
-  public void overridePubUnpub(PubUnpub value) {
+  public void overridePubUnpub(EPubUnpub value) {
     execution.getContext().setProperty(OVERRIDE_PUB_CHECK, value);
   }
 
   List<BaseObject> getPublishObjects(XWikiDocument doc) {
-    String wikiName = webUtilsService.getWikiRef(doc.getDocumentReference()).getName();
-    return doc.getXObjects(((DocumentDetailsClasses)documentDetailsClasses
-        ).getDocumentPublicationClassRef(wikiName));
+    if (doc != null) {
+      return modelAccess.getXObjects(doc, getPublicationClassReference(
+          doc.getDocumentReference()));
+    }
+    return Collections.emptyList();
+  }
+
+  DocumentReference getPublicationClassReference() {
+    return getPublicationClassReference(null);
+  }
+
+  DocumentReference getPublicationClassReference(EntityReference entityRef) {
+    return ((DocumentDetailsClasses)documentDetailsClasses
+        ).getDocumentPublicationClassRef(webUtilsService.getWikiRef(entityRef).getName());
   }
 
   @Override
@@ -114,11 +128,9 @@ public class PublicationService implements IPublicationServiceRole{
   public boolean isPublished(XWikiDocument doc) {
     List<BaseObject> objs = getPublishObjects(doc);
     boolean isPublished = false;
-    if((objs != null) && (!objs.isEmpty())) {
+    if(!objs.isEmpty()) {
       for(BaseObject obj : objs) {
-        if(obj != null) {
-          isPublished |= isAfterStart(obj) && isBeforeEnd(obj);
-        }
+        isPublished |= isAfterStart(obj) && isBeforeEnd(obj);
       }
     } else {
       LOGGER.debug("no publish objects found for '{}': no limits set means always"
