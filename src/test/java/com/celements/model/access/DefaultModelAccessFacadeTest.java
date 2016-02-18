@@ -22,9 +22,11 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -35,6 +37,7 @@ import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCase {
@@ -819,6 +822,34 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
       modelAccess.getAttachmentNameEqual(doc, filename);
       fail("AttachmentNotExistsException expected");
     } catch (AttachmentNotExistsException exp) {
+      //expected
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getApiDocument_hasAccess() throws Exception {
+    XWikiRightService mockRightSrv = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(mockRightSrv).anyTimes();
+    expect(mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()),
+        eq("db:space.doc"), same(getContext()))).andReturn(true).atLeastOnce();
+    replayDefault();
+    Document apiDoc = modelAccess.getApiDocument(doc);
+    assertNotNull("Expected Attachment api object - not null", apiDoc);
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getApiDocument_noAccess() throws Exception {
+    XWikiRightService mockRightSrv = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(mockRightSrv).anyTimes();
+    expect(mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()),
+        eq("db:space.doc"), same(getContext()))).andReturn(false).atLeastOnce();
+    replayDefault();
+    try {
+      modelAccess.getApiDocument(doc);
+      fail("NoAccessRightsException expected");
+    } catch (NoAccessRightsException exp) {
       //expected
     }
     verifyDefault();
