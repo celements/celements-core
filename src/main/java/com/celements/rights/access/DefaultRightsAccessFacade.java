@@ -1,7 +1,7 @@
 package com.celements.rights.access;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -19,8 +19,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 @Component
 public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      DefaultMenuAccessProvider.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(DefaultMenuAccessProvider.class);
 
   @Requirement
   IEntityReferenceRandomCompleterRole randomCompleter;
