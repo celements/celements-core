@@ -19,9 +19,9 @@
  */
 package com.celements.appScript;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,8 +39,7 @@ public class AppScriptAction extends XWikiAction {
 
   private static final String CEL_APPSCRIPT_CONTEXT_PROPERTY = "celAppScript";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      AppScriptAction.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(AppScriptAction.class);
 
   /**
    * The identifier of the view action.
@@ -61,7 +60,7 @@ public class AppScriptAction extends XWikiAction {
     String path = context.getRequest().getPathInfo();
     if (getAppScriptService().getStartIndex(path) > 0) {
       String celAppScript = getAppScriptService().getScriptNameFromURL();
-      LOGGER.debug("action: found script path [" + celAppScript + "].");
+      _LOGGER.debug("action: found script path [" + celAppScript + "].");
       context.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
       vcontext.put(CEL_APPSCRIPT_CONTEXT_PROPERTY, celAppScript);
