@@ -1,15 +1,12 @@
 package com.celements.rights.access;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.menu.access.DefaultMenuAccessProvider;
 import com.celements.web.service.IWebUtilsService;
