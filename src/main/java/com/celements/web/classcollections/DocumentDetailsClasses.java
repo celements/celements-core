@@ -34,6 +34,10 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
   
   public static final String NAME = "celements.documentDetails";
 
+  public static final String UNPUBLISH_DATE_FIELD = "unpublishDate";
+  
+  public static final String PUBLISH_DATE_FIELD = "publishDate";
+  
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentDetailsClasses.class);
 
@@ -71,9 +75,9 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addDateField("publishDate", "Publish Date (dd.MM.yyyy HH:mm)", 
+    needsUpdate |= bclass.addDateField(PUBLISH_DATE_FIELD, "Publish Date (dd.MM.yyyy HH:mm)", 
         "dd.MM.yyyy HH:mm", 0);
-    needsUpdate |= bclass.addDateField("unpublishDate", "Unpublish Date (dd.MM.yyyy " +
+    needsUpdate |= bclass.addDateField(UNPUBLISH_DATE_FIELD, "Unpublish Date (dd.MM.yyyy " +
         "HH:mm)", "dd.MM.yyyy HH:mm", 0);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
