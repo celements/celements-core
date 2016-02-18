@@ -27,7 +27,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.parents.IDocumentParentsListerRole;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
 import com.celements.web.comparators.XWikiAttachmentAscendingNameComparator;
 import com.celements.web.comparators.XWikiAttachmentDescendingChangeDateComparator;
@@ -610,7 +610,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testHasAccessLevel_docRef() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
         "MyDocument");
-    AccessLevel level = AccessLevel.EDIT;
+    EAccessLevel level = EAccessLevel.EDIT;
     XWikiRightService mockRightsService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
@@ -626,7 +626,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testHasAccessLevel_spaceRef() throws Exception {
     SpaceReference spaceRef = new SpaceReference("MySpace", webUtilsService.getWikiRef());
     DocumentReference docRef = new DocumentReference("untitled1", spaceRef);
-    AccessLevel level = AccessLevel.EDIT;
+    EAccessLevel level = EAccessLevel.EDIT;
     INextFreeDocRole nextFreeDocServiceMock = createMock(INextFreeDocRole.class);
     webUtilsService.nextFreeDocService = nextFreeDocServiceMock;
     expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
@@ -647,7 +647,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
         "MyDocument");
     AttachmentReference attRef = new AttachmentReference("file", docRef);
-    AccessLevel level = AccessLevel.EDIT;
+    EAccessLevel level = EAccessLevel.EDIT;
     XWikiRightService mockRightsService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
     expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
@@ -661,7 +661,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHasAccessLevel_wikiRefRef() throws Exception {
-    AccessLevel level = AccessLevel.EDIT;
+    EAccessLevel level = EAccessLevel.EDIT;
     
     replayDefault();
     assertFalse(webUtilsService.hasAccessLevel(webUtilsService.getWikiRef(), level));
@@ -672,7 +672,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   public void testHasAccessLevel_user() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
         "MyDocument");
-    AccessLevel level = AccessLevel.VIEW;
+    EAccessLevel level = EAccessLevel.VIEW;
     XWikiUser user = new XWikiUser("MySpace.MyUser");
     XWikiRightService mockRightsService = createMock(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();

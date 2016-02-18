@@ -1,6 +1,6 @@
-package com.celements.rights;
+package com.celements.rights.access;
 
-public enum AccessLevel {
+public enum EAccessLevel {
 
   VIEW("view"), 
   COMMENT("comment"),
@@ -12,7 +12,7 @@ public enum AccessLevel {
 
   private final String identifier;
 
-  private AccessLevel(String identifier) {
+  private EAccessLevel(String identifier) {
     this.identifier = identifier;
   }
 

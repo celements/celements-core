@@ -48,7 +48,7 @@ import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -519,12 +519,12 @@ public class AttachmentService implements IAttachmentServiceRole {
   public Attachment getApiAttachment(XWikiAttachment attachment
       ) throws NoAccessRightsException {
     XWikiDocument doc = attachment.getDoc();
-    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), AccessLevel.VIEW)) {
+    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
       Document fbDoc = doc.newDocument(getContext());
       return new Attachment(fbDoc, attachment, getContext());
     }
     throw new NoAccessRightsException(doc.getDocumentReference(),
-        getContext().getXWikiUser(), AccessLevel.VIEW);
+        getContext().getXWikiUser(), EAccessLevel.VIEW);
   }
 
 }

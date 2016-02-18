@@ -37,7 +37,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     context = getContext();
     xwiki = getWikiMock();
     rightsAccess = (DefaultRightsAccessFacade) Utils.getComponent(
-        IRightsAccessFacade.class);
+        IRightsAccessFacadeRole.class);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
     XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
     expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();

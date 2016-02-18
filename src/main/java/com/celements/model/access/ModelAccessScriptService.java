@@ -16,7 +16,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableList;
@@ -50,7 +50,7 @@ public class ModelAccessScriptService implements ScriptService {
   public Document getDocument(DocumentReference docRef) {
     Document ret = null;
     try {
-      if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
+      if (webUtils.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
         XWikiDocument doc = modelAccess.getDocument(docRef);
         ret = modelAccess.getApiDocument(doc);
       }
@@ -78,7 +78,7 @@ public class ModelAccessScriptService implements ScriptService {
       DocumentReference classRef, String key, Object value) {
     com.xpn.xwiki.api.Object ret = null;
     try {
-      if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
+      if (webUtils.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
         ret = toObjectApi(modelAccess.getXObject(docRef, classRef));
       }
     } catch (DocumentNotExistsException exc) {
@@ -112,7 +112,7 @@ public class ModelAccessScriptService implements ScriptService {
       DocumentReference classRef, String key, Collection<?> values) {
     List<com.xpn.xwiki.api.Object> ret = ImmutableList.of();
     try {
-      if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
+      if (webUtils.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
         ret = toObjectApi(modelAccess.getXObjects(docRef, classRef, key, values));
       }
     } catch (DocumentNotExistsException exc) {

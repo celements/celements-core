@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
@@ -145,9 +145,9 @@ public interface IWebUtilsService {
 
   public boolean isSuperAdminUser();
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level);
+  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level);
 
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user);
+  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user);
 
   /**
    * CAUTION: this method returns attachments which start with the attRef.name if no

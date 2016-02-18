@@ -115,7 +115,7 @@ com.celements.web.classcollections.OldCoreClassConfig
 com.celements.web.plugin.cmd.CelSendMail
 com.celements.mailsender.CelMailSenderService
 com.celements.rights.access.DefaultRightsAccessFacade
-com.celements.rights.access.EntityReferenceRandomCompleter
+com.celements.rights.access.internal.EntityReferenceRandomCompleter
 com.celements.model.util.DefaultXObjectUpdateService
 com.celements.lastChanged.LastChangedService
 com.celements.lastChanged.DocumentChangesListener

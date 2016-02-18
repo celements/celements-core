@@ -2,7 +2,7 @@ package com.celements.rights.access.exceptions;
 
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 public class NoAccessRightsException extends Exception {
@@ -13,10 +13,10 @@ public class NoAccessRightsException extends Exception {
 
   private XWikiUser user;
   
-  private AccessLevel expectedAccessLevel;
+  private EAccessLevel expectedAccessLevel;
 
   public NoAccessRightsException(EntityReference entityRef, XWikiUser user,
-      AccessLevel expectedAccessLevel) {
+      EAccessLevel expectedAccessLevel) {
     super();
     this.entityRef = entityRef;
     this.user = user;
@@ -24,7 +24,7 @@ public class NoAccessRightsException extends Exception {
   }
 
   public NoAccessRightsException(EntityReference entityRef, XWikiUser user,
-      AccessLevel expectedAccessLevel, Throwable cause) {
+      EAccessLevel expectedAccessLevel, Throwable cause) {
     super(cause);
     this.entityRef = entityRef;
     this.user = user;
@@ -39,7 +39,7 @@ public class NoAccessRightsException extends Exception {
     return user;
   }
 
-  public AccessLevel getExpectedAccessLevel() {
+  public EAccessLevel getExpectedAccessLevel() {
     return expectedAccessLevel;
   }
 

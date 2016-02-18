@@ -9,6 +9,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 import com.celements.menu.access.DefaultMenuAccessProvider;
+import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -16,7 +17,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 @Component
-public class DefaultRightsAccessFacade implements IRightsAccessFacade {
+public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DefaultMenuAccessProvider.class);

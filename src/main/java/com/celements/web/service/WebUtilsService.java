@@ -68,7 +68,7 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
@@ -570,12 +570,12 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level) {
+  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level) {
     return hasAccessLevel(ref, level, getContext().getXWikiUser());
   }
 
   @Override
-  public boolean hasAccessLevel(EntityReference ref, AccessLevel level, XWikiUser user) {
+  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user) {
     boolean ret = false;
     DocumentReference docRef = null;
     if (ref instanceof SpaceReference) {

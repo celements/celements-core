@@ -14,7 +14,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
 import com.celements.auth.IAuthenticationServiceRole;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -54,7 +54,7 @@ public class WebUtilsScriptService implements ScriptService {
 
   public Attachment getAttachment(AttachmentReference attRef) {
     try {
-      if (webUtilsService.hasAccessLevel(attRef, AccessLevel.VIEW)) {
+      if (webUtilsService.hasAccessLevel(attRef, EAccessLevel.VIEW)) {
         return webUtilsService.getAttachmentApi(attRef);
       }
     } catch (XWikiException xwe) {

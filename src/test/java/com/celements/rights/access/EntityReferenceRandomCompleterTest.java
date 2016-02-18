@@ -13,6 +13,8 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.rights.access.internal.EntityReferenceRandomCompleter;
+import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 

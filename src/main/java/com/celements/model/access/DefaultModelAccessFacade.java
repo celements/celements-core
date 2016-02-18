@@ -27,7 +27,7 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
@@ -107,11 +107,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public Document getApiDocument(XWikiDocument doc) throws NoAccessRightsException {
-    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), AccessLevel.VIEW)) {
+    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
       return doc.newDocument(getContext());
     }
     throw new NoAccessRightsException(doc.getDocumentReference(),
-        getContext().getXWikiUser(), AccessLevel.VIEW);
+        getContext().getXWikiUser(), EAccessLevel.VIEW);
   }
 
   private XWikiDocument getDocumentInternal(DocumentReference docRef

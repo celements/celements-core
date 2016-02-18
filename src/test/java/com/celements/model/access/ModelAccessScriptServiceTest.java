@@ -10,7 +10,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.exception.DocumentLoadException;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -40,7 +40,7 @@ public class ModelAccessScriptServiceTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_getDocument() throws Exception {
-    expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(AccessLevel.VIEW))
+    expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(EAccessLevel.VIEW))
         ).andReturn(true).once();
     expect(modelAccess.modelAccess.getDocument(eq(docRef))).andReturn(doc).once();
     Document apiDoc = new Document(doc, getContext());
@@ -53,7 +53,7 @@ public class ModelAccessScriptServiceTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_getDocument_loadException() throws Exception {
-    expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(AccessLevel.VIEW))
+    expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(EAccessLevel.VIEW))
         ).andReturn(true).once();
     expect(modelAccess.modelAccess.getDocument(eq(docRef))).andThrow(
         new DocumentLoadException(docRef)).once();
@@ -65,7 +65,7 @@ public class ModelAccessScriptServiceTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void test_getDocument_notViewRights() throws Exception {
-    expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(AccessLevel.VIEW))
+    expect(modelAccess.webUtils.hasAccessLevel(eq(docRef), eq(EAccessLevel.VIEW))
         ).andReturn(false).once();
     replayDefault();
     Document ret = modelAccess.getDocument(docRef);
@@ -76,7 +76,7 @@ public class ModelAccessScriptServiceTest extends AbstractBridgedComponentTestCa
   @Test
   public void test_getDocument_null() throws Exception {
     expect(modelAccess.webUtils.hasAccessLevel(isNull(DocumentReference.class), 
-        eq(AccessLevel.VIEW))).andReturn(false).once();
+        eq(EAccessLevel.VIEW))).andReturn(false).once();
     replayDefault();
     Document ret = modelAccess.getDocument(null);
     verifyDefault();

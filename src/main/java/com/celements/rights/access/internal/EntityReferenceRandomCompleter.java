@@ -1,4 +1,4 @@
-package com.celements.rights.access;
+package com.celements.rights.access.internal;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.xwiki.component.annotation.Component;

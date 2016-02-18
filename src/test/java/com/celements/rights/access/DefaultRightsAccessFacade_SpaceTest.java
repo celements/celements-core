@@ -15,6 +15,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +44,7 @@ public class DefaultRightsAccessFacade_SpaceTest extends AbstractBridgedComponen
     context = getContext();
     xwiki = getWikiMock();
     rightsAccess = (DefaultRightsAccessFacade) Utils.getComponent(
-        IRightsAccessFacade.class);
+        IRightsAccessFacadeRole.class);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
     XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
     expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
