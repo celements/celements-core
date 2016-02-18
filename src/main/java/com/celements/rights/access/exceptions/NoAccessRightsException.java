@@ -1,4 +1,4 @@
-package com.celements.model.access.exception;
+package com.celements.rights.access.exceptions;
 
 import org.xwiki.model.reference.EntityReference;
 
