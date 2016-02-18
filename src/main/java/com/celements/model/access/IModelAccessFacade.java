@@ -14,7 +14,9 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -303,5 +305,15 @@ public interface IModelAccessFacade {
    */
   public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
       ) throws AttachmentNotExistsException;
+
+  /**
+   * getApiDocument creates a com.xpn.xwiki.api.Document for <code>doc</code>
+   * if current context user has view rights on the given document else returns null;
+   * 
+   * @param doc
+   * @return an api Document object or null
+   * @throws NoAccessRightsException 
+   */
+  public Document getApiDocument(XWikiDocument doc) throws NoAccessRightsException;
 
 }

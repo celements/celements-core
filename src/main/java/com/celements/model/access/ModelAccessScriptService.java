@@ -16,6 +16,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.celements.rights.AccessLevel;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableList;
@@ -51,12 +52,15 @@ public class ModelAccessScriptService implements ScriptService {
     try {
       if (webUtils.hasAccessLevel(docRef, AccessLevel.VIEW)) {
         XWikiDocument doc = modelAccess.getDocument(docRef);
-        ret = doc.newDocument(getContext());
+        ret = modelAccess.getApiDocument(doc);
       }
     } catch (DocumentNotExistsException exc) {
       LOGGER.info("Doc does not exist '{}'", docRef, exc);
     } catch (DocumentLoadException exc) {
       LOGGER.error("Failed to load doc '{}'", docRef, exc);
+    } catch (NoAccessRightsException exc) {
+      LOGGER.error("no '{}' access rights for user '{}' on doc '{}'.",
+          exc.getExpectedAccessLevel(), exc.getUser(), docRef, exc);
     }
     return ret;
   }

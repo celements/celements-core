@@ -26,7 +26,9 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.rights.AccessLevel;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
@@ -36,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -100,6 +103,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     } else {
       throw new DocumentNotExistsException(docRef);
     }
+  }
+
+  @Override
+  public Document getApiDocument(XWikiDocument doc) throws NoAccessRightsException {
+    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), AccessLevel.VIEW)) {
+      return doc.newDocument(getContext());
+    }
+    throw new NoAccessRightsException(doc.getDocumentReference(),
+        getContext().getXWikiUser(), AccessLevel.VIEW);
   }
 
   private XWikiDocument getDocumentInternal(DocumentReference docRef
