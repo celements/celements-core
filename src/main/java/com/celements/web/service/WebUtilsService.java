@@ -61,7 +61,6 @@ import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
-import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
@@ -69,6 +68,7 @@ import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.rendering.XHTMLtoHTML5cleanup;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
@@ -83,7 +83,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -138,9 +137,6 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement
   IDefaultEmptyDocStrategyRole emptyChecker;
-
-  @Requirement
-  INextFreeDocRole nextFreeDocService;
 
   @Requirement
   ConfigurationSource defaultConfigSrc;
@@ -569,35 +565,24 @@ public class WebUtilsService implements IWebUtilsService {
     return false;
   }
 
-  @Override
-  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level) {
-    return hasAccessLevel(ref, level, getContext().getXWikiUser());
+  /**
+   * CAUTION: cyclic dependency with IRightsAccessFacadeRole
+   */
+  @Deprecated
+  private IRightsAccessFacadeRole getRightsAccess() {
+    return Utils.getComponent(IRightsAccessFacadeRole.class);
   }
 
   @Override
+  @Deprecated
+  public boolean hasAccessLevel(EntityReference ref, EAccessLevel level) {
+    return getRightsAccess().hasAccessLevel(ref, level);
+  }
+
+  @Override
+  @Deprecated
   public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user) {
-    boolean ret = false;
-    DocumentReference docRef = null;
-    if (ref instanceof SpaceReference) {
-      docRef = nextFreeDocService.getNextUntitledPageDocRef((SpaceReference) ref);
-    } else if (ref instanceof DocumentReference) {
-      docRef = (DocumentReference) ref;
-    } else if (ref instanceof AttachmentReference) {
-      docRef = ((AttachmentReference) ref).getDocumentReference();
-    }
-    if (docRef != null) {
-      try {
-        ret = getContext().getWiki().getRightService().hasAccessLevel(level.getIdentifier(), 
-            (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
-            serializeRef(docRef), getContext());
-      } catch (XWikiException xwe) {
-        // already being catched in XWikiRightServiceImpl.hasAccessLevel()
-        _LOGGER.error("should not happen");
-      }
-    }
-    _LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", 
-        ref, level, user, ret);
-    return ret;
+    return getRightsAccess().hasAccessLevel(ref, level, user);
   }
 
   @Override

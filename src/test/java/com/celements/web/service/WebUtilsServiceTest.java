@@ -25,7 +25,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
@@ -607,6 +606,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testHasAccessLevel_docRef() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
         "MyDocument");
@@ -623,26 +623,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testHasAccessLevel_spaceRef() throws Exception {
-    SpaceReference spaceRef = new SpaceReference("MySpace", webUtilsService.getWikiRef());
-    DocumentReference docRef = new DocumentReference("untitled1", spaceRef);
-    EAccessLevel level = EAccessLevel.EDIT;
-    INextFreeDocRole nextFreeDocServiceMock = createMock(INextFreeDocRole.class);
-    webUtilsService.nextFreeDocService = nextFreeDocServiceMock;
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
-        docRef).once();
-    XWikiRightService mockRightsService = createMock(XWikiRightService.class);
-    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
-    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
-        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
-        ).andReturn(true).once();
-    
-    replayDefault(mockRightsService, nextFreeDocServiceMock);
-    assertTrue(webUtilsService.hasAccessLevel(spaceRef, level));
-    verifyDefault(mockRightsService, nextFreeDocServiceMock);
-  }
-
-  @Test
+  @Deprecated
   public void testHasAccessLevel_attRef() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
         "MyDocument");
@@ -660,6 +641,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testHasAccessLevel_wikiRefRef() throws Exception {
     EAccessLevel level = EAccessLevel.EDIT;
     
@@ -669,6 +651,7 @@ public class WebUtilsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testHasAccessLevel_user() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
         "MyDocument");

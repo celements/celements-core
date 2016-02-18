@@ -8,11 +8,13 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,8 +41,6 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     rightsAccess = (DefaultRightsAccessFacade) Utils.getComponent(
         IRightsAccessFacadeRole.class);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
-    XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
-    expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
     groupSrvMock = createMockAndAddToDefault(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(context))).andReturn(groupSrvMock).anyTimes();
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
@@ -51,7 +51,10 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   }
 
   @Test
-  public void testHasAccessLevel_document_edit_true() throws Exception {
+  @Deprecated
+  public void testHasAccessLevel_document_edit_true_deprecated() throws Exception {
+    XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
+    expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
     XWikiUser user = new XWikiUser("XWiki.TestUser");
     String spaceName = "MySpace";
     WikiReference wikiRef = new WikiReference(context.getDatabase());
@@ -71,7 +74,10 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   }
 
   @Test
-  public void testHasAccessLevel_document_edit_Guest_false() throws Exception {
+  @Deprecated
+  public void testHasAccessLevel_document_edit_Guest_false_deprecated() throws Exception {
+    XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
+    expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
     XWikiUser user = new XWikiUser(XWikiRightService.GUEST_USER);
     String spaceName = "MySpace";
     WikiReference wikiRef = new WikiReference(context.getDatabase());
@@ -91,19 +97,148 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   }
 
   @Test
+  @Deprecated
+  public void testHasAccessLevel_wiki_edit_false_deprecated() throws Exception {
+    XWikiUser user = new XWikiUser("XWiki.TestUser");
+    WikiReference wikiRef = new WikiReference(context.getDatabase());
+    replayDefault();
+    assertFalse(rightsAccess.hasAccessLevel("edit", user, wikiRef));
+    verifyDefault();
+  }
+
+  @Test
   public void testHasAccessLevel_wiki_edit_false() throws Exception {
     XWikiUser user = new XWikiUser("XWiki.TestUser");
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     replayDefault();
-    try {
-      assertTrue(rightsAccess.hasAccessLevel("edit", user, wikiRef));
-      fail("expecting an IllegalArgumentException");
-    } catch (IllegalArgumentException iae) {
-      //expected exception
-    }
+    assertFalse(rightsAccess.hasAccessLevel(wikiRef, EAccessLevel.EDIT, user));
     verifyDefault();
   }
 
+  @Test
+  public void testHasAccessLevel_docRef() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
+        "MyDocument");
+    EAccessLevel level = EAccessLevel.EDIT;
+    XWikiRightService mockRightsService = createMockAndAddToDefault(
+        XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
+        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
+        ).andReturn(true).once();
+    
+    replayDefault();
+    assertTrue(rightsAccess.hasAccessLevel(docRef, level));
+    verifyDefault();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testHasAccessLevel_document_edit_true() throws Exception {
+    XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
+    expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
+    XWikiUser user = new XWikiUser("XWiki.TestUser");
+    String spaceName = "MySpace";
+    WikiReference wikiRef = new WikiReference(context.getDatabase());
+    SpaceReference spaceRef = new SpaceReference(spaceName, wikiRef);
+    DocumentReference docRef = new DocumentReference("MyTestDoc", spaceRef);
+    XWikiDocument testDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc).anyTimes();
+    String docFN = context.getDatabase() + ":MySpace.MyTestDoc";
+    expect(xwiki.getDocument(eq(docFN), same(context))).andReturn(testDoc
+        ).anyTimes();
+    prepareEmptyGroupMembers(user);
+    prepareMasterRights();
+    prepareSpaceRights(spaceRef);
+    replayDefault();
+    assertTrue(rightsAccess.hasAccessLevel(docRef, EAccessLevel.EDIT, user));
+    verifyDefault();
+  }
+
+  @Test
+  public void testHasAccessLevel_document_edit_Guest_false() throws Exception {
+    XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
+    expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
+    XWikiUser user = new XWikiUser(XWikiRightService.GUEST_USER);
+    String spaceName = "MySpace";
+    WikiReference wikiRef = new WikiReference(context.getDatabase());
+    SpaceReference spaceRef = new SpaceReference(spaceName, wikiRef);
+    DocumentReference docRef = new DocumentReference("MyTestDoc", spaceRef);
+    prepareEmptyGroupMembers(user);
+    prepareMasterRights();
+    prepareSpaceRights(spaceRef);
+    replayDefault();
+    assertFalse(rightsAccess.hasAccessLevel(docRef, EAccessLevel.EDIT, user));
+    verifyDefault();
+  }
+
+  @Test
+  public void testHasAccessLevel_spaceRef() throws Exception {
+    SpaceReference spaceRef = new SpaceReference("MySpace", webUtilsService.getWikiRef());
+    DocumentReference docRef = new DocumentReference("untitled1", spaceRef);
+    EAccessLevel level = EAccessLevel.EDIT;
+    XWikiRightService mockRightsService = createMockAndAddToDefault(
+        XWikiRightService.class);
+    IEntityReferenceRandomCompleterRole randomCompleterMock = createMockAndAddToDefault(
+        IEntityReferenceRandomCompleterRole.class);
+    rightsAccess.randomCompleter = randomCompleterMock;
+    expect(randomCompleterMock.randomCompleteSpaceRef(eq(spaceRef))).andReturn(docRef
+        ).once();
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
+        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
+        ).andReturn(true).once();
+    prepareSpaceRights(spaceRef);
+    replayDefault();
+    assertTrue(rightsAccess.hasAccessLevel(spaceRef, level));
+    verifyDefault();
+  }
+
+  @Test
+  public void testHasAccessLevel_attRef() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
+        "MyDocument");
+    AttachmentReference attRef = new AttachmentReference("file", docRef);
+    EAccessLevel level = EAccessLevel.EDIT;
+    XWikiRightService mockRightsService = createMockAndAddToDefault(
+        XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(getContext(
+        ).getUser()), eq(webUtilsService.serializeRef(docRef)), same(context))
+        ).andReturn(true).once();
+    
+    replayDefault();
+    assertTrue(rightsAccess.hasAccessLevel(attRef, level));
+    verifyDefault();
+  }
+
+  @Test
+  public void testHasAccessLevel_wikiRefRef() throws Exception {
+    EAccessLevel level = EAccessLevel.EDIT;
+    
+    replayDefault();
+    assertFalse(rightsAccess.hasAccessLevel(webUtilsService.getWikiRef(), level));
+    verifyDefault();
+  }
+
+  @Test
+  public void testHasAccessLevel_user() throws Exception {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", 
+        "MyDocument");
+    EAccessLevel level = EAccessLevel.VIEW;
+    XWikiUser user = new XWikiUser("MySpace.MyUser");
+    XWikiRightService mockRightsService = createMockAndAddToDefault(
+        XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(mockRightsService).anyTimes();
+    expect(mockRightsService.hasAccessLevel(eq(level.getIdentifier()), eq(user.getUser()), 
+        eq(webUtilsService.serializeRef(docRef)), same(context))).andReturn(false).once();
+    
+    replayDefault();
+    assertFalse(rightsAccess.hasAccessLevel(docRef, level, user));
+    verifyDefault();
+  }
+
+  @Deprecated
   private void prepareSpaceRights(SpaceReference spaceRef) throws XWikiException {
     String webPrefDocName = "WebPreferences";
     DocumentReference spacePrefDocRef = new DocumentReference(webPrefDocName, spaceRef);
@@ -130,6 +265,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
     }
   }
 
+  @Deprecated
   private void prepareMasterRights() throws XWikiException {
     DocumentReference wikiPrefDocRef = new DocumentReference(context.getDatabase(),
         "XWiki", "XWikiPreferences");

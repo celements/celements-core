@@ -145,8 +145,17 @@ public interface IWebUtilsService {
 
   public boolean isSuperAdminUser();
 
+  /**
+   * instead use IRightsAccessFacadeRole.hasAccessLevel(EntityReference, EAccessLevel)
+   */
+  @Deprecated
   public boolean hasAccessLevel(EntityReference ref, EAccessLevel level);
 
+  /**
+   * use IRightsAccessFacadeRole.hasAccessLevel(EntityReference, EAccessLevel, XWikiUser)
+   * instead
+   */
+  @Deprecated
   public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user);
 
   /**
