@@ -29,9 +29,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-@Component("celements.documentDetails")
+@Component(DocumentDetailsClasses.NAME)
 public class DocumentDetailsClasses extends AbstractClassCollection {
   
+  public static final String NAME = "celements.documentDetails";
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentDetailsClasses.class);
 
