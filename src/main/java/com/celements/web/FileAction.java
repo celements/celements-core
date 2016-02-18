@@ -25,8 +25,8 @@ import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -56,7 +56,7 @@ import com.xpn.xwiki.web.XWikiResponse;
  */
 public class FileAction extends SkinAction {
   /** Logging helper. */
-  private static final Log mLogger = LogFactory.getLog(FileAction.class);
+  private static final Logger _Logger = LoggerFactory.getLogger(FileAction.class);
 
   /** Path delimiter. */
   public static final String DELIMITER = "/";
@@ -88,8 +88,8 @@ public class FileAction extends SkinAction {
     // The default base skin is always a filesystem directory.
     String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
-    if (mLogger.isDebugEnabled()) {
-      mLogger.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
+    if (_Logger.isDebugEnabled()) {
+      _Logger.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
           + " ; defaultbaseskin: " + defaultbaseskin);
     }
 
@@ -102,8 +102,8 @@ public class FileAction extends SkinAction {
     while (idx > 0) {
       try {
         String filename = Util.decodeURI(path.substring(idx + 1), context);
-        if (mLogger.isDebugEnabled()) {
-          mLogger.debug("Trying '" + filename + "'");
+        if (_Logger.isDebugEnabled()) {
+          _Logger.debug("Trying '" + filename + "'");
         }
 
         // Try on the current skin document.
@@ -144,7 +144,7 @@ public class FileAction extends SkinAction {
           // successfully found. Signal this further, and stop trying to render.
           throw ex;
         }
-        mLogger.debug(new Integer(idx), ex);
+        _Logger.debug(new Integer(idx), ex);
       }
       idx = path.lastIndexOf(DELIMITER, idx - 1);
     }
@@ -183,14 +183,14 @@ public class FileAction extends SkinAction {
    */
   private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
       throws XWikiException, IOException {
-    if (mLogger.isDebugEnabled()) {
-      mLogger.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
+    if (_Logger.isDebugEnabled()) {
+      _Logger.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
           + "' document");
     }
     try {
       if (doc.isNew()) {
-        if (mLogger.isDebugEnabled()) {
-          mLogger.debug(doc.getName() + " is not a document");
+        if (_Logger.isDebugEnabled()) {
+          _Logger.debug(doc.getName() + " is not a document");
         }
       } else {
         return renderFileFromObjectField(filename, doc, context)
@@ -221,8 +221,8 @@ public class FileAction extends SkinAction {
    */
   private boolean renderFileFromFilesystem(String path, XWikiContext context)
       throws XWikiException {
-    if (mLogger.isDebugEnabled()) {
-      mLogger.debug("Rendering filesystem file from path [" + path + "]");
+    if (_Logger.isDebugEnabled()) {
+      _Logger.debug("Rendering filesystem file from path [" + path + "]");
     }
     XWikiResponse response = context.getResponse();
     try {
@@ -245,7 +245,7 @@ public class FileAction extends SkinAction {
         return true;
       }
     } catch (IOException ex) {
-      mLogger.info("Skin file '" + path + "' does not exist or cannot be accessed");
+      _Logger.info("Skin file '" + path + "' does not exist or cannot be accessed");
     }
     return false;
   }
@@ -267,7 +267,7 @@ public class FileAction extends SkinAction {
   @Override
   public boolean renderFileFromObjectField(String filename, XWikiDocument doc,
       XWikiContext context) throws IOException {
-    mLogger.debug("... as object property");
+    _Logger.debug("... as object property");
     BaseObject object = doc.getObject("XWiki.XWikiSkins");
     String content = null;
     if (object != null) {
@@ -287,7 +287,7 @@ public class FileAction extends SkinAction {
       response.getOutputStream().write(data);
       return true;
     } else {
-      mLogger.debug("Object field not found or empty");
+      _Logger.debug("Object field not found or empty");
     }
     return false;
   }
@@ -311,7 +311,7 @@ public class FileAction extends SkinAction {
   @Override
   public boolean renderFileFromAttachment(String filename, XWikiDocument doc,
       XWikiContext context) throws IOException, XWikiException {
-    mLogger.debug("... as attachment");
+    _Logger.debug("... as attachment");
     XWikiAttachment attachment = doc.getAttachment(filename);
     if (attachment != null) {
       XWiki xwiki = context.getWiki();
@@ -331,7 +331,7 @@ public class FileAction extends SkinAction {
       }
       return true;
     } else {
-      mLogger.debug("Attachment not found");
+      _Logger.debug("Attachment not found");
     }
     return false;
   }
