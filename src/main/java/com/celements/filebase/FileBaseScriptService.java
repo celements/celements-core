@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -15,12 +14,11 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.filebase.exceptions.FileBaseLoadException;
 import com.celements.filebase.exceptions.FileNotExistsException;
 import com.celements.filebase.matcher.IAttachmentMatcher;
+import com.celements.model.access.exception.NoAccessRightsException;
 import com.celements.web.plugin.cmd.TokenBasedUploadCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 @Component("filebase")
@@ -30,9 +28,6 @@ public class FileBaseScriptService implements ScriptService {
   IWebUtilsService webUtilsService;
   
   private static Logger _LOGGER  = LoggerFactory.getLogger(FileBaseScriptService.class);
-  
-  @Requirement
-  private Execution execution;
 
   @Requirement
   IAttachmentServiceRole attachmentService;
@@ -71,12 +66,14 @@ public class FileBaseScriptService implements ScriptService {
   public Attachment getFileNameEqual(String filename) throws FileBaseLoadException {
     try {
       XWikiAttachment xwikiAtt = filebaseService.getFileNameEqual(filename);
-      Document fbDoc = xwikiAtt.getDoc().newDocument(getContext());
-      return new Attachment(fbDoc, xwikiAtt, getContext());
+      return attachmentService.getApiAttachment(xwikiAtt);
     } catch (FileNotExistsException e) {
       _LOGGER.trace("Filebase could not find file [" + filename + "]");
-      return null;
+    } catch (NoAccessRightsException nare) {
+      _LOGGER.info("User {} was refused {} access on file base document {}", 
+          nare.getUser(), nare.getExpectedAccessLevel(), nare.getDocumentReference());
     }
+    return null;
   }
 
   public List<Attachment> getFilesNameMatch(IAttachmentMatcher attMatcher
@@ -84,13 +81,13 @@ public class FileBaseScriptService implements ScriptService {
     List<XWikiAttachment> xwikiAttList = filebaseService.getFilesNameMatch(attMatcher);
     List<Attachment> attList = new ArrayList<Attachment>();
     for(XWikiAttachment xwikiAtt : xwikiAttList) {
-      Document fbDoc = xwikiAtt.getDoc().newDocument(getContext());
-      attList.add(new Attachment(fbDoc, xwikiAtt, getContext()));
+      try {
+        attList.add(attachmentService.getApiAttachment(xwikiAtt));
+      } catch (NoAccessRightsException nare) {
+        _LOGGER.info("User {} was refused {} access on file base document {}", 
+            nare.getUser(), nare.getExpectedAccessLevel(), nare.getDocumentReference());
+      }
     }
     return attList;
-  }
-
-  private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
   }
 }
