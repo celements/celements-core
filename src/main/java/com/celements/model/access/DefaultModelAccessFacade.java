@@ -28,6 +28,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
@@ -52,6 +53,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Requirement
   IWebUtilsService webUtilsService;
+
+  @Requirement
+  IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
   private Execution execution;
@@ -107,7 +111,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public Document getApiDocument(XWikiDocument doc) throws NoAccessRightsException {
-    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
+    if (rightsAccess.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
       return doc.newDocument(getContext());
     }
     throw new NoAccessRightsException(doc.getDocumentReference(),
@@ -344,7 +348,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     com.xpn.xwiki.api.Object ret = null;
     if (obj != null) {
       try {
-        if (webUtilsService.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
+        if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
           throw new NoAccessRightsException(obj.getDocumentReference(),
