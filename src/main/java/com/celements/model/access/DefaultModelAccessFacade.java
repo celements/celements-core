@@ -517,8 +517,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
     LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
         filename, document, document.getDocumentReference());
-    throw new AttachmentNotExistsException(new AttachmentReference(
-        ((filename != null) ? filename : ""), document.getDocumentReference()));
+    //FIXME empty or null filename leads to exception:
+    //java.lang.IllegalArgumentException: An Entity Reference name cannot be null or empty
+    if(Strings.isNullOrEmpty(filename)) {
+      throw new AttachmentNotExistsException(null);
+    } else {
+      throw new AttachmentNotExistsException(new AttachmentReference(filename, 
+          document.getDocumentReference()));
+    }
   }
 
 }
