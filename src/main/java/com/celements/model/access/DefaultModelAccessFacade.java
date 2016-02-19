@@ -517,8 +517,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
     LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
         filename, document, document.getDocumentReference());
-    throw new AttachmentNotExistsException(new AttachmentReference(filename,
-        document.getDocumentReference()));
+    throw new AttachmentNotExistsException(new AttachmentReference(
+        ((filename != null) ? filename : ""), document.getDocumentReference()));
   }
 
 }
