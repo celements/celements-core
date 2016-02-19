@@ -308,12 +308,50 @@ public interface IModelAccessFacade {
 
   /**
    * getApiDocument creates a com.xpn.xwiki.api.Document for <code>doc</code>
-   * if current context user has view rights on the given document else returns null;
    * 
    * @param doc
    * @return an api Document object or null
-   * @throws NoAccessRightsException 
+   * @throws NoAccessRightsException  if current context user has no view rights
    */
   public Document getApiDocument(XWikiDocument doc) throws NoAccessRightsException;
+
+  /**
+   * getApiObject creates a com.xpn.xwiki.api.Object for <code>obj</code>
+   * 
+   * @param obj
+   * @return
+   * @throws NoAccessRightsException if current context user has no view rights
+   */
+  public com.xpn.xwiki.api.Object getApiObject(BaseObject obj
+      ) throws NoAccessRightsException;
+
+  /**
+   * getApiObject creates a com.xpn.xwiki.api.Object for <code>obj</code>
+   * 
+   * @param obj
+   * @return
+   **/
+  public com.xpn.xwiki.api.Object getApiObjectWithoutRightCheck(BaseObject obj);
+
+  /**
+   * getApiObjects creates for each valid BaseObject in <code>objs</code> a
+   * com.xpn.xwiki.api.Object. A BaseObject is valid if it is not null, has a correct
+   * DocumentReference set and the context user has view rights an that document.
+   * Invalid BaseObjects are omitted, thus the returned list may be smaller.
+   * 
+   * @param objs
+   * @return
+   */
+  public List<com.xpn.xwiki.api.Object> getApiObjects(List<BaseObject> objs);
+
+  /**
+   * getApiObjects creates for each valid BaseObject in <code>objs</code> a
+   * com.xpn.xwiki.api.Object. A BaseObject is valid if it is not null.
+   * 
+   * @param objs
+   * @return
+   */
+  public List<com.xpn.xwiki.api.Object> getApiObjectsWithoutRightChecks(
+      List<BaseObject> objs);
 
 }

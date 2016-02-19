@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
@@ -20,7 +19,6 @@ import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.google.common.collect.ImmutableList;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -38,14 +36,6 @@ public class ModelAccessScriptService implements ScriptService {
 
   @Requirement
   IRightsAccessFacadeRole rightsAccess;
-
-  @Requirement
-  Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
-  }
 
   public Document getDocument(DocumentReference docRef) {
     Document ret = null;
@@ -79,7 +69,8 @@ public class ModelAccessScriptService implements ScriptService {
     com.xpn.xwiki.api.Object ret = null;
     try {
       if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
-        ret = toObjectApi(modelAccess.getXObject(docRef, classRef));
+        ret = modelAccess.getApiObjectWithoutRightCheck(modelAccess.getXObject(docRef,
+            classRef));
       }
     } catch (DocumentNotExistsException exc) {
       LOGGER.info("Doc does not exist '{}'", docRef, exc);
@@ -89,13 +80,23 @@ public class ModelAccessScriptService implements ScriptService {
     return ret;
   }
 
+  /**
+   * programming rights needed
+   */
   public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef) {
     return getObject(doc, classRef, null, null);
   }
 
+  /**
+   * programming rights needed
+   */
   public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef,
       String key, Object value) {
-    return toObjectApi(modelAccess.getXObject(doc.getDocument(), classRef, key, value));
+    if (doc != null) {
+      return modelAccess.getApiObjectWithoutRightCheck(modelAccess.getXObject(
+          doc.getDocument(), classRef, key, value));
+    }
+    return null;
   }
 
   public List<com.xpn.xwiki.api.Object> getObjects(DocumentReference docRef,
@@ -113,7 +114,8 @@ public class ModelAccessScriptService implements ScriptService {
     List<com.xpn.xwiki.api.Object> ret = ImmutableList.of();
     try {
       if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
-        ret = toObjectApi(modelAccess.getXObjects(docRef, classRef, key, values));
+        ret = modelAccess.getApiObjectsWithoutRightChecks(modelAccess.getXObjects(docRef,
+            classRef, key, values));
       }
     } catch (DocumentNotExistsException exc) {
       LOGGER.info("Doc does not exist '{}'", docRef, exc);
@@ -133,64 +135,76 @@ public class ModelAccessScriptService implements ScriptService {
     return getObjects(doc, classRef, key, Arrays.asList(value));
   }
 
+  /**
+   * programming rights needed
+   */
   public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
       DocumentReference classRef, String key, Collection<?> values) {
-    return toObjectApi(modelAccess.getXObjects(doc.getDocument(), classRef, key, values));
+    return modelAccess.getApiObjectsWithoutRightChecks(modelAccess.getXObjects(
+        doc.getDocument(), classRef, key, values));
   }
 
+  /**
+   * programming rights needed
+   */
   public com.xpn.xwiki.api.Object newObject(Document doc, DocumentReference classRef) {
     com.xpn.xwiki.api.Object ret = null;
-    try {
-      ret = toObjectApi(modelAccess.newXObject(doc.getDocument(), classRef));
-    } catch (ClassDocumentLoadException exc) {
-      LOGGER.error("Failed to create object '{}' on doc '{}'", classRef, doc, exc);
+    if (doc != null) {
+      try {
+        ret = modelAccess.getApiObjectWithoutRightCheck(modelAccess.newXObject(
+            doc.getDocument(), classRef));
+      } catch (ClassDocumentLoadException exc) {
+        LOGGER.error("Failed to create object '{}' on doc '{}'", classRef, doc, exc);
+      }
     }
     return ret;
   }
 
+  /**
+   * programming rights needed
+   */
   public boolean removeObject(Document doc, com.xpn.xwiki.api.Object objToRemove) {
     return modelAccess.removeXObject(doc.getDocument(), objToRemove.getXWikiObject());
   }
 
+  /**
+   * programming rights needed
+   */
   public boolean removeObjects(Document doc,
       List<com.xpn.xwiki.api.Object> objsToRemove) {
     return modelAccess.removeXObjects(doc.getDocument(), toXObject(objsToRemove));
   }
 
+  /**
+   * programming rights needed
+   */
   public boolean removeObjects(Document doc, DocumentReference classRef) {
     return removeObjects(doc, classRef, null, null);
   }
 
+  /**
+   * programming rights needed
+   */
   public boolean removeObjects(Document doc, DocumentReference classRef, String key,
       Object value) {
     return removeObjects(doc, classRef, key, Arrays.asList(value));
   }
 
+  /**
+   * programming rights needed
+   */
   public boolean removeObjects(Document doc, DocumentReference classRef, String key,
       Collection<?> values) {
     return modelAccess.removeXObjects(doc.getDocument(), classRef, key, values);
   }
 
+  /**
+   * programming rights needed
+   */
   private List<BaseObject> toXObject(List<com.xpn.xwiki.api.Object> objs) {
     List<BaseObject> ret = new ArrayList<>();
     for (com.xpn.xwiki.api.Object obj : objs) {
       ret.add(obj.getXWikiObject());
-    }
-    return ret;
-  }
-
-  private com.xpn.xwiki.api.Object toObjectApi(BaseObject obj) {
-    com.xpn.xwiki.api.Object ret = null;
-    if (obj != null) {
-      ret = obj.newObjectApi(obj, getContext());
-    }
-    return ret;
-  }
-
-  private List<com.xpn.xwiki.api.Object> toObjectApi(List<BaseObject> objs) {
-    List<com.xpn.xwiki.api.Object> ret = new ArrayList<>();
-    for (BaseObject obj : objs) {
-      ret.add(toObjectApi(obj));
     }
     return ret;
   }

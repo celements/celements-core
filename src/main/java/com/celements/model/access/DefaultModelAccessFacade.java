@@ -339,6 +339,63 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public com.xpn.xwiki.api.Object getApiObject(BaseObject obj
+      ) throws NoAccessRightsException {
+    com.xpn.xwiki.api.Object ret = null;
+    if (obj != null) {
+      try {
+        if (webUtilsService.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
+          return getApiObjectWithoutRightCheck(obj);
+        } else {
+          throw new NoAccessRightsException(obj.getDocumentReference(),
+              getContext().getXWikiUser(), EAccessLevel.VIEW);
+        }
+      } catch (IllegalStateException exp) {
+        LOGGER.warn("getApiObject failed for '{}'", obj, exp);
+      }
+    }
+    return ret;
+  }
+
+  @Override
+  public com.xpn.xwiki.api.Object getApiObjectWithoutRightCheck(BaseObject obj) {
+    return obj.newObjectApi(obj, getContext());
+  }
+
+  @Override
+  public List<com.xpn.xwiki.api.Object> getApiObjects(List<BaseObject> objs) {
+    List<com.xpn.xwiki.api.Object> ret = new ArrayList<>();
+    for (BaseObject obj : objs) {
+      try {
+        if (obj != null) {
+          com.xpn.xwiki.api.Object apiObject = getApiObject(obj);
+          if (apiObject != null) {
+            ret.add(apiObject);
+          }
+        }
+      } catch (NoAccessRightsException exp) {
+        LOGGER.debug("getApiObjects ommits object '{}'", obj, exp);
+      }
+    }
+    return ret;
+  }
+
+  @Override
+  public List<com.xpn.xwiki.api.Object> getApiObjectsWithoutRightChecks(
+      List<BaseObject> objs) {
+    List<com.xpn.xwiki.api.Object> ret = new ArrayList<>();
+    for (BaseObject obj : objs) {
+      if (obj != null) {
+        com.xpn.xwiki.api.Object apiObject = getApiObjectWithoutRightCheck(obj);
+        if (apiObject != null) {
+          ret.add(apiObject);
+        }
+      }
+    }
+    return ret;
+  }
+
+  @Override
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef
       ) throws ClassDocumentLoadException {
     checkNotNull(doc);
