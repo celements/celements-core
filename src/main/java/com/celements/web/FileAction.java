@@ -144,7 +144,7 @@ public class FileAction extends SkinAction {
           // successfully found. Signal this further, and stop trying to render.
           throw ex;
         }
-        _Logger.debug(new Integer(idx), ex);
+        _Logger.debug(Integer.toString(idx), ex);
       }
       idx = path.lastIndexOf(DELIMITER, idx - 1);
     }
