@@ -75,4 +75,6 @@ public interface IAttachmentServiceRole {
   public Attachment getApiAttachment(XWikiAttachment attachment
       ) throws NoAccessRightsException;
 
+  public Attachment getApiAttachmentWithoutRightChecks(XWikiAttachment attachment);
+
 }
