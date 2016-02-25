@@ -55,6 +55,23 @@ public class ModelAccessScriptService implements ScriptService {
     return ret;
   }
 
+  public Document getOrCreateDocument(DocumentReference docRef) {
+    Document ret = null;
+    try {
+      if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW)
+          && rightsAccess.hasAccessLevel(docRef, EAccessLevel.EDIT)) {
+        XWikiDocument doc = modelAccess.getOrCreateDocument(docRef);
+        ret = modelAccess.getApiDocument(doc);
+      }
+    } catch (DocumentLoadException exc) {
+      LOGGER.error("Failed to load doc '{}'", docRef, exc);
+    } catch (NoAccessRightsException exc) {
+      LOGGER.error("no '{}' access rights for user '{}' on doc '{}'.",
+          exc.getExpectedAccessLevel(), exc.getUser(), docRef, exc);
+    }
+    return ret;
+  }
+
   public boolean exists(DocumentReference docRef) {
     return modelAccess.exists(docRef);
   }
