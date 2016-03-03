@@ -501,10 +501,24 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public void setProperty(BaseObject obj, String name, Object value) {
-    if (value instanceof Collection) {
-      value = Joiner.on('|').join((Iterable<?>) value);
+    if (value instanceof String) {
+      obj.setStringValue(name, (String) value);
+    } else if (value instanceof Date) {
+      obj.setDateValue(name, (Date) value);
+    } else if (value instanceof Integer) {
+      obj.setIntValue(name, (int) value);
+    } else if (value instanceof Long) {
+      obj.setLongValue(name, (long) value);
+    } else if (value instanceof Float) {
+      obj.setFloatValue(name, (float) value);
+    } else if (value instanceof Double) {
+      obj.setDoubleValue(name, (double) value);
+    } else {
+      if (value instanceof Collection) {
+        value = Joiner.on('|').join((Iterable<?>) value);
+      }
+      obj.set(name, value, getContext());
     }
-    obj.set(name, value, getContext());
   }
 
   @Override
