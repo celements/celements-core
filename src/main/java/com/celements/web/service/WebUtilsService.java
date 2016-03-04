@@ -1466,6 +1466,11 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  public DocumentReference checkWikiRef(DocumentReference docRef) {
+    return checkWikiRef(docRef, (DocumentReference) null);
+  }
+
+  @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
     return checkWikiRef(docRef, toDoc.getDocumentReference());
   }
