@@ -12,7 +12,9 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.web.service.IWebUtilsService;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -60,7 +62,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     String value = "asdf";
     fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
     
-    BaseClass bClass = expectNewBaseObject(this, classRef);    
+    BaseClass bClass = expectNewBaseObject(this, classRef);
     expectPropertyClass(bClass, fieldName, new StringClass());
     
     replayDefault();
@@ -97,35 +99,30 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     replayDefault();
     assertFalse(xObjUpdateService.updateFromMap(doc, fieldMap));
     verifyDefault();
+
+    assertNull(doc.getXObject(classRef));
   }
 
   @Test
-  public void test_updateFromMapAndSave() throws Exception {
+  public void test_updateFromMap_invalidClassName() throws Exception {
     Map<String, Object> fieldMap = new HashMap<>();
-    String fieldName = "someField";
-    String value = "asdf";
-    fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
-    doc.addXObject(obj);
+    fieldMap.put("invalidString", "asdf");
+    Throwable cause = new XWikiException();
     
-    expectPropertyClass(this, classRef, fieldName, new StringClass());
-    getWikiMock().saveDocument(same(doc), eq("updated fields"), eq(true), 
-        same(getContext()));
-    expectLastCall().once();
+    expect(getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")
+        ), same(getContext()))).andThrow(cause).once();
     
     replayDefault();
-    assertTrue(xObjUpdateService.updateFromMapAndSave(doc, fieldMap));
+    try {
+      xObjUpdateService.updateFromMap(doc, fieldMap);
+      fail("should throw ClassDocumentLoadException");
+    } catch (ClassDocumentLoadException cdle) {
+      // expected
+      assertSame(cause, cdle.getCause());
+    }
     verifyDefault();
-  }
 
-  @Test
-  public void test_updateFromMapAndSave_noSave() throws Exception {
-    Map<String, Object> fieldMap = new HashMap<>();
-    
-    replayDefault();
-    assertFalse(xObjUpdateService.updateFromMapAndSave(doc, fieldMap));
-    verifyDefault();
+    assertNull(doc.getXObject(classRef));
   }
   
   private IWebUtilsService getWebUtils() {
