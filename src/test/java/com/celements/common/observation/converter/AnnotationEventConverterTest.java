@@ -18,6 +18,7 @@ import org.xwiki.observation.remote.converter.LocalEventConverter;
 import org.xwiki.observation.remote.converter.RemoteEventConverter;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
@@ -53,18 +54,55 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testToRemote_remote() {
+    XWikiContext context = getContext();
+    String database = "myDB";
+    context.setDatabase(database);
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     LocalEventData localEvent = new LocalEventData();
     localEvent.setEvent(new RemoteTestEvent());
     localEvent.setSource(new XWikiDocument(docRef));
-    localEvent.setData(getContext());
+    localEvent.setData(context);
     RemoteEventData remoteEvent = new RemoteEventData();
     
     assertTrue(localEventConverter.toRemote(localEvent, remoteEvent));
     
     assertSame(localEvent.getEvent(), remoteEvent.getEvent());
-    assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get("docname"));
-    assertNotNull(remoteEvent.getData());
+    assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get(
+        AnnotationEventConverter.DOC_NAME));
+    assertEquals(database, ((Map<?, ?>) remoteEvent.getData()).get(
+        AnnotationEventConverter.CONTEXT_WIKI));
+  }
+  
+  @Test
+  public void testToRemote_invalidSource() {
+    XWikiContext context = getContext();
+    String database = "myDB";
+    context.setDatabase(database);
+    LocalEventData localEvent = new LocalEventData();
+    localEvent.setEvent(new RemoteTestEvent());
+    localEvent.setSource(new Object());
+    localEvent.setData(context);
+    RemoteEventData remoteEvent = new RemoteEventData();
+    
+    assertFalse(localEventConverter.toRemote(localEvent, remoteEvent));
+  }
+
+  @Test
+  public void testToRemote_noContextInData() {
+    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
+    LocalEventData localEvent = new LocalEventData();
+    localEvent.setEvent(new RemoteTestEvent());
+    localEvent.setSource(new XWikiDocument(docRef));
+    localEvent.setData(new Object());
+    RemoteEventData remoteEvent = new RemoteEventData();
+    
+    assertTrue(localEventConverter.toRemote(localEvent, remoteEvent));
+    
+    assertSame(localEvent.getEvent(), remoteEvent.getEvent());
+    assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get(
+        AnnotationEventConverter.DOC_NAME));
+    assertEquals("xwikidb", ((Map<?, ?>) remoteEvent.getData()).get(
+        AnnotationEventConverter.CONTEXT_WIKI));
   }
 
   @Test
@@ -78,7 +116,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
   public void testFromRemote_remote() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     Map<String, Serializable> docMap = new HashMap<String, Serializable>();
-    docMap.put("docname", docRef);
+    docMap.put(AnnotationEventConverter.DOC_NAME, docRef);
     RemoteEventData remoteEvent = new RemoteEventData();
     remoteEvent.setEvent(new RemoteTestEvent());
     remoteEvent.setSource((Serializable) docMap);
@@ -89,7 +127,8 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     
     assertSame(localEvent.getEvent(), localEvent.getEvent());
     assertEquals(docRef, ((XWikiDocument) localEvent.getSource()).getDocumentReference());
-    assertNotNull(localEvent.getData());
+    assertEquals(getContext().getDatabase(),
+        ((XWikiContext) localEvent.getData()).getDatabase());
   }
 
   @Test
