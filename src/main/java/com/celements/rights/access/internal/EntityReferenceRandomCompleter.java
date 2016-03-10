@@ -17,7 +17,7 @@ public class EntityReferenceRandomCompleter
   private DocumentAccessBridge documentAccessBridge;
 
   public EntityReference randomCompleteSpaceRef(EntityReference entityRef) {
-    if (entityRef.getType() == EntityType.SPACE) {
+    if ((entityRef != null) && (entityRef.getType() == EntityType.SPACE)) {
       SpaceReference spaceRef = new SpaceReference(entityRef);
       DocumentReference randomDocRef;
       do {
