@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -170,11 +171,15 @@ public class CssCommand {
     return cssList;
   }
   
-  private List<CSS> includeApplicationDefaultCSS() {
+  List<CSS> includeApplicationDefaultCSS() {
     List<CSS> cssList = Collections.emptyList();
-    for (ICssExtensionRole cssExt : Utils.getComponentList(ICssExtensionRole.class)) {
-      LOGGER.debug("includeApplicationDefaultCSS: for '{}'", cssExt.getClass());
-      cssList.addAll(cssExt.getCssList());
+    List<ICssExtensionRole> cssExtList = Utils.getComponentList(ICssExtensionRole.class);
+    if (!cssExtList.isEmpty()) {
+      cssList = new Vector<>();
+      for (ICssExtensionRole cssExt : cssExtList) {
+        LOGGER.debug("includeApplicationDefaultCSS: for '{}'", cssExt.getClass());
+        cssList.addAll(cssExt.getCssList());
+      }
     }
     return cssList;
   }
