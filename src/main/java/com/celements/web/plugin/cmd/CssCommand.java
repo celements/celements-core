@@ -26,11 +26,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.css.ICssExtensionRole;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSEngine;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class CssCommand {
 
@@ -47,8 +49,7 @@ public class CssCommand {
   public static final String SKINS_USER_CSS_CLASS = SKINS_USER_CSS_CLASS_SPACE + "."
     + SKINS_USER_CSS_CLASS_DOC;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CssCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CssCommand.class);
 
   public DocumentReference getSkinsUserCssClassRef(String wikiName) {
     return new DocumentReference(wikiName, SKINS_USER_CSS_CLASS_SPACE,
@@ -77,6 +78,7 @@ public class CssCommand {
 
   private List<CSS> collectAllCSS(XWikiContext context) throws XWikiException {
     List<CSS> cssList = new ArrayList<CSS>();
+    cssList.addAll(includeApplicationDefaultCSS());
     cssList.addAll(includeCSSAfterSkin("", context));
     cssList.addAll(includeCSSAfterPreferences("", context));
     cssList.addAll(includeCSSAfterPageType("", context));
@@ -168,6 +170,14 @@ public class CssCommand {
     return cssList;
   }
   
+  private List<CSS> includeApplicationDefaultCSS() {
+    List<CSS> cssList = Collections.emptyList();
+    for (ICssExtensionRole cssExt : Utils.getComponentList(ICssExtensionRole.class)) {
+      cssList.addAll(cssExt.getCssList());
+    }
+    return cssList;
+  }
+
   public List<CSS> includeCSSAfterSkin(String css, XWikiContext context){
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
@@ -186,8 +196,8 @@ public class CssCommand {
     try {
       pageTypeDoc = PageTypeCommand.getInstance().getPageTypeObj(context.getDoc(),
           context).getTemplateDocument(context);
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to include css after pageType.", exp);
     }
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
