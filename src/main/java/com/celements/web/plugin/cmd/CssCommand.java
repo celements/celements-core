@@ -173,6 +173,7 @@ public class CssCommand {
   private List<CSS> includeApplicationDefaultCSS() {
     List<CSS> cssList = Collections.emptyList();
     for (ICssExtensionRole cssExt : Utils.getComponentList(ICssExtensionRole.class)) {
+      LOGGER.debug("includeApplicationDefaultCSS: for '{}'", cssExt.getClass());
       cssList.addAll(cssExt.getCssList());
     }
     return cssList;
