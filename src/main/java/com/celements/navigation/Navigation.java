@@ -1021,6 +1021,9 @@ public class Navigation implements INavigation {
         fromHierarchyLevel);
     List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(parentRef, 
         getNavFilter());
+    LOGGER.debug("hasMore: parentRef [" + parentRef + "] currentMenuItems.size() [" 
+        + currentMenuItems.size() + "] offset [" + offset + "]"
+        + " nrOfItemsPerPage [" + nrOfItemsPerPage + "]");
     return currentMenuItems.size() > offset + nrOfItemsPerPage;
   }
 
