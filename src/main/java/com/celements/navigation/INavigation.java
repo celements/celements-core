@@ -147,5 +147,7 @@ public interface INavigation {
   public int getNumberOfItem();
   
   public int getEffectiveNumberOfItems();
+  
+  public boolean hasMore();
 
 }

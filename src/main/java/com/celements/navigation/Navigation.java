@@ -1015,6 +1015,7 @@ public class Navigation implements INavigation {
     this.navInclude = navInclude;
   }
   
+  @Override
   public boolean hasMore() {
     DocumentReference parentRef = getWebUtilsService().getParentForLevel(
         fromHierarchyLevel);
