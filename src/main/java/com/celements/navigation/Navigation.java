@@ -379,7 +379,7 @@ public class Navigation implements INavigation {
   private int getNumLevels() {
     return toHierarchyLevel - fromHierarchyLevel + 1;
   }
-
+  
   void addNavigationForParent(StringBuilder outStream, EntityReference parentRef,
       int numMoreLevels) throws XWikiException {
     LOGGER.debug("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
@@ -1013,6 +1013,18 @@ public class Navigation implements INavigation {
   
   void inject_navInclude(String navInclude) {
     this.navInclude = navInclude;
+  }
+  
+  @Override
+  public boolean hasMore() {
+    DocumentReference parentRef = getWebUtilsService().getParentForLevel(
+        fromHierarchyLevel);
+    List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(parentRef, 
+        getNavFilter());
+    LOGGER.debug("hasMore: parentRef [" + parentRef + "] currentMenuItems.size() [" 
+        + currentMenuItems.size() + "] offset [" + offset + "]"
+        + " nrOfItemsPerPage [" + nrOfItemsPerPage + "]");
+    return currentMenuItems.size() > offset + nrOfItemsPerPage;
   }
 
 }

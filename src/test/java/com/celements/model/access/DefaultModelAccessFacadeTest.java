@@ -1,5 +1,6 @@
 package com.celements.model.access;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -31,8 +32,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -728,11 +727,10 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void testSetProperty_String() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
-    PropertyInterface propClass = new StringClass();
     String name = "name";
     String val = "val";
     
-    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    expectPropertyClass(this, classRef, name, new StringClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, val);
@@ -746,11 +744,10 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void testSetProperty_Number() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
-    PropertyInterface propClass = new NumberClass();
     String name = "name";
     long val = 5;
     
-    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    expectPropertyClass(this, classRef, name, new NumberClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, val);
@@ -764,11 +761,10 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void testSetProperty_Date() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
-    PropertyInterface propClass = new DateClass();
     String name = "name";
     Date val = new Date();
     
-    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    expectPropertyClass(this, classRef, name, new DateClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, val);
@@ -782,10 +778,9 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   public void testSetProperty_List() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
-    PropertyInterface propClass = new StringClass();
     String name = "name";
     
-    expect(getBaseClass(classRef).get(eq(name))).andReturn(propClass).once();
+    expectPropertyClass(this, classRef, name, new StringClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, Arrays.asList("A", "B"));
@@ -853,12 +848,6 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
       //expected
     }
     verifyDefault();
-  }
-
-  private BaseClass getBaseClass(DocumentReference classRef) throws Exception {
-    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
-    expect(getWikiMock().getXClass(eq(classRef), same(getContext()))).andReturn(bClass);
-    return bClass;
   }
 
 }

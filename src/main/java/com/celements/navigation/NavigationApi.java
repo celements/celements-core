@@ -320,4 +320,8 @@ public class NavigationApi extends Api {
   public int getEffectiveNumberOfItems() {
     return navigation.getEffectiveNumberOfItems();
   }
+  
+  public boolean hasMore() {
+    return navigation.hasMore();
+  }
 }

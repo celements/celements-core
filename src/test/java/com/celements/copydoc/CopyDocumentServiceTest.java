@@ -1,5 +1,6 @@
 package com.celements.copydoc;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -8,20 +9,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.model.access.IModelAccessFacade;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -74,8 +75,8 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     Set<BaseObject> toIgnore = Sets.newHashSet();
-    BaseClass bClass = expectBaseClass(classRef);
-    expect(bClass.get(eq(name))).andReturn(new StringClass()).once();
+    BaseClass bClass = expectNewBaseObject(this, classRef);
+    expectPropertyClass(bClass, name, new StringClass());
     
     replayDefault();
     boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
@@ -98,7 +99,7 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     Set<BaseObject> toIgnore = Sets.newHashSet();
-    expectBaseClass(classRef);
+    expectNewBaseObject(this, classRef);
     
     replayDefault();
     boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
@@ -347,8 +348,7 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     List<BaseObject> srcObjs = Lists.newArrayList(srcObj);
     BaseObject trgObj = createObj(classRef);
     List<BaseObject> trgObjs = Lists.newArrayList(trgObj);
-    BaseClass bClass = expectBaseClass(classRef);       
-    expect(bClass.get(eq(name))).andReturn(new StringClass()).once();
+    expectPropertyClass(this, classRef, name, new StringClass());
     
     replayDefault();
     boolean ret = copyDocService.createOrUpdateObjects(docMock, srcObjs, trgObjs, set);
@@ -387,10 +387,9 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     Date val2 = new Date();
     srcObj.setDateValue(name2, val2);
     BaseObject trgObj = createObj(classRef);
-    BaseClass bClass = expectBaseClass(classRef);
-    
-    expect(bClass.get(eq(name1))).andReturn(new StringClass()).once();
-    expect(bClass.get(eq(name2))).andReturn(new DateClass()).once();
+    expectPropertyClasses(this, classRef, ImmutableMap.<String, PropertyClass>builder(
+        ).put(name1, new StringClass()
+        ).put(name2, new DateClass()).build());
     
     replayDefault();
     boolean ret = copyDocService.copyObject(srcObj, trgObj, set);
@@ -452,19 +451,6 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     return obj;
-  }
-
-  private BaseClass expectBaseClass(final DocumentReference classRef) throws XWikiException {
-    BaseClass bClass = createMockAndAddToDefault(BaseClass.class);
-    expect(getWikiMock().getXClass(eq(classRef), same(getContext()))).andReturn(bClass
-        ).anyTimes();
-    expect(bClass.newCustomClassInstance(same(getContext()))).andAnswer(new IAnswer<BaseObject>() {
-      @Override
-      public BaseObject answer() throws Throwable {
-        return new BaseObject();
-      }
-    }).anyTimes();
-    return bClass;
   }
 
   private IModelAccessFacade getModelAccess() {

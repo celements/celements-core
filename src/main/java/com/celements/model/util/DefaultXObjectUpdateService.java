@@ -12,7 +12,6 @@ import org.xwiki.component.annotation.Requirement;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
-import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -66,21 +65,23 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   }
 
   private String extractClassName(String str) {
-    return str.substring(0, str.lastIndexOf("."));
+    String className = "";
+    try {
+      className = str.substring(0, str.lastIndexOf("."));
+    } catch (IndexOutOfBoundsException exc) {
+      LOGGER.info("failed to extract className from '{}'");
+    }
+    return className;
   }
 
   private String extractFieldName(String str) {
-    return str.substring(str.lastIndexOf(".") + 1);
-  }
-
-  @Override
-  public boolean updateFromMapAndSave(XWikiDocument doc, Map<String, Object> fieldMap
-      ) throws ClassDocumentLoadException, DocumentSaveException {
-    if (updateFromMap(doc, fieldMap)) {
-      modelAccess.saveDocument(doc, "updated fields", true);
-      return true;
+    String fieldName = "";
+    try {
+      fieldName = str.substring(str.lastIndexOf(".") + 1);
+    } catch (IndexOutOfBoundsException exc) {
+      LOGGER.info("failed to extract fieldName from '{}'");
     }
-    return false;
+    return fieldName;
   }
 
 }

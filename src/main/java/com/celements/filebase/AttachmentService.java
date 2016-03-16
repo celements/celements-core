@@ -520,11 +520,16 @@ public class AttachmentService implements IAttachmentServiceRole {
       ) throws NoAccessRightsException {
     XWikiDocument doc = attachment.getDoc();
     if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
-      Document fbDoc = doc.newDocument(getContext());
-      return new Attachment(fbDoc, attachment, getContext());
+      return getApiAttachmentWithoutRightChecks(attachment);
     }
     throw new NoAccessRightsException(doc.getDocumentReference(),
         getContext().getXWikiUser(), EAccessLevel.VIEW);
+  }
+
+  @Override
+  public Attachment getApiAttachmentWithoutRightChecks(XWikiAttachment attachment) {
+    Document fbDoc = attachment.getDoc().newDocument(getContext());
+    return new Attachment(fbDoc, attachment, getContext());
   }
 
 }

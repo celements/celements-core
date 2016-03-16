@@ -1,6 +1,7 @@
 package com.celements.copydoc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +39,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean check(XWikiDocument doc1, XWikiDocument doc2, Set<BaseObject> toIgnore) {
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2,
+      Collection<BaseObject> toIgnore) {
     try {
       return copyInternal(doc1, doc2, toIgnore, false);
     } catch (ClassDocumentLoadException exc) {
@@ -70,13 +72,13 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore
-      ) throws ClassDocumentLoadException {
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Collection<BaseObject> toIgnore) throws ClassDocumentLoadException {
     return copyInternal(srcDoc, trgDoc, toIgnore, true);
   }
 
   private boolean copyInternal(XWikiDocument srcDoc, XWikiDocument trgDoc,
-      Set<BaseObject> toIgnore, boolean set) throws ClassDocumentLoadException {
+      Collection<BaseObject> toIgnore, boolean set) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
     hasChanged |= copyObjects(srcDoc, trgDoc, toIgnore, set);
@@ -130,8 +132,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
     return hasChanged;
   }
 
-  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore,
-      boolean set) throws ClassDocumentLoadException {
+  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Collection<BaseObject> toIgnore, boolean set) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     for (DocumentReference classRef : getAllClassRefs(srcDoc, trgDoc)) {
       List<BaseObject> srcObjs = getXObjects(srcDoc, classRef, toIgnore);
@@ -153,7 +155,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
-      Set<BaseObject> toIgnore) {
+      Collection<BaseObject> toIgnore) {
     List<BaseObject> ret = new ArrayList<>(modelAccess.getXObjects(doc, classRef));
     if (toIgnore != null) {
       ret.removeAll(toIgnore);

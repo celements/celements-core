@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.observation.event.Event;
@@ -24,11 +25,26 @@ public class AnnotationEventConverter extends AbstractXWikiEventConverter {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AnnotationEventConverter.class);
 
+  public static final String CONTEXT_WIKI = "contextwiki";
+  public static final String CONTEXT_USER = "contextuser";
+  public static final String DOC_NAME = "docname";
   public static final String DOC_PARENT = "docparent";
+  public static final String DOC_VERSION = "docversion";
+  public static final String DOC_LANGUAGE = "doclanguage";
   public static final String ORIGDOC_PARENT = "origdocparent";
+  public static final String ORIGDOC_VERSION = "origdocversion";
+  public static final String ORIGDOC_LANGUAGE = "origdoclanguage";
 
   @Requirement("relative")
   private EntityReferenceResolver<String> relativeRefResolver;
+
+  @Requirement
+  private Execution exec;
+  
+  private XWikiContext getContext() {
+    return (XWikiContext) exec.getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
+  }
 
   @Override
   public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent) {
@@ -36,16 +52,36 @@ public class AnnotationEventConverter extends AbstractXWikiEventConverter {
     LOGGER.trace("toRemote: start for event '{}'", event.getClass());
     if (shouldConvert(event.getClass())) {
       LOGGER.trace("toRemote: serialize event '{}'", event.getClass());
-      // fill the remote event
       remoteEvent.setEvent((Serializable) event);
-      remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource(
-          )));
-      remoteEvent.setData(serializeXWikiContext((XWikiContext) localEvent.getData()));
-      return true;
+      remoteEvent.setSource(getSerializedSource(localEvent));
+      remoteEvent.setData(getSerializedData(localEvent));
+      return (remoteEvent.getSource() != null) && (remoteEvent.getData() != null);
     } else {
       LOGGER.debug("toRemote: skip event '{}'", event.getClass());
     }
     return false;
+  }
+
+  private Serializable getSerializedSource(LocalEventData localEvent) {
+    Serializable source = null;
+    if (localEvent.getSource() instanceof XWikiDocument) {
+      source = serializeXWikiDocument((XWikiDocument) localEvent.getSource());
+    } else {
+      LOGGER.warn("getSerializedSource: source '{}' isn't XWikiDocument",
+          localEvent.getSource());
+    }
+    return source;
+  }
+
+  private Serializable getSerializedData(LocalEventData localEvent) {
+    XWikiContext context = null;
+    if (localEvent.getData() instanceof XWikiDocument) {
+      context = (XWikiContext) localEvent.getData();
+    } else {
+      context = getContext();
+      LOGGER.info("no XWikiContext in data, getting from execution instead");
+    }
+    return serializeXWikiContext(context);
   }
 
   @Override
@@ -73,6 +109,7 @@ public class AnnotationEventConverter extends AbstractXWikiEventConverter {
   }
 
   @SuppressWarnings({ "unchecked", "deprecation" })
+  @Override
   protected Serializable serializeXWikiDocument(XWikiDocument document) {
     HashMap<String, Serializable> remoteDataMap = (HashMap<String, Serializable>
         ) super.serializeXWikiDocument(document);
@@ -89,6 +126,7 @@ public class AnnotationEventConverter extends AbstractXWikiEventConverter {
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   protected XWikiDocument unserializeDocument(Serializable remoteData) {
     XWikiDocument doc = super.unserializeDocument(remoteData);
     Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;

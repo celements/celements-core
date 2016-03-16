@@ -1,5 +1,6 @@
 package com.celements.copydoc;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -20,7 +21,8 @@ public interface ICopyDocumentRole {
    */
   public boolean check(XWikiDocument doc1, XWikiDocument doc2);
 
-  public boolean check(XWikiDocument doc1, XWikiDocument doc2, Set<BaseObject> toIgnore);
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2,
+      Collection<BaseObject> toIgnore);
 
   /**
    * Copies given source doc to given target doc and saves target if it has changed
@@ -47,8 +49,8 @@ public interface ICopyDocumentRole {
   public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc
       ) throws ClassDocumentLoadException;
 
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore
-      ) throws ClassDocumentLoadException;
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc,
+      Collection<BaseObject> toIgnore) throws ClassDocumentLoadException;
 
   public boolean checkObject(BaseObject obj1, BaseObject obj2);
 
