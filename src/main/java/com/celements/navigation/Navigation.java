@@ -260,7 +260,7 @@ public class Navigation implements INavigation {
   }
 
   /**
-   * @deprecated since 2.24.0 use includeNavigation() instead.
+   * @deprecated since 2.24.0 use 4() instead.
    */
   @Deprecated
   public String includeNavigation(XWikiContext context) {
@@ -1019,12 +1019,16 @@ public class Navigation implements INavigation {
   public boolean hasMore() {
     DocumentReference parentRef = getWebUtilsService().getParentForLevel(
         fromHierarchyLevel);
-    List<TreeNode> currentMenuItems = getTreeNodeService().getSubNodesForParent(parentRef, 
-        getNavFilter());
+    String parent = "";
+    if (parentRef != null) {
+      parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
+    }
+    List<TreeNode> currentMenuItems = getCurrentMenuItems(fromHierarchyLevel, parent);
     LOGGER.debug("hasMore: parentRef [" + parentRef + "] currentMenuItems.size() [" 
         + currentMenuItems.size() + "] offset [" + offset + "]"
-        + " nrOfItemsPerPage [" + nrOfItemsPerPage + "]");
-    return currentMenuItems.size() > offset + nrOfItemsPerPage;
+        + " nrOfItemsPerPage [" + nrOfItemsPerPage + "] fromHierarchyLevel ["
+        + fromHierarchyLevel + "] parent [" + parent + "]");
+    return currentMenuItems.size() > 0;
   }
 
 }
