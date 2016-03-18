@@ -317,6 +317,10 @@ public class NavigationApi extends Api {
     return navigation.getNumberOfItem();
   }
 
+  /**
+   * use hasMore() instead
+   */
+  @Deprecated
   public int getEffectiveNumberOfItems() {
     return navigation.getEffectiveNumberOfItems();
   }

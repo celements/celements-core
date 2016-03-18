@@ -146,6 +146,10 @@ public interface INavigation {
 
   public int getNumberOfItem();
   
+  /**
+   * use hasMore() instead
+   */
+  @Deprecated
   public int getEffectiveNumberOfItems();
   
   public boolean hasMore();

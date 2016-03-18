@@ -994,8 +994,7 @@ public class Navigation implements INavigation {
     return this.nrOfItemsPerPage;
   }
   
-  //FIXME change implementation, there has to be a better / more efficient implementation 
-  //      than parsing dom
+  @Deprecated
   @Override
   public int getEffectiveNumberOfItems() {
     Tidy tidy = new Tidy();
