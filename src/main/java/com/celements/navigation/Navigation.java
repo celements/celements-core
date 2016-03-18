@@ -260,7 +260,7 @@ public class Navigation implements INavigation {
   }
 
   /**
-   * @deprecated since 2.24.0 use 4() instead.
+   * @deprecated since 2.24.0 use includeNavigation() instead.
    */
   @Deprecated
   public String includeNavigation(XWikiContext context) {
