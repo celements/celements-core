@@ -192,6 +192,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       ) throws DocumentSaveException {
     checkNotNull(doc);
     try {
+      String username = getContext().getUser();
+      doc.setAuthor(username);
+      if (doc.isNew()) {
+          doc.setCreator(username);
+      }
       getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     } catch (XWikiException xwe) {
       throw new DocumentSaveException(doc.getDocumentReference(), xwe);

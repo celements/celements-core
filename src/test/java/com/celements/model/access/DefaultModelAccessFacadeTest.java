@@ -381,6 +381,47 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
+  public void test_saveDocument_checkAuthor() throws Exception {
+    String username = "XWiki.TestUser";
+    getContext().setUser(username);
+    doc.setAuthor("XWiki.OldAuthor");
+    String oldCreator = "XWiki.OldCreator";
+    doc.setCreator(oldCreator);
+    Capture<XWikiDocument> docCapture = new Capture<>();
+    getWikiMock().saveDocument(capture(docCapture), eq(""), eq(false), same(getContext()));
+    expectLastCall().once();
+    doc.setMetaDataDirty(false);
+    replayDefault();
+    modelAccess.saveDocument(doc);
+    verifyDefault();
+    XWikiDocument docSaved = docCapture.getValue();
+    assertEquals(username, docSaved.getAuthor());
+    assertEquals(oldCreator, docSaved.getCreator());
+    assertTrue(docSaved.isMetaDataDirty());
+  }
+
+  @Test
+  public void test_saveDocument_checkAuthor_Creator_isNew() throws Exception {
+    String username = "XWiki.TestUser";
+    getContext().setUser(username);
+    doc.setNew(true);
+    doc.setAuthor("XWiki.OldAuthor");
+    String oldCreator = "XWiki.OldCreator";
+    doc.setCreator(oldCreator);
+    Capture<XWikiDocument> docCapture = new Capture<>();
+    getWikiMock().saveDocument(capture(docCapture), eq(""), eq(false), same(getContext()));
+    expectLastCall().once();
+    doc.setMetaDataDirty(false);
+    replayDefault();
+    modelAccess.saveDocument(doc);
+    verifyDefault();
+    XWikiDocument docSaved = docCapture.getValue();
+    assertEquals(username, docSaved.getAuthor());
+    assertEquals(username, docSaved.getCreator());
+    assertTrue(docSaved.isMetaDataDirty());
+  }
+
+  @Test
   public void test_saveDocument_null() throws Exception {
     try {
       modelAccess.saveDocument(null);
