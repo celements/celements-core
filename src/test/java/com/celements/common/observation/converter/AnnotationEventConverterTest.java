@@ -14,7 +14,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
-import org.xwiki.observation.remote.converter.LocalEventConverter;
 import org.xwiki.observation.remote.converter.RemoteEventConverter;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
@@ -24,32 +23,19 @@ import com.xpn.xwiki.web.Utils;
 
 public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCase {
   
-  private AnnotationEventConverter localEventConverter;
-  private AnnotationEventConverter remoteEventConverter;
+  private AnnotationEventConverter eventConverter;
 
   @Before
   public void setUp_AnnotationEventConverterTest() throws Exception {
-    localEventConverter = getAnnotationLocalEventConverter();
-    remoteEventConverter = getAnnotationRemoteEventConverter();
-  }
-
-  @Test
-  public void testComponentSingleton() throws Exception {
-    assertSame(localEventConverter, getAnnotationLocalEventConverter());
-  }
-
-  @Test
-  public void testComponentDoubleRole() {
-    assertNotNull(localEventConverter);
-    assertNotNull(remoteEventConverter);
-    assertNotSame(localEventConverter, remoteEventConverter);
+    eventConverter = (AnnotationEventConverter) Utils.getComponent(
+        RemoteEventConverter.class, "Annotation");
   }
 
   @Test
   public void testToRemote_local() {
     LocalEventData localEvent = new LocalEventData();
     localEvent.setEvent(new LocalTestEvent());
-    assertFalse(localEventConverter.toRemote(localEvent, null));
+    assertFalse(eventConverter.toRemote(localEvent, null));
   }
 
   @Test
@@ -64,7 +50,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     localEvent.setData(context);
     RemoteEventData remoteEvent = new RemoteEventData();
     
-    assertTrue(localEventConverter.toRemote(localEvent, remoteEvent));
+    assertTrue(eventConverter.toRemote(localEvent, remoteEvent));
     
     assertSame(localEvent.getEvent(), remoteEvent.getEvent());
     assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get(
@@ -84,7 +70,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     localEvent.setData(context);
     RemoteEventData remoteEvent = new RemoteEventData();
     
-    assertFalse(localEventConverter.toRemote(localEvent, remoteEvent));
+    assertFalse(eventConverter.toRemote(localEvent, remoteEvent));
   }
 
   @Test
@@ -96,7 +82,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     localEvent.setData(new Object());
     RemoteEventData remoteEvent = new RemoteEventData();
     
-    assertTrue(localEventConverter.toRemote(localEvent, remoteEvent));
+    assertTrue(eventConverter.toRemote(localEvent, remoteEvent));
     
     assertSame(localEvent.getEvent(), remoteEvent.getEvent());
     assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get(
@@ -109,7 +95,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
   public void testFromRemote_local() {
     RemoteEventData remoteEvent = new RemoteEventData();
     remoteEvent.setEvent(new LocalTestEvent());
-    assertFalse(localEventConverter.fromRemote(remoteEvent, null));
+    assertFalse(eventConverter.fromRemote(remoteEvent, null));
   }
 
   @Test
@@ -123,7 +109,7 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     remoteEvent.setData(getContext());
     LocalEventData localEvent = new LocalEventData();
     
-    assertTrue(localEventConverter.fromRemote(remoteEvent, localEvent));
+    assertTrue(eventConverter.fromRemote(remoteEvent, localEvent));
     
     assertSame(localEvent.getEvent(), localEvent.getEvent());
     assertEquals(docRef, ((XWikiDocument) localEvent.getSource()).getDocumentReference());
@@ -139,9 +125,9 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setParentReference(parentRef);
     HashMap<String, Serializable> map = (HashMap<String, Serializable>
-        ) localEventConverter.serializeXWikiDocument(doc);
+        ) eventConverter.serializeXWikiDocument(doc);
     assertEquals("wiki:space.parent", map.get(AnnotationEventConverter.DOC_PARENT));
-    XWikiDocument ret = localEventConverter.unserializeDocument(map);
+    XWikiDocument ret = eventConverter.unserializeDocument(map);
     assertEquals(parentRef, ret.getParentReference());
   }
 
@@ -155,9 +141,9 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     origDoc.setParentReference(parentRef);
     doc.setOriginalDocument(origDoc);
     HashMap<String, Serializable> map = (HashMap<String, Serializable>
-        ) localEventConverter.serializeXWikiDocument(doc);
+        ) eventConverter.serializeXWikiDocument(doc);
     assertEquals("wiki:space.parent", map.get(AnnotationEventConverter.ORIGDOC_PARENT));
-    XWikiDocument ret = localEventConverter.unserializeDocument(map);
+    XWikiDocument ret = eventConverter.unserializeDocument(map);
     assertEquals(parentRef, ret.getOriginalDocument().getParentReference());
   }
 
@@ -169,22 +155,38 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setParentReference(parentRef);
     HashMap<String, Serializable> map = (HashMap<String, Serializable>
-        ) localEventConverter.serializeXWikiDocument(doc);
+        ) eventConverter.serializeXWikiDocument(doc);
     assertEquals("parent", map.get(AnnotationEventConverter.DOC_PARENT));
-    XWikiDocument ret = localEventConverter.unserializeDocument(map);
+    XWikiDocument ret = eventConverter.unserializeDocument(map);
     assertEquals("parent", ret.getParent());
   }
-
-  private AnnotationEventConverter getAnnotationLocalEventConverter() throws Exception {
-    return (AnnotationEventConverter) Utils.getComponent(LocalEventConverter.class,
-        "Annotation");
+  
+  @Test
+  public void testShouldConvert_local() {
+    assertFalse(eventConverter.shouldConvert(LocalTestEvent.class));
+  }
+  
+  @Test
+  public void testShouldConvert_remote() {
+    assertTrue(eventConverter.shouldConvert(RemoteTestEvent.class));
+  }
+  
+  @Test
+  public void testShouldConvert_none() {
+    assertFalse(eventConverter.shouldConvert(NoneTestEvent.class));
+  }
+  
+  @Test
+  public void testShouldConvert_localAndRemote() {
+    try {
+      eventConverter.shouldConvert(LocalAndRemoteTestEvent.class);
+      fail("expecting IllegalStateException");
+    } catch (IllegalStateException exc) {
+      // expected
+    }
   }
 
-  private AnnotationEventConverter getAnnotationRemoteEventConverter() throws Exception {
-    return (AnnotationEventConverter) Utils.getComponent(RemoteEventConverter.class,
-        "Annotation");
-  }
-
+  @Local
   private class LocalTestEvent implements Event, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -197,6 +199,28 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
 
   @Remote
   private class RemoteTestEvent implements Event, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean matches(Object otherEvent) {
+      return false;
+    }    
+  }
+
+  private class NoneTestEvent implements Event, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean matches(Object otherEvent) {
+      return false;
+    }    
+  }
+
+  @Local
+  @Remote
+  private class LocalAndRemoteTestEvent implements Event, Serializable {
 
     private static final long serialVersionUID = 1L;
 

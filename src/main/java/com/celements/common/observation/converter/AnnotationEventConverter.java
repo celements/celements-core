@@ -104,8 +104,20 @@ public class AnnotationEventConverter extends AbstractXWikiEventConverter {
     return false;
   }
 
-  private boolean shouldConvert(Class<? extends Event> eventClass) {
-    return eventClass.getAnnotation(Remote.class) != null;
+  boolean shouldConvert(Class<? extends Event> eventClass) {
+    boolean isRemote = eventClass.getAnnotation(Remote.class) != null;
+    boolean isLocal = eventClass.getAnnotation(Local.class) != null;
+    if (isRemote && isLocal) {
+      throw new IllegalStateException("Event class is defined as local and remote at the "
+          + "same time '" + eventClass + "'");
+    } else if (isRemote) {
+      return true;
+    } else if (isLocal) {
+      return false;
+    } else {
+      LOGGER.warn("Local/Remote Annotation missing from event class '{}'", eventClass);
+      return false;
+    }
   }
 
   @SuppressWarnings({ "unchecked", "deprecation" })
