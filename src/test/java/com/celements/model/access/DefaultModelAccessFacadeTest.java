@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
@@ -32,6 +32,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -39,7 +40,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCase {
+public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   private DefaultModelAccessFacade modelAccess;
   private XWikiDocument doc;
@@ -624,7 +625,6 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
     BaseObject obj = new BaseObject();
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
-    //IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
     classRef = new DocumentReference("otherWiki", classRef.getLastSpaceReference(
         ).getName(), classRef.getName());
     replayDefault();
@@ -655,6 +655,43 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
       // expected
     }
     verifyDefault();
+  }
+  
+  @Test
+  public void test_getOrgCreateXObject_get() throws Exception {
+    BaseObject obj = addObj(classRef, null, null);
+    
+    replayDefault();
+    BaseObject ret = modelAccess.getOrCreateXObject(doc, classRef);
+    verifyDefault();
+    
+    assertSame(obj, ret);
+  }
+  
+  @Test
+  public void test_getOrgCreateXObject_create() throws Exception {
+    expectNewBaseObject(classRef);
+    
+    replayDefault();
+    BaseObject ret = modelAccess.getOrCreateXObject(doc, classRef);
+    verifyDefault();
+    
+    assertEquals(classRef, ret.getXClassReference());
+  }
+  
+  @Test
+  public void test_getOrgCreateXObject_create_set() throws Exception {
+    String key = "field";
+    String val = "val";
+    BaseClass bClassMock = expectNewBaseObject(classRef);
+    expect(bClassMock.get(eq(key))).andReturn(new StringClass()).anyTimes();
+    
+    replayDefault();
+    BaseObject ret = modelAccess.getOrCreateXObject(doc, classRef, key, val);
+    verifyDefault();
+    
+    assertEquals(classRef, ret.getXClassReference());
+    assertEquals(val, ret.getStringValue(key));
   }
 
   @Test
@@ -771,7 +808,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     String name = "name";
     String val = "val";
     
-    expectPropertyClass(this, classRef, name, new StringClass());
+    expectPropertyClass(classRef, name, new StringClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, val);
@@ -788,7 +825,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     String name = "name";
     long val = 5;
     
-    expectPropertyClass(this, classRef, name, new NumberClass());
+    expectPropertyClass(classRef, name, new NumberClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, val);
@@ -805,7 +842,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     String name = "name";
     Date val = new Date();
     
-    expectPropertyClass(this, classRef, name, new DateClass());
+    expectPropertyClass(classRef, name, new DateClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, val);
@@ -821,7 +858,7 @@ public class DefaultModelAccessFacadeTest extends AbstractBridgedComponentTestCa
     obj.setXClassReference(classRef);
     String name = "name";
     
-    expectPropertyClass(this, classRef, name, new StringClass());
+    expectPropertyClass(classRef, name, new StringClass());
     
     replayDefault();
     modelAccess.setProperty(obj, name, Arrays.asList("A", "B"));

@@ -420,9 +420,18 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef
       ) throws ClassDocumentLoadException {
-    BaseObject obj = getXObject(doc, classRef);
+    return getOrCreateXObject(doc, classRef, null, null);
+  }
+
+  @Override
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef,
+      String key, Object value) throws ClassDocumentLoadException {
+    BaseObject obj = getXObject(doc, classRef, key, value);
     if (obj == null) {
       obj = newXObject(doc, classRef);
+      if (key != null) {
+        setProperty(obj, key, value);
+      }
     }
     return obj;
   }

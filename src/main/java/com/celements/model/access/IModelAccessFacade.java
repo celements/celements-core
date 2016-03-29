@@ -205,7 +205,11 @@ public interface IModelAccessFacade {
    *          to get new xobject on (may not be null)
    * @param classRef
    *          type of xobjects to create (may not be null)
-   * @return newly created xobject
+   * @param key
+   *          for field specific xobject filtering (null means no filtering)
+   * @param value
+   *          for field specific xobject filtering
+   * @return newly created xobject with set key - value
    * @throws ClassDocumentLoadException
    *           if unable to load class document
    */
@@ -223,6 +227,18 @@ public interface IModelAccessFacade {
    */
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef
       ) throws ClassDocumentLoadException;
+
+  /**
+   * @param doc
+   *          to get or create new xobject on (may not be null)
+   * @param classRef
+   *          type of xobjects to create (may not be null)
+   * @return already existing or newly created xobject
+   * @throws ClassDocumentLoadException
+   *           if unable to load class document
+   */
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef,
+      String key, Object value) throws ClassDocumentLoadException;
 
   /**
    * @param doc
