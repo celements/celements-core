@@ -3,17 +3,12 @@ package com.celements.common.observation.listener;
 import org.xwiki.observation.event.Event;
 
 public abstract class AbstractLocalEventListener<S, D> extends AbstractEventListener {
-  
-  protected abstract Class<S> getSourceClass();
-  
-  protected abstract Class<D> getDataClass();
 
   @Override
+  @SuppressWarnings("unchecked")
   protected void onLocalEvent(Event event, Object source, Object data) {
-    onEventInternal(event, getSourceClass().cast(source), getDataClass().cast(data));
+    onEventInternal(event, (S) source, (D) data);
   }
-
-  protected abstract void onEventInternal(Event event, S source, D data);
 
   @Override
   protected void onRemoteEvent(Event event, Object source, Object data) {
@@ -22,5 +17,7 @@ public abstract class AbstractLocalEventListener<S, D> extends AbstractEventList
           event.getClass(), source, data);
     }
   }
+
+  protected abstract void onEventInternal(Event event, S source, D data);
 
 }
