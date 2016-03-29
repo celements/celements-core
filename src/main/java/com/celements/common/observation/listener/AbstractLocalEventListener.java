@@ -10,7 +10,7 @@ public abstract class AbstractLocalEventListener<S, D> extends AbstractEventList
 
   @Override
   protected void onLocalEvent(Event event, Object source, Object data) {
-    onEvent(event, getSourceClass().cast(source), getDataClass().cast(data));
+    onEventInternal(event, getSourceClass().cast(source), getDataClass().cast(data));
   }
 
   protected abstract void onEventInternal(Event event, S source, D data);
