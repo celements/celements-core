@@ -45,7 +45,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     obj.setXClassReference(classRef);
     doc.addXObject(obj);
     
-    expectPropertyClass(this, classRef, fieldName, new StringClass());
+    expectPropertyClass(classRef, fieldName, new StringClass());
     
     replayDefault();
     assertTrue(xObjUpdateService.updateFromMap(doc, fieldMap));
@@ -62,7 +62,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     String value = "asdf";
     fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
     
-    BaseClass bClass = expectNewBaseObject(this, classRef);
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, fieldName, new StringClass());
     
     replayDefault();

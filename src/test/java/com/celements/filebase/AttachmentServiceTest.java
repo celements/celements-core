@@ -19,6 +19,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.TestMessageTool;
 import com.celements.filebase.matcher.IAttachmentMatcher;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;

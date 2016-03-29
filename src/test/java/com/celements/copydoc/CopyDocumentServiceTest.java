@@ -75,7 +75,7 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     Set<BaseObject> toIgnore = Sets.newHashSet();
-    BaseClass bClass = expectNewBaseObject(this, classRef);
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, name, new StringClass());
     
     replayDefault();
@@ -99,7 +99,7 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     srcDoc.addXObject(createObj(srcClassRef, name, val));
     XWikiDocument trgDoc = new XWikiDocument(docRef);
     Set<BaseObject> toIgnore = Sets.newHashSet();
-    expectNewBaseObject(this, classRef);
+    expectNewBaseObject(classRef);
     
     replayDefault();
     boolean ret = copyDocService.copyObjects(srcDoc, trgDoc, toIgnore, set);
@@ -348,7 +348,7 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     List<BaseObject> srcObjs = Lists.newArrayList(srcObj);
     BaseObject trgObj = createObj(classRef);
     List<BaseObject> trgObjs = Lists.newArrayList(trgObj);
-    expectPropertyClass(this, classRef, name, new StringClass());
+    expectPropertyClass(classRef, name, new StringClass());
     
     replayDefault();
     boolean ret = copyDocService.createOrUpdateObjects(docMock, srcObjs, trgObjs, set);
@@ -387,7 +387,7 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     Date val2 = new Date();
     srcObj.setDateValue(name2, val2);
     BaseObject trgObj = createObj(classRef);
-    expectPropertyClasses(this, classRef, ImmutableMap.<String, PropertyClass>builder(
+    expectPropertyClasses(classRef, ImmutableMap.<String, PropertyClass>builder(
         ).put(name1, new StringClass()
         ).put(name2, new DateClass()).build());
     
