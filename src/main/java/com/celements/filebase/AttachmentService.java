@@ -500,6 +500,16 @@ public class AttachmentService implements IAttachmentServiceRole {
     XWikiDocument doc = modelAccess.getDocument(docRef);
     return getAttachmentNameEqual(doc, attachmentRef.getName());
   }
+  
+  @Override
+  public XWikiAttachment getAttachmentFirstNameMatch(XWikiDocument document,
+      IAttachmentMatcher attMatcher) throws AttachmentNotExistsException {
+    List<XWikiAttachment> attList =  getAttachmentsNameMatch(document, attMatcher);
+    if(!attList.isEmpty()) {
+      return attList.get(0);
+    }
+    throw new AttachmentNotExistsException(attMatcher, document.getDocumentReference());
+  }
 
   @Override
   public List<XWikiAttachment> getAttachmentsNameMatch(XWikiDocument document,

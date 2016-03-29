@@ -77,4 +77,7 @@ public interface IAttachmentServiceRole {
 
   public Attachment getApiAttachmentWithoutRightChecks(XWikiAttachment attachment);
 
+  public XWikiAttachment getAttachmentFirstNameMatch(XWikiDocument document,
+      IAttachmentMatcher attMatcher) throws AttachmentNotExistsException;
+
 }

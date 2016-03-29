@@ -493,6 +493,49 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     }
     verifyDefault();
   }
+  
+  @Test
+  public void test_getAttachmentFirstNameMatch() throws AttachmentNotExistsException {
+    String filename = "image.jpg";
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, filename + ".zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, filename);
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    IAttachmentMatcher mockMatcher = createMockAndAddToDefault(
+        IAttachmentMatcher.class);
+    expect(mockMatcher.accept(firstAtt)).andReturn(true).anyTimes();
+    expect(mockMatcher.accept(imageAtt)).andReturn(true).anyTimes();
+    expect(mockMatcher.accept(lastAtt)).andReturn(false).anyTimes();
+    replayDefault();
+    XWikiAttachment resFirstImage;
+    resFirstImage = attService.getAttachmentFirstNameMatch(doc, mockMatcher);
+    verifyDefault();
+    assertNotNull("Expected emptyList - not null", resFirstImage);
+    assertEquals(firstAtt.getFilename(), resFirstImage.getFilename());
+  }
+  
+  @Test
+  public void test_getAttachmentFirstNameMatch_empty() {
+    XWikiAttachment firstAtt = new XWikiAttachment(doc, "bli.zip");
+    XWikiAttachment imageAtt = new XWikiAttachment(doc, "other.file");
+    XWikiAttachment lastAtt = new XWikiAttachment(doc, "bli.gaga");
+    List<XWikiAttachment> attList = Arrays.asList(firstAtt, imageAtt, lastAtt);
+    doc.setAttachmentList(attList);
+    IAttachmentMatcher mockMatcher = createMockAndAddToDefault(
+        IAttachmentMatcher.class);
+    expect(mockMatcher.accept(firstAtt)).andReturn(false).anyTimes();
+    expect(mockMatcher.accept(imageAtt)).andReturn(false).anyTimes();
+    expect(mockMatcher.accept(lastAtt)).andReturn(false).anyTimes();
+    replayDefault();
+    try {
+      attService.getAttachmentFirstNameMatch(doc, mockMatcher);
+      fail("AttachmentNotExistsException expected");
+    } catch (AttachmentNotExistsException e) {
+      //expected outcome
+    }
+    verifyDefault();
+  }
 
   @Test
   public void test_getAttachmentsNameMatch() throws Exception {
