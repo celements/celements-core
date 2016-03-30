@@ -27,7 +27,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
-import com.celements.web.plugin.cmd.CreateDocumentCommand;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,6 +41,9 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
 
   @Requirement
   protected IWebUtilsService webUtilsService;
+  
+  @Requirement
+  protected IModelAccessFacade modelAccess;
 
   @Requirement("xwikiproperties")
   protected ConfigurationSource xwikiPropConfigSource;
@@ -79,21 +83,15 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
   }
 
   private XWikiDocument getDoc() throws XWikiException {
-    XWikiDocument doc;
-    if (!getContext().getWiki().exists(getDocRef(), getContext())) {
-      XWikiUser originalUser = getContext().getXWikiUser();
-      try {
-        setUserInContext(getUser());
-        doc = new CreateDocumentCommand().createDocument(getDocRef(), null, false);
-        getLogger().info("created doc '{}'", doc);
-      } finally {
-        setUserInContext(originalUser);
-      }
-    } else {
-      doc = getContext().getWiki().getDocument(getDocRef(), getContext());
-      getLogger().debug("already exists doc '{}'", doc);
+    XWikiUser originalUser = getContext().getXWikiUser();
+    try {
+      setUserInContext(getUser());
+      return modelAccess.getOrCreateDocument(getDocRef());
+    } catch (DocumentLoadException dle) {
+      throw new XWikiException(0, 0, "failed to load doc", dle);
+    } finally {
+      setUserInContext(originalUser);
     }
-    return doc;
   }
 
   @SuppressWarnings("unchecked")
