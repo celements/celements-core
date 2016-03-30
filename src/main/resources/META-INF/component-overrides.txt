@@ -1,1 +1,2 @@
 com.celements.xwikiPatches.SpacePreferencesConfigurationSource
+com.celements.common.observation.listener.LocalEventListener

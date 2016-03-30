@@ -1,5 +1,6 @@
 package com.celements.common.observation.converter;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import java.io.Serializable;
@@ -16,174 +17,272 @@ import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.RemoteEventConverter;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCase {
+public class AnnotationEventConverterTest extends AbstractComponentTest {
   
-  private AnnotationEventConverter eventConverter;
+  private AnnotationEventConverter converter;
 
   @Before
   public void setUp_AnnotationEventConverterTest() throws Exception {
-    eventConverter = (AnnotationEventConverter) Utils.getComponent(
+    converter = (AnnotationEventConverter) Utils.getComponent(
         RemoteEventConverter.class, "Annotation");
+  }
+  
+  @Test
+  public void test_getPriority() {
+    assertEquals(1500, converter.getPriority());
   }
 
   @Test
-  public void testToRemote_local() {
+  public void test_toRemote_local() {
     LocalEventData localEvent = new LocalEventData();
     localEvent.setEvent(new LocalTestEvent());
-    assertFalse(eventConverter.toRemote(localEvent, null));
+    assertFalse(converter.toRemote(localEvent, null));
   }
 
   @Test
   public void testToRemote_remote() {
-    XWikiContext context = getContext();
-    String database = "myDB";
-    context.setDatabase(database);
-    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     LocalEventData localEvent = new LocalEventData();
     localEvent.setEvent(new RemoteTestEvent());
-    localEvent.setSource(new XWikiDocument(docRef));
-    localEvent.setData(context);
+    localEvent.setSource(getSerializable());
+    localEvent.setData(getSerializable());
     RemoteEventData remoteEvent = new RemoteEventData();
     
-    assertTrue(eventConverter.toRemote(localEvent, remoteEvent));
+    replayDefault();
+    assertTrue(converter.toRemote(localEvent, remoteEvent));
+    verifyDefault();
     
     assertSame(localEvent.getEvent(), remoteEvent.getEvent());
-    assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get(
-        AnnotationEventConverter.DOC_NAME));
-    assertEquals(database, ((Map<?, ?>) remoteEvent.getData()).get(
-        AnnotationEventConverter.CONTEXT_WIKI));
+    assertSame(localEvent.getSource(), remoteEvent.getSource());
+    assertSame(localEvent.getData(), remoteEvent.getData());
   }
   
   @Test
-  public void testToRemote_invalidSource() {
+  public void test_serializeSource() {
+    LocalEventData localEvent = new LocalEventData();
+    localEvent.setSource(getSerializable());
+    
+    replayDefault();
+    Serializable ret = converter.serializeSource(localEvent);
+    verifyDefault();
+    
+    assertSame(localEvent.getSource(), ret);
+  }
+  
+  @Test
+  public void test_serializeSource_XWikiDocument() {
+    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
+    LocalEventData localEvent = new LocalEventData();
+    localEvent.setSource(new XWikiDocument(docRef));
+    
+    replayDefault();
+    Serializable ret = converter.serializeSource(localEvent);
+    verifyDefault();
+    
+    assertEquals(docRef, ((Map<?, ?>) ret).get(AnnotationEventConverter.DOC_NAME));
+  }
+  
+  @Test
+  public void test_serializeSource_invalid() {
+    LocalEventData localEvent = new LocalEventData();
+    localEvent.setSource(new Object());
+    
+    replayDefault();
+    try {
+      converter.serializeSource(localEvent);
+      fail("expecting ClassCastException");
+    } catch (ClassCastException exc) {
+      // expected
+    }
+    verifyDefault();
+  }
+  
+  @Test
+  public void test_serializeData() {
+    LocalEventData localEvent = new LocalEventData();
+    localEvent.setData(getSerializable());
+    
+    replayDefault();
+    Serializable ret = converter.serializeData(localEvent);
+    verifyDefault();
+    
+    assertSame(localEvent.getData(), ret);
+  }
+  
+  @Test
+  public void test_serializeData_XWikiContext() {
     XWikiContext context = getContext();
     String database = "myDB";
     context.setDatabase(database);
     LocalEventData localEvent = new LocalEventData();
-    localEvent.setEvent(new RemoteTestEvent());
-    localEvent.setSource(new Object());
     localEvent.setData(context);
-    RemoteEventData remoteEvent = new RemoteEventData();
     
-    assertFalse(eventConverter.toRemote(localEvent, remoteEvent));
+    replayDefault();
+    Serializable ret = converter.serializeData(localEvent);
+    verifyDefault();
+    
+    assertEquals(database, ((Map<?, ?>) ret).get(AnnotationEventConverter.CONTEXT_WIKI));
   }
-
+  
   @Test
-  public void testToRemote_noContextInData() {
-    DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
+  public void test_serializeData_invalid() {
     LocalEventData localEvent = new LocalEventData();
-    localEvent.setEvent(new RemoteTestEvent());
-    localEvent.setSource(new XWikiDocument(docRef));
     localEvent.setData(new Object());
-    RemoteEventData remoteEvent = new RemoteEventData();
     
-    assertTrue(eventConverter.toRemote(localEvent, remoteEvent));
-    
-    assertSame(localEvent.getEvent(), remoteEvent.getEvent());
-    assertEquals(docRef, ((Map<?, ?>) remoteEvent.getSource()).get(
-        AnnotationEventConverter.DOC_NAME));
-    assertEquals("xwikidb", ((Map<?, ?>) remoteEvent.getData()).get(
-        AnnotationEventConverter.CONTEXT_WIKI));
+    replayDefault();
+    try {
+      converter.serializeData(localEvent);
+      fail("expecting ClassCastException");
+    } catch (ClassCastException exc) {
+      // expected
+    }
+    verifyDefault();
   }
 
   @Test
-  public void testFromRemote_local() {
+  public void test_fromRemote_local() {
     RemoteEventData remoteEvent = new RemoteEventData();
     remoteEvent.setEvent(new LocalTestEvent());
-    assertFalse(eventConverter.fromRemote(remoteEvent, null));
+    
+    replayDefault();
+    assertFalse(converter.fromRemote(remoteEvent, null));
   }
 
   @Test
-  public void testFromRemote_remote() {
+  public void test_fromRemote_remote() {
+    RemoteEventData remoteEvent = new RemoteEventData();
+    remoteEvent.setEvent(new RemoteTestEvent());
+    remoteEvent.setSource(getSerializable());
+    remoteEvent.setData(getSerializable());
+    LocalEventData localEvent = new LocalEventData();
+    
+    replayDefault();
+    assertTrue(converter.fromRemote(remoteEvent, localEvent));
+    verifyDefault();
+    
+    assertSame(remoteEvent.getEvent(), localEvent.getEvent());
+    assertSame(remoteEvent.getSource(), localEvent.getSource());
+    assertSame(remoteEvent.getData(), localEvent.getData());
+  }
+  
+  @Test
+  public void test_unserializeSource() {
+    RemoteEventData remoteEvent = new RemoteEventData();
+    remoteEvent.setSource(getSerializable());
+    
+    replayDefault();
+    Object ret = converter.unserializeSource(remoteEvent);
+    verifyDefault();
+    
+    assertSame(remoteEvent.getSource(), ret);
+  }
+  
+  @Test
+  public void test_unserializeSource_XWikiDocument() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     Map<String, Serializable> docMap = new HashMap<String, Serializable>();
     docMap.put(AnnotationEventConverter.DOC_NAME, docRef);
     RemoteEventData remoteEvent = new RemoteEventData();
-    remoteEvent.setEvent(new RemoteTestEvent());
     remoteEvent.setSource((Serializable) docMap);
+    
+    replayDefault();
+    Object ret = converter.unserializeSource(remoteEvent);
+    verifyDefault();
+    
+    assertEquals(docRef, ((XWikiDocument) ret).getDocumentReference());
+  }
+  
+  @Test
+  public void test_unserializeData() {
+    RemoteEventData remoteEvent = new RemoteEventData();
+    remoteEvent.setData(getSerializable());
+    
+    replayDefault();
+    Object ret = converter.unserializeData(remoteEvent);
+    verifyDefault();
+    
+    assertSame(remoteEvent.getData(), ret);
+  }
+  
+  @Test
+  public void test_unserializeData_XWikiContext() {
+    RemoteEventData remoteEvent = new RemoteEventData();
     remoteEvent.setData(getContext());
-    LocalEventData localEvent = new LocalEventData();
     
-    assertTrue(eventConverter.fromRemote(remoteEvent, localEvent));
-    
-    assertSame(localEvent.getEvent(), localEvent.getEvent());
-    assertEquals(docRef, ((XWikiDocument) localEvent.getSource()).getDocumentReference());
-    assertEquals(getContext().getDatabase(),
-        ((XWikiContext) localEvent.getData()).getDatabase());
+    replayDefault();
+    Object ret = converter.unserializeData(remoteEvent);
+    verifyDefault();
+    assertEquals(getContext().getDatabase(), ((XWikiContext) ret).getDatabase());
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void testSerializeXWikiDocument_parent() {
+  public void test_serializeXWikiDocument_parent() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     EntityReference parentRef = new DocumentReference("wiki", "space", "parent");
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setParentReference(parentRef);
-    HashMap<String, Serializable> map = (HashMap<String, Serializable>
-        ) eventConverter.serializeXWikiDocument(doc);
+    Map<?, ?> map = (Map<?, ?>) converter.serializeXWikiDocument(doc);
     assertEquals("wiki:space.parent", map.get(AnnotationEventConverter.DOC_PARENT));
-    XWikiDocument ret = eventConverter.unserializeDocument(map);
+    
+    replayDefault();
+    XWikiDocument ret = converter.unserializeDocument((Serializable) map);
+    verifyDefault();
+    
     assertEquals(parentRef, ret.getParentReference());
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void testSerializeXWikiDocument_origParent() {
+  public void test_serializeXWikiDocument_origParent() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     EntityReference parentRef = new DocumentReference("wiki", "space", "parent");
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiDocument origDoc = new XWikiDocument(docRef);
     origDoc.setParentReference(parentRef);
     doc.setOriginalDocument(origDoc);
-    HashMap<String, Serializable> map = (HashMap<String, Serializable>
-        ) eventConverter.serializeXWikiDocument(doc);
+    Map<?, ?> map = (Map<?, ?>) converter.serializeXWikiDocument(doc);
     assertEquals("wiki:space.parent", map.get(AnnotationEventConverter.ORIGDOC_PARENT));
-    XWikiDocument ret = eventConverter.unserializeDocument(map);
+    
+    replayDefault();
+    XWikiDocument ret = converter.unserializeDocument((Serializable) map);
+    verifyDefault();
+    
     assertEquals(parentRef, ret.getOriginalDocument().getParentReference());
   }
 
   @Test
-  @SuppressWarnings({ "unchecked", "deprecation" })
-  public void testSerializeXWikiDocument_relative() {
+  @SuppressWarnings("deprecation")
+  public void test_serializeXWikiDocument_relative() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
     EntityReference parentRef = new EntityReference("parent", EntityType.DOCUMENT);
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setParentReference(parentRef);
-    HashMap<String, Serializable> map = (HashMap<String, Serializable>
-        ) eventConverter.serializeXWikiDocument(doc);
+    Map<?, ?> map = (Map<?, ?>) converter.serializeXWikiDocument(doc);
     assertEquals("parent", map.get(AnnotationEventConverter.DOC_PARENT));
-    XWikiDocument ret = eventConverter.unserializeDocument(map);
+    
+    replayDefault();
+    XWikiDocument ret = converter.unserializeDocument((Serializable) map);
+    verifyDefault();
+    
     assertEquals("parent", ret.getParent());
   }
   
   @Test
-  public void testShouldConvert_local() {
-    assertFalse(eventConverter.shouldConvert(LocalTestEvent.class));
+  public void test_shouldConvert_local() {
+    assertFalse(converter.shouldConvert(LocalTestEvent.class));
   }
   
   @Test
-  public void testShouldConvert_remote() {
-    assertTrue(eventConverter.shouldConvert(RemoteTestEvent.class));
+  public void test_shouldConvert_remote() {
+    assertTrue(converter.shouldConvert(RemoteTestEvent.class));
   }
   
   @Test
-  public void testShouldConvert_none() {
-    assertFalse(eventConverter.shouldConvert(NoneTestEvent.class));
-  }
-  
-  @Test
-  public void testShouldConvert_localAndRemote() {
-    try {
-      eventConverter.shouldConvert(LocalAndRemoteTestEvent.class);
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException exc) {
-      // expected
-    }
+  public void test_shouldConvert_none() {
+    assertFalse(converter.shouldConvert(NoneTestEvent.class));
   }
 
   @Local
@@ -217,17 +316,11 @@ public class AnnotationEventConverterTest extends AbstractBridgedComponentTestCa
       return false;
     }    
   }
-
-  @Local
-  @Remote
-  private class LocalAndRemoteTestEvent implements Event, Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public boolean matches(Object otherEvent) {
-      return false;
-    }    
+  
+  private Serializable getSerializable() {
+    return new Serializable() {
+      private static final long serialVersionUID = 1L;
+    };
   }
 
 }
