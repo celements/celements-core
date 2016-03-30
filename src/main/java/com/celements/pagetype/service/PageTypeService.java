@@ -160,6 +160,7 @@ public class PageTypeService implements IPageTypeRole {
   @Override
   public boolean setPageType(XWikiDocument doc, PageTypeReference ref) {
     checkNotNull(doc);
+    checkNotNull(ref);
     try {
       BaseObject obj = modelAccess.getOrCreateXObject(doc,
           pageTypeClassConf.getPageTypeClassRef());

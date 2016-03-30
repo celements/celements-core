@@ -19,44 +19,42 @@
  */
 package com.celements.web.plugin.cmd;
 
-import java.util.Date;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.context.Execution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.pagetype.PageTypeClasses;
-import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.model.access.exception.DocumentAlreadyExistsException;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeRole;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-// TODO move part for adding a page type to a doc (e.g. to PageTypeService) and then 
-// deprecate this class since doc creation should be done via IModelAccessFacade
+/**
+ * 
+ * @deprecated instead use {@link IModelAccessFacade#createDocument(DocumentReference)}
+ * and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
+ *
+ */
+@Deprecated
 public class CreateDocumentCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CreateDocumentCommand.class);
-
-  IWebUtils webUtils = WebUtils.getInstance();
-
-  IWebUtilsService injected_webService;
+  private static Logger LOGGER = LoggerFactory.getLogger(CreateDocumentCommand.class);
 
   /**
-   * NOTE: use {@link IModelAccessFacade#createDocument(DocumentReference)} if page type 
-   * isn't required.<br>
-   * <br>
+   * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)}
+   * and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
+   * 
    * createDocument creates a new document if it does not exist
    * @param docRef
    * @param pageType
    * @return
    */
+  @Deprecated
   public XWikiDocument createDocument(DocumentReference docRef, String pageType) {
     try {
       return createDocument(docRef, pageType, true);
@@ -67,8 +65,8 @@ public class CreateDocumentCommand {
   }
 
   /**
-   * NOTE: use {@link IModelAccessFacade#createDocument(DocumentReference)} if page type 
-   * isn't required.<br>
+   * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)}
+   * and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
    * <br>
    * createDocument creates a new document if it does not exist
    * @param docRef
@@ -77,65 +75,39 @@ public class CreateDocumentCommand {
    * @return
    * @throws XWikiException 
    */
+  @Deprecated
   public XWikiDocument createDocument(DocumentReference docRef, String pageType, 
       boolean withSave) throws XWikiException {
-    if (!getContext().getWiki().exists(docRef, getContext())) {
-      XWikiDocument theNewDoc = getContext().getWiki().getDocument(docRef, getContext());
-      initNewXWikiDocument(theNewDoc);
+    try {
+      XWikiDocument doc = getModelAccess().createDocument(docRef);
+      PageTypeReference ptRef = getPageTypeService().getPageTypeRefByConfigName(
+          Strings.nullToEmpty(pageType));
       String pageTypeStr = "";
-      if (pageType != null) {
-        DocumentReference pageTypeClassRef = new DocumentReference(
-            docRef.getWikiReference().getName(), PageTypeClasses.PAGE_TYPE_CLASS_SPACE,
-            PageTypeClasses.PAGE_TYPE_CLASS_DOC);
-        BaseObject pageTypeObj = theNewDoc.getXObject(pageTypeClassRef, true,
-            getContext());
-        pageTypeObj.setStringValue("page_type", pageType);
+      if (ptRef != null) {
+        getPageTypeService().setPageType(doc, ptRef);
         pageTypeStr = pageType + "-";
       }
       if (withSave) {
-        getContext().getWiki().saveDocument(theNewDoc, "init " + pageTypeStr + "document", 
-            false, getContext());
-        LOGGER.debug("saved '" + theNewDoc + "'");
+        getModelAccess().saveDocument(doc, "init " + pageTypeStr + "document", false);
+        LOGGER.debug("saved '" + doc + "'");
       } else {
-        LOGGER.debug("skipped saving '" + theNewDoc + "'");
+        LOGGER.debug("skipped saving '" + doc + "'");
       }
-      return theNewDoc;
-    } else {
-      LOGGER.warn("Failed to create new Document [" + docRef
-          + "] because it already exists");
+      return doc;
+    } catch (DocumentLoadException | DocumentSaveException exc) {
+      throw new XWikiException(0, 0, "Load/Save failed", exc);
+    } catch (DocumentAlreadyExistsException exc) {
+      LOGGER.info("doc already exists '{}'", docRef);
     }
     return null;
   }
 
-  void initNewXWikiDocument(XWikiDocument theNewDoc) {
-    Date creationDate = new Date();
-    theNewDoc.setDefaultLanguage(getWebService().getDefaultLanguage());
-    theNewDoc.setLanguage("");
-    theNewDoc.setCreationDate(creationDate);
-    theNewDoc.setContentUpdateDate(creationDate);
-    theNewDoc.setDate(creationDate);
-    theNewDoc.setCreator(getContext().getUser());
-    theNewDoc.setAuthor(getContext().getUser());
-    theNewDoc.setTranslation(0);
-    theNewDoc.setContent("");
-    theNewDoc.setMetaDataDirty(true);
-    LOGGER.info("initNewXWikiDocument:  doc ["
-        + theNewDoc.getDocumentReference() + "], defaultLang ["
-        + theNewDoc.getDefaultLanguage() + "] isNew saving");
+  private IPageTypeRole getPageTypeService() {
+    return Utils.getComponent(IPageTypeRole.class);
   }
 
-  private IWebUtilsService getWebService() {
-    if (injected_webService != null) {
-      return injected_webService;
-    }
-    return Utils.getComponent(IWebUtilsService.class);
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
-
-  private Execution getExecution() {
-    return Utils.getComponent(Execution.class);
-  }
-
-  private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
-  }
+  
 }
