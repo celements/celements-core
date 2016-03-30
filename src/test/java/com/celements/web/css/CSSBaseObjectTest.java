@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
 
@@ -167,7 +168,13 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);
-    expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(doc);
+    expect(getWikiMock().getDocument(eq(xwikiPrefDocRef), same(getContext()))
+        ).andReturn(doc);
+    XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(rightSerivce);
+    String fullName = getContext().getDatabase() + ":XWiki.XWikiPreferences";
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), 
+        eq(fullName), same(getContext()))).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();
@@ -178,7 +185,6 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
         AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
-    String fullName = "XWiki.XWikiPreferences";
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
         "XWiki", "XWikiPreferences");
     bo.setStringValue("cssname", "XWiki.XWikiPreferences;myAttachment.css");
@@ -217,7 +223,13 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);
-    expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(doc);
+    expect(getWikiMock().getDocument(eq(xwikiPrefDocRef), same(getContext()))
+        ).andReturn(doc);
+    XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(rightSerivce);
+    String fullName = "celements2web:XWiki.XWikiPreferences";
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), 
+        eq(fullName), same(getContext()))).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();

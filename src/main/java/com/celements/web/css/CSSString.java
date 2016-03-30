@@ -19,19 +19,20 @@
  */
 package com.celements.web.css;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class CSSString extends CSS {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(CSSString.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CSSString.class);
 
   private String file;
   private boolean alternate;
@@ -95,14 +96,19 @@ public class CSSString extends CSS {
   @Override
   public Attachment getAttachment() {
     if (isAttachment()) {
+      String pageFN = getAttachmentURLcmd().getPageFullName(file);
       try {
-        XWikiDocument attDoc = context.getWiki().getDocument(getAttachmentURLcmd(
-            ).getPageFullName(file), context);
-        XWikiAttachment att = attDoc.getAttachment(getAttachmentURLcmd(
-            ).getAttachmentName(file));
-        return new Attachment(new Document(attDoc, context), att, context);
-      } catch (XWikiException e) {
-        mLogger.error(e);
+        XWikiDocument attDoc = context.getWiki().getDocument(getWebUtilsService(
+            ).resolveDocumentReference(pageFN), context);
+        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(attDoc, 
+            getAttachmentURLcmd().getAttachmentName(file));
+        return getAttachmentService().getApiAttachment(att);
+      } catch (XWikiException xwe) {
+        LOGGER.error("Exception getting attachment document.", xwe);
+      } catch (AttachmentNotExistsException anee) {
+        LOGGER.warn("Couldn't find attachment [{}] on doc [{}]", file, pageFN, anee);
+      } catch (NoAccessRightsException e) {
+        LOGGER.error("No rights to view attachment [{}] on doc [{}]", file, pageFN, e);
       }
     }
     return null;

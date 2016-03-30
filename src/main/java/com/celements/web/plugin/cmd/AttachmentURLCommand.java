@@ -25,8 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 
+import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -60,16 +63,18 @@ public class AttachmentURLCommand {
       String attName = getAttachmentName(link);
       try {
         XWikiDocument doc = context.getWiki().getDocument(getPageFullName(link), context);
-        if (doc.getAttachment(attName) == null) {
-          return null;
-        }
+        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
         url = doc.getAttachmentURL(attName, action, context);
         url += "?version=" + new LastStartupTimeStamp().getLastChangedTimeStamp(
-            doc.getAttachment(attName).getDate());
+            att.getDate());
       } catch (XWikiException exp) {
         LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link)
             + " and file " + attName, exp);
         url = link;
+      } catch (AttachmentNotExistsException anee) {
+        LOGGER.warn("Attachment not found for link [{}] and action [{}]", link, action, 
+            anee);
+        return null;
       }
     } else if(isOnDiskLink(link)) {
       String path = link.trim().substring(1);
@@ -119,6 +124,10 @@ public class AttachmentURLCommand {
       LOGGER.error("Failed to getServerURL.", exp);
     }
     return "";
+  }
+  
+  private IAttachmentServiceRole getAttachmentService() {
+    return Utils.getComponent(IAttachmentServiceRole.class);
   }
 
   private XWikiContext getContext() {

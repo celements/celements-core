@@ -586,6 +586,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  @Deprecated
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException {
     XWikiDocument attDoc = getContext().getWiki().getDocument(
         attRef.getDocumentReference(), getContext());

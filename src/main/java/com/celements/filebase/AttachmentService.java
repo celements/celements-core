@@ -111,9 +111,14 @@ public class AttachmentService implements IAttachmentServiceRole {
     //those not saved changes would be left in memory
     XWikiDocument theDoc = (XWikiDocument) doc.clone();
     // Read XWikiAttachment
-    XWikiAttachment attachment = theDoc.getAttachment(filename);
+    XWikiAttachment attachment = null;
+    try {
+      attachment = getAttachmentNameEqual(theDoc, filename);
+    } catch (AttachmentNotExistsException e) {
+      _LOGGER.debug("adding new attachment with name [{}]", filename);
+    }
 
-    if ((attachment == null) || !filename.equals(attachment.getFilename())) {
+    if (attachment == null) {
       attachment = new XWikiAttachment();
       theDoc.getAttachmentList().add(attachment);
     }
@@ -436,11 +441,14 @@ public class AttachmentService implements IAttachmentServiceRole {
         //Analogue to class DeleteAttachmentAction
         String versionCommentList = "";
         for (String filename : attachmentMap.get(docRef)) {
-            XWikiAttachment attachment = doc.getAttachment(filename);
-            if (attachment != null) {
+            try {
+              XWikiAttachment attachment = getAttachmentNameEqual(doc, filename);
               versionCommentList += ", " + filename;
               doc.deleteAttachment(attachment, getContext());
               nrDeletedOnDoc++;
+            } catch (AttachmentNotExistsException anee) {
+              _LOGGER.warn("Tried to delete not existing attachment [{}] on doc [{}]", 
+                  filename, doc, anee);
             }
         }
         if (nrDeletedOnDoc > 0) {

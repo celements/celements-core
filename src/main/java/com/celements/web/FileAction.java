@@ -28,6 +28,10 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.filebase.matcher.IAttFileNameMatcherRole;
+import com.celements.filebase.matcher.IAttachmentMatcher;
+import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -36,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.SkinAction;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 
 /**
@@ -312,8 +317,11 @@ public class FileAction extends SkinAction {
   public boolean renderFileFromAttachment(String filename, XWikiDocument doc,
       XWikiContext context) throws IOException, XWikiException {
     _Logger.debug("... as attachment");
-    XWikiAttachment attachment = doc.getAttachment(filename);
-    if (attachment != null) {
+    try {
+      IAttFileNameMatcherRole matcher = Utils.getComponent(IAttFileNameMatcherRole.class);
+      matcher.setFileNamePattern(filename);
+      XWikiAttachment attachment = getAttachmentService().getAttachmentFirstNameMatch(doc,
+          matcher);
       XWiki xwiki = context.getWiki();
       XWikiResponse response = context.getResponse();
       String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
@@ -330,10 +338,13 @@ public class FileAction extends SkinAction {
             );
       }
       return true;
-    } else {
-      _Logger.debug("Attachment not found");
+    } catch (AttachmentNotExistsException anee) {
+      _Logger.debug("Attachment not found", anee);
     }
     return false;
   }
 
+  public IAttachmentServiceRole getAttachmentService() {
+    return Utils.getComponent(IAttachmentServiceRole.class);
+  }
 }

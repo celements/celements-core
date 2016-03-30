@@ -19,22 +19,23 @@
  */
 package com.celements.web.css;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public class CSSBaseObject extends CSS {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CSSBaseObject.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CSSBaseObject.class);
 
   private BaseObject obj;
 
@@ -92,19 +93,23 @@ public class CSSBaseObject extends CSS {
   @Override
   public Attachment getAttachment() {
     if (isAttachment()) {
+      String cssName = getCssBasePath();
+      DocumentReference addDocRef = getWebUtilsService(
+          ).resolveDocumentReference(attURLcmd.getPageFullName(cssName));
+      LOGGER.debug("getAttachment for [" + cssName + "].");
       try {
-        String cssName = getCssBasePath();
-        LOGGER.debug("getAttachment for [" + cssName + "].");
-        DocumentReference addDocRef = getWebUtilsService(
-            ).resolveDocumentReference(attURLcmd.getPageFullName(cssName));
         XWikiDocument attDoc = context.getWiki().getDocument(addDocRef, context);
-        XWikiAttachment att = attDoc.getAttachment(attURLcmd.getAttachmentName(
-            obj.getStringValue("cssname")));
-        if (att != null) {
-          return new Attachment(new Document(attDoc, context), att, context);
-        }
-      } catch (XWikiException e) {
-        LOGGER.error(e);
+        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(attDoc, 
+            attURLcmd.getAttachmentName(obj.getStringValue("cssname")));
+        return getAttachmentService().getApiAttachment(att);
+      } catch (XWikiException xwe) {
+        LOGGER.error("Exception getting attachment document.", xwe);
+      } catch (AttachmentNotExistsException anee) {
+        LOGGER.warn("Couldn't find CSS [{}] on doc [{}]", obj.getStringValue(
+            "cssname"), addDocRef, anee);
+      } catch (NoAccessRightsException e) {
+        LOGGER.error("No rights to view CSS [{}] on doc [{}]", obj.getStringValue(
+            "cssname"), addDocRef, e);
       }
     }
     return null;

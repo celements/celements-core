@@ -31,20 +31,18 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class CSSStringTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
-  private XWiki xwiki;
 
   @Before
   public void setUp_CSSStringTest() {
     context = getContext();
-    xwiki = getWikiMock();
   }
 
   @Test
@@ -123,7 +121,12 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);
-    expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(doc);
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc);
+    XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
+    expect(getWikiMock().getRightService()).andReturn(rightSerivce);
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), 
+        eq(getContext().getDatabase() + ":" + fullName), same(getContext()))
+        ).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();
