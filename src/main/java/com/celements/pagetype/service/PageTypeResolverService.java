@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.IClassCollectionRole;
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.pagetype.IPageTypeClassConfig;

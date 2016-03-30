@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @ComponentRole
 public interface IPageTypeRole {
@@ -41,4 +42,6 @@ public interface IPageTypeRole {
 
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible);
+  
+  public boolean setPageType(XWikiDocument doc, PageTypeReference pageTypeRef);
 }

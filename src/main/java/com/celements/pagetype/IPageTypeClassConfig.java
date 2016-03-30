@@ -31,6 +31,8 @@ public interface IPageTypeClassConfig {
 
   public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef);
 
+  public DocumentReference getPageTypeClassRef();
+
   public DocumentReference getPageTypeClassRef(WikiReference wikiRef);
 
 }

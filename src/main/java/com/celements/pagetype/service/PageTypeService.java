@@ -19,6 +19,8 @@
  */
 package com.celements.pagetype.service;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,22 +29,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 @Component
 public class PageTypeService implements IPageTypeRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(PageTypeService.class);
 
   @Requirement
   Map<String, IPageTypeProviderRole> pageTypeProviders;
+
+  @Requirement
+  private IPageTypeClassConfig pageTypeClassConf;
+  
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {
     if (pageTypeName != null) {
@@ -142,6 +155,24 @@ public class PageTypeService implements IPageTypeRole {
     LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
         catList.toArray()) + "] return " + Arrays.deepToString(filteredPTset.toArray()));
     return filteredPTset;
+  }
+
+  @Override
+  public boolean setPageType(XWikiDocument doc, PageTypeReference ref) {
+    checkNotNull(doc);
+    try {
+      BaseObject obj = modelAccess.getOrCreateXObject(doc,
+          pageTypeClassConf.getPageTypeClassRef());
+      boolean hasChanged = !ref.getConfigName().equals(modelAccess.getProperty(obj,
+          IPageTypeClassConfig.PAGE_TYPE_FIELD));
+      if (hasChanged) {
+        modelAccess.setProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD,
+            ref.getConfigName());
+      }
+      return hasChanged;
+    } catch (ClassDocumentLoadException exc) {
+      throw new IllegalStateException("Unable to load PageTypeClass", exc);
+    }
   }
 
 }
