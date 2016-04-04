@@ -9,6 +9,8 @@ import com.xpn.xwiki.web.Utils;
 public abstract class AbstractEntityEvent extends AbstractFilterableEvent {
 
   private static final long serialVersionUID = 1L;
+  
+  private EntityReference reference;
 
   public AbstractEntityEvent() {
     super();
@@ -16,11 +18,16 @@ public abstract class AbstractEntityEvent extends AbstractFilterableEvent {
 
   public AbstractEntityEvent(EntityReference reference) {
     super(getSerializer().serialize(reference));
+    this.reference = reference;
   }
 
   @SuppressWarnings("unchecked")
   public static EntityReferenceSerializer<String> getSerializer() {
     return Utils.getComponent(EntityReferenceSerializer.class);
+  }
+
+  public EntityReference getReference() {
+    return reference.clone();
   }
 
 }
