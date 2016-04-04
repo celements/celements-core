@@ -125,3 +125,6 @@ com.celements.filebase.FileBaseAccessService
 com.celements.rights.publication.PublicationService
 com.celements.rights.access.RightsAccessScriptService
 com.celements.common.observation.listener.LocalEventListener
+com.celements.configuration.CelementsPropertiesConfigurationSource
+com.celements.configuration.CelementsDefaultConfigurationSource
+com.celements.configuration.CelementsAllConfigurationSource
