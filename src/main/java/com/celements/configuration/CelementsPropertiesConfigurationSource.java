@@ -41,10 +41,10 @@ public class CelementsPropertiesConfigurationSource extends CommonsConfiguration
   private static final Logger LOGGER = LoggerFactory.getLogger(
       CelementsPropertiesConfigurationSource.class);
 
-  private static final String CELEMENTS_PROPERTIES_FILE = "/WEB-INF/celements.properties";
+  static final String CELEMENTS_PROPERTIES_FILE = "/WEB-INF/celements.properties";
 
   @Requirement
-  private Container container;
+  Container container;
 
   @Override
   public void initialize() throws InitializationException {

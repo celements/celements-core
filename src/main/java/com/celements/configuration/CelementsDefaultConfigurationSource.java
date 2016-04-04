@@ -42,16 +42,16 @@ public class CelementsDefaultConfigurationSource extends CompositeConfigurationS
     implements Initializable {
 
   @Requirement("xwikiproperties")
-  private ConfigurationSource xwikiPropertiesSource;
+  ConfigurationSource xwikiPropertiesSource;
 
   @Requirement("celementsproperties")
-  private ConfigurationSource celementsPropertiesSource;
+  ConfigurationSource celementsPropertiesSource;
 
   @Requirement("wiki")
-  private ConfigurationSource wikiPreferencesSource;
+  ConfigurationSource wikiPreferencesSource;
 
   @Requirement("space")
-  private ConfigurationSource spacePreferencesSource;
+  ConfigurationSource spacePreferencesSource;
 
   @Override
   public void initialize() throws InitializationException {
