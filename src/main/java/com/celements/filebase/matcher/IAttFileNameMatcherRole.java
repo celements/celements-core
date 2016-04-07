@@ -7,4 +7,6 @@ public interface IAttFileNameMatcherRole extends IAttachmentMatcher {
 
   public void setFileNamePattern(String fileNamePattern);
 
+  public String getFileNamePattern();
+
 }

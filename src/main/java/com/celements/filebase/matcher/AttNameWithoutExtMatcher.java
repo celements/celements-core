@@ -37,4 +37,9 @@ public class AttNameWithoutExtMatcher implements IAttFileNameMatcherRole {
     this.fileNamePattern = fileNamePattern;
   }
 
+  @Override
+  public String getFileNamePattern() {
+    return fileNamePattern;
+  }
+
 }

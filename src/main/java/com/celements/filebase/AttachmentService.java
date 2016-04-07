@@ -42,6 +42,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.filebase.matcher.IAttFileNameMatcherRole;
 import com.celements.filebase.matcher.IAttachmentMatcher;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.AttachmentNotExistsException;
@@ -511,12 +512,17 @@ public class AttachmentService implements IAttachmentServiceRole {
   
   @Override
   public XWikiAttachment getAttachmentFirstNameMatch(XWikiDocument document,
-      IAttachmentMatcher attMatcher) throws AttachmentNotExistsException {
-    List<XWikiAttachment> attList =  getAttachmentsNameMatch(document, attMatcher);
-    if(!attList.isEmpty()) {
-      return attList.get(0);
+      IAttFileNameMatcherRole attMatcher) throws AttachmentNotExistsException {
+    String filename = attMatcher.getFileNamePattern();
+    try {
+      return getAttachmentNameEqual(document, filename);
+    } catch(AttachmentNotExistsException anee) {
+      List<XWikiAttachment> attList =  getAttachmentsNameMatch(document, attMatcher);
+      if(!attList.isEmpty()) {
+        return attList.get(0);
+      }
+      throw anee;
     }
-    throw new AttachmentNotExistsException(attMatcher, document.getDocumentReference());
   }
 
   @Override

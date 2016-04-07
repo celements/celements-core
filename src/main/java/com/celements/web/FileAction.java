@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.filebase.matcher.AttNameWithoutExtMatcher;
 import com.celements.filebase.matcher.IAttFileNameMatcherRole;
-import com.celements.filebase.matcher.IAttachmentMatcher;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -318,7 +318,8 @@ public class FileAction extends SkinAction {
       XWikiContext context) throws IOException, XWikiException {
     _Logger.debug("... as attachment");
     try {
-      IAttFileNameMatcherRole matcher = Utils.getComponent(IAttFileNameMatcherRole.class);
+      IAttFileNameMatcherRole matcher = Utils.getComponent(IAttFileNameMatcherRole.class, 
+          AttNameWithoutExtMatcher.ATT_NAME_WITHOUT_EXT_MATCHER);
       matcher.setFileNamePattern(filename);
       XWikiAttachment attachment = getAttachmentService().getAttachmentFirstNameMatch(doc,
           matcher);
