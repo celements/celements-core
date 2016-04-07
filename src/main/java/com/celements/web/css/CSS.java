@@ -21,6 +21,7 @@ package com.celements.web.css;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
@@ -124,6 +125,10 @@ public abstract class CSS extends Api {
 
   protected IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  protected IAttachmentServiceRole getAttachmentService() {
+    return Utils.getComponent(IAttachmentServiceRole.class);
   }
 
 }

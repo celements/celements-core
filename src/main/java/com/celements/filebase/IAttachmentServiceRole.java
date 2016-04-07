@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.AttachmentReference;
 
+import com.celements.filebase.matcher.IAttFileNameMatcherRole;
 import com.celements.filebase.matcher.IAttachmentMatcher;
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
@@ -76,5 +77,8 @@ public interface IAttachmentServiceRole {
       ) throws NoAccessRightsException;
 
   public Attachment getApiAttachmentWithoutRightChecks(XWikiAttachment attachment);
+
+  public XWikiAttachment getAttachmentFirstNameMatch(XWikiDocument document,
+      IAttFileNameMatcherRole attMatcher) throws AttachmentNotExistsException;
 
 }
