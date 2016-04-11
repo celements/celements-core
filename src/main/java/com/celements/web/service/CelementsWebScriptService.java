@@ -979,6 +979,11 @@ public class CelementsWebScriptService implements ScriptService {
     _LOGGER.debug("getGlobalContextValue: key '{}', value '{}'", key, value);
     return value;
   }
+  
+  public boolean useMultiselect() {
+    return "1".equals(getContext().getWiki().getSpacePreference("celMultiselect",
+        "celements.celMultiselect", "0", getContext()));
+  }
 
   /**
    * @deprecated since 2.64.0 instead use TreeNodeScriptService.moveTreeDocAfter
