@@ -86,7 +86,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkNotNull(docRef);
     checkState(!Strings.isNullOrEmpty(lang));
     if (exists(docRef)) {
-      XWikiDocument translatedDocument = getDocumentInternal(docRef);
+      XWikiDocument translatedDocument = getDocumentInternalForReadOnly(docRef);
       String defaultLanguage = webUtilsService.getDefaultLanguage(
           docRef.getLastSpaceReference());
       String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
@@ -103,7 +103,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
           throw new DocumentLoadException(docRef, xwe);
         }
       }
-      return translatedDocument;
+      // We need to clone this document first, since a cached storage would return the same object for the
+      // following requests, so concurrent request might get a partially modified object, or worse, if an error
+      // occurs during the save, the cached object will not reflect the actual document at all.
+      return translatedDocument.clone();
     } else {
       throw new DocumentNotExistsException(docRef);
     }
@@ -118,12 +121,51 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         getContext().getXWikiUser(), EAccessLevel.VIEW);
   }
 
+  /**
+   * returns an editable document
+   */
   private XWikiDocument getDocumentInternal(DocumentReference docRef
+      ) throws DocumentLoadException {
+    // We need to clone this document first, since a cached storage would return the same object for the
+    // following requests, so concurrent request might get a partially modified object, or worse, if an error
+    // occurs during the save, the cached object will not reflect the actual document at all.
+    return getDocumentInternalForReadOnly(docRef).clone();
+  }
+
+  /**
+   * returns an xwiki document for readonly usage
+   * 
+   * CAUTION: never ever change anything on the returned XWikiDocument, because it is
+   * the object in cache. Thus the same object will be returned for the following
+   * requests. If you change this object, concurrent request might get a partially
+   * modified object, or worse, if an error occurs during the save (or no save call
+   * happens), the cached object will not reflect the actual document at all.
+   */
+  private XWikiDocument getDocumentInternalForReadOnly(DocumentReference docRef
       ) throws DocumentLoadException {
     try {
       return getContext().getWiki().getDocument(docRef, getContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
+    }
+  }
+
+  /**
+   * returns an xwiki document for readonly usage
+   * 
+   * CAUTION: never ever change anything on the returned XWikiDocument, because it is
+   * the object in cache. Thus the same object will be returned for the following
+   * requests. If you change this object, concurrent request might get a partially
+   * modified object, or worse, if an error occurs during the save (or no save call
+   * happens), the cached object will not reflect the actual document at all.
+   */
+  private XWikiDocument getDocumentForReadOnly(DocumentReference docRef
+      ) throws DocumentLoadException, DocumentNotExistsException {
+    checkNotNull(docRef);
+    if (exists(docRef)) {
+      return getDocumentInternalForReadOnly(docRef);
+    } else {
+      throw new DocumentNotExistsException(docRef);
     }
   }
 
@@ -255,14 +297,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef
       ) throws DocumentLoadException, DocumentNotExistsException {
-    return Iterables.getFirst(getXObjects(getDocument(docRef), classRef), null);
+    return Iterables.getFirst(getXObjects(getDocumentForReadOnly(docRef),
+        classRef), null);
   }
 
   @Override
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws DocumentLoadException, DocumentNotExistsException {
-    return Iterables.getFirst(getXObjects(getDocument(docRef), classRef, key, value),
-        null);
+    return Iterables.getFirst(getXObjects(getDocumentForReadOnly(docRef), classRef, key,
+        value), null);
   }
 
   @Override
@@ -279,20 +322,20 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef
       ) throws DocumentLoadException, DocumentNotExistsException {
-    return getXObjects(getDocument(docRef), classRef);
+    return getXObjects(getDocumentForReadOnly(docRef), classRef);
   }
 
   @Override
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws DocumentLoadException, DocumentNotExistsException {
-    return getXObjects(getDocument(docRef), classRef, key, value);
+    return getXObjects(getDocumentForReadOnly(docRef), classRef, key, value);
   }
 
   @Override
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Collection<?> values) throws DocumentLoadException,
       DocumentNotExistsException {
-    return getXObjects(getDocument(docRef), classRef, key, values);
+    return getXObjects(getDocumentForReadOnly(docRef), classRef, key, values);
   }
 
   @Override
@@ -473,7 +516,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public Object getProperty(DocumentReference docRef, DocumentReference classRef,
       String name) throws DocumentLoadException, DocumentNotExistsException {
-    return getProperty(getDocument(classRef), classRef, name);
+    return getProperty(getDocumentForReadOnly(classRef), classRef, name);
   }
 
   @Override
