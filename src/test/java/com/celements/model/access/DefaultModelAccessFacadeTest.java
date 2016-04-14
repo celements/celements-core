@@ -15,6 +15,7 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.exception.AttachmentNotExistsException;
@@ -52,6 +53,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void setUp_DefaultModelAccessFacadeTest() {
     modelAccess = (DefaultModelAccessFacade) Utils.getComponent(IModelAccessFacade.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
+    doc.setSyntax(Syntax.XWIKI_1_0);
     doc.setMetaDataDirty(false);
     xwikiStoreMock = createMockAndAddToDefault(XWikiStoreInterface.class);
     doc.setStore(xwikiStoreMock);
@@ -72,7 +74,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     XWikiDocument ret = modelAccess.getDocument(doc.getDocumentReference());
     verifyDefault();
-    assertSame(doc, ret);
+    assertEquals(doc, ret);
+    assertNotSame("must be cloned for cache safety", doc, ret);
   }
 
   @Test
@@ -132,7 +135,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "de");
     verifyDefault();
-    assertSame(doc, theDoc);
+    assertEquals(doc, theDoc);
+    assertNotSame("must be cloned for cache safety", doc, theDoc);
   }
 
   @Test
@@ -178,12 +182,14 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     theTdoc.setDefaultLanguage("de");
     theTdoc.setLanguage("en");
     theTdoc.setNew(false);
+    theTdoc.setSyntax(Syntax.XWIKI_1_0);
     expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))
         ).andReturn(theTdoc).once();
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "en");
     verifyDefault();
-    assertSame(theTdoc, theDoc);
+    assertEquals(theTdoc, theDoc);
+    assertNotSame("must be cloned for cache safety", theTdoc, theDoc);
     XWikiDocument loadedTdoc = tdocCapture.getValue();
     assertEquals(doc.getDocumentReference(), loadedTdoc.getDocumentReference());
     assertEquals("en", loadedTdoc.getLanguage());
@@ -205,17 +211,18 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     getContext().setUser(userName);
     XWikiDocument ret = modelAccess.createDocument(doc.getDocumentReference());
     verifyDefault();
-    assertSame(doc, ret);
-    assertEquals("de", doc.getDefaultLanguage());
-    assertEquals("", doc.getLanguage());
-    assertTrue(beforeCreationDate.before(doc.getCreationDate()));
-    assertTrue(beforeCreationDate.before(doc.getContentUpdateDate()));
-    assertTrue(beforeCreationDate.before(doc.getDate()));
-    assertEquals(userName, doc.getCreator());
-    assertEquals(userName, doc.getAuthor());
-    assertEquals(0, doc.getTranslation());
-    assertEquals("", doc.getContent());
-    assertTrue(doc.isMetaDataDirty());
+    assertEquals(doc.getDocumentReference(), ret.getDocumentReference());
+    assertNotSame("must be cloned for cache safety", doc, ret);
+    assertEquals("de", ret.getDefaultLanguage());
+    assertEquals("", ret.getLanguage());
+    assertTrue(beforeCreationDate.before(ret.getCreationDate()));
+    assertTrue(beforeCreationDate.before(ret.getContentUpdateDate()));
+    assertTrue(beforeCreationDate.before(ret.getDate()));
+    assertEquals(userName, ret.getCreator());
+    assertEquals(userName, ret.getAuthor());
+    assertEquals(0, ret.getTranslation());
+    assertEquals("", ret.getContent());
+    assertTrue(ret.isMetaDataDirty());
   }
 
   @Test
@@ -268,7 +275,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
     verifyDefault();
-    assertSame(doc, ret);
+    assertEquals(doc, ret);
+    assertNotSame("must be cloned for cache safety", doc, ret);
     assertFalse(doc.isMetaDataDirty());
   }
 
@@ -298,8 +306,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
     verifyDefault();
-    assertSame(doc, ret);
-    assertTrue(doc.isMetaDataDirty());
+    assertEquals(doc.getDocumentReference(), ret.getDocumentReference());
+    assertNotSame("must be cloned for cache safety", doc, ret);
+    assertTrue(ret.isMetaDataDirty());
   }
 
   @Test

@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 
 import java.util.Collections;
 
+import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -66,13 +67,17 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc)
         .once();
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(""))).andReturn(null).once();
-    getWikiMock().saveDocument(same(theNewDoc), eq("init document"), eq(false),
+    Capture<XWikiDocument> docCaptcher = new Capture<>();
+    getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false),
         same(getContext()));
     expectLastCall().once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, null);
     assertNotNull(theDoc);
-    assertSame(theNewDoc, theDoc);
+    XWikiDocument captNewDoc = docCaptcher.getValue();
+    assertNotSame(theNewDoc, captNewDoc);
+    assertSame(theDoc, captNewDoc);
+    assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     verifyDefault();
   }
 
@@ -83,20 +88,28 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
         "mySpace", "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc)
-        .once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc
+        ).once();
     PageTypeReference ptRef = new PageTypeReference(pageType, "",
         Collections.<String>emptyList());
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef)
-        .once();
-    expect(pageTypeServiceMock.setPageType(same(theNewDoc), eq(ptRef))).andReturn(true)
-        .once();
-    getWikiMock().saveDocument(same(theNewDoc), eq("init RichText-document"), eq(false),
-        same(getContext()));
+    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef
+        ).once();
+    Capture<XWikiDocument> docCaptcher = new Capture<>();
+    expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))
+        ).andReturn(true).once();
+    Capture<XWikiDocument> docCaptcher2 = new Capture<>();
+    getWikiMock().saveDocument(capture(docCaptcher2), eq("init RichText-document"),
+        eq(false), same(getContext()));
     expectLastCall().once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType);
     assertNotNull(theDoc);
+    XWikiDocument captNewDoc = docCaptcher.getValue();
+    XWikiDocument captNewDoc2 = docCaptcher2.getValue();
+    assertNotSame(theNewDoc, captNewDoc);
+    assertSame(captNewDoc2, captNewDoc);
+    assertSame(theDoc, captNewDoc);
+    assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     verifyDefault();
   }
 
@@ -107,16 +120,21 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
         "mySpace", "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc)
-        .once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc
+        ).once();
     PageTypeReference ptRef = new PageTypeReference(pageType, "",
         Collections.<String>emptyList());
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef)
-        .once();
-    expect(pageTypeServiceMock.setPageType(same(theNewDoc), eq(ptRef))).andReturn(true)
-        .once();
+    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef
+        ).once();
+    Capture<XWikiDocument> docCaptcher = new Capture<>();
+    expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true
+        ).once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType, false);
+    XWikiDocument captNewDoc = docCaptcher.getValue();
+    assertNotSame(theNewDoc, captNewDoc);
+    assertSame(theDoc, captNewDoc);
+    assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     assertNotNull(theDoc);
     verifyDefault();
   }
