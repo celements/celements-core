@@ -85,31 +85,27 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         TranslationNotExistsException {
     checkNotNull(docRef);
     checkState(!Strings.isNullOrEmpty(lang));
-    if (exists(docRef)) {
-      XWikiDocument translatedDocument = getDocumentInternalForReadOnly(docRef);
-      String defaultLanguage = webUtilsService.getDefaultLanguage(
-          docRef.getLastSpaceReference());
-      String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
-      if (!lang.equals(docDefLang) && (!"".equals(docDefLang)
-          || !lang.equals(defaultLanguage))) {
-        try {
-          if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
-            translatedDocument = translatedDocument.getTranslatedDocument(lang,
-                getContext());
-          } else {
-            throw new TranslationNotExistsException(docRef, lang);
-          }
-        } catch (XWikiException xwe) {
-          throw new DocumentLoadException(docRef, xwe);
+    XWikiDocument translatedDocument = getDocumentForReadOnly(docRef);
+    String defaultLanguage = webUtilsService.getDefaultLanguage(
+        docRef.getLastSpaceReference());
+    String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
+    if (!lang.equals(docDefLang) && (!"".equals(docDefLang)
+        || !lang.equals(defaultLanguage))) {
+      try {
+        if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
+          translatedDocument = translatedDocument.getTranslatedDocument(lang,
+              getContext());
+        } else {
+          throw new TranslationNotExistsException(docRef, lang);
         }
+      } catch (XWikiException xwe) {
+        throw new DocumentLoadException(docRef, xwe);
       }
-      // We need to clone this document first, since a cached storage would return the same object for the
-      // following requests, so concurrent request might get a partially modified object, or worse, if an error
-      // occurs during the save, the cached object will not reflect the actual document at all.
-      return translatedDocument.clone();
-    } else {
-      throw new DocumentNotExistsException(docRef);
     }
+    // We need to clone this document first, since a cached storage would return the same object for the
+    // following requests, so concurrent request might get a partially modified object, or worse, if an error
+    // occurs during the save, the cached object will not reflect the actual document at all.
+    return translatedDocument.clone();
   }
 
   @Override
