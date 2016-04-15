@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -55,6 +56,7 @@ public class AbstractDocumentCreateListenerTest extends AbstractBridgedComponent
         createMockAndAddToDefault(RemoteObservationManagerContext.class));
     listener.injectObservationManager(obsManagerMock = 
         createMockAndAddToDefault(ObservationManager.class));
+    listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     creatingEventMock = createMockAndAddToDefault(Event.class);
     createdEventMock = createMockAndAddToDefault(Event.class);

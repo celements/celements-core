@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -62,6 +63,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractBridgedComponent
         createMockAndAddToDefault(RemoteObservationManagerContext.class));
     listener.injectObservationManager(obsManagerMock = 
         createMockAndAddToDefault(ObservationManager.class));
+    listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     deletingEventMock = createMockAndAddToDefault(Event.class);
     deletedEventMock = createMockAndAddToDefault(Event.class);
