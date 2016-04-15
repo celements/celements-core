@@ -1,9 +1,12 @@
 package com.celements.common.observation.listener;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -17,6 +20,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractEventListener implements EventListener {
 
+  static final String CFG_SRC_KEY = "celements.observation.disabledListener";
+  
+  private volatile boolean disabled = false;
+
   @Requirement
   protected IModelAccessFacade modelAccess;
 
@@ -24,10 +31,13 @@ public abstract class AbstractEventListener implements EventListener {
   protected IWebUtilsService webUtilsService;
 
   @Requirement
+  protected ConfigurationSource configSrc;
+
+  @Requirement
   private RemoteObservationManagerContext remoteObsManagerContext;
 
   @Requirement
-  private Execution execution;
+  protected Execution execution;
 
   /**
    * The observation manager that will be use to fire user creation events. Note: We can't
@@ -54,20 +64,36 @@ public abstract class AbstractEventListener implements EventListener {
         XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
+  public synchronized boolean isDisabled() {
+    return disabled || configSrc.getProperty(CFG_SRC_KEY, List.class).contains(getName());
+  }
+  
+  public synchronized void enable() {
+    disabled = false;
+  }
+  
+  public synchronized void disable() {
+    disabled = true;
+  }
+
   protected boolean isLocalEvent() {
     return !remoteObsManagerContext.isRemoteState();
   }
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    if ((event != null) && (source != null)) {
+    if (isDisabled()) {
+      getLogger().info("listener disabled");
+    } else if ((event == null) || (source == null)) {
+      getLogger().warn("onEvent: got null event '{}' or source '{}'", event, source);
+    } else {
+      getLogger().trace("onEvent: '{}', source '{}', data '{}'", event.getClass(), source,
+          data);
       if (isLocalEvent()) {
         onLocalEvent(event, source, data);
       } else {
         onRemoteEvent(event, source, data);
       }
-    } else {
-      getLogger().warn("onEvent: got null values, event '{}', source '{}'", event,source);
     }
   }
 
