@@ -10,8 +10,11 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
-import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -28,7 +31,10 @@ public class AuthenticationService implements IAuthenticationServiceRole {
   
   @Requirement
   private IWebUtilsService webUtilsService;
-  
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
+
   @Requirement
   private Execution execution;
 
@@ -42,39 +48,44 @@ public class AuthenticationService implements IAuthenticationServiceRole {
   }
   
   @Override 
-  public Map<String, String> activateAccount(String activationCode) throws XWikiException{
+  public Map<String, String> activateAccount(String activationCode
+      ) throws AccountActivationFailedException {
     _LOGGER.debug("activateAccount: for code " + activationCode);
-    Map<String, String> userAccount = new HashMap<String, String>();
-    String hashedCode = getPasswordHash("hash:SHA-512:", activationCode);
-    String username = new UserNameForUserDataCommand().getUsernameForUserData(hashedCode,
-        "validkey", getContext());
-    _LOGGER.debug("activateAccount: username = " + username);
-    
-    if((username != null) && !username.equals("")){
-      String password = getContext().getWiki().generateRandomString(24);
-
-      DocumentReference userDocRef = webUtilsService.resolveDocumentReference(username);
-      _LOGGER.debug("activateAccount: userDocRef = " + userDocRef);
-      XWikiDocument doc = getContext().getWiki().getDocument(userDocRef, getContext());
-      _LOGGER.debug("activateAccount: userDoc = " + doc);
-      DocumentReference userObjRef = webUtilsService.resolveDocumentReference(
-          "XWiki.XWikiUsers");
-      _LOGGER.debug("activateAccount: userObjRef = " + userObjRef);
-      BaseObject obj = doc.getXObject(userObjRef);
-      _LOGGER.debug("activateAccount: userObj = " + obj);
-
-//      obj.set("validkey", "", context);
-      obj.set("active", "1", getContext());
-      obj.set("force_pwd_change", "1", getContext());
-      obj.set("password", password, getContext());
+    try {
+      Map<String, String> userAccount = new HashMap<String, String>();
+      String hashedCode = getPasswordHash("hash:SHA-512:", activationCode);
+      String username = new UserNameForUserDataCommand().getUsernameForUserData(hashedCode,
+          "validkey", getContext());
+      _LOGGER.debug("activateAccount: username = " + username);
       
-      getContext().getWiki().saveDocument(doc, getContext());
-      
-      userAccount.put("username", username);
-      userAccount.put("password", password);
+      if((username != null) && !username.equals("")){
+        String password = getContext().getWiki().generateRandomString(24);
+  
+        DocumentReference userDocRef = webUtilsService.resolveDocumentReference(username);
+        _LOGGER.debug("activateAccount: userDocRef = " + userDocRef);
+        XWikiDocument doc = modelAccess.getDocument(userDocRef);
+        _LOGGER.debug("activateAccount: userDoc = " + doc);
+        DocumentReference userObjRef = webUtilsService.resolveDocumentReference(
+            "XWiki.XWikiUsers");
+        _LOGGER.debug("activateAccount: userObjRef = " + userObjRef);
+        BaseObject obj = doc.getXObject(userObjRef);
+        _LOGGER.debug("activateAccount: userObj = " + obj);
+  
+  //      obj.set("validkey", "", context);
+        obj.set("active", "1", getContext());
+        obj.set("force_pwd_change", "1", getContext());
+        obj.set("password", password, getContext());
+        
+        modelAccess.saveDocument(doc, "activate account");
+        
+        userAccount.put("username", username);
+        userAccount.put("password", password);
+      }
+      return userAccount;
+    } catch (XWikiException | DocumentSaveException | DocumentLoadException
+        | DocumentNotExistsException exp) {
+      throw new AccountActivationFailedException(exp);
     }
-    
-    return userAccount;
   }
   
   @Override 

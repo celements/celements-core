@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.AuthenticationService;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mailsender.IMailSenderRole;
@@ -255,8 +256,13 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
    */
   @Deprecated
   public Map<String, String> activateAccount(String activationCode,
-      XWikiContext context) throws XWikiException{    
-    return getAuthenticationService().activateAccount(activationCode);
+      XWikiContext context) throws XWikiException {
+    try {
+      return getAuthenticationService().activateAccount(activationCode);
+    } catch(AccountActivationFailedException authExp) {
+      throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+          XWikiException.ERROR_XWIKI_UNKNOWN, "activateAccount failed.", authExp);
+    }
   }
 
   /**

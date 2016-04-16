@@ -1,5 +1,6 @@
 package com.celements.auth;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +18,10 @@ import com.celements.web.plugin.cmd.RemoteUserValidator;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
-import com.celements.web.token.TokenLDAPAuthServiceImpl;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 
 @Component("authentication")
 public class AuthenticationScriptService implements ScriptService {
@@ -163,12 +161,13 @@ public class AuthenticationScriptService implements ScriptService {
     return getNewCelementsTokenForUser(false);
   }
   
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
-   */
-  public Map<String, String> activateAccount(String activationCode) throws XWikiException{
-    return authenticationService.activateAccount(activationCode);
+  public Map<String, String> activateAccount(String activationCode) {
+    try {
+      return authenticationService.activateAccount(activationCode);
+    } catch (AccountActivationFailedException authExp) {
+      _LOGGER.info("Failed to activate account", authExp);
+    }
+    return Collections.emptyMap();
   }
   
   /*
