@@ -1,5 +1,6 @@
 package com.celements.filebase;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -9,15 +10,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
+import org.easymock.CaptureType;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.TestMessageTool;
 import com.celements.filebase.matcher.IAttFileNameMatcherRole;
 import com.celements.filebase.matcher.IAttachmentMatcher;
@@ -36,7 +38,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
+public class AttachmentServiceTest extends AbstractComponentTest {
 
   private AttachmentService attService;
   private XWikiDocument doc;
@@ -50,6 +52,7 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     xwikiStoreMock = createMockAndAddToDefault(XWikiStoreInterface.class);
     doc.setStore(xwikiStoreMock);
     doc.setNew(false);
+    doc.setSyntax(Syntax.XWIKI_1_0);
     expect(getWikiMock().getStore()).andReturn(xwikiStoreMock).anyTimes();
   }
   
@@ -108,12 +111,18 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     attList.add(new AttachmentReference(name2, docRef));
     attList.add(new AttachmentReference(name3, docRef));
     XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setNew(false);
+    doc.setSyntax(Syntax.XWIKI_1_0);
+    expect(getContext().getWiki().exists(eq(docRef), same(getContext()))).andReturn(true
+        ).once();
     expect(getContext().getWiki().getDocument(eq(docRef), same(getContext()))
         ).andReturn(doc).once();
     String comment = "deleted attachments " + names;
     ((TestMessageTool)getContext().getMessageTool()).injectMessage("core.comment." +
               "deleteAttachmentComment", Arrays.asList(names), comment);
-    getContext().getWiki().saveDocument(same(doc), same(getContext()));
+    Capture<XWikiDocument> savedDocCapture = new Capture<>();
+    getContext().getWiki().saveDocument(capture(savedDocCapture), isA(String.class),
+        eq(false), same(getContext()));
     expectLastCall();
     XWikiAttachment att1 = new XWikiAttachment();
     att1.setFilename(name1);
@@ -129,17 +138,21 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     XWikiAttachmentStoreInterface store = createMockAndAddToDefault(
         XWikiAttachmentStoreInterface.class);
     expect(getWikiMock().getAttachmentStore()).andReturn(store).anyTimes();
-    store.deleteXWikiAttachment(same(att1), same(getContext()), eq(true));
-    expectLastCall();
-    store.deleteXWikiAttachment(same(att2), same(getContext()), eq(true));
-    expectLastCall();
-    store.deleteXWikiAttachment(same(att3), same(getContext()), eq(true));
-    expectLastCall();
+    Capture<XWikiAttachment> attCaptures = new Capture<>(CaptureType.ALL);
+    store.deleteXWikiAttachment(capture(attCaptures), same(getContext()), eq(true));
+    expectLastCall().times(3);
     replayDefault();
     assertEquals(3, attService.deleteAttachmentList(attList));
     verifyDefault();
-    assertEquals(getContext().getUser(), doc.getAuthor());
-    assertEquals(comment, doc.getComment());
+    List<XWikiAttachment> delAttList = attCaptures.getValues();
+    assertEquals(3, delAttList.size());
+    for (XWikiAttachment delAtt : delAttList) {
+      assertTrue(attList.contains(new AttachmentReference(delAtt.getFilename(),
+          delAtt.getDoc().getDocumentReference())));
+    }
+    XWikiDocument savedDoc = savedDocCapture.getValue();
+    assertEquals(getContext().getUser(), savedDoc.getAuthor());
+    assertEquals(comment, savedDoc.getComment());
   }
   
   @Test
@@ -161,21 +174,30 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     attList.add(new AttachmentReference(name3, docRef));
     attList.add(new AttachmentReference(name4, docRef2));
     attList.add(new AttachmentReference(name5, docRef));
+    expect(getContext().getWiki().exists(eq(docRef), same(getContext()))).andReturn(true
+        ).once();
+    expect(getContext().getWiki().exists(eq(docRef2), same(getContext()))).andReturn(true
+        ).once();
     XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setNew(false);
+    doc.setSyntax(Syntax.XWIKI_1_0);
     expect(getContext().getWiki().getDocument(eq(docRef), same(getContext()))
-        ).andReturn(doc).once();    String comment = "deleted attachments " + names;
+        ).andReturn(doc).once();
+    String comment = "deleted attachments " + names;
     ((TestMessageTool)getContext().getMessageTool()).injectMessage("core.comment." +
         "deleteAttachmentComment", Arrays.asList(names), comment);
-    getContext().getWiki().saveDocument(same(doc), same(getContext()));
-    expectLastCall();
+    Capture<XWikiDocument> savedDocsCapture = new Capture<>(CaptureType.ALL);
+    getContext().getWiki().saveDocument(capture(savedDocsCapture), isA(String.class),
+        eq(false), same(getContext()));
+    expectLastCall().atLeastOnce();
     XWikiDocument doc2 = new XWikiDocument(docRef2);
+    doc2.setNew(false);
+    doc2.setSyntax(Syntax.XWIKI_1_0);
     expect(getContext().getWiki().getDocument(eq(docRef2), same(getContext()))
         ).andReturn(doc2).once();
     String comment2 = "deleted attachments " + names2;
     ((TestMessageTool)getContext().getMessageTool()).injectMessage("core.comment." +
         "deleteAttachmentComment", Arrays.asList(names2), comment2);
-    getContext().getWiki().saveDocument(same(doc2), same(getContext()));
-    expectLastCall();
     XWikiAttachment att2 = new XWikiAttachment();
     att2.setFilename(name2);
     doc2.getAttachmentList().add(att2);
@@ -193,21 +215,33 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     XWikiAttachmentStoreInterface store = createMockAndAddToDefault(
         XWikiAttachmentStoreInterface.class);
     expect(getWikiMock().getAttachmentStore()).andReturn(store).anyTimes();
-    store.deleteXWikiAttachment(same(att2), same(getContext()), eq(true));
-    expectLastCall();
-    store.deleteXWikiAttachment(same(att3), same(getContext()), eq(true));
-    expectLastCall();
-    store.deleteXWikiAttachment(same(att4), same(getContext()), eq(true));
-    expectLastCall();
-    store.deleteXWikiAttachment(same(att5), same(getContext()), eq(true));
-    expectLastCall();
+    Capture<XWikiAttachment> attCaptures = new Capture<>(CaptureType.ALL);
+    store.deleteXWikiAttachment(capture(attCaptures), same(getContext()), eq(true));
+    expectLastCall().anyTimes();
     replayDefault();
     assertEquals(4, attService.deleteAttachmentList(attList));
     verifyDefault();
-    assertEquals(getContext().getUser(), doc.getAuthor());
-    assertEquals(comment, doc.getComment());
-    assertEquals(getContext().getUser(), doc2.getAuthor());
-    assertEquals(comment2, doc2.getComment());
+    List<XWikiAttachment> delAttList = attCaptures.getValues();
+    assertEquals(4, delAttList.size());
+    for (XWikiAttachment delAtt : delAttList) {
+      assertTrue(attList.contains(new AttachmentReference(delAtt.getFilename(),
+          delAtt.getDoc().getDocumentReference())));
+    }
+    List<XWikiDocument> savedDocsList = savedDocsCapture.getValues();
+    assertEquals(2, savedDocsList.size());
+    XWikiDocument savedDoc;
+    XWikiDocument savedDoc2;
+    if (savedDocsList.get(0).getDocumentReference().equals(docRef)) {
+      savedDoc = savedDocsList.get(0);
+      savedDoc2 = savedDocsList.get(1);
+    } else {
+      savedDoc = savedDocsList.get(1);
+      savedDoc2 = savedDocsList.get(0);
+    }
+    assertEquals(getContext().getUser(), savedDoc.getAuthor());
+    assertEquals(comment, savedDoc.getComment());
+    assertEquals(getContext().getUser(), savedDoc2.getAuthor());
+    assertEquals(comment2, savedDoc2.getComment());
   }
   
   @Test
@@ -271,7 +305,8 @@ public class AttachmentServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), spc, 
         docName);
     XWikiDocument doc = new XWikiDocument(docRef);
-    doc.setSyntax(new Syntax(SyntaxType.XWIKI, "1.0"));
+    doc.setNew(false);
+    doc.setSyntax(Syntax.XWIKI_1_0);
     XWikiURLFactory URLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
     URL url = null;
     expect(URLFactory.createAttachmentRevisionURL(eq(filename), eq(spc), eq(docName), 

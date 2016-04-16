@@ -50,8 +50,8 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -85,7 +85,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   Execution execution;
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  IRightsAccessFacadeRole rightsAccess;
 
   private XWikiContext getContext() {
     return (XWikiContext)execution.getContext().getProperty("xwikicontext");
@@ -438,7 +438,7 @@ public class AttachmentService implements IAttachmentServiceRole {
     for (DocumentReference docRef : attachmentMap.keySet()) {
       int nrDeletedOnDoc = 0;
       try {
-        XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+        XWikiDocument doc = modelAccess.getDocument(docRef);
         //Analogue to class DeleteAttachmentAction
         String versionCommentList = "";
         for (String filename : attachmentMap.get(docRef)) {
@@ -461,11 +461,12 @@ public class AttachmentService implements IAttachmentServiceRole {
           // the newdoc.originalDoc as well
           doc.setOriginalDocument(doc);
           // Also save the document and attachment metadata
-          getContext().getWiki().saveDocument(doc, getContext());
+          modelAccess.saveDocument(doc, "deleted " + nrDeletedOnDoc + " attachments");
         }
         nrDeleted += nrDeletedOnDoc;
-      } catch (XWikiException xwe) {
-        _LOGGER.error("Exception deleting Attachments on doch " + docRef, xwe);
+      } catch (XWikiException | DocumentLoadException | DocumentNotExistsException
+          | DocumentSaveException xwe) {
+        _LOGGER.error("Exception deleting Attachments on doc '{}'", docRef, xwe);
       }
     }
     return nrDeleted;
@@ -543,7 +544,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   public Attachment getApiAttachment(XWikiAttachment attachment
       ) throws NoAccessRightsException {
     XWikiDocument doc = attachment.getDoc();
-    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
+    if (rightsAccess.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
       return getApiAttachmentWithoutRightChecks(attachment);
     }
     throw new NoAccessRightsException(doc.getDocumentReference(),
