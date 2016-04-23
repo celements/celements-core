@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageType;
 import com.celements.pagetype.PageTypeApi;
+import com.celements.pagetype.xobject.XObjectPageTypeProvider;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -128,7 +129,7 @@ public class PageTypeCommand {
     if (pageTypeName.indexOf('.') > 0) {
       return pageTypeName;
     } else {
-      return "PageTypes." + pageTypeName;
+      return XObjectPageTypeProvider.DEFAULT_PAGE_TYPES_SPACE + "." + pageTypeName;
     }
   }
 

@@ -27,11 +27,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.service.IWebUtilsService;
 
 @Component(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
@@ -46,7 +47,7 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
   private String _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME =
       "celXObjectGetAllPageTypesTotelTime";
 
-  PageTypeCommand pageTypeCmd = new PageTypeCommand();
+  public static final String DEFAULT_PAGE_TYPES_SPACE = "PageTypes";
 
   @Requirement
   IXObjectPageTypeCacheRole xobjectPageTypeCache;
@@ -62,12 +63,9 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
   }
 
   public IPageTypeConfig getPageTypeByReference(PageTypeReference pageTypeRef) {
-    String pageTypeFN = pageTypeCmd.completePageTypeDocName(pageTypeRef.getConfigName());
-    return getXObjectPTConfigForFN(pageTypeFN);
-  }
-
-  private XObjectPageTypeConfig getXObjectPTConfigForFN(String pageTypeFN) {
-    return new XObjectPageTypeConfig(pageTypeFN);
+    DocumentReference pageTypeDocRef = new DocumentReference(pageTypeRef.getConfigName(),
+        new SpaceReference(DEFAULT_PAGE_TYPES_SPACE, webUtilsService.getWikiRef()));
+    return new XObjectPageTypeConfig(pageTypeDocRef);
   }
 
   public List<PageTypeReference> getPageTypes() {
