@@ -128,3 +128,5 @@ com.celements.common.observation.listener.LocalEventListener
 com.celements.configuration.CelementsPropertiesConfigurationSource
 com.celements.configuration.CelementsDefaultConfigurationSource
 com.celements.configuration.CelementsAllConfigurationSource
+com.celements.pagetype.DefaultPageTypeCategory
+com.celements.cells.CellTypeCategory
