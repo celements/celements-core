@@ -28,9 +28,9 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
-import com.celements.pagetype.IPageTypeCategoryRole;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.category.IPageTypeCategoryRole;
 
 @Component("pageType")
 public class PageTypeScriptService implements ScriptService {

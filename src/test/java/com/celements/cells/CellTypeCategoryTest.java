@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.pagetype.IPageTypeCategoryRole;
+import com.celements.pagetype.category.IPageTypeCategoryRole;
 import com.xpn.xwiki.web.Utils;
 
 

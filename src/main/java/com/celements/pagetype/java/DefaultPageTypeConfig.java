@@ -1,5 +1,6 @@
 package com.celements.pagetype.java;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.context.Execution;
@@ -58,7 +59,7 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public List<String> getCategories() {
-    return pageTypeImpl.getCategories();
+    return new ArrayList<String>(pageTypeImpl.getCategoryNames());
   }
 
   @Override

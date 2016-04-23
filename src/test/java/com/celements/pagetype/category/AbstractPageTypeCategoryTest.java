@@ -1,4 +1,4 @@
-package com.celements.pagetype;
+package com.celements.pagetype.category;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.pagetype.category.AbstractPageTypeCategory;
 
 
 public class AbstractPageTypeCategoryTest extends AbstractComponentTest {

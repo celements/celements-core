@@ -1,24 +1,27 @@
 package com.celements.pagetype.java;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.python.google.common.collect.Sets;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.Lists;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase {
+public class DefaultPageTypeConfigTest extends AbstractComponentTest {
 
   private IJavaPageTypeRole pageTypeImplMock;
   private DefaultPageTypeConfig testPageType;
@@ -59,8 +62,10 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetCategories() {
-    List<String> expectedCategories = Arrays.asList("", "pageType");
-    expect(pageTypeImplMock.getCategories()).andReturn(expectedCategories).anyTimes();
+    Set<String> expectedCategoriesSet = Sets.newHashSet("", "pageType");
+    List<String> expectedCategories = Lists.newArrayList(expectedCategoriesSet);
+    expect(pageTypeImplMock.getCategoryNames()).andReturn(expectedCategoriesSet
+        ).anyTimes();
     replayDefault();
     assertEquals(expectedCategories, testPageType.getCategories());
     verifyDefault();

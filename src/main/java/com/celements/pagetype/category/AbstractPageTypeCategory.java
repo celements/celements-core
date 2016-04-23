@@ -1,4 +1,4 @@
-package com.celements.pagetype;
+package com.celements.pagetype.category;
 
 import java.util.Collections;
 import java.util.HashSet;
