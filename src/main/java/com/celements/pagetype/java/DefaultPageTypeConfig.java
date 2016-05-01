@@ -16,6 +16,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class DefaultPageTypeConfig implements IPageTypeConfig {
 
+  public static final String PRETTYNAME_DICT_PREFIX = "cel_pagetype_prettyname_";
+
   private IJavaPageTypeRole pageTypeImpl;
 
   private XWikiContext getContext() {
@@ -38,10 +40,10 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public String getPrettyName() {
-    String dictNameKey = "cel_pagetype_prettyname_" + getName();
+    String dictNameKey = PRETTYNAME_DICT_PREFIX + getName();
     String dictionaryPrettyName = getWebUtilsService().getAdminMessageTool().get(
         dictNameKey);
-    if (dictNameKey.equals(dictionaryPrettyName)) {
+    if (!dictNameKey.equals(dictionaryPrettyName)) {
       return dictionaryPrettyName;
     }
     return getName();

@@ -151,4 +151,29 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_getPrettyName_inDict() {
+    String pageTypeName = "thePageTypeName";
+    String expectedPrettyName = "My Dictionary Pretty Name";
+    String dictKey = DefaultPageTypeConfig.PRETTYNAME_DICT_PREFIX + pageTypeName;
+    getMessageToolStub().injectMessage(dictKey, expectedPrettyName);
+    expect(webUtilsMock.getAdminMessageTool()).andReturn(getMessageToolStub()).anyTimes();
+    expect(pageTypeImplMock.getName()).andReturn(pageTypeName).anyTimes();
+    replayDefault();
+    assertEquals(expectedPrettyName, testPageType.getPrettyName());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPrettyName_notInDict() {
+    String pageTypeName = "thePageTypeName";
+    String dictKey = DefaultPageTypeConfig.PRETTYNAME_DICT_PREFIX + pageTypeName;
+    getMessageToolStub().injectMessage(dictKey, dictKey);
+    expect(webUtilsMock.getAdminMessageTool()).andReturn(getMessageToolStub()).anyTimes();
+    expect(pageTypeImplMock.getName()).andReturn(pageTypeName).anyTimes();
+    replayDefault();
+    assertEquals(pageTypeName, testPageType.getPrettyName());
+    verifyDefault();
+  }
+
 }
