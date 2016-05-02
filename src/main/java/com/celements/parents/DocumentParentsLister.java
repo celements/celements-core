@@ -56,7 +56,7 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     return parents;
   }
 
-  public void setPrimaryParents(List<DocumentReference> parents
+  private void setPrimaryParents(List<DocumentReference> parents
       ) throws XDocRecursionException {
     for (String providerName : getPrimaryProviderNames()) {
       IDocParentProviderRole provider = docParentProviderMap.get(providerName);
@@ -67,7 +67,7 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     }
   }
 
-  public boolean setSecondaryProviderParent(List<DocumentReference> parents
+  private boolean setSecondaryProviderParent(List<DocumentReference> parents
       ) throws XDocRecursionException {
     DocumentReference docRef = Iterables.getLast(parents);
     List<DocumentReference> nextParents = Collections.emptyList();

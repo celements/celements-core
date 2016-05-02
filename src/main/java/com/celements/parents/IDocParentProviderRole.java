@@ -9,9 +9,8 @@ import org.xwiki.model.reference.DocumentReference;
 public interface IDocParentProviderRole {
 
   /**
-   * get only parents for docRef NOT including docRef itself
    * @param docRef
-   * @return parents of docRef
+   * @return parents of docRef from bottom up (does NOT include docRef itself)
    */
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef);
 
