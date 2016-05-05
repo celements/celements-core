@@ -26,6 +26,13 @@ import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * instead use an ExecutorService implementation e.g. ThreadPoolExecutor
+ * 
+ * @author pichlerf
+ *
+ */
+@Deprecated
 public class DocumentCreationWorkerControl {
   private static DocumentCreationWorkerControl workerControl;
   private List<DocumentCreationWorker> workers;

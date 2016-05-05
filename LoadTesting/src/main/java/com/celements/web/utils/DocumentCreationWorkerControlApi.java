@@ -22,6 +22,17 @@ package com.celements.web.utils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 
+/**
+ * TODO change to ScriptService using an ExecuterService implementation
+ * e.g.     ExecutorService executor = Executors.newFixedThreadPool(2);
+ * Create the DocumentCreationWorker and wrap in a FutureTask. After that add the
+ * futureTask to the executor:    executor.execute(futureTask1);
+ * The FutureTask allows to cancel the Worker and can check if it isDone.
+ * 
+ * @author pichlerf
+ *
+ */
+@Deprecated
 public class DocumentCreationWorkerControlApi extends Api {
   DocumentCreationWorkerControl workerControl;
   
