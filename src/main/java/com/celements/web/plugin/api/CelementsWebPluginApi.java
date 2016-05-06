@@ -70,7 +70,6 @@ import com.celements.web.service.IWebUtilsService;
 import com.celements.web.service.LegacySkinScriptService;
 import com.celements.web.service.WebUtilsScriptService;
 import com.celements.web.service.WebUtilsService;
-import com.celements.web.utils.DocumentCreationWorkerControlApi;
 import com.celements.web.utils.SuggestBaseClass;
 import com.celements.web.utils.WebUtils;
 import com.celements.webform.ActionScriptService;
@@ -1767,14 +1766,6 @@ public class CelementsWebPluginApi extends Api {
   @Deprecated
   public boolean isValidLanguage() {
     return getScriptService().isValidLanguage();
-  }
-
-  /**
-   * @deprecated since 2.59 without replacement
-   */
-  @Deprecated
-  public DocumentCreationWorkerControlApi getTestDocumentCreationWorker() {
-    return new DocumentCreationWorkerControlApi(context);
   }
 
   /**
