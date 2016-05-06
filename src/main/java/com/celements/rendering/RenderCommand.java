@@ -54,7 +54,7 @@ public class RenderCommand {
 
   IPageTypeResolverRole injectedPageTypeResolver;
 
-  private static XWikiRenderingEngine defaultRenderingEngine;
+  private volatile static XWikiRenderingEngine defaultRenderingEngine;
 
   /**
    * @Deprecated since 2.18.0 instead use new RenderCommand() 
@@ -280,7 +280,7 @@ public class RenderCommand {
     return this.renderingEngine;
   }
 
-  static XWikiRenderingEngine getDefaultRenderingEngine(XWikiContext context
+  synchronized static XWikiRenderingEngine getDefaultRenderingEngine(XWikiContext context
       ) throws XWikiException {
     if (defaultRenderingEngine == null) {
       defaultRenderingEngine = initRenderingEngine(Arrays.asList("velocity", "groovy"),
