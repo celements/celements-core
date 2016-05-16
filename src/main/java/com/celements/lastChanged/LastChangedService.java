@@ -135,6 +135,7 @@ public class LastChangedService implements ILastChangedRole {
 
   Map<SpaceReference, Date> getLastUpdatedSpaceCache() {
     if (lastUpdatedSpaceCache == null) {
+      //XXX why not use ConcurrentHashMap???
       lastUpdatedSpaceCache = new HashMap<>();
     }
     return lastUpdatedSpaceCache;
@@ -142,6 +143,7 @@ public class LastChangedService implements ILastChangedRole {
 
   Map<WikiReference, Date> getLastUpdatedWikiCache() {
     if (lastUpdatedWikiCache == null) {
+      //XXX why not use ConcurrentHashMap???
       lastUpdatedWikiCache = new HashMap<>();
     }
     return lastUpdatedWikiCache;
