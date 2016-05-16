@@ -58,22 +58,19 @@ public class GetNotMappedMenuItemsForParentCommandTest
   @Test
   public void testGetCacheKey_space() {
     context.setDatabase("mydatabase");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace.",
-        context));
+    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace."));
   }
 
   @Test
   public void testGetCacheKey_fullName() {
     context.setDatabase("mydatabase");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace2.Doc2",
-        context));
+    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace2.Doc2"));
   }
 
   @Test
   public void testGetCacheKey_space_different_db() {
     context.setDatabase("theWiki");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace.",
-        context));
+    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace."));
   }
 
   @Test
@@ -122,7 +119,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
   public void testGetTreeNodesForParentKey_hit() throws Exception {
     context.setDatabase("mydatabase");
     String searchParentKey = "mydatabase:MySpace.";
-    String cacheKey = notMappedItemsCmd.getCacheKey(searchParentKey, context);
+    String cacheKey = notMappedItemsCmd.getCacheKey(searchParentKey);
     HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), "", 1),
@@ -156,7 +153,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
   public void testGetTreeNodesForParentKey_hit_empty() throws Exception {
     context.setDatabase("mydatabase");
     String searchParentKey = "mydatabase:MySpace.MyDoc1";
-    String cacheKey = notMappedItemsCmd.getCacheKey(searchParentKey, context);
+    String cacheKey = notMappedItemsCmd.getCacheKey(searchParentKey);
     HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
     mySpaceMap.put("mydatabase:MySpace.", Arrays.asList(
         new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1"),
@@ -200,7 +197,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     context.setDatabase("mydatabase");
     replayDefault();
     assertEquals("mydatabase:Full.Name", notMappedItemsCmd.getParentKey(
-        context.getDatabase(), "Full.Name", "Space", context));
+        context.getDatabase(), "Full.Name", "Space"));
     verifyDefault();
   }
 
@@ -209,7 +206,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     context.setDatabase("mydatabase");
     replayDefault();
     assertEquals("mydatabase:Space.Name", notMappedItemsCmd.getParentKey(
-        context.getDatabase(), "Name", "Space", context));
+        context.getDatabase(), "Name", "Space"));
     verifyDefault();
   }
 
@@ -218,7 +215,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     context.setDatabase("myTestWiki");
     replayDefault();
     assertEquals("mydatabase:Space.Name", notMappedItemsCmd.getParentKey("mydatabase",
-        "Name", "Space", context));
+        "Name", "Space"));
     verifyDefault();
   }
 
@@ -263,7 +260,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
         ).andReturn(resultList).atLeastOnce();
     replayDefault();
-    List<Object[]> result = notMappedItemsCmd.executeSearch("mydatabase", context);
+    List<Object[]> result = notMappedItemsCmd.executeSearch("mydatabase");
     assertEquals("expect database being adjusted.", "mydatabase", context.getDatabase());
     assertEquals(resultList, result);
     verifyDefault();
@@ -278,8 +275,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))
         ).andReturn(resultList).atLeastOnce();
     replayDefault();
-    List<Object[]> result = notMappedItemsCmd.getFromDBForParentKey("mydatabase:MySpace.",
-        context);
+    List<Object[]> result = notMappedItemsCmd.getFromDBForParentKey("mydatabase:MySpace.");
     assertEquals("expect database being preserved.", "myTestWiki", context.getDatabase());
     assertEquals(resultList, result);
     verifyDefault();

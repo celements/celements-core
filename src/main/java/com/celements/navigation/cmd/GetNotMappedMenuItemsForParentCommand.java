@@ -24,42 +24,60 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.IPartNameGetStrategy;
 import com.celements.navigation.TreeNode;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class GetNotMappedMenuItemsForParentCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       GetNotMappedMenuItemsForParentCommand.class);
 
-  private HashMap<String, Map<String, List<TreeNode>>> menuItems;
+  private Map<String, Map<String, List<TreeNode>>> menuItems;
   
   private int queryCount = 0;
 
-  public GetNotMappedMenuItemsForParentCommand() {
-    menuItems = new HashMap<String, Map<String, List<TreeNode>>>();
+  private XWikiContext getContext() {
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext(
+        ).getProperty("xwikicontext");
   }
 
-  HashMap<String, Map<String, List<TreeNode>>> getMenuItemsCache() {
+  public GetNotMappedMenuItemsForParentCommand() {
+    menuItems = new ConcurrentHashMap<String, Map<String, List<TreeNode>>>();
+  }
+
+  Map<String, Map<String, List<TreeNode>>> getMenuItemsCache() {
     return menuItems;
   }
 
+  /**
+   * @deprecated instead use getTreeNodesForParentKey(String
+   */
+  @Deprecated
   public List<TreeNode> getTreeNodesForParentKey(String searchParentKey,
       XWikiContext context) {
-    String cacheKey = getCacheKey(searchParentKey, context);
+    return getTreeNodesForParentKey(searchParentKey);
+  }
+
+  synchronized public List<TreeNode> getTreeNodesForParentKey(String searchParentKey) {
+    String cacheKey = getCacheKey(searchParentKey);
     LOGGER.trace("getNotMappedMenuItemsFromDatabase: for cacheKey [" + cacheKey + "].");
     if (!menuItems.containsKey(cacheKey)) {
       Map<String, List<TreeNode>> wikiMenuItemsMap =
-        new HashMap<String, List<TreeNode>>();
+          new HashMap<String, List<TreeNode>>();
       queryCount = queryCount + 1;
       List<TreeNode> menu = null;
       try {
@@ -69,8 +87,8 @@ public class GetNotMappedMenuItemsForParentCommand {
         String oldParentKey = "";
         int docCount = 0;
         long start = System.currentTimeMillis();
-        String wikiName = getWikiName(searchParentKey, context);
-        List<Object[]> results = getFromDBForParentKey(wikiName, context);
+        String wikiName = getWikiName(searchParentKey);
+        List<Object[]> results = getFromDBForParentKey(wikiName);
         long end = System.currentTimeMillis();
         LOGGER.info("getNotMappedMenuItemsFromDatabase: time for searchDocumentsNames: "
             + (end-start));
@@ -79,8 +97,7 @@ public class GetNotMappedMenuItemsForParentCommand {
           docCount++;
           LOGGER.debug("got item from db: " + docData[0].toString());
           oldParentKey = parentKey;
-          parentKey = getParentKey(wikiName, docData[2].toString(), docData[1].toString(),
-              context);
+          parentKey = getParentKey(wikiName, docData[2].toString(), docData[1].toString());
           if(!oldParentKey.equals(parentKey) || (menu == null)) {
             if (menu != null) {
               LOGGER.debug("put menu in cache for parent [" + oldParentKey + "]");
@@ -124,15 +141,19 @@ public class GetNotMappedMenuItemsForParentCommand {
         if (menu != null) {
           wikiMenuItemsMap.put(parentKey, menu);
         }
+        for (String theParentKey : wikiMenuItemsMap.keySet()) {
+          List<TreeNode> theMenu = wikiMenuItemsMap.get(theParentKey);
+          wikiMenuItemsMap.put(theParentKey, ImmutableList.copyOf(theMenu));
+        }
         end = System.currentTimeMillis();
         LOGGER.info("getNotMappedMenuItemsFromDatabase: time for building cache: "
             + (end-start));
         LOGGER.info("getNotMappedMenuItemsFromDatabase: cache size: "
             + wikiMenuItemsMap.size());
+        menuItems.put(cacheKey, ImmutableMap.copyOf(wikiMenuItemsMap));
       } catch (XWikiException exp) {
         LOGGER.error("getSubMenuItemsForParent ", exp);
       }
-      menuItems.put(cacheKey, wikiMenuItemsMap);
     }
     if ((menuItems.get(cacheKey) != null)
         && (menuItems.get(cacheKey).get(searchParentKey) != null)){
@@ -141,21 +162,24 @@ public class GetNotMappedMenuItemsForParentCommand {
     return Collections.emptyList();
   }
 
-  List<Object[]> getFromDBForParentKey(String wikiName, XWikiContext context)
+  List<Object[]> getFromDBForParentKey(String wikiName)
       throws XWikiException {
-    String databaseBefore = context.getDatabase();
-    List<Object[]> results = executeSearch(wikiName, context);
-    context.setDatabase(databaseBefore);
-    return results;
+    String databaseBefore = getContext().getDatabase();
+    try {
+      List<Object[]> results = executeSearch(wikiName);
+      return results;
+    } finally {
+      getContext().setDatabase(databaseBefore);
+    }
   }
 
-  List<Object[]> executeSearch(String wikiName, XWikiContext context)
+  List<Object[]> executeSearch(String wikiName)
       throws XWikiException {
-    context.setDatabase(wikiName);
+    getContext().setDatabase(wikiName);
     String hql = getHQL();
-    LOGGER.debug("Executing on db [" + context.getDatabase() + "] hql: " + hql);
-    List<Object[]> results = context.getWiki().getStore().search(hql, 0, 0,
-        context);
+    LOGGER.debug("Executing on db [" + getContext().getDatabase() + "] hql: " + hql);
+    List<Object[]> results = getContext().getWiki().getStore().search(hql, 0, 0,
+        getContext());
     return results;
   }
 
@@ -180,19 +204,19 @@ public class GetNotMappedMenuItemsForParentCommand {
       + " order by doc.parent, pos.value";
   }
 
-  String getCacheKey(String parentKey, XWikiContext context) {
-    return getWikiName(parentKey, context);
+  String getCacheKey(String parentKey) {
+    return getWikiName(parentKey);
   }
 
-  private String getWikiName(String parentKey, XWikiContext context) {
-    String wikiName = context.getDatabase();
+  private String getWikiName(String parentKey) {
+    String wikiName = getContext().getDatabase();
     if (parentKey.contains(":")) {
       wikiName = parentKey.split(":", 2)[0];
     }
     return wikiName;
   }
 
-  String getParentKey(String wikiName, String parent, String menuSpace, XWikiContext context) {
+  String getParentKey(String wikiName, String parent, String menuSpace) {
     String parentKey = "";
     if (parent != null) {
       parentKey = parent;
@@ -231,7 +255,7 @@ public class GetNotMappedMenuItemsForParentCommand {
     if (wikiMenuItemsMap.containsKey(parentKey)) {
       return wikiMenuItemsMap.get(parentKey);
     } else {
-      return new ArrayList<TreeNode>();
+      return new ArrayList<TreeNode>(10);
     }
   }
   
