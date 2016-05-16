@@ -61,7 +61,8 @@ public class TreeNodeCache implements ITreeNodeCache {
     notMappedMenuItemCommand = testGetMenuItemCommand;
   }
 
-  public GetNotMappedMenuItemsForParentCommand getNotMappedMenuItemsForParentCmd() {
+  synchronized public GetNotMappedMenuItemsForParentCommand
+      getNotMappedMenuItemsForParentCmd() {
     if (notMappedMenuItemCommand == null) {
       notMappedMenuItemCommand = new GetNotMappedMenuItemsForParentCommand();
     }

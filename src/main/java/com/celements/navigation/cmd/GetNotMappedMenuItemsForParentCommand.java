@@ -240,7 +240,7 @@ public class GetNotMappedMenuItemsForParentCommand {
   /* (non-Javadoc)
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
-  public void flushMenuItemCache(XWikiContext context) {
+  synchronized public void flushMenuItemCache(XWikiContext context) {
     if (context != null) {
       LOGGER.debug("Entered method flushMenuItemCache with context db ["
           + context.getDatabase() + "].");
