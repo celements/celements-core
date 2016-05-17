@@ -255,7 +255,7 @@ public class GetNotMappedMenuItemsForParentCommand {
     if (wikiMenuItemsMap.containsKey(parentKey)) {
       return wikiMenuItemsMap.get(parentKey);
     } else {
-      return new ArrayList<TreeNode>(10);
+      return new ArrayList<TreeNode>(20);
     }
   }
   
