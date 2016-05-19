@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -311,7 +314,19 @@ public interface IModelAccessFacade {
    */
   public Object getProperty(BaseObject obj, String name);
 
+  public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull XObjectField<T> field)
+      throws DocumentLoadException, DocumentNotExistsException;
+
+  public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull XObjectField<T> field);
+
   public void setProperty(BaseObject obj, String name, Object value);
+
+  public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
+      @NotNull XObjectField<T> field, @Nullable T value) throws DocumentLoadException,
+          DocumentNotExistsException;
+
+  public <T> void setProperty(@NotNull XWikiDocument doc, @NotNull XObjectField<T> field,
+      @Nullable T value);
 
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use
