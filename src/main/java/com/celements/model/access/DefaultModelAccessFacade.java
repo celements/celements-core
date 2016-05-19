@@ -502,7 +502,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public Object getProperty(DocumentReference docRef, DocumentReference classRef, String name)
       throws DocumentLoadException, DocumentNotExistsException {
-    return getProperty(getDocumentForReadOnly(classRef), classRef, name);
+    return getProperty(getDocumentForReadOnly(docRef), classRef, name);
   }
 
   @Override
