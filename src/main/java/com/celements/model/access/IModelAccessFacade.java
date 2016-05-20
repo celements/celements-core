@@ -18,6 +18,7 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.model.util.XObjectField;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -326,7 +327,7 @@ public interface IModelAccessFacade {
           DocumentNotExistsException;
 
   public <T> void setProperty(@NotNull XWikiDocument doc, @NotNull XObjectField<T> field,
-      @Nullable T value);
+      @Nullable T value) throws ClassDocumentLoadException;
 
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use

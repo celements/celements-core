@@ -27,6 +27,7 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.model.util.XObjectField;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -543,11 +544,48 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public <T> T getProperty(DocumentReference docRef, XObjectField<T> field)
+      throws DocumentLoadException, DocumentNotExistsException {
+    return castObject(getProperty(docRef, field.getClassRef(), field.getName()), field);
+  }
+
+  @Override
+  public <T> T getProperty(XWikiDocument doc, XObjectField<T> field) {
+    return castObject(getProperty(doc, field.getClassRef(), field.getName()), field);
+  }
+
+  private <T> T castObject(Object obj, XObjectField<T> field) {
+    try {
+      return field.getToken().cast(obj);
+    } catch (ClassCastException ex) {
+      throw new IllegalArgumentException("XObjectField ill defined: " + field, ex);
+    }
+  }
+
+  @Override
   public void setProperty(BaseObject obj, String name, Object value) {
     if (value instanceof Collection) {
       value = Joiner.on('|').join((Iterable<?>) value);
     }
     obj.set(name, value, getContext());
+  }
+
+  @Override
+  public <T> XWikiDocument setProperty(DocumentReference docRef, XObjectField<T> field, T value)
+      throws DocumentLoadException, DocumentNotExistsException {
+    XWikiDocument doc = getDocument(docRef);
+    setProperty(doc, field, value);
+    return doc;
+  }
+
+  @Override
+  public <T> void setProperty(XWikiDocument doc, XObjectField<T> field, T value)
+      throws ClassDocumentLoadException {
+    try {
+      setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(), value);
+    } catch (ClassCastException ex) {
+      throw new IllegalArgumentException("XObjectField ill defined: " + field, ex);
+    }
   }
 
   @Override
@@ -569,39 +607,6 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throw new AttachmentNotExistsException(new AttachmentReference(filename, document
           .getDocumentReference()));
     }
-  }
-
-  @Override
-  public <T> T getProperty(DocumentReference docRef, XObjectField<T> field)
-      throws DocumentLoadException, DocumentNotExistsException {
-    return castObject(getProperty(docRef, field.getClassRef(), field.getName()), field);
-  }
-
-  @Override
-  public <T> T getProperty(XWikiDocument doc, XObjectField<T> field) {
-    return castObject(getProperty(doc, field.getClassRef(), field.getName()), field);
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> T castObject(Object obj, XObjectField<T> field) {
-    try {
-      return (T) obj;
-    } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("XObjectField ill defined: " + field, ex);
-    }
-  }
-
-  @Override
-  public <T> XWikiDocument setProperty(DocumentReference docRef, XObjectField<T> field, T value)
-      throws DocumentLoadException, DocumentNotExistsException {
-    XWikiDocument doc = getDocument(docRef);
-    setProperty(doc, field, value);
-    return doc;
-  }
-
-  @Override
-  public <T> void setProperty(XWikiDocument doc, XObjectField<T> field, T value) {
-    setProperty(getXObject(doc, field.getClassRef()), field.getName(), value);
   }
 
 }
