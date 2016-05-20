@@ -58,19 +58,19 @@ public class GetNotMappedMenuItemsForParentCommandTest
   @Test
   public void testGetCacheKey_space() {
     context.setDatabase("mydatabase");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace."));
+    assertEquals("mydatabase", notMappedItemsCmd.getWikiCacheKey("mydatabase:MySpace."));
   }
 
   @Test
   public void testGetCacheKey_fullName() {
     context.setDatabase("mydatabase");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace2.Doc2"));
+    assertEquals("mydatabase", notMappedItemsCmd.getWikiCacheKey("mydatabase:MySpace2.Doc2"));
   }
 
   @Test
   public void testGetCacheKey_space_different_db() {
     context.setDatabase("theWiki");
-    assertEquals("mydatabase", notMappedItemsCmd.getCacheKey("mydatabase:MySpace."));
+    assertEquals("mydatabase", notMappedItemsCmd.getWikiCacheKey("mydatabase:MySpace."));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
   public void testGetTreeNodesForParentKey_hit() throws Exception {
     context.setDatabase("mydatabase");
     String searchParentKey = "mydatabase:MySpace.";
-    String cacheKey = notMappedItemsCmd.getCacheKey(searchParentKey);
+    String cacheKey = notMappedItemsCmd.getWikiCacheKey(searchParentKey);
     HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), "", 1),
@@ -153,7 +153,7 @@ public class GetNotMappedMenuItemsForParentCommandTest
   public void testGetTreeNodesForParentKey_hit_empty() throws Exception {
     context.setDatabase("mydatabase");
     String searchParentKey = "mydatabase:MySpace.MyDoc1";
-    String cacheKey = notMappedItemsCmd.getCacheKey(searchParentKey);
+    String cacheKey = notMappedItemsCmd.getWikiCacheKey(searchParentKey);
     HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
     mySpaceMap.put("mydatabase:MySpace.", Arrays.asList(
         new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1"),
