@@ -48,8 +48,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 public class DefaultModelAccessFacade implements IModelAccessFacade {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      DefaultModelAccessFacade.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelAccessFacade.class);
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -61,8 +60,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
@@ -80,21 +78,17 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    * TODO unit test
    */
   @Override
-  public XWikiDocument getDocument(DocumentReference docRef, String lang
-      ) throws DocumentLoadException, DocumentNotExistsException,
-        TranslationNotExistsException {
+  public XWikiDocument getDocument(DocumentReference docRef, String lang)
+      throws DocumentLoadException, DocumentNotExistsException, TranslationNotExistsException {
     checkNotNull(docRef);
     checkState(!Strings.isNullOrEmpty(lang));
     XWikiDocument translatedDocument = getDocumentForReadOnly(docRef);
-    String defaultLanguage = webUtilsService.getDefaultLanguage(
-        docRef.getLastSpaceReference());
+    String defaultLanguage = webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference());
     String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
-    if (!lang.equals(docDefLang) && (!"".equals(docDefLang)
-        || !lang.equals(defaultLanguage))) {
+    if (!lang.equals(docDefLang) && (!"".equals(docDefLang) || !lang.equals(defaultLanguage))) {
       try {
         if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
-          translatedDocument = translatedDocument.getTranslatedDocument(lang,
-              getContext());
+          translatedDocument = translatedDocument.getTranslatedDocument(lang, getContext());
         } else {
           throw new TranslationNotExistsException(docRef, lang);
         }
@@ -102,9 +96,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         throw new DocumentLoadException(docRef, xwe);
       }
     }
-    // We need to clone this document first, since a cached storage would return the same object for the
-    // following requests, so concurrent request might get a partially modified object, or worse, if an error
-    // occurs during the save, the cached object will not reflect the actual document at all.
+    // We need to clone this document first, since a cached storage would return the same
+    // object for the
+    // following requests, so concurrent request might get a partially modified object, or
+    // worse, if an error
+    // occurs during the save, the cached object will not reflect the actual document at
+    // all.
     return translatedDocument.clone();
   }
 
@@ -113,32 +110,33 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (rightsAccess.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
       return doc.newDocument(getContext());
     }
-    throw new NoAccessRightsException(doc.getDocumentReference(),
-        getContext().getXWikiUser(), EAccessLevel.VIEW);
+    throw new NoAccessRightsException(doc.getDocumentReference(), getContext().getXWikiUser(),
+        EAccessLevel.VIEW);
   }
 
   /**
    * returns an editable document
    */
-  private XWikiDocument getDocumentInternal(DocumentReference docRef
-      ) throws DocumentLoadException {
-    // We need to clone this document first, since a cached storage would return the same object for the
-    // following requests, so concurrent request might get a partially modified object, or worse, if an error
-    // occurs during the save, the cached object will not reflect the actual document at all.
+  private XWikiDocument getDocumentInternal(DocumentReference docRef) throws DocumentLoadException {
+    // We need to clone this document first, since a cached storage would return the same
+    // object for the
+    // following requests, so concurrent request might get a partially modified object, or
+    // worse, if an error
+    // occurs during the save, the cached object will not reflect the actual document at
+    // all.
     return getDocumentInternalForReadOnly(docRef).clone();
   }
 
   /**
-   * returns an xwiki document for readonly usage
-   * 
-   * CAUTION: never ever change anything on the returned XWikiDocument, because it is
-   * the object in cache. Thus the same object will be returned for the following
-   * requests. If you change this object, concurrent request might get a partially
-   * modified object, or worse, if an error occurs during the save (or no save call
-   * happens), the cached object will not reflect the actual document at all.
+   * returns an xwiki document for readonly usage CAUTION: never ever change anything on
+   * the returned XWikiDocument, because it is the object in cache. Thus the same object
+   * will be returned for the following requests. If you change this object, concurrent
+   * request might get a partially modified object, or worse, if an error occurs during
+   * the save (or no save call happens), the cached object will not reflect the actual
+   * document at all.
    */
-  private XWikiDocument getDocumentInternalForReadOnly(DocumentReference docRef
-      ) throws DocumentLoadException {
+  private XWikiDocument getDocumentInternalForReadOnly(DocumentReference docRef)
+      throws DocumentLoadException {
     try {
       return getContext().getWiki().getDocument(docRef, getContext());
     } catch (XWikiException xwe) {
@@ -147,16 +145,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   /**
-   * returns an xwiki document for readonly usage
-   * 
-   * CAUTION: never ever change anything on the returned XWikiDocument, because it is
-   * the object in cache. Thus the same object will be returned for the following
-   * requests. If you change this object, concurrent request might get a partially
-   * modified object, or worse, if an error occurs during the save (or no save call
-   * happens), the cached object will not reflect the actual document at all.
+   * returns an xwiki document for readonly usage CAUTION: never ever change anything on
+   * the returned XWikiDocument, because it is the object in cache. Thus the same object
+   * will be returned for the following requests. If you change this object, concurrent
+   * request might get a partially modified object, or worse, if an error occurs during
+   * the save (or no save call happens), the cached object will not reflect the actual
+   * document at all.
    */
-  private XWikiDocument getDocumentForReadOnly(DocumentReference docRef
-      ) throws DocumentLoadException, DocumentNotExistsException {
+  private XWikiDocument getDocumentForReadOnly(DocumentReference docRef)
+      throws DocumentLoadException, DocumentNotExistsException {
     checkNotNull(docRef);
     if (exists(docRef)) {
       return getDocumentInternalForReadOnly(docRef);
@@ -166,8 +163,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public XWikiDocument createDocument(DocumentReference docRef
-      ) throws DocumentLoadException, DocumentAlreadyExistsException {
+  public XWikiDocument createDocument(DocumentReference docRef) throws DocumentLoadException,
+      DocumentAlreadyExistsException {
     checkNotNull(docRef);
     if (!exists(docRef)) {
       return createDocumentInternal(docRef);
@@ -176,8 +173,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
   }
 
-  private XWikiDocument createDocumentInternal(DocumentReference docRef
-      ) throws DocumentLoadException {
+  private XWikiDocument createDocumentInternal(DocumentReference docRef)
+      throws DocumentLoadException {
     XWikiDocument doc = getDocumentInternal(docRef);
     Date creationDate = new Date();
     doc.setDefaultLanguage(webUtilsService.getDefaultLanguage());
@@ -194,8 +191,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public XWikiDocument getOrCreateDocument(DocumentReference docRef
-      ) throws DocumentLoadException {
+  public XWikiDocument getOrCreateDocument(DocumentReference docRef) throws DocumentLoadException {
     checkNotNull(docRef);
     if (exists(docRef)) {
       return getDocumentInternal(docRef);
@@ -226,14 +222,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit
-      ) throws DocumentSaveException {
+  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
+      throws DocumentSaveException {
     checkNotNull(doc);
     try {
       String username = getContext().getUser();
       doc.setAuthor(username);
       if (doc.isNew()) {
-          doc.setCreator(username);
+        doc.setCreator(username);
       }
       getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     } catch (XWikiException xwe) {
@@ -242,8 +238,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void deleteDocument(DocumentReference docRef, boolean totrash
-      ) throws DocumentLoadException, DocumentDeleteException {
+  public void deleteDocument(DocumentReference docRef, boolean totrash)
+      throws DocumentLoadException, DocumentDeleteException {
     try {
       deleteDocument(getDocument(docRef), totrash);
     } catch (DocumentNotExistsException exc) {
@@ -252,8 +248,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void deleteDocument(XWikiDocument doc, boolean totrash
-      ) throws DocumentDeleteException {
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException {
     checkNotNull(doc);
     List<XWikiDocument> toDelDocs = new ArrayList<>();
     try {
@@ -273,13 +268,13 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash
-      ) throws DocumentDeleteException {
+  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
+      throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
       getContext().setDatabase(webUtilsService.getWikiRef(doc).getName());
-      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'",
-          doc, doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
+      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc, doc
+          .getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
         getContext().getWiki().deleteDocument(doc, totrash, getContext());
       } catch (XWikiException xwe) {
@@ -291,17 +286,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef
-      ) throws DocumentLoadException, DocumentNotExistsException {
-    return Iterables.getFirst(getXObjects(getDocumentForReadOnly(docRef),
-        classRef), null);
+  public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef)
+      throws DocumentLoadException, DocumentNotExistsException {
+    return Iterables.getFirst(getXObjects(getDocumentForReadOnly(docRef), classRef), null);
   }
 
   @Override
-  public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef,
-      String key, Object value) throws DocumentLoadException, DocumentNotExistsException {
-    return Iterables.getFirst(getXObjects(getDocumentForReadOnly(docRef), classRef, key,
-        value), null);
+  public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef, String key,
+      Object value) throws DocumentLoadException, DocumentNotExistsException {
+    return Iterables.getFirst(getXObjects(getDocumentForReadOnly(docRef), classRef, key, value),
+        null);
   }
 
   @Override
@@ -316,8 +310,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef
-      ) throws DocumentLoadException, DocumentNotExistsException {
+  public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef)
+      throws DocumentLoadException, DocumentNotExistsException {
     return getXObjects(getDocumentForReadOnly(docRef), classRef);
   }
 
@@ -329,8 +323,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
-      String key, Collection<?> values) throws DocumentLoadException,
-      DocumentNotExistsException {
+      String key, Collection<?> values) throws DocumentLoadException, DocumentNotExistsException {
     return getXObjects(getDocumentForReadOnly(docRef), classRef, key, values);
   }
 
@@ -340,20 +333,20 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, Object value) {
+  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
+      Object value) {
     return getXObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   @Override
-  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef,
-      String key, Collection<?> values) {
+  public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
+      Collection<?> values) {
     checkNotNull(doc);
     checkNotNull(classRef);
     classRef = webUtilsService.checkWikiRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
-    for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
-        ImmutableList.<BaseObject>of())) {
+    for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef), ImmutableList
+        .<BaseObject>of())) {
       if ((obj != null) && checkPropertyKeyValues(obj, key, values)) {
         ret.add(obj);
       }
@@ -373,8 +366,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     return Collections.unmodifiableMap(ret);
   }
 
-  private boolean checkPropertyKeyValues(BaseObject obj, String key,
-      Collection<?> checkValues) {
+  private boolean checkPropertyKeyValues(BaseObject obj, String key, Collection<?> checkValues) {
     boolean valid = (key == null);
     if (!valid) {
       checkValues = MoreObjects.firstNonNull(checkValues, Collections.emptyList());
@@ -387,16 +379,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public com.xpn.xwiki.api.Object getApiObject(BaseObject obj
-      ) throws NoAccessRightsException {
+  public com.xpn.xwiki.api.Object getApiObject(BaseObject obj) throws NoAccessRightsException {
     com.xpn.xwiki.api.Object ret = null;
     if (obj != null) {
       try {
         if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
-          throw new NoAccessRightsException(obj.getDocumentReference(),
-              getContext().getXWikiUser(), EAccessLevel.VIEW);
+          throw new NoAccessRightsException(obj.getDocumentReference(), getContext().getXWikiUser(),
+              EAccessLevel.VIEW);
         }
       } catch (IllegalStateException exp) {
         LOGGER.warn("getApiObject failed for '{}'", obj, exp);
@@ -429,8 +420,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public List<com.xpn.xwiki.api.Object> getApiObjectsWithoutRightChecks(
-      List<BaseObject> objs) {
+  public List<com.xpn.xwiki.api.Object> getApiObjectsWithoutRightChecks(List<BaseObject> objs) {
     List<com.xpn.xwiki.api.Object> ret = new ArrayList<>();
     for (BaseObject obj : objs) {
       if (obj != null) {
@@ -444,8 +434,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef
-      ) throws ClassDocumentLoadException {
+  public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef)
+      throws ClassDocumentLoadException {
     checkNotNull(doc);
     checkNotNull(classRef);
     classRef = webUtilsService.checkWikiRef(classRef, doc);
@@ -457,14 +447,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef
-      ) throws ClassDocumentLoadException {
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef)
+      throws ClassDocumentLoadException {
     return getOrCreateXObject(doc, classRef, null, null);
   }
 
   @Override
-  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef,
-      String key, Object value) throws ClassDocumentLoadException {
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef, String key,
+      Object value) throws ClassDocumentLoadException {
     BaseObject obj = getXObject(doc, classRef, key, value);
     if (obj == null) {
       obj = newXObject(doc, classRef);
@@ -510,9 +500,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public Object getProperty(DocumentReference docRef, DocumentReference classRef,
-      String name) throws DocumentLoadException, DocumentNotExistsException {
-    return getProperty(getDocumentForReadOnly(classRef), classRef, name);
+  public Object getProperty(DocumentReference docRef, DocumentReference classRef, String name)
+      throws DocumentLoadException, DocumentNotExistsException {
+    return getProperty(getDocumentForReadOnly(docRef), classRef, name);
   }
 
   @Override
@@ -561,22 +551,23 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename
-      ) throws AttachmentNotExistsException {
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename)
+      throws AttachmentNotExistsException {
     for (XWikiAttachment attach : document.getAttachmentList()) {
       if ((attach != null) && attach.getFilename().equals(filename)) {
-          return attach;
+        return attach;
       }
     }
-    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
-        filename, document, document.getDocumentReference());
-    //FIXME empty or null filename leads to exception:
-    //java.lang.IllegalArgumentException: An Entity Reference name cannot be null or empty
-    if(Strings.isNullOrEmpty(filename)) {
+    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]", filename,
+        document, document.getDocumentReference());
+    // FIXME empty or null filename leads to exception:
+    // java.lang.IllegalArgumentException: An Entity Reference name cannot be null or
+    // empty
+    if (Strings.isNullOrEmpty(filename)) {
       throw new AttachmentNotExistsException(null);
     } else {
-      throw new AttachmentNotExistsException(new AttachmentReference(filename, 
-          document.getDocumentReference()));
+      throw new AttachmentNotExistsException(new AttachmentReference(filename, document
+          .getDocumentReference()));
     }
   }
 

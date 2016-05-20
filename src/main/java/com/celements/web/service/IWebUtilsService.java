@@ -62,20 +62,22 @@ public interface IWebUtilsService {
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
    * corresponding DocumentReference or throws IndexOutOfBoundsException
+   *
    * @param level
    * @return DocumentReference of level
-   * @throws IndexOutOfBoundsException - if level above root or below lowest
+   * @throws IndexOutOfBoundsException
+   *           - if level above root or below lowest
    */
   public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
 
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc);
 
-  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section
-      ) throws XWikiException;
+  public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section)
+      throws XWikiException;
 
-  public String getDocSection(String regex, DocumentReference docRef, int section
-      ) throws XWikiException;
+  public String getDocSection(String regex, DocumentReference docRef, int section)
+      throws XWikiException;
 
   public int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
@@ -119,24 +121,21 @@ public interface IWebUtilsService {
 
   public DocumentReference resolveDocumentReference(String fullName);
 
-  public DocumentReference resolveDocumentReference(String fullName, 
-      WikiReference wikiRef);
+  public DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef);
 
   public EntityReference resolveRelativeEntityReference(String name, EntityType type);
 
   public SpaceReference resolveSpaceReference(String spaceName);
 
-  public SpaceReference resolveSpaceReference(String spaceName, 
-      WikiReference wikiRef);
+  public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
 
   public AttachmentReference resolveAttachmentReference(String fullName);
 
-  public AttachmentReference resolveAttachmentReference(String fullName, 
-      WikiReference wikiRef);
+  public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef);
 
   public EntityReference resolveEntityReference(String name, EntityType type);
 
-  public EntityReference resolveEntityReference(String name, EntityType type, 
+  public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef);
 
   public boolean isAdminUser();
@@ -159,75 +158,72 @@ public interface IWebUtilsService {
   public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user);
 
   /**
-   * CAUTION: this method returns attachments which start with the attRef.name if no
-   * exact match exists.
-   * 
-   * @deprecated instead use IAttachmentServiceRole.getAttachmentNameEqual
-   *             or IAttachmentServiceRole.getAttachmentsNameMatch
+   * CAUTION: this method returns attachments which start with the attRef.name if no exact
+   * match exists.
+   *
+   * @deprecated instead use IAttachmentServiceRole.getAttachmentNameEqual or
+   *             IAttachmentServiceRole.getAttachmentsNameMatch
    */
   @Deprecated
   public XWikiAttachment getAttachment(AttachmentReference attRef) throws XWikiException;
 
   public Attachment getAttachmentApi(AttachmentReference attRef) throws XWikiException;
-  
+
   /**
    * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator)}
    */
   @Deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException;
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
+      throws ClassNotFoundException;
 
-  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator);
 
   /**
-   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, 
-   * boolean)}
+   * @deprecated instead use
+   *             {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly);
 
-  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly);
 
   /**
-   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, 
-   * boolean, int, int)}
+   * @deprecated instead use
+   *             {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean, int, int)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb);
 
-  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc, 
+  public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb);
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
-  public List<Attachment> getAttachmentListSortedSpace(String spaceName,
-      String comparator, boolean imagesOnly, int start, int nb
-      ) throws ClassNotFoundException;
+  // TODO change signature requirement to XWikiDocument instead of document and mark
+  // the old version as deprecated
+  public List<Attachment> getAttachmentListSortedSpace(String spaceName, String comparator,
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException;
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
+  // TODO change signature requirement to XWikiDocument instead of document and mark
+  // the old version as deprecated
   public List<Attachment> getAttachmentListForTagSorted(Document doc, String tagName,
       String comparator, boolean imagesOnly, int start, int nb);
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
-  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName,
-      String tagName, String comparator, boolean imagesOnly, int start, int nb
-      ) throws ClassNotFoundException;
+  // TODO change signature requirement to XWikiDocument instead of document and mark
+  // the old version as deprecated
+  public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName, String tagName,
+      String comparator, boolean imagesOnly, int start, int nb) throws ClassNotFoundException;
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly);
+  // TODO change signature requirement to XWikiDocument instead of document and mark
+  // the old version as deprecated
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly);
 
-  //TODO change signature requirement to XWikiDocument instead of document and mark
-  //     the old version as deprecated
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly, int start, int nb);
+  // TODO change signature requirement to XWikiDocument instead of document and mark
+  // the old version as deprecated
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
+      int start, int nb);
 
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
@@ -238,7 +234,7 @@ public interface IWebUtilsService {
   public String[] splitStringByLength(String inStr, int maxLength);
 
   public String getJSONContent(XWikiDocument cdoc);
-  
+
   public String getJSONContent(DocumentReference docRef);
 
   public String getUserNameForDocRef(DocumentReference authDocRef) throws XWikiException;
@@ -266,34 +262,33 @@ public interface IWebUtilsService {
   public String serializeRef(EntityReference entityRef);
 
   public String serializeRef(EntityReference entityRef, boolean local);
-  
+
   public Map<String, String[]> getRequestParameterMap();
 
   public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
 
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException;
 
-  public void deleteAllDocuments(XWikiDocument doc, boolean totrash
-      ) throws XWikiException;
+  public void deleteAllDocuments(XWikiDocument doc, boolean totrash) throws XWikiException;
 
   public String getTemplatePathOnDisk(String renderTemplatePath);
 
   public String getTemplatePathOnDisk(String renderTemplatePath, String lang);
 
-  public String renderInheritableDocument(DocumentReference docRef, String lang
-      ) throws XWikiException;
+  public String renderInheritableDocument(DocumentReference docRef, String lang)
+      throws XWikiException;
 
-  public String renderInheritableDocument(DocumentReference docRef, String lang,
-      String defLang) throws XWikiException;
+  public String renderInheritableDocument(DocumentReference docRef, String lang, String defLang)
+      throws XWikiException;
 
   public boolean isLayoutEditor();
 
   public String cleanupXHTMLtoHTML5(String xhtml);
-  
+
   public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
 
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
-  
+
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN);
 
   public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
@@ -301,16 +296,19 @@ public interface IWebUtilsService {
 
   public boolean existsInheritableDocument(DocumentReference docRef, String lang);
 
-  public boolean existsInheritableDocument(DocumentReference docRef, String lang,
-      String defLang);
+  public boolean existsInheritableDocument(DocumentReference docRef, String lang, String defLang);
 
   /**
    * used to send an email if result of <param>jobMailName</param> is not empty
-   * 
-   * @param jobMailName inheritable Mails document name
-   * @param fromAddr sender address
-   * @param toAddr  recipients
-   * @param params list of strings passed through to dictionary subject resolving
+   *
+   * @param jobMailName
+   *          inheritable Mails document name
+   * @param fromAddr
+   *          sender address
+   * @param toAddr
+   *          recipients
+   * @param params
+   *          list of strings passed through to dictionary subject resolving
    */
   public void sendCheckJobMail(String jobMailName, String fromAddr, String toAddr,
       List<String> params);
@@ -321,7 +319,7 @@ public interface IWebUtilsService {
    * resolves the {@link EntityType} for the given fullName.<br>
    * <br>
    * Simple names will return {@link EntityType#WIKI}.
-   * 
+   *
    * @param fullName
    * @return
    */
@@ -329,31 +327,28 @@ public interface IWebUtilsService {
 
   /**
    * resolves the {@link EntityType} for the given fullName.
-   * 
+   *
    * @param fullName
-   * @param defaultNameType EntityType used if given fullName is just a simple name
+   * @param defaultNameType
+   *          EntityType used if given fullName is just a simple name
    * @return
    */
-  public EntityType resolveEntityTypeForFullName(String fullName, 
-      EntityType defaultNameType);
+  public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType);
 
   /**
    * only used as an adapter for unstable 2
    */
   public <T> T lookup(Class<T> role) throws ComponentLookupException;
 
-
   /**
    * only used as an adapter for unstable 2
    */
   public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException;
 
-
   /**
    * only used as an adapter for unstable 2
    */
   public <T> List<T> lookupList(Class<T> role) throws ComponentLookupException;
-
 
   /**
    * only used as an adapter for unstable 2
@@ -362,6 +357,7 @@ public interface IWebUtilsService {
 
   /**
    * checks and corrects the WikiReference on docRef compared to current wiki.
+   *
    * @param docRef
    * @return
    */
@@ -369,6 +365,7 @@ public interface IWebUtilsService {
 
   /**
    * checks and corrects the WikiReference on docRef compared to toDoc.
+   *
    * @param docRef
    * @param toDoc
    * @return
@@ -377,6 +374,7 @@ public interface IWebUtilsService {
 
   /**
    * checks and corrects the WikiReference on docRef compared to toDoc.
+   *
    * @param docRef
    * @param toRef
    * @return
@@ -387,7 +385,6 @@ public interface IWebUtilsService {
 
   public DocumentReference setWikiReference(DocumentReference docRef, String wikiName);
 
-  public DocumentReference setWikiReference(DocumentReference docRef,
-      WikiReference wikiRef);
+  public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef);
 
 }
