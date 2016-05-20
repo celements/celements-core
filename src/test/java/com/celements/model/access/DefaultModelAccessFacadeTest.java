@@ -26,6 +26,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.model.util.XObjectField;
+import com.celements.model.util.XObjectFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
@@ -916,14 +917,15 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void testSetProperty_XObjectField() throws Exception {
-    XObjectField<String> field = new XObjectField<>(classRef, "name", String.class);
     String val = "val";
+    XObjectFieldValue<String> field = new XObjectFieldValue<>(new XObjectField<>(classRef, "name",
+        String.class), val);
     BaseObject obj = addObj(classRef, field.getName(), "");
 
     expectPropertyClass(classRef, field.getName(), new StringClass());
 
     replayDefault();
-    modelAccess.setProperty(doc, field, val);
+    modelAccess.setProperty(doc, field);
     verifyDefault();
 
     assertEquals(1, obj.getFieldList().size());
@@ -932,14 +934,15 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void testSetProperty_XObjectField_illegalField() throws Exception {
-    XObjectField<Date> field = new XObjectField<>(classRef, "name", Date.class);
+    XObjectFieldValue<Date> field = new XObjectFieldValue<>(new XObjectField<>(classRef, "name",
+        Date.class), new Date());
     BaseClass bClass = expectNewBaseObject(classRef);
 
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
     replayDefault();
     try {
-      modelAccess.setProperty(doc, field, new Date());
+      modelAccess.setProperty(doc, field);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
       assertTrue(iae.getMessage().contains("class.any.name"));
@@ -951,13 +954,14 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void testSetProperty_XObjectField_newObj() throws Exception {
-    XObjectField<String> field = new XObjectField<>(classRef, "name", String.class);
     String val = "val";
+    XObjectFieldValue<String> field = new XObjectFieldValue<>(new XObjectField<>(classRef, "name",
+        String.class), val);
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
     replayDefault();
-    modelAccess.setProperty(doc, field, val);
+    modelAccess.setProperty(doc, field);
     verifyDefault();
 
     BaseObject obj = doc.getXObject(classRef);

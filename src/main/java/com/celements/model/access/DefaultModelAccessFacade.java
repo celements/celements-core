@@ -28,6 +28,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.model.util.XObjectField;
+import com.celements.model.util.XObjectFieldValue;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -571,18 +572,18 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public <T> XWikiDocument setProperty(DocumentReference docRef, XObjectField<T> field, T value)
+  public <T> XWikiDocument setProperty(DocumentReference docRef, XObjectFieldValue<T> field)
       throws DocumentLoadException, DocumentNotExistsException {
     XWikiDocument doc = getDocument(docRef);
-    setProperty(doc, field, value);
+    setProperty(doc, field);
     return doc;
   }
 
   @Override
-  public <T> void setProperty(XWikiDocument doc, XObjectField<T> field, T value)
+  public <T> void setProperty(XWikiDocument doc, XObjectFieldValue<T> field)
       throws ClassDocumentLoadException {
     try {
-      setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(), value);
+      setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(), field.getValue());
     } catch (ClassCastException ex) {
       throw new IllegalArgumentException("XObjectField ill defined: " + field, ex);
     }

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -19,6 +18,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.model.util.XObjectField;
+import com.celements.model.util.XObjectFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -323,11 +323,10 @@ public interface IModelAccessFacade {
   public void setProperty(BaseObject obj, String name, Object value);
 
   public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
-      @NotNull XObjectField<T> field, @Nullable T value) throws DocumentLoadException,
-          DocumentNotExistsException;
+      @NotNull XObjectFieldValue<T> field) throws DocumentLoadException, DocumentNotExistsException;
 
-  public <T> void setProperty(@NotNull XWikiDocument doc, @NotNull XObjectField<T> field,
-      @Nullable T value) throws ClassDocumentLoadException;
+  public <T> void setProperty(@NotNull XWikiDocument doc, @NotNull XObjectFieldValue<T> field)
+      throws ClassDocumentLoadException;
 
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use

@@ -75,7 +75,7 @@ public class XObjectField<T> {
     return getWebUtils().serializeRef(getClassRef(), local) + "." + getName();
   }
 
-  private static IWebUtilsService getWebUtils() {
+  static IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
