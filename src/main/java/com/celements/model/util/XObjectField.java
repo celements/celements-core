@@ -60,16 +60,19 @@ public class XObjectField<T> {
   public boolean equals(Object obj) {
     if (obj instanceof XObjectField) {
       XObjectField<?> other = (XObjectField<?>) obj;
-      return new EqualsBuilder().append(this.getClassRef(), other.getClassRef()).append(this
-          .getName(), other.getName()).isEquals();
+      return new EqualsBuilder().append(getClassRef(), other.getClassRef()).append(getName(), other
+          .getName()).isEquals();
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return Utils.getComponent(IWebUtilsService.class).serializeRef(getClassRef(), true) + "."
-        + getName();
+    return toString(true);
+  }
+
+  public String toString(boolean local) {
+    return getWebUtils().serializeRef(getClassRef(), local) + "." + getName();
   }
 
   private static IWebUtilsService getWebUtils() {
