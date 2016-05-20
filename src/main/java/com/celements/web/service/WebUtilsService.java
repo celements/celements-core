@@ -452,6 +452,17 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  public WikiReference resolveWikiReference(String wikiName) {
+    WikiReference ret;
+    if (StringUtils.isNotBlank(wikiName)) {
+      ret = new WikiReference(wikiName);
+    } else {
+      ret = getWikiRef();
+    }
+    return ret;
+  }
+
+  @Override
   public AttachmentReference resolveAttachmentReference(String fullName) {
     return resolveAttachmentReference(fullName, null);
   }

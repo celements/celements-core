@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
@@ -128,6 +130,8 @@ public interface IWebUtilsService {
   public SpaceReference resolveSpaceReference(String spaceName);
 
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
+
+  public WikiReference resolveWikiReference(@Nullable String wikiName);
 
   public AttachmentReference resolveAttachmentReference(String fullName);
 

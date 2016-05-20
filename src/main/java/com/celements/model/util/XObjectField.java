@@ -5,12 +5,10 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
@@ -32,16 +30,8 @@ public class XObjectField<T> {
   public XObjectField(@Nullable String wiki, @NotNull String classSpace, @NotNull String className,
       @NotNull String name, Class<T> token) {
     this(new DocumentReference(Objects.requireNonNull(Strings.emptyToNull(className)),
-        new SpaceReference(Objects.requireNonNull(Strings.emptyToNull(classSpace)), resolveWikiRef(
-            wiki))), name, token);
-  }
-
-  private static WikiReference resolveWikiRef(String wiki) {
-    if (StringUtils.isBlank(wiki)) {
-      return Utils.getComponent(IWebUtilsService.class).getWikiRef();
-    } else {
-      return new WikiReference(wiki);
-    }
+        new SpaceReference(Objects.requireNonNull(Strings.emptyToNull(classSpace)), getWebUtils()
+            .resolveWikiReference(wiki))), name, token);
   }
 
   public XObjectField(@NotNull String classSpace, @NotNull String className, @NotNull String name,
@@ -80,6 +70,10 @@ public class XObjectField<T> {
   public String toString() {
     return Utils.getComponent(IWebUtilsService.class).serializeRef(getClassRef(), true) + "."
         + getName();
+  }
+
+  private static IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
 }
