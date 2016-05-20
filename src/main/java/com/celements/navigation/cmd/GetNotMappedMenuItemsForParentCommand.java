@@ -109,7 +109,7 @@ public class GetNotMappedMenuItemsForParentCommand {
           LOGGER.debug("got item from db: {}", docData[0].toString());
           oldParentKey = parentKey;
           parentKey = getParentKey(wikiName, docData[2].toString(), docData[1].toString());
-          if(!oldParentKey.equals(parentKey) || (menu == null)) {
+          if (!oldParentKey.equals(parentKey) || (menu == null)) {
             if (menu != null) {
               LOGGER.debug("put menu in cache for parent [{}]", oldParentKey);
               wikiMenuItemsMap.put(oldParentKey, menu);
