@@ -1,6 +1,7 @@
 package com.celements.model.util;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -12,13 +13,29 @@ public interface IXObjectUpdateRole {
 
   /**
    * updates the document from the field map given
-   * 
+   *
    * @param doc
-   * @param fieldMap key is of format "{ClassFullName}.{FieldName}"
+   * @param fieldMap
+   *          key is of format "{ClassFullName}.{FieldName}"
    * @return true if doc has changed
-   * @throws ClassDocumentLoadException if encountered invalid class name
+   * @throws ClassDocumentLoadException
+   *           if encountered invalid class name
+   * @deprecated instead use {@link #update(XWikiDocument, Set)}
    */
-  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap
-      ) throws ClassDocumentLoadException;
+  @Deprecated
+  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap)
+      throws ClassDocumentLoadException;
+
+  /**
+   * updates the document from the field map given
+   *
+   * @param doc
+   * @param fieldValues
+   * @return true if doc has changed
+   * @throws ClassDocumentLoadException
+   *           if encountered invalid class name
+   */
+  public boolean update(XWikiDocument doc, Set<XObjectFieldValue<?>> fieldValues)
+      throws ClassDocumentLoadException;
 
 }
