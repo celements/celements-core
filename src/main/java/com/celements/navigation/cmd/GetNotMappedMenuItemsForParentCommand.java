@@ -69,7 +69,7 @@ public class GetNotMappedMenuItemsForParentCommand {
   }
 
   /**
-   * @deprecated instead use getTreeNodesForParentKey(String
+   * @deprecated instead use getTreeNodesForParentKey(String)
    */
   @Deprecated
   public List<TreeNode> getTreeNodesForParentKey(String searchParentKey,
