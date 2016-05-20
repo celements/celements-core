@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -31,15 +32,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-public class GetNotMappedMenuItemsForParentCommandTest
-  extends AbstractBridgedComponentTestCase {
+public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
