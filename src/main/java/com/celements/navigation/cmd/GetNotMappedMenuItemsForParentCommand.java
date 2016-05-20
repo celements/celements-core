@@ -78,21 +78,21 @@ public class GetNotMappedMenuItemsForParentCommand {
   }
 
   public List<TreeNode> getTreeNodesForParentKey(String searchParentKey) {
-    String wikiCacheKey = getWikiCacheKey(searchParentKey);
-    LOGGER.trace("getNotMappedMenuItemsFromDatabase: for cacheKey [{}].", wikiCacheKey);
-    if (!menuItems.containsKey(wikiCacheKey)) {
-      loadMenuForWiki(wikiCacheKey);
+    String wikiName = getWikiName(searchParentKey);
+    LOGGER.trace("getNotMappedMenuItemsFromDatabase: for cacheKey [{}].", wikiName);
+    if (!menuItems.containsKey(wikiName)) {
+      loadMenuForWiki(wikiName);
     }
-    if (menuItems.containsKey(wikiCacheKey) && (menuItems.get(wikiCacheKey) != null)
-        && (menuItems.get(wikiCacheKey).get(searchParentKey) != null)){
-      return menuItems.get(wikiCacheKey).get(searchParentKey);
+    if (menuItems.containsKey(wikiName) && (menuItems.get(wikiName) != null)
+        && (menuItems.get(wikiName).get(searchParentKey) != null)){
+      return menuItems.get(wikiName).get(searchParentKey);
     }
     return Collections.emptyList();
   }
 
-  synchronized private void loadMenuForWiki(String wikiCacheKey) {
-    if (!menuItems.containsKey(wikiCacheKey)) {
-      LOGGER.debug("loadMenuForWiki: loading for wikiCacheKey [{}].", wikiCacheKey);
+  synchronized private void loadMenuForWiki(String wikiName) {
+    if (!menuItems.containsKey(wikiName)) {
+      LOGGER.debug("loadMenuForWiki: loading for wikiName [{}].", wikiName);
       Map<String, List<TreeNode>> wikiMenuItemsMap =
           new HashMap<String, List<TreeNode>>();
       queryCount = queryCount + 1;
@@ -104,7 +104,6 @@ public class GetNotMappedMenuItemsForParentCommand {
         String oldParentKey = "";
         int docCount = 0;
         long start = System.currentTimeMillis();
-        String wikiName = getWikiName(wikiCacheKey);
         List<Object[]> results = getFromDBForParentKey(wikiName);
         long end = System.currentTimeMillis();
         LOGGER.info("loadMenuForWiki: time for searchDocumentsNames: {} ", (end-start));
@@ -162,7 +161,7 @@ public class GetNotMappedMenuItemsForParentCommand {
         end = System.currentTimeMillis();
         LOGGER.info("loadMenuForWiki: time for building cache: {} ", (end-start));
         LOGGER.info("loadMenuForWiki: cache size: {}", wikiMenuItemsMap.size());
-        menuItems.put(wikiCacheKey, Collections.unmodifiableMap(wikiMenuItemsMap));
+        menuItems.put(wikiName, Collections.unmodifiableMap(wikiMenuItemsMap));
       } catch (XWikiException exp) {
         LOGGER.error("loadMenuForWiki failed. ", exp);
       }
