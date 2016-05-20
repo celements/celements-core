@@ -33,8 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.IPartNameGetStrategy;
 import com.celements.navigation.TreeNode;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -158,12 +156,12 @@ public class GetNotMappedMenuItemsForParentCommand {
         }
         for (String theParentKey : wikiMenuItemsMap.keySet()) {
           List<TreeNode> theMenu = wikiMenuItemsMap.get(theParentKey);
-          wikiMenuItemsMap.put(theParentKey, ImmutableList.copyOf(theMenu));
+          wikiMenuItemsMap.put(theParentKey, Collections.unmodifiableList(theMenu));
         }
         end = System.currentTimeMillis();
         LOGGER.info("loadMenuForWiki: time for building cache: {} ", (end-start));
         LOGGER.info("loadMenuForWiki: cache size: {}", wikiMenuItemsMap.size());
-        menuItems.put(wikiCacheKey, ImmutableMap.copyOf(wikiMenuItemsMap));
+        menuItems.put(wikiCacheKey, Collections.unmodifiableMap(wikiMenuItemsMap));
       } catch (XWikiException exp) {
         LOGGER.error("loadMenuForWiki failed. ", exp);
       }
