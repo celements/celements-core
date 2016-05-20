@@ -81,7 +81,7 @@ public class GetNotMappedMenuItemsForParentCommand {
     String wikiCacheKey = getWikiCacheKey(searchParentKey);
     LOGGER.trace("getNotMappedMenuItemsFromDatabase: for cacheKey [{}].", wikiCacheKey);
     if (!menuItems.containsKey(wikiCacheKey)) {
-      loadMenuForWiki(searchParentKey);
+      loadMenuForWiki(wikiCacheKey);
     }
     if (menuItems.containsKey(wikiCacheKey) && (menuItems.get(wikiCacheKey) != null)
         && (menuItems.get(wikiCacheKey).get(searchParentKey) != null)){
