@@ -57,8 +57,9 @@ public class GetNotMappedMenuItemsForParentCommand {
     /* ConcurrentHashMap is needed to prevent:
      * 1) ConcurrentModificationException if Thread A iterates over menuItems and
      *    Thread B is changing it.
-     * 2) Thread B changed a document and flushes menuItems for myWiki
-     * 3) Thread A stores already old version of myWiki in menuItems cache
+     * 2) Thread B changes the HashMap and Thread B does not synchronize on read
+     *    which may lead that it reads an old version from its memory cache.
+     *    Details see JSR133
      */
     menuItems = new ConcurrentHashMap<String, Map<String, List<TreeNode>>>();
   }
