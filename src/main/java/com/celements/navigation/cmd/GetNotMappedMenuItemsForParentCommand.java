@@ -46,7 +46,7 @@ public class GetNotMappedMenuItemsForParentCommand {
   private static Logger LOGGER = LoggerFactory.getLogger(
       GetNotMappedMenuItemsForParentCommand.class);
 
-  private Map<String, Map<String, List<TreeNode>>> menuItems;
+  private final Map<String, Map<String, List<TreeNode>>> menuItems;
   
   private int queryCount = 0;
 
@@ -56,6 +56,12 @@ public class GetNotMappedMenuItemsForParentCommand {
   }
 
   public GetNotMappedMenuItemsForParentCommand() {
+    /* ConcurrentHashMap is needed to prevent:
+     * 1) ConcurrentModificationException if Thread A iterates over menuItems and
+     *    Thread B is changing it.
+     * 2) Thread B changed a document and flushes menuItems for myWiki
+     * 3) Thread A stores already old version of myWiki in menuItems cache
+     */
     menuItems = new ConcurrentHashMap<String, Map<String, List<TreeNode>>>();
   }
 
@@ -243,6 +249,11 @@ public class GetNotMappedMenuItemsForParentCommand {
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   synchronized public void flushMenuItemCache(XWikiContext context) {
+    /* flushMenuItemCache must be synchronized to prevent following situation:
+     * 1) Thread A starts loadMenuForWiki for myWiki and gets current state from DB
+     * 2) Thread B changed a document and flushes menuItems for myWiki
+     * 3) Thread A stores already old version of myWiki in menuItems cache
+     */
     if (context != null) {
       LOGGER.debug("Entered method flushMenuItemCache with context db [{}].",
           context.getDatabase());
