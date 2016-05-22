@@ -54,18 +54,24 @@ public class GetNotMappedMenuItemsForParentCommand {
   }
 
   public GetNotMappedMenuItemsForParentCommand() {
-    /* ConcurrentHashMap is needed to prevent:
-     * 1) ConcurrentModificationException if Thread A iterates over menuItems and
-     *    Thread B is changing it.
-     * 2) Thread B changes the HashMap and Thread B does not synchronize on read
-     *    which may lead that it reads an old version from its memory cache.
-     *    Details see JSR133
+    /* ConcurrentHashMap allows non synchronized reading and still prevents following
+     * situation:
+     * Thread B changes the HashMap and Thread A does not synchronize on read
+     * which may lead to Thread A reading an old version from its memory cache.
+     * Details see JSR133
      */
     menuItems = new ConcurrentHashMap<String, Map<String, List<TreeNode>>>();
   }
 
-  Map<String, Map<String, List<TreeNode>>> getMenuItemsCache() {
-    return menuItems;
+  /**
+   * use for tests only!!!
+   */
+  void injectMapForTests(String wikiName, HashMap<String, List<TreeNode>> myWikiTestMap) {
+    menuItems.put(wikiName, myWikiTestMap);
+  }
+
+  Map<String, List<TreeNode>> internalGetMenuItemsForWiki(String wikiName) {
+    return menuItems.get(wikiName);
   }
 
   /**
@@ -80,17 +86,17 @@ public class GetNotMappedMenuItemsForParentCommand {
   public List<TreeNode> getTreeNodesForParentKey(String searchParentKey) {
     String wikiName = getWikiName(searchParentKey);
     LOGGER.trace("getNotMappedMenuItemsFromDatabase: for cacheKey [{}].", wikiName);
-    if (!menuItems.containsKey(wikiName)) {
-      loadMenuForWiki(wikiName);
+    Map<String, List<TreeNode>> wikiMenu = internalGetMenuItemsForWiki(wikiName);
+    if (wikiMenu == null) {
+      wikiMenu = loadMenuForWiki(wikiName);
     }
-    if (menuItems.containsKey(wikiName) && (menuItems.get(wikiName) != null)
-        && (menuItems.get(wikiName).get(searchParentKey) != null)){
-      return menuItems.get(wikiName).get(searchParentKey);
+    if (wikiMenu.containsKey(searchParentKey)) {
+      return wikiMenu.get(searchParentKey);
     }
     return Collections.emptyList();
   }
 
-  synchronized private void loadMenuForWiki(String wikiName) {
+  synchronized Map<String, List<TreeNode>> loadMenuForWiki(String wikiName) {
     if (!menuItems.containsKey(wikiName)) {
       LOGGER.debug("loadMenuForWiki: loading for wikiName [{}].", wikiName);
       Map<String, List<TreeNode>> wikiMenuItemsMap =
@@ -98,8 +104,6 @@ public class GetNotMappedMenuItemsForParentCommand {
       queryCount = queryCount + 1;
       List<TreeNode> menu = null;
       try {
-        //TODO: check if it is ok, that we can get documents from other
-        //      spaces than the one of the parent.
         String parentKey = "";
         String oldParentKey = "";
         int docCount = 0;
@@ -166,6 +170,7 @@ public class GetNotMappedMenuItemsForParentCommand {
         LOGGER.error("loadMenuForWiki failed. ", exp);
       }
     }
+    return internalGetMenuItemsForWiki(wikiName);
   }
 
   List<Object[]> getFromDBForParentKey(String wikiName)
