@@ -150,7 +150,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
 
   @Override
   public String getNewRandomXWikiUserName(String accountName) {
-    while (Strings.isNullOrEmpty(accountName.trim()) || modelAccess.exists(
+    while (Strings.isNullOrEmpty(accountName) || modelAccess.exists(
         webUtilsService.resolveDocumentReference("XWiki." + accountName))) {
       accountName = RandomStringUtils.randomAlphabetic(12);
     }
