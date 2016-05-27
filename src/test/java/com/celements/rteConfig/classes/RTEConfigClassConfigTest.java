@@ -18,21 +18,18 @@ public class RTEConfigClassConfigTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_RTEConfigClassConfigTest() throws Exception {
-    rteConfigClassCfg = (RTEConfigClassConfig) Utils.getComponent(
-        IRTEConfigClassConfig.class);
+    rteConfigClassCfg = (RTEConfigClassConfig) Utils.getComponent(IRTEConfigClassConfig.class);
   }
 
   @Test
   public void testGetRTEConfigTypePropertiesClassRefEntityReference() {
     EntityReference inRef = new EntityReference("xwikiDb", EntityType.WIKI);
     replayDefault();
-    DocumentReference classRef = rteConfigClassCfg.getRTEConfigTypePropertiesClassRef(
-        inRef);
+    DocumentReference classRef = rteConfigClassCfg.getRTEConfigTypePropertiesClassRef(inRef);
     assertEquals("xwikiDb", classRef.extractReference(EntityType.WIKI).getName());
-    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE,
-        classRef.extractReference(EntityType.SPACE).getName());
-    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC,
-        classRef.getName());
+    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE, classRef.extractReference(
+        EntityType.SPACE).getName());
+    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC, classRef.getName());
     verifyDefault();
   }
 
@@ -40,13 +37,11 @@ public class RTEConfigClassConfigTest extends AbstractBridgedComponentTestCase {
   public void testGetRTEConfigTypePropertiesClassRefWikiReference() {
     WikiReference inRef = new WikiReference("xwikiDb");
     replayDefault();
-    DocumentReference classRef = rteConfigClassCfg.getRTEConfigTypePropertiesClassRef(
-        inRef);
+    DocumentReference classRef = rteConfigClassCfg.getRTEConfigTypePropertiesClassRef(inRef);
     assertEquals("xwikiDb", classRef.extractReference(EntityType.WIKI).getName());
-    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE,
-        classRef.extractReference(EntityType.SPACE).getName());
-    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC,
-        classRef.getName());
+    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE, classRef.extractReference(
+        EntityType.SPACE).getName());
+    assertEquals(IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC, classRef.getName());
     verifyDefault();
   }
 

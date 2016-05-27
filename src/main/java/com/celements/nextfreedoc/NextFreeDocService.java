@@ -24,12 +24,11 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class NextFreeDocService implements INextFreeDocRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      NextFreeDocService.class);
-  
+  private static Log LOGGER = LogFactory.getFactory().getInstance(NextFreeDocService.class);
+
   // TODO refactor to org.xwiki.cache.CacheManager
   private final Map<DocumentReference, Long> numCache = new HashMap<DocumentReference, Long>();
-  
+
   @Requirement
   private QueryManager queryManager;
 
@@ -50,7 +49,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   public DocumentReference getNextUntitledPageDocRef(SpaceReference spaceRef) {
     return getNextTitledPageDocRef(spaceRef, UNTITLED_NAME);
   }
-  
+
   private long getNextTitledPageNum(DocumentReference baseDocRef) {
     long num = getHighestNum(baseDocRef);
     while (!isAvailableDocRef(createDocRef(baseDocRef, num))) {
@@ -72,20 +71,20 @@ public class NextFreeDocService implements INextFreeDocRole {
   }
 
   private DocumentReference createDocRef(DocumentReference baseDocRef, long num) {
-    //IMPORTANT do no use setName on DocumentReference
-    //          -> it does not exist on xwiki 4.5.4
+    // IMPORTANT do no use setName on DocumentReference
+    // -> it does not exist on xwiki 4.5.4
     DocumentReference ret = new DocumentReference(baseDocRef.getName() + num,
         baseDocRef.getLastSpaceReference());
     return ret;
   }
-  
+
   long getHighestNum(DocumentReference baseDocRef) {
     Long num = numCache.get(baseDocRef);
     try {
       int offset = 0, limit = 8;
       List<Object> results;
-      while ((num == null) && ((results = getHighestNumQuery(baseDocRef, offset, limit
-          ).execute()).size() > 0)) {
+      while ((num == null) && ((results = getHighestNumQuery(baseDocRef, offset,
+          limit).execute()).size() > 0)) {
         num = extractNumFromResults(baseDocRef.getName(), results);
         offset += results.size();
         limit *= 2;
@@ -96,12 +95,12 @@ public class NextFreeDocService implements INextFreeDocRole {
     if (num == null) {
       num = 1L;
     }
-    LOGGER.debug("getHighestNum: for baseDocRef '" + baseDocRef + "' got '" + num + "'" );
+    LOGGER.debug("getHighestNum: for baseDocRef '" + baseDocRef + "' got '" + num + "'");
     return num;
   }
 
-  private Query getHighestNumQuery(DocumentReference baseDocRef, int offset, int limit
-      ) throws QueryException {
+  private Query getHighestNumQuery(DocumentReference baseDocRef, int offset, int limit)
+      throws QueryException {
     Query query = queryManager.createQuery(getHighestNumHQL(), Query.HQL);
     query.setOffset(offset);
     query.setLimit(limit);
@@ -125,7 +124,7 @@ public class NextFreeDocService implements INextFreeDocRole {
           num = Long.parseLong(numStr) + 1;
           break;
         } else {
-          LOGGER.warn("extractNumFromResults: given name '" + name 
+          LOGGER.warn("extractNumFromResults: given name '" + name
               + "' does not start with expected prefix '" + prefix + "'");
         }
       } catch (NumberFormatException nfExc) {
@@ -141,7 +140,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   void injectQueryManager(QueryManager queryManager) {
     this.queryManager = queryManager;
   }
-  
+
   /**
    * USE FOR TEST PURPOSES ONLY
    */

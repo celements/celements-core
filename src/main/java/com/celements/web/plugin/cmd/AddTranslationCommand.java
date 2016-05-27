@@ -34,13 +34,12 @@ import com.xpn.xwiki.web.Utils;
 
 public class AddTranslationCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      AddTranslationCommand.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(AddTranslationCommand.class);
 
   /**
-   * Adds a Translation document in given language if it does not already exist.
-   * The document must already be created in the default language.
-   * If the Translation already exists, the Translation flag is forced to 1 anyhow.
+   * Adds a Translation document in given language if it does not already exist. The
+   * document must already be created in the default language. If the Translation already
+   * exists, the Translation flag is forced to 1 anyhow.
    * 
    * @param docRef
    * @param language
@@ -53,11 +52,10 @@ public class AddTranslationCommand {
         XWikiDocument mainDoc = getContext().getWiki().getDocument(docRef, getContext());
         if (!language.equals(mainDoc.getDefaultLanguage())) {
           XWikiDocument transDoc = createTranslationDoc(mainDoc, language);
-          LOGGER.debug("Successfully added translation for [" + docRef
-              + "] for language [" + language + "] and doc default language is ["
-              + transDoc.getDefaultLanguage() + "] - translation? ["
-              + transDoc.getTranslation() + "].");
-          //TODO fix history entry.
+          LOGGER.debug("Successfully added translation for [" + docRef + "] for language ["
+              + language + "] and doc default language is [" + transDoc.getDefaultLanguage()
+              + "] - translation? [" + transDoc.getTranslation() + "].");
+          // TODO fix history entry.
           boolean transDocWasNew = transDoc.isNew();
           getContext().getWiki().saveDocument(transDoc, getContext());
           successful = transDocWasNew;
@@ -66,26 +64,24 @@ public class AddTranslationCommand {
               + mainDoc.getDefaultLanguage() + "] for document [" + docRef + "].");
         }
       } catch (XWikiException exp) {
-        LOGGER.debug("failed to add translation because cannot get main document ["
-            + docRef + "].", exp);
+        LOGGER.debug("failed to add translation because cannot get main document [" + docRef + "].",
+            exp);
       }
     } else {
-      LOGGER.debug("failed to add translation because document [" + docRef
-          + "] does not exist");
+      LOGGER.debug("failed to add translation because document [" + docRef + "] does not exist");
     }
     return successful;
   }
 
   /**
-   * Adds a Translation document in given language if it does not already exist.
-   * The document must already be created in the default language.
-   * If the Translation already exists, the Translation flag is forced to 1 anyhow.
+   * Adds a Translation document in given language if it does not already exist. The
+   * document must already be created in the default language. If the Translation already
+   * exists, the Translation flag is forced to 1 anyhow.
    * 
    * @param fullName
    * @param language
    * @param context
    * @return isNew for translation document
-   * 
    * @deprecated since 2.18.0 instead use addTranslation(DocumentReference, String)
    */
   @Deprecated
@@ -96,13 +92,13 @@ public class AddTranslationCommand {
 
   /**
    * Details of this methods are taken from XWiki's SaveAction
+   * 
    * @param mainDoc
    * @param language
    * @return
    * @throws XWikiException
    */
-  XWikiDocument createTranslationDoc(XWikiDocument mainDoc,
-      String language) throws XWikiException {
+  XWikiDocument createTranslationDoc(XWikiDocument mainDoc, String language) throws XWikiException {
     XWikiDocument transDoc = mainDoc.getTranslatedDocument(language, getContext());
     if ((transDoc == mainDoc) && getContext().getWiki().isMultiLingual(getContext())) {
       transDoc = new XWikiDocument(mainDoc.getDocumentReference());
@@ -112,8 +108,8 @@ public class AddTranslationCommand {
       transDoc.setContent(mainDoc.getContent());
       applyCreationDateFix(transDoc);
     } else if (transDoc != mainDoc) {
-      LOGGER.debug("Translation document [" + mainDoc.getDocumentReference() + "] , "
-          + language + "] already exists.");
+      LOGGER.debug("Translation document [" + mainDoc.getDocumentReference() + "] , " + language
+          + "] already exists.");
     }
     transDoc.setTranslation(1);
     // Make sure we have at least the meta data dirty status
@@ -122,23 +118,21 @@ public class AddTranslationCommand {
   }
 
   void applyCreationDateFix(XWikiDocument doc) {
-    //FIXME Should be done when xwiki saves a new document. Unfortunately it is done
-    //      when you first get a document and than cached.
-    if(doc.isNew()) {
+    // FIXME Should be done when xwiki saves a new document. Unfortunately it is done
+    // when you first get a document and than cached.
+    if (doc.isNew()) {
       doc.setCreationDate(new Date());
       doc.setCreator(getContext().getUser());
     }
   }
 
-  public XWikiDocument getTranslatedDoc(XWikiDocument mainDoc, String language
-      ) throws XWikiException {
+  public XWikiDocument getTranslatedDoc(XWikiDocument mainDoc, String language)
+      throws XWikiException {
     XWikiDocument transDoc = mainDoc.getTranslatedDocument(getContext().getLanguage(),
         getContext());
-    if ((transDoc == mainDoc) && !getContext().getLanguage().equals(
-        mainDoc.getDefaultLanguage())) {
+    if ((transDoc == mainDoc) && !getContext().getLanguage().equals(mainDoc.getDefaultLanguage())) {
       LOGGER.info("creating new " + getContext().getLanguage() + " Translation for ["
-          + mainDoc.getDocumentReference() + "] (defult [" + mainDoc.getDefaultLanguage()
-          + "])");
+          + mainDoc.getDocumentReference() + "] (defult [" + mainDoc.getDefaultLanguage() + "])");
       transDoc = createTranslationDoc(mainDoc, language);
     }
     return transDoc;
@@ -149,7 +143,7 @@ public class AddTranslationCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {

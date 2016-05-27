@@ -9,7 +9,7 @@ import com.xpn.xwiki.web.Utils;
 public abstract class AbstractEntityEvent extends AbstractFilterableEvent {
 
   private static final long serialVersionUID = 1L;
-  
+
   private EntityReference reference;
 
   public AbstractEntityEvent() {

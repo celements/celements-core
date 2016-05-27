@@ -10,7 +10,7 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeCacheListenerTest extends AbstractBridgedComponentTestCase {
-  
+
   private static final String _COMPONENT_NAME = "TreeNodeCacheListener";
   private TreeNodeCacheListener eventListener;
 
@@ -30,8 +30,7 @@ public class TreeNodeCacheListenerTest extends AbstractBridgedComponentTestCase 
   }
 
   private TreeNodeCacheListener getTreeNodeCacheListener() {
-    return (TreeNodeCacheListener) Utils.getComponent(EventListener.class,
-        _COMPONENT_NAME);
+    return (TreeNodeCacheListener) Utils.getComponent(EventListener.class, _COMPONENT_NAME);
   }
 
 }

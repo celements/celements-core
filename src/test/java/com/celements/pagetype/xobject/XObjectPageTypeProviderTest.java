@@ -50,8 +50,8 @@ public class XObjectPageTypeProviderTest extends AbstractComponentTest {
   public void setUp_XObjectPageTypeProviderTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    xObjPTprovider = (XObjectPageTypeProvider) Utils.getComponent(
-        IPageTypeProviderRole.class, XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER);
+    xObjPTprovider = (XObjectPageTypeProvider) Utils.getComponent(IPageTypeProviderRole.class,
+        XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER);
   }
 
   @Test
@@ -62,13 +62,13 @@ public class XObjectPageTypeProviderTest extends AbstractComponentTest {
 
   @Test
   public void testGetPageTypeByReference() {
-    PageTypeReference testPTref = new PageTypeReference("TestPageTypeRef",
-        "xObjectProvider", Arrays.asList(""));
+    PageTypeReference testPTref = new PageTypeReference("TestPageTypeRef", "xObjectProvider",
+        Arrays.asList(""));
     DocumentReference pTdocRef = new DocumentReference(context.getDatabase(),
         XObjectPageTypeProvider.DEFAULT_PAGE_TYPES_SPACE, "TestPageTypeRef");
     replayDefault();
-    XObjectPageTypeConfig ptObj =
-        (XObjectPageTypeConfig) xObjPTprovider.getPageTypeByReference(testPTref);
+    XObjectPageTypeConfig ptObj = (XObjectPageTypeConfig) xObjPTprovider.getPageTypeByReference(
+        testPTref);
     assertNotNull(ptObj);
     assertEquals("TestPageTypeRef", ptObj.getName());
     assertEquals(pTdocRef, ptObj.pageType.getDocumentReference());
@@ -77,18 +77,16 @@ public class XObjectPageTypeProviderTest extends AbstractComponentTest {
 
   @Test
   public void testGetPageTypes() throws Exception {
-    Set<String> allPageTypeNames = new HashSet<String>(Arrays.asList(
-        "PageTypes.RichText"));
-    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(false
-        ).anyTimes();
-    DocumentReference centralRichTextPTdocRef = new DocumentReference("celements2web",
-        "PageTypes", "RichText");
+    Set<String> allPageTypeNames = new HashSet<String>(Arrays.asList("PageTypes.RichText"));
+    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(false).anyTimes();
+    DocumentReference centralRichTextPTdocRef = new DocumentReference("celements2web", "PageTypes",
+        "RichText");
     XWikiDocument centralRichTextPTdoc = new XWikiDocument(centralRichTextPTdocRef);
-    expect(xwiki.getDocument(eq("celements2web:PageTypes.RichText"), same(context))
-        ).andReturn(centralRichTextPTdoc).anyTimes();
+    expect(xwiki.getDocument(eq("celements2web:PageTypes.RichText"), same(context))).andReturn(
+        centralRichTextPTdoc).anyTimes();
     List<String> pageTypeString = Arrays.asList("PageTypes.RichText");
-    expect(xwiki.<String>search(isA(String.class), same(context))).andReturn(
-        pageTypeString).times(2);
+    expect(xwiki.<String>search(isA(String.class), same(context))).andReturn(pageTypeString).times(
+        2);
     replayDefault();
     List<PageTypeReference> allPageTypes = xObjPTprovider.getPageTypes();
     assertFalse("expecting RichtText page type reference.", allPageTypes.isEmpty());

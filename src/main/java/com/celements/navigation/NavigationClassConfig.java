@@ -30,8 +30,8 @@ public class NavigationClassConfig implements INavigationClassConfig {
 
   @Override
   public DocumentReference getNavigationConfigClassRef(WikiReference wikiRef) {
-    return new DocumentReference(NAVIGATION_CONFIG_CLASS_DOC, 
-        webUtils.resolveSpaceReference(NAVIGATION_CONFIG_CLASS_SPACE, wikiRef));
+    return new DocumentReference(NAVIGATION_CONFIG_CLASS_DOC, webUtils.resolveSpaceReference(
+        NAVIGATION_CONFIG_CLASS_SPACE, wikiRef));
   }
 
   @Override
@@ -46,8 +46,8 @@ public class NavigationClassConfig implements INavigationClassConfig {
 
   @Override
   public DocumentReference getMenuItemClassRef(WikiReference wikiRef) {
-    return new DocumentReference(MENU_ITEM_CLASS_DOC, 
-        webUtils.resolveSpaceReference(MENU_ITEM_CLASS_SPACE, wikiRef));
+    return new DocumentReference(MENU_ITEM_CLASS_DOC, webUtils.resolveSpaceReference(
+        MENU_ITEM_CLASS_SPACE, wikiRef));
   }
 
   @Override

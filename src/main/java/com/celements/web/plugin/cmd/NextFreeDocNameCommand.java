@@ -30,66 +30,60 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole}
- *  
  */
 @Deprecated
 public class NextFreeDocNameCommand {
-  
+
   /**
-   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
-   *              #getNextTitledPageDocRef(SpaceReference, String)}
-   *  
+   * @Deprecated: since 2.47.0 instead use
+   *              {@link INextFreeDocRole #getNextTitledPageDocRef(SpaceReference, String)}
    */
   @Deprecated
-  public String getNextTitledPageFullName(String space, String title,
-      XWikiContext context) {
-    DocumentReference docRef = getNextFreeDocService().getNextTitledPageDocRef(
-        new SpaceReference(space, new WikiReference(context.getDatabase())), title);
+  public String getNextTitledPageFullName(String space, String title, XWikiContext context) {
+    DocumentReference docRef = getNextFreeDocService().getNextTitledPageDocRef(new SpaceReference(
+        space, new WikiReference(context.getDatabase())), title);
     return getWebUtilsService().getRefLocalSerializer().serialize(docRef);
   }
 
   /**
-   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
-   *              #getNextTitledPageDocRef(SpaceReference, String)}
-   *  
+   * @Deprecated: since 2.47.0 instead use
+   *              {@link INextFreeDocRole #getNextTitledPageDocRef(SpaceReference, String)}
    */
   @Deprecated
   public DocumentReference getNextTitledPageDocRef(String space, String title,
       XWikiContext context) {
-    return getNextFreeDocService().getNextTitledPageDocRef(new SpaceReference(space, 
+    return getNextFreeDocService().getNextTitledPageDocRef(new SpaceReference(space,
         new WikiReference(context.getDatabase())), title);
   }
 
   /**
-   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
-   *              #getNextUntitledPageDocRef(SpaceReference)}
-   *  
+   * @Deprecated: since 2.47.0 instead use
+   *              {@link INextFreeDocRole #getNextUntitledPageDocRef(SpaceReference)}
    */
   @Deprecated
   public String getNextUntitledPageFullName(String space, XWikiContext context) {
-    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(
-        new SpaceReference(space, new WikiReference(context.getDatabase())));
+    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(new SpaceReference(
+        space, new WikiReference(context.getDatabase())));
     return getWebUtilsService().getRefLocalSerializer().serialize(docRef);
   }
 
   /**
-   * @Deprecated: since 2.47.0 instead use {@link INextFreeDocRole
-   *              #getNextUntitledPageDocRef(SpaceReference)}
-   *  
+   * @Deprecated: since 2.47.0 instead use
+   *              {@link INextFreeDocRole #getNextUntitledPageDocRef(SpaceReference)}
    */
   @Deprecated
   public String getNextUntitledPageName(String space, XWikiContext context) {
-    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(
-        new SpaceReference(space, new WikiReference(context.getDatabase())));
+    DocumentReference docRef = getNextFreeDocService().getNextUntitledPageDocRef(new SpaceReference(
+        space, new WikiReference(context.getDatabase())));
     return docRef.getName();
   }
-  
+
   private INextFreeDocRole getNextFreeDocService() {
     return Utils.getComponent(INextFreeDocRole.class);
   }
-  
+
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
-  
+
 }

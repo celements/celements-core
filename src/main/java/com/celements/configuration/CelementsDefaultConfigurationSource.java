@@ -38,8 +38,8 @@ import org.xwiki.configuration.internal.CompositeConfigurationSource;
  * profile (in which case the {@link CelementsAllConfigurationSource} should be used.
  */
 @Component
-public class CelementsDefaultConfigurationSource extends CompositeConfigurationSource
-    implements Initializable {
+public class CelementsDefaultConfigurationSource extends CompositeConfigurationSource implements
+    Initializable {
 
   @Requirement("xwikiproperties")
   ConfigurationSource xwikiPropertiesSource;

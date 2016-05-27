@@ -17,12 +17,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTestCase{
+public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTestCase {
+
   UserNameForUserDataCommand cmd;
-  
+
   XWiki xwiki;
   XWikiStoreInterface store;
-  
+
   @Before
   public void setUp_UserNameForUserDataCommandTest() throws Exception {
     cmd = new UserNameForUserDataCommand();
@@ -51,11 +52,11 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     String login = "testLogin";
     expect(xwiki.exists(eq("XWiki." + login), same(getContext()))).andReturn(false).once();
     List<String> emptyList = Collections.emptyList();
-    expect(store.searchDocumentsNames((String)anyObject(), eq(0), eq(0), same(getContext(
-        )))).andReturn(emptyList).once();
+    expect(store.searchDocumentsNames((String) anyObject(), eq(0), eq(0), same(
+        getContext()))).andReturn(emptyList).once();
     List<XWikiDocument> emptyDocList = Collections.emptyList();
-    expect(store.searchDocuments(eq("where lower(doc.name)=?"), (List<String>)anyObject(), 
-        same(getContext()))).andReturn(emptyDocList).once();
+    expect(store.searchDocuments(eq("where lower(doc.name)=?"), (List<String>) anyObject(), same(
+        getContext()))).andReturn(emptyDocList).once();
     replay(store, xwiki);
     assertEquals("", cmd.getUsernameForUserData(login, "loginname,,", getContext()));
     verify(store, xwiki);
@@ -66,11 +67,10 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     String login = "testLogin";
     expect(xwiki.exists(eq("XWiki." + login), same(getContext()))).andReturn(true).once();
     List<String> emptyList = Collections.emptyList();
-    expect(store.searchDocumentsNames((String)anyObject(), eq(0), eq(0), same(getContext(
-        )))).andReturn(emptyList).once();
+    expect(store.searchDocumentsNames((String) anyObject(), eq(0), eq(0), same(
+        getContext()))).andReturn(emptyList).once();
     replay(store, xwiki);
-    assertEquals("XWiki." + login, cmd.getUsernameForUserData(login, ",,loginname", 
-        getContext()));
+    assertEquals("XWiki." + login, cmd.getUsernameForUserData(login, ",,loginname", getContext()));
     verify(store, xwiki);
   }
 
@@ -78,18 +78,16 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
   public void testGetUsernameForUserData_loginname_mixedCase() throws XWikiException {
     String login = "testLogin";
     String mixedLogin = "TeStLoGin";
-    expect(xwiki.exists(eq("XWiki." + mixedLogin), same(getContext()))).andReturn(false
-        ).once();
+    expect(xwiki.exists(eq("XWiki." + mixedLogin), same(getContext()))).andReturn(false).once();
     List<String> emptyList = Collections.emptyList();
-    expect(store.searchDocumentsNames((String)anyObject(), eq(0), eq(0), same(getContext(
-        )))).andReturn(emptyList).once();
+    expect(store.searchDocumentsNames((String) anyObject(), eq(0), eq(0), same(
+        getContext()))).andReturn(emptyList).once();
     List<XWikiDocument> list = new ArrayList<XWikiDocument>();
-    list.add(new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", 
-        login)));
-    expect(store.searchDocuments(eq("where lower(doc.name)=?"), (List<String>)anyObject(), 
-        same(getContext()))).andReturn(list).once();
+    list.add(new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", login)));
+    expect(store.searchDocuments(eq("where lower(doc.name)=?"), (List<String>) anyObject(), same(
+        getContext()))).andReturn(list).once();
     replay(store, xwiki);
-    assertEquals("XWiki." + login, cmd.getUsernameForUserData(mixedLogin, ",loginname,", 
+    assertEquals("XWiki." + login, cmd.getUsernameForUserData(mixedLogin, ",loginname,",
         getContext()));
     verify(store, xwiki);
   }
@@ -97,8 +95,8 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
   @Test
   public void testGetUsernameForUserData_email_notExists() throws XWikiException {
     List<String> emptyList = Collections.emptyList();
-    expect(store.searchDocumentsNames((String)anyObject(), eq(0), eq(0), same(getContext(
-        )))).andReturn(emptyList).once();
+    expect(store.searchDocumentsNames((String) anyObject(), eq(0), eq(0), same(
+        getContext()))).andReturn(emptyList).once();
     replay(store, xwiki);
     assertEquals("", cmd.getUsernameForUserData("abc@ucme.com", "email", getContext()));
     verify(store, xwiki);
@@ -110,11 +108,10 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     String docName = "XWiki.abc";
     List<String> list = new ArrayList<String>();
     list.add(docName);
-    expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), 
-        same(getContext()))).andReturn(list).once();
+    expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), same(
+        getContext()))).andReturn(list).once();
     replay(store, xwiki);
-    assertEquals(docName, cmd.getUsernameForUserData(login, "email,loginname", 
-        getContext()));
+    assertEquals(docName, cmd.getUsernameForUserData(login, "email,loginname", getContext()));
     verify(store, xwiki);
   }
 
@@ -125,11 +122,10 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     String docName = "XWiki.abc";
     List<String> list = new ArrayList<String>();
     list.add(docName);
-    expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), 
-        same(getContext()))).andReturn(list).once();
+    expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), same(
+        getContext()))).andReturn(list).once();
     replay(store, xwiki);
-    assertEquals(docName, cmd.getUsernameForUserData(loginCased, "email,loginname", 
-        getContext()));
+    assertEquals(docName, cmd.getUsernameForUserData(loginCased, "email,loginname", getContext()));
     verify(store, xwiki);
   }
 
@@ -140,17 +136,17 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     List<String> list = new ArrayList<String>();
     list.add(docName);
     list.add(docName);
-    expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), 
-        same(getContext()))).andReturn(list).once();
+    expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), same(
+        getContext()))).andReturn(list).once();
     replay(store, xwiki);
     assertNull(cmd.getUsernameForUserData(login, "email,loginname", getContext()));
     verify(store, xwiki);
   }
-  
+
   private String getDBQuery(String login) {
-    return ", BaseObject as obj, StringProperty as str where doc.space='XWiki' and " +
-        "obj.name=doc.fullName and obj.className='XWiki.XWikiUsers' and " +
-        "obj.id=str.id.id and (str.id.name='email' or str.id.name='loginname' ) and " +
-        "lower(str.value)='" + login.toLowerCase() + "'";
+    return ", BaseObject as obj, StringProperty as str where doc.space='XWiki' and "
+        + "obj.name=doc.fullName and obj.className='XWiki.XWikiUsers' and "
+        + "obj.id=str.id.id and (str.id.name='email' or str.id.name='loginname' ) and "
+        + "lower(str.value)='" + login.toLowerCase() + "'";
   }
 }

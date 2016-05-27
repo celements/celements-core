@@ -31,7 +31,7 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 
 public class Parser {
-  
+
   private ILexicalParser<? extends IGenericLiteral> lexParser;
   private JsonParser parser;
   private static JsonFactory factory = new JsonFactory();
@@ -41,14 +41,12 @@ public class Parser {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(Parser.class);
 
-  public static <T extends IGenericLiteral> Parser createLexicalParser(
-      T initLiteral, IEventHandler<T> eventHandler) {
-    return new Parser(initLiteral, new LexicalParser<T>(initLiteral,
-        eventHandler));
+  public static <T extends IGenericLiteral> Parser createLexicalParser(T initLiteral,
+      IEventHandler<T> eventHandler) {
+    return new Parser(initLiteral, new LexicalParser<T>(initLiteral, eventHandler));
   }
-  
-  <T extends IGenericLiteral> Parser(T initLiteral,
-      ILexicalParser<T> lexParser) {
+
+  <T extends IGenericLiteral> Parser(T initLiteral, ILexicalParser<T> lexParser) {
     this.lexParser = lexParser;
   }
 
@@ -61,50 +59,50 @@ public class Parser {
       lexParser.initEvent();
       while (parser.hasCurrentToken()) {
         switch (nextToken) {
-        case VALUE_TRUE:
-        case VALUE_FALSE:
-          boolean boolValue = parser.getBooleanValue();
-          lastValue = Boolean.toString(boolValue);
-          lexParser.booleanEvent(boolValue);
-          impliciteCloseProperty();
-          break;
-        case VALUE_STRING:
-          lastValue = parser.getText();
-          lexParser.stringEvent(lastValue);
-          impliciteCloseProperty();
-          break;
-        case START_ARRAY:
-          checkIllegalStackState(ECommand.DICTIONARY_COMMAND, nextToken);
-          workerStack.push(ECommand.ARRAY_COMMAND);
-          lexParser.openArrayEvent();
-          break;
-        case END_ARRAY:
-          checkStackState(ECommand.ARRAY_COMMAND);
-          lexParser.closeArrayEvent();
-          workerStack.pop();
-          impliciteCloseProperty();
-          break;
-        case START_OBJECT:
-          checkIllegalStackState(ECommand.DICTIONARY_COMMAND, nextToken);
-          workerStack.push(ECommand.DICTIONARY_COMMAND);
-          lexParser.openDictionaryEvent();
-          break;
-        case END_OBJECT:
-          checkStackState(ECommand.DICTIONARY_COMMAND);
-          lexParser.closeDictionaryEvent();
-          workerStack.pop();
-          impliciteCloseProperty();
-          break;
-        case FIELD_NAME:
-          checkStackState(ECommand.DICTIONARY_COMMAND);
-          workerStack.push(ECommand.PROPERTY_COMMAND);
-          lastKey = parser.getText();
-          lexParser.openPropertyEvent(lastKey);
-          break;
-        default:
-          LOGGER.warn("unkown token [" + nextToken + "] lastKey [" + lastKey
-              + "] lastValue [" + lastValue + "].");
-          break;
+          case VALUE_TRUE:
+          case VALUE_FALSE:
+            boolean boolValue = parser.getBooleanValue();
+            lastValue = Boolean.toString(boolValue);
+            lexParser.booleanEvent(boolValue);
+            impliciteCloseProperty();
+            break;
+          case VALUE_STRING:
+            lastValue = parser.getText();
+            lexParser.stringEvent(lastValue);
+            impliciteCloseProperty();
+            break;
+          case START_ARRAY:
+            checkIllegalStackState(ECommand.DICTIONARY_COMMAND, nextToken);
+            workerStack.push(ECommand.ARRAY_COMMAND);
+            lexParser.openArrayEvent();
+            break;
+          case END_ARRAY:
+            checkStackState(ECommand.ARRAY_COMMAND);
+            lexParser.closeArrayEvent();
+            workerStack.pop();
+            impliciteCloseProperty();
+            break;
+          case START_OBJECT:
+            checkIllegalStackState(ECommand.DICTIONARY_COMMAND, nextToken);
+            workerStack.push(ECommand.DICTIONARY_COMMAND);
+            lexParser.openDictionaryEvent();
+            break;
+          case END_OBJECT:
+            checkStackState(ECommand.DICTIONARY_COMMAND);
+            lexParser.closeDictionaryEvent();
+            workerStack.pop();
+            impliciteCloseProperty();
+            break;
+          case FIELD_NAME:
+            checkStackState(ECommand.DICTIONARY_COMMAND);
+            workerStack.push(ECommand.PROPERTY_COMMAND);
+            lastKey = parser.getText();
+            lexParser.openPropertyEvent(lastKey);
+            break;
+          default:
+            LOGGER.warn("unkown token [" + nextToken + "] lastKey [" + lastKey + "] lastValue ["
+                + lastValue + "].");
+            break;
         }
         nextToken = parser.nextToken();
       }
@@ -115,25 +113,20 @@ public class Parser {
   }
 
   private void checkIllegalStackState(ECommand illegalCommand, JsonToken token) {
-    if (!workerStack.isEmpty()
-        && workerStack.peek() == illegalCommand) {
-      throw new IllegalStateException("Found illegal " + token
-          + " inside " + illegalCommand);
+    if (!workerStack.isEmpty() && workerStack.peek() == illegalCommand) {
+      throw new IllegalStateException("Found illegal " + token + " inside " + illegalCommand);
     }
   }
 
   private void checkStackState(ECommand expectedCommand) {
-    if (workerStack.isEmpty()
-        || workerStack.peek() != expectedCommand) {
-      throw new IllegalStateException("Expecting " + expectedCommand
-          + " but found " + workerStack.peek() + " Last key [" + lastKey
-          + "] last value [" + lastValue + "]");
+    if (workerStack.isEmpty() || workerStack.peek() != expectedCommand) {
+      throw new IllegalStateException("Expecting " + expectedCommand + " but found "
+          + workerStack.peek() + " Last key [" + lastKey + "] last value [" + lastValue + "]");
     }
   }
 
   private void impliciteCloseProperty() {
-    if (!workerStack.isEmpty()
-        && workerStack.peek() == ECommand.PROPERTY_COMMAND) {
+    if (!workerStack.isEmpty() && workerStack.peek() == ECommand.PROPERTY_COMMAND) {
       lexParser.closePropertyEvent();
       workerStack.pop();
     }

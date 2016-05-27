@@ -38,20 +38,18 @@ import com.celements.web.service.IWebUtilsService;
 @Component(XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER)
 public class XObjectPageTypeProvider implements IPageTypeProviderRole {
 
-  public static final String X_OBJECT_PAGE_TYPE_PROVIDER =
-      "com.celements.XObjectPageTypeProvider";
+  public static final String X_OBJECT_PAGE_TYPE_PROVIDER = "com.celements.XObjectPageTypeProvider";
 
   private static Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeProvider.class);
 
   private String _CEL_XOBJ_GETALLPAGETYPES_COUNTER = "celXObjectGetAllPageTypesCounter";
-  private String _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME =
-      "celXObjectGetAllPageTypesTotelTime";
+  private String _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME = "celXObjectGetAllPageTypesTotelTime";
 
   public static final String DEFAULT_PAGE_TYPES_SPACE = "PageTypes";
 
   @Requirement
   IXObjectPageTypeCacheRole xobjectPageTypeCache;
-  
+
   @Requirement
   private IWebUtilsService webUtilsService;
 
@@ -83,8 +81,7 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
       long timeUsed = endMillis - startMillis;
       Long totalTimeUsed = 0L;
       if (getExecContext().getProperty(_CEL_XOBJ_GETALLPAGETYPES_TOTALTIME) != null) {
-        totalTimeUsed = (Long) getExecContext().getProperty(
-            _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME);
+        totalTimeUsed = (Long) getExecContext().getProperty(_CEL_XOBJ_GETALLPAGETYPES_TOTALTIME);
       }
       totalTimeUsed += timeUsed;
       getExecContext().setProperty(_CEL_XOBJ_GETALLPAGETYPES_TOTALTIME, totalTimeUsed);

@@ -34,7 +34,7 @@ import com.xpn.xwiki.web.Utils;
 public class TreeNode {
 
   private String parent;
-  
+
   private Integer position;
 
   private String partName;
@@ -44,7 +44,7 @@ public class TreeNode {
   private DocumentReference docRef;
 
   private String databaseName;
-  
+
   @Deprecated
   public TreeNode(String fullName, String parent, Integer position, String databaseName) {
     this.databaseName = databaseName;
@@ -59,8 +59,7 @@ public class TreeNode {
     setPosition(position);
   }
 
-  public TreeNode(DocumentReference docRef, DocumentReference parentRef, Integer position
-      ) {
+  public TreeNode(DocumentReference docRef, DocumentReference parentRef, Integer position) {
     setDocumentReference(docRef);
     setParent(getWebUtilsService().getRefLocalSerializer().serialize(parentRef));
     setPosition(position);
@@ -77,9 +76,7 @@ public class TreeNode {
   }
 
   /**
-   * 
    * @return fullName
-   * 
    * @deprecated since 2.14.0 use getDocumentReference instead
    */
   @Deprecated
@@ -141,7 +138,7 @@ public class TreeNode {
 
   public void setPartName(String partName) {
     if (partName == null) {
-        partName = "";
+      partName = "";
     }
     this.partName = partName;
   }
@@ -177,12 +174,12 @@ public class TreeNode {
 
   @Override
   public String toString() {
-    return "[ docRef = [" + docRef + "], parent = [" + parent + "], position = ["
-    + position + "], partName = [" + getPartName(getContext()) + "] ]";
+    return "[ docRef = [" + docRef + "], parent = [" + parent + "], position = [" + position
+        + "], partName = [" + getPartName(getContext()) + "] ]";
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecutionContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecutionContext().getProperty("xwikicontext");
   }
 
   private ExecutionContext getExecutionContext() {

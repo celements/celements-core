@@ -22,18 +22,18 @@ package com.celements.web.medialib.datafields;
 public interface IDataField {
 
   public String getColumnId() throws IllegalStateException;
-  
+
   public String getColumnPrettyName() throws IllegalStateException;
-  
+
   public String getType() throws IllegalStateException;
-  
+
   public String getValue() throws IllegalStateException;
-  
+
   public void setColumnId();
-  
+
   public void setColumnPrettyName();
-  
+
   public void setType();
-  
+
   public void setValue();
 }

@@ -76,15 +76,14 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
     expect(cssMock.getCSS(same(context))).andReturn(url);
     expect(cssMock.getCssBasePath()).andReturn(basePath);
     replayDefault();
-    assertEquals("<!-- WARNING: css file not found: " + basePath + " -->\n",
-        css.displayInclude(context)); 
+    assertEquals("<!-- WARNING: css file not found: " + basePath + " -->\n", css.displayInclude(
+        context));
     verifyDefault();
   }
 
   @Test
   public void testGetURLFromString() {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
-        AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     css.testInjectAttURLcmd(attURLcmd);
     String cssPath = ":celRes/celements2.css";
     String urlPath = "/skin/resources/celRes/celements2.css";
@@ -94,9 +93,9 @@ public class CSSTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
   private class CSSMock extends CSS {
 

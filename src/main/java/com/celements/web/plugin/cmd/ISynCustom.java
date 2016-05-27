@@ -42,8 +42,7 @@ public interface ISynCustom {
    * @deprecated use syncustom script service direcly instead
    */
   @Deprecated
-  public void sendCallbackNotificationMail(Map<String, String[]> data,
-      List<String> recipients);
+  public void sendCallbackNotificationMail(Map<String, String[]> data, List<String> recipients);
 
   /**
    * @deprecated use syncustom script service direcly instead
@@ -73,15 +72,14 @@ public interface ISynCustom {
    * @deprecated use syncustom script service direcly instead
    */
   @Deprecated
-  public int countObjsWithField(String fullName, String className, String fieldName,
-      String value, String valueEnd);
+  public int countObjsWithField(String fullName, String className, String fieldName, String value,
+      String valueEnd);
 
   /**
    * @deprecated use syncustom script service direcly instead
    */
   @Deprecated
-  public Map<String, Integer> getRegistrationStatistics(Document mappingDoc,
-      String congressName);
+  public Map<String, Integer> getRegistrationStatistics(Document mappingDoc, String congressName);
 
   /**
    * @deprecated use syncustom script service direcly instead

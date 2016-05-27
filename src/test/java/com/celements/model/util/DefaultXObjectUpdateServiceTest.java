@@ -29,8 +29,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
 
   @Before
   public void setUp_DefaultXObjectUpdateServiceTest() throws Exception {
-    xObjUpdateService = (DefaultXObjectUpdateService) Utils.getComponent(
-        IXObjectUpdateRole.class);
+    xObjUpdateService = (DefaultXObjectUpdateService) Utils.getComponent(IXObjectUpdateRole.class);
     doc = new XWikiDocument(new DocumentReference("xwikidb", "space", "doc"));
     classRef = new DocumentReference("xwikidb", "class", "any");
   }
@@ -44,9 +43,9 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     doc.addXObject(obj);
-    
+
     expectPropertyClass(classRef, fieldName, new StringClass());
-    
+
     replayDefault();
     assertTrue(xObjUpdateService.updateFromMap(doc, fieldMap));
     verifyDefault();
@@ -61,14 +60,14 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     String fieldName = "someField";
     String value = "asdf";
     fieldMap.put(getWebUtils().serializeRef(classRef, true) + "." + fieldName, value);
-    
+
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, fieldName, new StringClass());
-    
+
     replayDefault();
     assertTrue(xObjUpdateService.updateFromMap(doc, fieldMap));
     verifyDefault();
-    
+
     assertEquals(1, doc.getXObjects(classRef).size());
     assertEquals(value, doc.getXObject(classRef).getStringValue(fieldName));
   }
@@ -83,7 +82,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     obj.setXClassReference(classRef);
     obj.setStringValue(fieldName, value);
     doc.addXObject(obj);
-    
+
     replayDefault();
     assertFalse(xObjUpdateService.updateFromMap(doc, fieldMap));
     verifyDefault();
@@ -95,7 +94,7 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
   @Test
   public void test_updateFromMap_empty() throws Exception {
     Map<String, Object> fieldMap = new HashMap<>();
-    
+
     replayDefault();
     assertFalse(xObjUpdateService.updateFromMap(doc, fieldMap));
     verifyDefault();
@@ -108,10 +107,10 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     Map<String, Object> fieldMap = new HashMap<>();
     fieldMap.put("invalidString", "asdf");
     Throwable cause = new XWikiException();
-    
-    expect(getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")
-        ), same(getContext()))).andThrow(cause).once();
-    
+
+    expect(getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")), same(
+        getContext()))).andThrow(cause).once();
+
     replayDefault();
     try {
       xObjUpdateService.updateFromMap(doc, fieldMap);
@@ -124,9 +123,9 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
 
     assertNull(doc.getXObject(classRef));
   }
-  
+
   private IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
   }
-  
+
 }

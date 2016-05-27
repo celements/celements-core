@@ -29,8 +29,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Component
 public class QueryExecutionService implements IQueryExecutionServiceRole {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      QueryExecutionService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(QueryExecutionService.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -84,8 +83,8 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
         transaction.rollback();
       }
     }
-    LOGGER.info("executing sql '{}' for db '{}' returned '{}'", sql, getContext(
-        ).getDatabase(), result);
+    LOGGER.info("executing sql '{}' for db '{}' returned '{}'", sql, getContext().getDatabase(),
+        result);
     return result;
   }
 
@@ -95,8 +94,8 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
   }
 
   @Override
-  public int executeWriteHQL(String hql, Map<String, Object> binds, WikiReference wikiRef
-      ) throws XWikiException {
+  public int executeWriteHQL(String hql, Map<String, Object> binds, WikiReference wikiRef)
+      throws XWikiException {
     WikiReference curWikiRef = webUtilsService.getWikiRef();
     try {
       getContext().setDatabase(webUtilsService.getWikiRef(wikiRef).getName());
@@ -131,8 +130,8 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
         LOGGER.debug("executeAndGetDocRefs: received invalid fullName '{}'", fullName);
       }
     }
-    LOGGER.info("executeAndGetDocRefs: {} results for query '{}' and wiki '{}'", 
-        ret.size(), query.getStatement(), wikiRef);
+    LOGGER.info("executeAndGetDocRefs: {} results for query '{}' and wiki '{}'", ret.size(),
+        query.getStatement(), wikiRef);
     return ret;
   }
 

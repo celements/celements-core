@@ -38,10 +38,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
+public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      ReorderSaveHandler.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(ReorderSaveHandler.class);
   private XWikiContext context;
   private DocumentReference parentRef;
   private EReorderLiteral currentCommand;
@@ -58,7 +57,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
   public void openEvent(EReorderLiteral literal) {
     LOGGER.debug("open event: " + literal.name());
-      currentCommand = literal;
+    currentCommand = literal;
   }
 
   public void readPropertyKey(String key) {
@@ -70,13 +69,12 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
         parentRef = newParentRef;
       } else {
         parentRef = null;
-        LOGGER.error("readPropertyKey: cannot load parentDocument [" + newParentFN 
-            + "].");
+        LOGGER.error("readPropertyKey: cannot load parentDocument [" + newParentFN + "].");
       }
       currentPos = 0;
     } else {
-      throw new IllegalStateException("readPropertyKey: expecting ParentChildren but"
-          + " found " + currentCommand);
+      throw new IllegalStateException("readPropertyKey: expecting ParentChildren but" + " found "
+          + currentCommand);
     }
   }
 
@@ -115,7 +113,8 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
   /**
    * FOR TESTS ONLY!!!
-   * @param object 
+   * 
+   * @param object
    */
   void inject_ParentRef(DocumentReference newParent) {
     parentRef = newParent;
@@ -123,7 +122,8 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
 
   /**
    * FOR TESTS ONLY!!!
-   * @param object 
+   * 
+   * @param object
    */
   void inject_current(EReorderLiteral newCurrentCommand) {
     currentCommand = newCurrentCommand;
@@ -144,10 +144,10 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
             markParentDirty(getParentReference());
             updateNeeded = true;
           }
-          BaseObject menuItemObj = xdoc.getXObject(getNavClassConfig(
-              ).getMenuItemClassRef(context.getDatabase()));
-          if ((menuItemObj != null)
-              && (menuItemObj.getIntValue("menu_position") != getCurrentPos())) {
+          BaseObject menuItemObj = xdoc.getXObject(getNavClassConfig().getMenuItemClassRef(
+              context.getDatabase()));
+          if ((menuItemObj != null) && (menuItemObj.getIntValue(
+              "menu_position") != getCurrentPos())) {
             menuItemObj.setIntValue("menu_position", getCurrentPos());
             markParentDirty(xdoc.getParentReference());
             updateNeeded = true;
@@ -156,23 +156,20 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral>{
             context.getWiki().saveDocument(xdoc, "Restructuring", context);
           }
         } catch (XWikiException e) {
-          LOGGER.error("readPropertyKey: cannot load document [" + docFN 
-              + "].");
+          LOGGER.error("readPropertyKey: cannot load document [" + docFN + "].");
         }
         currentPos = getCurrentPos() + 1;
       } else {
-        LOGGER.error("readPropertyKey: cannot load parentDocument [" + docFN 
-            + "].");
+        LOGGER.error("readPropertyKey: cannot load parentDocument [" + docFN + "].");
       }
     } else {
-      throw new IllegalStateException("stringEvent: expecting element_id but"
-          + " found [" + currentCommand + "] with parent [" + getParentFN() + "].");
+      throw new IllegalStateException("stringEvent: expecting element_id but" + " found ["
+          + currentCommand + "] with parent [" + getParentFN() + "].");
     }
   }
 
   EntityReference getRelativeParentReference() {
-    return getWebUtils().resolveRelativeEntityReference(getParentFN(),
-        EntityType.DOCUMENT);
+    return getWebUtils().resolveRelativeEntityReference(getParentFN(), EntityType.DOCUMENT);
   }
 
   boolean hasDiffParentReferences(EntityReference parentReference) {

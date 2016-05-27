@@ -46,9 +46,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class XObjectPageTypeDocumentDeletedListenerTest
-    extends AbstractBridgedComponentTestCase {
-  
+public class XObjectPageTypeDocumentDeletedListenerTest extends AbstractBridgedComponentTestCase {
+
   private static final String _COMPONENT_NAME = "XObjectPageTypeDocumentDeletedListener";
   private XObjectPageTypeDocumentDeletedListener eventListener;
   private XWikiContext context;
@@ -63,8 +62,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
     eventListener = getXObjPageTypeDocUpdatedListener();
     defaultObservationManager = Utils.getComponent(ObservationManager.class);
     componentManager.release(defaultObservationManager);
-    ComponentDescriptor<ObservationManager> obsManagDesc =
-      componentManager.getComponentDescriptor(ObservationManager.class, "default");
+    ComponentDescriptor<ObservationManager> obsManagDesc = componentManager.getComponentDescriptor(
+        ObservationManager.class, "default");
     obsManagerMock = createMockAndAddToDefault(ObservationManager.class);
     componentManager.registerComponent(obsManagDesc, obsManagerMock);
   }
@@ -72,8 +71,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
   @After
   public void tearDown_XObjectPageTypeDocumentDeletedListenerTest() throws Exception {
     componentManager.release(obsManagerMock);
-    ComponentDescriptor<ObservationManager> obsManagDesc =
-      componentManager.getComponentDescriptor(ObservationManager.class, "default");
+    ComponentDescriptor<ObservationManager> obsManagDesc = componentManager.getComponentDescriptor(
+        ObservationManager.class, "default");
     componentManager.registerComponent(obsManagDesc, defaultObservationManager);
   }
 
@@ -89,8 +88,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(new DocumentDeletedEvent(
-        ).getClass().getName());
+    List<String> expectedEventClassList = Arrays.asList(
+        new DocumentDeletedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());
@@ -110,8 +109,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testGetOrginialDocument_noOrigialDoc() {
-    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "pageTypeDocName");
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "pageTypeDocName");
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     replayDefault();
     assertNull(eventListener.getOrginialDocument(sourceDoc));
@@ -120,8 +119,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testGetOrginialDocument_originalDoc() {
-    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "pageTypeDocName");
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "pageTypeDocName");
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
@@ -133,8 +132,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testOnEvent_remoteEvent() {
-    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "pageTypeDocName");
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "pageTypeDocName");
     Event docDelEvent = new DocumentDeletedEvent(pageTypeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
@@ -150,8 +149,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testOnEvent_localEvent_nullDoc() {
-    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "pageTypeDocName");
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "pageTypeDocName");
     Event docDelEvent = new DocumentDeletedEvent(pageTypeDocRef);
     RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
@@ -164,8 +163,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testOnEvent_localEvent_noObject() {
-    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "pageTypeDocName");
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "pageTypeDocName");
     Event docDelEvent = new DocumentDeletedEvent(pageTypeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
@@ -181,8 +180,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
 
   @Test
   public void testOnEvent_localEvent_pageTypePropObj() {
-    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "pageTypeDocName");
+    DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "pageTypeDocName");
     Event docDelEvent = new DocumentDeletedEvent(pageTypeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(pageTypeDocRef);
     XWikiDocument origDoc = new XWikiDocument(pageTypeDocRef);
@@ -194,8 +193,7 @@ public class XObjectPageTypeDocumentDeletedListenerTest
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
     expect(remoteObsManagerCtx.isRemoteState()).andReturn(false).atLeastOnce();
-    obsManagerMock.notify(isA(XObjectPageTypeDeletedEvent.class), same(sourceDoc),
-        same(context));
+    obsManagerMock.notify(isA(XObjectPageTypeDeletedEvent.class), same(sourceDoc), same(context));
     expectLastCall().once();
     replayDefault();
     eventListener.onEvent(docDelEvent, sourceDoc, context);
@@ -208,8 +206,8 @@ public class XObjectPageTypeDocumentDeletedListenerTest
   }
 
   private XObjectPageTypeDocumentDeletedListener getXObjPageTypeDocUpdatedListener() {
-    return (XObjectPageTypeDocumentDeletedListener) Utils.getComponent(
-        EventListener.class, _COMPONENT_NAME);
+    return (XObjectPageTypeDocumentDeletedListener) Utils.getComponent(EventListener.class,
+        _COMPONENT_NAME);
   }
 
 }

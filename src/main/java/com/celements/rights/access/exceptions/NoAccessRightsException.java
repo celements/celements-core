@@ -12,7 +12,7 @@ public class NoAccessRightsException extends Exception {
   private EntityReference entityRef;
 
   private XWikiUser user;
-  
+
   private EAccessLevel expectedAccessLevel;
 
   public NoAccessRightsException(EntityReference entityRef, XWikiUser user,
@@ -30,7 +30,7 @@ public class NoAccessRightsException extends Exception {
     this.user = user;
     this.expectedAccessLevel = expectedAccessLevel;
   }
-  
+
   public EntityReference getEntityRef() {
     return entityRef;
   }

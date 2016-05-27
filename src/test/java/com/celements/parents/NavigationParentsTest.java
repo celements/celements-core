@@ -34,26 +34,24 @@ public class NavigationParentsTest extends AbstractBridgedComponentTestCase {
   @After
   @SuppressWarnings("unchecked")
   public void tearDown_NavigationParentsTest() {
-    navParents.navCache = Utils.getComponent(IDocumentReferenceCache.class, 
-        NavigationCache.NAME);
+    navParents.navCache = Utils.getComponent(IDocumentReferenceCache.class, NavigationCache.NAME);
   }
 
   @Test
   public void testGetDocumentParentsList() throws Exception {
     WikiReference wikiRef = new WikiReference("db");
-    DocumentReference docRef = new DocumentReference("myDoc", 
-        new SpaceReference("space", wikiRef));
-    DocumentReference parentLocal = new DocumentReference("parent", 
-        new SpaceReference("parentSpace", wikiRef));
+    DocumentReference docRef = new DocumentReference("myDoc", new SpaceReference("space", wikiRef));
+    DocumentReference parentLocal = new DocumentReference("parent", new SpaceReference(
+        "parentSpace", wikiRef));
     WikiReference centralWikiRef = new WikiReference("celements2web");
-    DocumentReference parentCentral = new DocumentReference("parent", 
-        new SpaceReference("parentSpace", centralWikiRef));
-    
+    DocumentReference parentCentral = new DocumentReference("parent", new SpaceReference(
+        "parentSpace", centralWikiRef));
+
     expect(navParents.navCache.getCachedDocRefs(eq(wikiRef), eq("space"))).andReturn(
         ImmutableSet.of(parentLocal)).once();
-    expect(navParents.navCache.getCachedDocRefs(eq(centralWikiRef), eq("space"))
-        ).andReturn(ImmutableSet.of(parentCentral)).once();
-    
+    expect(navParents.navCache.getCachedDocRefs(eq(centralWikiRef), eq("space"))).andReturn(
+        ImmutableSet.of(parentCentral)).once();
+
     List<DocumentReference> docParentsList = Arrays.asList(parentLocal, parentCentral);
     replayDefault();
     assertEquals(docParentsList, navParents.getDocumentParentsList(docRef));

@@ -38,11 +38,10 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
   private IWebUtilsService webUtilsService;
 
   /**
-   * The observation manager that will be use to fire user creation events.
-   * Note: We can't have the OM as a requirement, since it would create an
-   * infinite initialization loop, causing a stack overflow error (this event
-   * listener would require an initialized OM and the OM requires a list of
-   * initialized event listeners)
+   * The observation manager that will be use to fire user creation events. Note: We can't
+   * have the OM as a requirement, since it would create an infinite initialization loop,
+   * causing a stack overflow error (this event listener would require an initialized OM
+   * and the OM requires a list of initialized event listeners)
    */
   private ObservationManager observationManager;
 
@@ -64,16 +63,15 @@ public abstract class AbstractXObjectPageTypeDocumentListener {
     }
     return null;
   }
-  
+
   protected DocumentReference getPageTypePropertiesClassRef(XWikiDocument doc) {
-    return pageTypeClassConfig.getPageTypePropertiesClassRef(webUtilsService.getWikiRef(
-        doc));
+    return pageTypeClassConfig.getPageTypePropertiesClassRef(webUtilsService.getWikiRef(doc));
   }
 
   final protected IWebUtilsService getWebUtilsService() {
     return webUtilsService;
   };
-  
+
   abstract protected Logger getLogger();
 
 }

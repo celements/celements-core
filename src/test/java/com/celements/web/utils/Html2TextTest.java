@@ -31,8 +31,9 @@ import org.junit.Test;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 
 public class Html2TextTest extends AbstractBridgedComponentTestCase {
+
   Html2Text h2t;
-  
+
   @Before
   public void setUp_WebUtilsTest() {
     h2t = new Html2Text();
@@ -47,7 +48,8 @@ public class Html2TextTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testParse_complexContent() throws IOException {
-    Reader in = new StringReader("<html><head></head><body><div>Test String!<span>Mit &Uuml;ml&auml;uten.</span><div></body></html>");
+    Reader in = new StringReader(
+        "<html><head></head><body><div>Test String!<span>Mit &Uuml;ml&auml;uten.</span><div></body></html>");
     h2t.parse(in);
     assertEquals("Test String!\r\nMit Ümläuten.", h2t.getText());
   }
@@ -56,9 +58,9 @@ public class Html2TextTest extends AbstractBridgedComponentTestCase {
   public void testHandleText() {
     StringBuffer sb = new StringBuffer();
     h2t.injectStringBuffer(sb);
-    h2t.handleText(new char[]{'t', 'e', 's', 't'}, 100);
+    h2t.handleText(new char[] { 't', 'e', 's', 't' }, 100);
     assertEquals("test", h2t.getText());
-    h2t.handleText(new char[]{'i', 't', ' ', 'n', 'o', 'w'}, 100);
+    h2t.handleText(new char[] { 'i', 't', ' ', 'n', 'o', 'w' }, 100);
     assertEquals("test\r\nit now", h2t.getText());
   }
 
@@ -67,7 +69,7 @@ public class Html2TextTest extends AbstractBridgedComponentTestCase {
     h2t.injectStringBuffer(new StringBuffer("Test String"));
     assertEquals("Test String", h2t.getText());
   }
-  
+
   @Test
   public void testInjectStringBuffer() {
     assertNotNull(h2t.getText());

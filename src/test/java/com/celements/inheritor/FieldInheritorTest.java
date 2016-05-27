@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
-  
+
   private FieldInheritor _fieldInheritor;
   private IIteratorFactory<XObjectIterator> _iteratorFactory;
   private XWikiContext _context;
@@ -48,14 +48,13 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
   private List<String> _docList;
   private String _fullname;
   private DocumentReference _docRef;
-  
+
   @Before
   public void setUp_FieldInheritorTest() throws Exception {
     _context = getContext();
     _xwiki = createMock(XWiki.class);
     _context.setWiki(_xwiki);
-    _testClassRef = new DocumentReference(_context.getDatabase(), "Celements",
-        "TestClass");
+    _testClassRef = new DocumentReference(_context.getDatabase(), "Celements", "TestClass");
     _fieldInheritor = new FieldInheritor();
     _fullname = "Test.Doc";
     _docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
@@ -63,14 +62,14 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     _docList = new ArrayList<String>();
     _iteratorFactory = getTestIteratorFactory(_docList);
   }
-  
+
   @Test
   public void testSetEmptyFieldChecker() {
     IEmptyFieldChecker emptyFieldChecker = new DefaultEmptyFieldChecker();
     _fieldInheritor.setEmptyFieldChecker(emptyFieldChecker);
     assertEquals(emptyFieldChecker, _fieldInheritor.getEmptyFieldChecker());
   }
-  
+
   @Test
   public void testGetEmptyFieldChecker() {
     assertTrue(_fieldInheritor.getEmptyFieldChecker() != null);
@@ -78,7 +77,7 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetObject() throws Exception{
+  public void testGetObject() throws Exception {
     _docList.add(_fullname);
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
@@ -88,40 +87,37 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     secondObj.setXClassReference(_testClassRef);
     secondObj.setStringValue("field2", "value2");
     _testDoc.addXObject(secondObj);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc
-        ).anyTimes();
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _fieldInheritor.setIteratorFactory(_iteratorFactory);
-    replay(_xwiki);      
-    assertSame("Expecting second object.", secondObj,
-        _fieldInheritor.getObject("field2"));
-    assertSame("Expecting first object.", firstObj,
-        _fieldInheritor.getObject("field1"));
+    replay(_xwiki);
+    assertSame("Expecting second object.", secondObj, _fieldInheritor.getObject("field2"));
+    assertSame("Expecting first object.", firstObj, _fieldInheritor.getObject("field1"));
     verify(_xwiki);
   }
-  
+
   @Test
-  public void testGetObject_noSuchObject(){ 
+  public void testGetObject_noSuchObject() {
     _fieldInheritor.setIteratorFactory(_iteratorFactory);
-    assertEquals(null,_fieldInheritor.getObject("myField"));
+    assertEquals(null, _fieldInheritor.getObject("myField"));
   }
-  
+
   @Test
-  public void testGetObject_noIteratorFactory(){
+  public void testGetObject_noIteratorFactory() {
     try {
       _fieldInheritor.getObject("myField");
       fail("Expecting exception.");
-    } catch(IllegalStateException ex) {
-      //expected behaviour
+    } catch (IllegalStateException ex) {
+      // expected behaviour
     }
   }
-  
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
-  
-  private IIteratorFactory<XObjectIterator> getTestIteratorFactory(
-      final List<String> docList) {
+
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
+
+  private IIteratorFactory<XObjectIterator> getTestIteratorFactory(final List<String> docList) {
     return new IIteratorFactory<XObjectIterator>() {
+
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(_context);
         iterator.setClassName(_testClassRef.getLastSpaceReference().getName() + "."

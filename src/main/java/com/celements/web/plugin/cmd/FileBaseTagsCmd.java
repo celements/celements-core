@@ -41,8 +41,8 @@ public class FileBaseTagsCmd {
   private IWebUtils celUtils = WebUtils.getInstance();
 
   public List<TreeNode> getAllFileBaseTags(XWikiContext context) {
-    return celUtils.getSubNodesForParent("", getTagSpaceName(context),
-        new InternalRightsFilter(), context);
+    return celUtils.getSubNodesForParent("", getTagSpaceName(context), new InternalRightsFilter(),
+        context);
   }
 
   public String getTagSpaceName(XWikiContext context) {
@@ -86,8 +86,7 @@ public class FileBaseTagsCmd {
         }
       }
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get tag document [" + getTagFullName(tagName, context)
-          +"].", exp);
+      mLogger.error("Failed to get tag document [" + getTagFullName(tagName, context) + "].", exp);
     }
     return tagDoc;
   }

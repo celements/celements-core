@@ -19,7 +19,6 @@
  */
 package com.celements.common.classes;
 
-
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -49,10 +48,9 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testRunUpdate_activated_Prefs() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))
-        ).andReturn("mycol,testcol").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
+        "mycol,testcol").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn("").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
@@ -61,10 +59,9 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testRunUpdate_deactivated_Prefs() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))
-        ).andReturn("othercol,andcol").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))
-      ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
+        "othercol,andcol").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn("").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
@@ -73,10 +70,10 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testRunUpdate_activated_Param() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))
-        ).andReturn("mycol,testcol").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn(
+        "mycol,testcol").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
@@ -85,23 +82,22 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testRunUpdate_deactivated_Param() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))
-      ).andReturn("othercol,andcol").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn(
+        "othercol,andcol").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
     assertFalse(testClassColl.initClassExecuted);
   }
 
-  
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
   static class TestClassCollection extends CelementsClassCollection {
-    
+
     private final static Log mLogger = LogFactory.getFactory().getInstance(
         TestClassCollection.class);
 

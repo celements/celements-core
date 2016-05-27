@@ -27,7 +27,7 @@ import com.celements.web.medialib.datafields.IDataFieldRow;
 public interface IDataProvider extends Iterator<IDataFieldRow> {
 
   public void appendHeader(Builder builder);
-  
+
   public void appendRow(Builder builder);
-  
+
 }

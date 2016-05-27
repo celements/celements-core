@@ -56,30 +56,25 @@ public class PageLayoutCommand {
 
   public static final String SIMPLE_LAYOUT = "SimpleLayout";
 
-  public static final String XWIKICFG_CELEMENTS_LAYOUT_DEFAULT
-      = "celements.layout.default";
+  public static final String XWIKICFG_CELEMENTS_LAYOUT_DEFAULT = "celements.layout.default";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      PageLayoutCommand.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(PageLayoutCommand.class);
 
   QueryManager queryManager;
 
   IWebUtilsService webUtilsService;
 
   public static final String PAGE_LAYOUT_PROPERTIES_CLASS_SPACE = "Celements";
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS_DOC =
-    "PageLayoutPropertiesClass";
-  public static final String PAGE_LAYOUT_PROPERTIES_CLASS =
-    PAGE_LAYOUT_PROPERTIES_CLASS_SPACE + "." + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
+  public static final String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
+  public static final String PAGE_LAYOUT_PROPERTIES_CLASS = PAGE_LAYOUT_PROPERTIES_CLASS_SPACE + "."
+      + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
 
   public static final String CEL_LAYOUT_EDITOR_PL_NAME = "CelLayoutEditor";
 
-  private static final String CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY =
-      "celRenderingLayout";
+  private static final String CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY = "celRenderingLayout";
 
-  private static final String CEL_RENDERING_LAYOUT_STACK_PROPERTY =
-      "celRenderingLayoutStack";
-  
+  private static final String CEL_RENDERING_LAYOUT_STACK_PROPERTY = "celRenderingLayoutStack";
+
   /**
    * The name of the internal packaging plugin.
    */
@@ -101,28 +96,25 @@ public class PageLayoutCommand {
   private Map<String, String> getPageLayoutMap(boolean onlyActive) {
     Map<String, String> plMap = new HashMap<String, String>();
     try {
-      for (Object resultRowObj : getContext().getWiki().search(getPageLayoutHQL(
-          onlyActive), getContext())) {
+      for (Object resultRowObj : getContext().getWiki().search(getPageLayoutHQL(onlyActive),
+          getContext())) {
         Object[] resultRow = (Object[]) resultRowObj;
         plMap.put(resultRow[0].toString(), resultRow[1].toString());
       }
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get all page layouts", exp);
     }
-    return plMap ;
+    return plMap;
   }
 
   String getPageLayoutHQL(boolean onlyActive) {
-    String hql = "select doc.space, pl.prettyname"
-      + " from XWikiDocument as doc, BaseObject obj,"
-      + " Celements.PageLayoutPropertiesClass as pl"
-      + " where doc.fullName = obj.name"
-      + " and obj.className='Celements.PageLayoutPropertiesClass'"
-      + " and pl.id.id=obj.id";
+    String hql = "select doc.space, pl.prettyname" + " from XWikiDocument as doc, BaseObject obj,"
+        + " Celements.PageLayoutPropertiesClass as pl" + " where doc.fullName = obj.name"
+        + " and obj.className='Celements.PageLayoutPropertiesClass'" + " and pl.id.id=obj.id";
     if (onlyActive) {
       hql += " and pl.isActive = 1";
     }
-      hql += " order by pl.prettyname asc";
+    hql += " order by pl.prettyname asc";
     return hql;
   }
 
@@ -137,10 +129,8 @@ public class PageLayoutCommand {
           XWikiDocument propXdoc = getContext().getWiki().getDocument(standardPropDocRef(
               layoutSpaceRef), getContext());
           BaseObject layoutPropObj = propXdoc.newXObject(getPageLayoutPropertiesClassRef(
-              propXdoc.getDocumentReference().getWikiReference().getName()),
-              getContext());
-          layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName()
-              + " Layout");
+              propXdoc.getDocumentReference().getWikiReference().getName()), getContext());
+          layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
           layoutPropObj.setStringValue("doctype", getDocType());
           getContext().getWiki().saveDocument(propXdoc, "Creating page layout", false,
               getContext());
@@ -154,29 +144,26 @@ public class PageLayoutCommand {
   }
 
   private String getDocType() {
-    return Utils.getComponent(ConfigurationSource.class).getProperty(
-        "celements.layout.docType", "HTML 5");
+    return Utils.getComponent(ConfigurationSource.class).getProperty("celements.layout.docType",
+        "HTML 5");
   }
 
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {
     XWiki xwiki = getContext().getWiki();
     try {
-      Query spaceDocsQuery = getQueryManager().createQuery(
-          "where doc.space = :space", Query.XWQL);
+      Query spaceDocsQuery = getQueryManager().createQuery("where doc.space = :space", Query.XWQL);
       spaceDocsQuery.bindValue("space", layoutSpaceRef.getName());
-      for (String docName : spaceDocsQuery.<String> execute()) {
-        DocumentReference docReference = getWebUtilsService().resolveDocumentReference(
-            docName);
-        xwiki.deleteAllDocuments(xwiki.getDocument(docReference, getContext()),
-            getContext());
+      for (String docName : spaceDocsQuery.<String>execute()) {
+        DocumentReference docReference = getWebUtilsService().resolveDocumentReference(docName);
+        xwiki.deleteAllDocuments(xwiki.getDocument(docReference, getContext()), getContext());
       }
       return true;
     } catch (QueryException exp) {
       LOGGER.warn("Failed to get the list of documents while trying to delete space ["
           + layoutSpaceRef + "]", exp);
     } catch (XWikiException exp) {
-      LOGGER.error("deleteLayout: Failed to delete documents for space [" + layoutSpaceRef
-          + "].", exp);
+      LOGGER.error("deleteLayout: Failed to delete documents for space [" + layoutSpaceRef + "].",
+          exp);
     }
     return false;
   }
@@ -193,7 +180,7 @@ public class PageLayoutCommand {
    * @return
    */
   public boolean layoutExists(SpaceReference layoutSpaceRef) {
-      return (getLayoutPropDoc(layoutSpaceRef) != null);
+    return (getLayoutPropDoc(layoutSpaceRef) != null);
   }
 
   public boolean canRenderLayout(SpaceReference layoutSpaceRef) {
@@ -214,8 +201,8 @@ public class PageLayoutCommand {
   public XWikiDocument getLayoutPropDoc() {
     SpaceReference currDocPageLayout = getPageLayoutForCurrentDoc();
     if (currDocPageLayout != null) {
-      LOGGER.debug("getLayoutPropDoc: found page layout [" + currDocPageLayout
-          + "] for page [" + getContext().getDoc().getDocumentReference() + "].");
+      LOGGER.debug("getLayoutPropDoc: found page layout [" + currDocPageLayout + "] for page ["
+          + getContext().getDoc().getDocumentReference() + "].");
       return getLayoutPropDoc(currDocPageLayout);
     } else {
       LOGGER.debug("getLayoutPropDoc: found NO page layout for page ["
@@ -227,7 +214,8 @@ public class PageLayoutCommand {
   /**
    * getLayoutPropDoc
    * 
-   * @param layoutSpaceRef may not be null (NPE if null)
+   * @param layoutSpaceRef
+   *          may not be null (NPE if null)
    * @return property doc for layoutSpaceRef
    */
   public XWikiDocument getLayoutPropDoc(SpaceReference layoutSpaceRef) {
@@ -235,15 +223,14 @@ public class PageLayoutCommand {
     DocumentReference layoutPropDocRef = standardPropDocRef(layoutSpaceRef);
     if (getContext().getWiki().exists(layoutPropDocRef, getContext())) {
       try {
-        XWikiDocument theDoc = getContext().getWiki().getDocument(layoutPropDocRef,
-            getContext());
-        if (theDoc.getXObject(getPageLayoutPropertiesClassRef(theDoc.getDocumentReference(
-            ).getWikiReference().getName())) != null) {
+        XWikiDocument theDoc = getContext().getWiki().getDocument(layoutPropDocRef, getContext());
+        if (theDoc.getXObject(getPageLayoutPropertiesClassRef(
+            theDoc.getDocumentReference().getWikiReference().getName())) != null) {
           layoutPropDoc = theDoc;
         }
       } catch (XWikiException exp) {
-        LOGGER.error("getLayoutPropDoc: Failed to get layout property doc for [" 
-            + layoutSpaceRef + "].", exp);
+        LOGGER.error("getLayoutPropDoc: Failed to get layout property doc for [" + layoutSpaceRef
+            + "].", exp);
       }
     }
     return layoutPropDoc;
@@ -280,8 +267,8 @@ public class PageLayoutCommand {
     renderEngine.renderPageLayout(layoutSpaceRef);
     getRenderingLayoutStack().pop();
     setRenderLayoutInVelocityContext(getCurrentRenderingLayout());
-    LOGGER.info("renderPageLayout finishing. Time used in millisec: "
-        + (System.currentTimeMillis() - millisec));
+    LOGGER.info("renderPageLayout finishing. Time used in millisec: " + (System.currentTimeMillis()
+        - millisec));
     return cellRenderer.getAsString();
   }
 
@@ -295,11 +282,12 @@ public class PageLayoutCommand {
   private void setRenderLayoutInVelocityContext(SpaceReference layoutSpaceRef) {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     if (layoutSpaceRef != null) {
-      /* IMPORTANT: do not use .clone() on any reference it will not be available
-       * on unstable branch
+      /*
+       * IMPORTANT: do not use .clone() on any reference it will not be available on
+       * unstable branch
        */
       SpaceReference copyOfLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
-          (WikiReference)layoutSpaceRef.getParent());
+          (WikiReference) layoutSpaceRef.getParent());
       vcontext.put(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY, copyOfLayoutSpaceRef);
     } else {
       vcontext.remove(CEL_RENDERING_LAYOUT_CONTEXT_PROPERTY);
@@ -310,23 +298,21 @@ public class PageLayoutCommand {
   private Stack<SpaceReference> getRenderingLayoutStack() {
     ExecutionContext execContext = getExecution().getContext();
     if (execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY) == null) {
-      execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY,
-          new Stack<SpaceReference>());
+      execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY, new Stack<SpaceReference>());
     }
-    return (Stack<SpaceReference>) execContext.getProperty(
-        CEL_RENDERING_LAYOUT_STACK_PROPERTY);
+    return (Stack<SpaceReference>) execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY);
   }
- 
+
   /**
-   * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may
-   * be used by the current context database.
+   * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may be
+   * used by the current context database.
    * 
    * @return
    */
   public SpaceReference getPageLayoutForCurrentDoc() {
     return getPageLayoutForDoc(getContext().getDoc().getDocumentReference());
   }
-  
+
   /**
    * @deprecated since 2.14.0 instead use getPageLayoutForDoc(DocumentReference)
    */
@@ -352,9 +338,8 @@ public class PageLayoutCommand {
     if (layoutExists(documentReference.getLastSpaceReference())) {
       layoutSpaceRef = getCelLayoutEditorSpaceRef();
     } else {
-      String spaceName = getInheritorFactory().getPageLayoutInheritor(
-          getFullNameForDocRef(documentReference), getContext()
-        ).getStringValue("page_layout", null);
+      String spaceName = getInheritorFactory().getPageLayoutInheritor(getFullNameForDocRef(
+          documentReference), getContext()).getStringValue("page_layout", null);
       if (spaceName != null) {
         layoutSpaceRef = getWebUtilsService().resolveSpaceReference(spaceName);
       }
@@ -363,30 +348,27 @@ public class PageLayoutCommand {
     if ((layoutSpaceRef == null) || !checkLayoutAccess(layoutSpaceRef)) {
       layoutSpaceRef = getDefaultLayoutSpaceReference();
     }
-    LOGGER.info("getPageLayoutForDoc: for [" + documentReference + "] returning ["
-        + layoutSpaceRef + "].  Time used in millisec: "
-        + (System.currentTimeMillis() - millisec));
+    LOGGER.info("getPageLayoutForDoc: for [" + documentReference + "] returning [" + layoutSpaceRef
+        + "].  Time used in millisec: " + (System.currentTimeMillis() - millisec));
     return layoutSpaceRef;
   }
 
   /**
-   * prohibit layout access in different db except central celements2web (or
-   * default layout configured on disk).
-   * 
-   * TODO add allowedDBs to layout properties
+   * prohibit layout access in different db except central celements2web (or default
+   * layout configured on disk). TODO add allowedDBs to layout properties
    * 
    * @param layoutSpaceRef
    * @return
    */
   public boolean checkLayoutAccess(SpaceReference layoutSpaceRef) {
     String layoutWikiName = layoutSpaceRef.getParent().getName();
-    return getContext().getDatabase().equals(layoutWikiName)
-        || "celements2web".equals(layoutWikiName);
+    return getContext().getDatabase().equals(layoutWikiName) || "celements2web".equals(
+        layoutWikiName);
   }
 
   public SpaceReference getDefaultLayoutSpaceReference() {
-    SpaceReference defaultLayoutSpaceRef = new SpaceReference(getDefaultLayout(),
-        new WikiReference(getContext().getDatabase()));
+    SpaceReference defaultLayoutSpaceRef = new SpaceReference(getDefaultLayout(), new WikiReference(
+        getContext().getDatabase()));
     defaultLayoutSpaceRef = decideLocalOrCentral(defaultLayoutSpaceRef);
     return defaultLayoutSpaceRef;
   }
@@ -394,8 +376,8 @@ public class PageLayoutCommand {
   String getDefaultLayout() {
     String defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT,
         SIMPLE_LAYOUT);
-    if ((getContext() != null) && (getContext().getAction() != null)
-        && !"view".equals(getContext().getAction())) {
+    if ((getContext() != null) && (getContext().getAction() != null) && !"view".equals(
+        getContext().getAction())) {
       defaultLayout = getContext().getWiki().Param(XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
           + getContext().getAction(), defaultLayout);
       LOGGER.debug("getDefaultLayout for action [" + getContext().getAction() + "] got ["
@@ -410,8 +392,7 @@ public class PageLayoutCommand {
     if ((layoutSpaceRef != null) && !layoutExists(layoutSpaceRef)) {
       SpaceReference centralLayoutSpaceRef = new SpaceReference(layoutSpaceRef.getName(),
           new WikiReference("celements2web"));
-      if (!layoutSpaceRef.equals(centralLayoutSpaceRef)
-          && layoutExists(centralLayoutSpaceRef)) {
+      if (!layoutSpaceRef.equals(centralLayoutSpaceRef) && layoutExists(centralLayoutSpaceRef)) {
         layoutSpaceRef = centralLayoutSpaceRef;
       } else {
         layoutSpaceRef = null;
@@ -426,24 +407,24 @@ public class PageLayoutCommand {
   }
 
   private String getFullNameForDocRef(DocumentReference documentReference) {
-    return documentReference.getLastSpaceReference().getName() + "."
-        + documentReference.getName();
+    return documentReference.getLastSpaceReference().getName() + "." + documentReference.getName();
   }
 
   private InheritorFactory getInheritorFactory() {
-   if (_injectedInheritorFactory != null) {
-     return _injectedInheritorFactory;
+    if (_injectedInheritorFactory != null) {
+      return _injectedInheritorFactory;
     }
     return new InheritorFactory();
   }
- 
- /**
-  * For TESTS ONLY!!!
-  * @param injectedInheritorFactory
-  */
- void inject_TEST_InheritorFactory(InheritorFactory injectedInheritorFactory) {
-   _injectedInheritorFactory = injectedInheritorFactory;
- }
+
+  /**
+   * For TESTS ONLY!!!
+   * 
+   * @param injectedInheritorFactory
+   */
+  void inject_TEST_InheritorFactory(InheritorFactory injectedInheritorFactory) {
+    _injectedInheritorFactory = injectedInheritorFactory;
+  }
 
   public boolean isActive(SpaceReference layoutSpaceRef) {
     BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
@@ -455,8 +436,7 @@ public class PageLayoutCommand {
 
   public String getPrettyName(SpaceReference layoutSpaceRef) {
     BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if ((layoutPropertyObj != null)
-        && (layoutPropertyObj.getStringValue("prettyname") != null)) {
+    if ((layoutPropertyObj != null) && (layoutPropertyObj.getStringValue("prettyname") != null)) {
       return layoutPropertyObj.getStringValue("prettyname");
     }
     return "";
@@ -464,8 +444,7 @@ public class PageLayoutCommand {
 
   public String getVersion(SpaceReference layoutSpaceRef) {
     BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if ((layoutPropertyObj != null)
-        && (layoutPropertyObj.getStringValue("version") != null)) {
+    if ((layoutPropertyObj != null) && (layoutPropertyObj.getStringValue("version") != null)) {
       return layoutPropertyObj.getStringValue("version");
     }
     return "";
@@ -480,28 +459,33 @@ public class PageLayoutCommand {
   /**
    * Export an page layout space into XAR using Packaging plugin.
    * 
-   * @param layoutSpaceRef the layout space reference of the application to export.
-   * @param withDocHistory indicate if history of documents is exported.
-   * @param context the XWiki context.
-   * @throws XWikiException error when :
-   *             <ul>
-   *             <li>or getting page-layouts documents to export.</li>
-   *             <li>or when apply export.</li>
-   *             </ul>
-   * @throws IOException error when apply export.
+   * @param layoutSpaceRef
+   *          the layout space reference of the application to export.
+   * @param withDocHistory
+   *          indicate if history of documents is exported.
+   * @param context
+   *          the XWiki context.
+   * @throws XWikiException
+   *           error when :
+   *           <ul>
+   *           <li>or getting page-layouts documents to export.</li>
+   *           <li>or when apply export.</li>
+   *           </ul>
+   * @throws IOException
+   *           error when apply export.
    */
-  public void exportLayoutXAR(SpaceReference layoutSpaceRef, boolean withDocHistory
-      ) throws XWikiException, IOException {
-      PackageAPI export = ((PackageAPI) getContext().getWiki().getPluginApi(
-          PACKAGEPLUGIN_NAME, getContext()));
-      export.setName(getPrettyName(layoutSpaceRef) + "-" + getVersion(layoutSpaceRef));
-      for (String documentName : getContext().getWiki().getSpaceDocsName(
-          layoutSpaceRef.getName(), getContext())) {
-          export.add(extendToFullName(layoutSpaceRef.getName(), documentName),
-              DocumentInfo.ACTION_OVERWRITE);
-      }
-      export.setWithVersions(withDocHistory);
-      export.export();
+  public void exportLayoutXAR(SpaceReference layoutSpaceRef, boolean withDocHistory)
+      throws XWikiException, IOException {
+    PackageAPI export = ((PackageAPI) getContext().getWiki().getPluginApi(PACKAGEPLUGIN_NAME,
+        getContext()));
+    export.setName(getPrettyName(layoutSpaceRef) + "-" + getVersion(layoutSpaceRef));
+    for (String documentName : getContext().getWiki().getSpaceDocsName(layoutSpaceRef.getName(),
+        getContext())) {
+      export.add(extendToFullName(layoutSpaceRef.getName(), documentName),
+          DocumentInfo.ACTION_OVERWRITE);
+    }
+    export.setWithVersions(withDocHistory);
+    export.export();
   }
 
   String extendToFullName(String layoutSpaceName, String documentName) {
@@ -513,7 +497,7 @@ public class PageLayoutCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {

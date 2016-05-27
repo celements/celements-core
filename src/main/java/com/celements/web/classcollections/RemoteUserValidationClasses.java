@@ -32,23 +32,23 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.remoteValidator.classes")
 public class RemoteUserValidationClasses extends CelementsClassCollection {
-  
+
   private static Log mLogger = LogFactory.getFactory().getInstance(
       RemoteUserValidationClasses.class);
-  
+
   public void initClasses(XWikiContext context) throws XWikiException {
     getRemoteUserValidationClass(context);
   }
-  
-  public RemoteUserValidationClasses() {}
-  
-  protected BaseClass getRemoteUserValidationClass(XWikiContext context
-      ) throws XWikiException {
+
+  public RemoteUserValidationClasses() {
+  }
+
+  protected BaseClass getRemoteUserValidationClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
         "RemoteUserValidationClass");
-    
+
     try {
       doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
@@ -56,20 +56,20 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("host", "Allow from host", 30);
     needsUpdate |= bclass.addTextField("secret", "Secret for host", 30);
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
   }
-  
+
   public String getConfigName() {
     return "remoteValidator";
   }
-  
+
   @Override
   protected Log getLogger() {
     return mLogger;

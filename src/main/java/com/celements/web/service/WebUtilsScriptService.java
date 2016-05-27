@@ -23,9 +23,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 @Component("webUtils")
 public class WebUtilsScriptService implements ScriptService {
-  
-  private static Logger _LOGGER  = LoggerFactory.getLogger(
-      AuthenticationScriptService.class);
+
+  private static Logger _LOGGER = LoggerFactory.getLogger(AuthenticationScriptService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -37,13 +36,13 @@ public class WebUtilsScriptService implements ScriptService {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public String getDefaultLanguage() {
     return webUtilsService.getDefaultLanguage();
   }
-  
+
   public XWikiMessageTool getMessageTool(String adminLanguage) {
     return webUtilsService.getMessageTool(adminLanguage);
   }
@@ -64,90 +63,86 @@ public class WebUtilsScriptService implements ScriptService {
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
-  public List<Attachment> getAttachmentListSorted(Document doc, String comparator
-      ) throws ClassNotFoundException{
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
+      throws ClassNotFoundException {
     return webUtilsService.getAttachmentListSorted(doc, comparator);
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
-      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return webUtilsService.getAttachmentListSorted(doc, comparator, imagesOnly, start,
-        nb);
+      boolean imagesOnly, int start, int nb) throws ClassNotFoundException {
+    return webUtilsService.getAttachmentListSorted(doc, comparator, imagesOnly, start, nb);
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly) throws ClassNotFoundException{
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly)
+      throws ClassNotFoundException {
     return getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, 0, 0);
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly, int start, int nb) throws ClassNotFoundException{
-    return webUtilsService.getAttachmentListSortedAsJSON(doc, comparator, imagesOnly,
-        start, nb);
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
+      int start, int nb) throws ClassNotFoundException {
+    return webUtilsService.getAttachmentListSortedAsJSON(doc, comparator, imagesOnly, start, nb);
   }
 
   public List<DocumentReference> getDocumentParentsDocRefList(DocumentReference docRef,
       boolean includeDoc) {
     return webUtilsService.getDocumentParentsList(docRef, includeDoc);
   }
-  
+
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
     List<Attachment> attachments = Collections.emptyList();
-    if (hasProgrammingRights()){
+    if (hasProgrammingRights()) {
       _LOGGER.info("getAttachmentsForDocs: fetching attachments...");
       attachments = webUtilsService.getAttachmentsForDocs(docsFN);
-    }
-    else {
+    } else {
       _LOGGER.info("getAttachmentsForDocs: no programming rights");
     }
     return attachments;
   }
-  
+
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
-  public String getDocSectionAsJSON(String regex, DocumentReference fullName, int part
-      ) throws XWikiException {
+  public String getDocSectionAsJSON(String regex, DocumentReference fullName, int part)
+      throws XWikiException {
     return webUtilsService.getDocSectionAsJSON(regex, fullName, part);
   }
-  
+
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
-  public int countSections(String regex, DocumentReference fullName) 
-      throws XWikiException {
+  public int countSections(String regex, DocumentReference fullName) throws XWikiException {
     return webUtilsService.countSections(regex, fullName);
   }
-  
+
   public List<String> getAllowedLanguages() {
     return webUtilsService.getAllowedLanguages();
   }
-  
+
   public List<String> getAllowedLanguages(String spaceName) {
     return webUtilsService.getAllowedLanguages(spaceName);
   }
-  
+
   public String getParentSpace() {
     return webUtilsService.getParentSpace();
   }
-  
+
   public String getJSONContent(Document contentDoc) {
     return webUtilsService.getJSONContent(contentDoc.getDocument());
   }
@@ -164,7 +159,6 @@ public class WebUtilsScriptService implements ScriptService {
   }
 
   /**
-   * 
    * @param authorDocName
    * @return returns the name of the user in the form "lastname, first name"
    */
@@ -176,11 +170,11 @@ public class WebUtilsScriptService implements ScriptService {
     }
     return "N/A";
   }
-  
+
   public String getMajorVersion(Document doc) {
     return webUtilsService.getMajorVersion(doc.getDocument());
   }
-  
+
   private boolean hasProgrammingRights() {
     return getContext().getWiki().getRightService().hasProgrammingRights(getContext());
   }

@@ -43,16 +43,16 @@ public interface IAttachmentServiceRole {
 
   public int uploadMultipleAttachments(XWikiDocument attachToDoc, String fieldNamePrefix);
 
-  public boolean uploadAttachment(String fieldName, String filename,
-      FileUploadPlugin fileupload, XWikiDocument doc) throws XWikiException;
-  
-  public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename, 
+  public boolean uploadAttachment(String fieldName, String filename, FileUploadPlugin fileupload,
+      XWikiDocument doc) throws XWikiException;
+
+  public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename,
       String username, String comment) throws AttachmentToBigException,
-        AddingAttachmentContentFailedException, DocumentSaveException;
-  
+          AddingAttachmentContentFailedException, DocumentSaveException;
+
   public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
-        AddingAttachmentContentFailedException, DocumentSaveException;
+          AddingAttachmentContentFailedException, DocumentSaveException;
 
   public String clearFileName(String fileName);
 
@@ -67,14 +67,12 @@ public interface IAttachmentServiceRole {
       throws AttachmentNotExistsException;
 
   public XWikiAttachment getAttachmentNameEqual(AttachmentReference attachmentRef)
-      throws DocumentLoadException, AttachmentNotExistsException,
-      DocumentNotExistsException;
+      throws DocumentLoadException, AttachmentNotExistsException, DocumentNotExistsException;
 
   public List<XWikiAttachment> getAttachmentsNameMatch(XWikiDocument document,
       IAttachmentMatcher attMatcher);
 
-  public Attachment getApiAttachment(XWikiAttachment attachment
-      ) throws NoAccessRightsException;
+  public Attachment getApiAttachment(XWikiAttachment attachment) throws NoAccessRightsException;
 
   public Attachment getApiAttachmentWithoutRightChecks(XWikiAttachment attachment);
 

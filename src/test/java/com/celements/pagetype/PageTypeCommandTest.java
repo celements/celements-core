@@ -55,7 +55,7 @@ public class PageTypeCommandTest extends AbstractBridgedComponentTestCase {
   public void testGetPageType_Default() throws Exception {
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName("MySpace.MyDocument");
-    //No PageType Object prepared -> Default PageType is RichText
+    // No PageType Object prepared -> Default PageType is RichText
     String pageTypeFN = pageTypeCmd.getPageType(doc, context);
     assertEquals("RichText", pageTypeFN);
   }
@@ -96,7 +96,7 @@ public class PageTypeCommandTest extends AbstractBridgedComponentTestCase {
   public void testGetPageTypeDocFN_Default() {
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName("MySpace.MyDocument");
-    //No PageType Object prepared -> Default PageType is RichText
+    // No PageType Object prepared -> Default PageType is RichText
     String pageTypeFN = pageTypeCmd.getPageTypeDocFN(doc, context);
     assertEquals("PageTypes.RichText", pageTypeFN);
   }

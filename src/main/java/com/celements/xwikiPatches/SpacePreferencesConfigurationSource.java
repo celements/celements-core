@@ -25,15 +25,13 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * In xwiki 2.7.2 the SpacePreferencesConfigurationSource by the broken
- * AbstractDocumentConfigurationSource on line 173 stating:
- *   classReference = getDocumentReference();
- * And SpacePrefencesConfigurationSource.getClassReference ist broken too on generating
- *   documentReference = new DocumentReference
- * 
+ * AbstractDocumentConfigurationSource on line 173 stating: classReference =
+ * getDocumentReference(); And SpacePrefencesConfigurationSource.getClassReference ist
+ * broken too on generating documentReference = new DocumentReference
  */
 @Component("space")
-public class SpacePreferencesConfigurationSource
-      extends AbstractDocumentConfigurationSource {
+public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigurationSource {
+
   private static final String DOCUMENT_NAME = "WebPreferences";
 
   private static final String CLASS_SPACE_NAME = "XWiki";
@@ -49,8 +47,7 @@ public class SpacePreferencesConfigurationSource
   protected DocumentReference getClassReference() {
     DocumentReference classReference = null;
 
-    DocumentReference currentDocumentReference = getDocumentAccessBridge()
-        .getCurrentDocumentReference();
+    DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
     if (currentDocumentReference != null) {
       // Add the current current wiki references to the XWiki Preferences class
       // reference to form
@@ -77,8 +74,7 @@ public class SpacePreferencesConfigurationSource
     DocumentReference documentReference = null;
 
     // Get the current document reference to extract the wiki and space names.
-    DocumentReference currentDocumentReference = getDocumentAccessBridge(
-        ).getCurrentDocumentReference();
+    DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
 
     if (currentDocumentReference != null) {
       // Add the current spaces and current wiki references to the Web

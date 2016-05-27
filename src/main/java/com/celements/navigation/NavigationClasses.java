@@ -42,8 +42,7 @@ public class NavigationClasses extends AbstractClassCollection {
   @Deprecated
   public static final String MENU_NAME_CLASS_SPACE = "Celements2";
   @Deprecated
-  public static final String MENU_NAME_CLASS = MENU_NAME_CLASS_SPACE + "."
-      + MENU_NAME_CLASS_DOC;
+  public static final String MENU_NAME_CLASS = MENU_NAME_CLASS_SPACE + "." + MENU_NAME_CLASS_DOC;
   @Deprecated
   public static final String MENU_NAME_FIELD = "menu_name";
   @Deprecated
@@ -59,15 +58,15 @@ public class NavigationClasses extends AbstractClassCollection {
   public static final String MAPPED_MENU_ITEM_CLASS_DOC = "MenuItemClass";
   @Deprecated
   public static final String MAPPED_MENU_ITEM_CLASS = MAPPED_MENU_ITEM_CLASS_SPACE + "."
-        + MAPPED_MENU_ITEM_CLASS_DOC;
+      + MAPPED_MENU_ITEM_CLASS_DOC;
 
   @Deprecated
   public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
   @Deprecated
   public static final String NAVIGATION_CONFIG_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
   @Deprecated
-  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
-        + "." + NAVIGATION_CONFIG_CLASS_DOC;
+  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE + "."
+      + NAVIGATION_CONFIG_CLASS_DOC;
 
   @Deprecated
   public static final String MENU_ELEMENT_NAME_FIELD = "menu_element_name";
@@ -93,15 +92,13 @@ public class NavigationClasses extends AbstractClassCollection {
   @Deprecated
   public static final String MENU_ITEM_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
   @Deprecated
-  public static final String MENU_ITEM_CLASS = MENU_ITEM_CLASS_SPACE + "."
-        + MENU_ITEM_CLASS_DOC;
+  public static final String MENU_ITEM_CLASS = MENU_ITEM_CLASS_SPACE + "." + MENU_ITEM_CLASS_DOC;
   @Deprecated
   public static final String MENU_POSITION_FIELD = "menu_position";
   @Deprecated
   public static final String PART_NAME_FIELD = "part_name";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      NavigationClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(NavigationClasses.class);
 
   @Requirement
   INavigationClassConfig navClassCfg;
@@ -185,10 +182,10 @@ public class NavigationClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField(MENU_ELEMENT_NAME_FIELD, "Menu Element Name", 30);
-    needsUpdate |= bclass.addNumberField(FROM_HIERARCHY_LEVEL_FIELD,
-        "From Hierarchy Level", 30, "integer");
-    needsUpdate |= bclass.addNumberField(TO_HIERARCHY_LEVEL_FIELD, "To Hierarchy Level",
-        30, "integer");
+    needsUpdate |= bclass.addNumberField(FROM_HIERARCHY_LEVEL_FIELD, "From Hierarchy Level", 30,
+        "integer");
+    needsUpdate |= bclass.addNumberField(TO_HIERARCHY_LEVEL_FIELD, "To Hierarchy Level", 30,
+        "integer");
     needsUpdate |= bclass.addNumberField(SHOW_INACTIVE_TO_LEVEL_FIELD,
         "Always Show Inactive To Level", 30, "integer");
     needsUpdate |= bclass.addTextField(MENU_SPACE_FIELD, "Menu Space Name (leave empty"
@@ -220,26 +217,24 @@ public class NavigationClasses extends AbstractClassCollection {
   BaseClass getMenuItemClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = navClassCfg.getMenuItemClassRef(getContext(
-        ).getDatabase());
+    DocumentReference classRef = navClassCfg.getMenuItemClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + INavigationClassConfig.MENU_ITEM_CLASS
-          + " class document.", exp);
+      LOGGER.error("Failed to get " + INavigationClassConfig.MENU_ITEM_CLASS + " class document.",
+          exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD,
-        "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD,
-        "Menu Part Name", 30);
-    needsUpdate |= bclass.addTextField(INavigationClassConfig.TARGET_FIELD, "Link Target",
+    needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD, "Position", 30,
+        "integer");
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD, "Menu Part Name",
         30);
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.TARGET_FIELD, "Link Target", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -258,8 +253,7 @@ public class NavigationClasses extends AbstractClassCollection {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
-    DocumentReference classRef = navClassCfg.getNewMenuItemClassRef(getContext(
-        ).getDatabase());
+    DocumentReference classRef = navClassCfg.getNewMenuItemClassRef(getContext().getDatabase());
 
     try {
       doc = xwiki.getDocument(classRef, getContext());
@@ -272,10 +266,10 @@ public class NavigationClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD,
-        "Position", 30, "integer");
-    needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD,
-        "Menu Part Name", 30);
+    needsUpdate |= bclass.addNumberField(INavigationClassConfig.MENU_POSITION_FIELD, "Position", 30,
+        "integer");
+    needsUpdate |= bclass.addTextField(INavigationClassConfig.PART_NAME_FIELD, "Menu Part Name",
+        30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

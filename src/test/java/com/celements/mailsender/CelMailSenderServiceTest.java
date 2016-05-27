@@ -22,8 +22,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void CelMailSenderServiceTest_setUp() throws Exception {
-    mailSender = (CelMailSenderService) Utils.getComponent(
-        IMailSenderRole.class);
+    mailSender = (CelMailSenderService) Utils.getComponent(IMailSenderRole.class);
   }
 
   @Test

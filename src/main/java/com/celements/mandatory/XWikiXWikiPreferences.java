@@ -37,8 +37,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("celements.mandatory.wikipreferences")
 public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      XWikiXWikiPreferences.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(XWikiXWikiPreferences.class);
 
   @Requirement
   private IPageTypeClassConfig pageTypeClassConfig;
@@ -60,8 +59,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
 
   @Override
   protected boolean skip() {
-    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiPreferences", 
-        0) == 1L;
+    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiPreferences", 0) == 1L;
   }
 
   @Override
@@ -86,14 +84,14 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
       prefsObj.set("editor", "Text", getContext());
       prefsObj.set("renderXWikiRadeoxRenderer", 0, getContext());
       prefsObj.set("pageWidth", "default", getContext());
-      LOGGER.debug("XWikiPreferences missing wiki preferences object added for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing wiki preferences object added for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("multilingual", -1) < 0) {
       prefsObj.setIntValue("multilingual", 1);
-      LOGGER.debug("XWikiPreferences missing multilingual configuration added for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing multilingual configuration added for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_edit", -1) < 0) {
@@ -110,8 +108,8 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     }
     if (prefsObj.getLongValue("upload_maxsize") <= 0) {
       prefsObj.set("upload_maxsize", 104857600L, getContext());
-      LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     String documentBundles = prefsObj.getStringValue("documentBundles");
@@ -123,14 +121,13 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
         documentBundles = documentBundles + ",celements2web:Celements2.Dictionary";
       }
       prefsObj.setStringValue("documentBundles", documentBundles);
-      LOGGER.debug("XWikiPreferences added missing Celements2.Dictionary for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences added missing Celements2.Dictionary for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     String centralfilebaseConfig = prefsObj.getStringValue("cel_centralfilebase");
     if (StringUtils.isEmpty(centralfilebaseConfig)) {
-      prefsObj.set("cel_centralfilebase", "Content_attachments.FileBaseDoc",
-          getContext());
+      prefsObj.set("cel_centralfilebase", "Content_attachments.FileBaseDoc", getContext());
       LOGGER.debug("XWikiPreferences missing cel_centralfilebase configuration added for"
           + " database [" + getWiki() + "].");
       dirty = true;
@@ -138,8 +135,7 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     return dirty;
   }
 
-  private boolean checkWikiPreferencesForMainWiki(XWikiDocument wikiPrefDoc
-      ) throws XWikiException {
+  private boolean checkWikiPreferencesForMainWiki(XWikiDocument wikiPrefDoc) throws XWikiException {
     boolean dirty = false;
     BaseObject prefsObj = wikiPrefDoc.getXObject(getDocRef(), false, getContext());
     if (prefsObj == null) {
@@ -147,14 +143,14 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
       prefsObj.set("editor", "Text", getContext());
       prefsObj.set("renderXWikiRadeoxRenderer", 1, getContext());
       prefsObj.set("pageWidth", "default", getContext());
-      LOGGER.debug("XWikiPreferences missing wiki preferences object added for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing wiki preferences object added for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("multilingual", -1) < 0) {
       prefsObj.setIntValue("multilingual", 1);
-      LOGGER.debug("XWikiPreferences missing multilingual configuration added for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing multilingual configuration added for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     if (prefsObj.getIntValue("authenticate_edit", -1) < 0) {
@@ -171,8 +167,8 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     }
     if (prefsObj.getLongValue("upload_maxsize") <= 0) {
       prefsObj.set("upload_maxsize", 104857600L, getContext());
-      LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for"
-          + " database [" + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing upload_maxsize configuration added for" + " database ["
+          + getWiki() + "].");
       dirty = true;
     }
     return dirty;
@@ -182,13 +178,12 @@ public class XWikiXWikiPreferences extends AbstractMandatoryDocument {
     boolean dirty = false;
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
         webUtilsService.getWikiRef());
-    BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false,
-        getContext());
+    BaseObject pageTypeObj = wikiPrefDoc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = wikiPrefDoc.newXObject(pageTypeClassRef, getContext());
       pageTypeObj.setStringValue("page_type", "WikiPreference");
-      LOGGER.debug("XWikiPreferences missing page type object fixed for database ["
-          + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing page type object fixed for database [" + getWiki()
+          + "].");
       dirty = true;
     }
     return dirty;

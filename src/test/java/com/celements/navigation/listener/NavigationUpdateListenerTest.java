@@ -19,7 +19,7 @@ public class NavigationUpdateListenerTest extends AbstractBridgedComponentTestCa
 
   @Before
   public void setUp_NavigationUpdateListenerTest() throws Exception {
-    listener = (NavigationUpdateListener) Utils.getComponent(EventListener.class, 
+    listener = (NavigationUpdateListener) Utils.getComponent(EventListener.class,
         NavigationUpdateListener.NAME);
   }
 
@@ -31,8 +31,8 @@ public class NavigationUpdateListenerTest extends AbstractBridgedComponentTestCa
   @Test
   public void testGetRequiredObjClassRef() {
     WikiReference wikiRef = new WikiReference("myWiki");
-    assertEquals(Utils.getComponent(INavigationClassConfig.class
-        ).getNavigationConfigClassRef(wikiRef), listener.getRequiredObjClassRef(wikiRef));
+    assertEquals(Utils.getComponent(INavigationClassConfig.class).getNavigationConfigClassRef(
+        wikiRef), listener.getRequiredObjClassRef(wikiRef));
   }
 
   @Test

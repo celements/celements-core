@@ -35,8 +35,7 @@ public class XDocParentsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetDocumentParentsList() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "mySpace",

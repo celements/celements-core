@@ -21,13 +21,14 @@ package com.celements.common.collections;
 
 import java.util.List;
 
-
 public class ListUtils {
 
-  private ListUtils() {}
-  
+  private ListUtils() {
+  }
+
   /**
    * Provides a type safe substract for Lists.
+   * 
    * @param <T>
    * @param list1
    * @param list2
@@ -37,12 +38,12 @@ public class ListUtils {
   public static <T> List<T> subtract(List<T> list1, List<T> list2) {
     return org.apache.commons.collections.ListUtils.subtract(list1, list2);
   }
-  
+
   public static String implode(List<String> list, String delimiter) {
     String implodedString = "";
-    if(list != null) {
+    if (list != null) {
       for (String element : list) {
-        if(implodedString.length() > 0) {
+        if (implodedString.length() > 0) {
           implodedString += delimiter;
         }
         implodedString += element;

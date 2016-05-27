@@ -8,8 +8,8 @@ import com.xpn.xwiki.XWikiException;
 @ComponentRole
 public interface IMenuAccessProviderRole {
 
-  public boolean hasview(DocumentReference menuBarDocRef
-      ) throws NoAccessDefinedException, XWikiException;
+  public boolean hasview(DocumentReference menuBarDocRef) throws NoAccessDefinedException,
+      XWikiException;
 
   public boolean denyView(DocumentReference menuBarDocRef);
 

@@ -17,15 +17,18 @@ public class RTEConfigClasses extends AbstractClassCollection {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfigClasses.class);
 
-  /**@Deprecated instead use IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC **/
+  /**
+   * @Deprecated instead use IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC
+   **/
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC =
-      "RTEConfigTypePropertiesClass";
-  /**@Deprecated instead use IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE **/
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC = "RTEConfigTypePropertiesClass";
+  /**
+   * @Deprecated instead use IRTEConfigClassConfig.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE
+   **/
   @Deprecated
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = "Classes";
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS =
-      RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE + "." + RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS = RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE + "."
+      + RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
 
   public static final String RTE_CONFIG_TEMPLATE_PRPOP_CLASS_SPACE = "RTEConfigClasses";
   public static final String RTE_CONFIG_TEMPLATE_PRPOP_CLASS_DOC = "RTEConfigTemplate";
@@ -61,20 +64,18 @@ public class RTEConfigClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + getRTEConfigTemplateClassRef(getContext(
-          ).getDatabase()) + " class document. ", exp);
+      LOGGER.error("Failed to get " + getRTEConfigTemplateClassRef(getContext().getDatabase())
+          + " class document. ", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextField("templateName", "RichTextEditor Template Name",
+    needsUpdate |= bclass.addTextField("templateName", "RichTextEditor Template Name", 30);
+    needsUpdate |= bclass.addTextField("templateUrl", "RichTextEditor Template URL", 30);
+    needsUpdate |= bclass.addTextField("templateDesc", "RichTextEditor Template" + " Description",
         30);
-    needsUpdate |= bclass.addTextField("templateUrl", "RichTextEditor Template URL",
-        30);
-    needsUpdate |= bclass.addTextField("templateDesc", "RichTextEditor Template"
-        + " Description", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -89,8 +90,7 @@ public class RTEConfigClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + RTE_CONFIG_TYPE_PRPOP_CLASS + " class document. ",
-          exp);
+      LOGGER.error("Failed to get " + RTE_CONFIG_TYPE_PRPOP_CLASS + " class document. ", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -98,19 +98,16 @@ public class RTEConfigClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextAreaField("styles", "RichTextEditor Styles", 80, 15);
-    needsUpdate |= bclass.addTextField("plugins", "RichTextEditor Additional Plugins",
-        30);
+    needsUpdate |= bclass.addTextField("plugins", "RichTextEditor Additional Plugins", 30);
     needsUpdate |= bclass.addTextField("row_1", "RichTextEditor Layout Row 1", 30);
     needsUpdate |= bclass.addTextField("row_2", "RichTextEditor Layout Row 2", 30);
     needsUpdate |= bclass.addTextField("row_3", "RichTextEditor Layout Row 3", 30);
-    needsUpdate |= bclass.addTextField("blockformats", "RichTextEditor Block Formats",
-        30);
-    needsUpdate |= bclass.addTextAreaField("valid_elements",
-        "RichTextEditor valid elements config", 80, 15);
+    needsUpdate |= bclass.addTextField("blockformats", "RichTextEditor Block Formats", 30);
+    needsUpdate |= bclass.addTextAreaField("valid_elements", "RichTextEditor valid elements config",
+        80, 15);
     needsUpdate |= bclass.addTextAreaField("invalid_elements",
         "RichTextEditor invalid elements config", 80, 15);
-    needsUpdate |= bclass.addTextField("link_picker_spaces",
-        "Spaces listed in Link Picker", 30);
+    needsUpdate |= bclass.addTextField("link_picker_spaces", "Spaces listed in Link Picker", 30);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;

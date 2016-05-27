@@ -28,7 +28,7 @@ public interface IEventHandler<T extends IGenericLiteral> {
   public void stringEvent(String value);
 
   public void booleanEvent(boolean value);
-  
+
   public void readPropertyKey(String key);
 
 }

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package com.celements.web.utils;
+
 import java.io.IOException;
 import java.io.Reader;
 
@@ -25,30 +26,31 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 
 public class Html2Text extends HTMLEditorKit.ParserCallback {
- StringBuffer s;
 
- public void parse(Reader in) throws IOException {
-   s = new StringBuffer();
-   ParserDelegator delegator = new ParserDelegator();
-   // CHECK - TRUE ignores charset directive
-   delegator.parse(in, this, Boolean.TRUE);
- }
+  StringBuffer s;
 
- public void handleText(char[] text, int pos) {
-   if(s.length() > 0) {
-     s.append("\r\n");
-   }
-   s.append(new String(text));
- }
+  public void parse(Reader in) throws IOException {
+    s = new StringBuffer();
+    ParserDelegator delegator = new ParserDelegator();
+    // CHECK - TRUE ignores charset directive
+    delegator.parse(in, this, Boolean.TRUE);
+  }
 
- public String getText() {
-   if(s == null) {
-     return "";
-   }
-   return s.toString();
- }
- 
- void injectStringBuffer(StringBuffer s) {
-   this.s = s;
- }
+  public void handleText(char[] text, int pos) {
+    if (s.length() > 0) {
+      s.append("\r\n");
+    }
+    s.append(new String(text));
+  }
+
+  public String getText() {
+    if (s == null) {
+      return "";
+    }
+    return s.toString();
+  }
+
+  void injectStringBuffer(StringBuffer s) {
+    this.s = s;
+  }
 }

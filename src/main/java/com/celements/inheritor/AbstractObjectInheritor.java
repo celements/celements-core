@@ -29,8 +29,9 @@ import com.xpn.xwiki.objects.BaseCollection;
 public abstract class AbstractObjectInheritor implements IObjectInheritor {
 
   private IIteratorFactory<XObjectIterator> _iteratorFactory;
+
   public abstract BaseCollection getObject(String key);
-  
+
   public void setIteratorFactory(IIteratorFactory<XObjectIterator> iteratorFactory) {
     _iteratorFactory = iteratorFactory;
   }
@@ -38,7 +39,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   protected IIteratorFactory<XObjectIterator> getIteratorFactory() {
     return _iteratorFactory;
   }
-  
+
   public String getStringValue(String key) {
     return getStringValue(key, "");
   }
@@ -53,7 +54,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public String getLargeStringValue(String key) {
     return getLargeStringValue(key, "");
   }
-  
+
   public String getLargeStringValue(String key, String defaultValue) {
     if (getObject(key) == null)
       return defaultValue;
@@ -64,7 +65,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public int getIntValue(String key) {
     return getIntValue(key, 0);
   }
-  
+
   public int getIntValue(String key, int defaultValue) {
     if (getObject(key) == null)
       return defaultValue;
@@ -75,7 +76,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public long getLongValue(String key) {
     return getLongValue(key, 0);
   }
-  
+
   public long getLongValue(String key, long defaultValue) {
     if (getObject(key) == null)
       return defaultValue;
@@ -86,7 +87,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public float getFloatValue(String key) {
     return getFloatValue(key, 0);
   }
-  
+
   public float getFloatValue(String key, float defaultValue) {
     if (getObject(key) == null)
       return defaultValue;
@@ -97,7 +98,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public double getDoubleValue(String key) {
     return getDoubleValue(key, 0);
   }
-  
+
   public double getDoubleValue(String key, double defaultValue) {
     if (getObject(key) == null)
       return defaultValue;
@@ -108,7 +109,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public Date getDateValue(String key) {
     return getDateValue(key, null);
   }
-  
+
   public Date getDateValue(String key, Date defaultValue) {
     if (getObject(key) == null)
       return defaultValue;
@@ -119,7 +120,7 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
   public List getListValue(String key) {
     return getListValue(key, null);
   }
-  
+
   public List getListValue(String key, List defaultValue) {
     if (getObject(key) == null)
       return defaultValue;

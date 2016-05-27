@@ -66,10 +66,10 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injecExecution(Utils.getComponent(Execution.class));
     listener.injectCopyDocService(Utils.getComponent(ICopyDocumentRole.class));
-    listener.injectRemoteObservationManagerContext(remoteObsManContextMock = 
-        createMockAndAddToDefault(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = 
-        createMockAndAddToDefault(ObservationManager.class));
+    listener.injectRemoteObservationManagerContext(
+        remoteObsManContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class));
+    listener.injectObservationManager(obsManagerMock = createMockAndAddToDefault(
+        ObservationManager.class));
     listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     creatingEventMock = createMockAndAddToDefault(Event.class);
@@ -87,16 +87,16 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
       eventClasses.add(theEvent.getClass());
     }
     assertEquals(2, eventClasses.size());
-    assertTrue("Expecting registration for DocumentUpdatingEvent",
-        eventClasses.contains(DocumentUpdatingEvent.class));
-    assertTrue("Expecting registration for DocumentUpdatedEvent events",
-        eventClasses.contains(DocumentUpdatedEvent.class));
+    assertTrue("Expecting registration for DocumentUpdatingEvent", eventClasses.contains(
+        DocumentUpdatingEvent.class));
+    assertTrue("Expecting registration for DocumentUpdatedEvent events", eventClasses.contains(
+        DocumentUpdatedEvent.class));
   }
 
   @Test
   public void testOnEvent_nullDoc_ing() {
     Event event = new DocumentUpdatingEvent();
-    
+
     replayDefault();
     listener.onEvent(event, null, context);
     verifyDefault();
@@ -105,7 +105,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
   @Test
   public void testOnEvent_nullDoc_ed() {
     Event event = new DocumentUpdatedEvent();
-    
+
     replayDefault();
     listener.onEvent(event, null, context);
     verifyDefault();
@@ -116,7 +116,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     Event event = new DocumentUpdatingEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(true).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -127,7 +127,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     Event event = new DocumentUpdatedEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(true).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -140,7 +140,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -153,7 +153,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -167,7 +167,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -181,7 +181,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -196,7 +196,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     obsManagerMock.notify(same(creatingEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -211,7 +211,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
     obsManagerMock.notify(same(createdEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -225,7 +225,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -239,7 +239,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(null).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -254,7 +254,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -269,7 +269,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletedEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -282,7 +282,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -295,7 +295,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -309,7 +309,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(getBaseObject1()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(getBaseObject2()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -323,7 +323,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getXObject(eq(classRef))).andReturn(getBaseObject1()).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(getBaseObject2()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -338,7 +338,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getXObject(eq(classRef))).andReturn(getBaseObject2()).once();
     obsManagerMock.notify(same(updatingEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -353,7 +353,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getXObject(eq(classRef))).andReturn(getBaseObject2()).once();
     obsManagerMock.notify(same(updatedEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -373,7 +373,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getContent()).andReturn("").once();
     obsManagerMock.notify(same(updatedEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -393,7 +393,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getContent()).andReturn("").once();
     obsManagerMock.notify(same(updatedEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -411,7 +411,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(origDocMock.getTitle()).andReturn("").once();
     expect(docMock.getContent()).andReturn("").once();
     expect(origDocMock.getContent()).andReturn("").once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -435,7 +435,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
     Logger LOGGER = LoggerFactory.getLogger(TestDocumentUpdateListener.class);
     static final String NAME = "TestDocumentUpdateListener";
-    
+
     boolean includeDocFields = false;
 
     @Override
@@ -493,7 +493,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     protected boolean includeDocFields() {
       return includeDocFields;
     }
-    
+
   }
 
 }

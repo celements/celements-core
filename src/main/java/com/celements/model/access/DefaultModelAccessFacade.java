@@ -273,8 +273,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     String dbBefore = getContext().getDatabase();
     try {
       getContext().setDatabase(webUtilsService.getWikiRef(doc).getName());
-      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc, doc
-          .getLanguage(), totrash, dbBefore, getContext().getDatabase());
+      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
+          doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
         getContext().getWiki().deleteDocument(doc, totrash, getContext());
       } catch (XWikiException xwe) {
@@ -345,8 +345,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkNotNull(classRef);
     classRef = webUtilsService.checkWikiRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
-    for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef), ImmutableList
-        .<BaseObject>of())) {
+    for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
+        ImmutableList.<BaseObject>of())) {
       if ((obj != null) && checkPropertyKeyValues(obj, key, values)) {
         ret.add(obj);
       }
@@ -566,8 +566,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (Strings.isNullOrEmpty(filename)) {
       throw new AttachmentNotExistsException(null);
     } else {
-      throw new AttachmentNotExistsException(new AttachmentReference(filename, document
-          .getDocumentReference()));
+      throw new AttachmentNotExistsException(new AttachmentReference(filename,
+          document.getDocumentReference()));
     }
   }
 

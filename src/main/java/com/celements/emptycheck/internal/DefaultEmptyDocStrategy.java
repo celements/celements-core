@@ -25,18 +25,15 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public boolean isEmptyRTEDocument(DocumentReference docRef) {
-    return isEmptyRTEDocumentDefault(docRef)
-        && isEmptyRTEDocumentTranslated(docRef);
+    return isEmptyRTEDocumentDefault(docRef) && isEmptyRTEDocumentTranslated(docRef);
   }
 
   public boolean isEmptyDocument(DocumentReference docRef) {
-    return isEmptyDocumentDefault(docRef)
-        && isEmptyDocumentTranslated(docRef);
+    return isEmptyDocumentDefault(docRef) && isEmptyDocumentTranslated(docRef);
   }
 
   /**
@@ -46,20 +43,19 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     try {
       return isEmptyRTEDocument(getContext().getWiki().getDocument(docRef, getContext()));
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to check if content of default language version for docRef ["
-          + docRef + "] is empty.", exp);
+      LOGGER.error("Failed to check if content of default language version for docRef [" + docRef
+          + "] is empty.", exp);
     }
     return true;
   }
-  
+
   /**
    * check if content of translated (context.language) version for docRef is empty
    */
   public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
     try {
-      return isEmptyRTEDocument(getContext().getWiki(
-          ).getDocument(docRef, getContext()).getTranslatedDocument(
-              getContext().getLanguage(), getContext()));
+      return isEmptyRTEDocument(getContext().getWiki().getDocument(docRef,
+          getContext()).getTranslatedDocument(getContext().getLanguage(), getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("isEmptyRTEDocumentTranslated failed getting document. ", exp);
     }
@@ -77,8 +73,7 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
 
   public boolean isEmptyDocumentDefault(DocumentReference docRef) {
     try {
-      return isEmptyDocument(getContext().getWiki(
-          ).getDocument(docRef, getContext()));
+      return isEmptyDocument(getContext().getWiki().getDocument(docRef, getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("isEmptyDocumentDefault failed getting document. ", exp);
     }
@@ -87,9 +82,8 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
 
   public boolean isEmptyDocumentTranslated(DocumentReference docRef) {
     try {
-      return isEmptyDocument(getContext().getWiki(
-          ).getDocument(docRef, getContext()).getTranslatedDocument(
-              getContext().getLanguage(), getContext()));
+      return isEmptyDocument(getContext().getWiki().getDocument(docRef,
+          getContext()).getTranslatedDocument(getContext().getLanguage(), getContext()));
     } catch (XWikiException exp) {
       LOGGER.error("isEmptyDocumentTranslated failed getting document", exp);
     }

@@ -49,7 +49,7 @@ public class DocumentUpdatedEventListener implements EventListener {
   private Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public List<Event> getEvents() {
@@ -65,9 +65,9 @@ public class DocumentUpdatedEventListener implements EventListener {
     if (source instanceof XWikiDocument) {
       XWikiDocument document = (XWikiDocument) source;
       DocumentReference xwikiPrefDoc = new DocumentReference(
-          document.getDocumentReference().getLastSpaceReference().getParent().getName(),
-          "XWiki", "XWikiPreferences");
-      if(document.getDocumentReference().equals(xwikiPrefDoc)) {
+          document.getDocumentReference().getLastSpaceReference().getParent().getName(), "XWiki",
+          "XWikiPreferences");
+      if (document.getDocumentReference().equals(xwikiPrefDoc)) {
         LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
             + "Collections.");
         classesCompositor.checkAllClassCollections();
@@ -76,8 +76,7 @@ public class DocumentUpdatedEventListener implements EventListener {
             + "Collections.");
       }
     } else {
-      LOGGER.warn("unrecognised event [" + event.getClass()
-          + "] in classes.CompositorComonent.");
+      LOGGER.warn("unrecognised event [" + event.getClass() + "] in classes.CompositorComonent.");
     }
   }
 

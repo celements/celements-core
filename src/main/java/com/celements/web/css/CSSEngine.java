@@ -47,50 +47,49 @@ public class CSSEngine implements ICSSEngine {
   }
 
   /**
-   * 
    * @param css
    * @param field
    * @param baseCSSList
    * @param context
    * @return the returned list is XWikiContext dependent and therefore may not be cached
-   *         or similar. The list is as a consequence too not thread safe.
-   *         TODO: Fix mix of API and backend. Extract business objects (controller)
-   *         from CSS classes and use them here.
+   *         or similar. The list is as a consequence too not thread safe. TODO: Fix mix
+   *         of API and backend. Extract business objects (controller) from CSS classes
+   *         and use them here.
    */
   @SuppressWarnings("unchecked")
-  public List<CSS> includeCSS(String css, String field,
-      List<BaseObject> baseCSSList, XWikiContext context){
+  public List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
+      XWikiContext context) {
     LOGGER.debug("adding '" + css + "' to " + field + ". List contains already "
-        + ((baseCSSList != null)?baseCSSList.size():"0") + " items.");
+        + ((baseCSSList != null) ? baseCSSList.size() : "0") + " items.");
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
-    
-    if(vcontext != null){
-      if(vcontext.containsKey(field)){
-        cssList = (List<CSS>)vcontext.get(field);
-      } else{
+
+    if (vcontext != null) {
+      if (vcontext.containsKey(field)) {
+        cssList = (List<CSS>) vcontext.get(field);
+      } else {
         cssList = new ArrayList<CSS>();
-        if(baseCSSList != null){
+        if (baseCSSList != null) {
           for (BaseObject cssObj : baseCSSList) {
-            if(cssObj != null) {
-              LOGGER.debug("includeCSS: adding baseObject [" + cssObj.getStringValue(
-              "cssname") + "].");
+            if (cssObj != null) {
+              LOGGER.debug("includeCSS: adding baseObject [" + cssObj.getStringValue("cssname")
+                  + "].");
               cssList.add(new CSSBaseObject(cssObj, context));
             }
           }
         }
       }
-      
+
       String[] newCSSList = css.split(" ");
       for (int i = 0; i < newCSSList.length; i++) {
-        if((newCSSList[i] != null) && (!newCSSList[i].trim().equals(""))){
+        if ((newCSSList[i] != null) && (!newCSSList[i].trim().equals(""))) {
           cssList.add(new CSSString(newCSSList[i], context));
         }
       }
-      
+
       vcontext.put(field, cssList);
     }
-    
+
     return cssList;
   }
 

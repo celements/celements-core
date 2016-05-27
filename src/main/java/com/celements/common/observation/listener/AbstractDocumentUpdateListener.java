@@ -51,8 +51,8 @@ public abstract class AbstractDocumentUpdateListener extends AbstractDocumentLis
       notifyEvent = getCreateEvent(event, doc.getDocumentReference());
     } else if ((bObj == null) && (origBObj != null)) {
       notifyEvent = getDeleteEvent(event, doc.getDocumentReference());
-    } else if ((bObj != null) && (origBObj != null)
-        && (copyDocService.checkObject(bObj, origBObj) || checkDocFields(doc))) {
+    } else if ((bObj != null) && (origBObj != null) && (copyDocService.checkObject(bObj, origBObj)
+        || checkDocFields(doc))) {
       notifyEvent = getUpdateEvent(event, doc.getDocumentReference());
     }
     return notifyEvent;

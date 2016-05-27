@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponentTestCase {
-  
+
   private static final String _COMPONENT_NAME = "TreeNodeDocumentDeletedListener";
   private TreeNodeDocumentDeletedListener eventListener;
   private XWikiContext context;
@@ -68,8 +68,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(new DocumentDeletedEvent(
-        ).getClass().getName());
+    List<String> expectedEventClassList = Arrays.asList(
+        new DocumentDeletedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());
@@ -89,8 +89,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testGetOrginialDocument_noOrigialDoc() {
-    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "treeNodeDocName");
+    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "treeNodeDocName");
     XWikiDocument sourceDoc = new XWikiDocument(treeNodeDocRef);
     replayDefault();
     assertNull(eventListener.getOrginialDocument(sourceDoc));
@@ -99,8 +99,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testGetOrginialDocument_originalDoc() {
-    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "treeNodeDocName");
+    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "treeNodeDocName");
     XWikiDocument sourceDoc = new XWikiDocument(treeNodeDocRef);
     XWikiDocument origDoc = new XWikiDocument(treeNodeDocRef);
     sourceDoc.setOriginalDocument(origDoc);
@@ -112,8 +112,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testOnEvent_remoteEvent() {
-    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "treeNodeDocName");
+    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "treeNodeDocName");
     Event docDelEvent = new DocumentDeletedEvent(treeNodeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(treeNodeDocRef);
     XWikiDocument origDoc = new XWikiDocument(treeNodeDocRef);
@@ -129,8 +129,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testOnEvent_localEvent_nullDoc() {
-    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "treeNodeDocName");
+    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "treeNodeDocName");
     Event docDelEvent = new DocumentDeletedEvent(treeNodeDocRef);
     RemoteObservationManagerContext remoteObsManagerCtx = createMockAndAddToDefault(
         RemoteObservationManagerContext.class);
@@ -143,8 +143,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testOnEvent_localEvent_noObject() {
-    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "treeNodeDocName");
+    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "treeNodeDocName");
     Event docDelEvent = new DocumentDeletedEvent(treeNodeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(treeNodeDocRef);
     XWikiDocument origDoc = new XWikiDocument(treeNodeDocRef);
@@ -160,8 +160,8 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
 
   @Test
   public void testOnEvent_localEvent_menuItemObj() {
-    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(),
-        "spaceName", "treeNodeDocName");
+    DocumentReference treeNodeDocRef = new DocumentReference(context.getDatabase(), "spaceName",
+        "treeNodeDocName");
     Event docDelEvent = new DocumentDeletedEvent(treeNodeDocRef);
     XWikiDocument sourceDoc = new XWikiDocument(treeNodeDocRef);
     XWikiDocument origDoc = new XWikiDocument(treeNodeDocRef);
@@ -174,8 +174,7 @@ public class TreeNodeDocumentDeletedListenerTest extends AbstractBridgedComponen
         RemoteObservationManagerContext.class);
     eventListener.remoteObservationManagerContext = remoteObsManagerCtx;
     expect(remoteObsManagerCtx.isRemoteState()).andReturn(false).atLeastOnce();
-    obsManagerMock.notify(isA(TreeNodeDeletedEvent.class), same(sourceDoc),
-        same(context));
+    obsManagerMock.notify(isA(TreeNodeDeletedEvent.class), same(sourceDoc), same(context));
     expectLastCall().once();
     replayDefault();
     eventListener.onEvent(docDelEvent, sourceDoc, context);

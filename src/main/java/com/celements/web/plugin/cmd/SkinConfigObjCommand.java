@@ -37,8 +37,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class SkinConfigObjCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      SkinConfigObjCommand.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(SkinConfigObjCommand.class);
 
   IWebUtilsService injected_webService;
 
@@ -46,10 +45,10 @@ public class SkinConfigObjCommand {
     XWikiDocument doc = getContext().getDoc();
     try {
       String className = getSkinConfigClassNameFromSkinDoc(fallbackClassName);
-      return new InheritorFactory().getConfigDocFieldInheritor(
-          className, getWebService().getRefLocalSerializer().serialize(
-              doc.getDocumentReference()), getContext());
-    } catch(XWikiException exp){
+      return new InheritorFactory().getConfigDocFieldInheritor(className,
+          getWebService().getRefLocalSerializer().serialize(doc.getDocumentReference()),
+          getContext());
+    } catch (XWikiException exp) {
       LOGGER.error("Failed to get skin-config object.", exp);
     }
     return null;
@@ -66,23 +65,22 @@ public class SkinConfigObjCommand {
     try {
       String className = getSkinConfigClassNameFromSkinDoc(fallbackClassName);
       if ((className != null) && !"".equals(className)) {
-        BaseObject configObj = WebUtils.getInstance().getConfigDocByInheritance(doc,
-            className, getContext()).getObject(className);
+        BaseObject configObj = WebUtils.getInstance().getConfigDocByInheritance(doc, className,
+            getContext()).getObject(className);
         return configObj;
       }
-    } catch(XWikiException e){
+    } catch (XWikiException e) {
       LOGGER.error(e);
     }
     return null;
   }
 
-  private String getSkinConfigClassNameFromSkinDoc(String fallbackClassName)
-      throws XWikiException {
+  private String getSkinConfigClassNameFromSkinDoc(String fallbackClassName) throws XWikiException {
     XWiki xwiki = getContext().getWiki();
     XWikiDocument skinDoc = xwiki.getDocument(getWebService().resolveDocumentReference(
         xwiki.getSpacePreference("skin", getContext())), getContext());
-    BaseObject skinObj = skinDoc.getXObject(getSkinsClassRef(skinDoc.getDocumentReference(
-        ).getLastSpaceReference().getParent().getName()));
+    BaseObject skinObj = skinDoc.getXObject(getSkinsClassRef(
+        skinDoc.getDocumentReference().getLastSpaceReference().getParent().getName()));
     LOGGER.debug("getSkinConfigClassNameFromSkinDoc: skinObj [" + skinObj + "] found for"
         + " skinDoc [" + skinDoc.getDocumentReference() + "].");
     String className = fallbackClassName;
@@ -92,8 +90,7 @@ public class SkinConfigObjCommand {
         className = skinConfigClassName;
       }
     }
-    LOGGER.info("getSkinConfigClassNameFromSkinDoc returning className [" + className
-        + "].");
+    LOGGER.info("getSkinConfigClassNameFromSkinDoc returning className [" + className + "].");
     return className;
   }
 
@@ -113,7 +110,7 @@ public class SkinConfigObjCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
 }

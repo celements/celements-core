@@ -21,8 +21,8 @@ package com.celements.web.medialib.datafields;
 
 public class Date implements IDataField {
 
-  //TODO als Number (Long) behandeln
-  
+  // TODO als Number (Long) behandeln
+
   public String getColumnId() throws IllegalStateException {
     // TODO Auto-generated method stub
     return null;
@@ -45,22 +45,22 @@ public class Date implements IDataField {
 
   public void setColumnId() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setColumnPrettyName() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setType() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setValue() {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

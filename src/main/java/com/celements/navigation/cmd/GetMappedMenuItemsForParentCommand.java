@@ -34,15 +34,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 public class GetMappedMenuItemsForParentCommand {
-  
-  public static final String CELEMENTS_MAPPED_MENU_ITEMS_KEY =
-    "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
-  
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      CelementsWebPlugin.class);
-  
+
+  public static final String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
+
+  private static Log mLogger = LogFactory.getFactory().getInstance(CelementsWebPlugin.class);
+
   private boolean _isActive;
-  
+
   public void set_isActive(boolean _isActive) {
     this._isActive = _isActive;
   }
@@ -53,10 +51,10 @@ public class GetMappedMenuItemsForParentCommand {
 
   public List<TreeNode> getTreeNodesForParentKey(String parentKey, XWikiContext context) {
     if (is_isActive() && !"".equals(parentKey)) {
-      if(parentKey.trim().endsWith(".")){
+      if (parentKey.trim().endsWith(".")) {
         parentKey = " ";
       }
-      if(parentKey.indexOf(':') < 0) {
+      if (parentKey.indexOf(':') < 0) {
         parentKey = context.getDatabase() + ":" + parentKey;
       }
       List<Object> parameterList = new Vector<Object>();
@@ -65,10 +63,9 @@ public class GetMappedMenuItemsForParentCommand {
       context.setDatabase(parentKey.split(":")[0]);
       List<TreeNode> menu = new ArrayList<TreeNode>();
       try {
-        List<Object[]> results = context.getWiki().getStore().search(getHQL(), 0, 0,
-            context);
-        mLogger.info("getMenuItems: found " + results.size() + " menus with parentKey " + 
-            parentKey);
+        List<Object[]> results = context.getWiki().getStore().search(getHQL(), 0, 0, context);
+        mLogger.info("getMenuItems: found " + results.size() + " menus with parentKey "
+            + parentKey);
         for (Object[] nodeData : results) {
           TreeNode treeNode = new TreeNode(new DocumentReference(context.getDatabase(),
               nodeData[1].toString(), nodeData[0].toString().split("\\.")[1]),
@@ -101,6 +98,5 @@ public class GetMappedMenuItemsForParentCommand {
     hql += " order by menuitem.menu_position";
     return hql;
   }
-
 
 }

@@ -52,30 +52,27 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
- * DocFormCommand handles validation of a request with document/object fields
- * and ensures that they are correctly prepared for save.
- * 
- * IMPORTANT: use exactly ONE instance of this class for each XWikiContext (each request).
+ * DocFormCommand handles validation of a request with document/object fields and ensures
+ * that they are correctly prepared for save. IMPORTANT: use exactly ONE instance of this
+ * class for each XWikiContext (each request).
  * 
  * @author fabian
- *
  */
 public class DocFormCommand {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DocFormCommand.class);
-  
+
   private final Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
   private final Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
 
   /**
-   * @Deprecated: since 2.59  instead use variable in {@link 
-   * #updateDocFromMap(DocumentReference, Map, XWikiContext)}
+   * @Deprecated: since 2.59 instead use variable in
+   *              {@link #updateDocFromMap(DocumentReference, Map, XWikiContext)}
    */
   @Deprecated
   public Set<XWikiDocument> updateDocFromMap(String fullname, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    return updateDocFromMap(getWebUtilsService().resolveDocumentReference(fullname), 
-        data, context);
+    return updateDocFromMap(getWebUtilsService().resolveDocumentReference(fullname), data, context);
   }
 
   public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data,
@@ -83,13 +80,12 @@ public class DocFormCommand {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     String template = context.getRequest().getParameter("template");
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}' and request "
-          + "'{}'", doc, template, context.getRequest().getParameterMap());
+      LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}' and request " + "'{}'",
+          doc, template, context.getRequest().getParameterMap());
     } else {
-      LOGGER.debug("updateDocFromMap: updating doc '{}' with template '{}'", doc, 
-          template);
+      LOGGER.debug("updateDocFromMap: updating doc '{}' with template '{}'", doc, template);
     }
-    if(doc.isNew() && !"".equals(template.trim())) {
+    if (doc.isNew() && !"".equals(template.trim())) {
       DocumentReference templRef = getWebUtilsService().resolveDocumentReference(template);
       try {
         doc.readFromTemplate(templRef, context);
@@ -108,7 +104,7 @@ public class DocFormCommand {
         XWikiDocument tSaveDoc = getTranslatedDoc(key.getDocRef(), context);
         if (key.getFieldName().equals("content")) {
           tSaveDoc.setContent(value);
-        } else if(key.getFieldName().equals("title")) {
+        } else if (key.getFieldName().equals("title")) {
           tSaveDoc.setTitle(value);
         } else {
           LOGGER.info("updateDocFromMap: unknown field name in key '{}'", key);
@@ -120,14 +116,14 @@ public class DocFormCommand {
     }
     return new HashSet<XWikiDocument>(changedDocs.values());
   }
-  
+
   public Map<String, String[]> prepareMapForDocUpdate(Map<String, ?> map) {
     Map<String, String[]> recompMap = new HashMap<String, String[]>();
     for (String key : map.keySet()) {
-      if(map.get(key) instanceof String[]) {
-        recompMap.put(key, (String[])map.get(key));
-      } else if(map.get(key) instanceof String) {
-        recompMap.put(key, new String[]{(String)map.get(key)});
+      if (map.get(key) instanceof String[]) {
+        recompMap.put(key, (String[]) map.get(key));
+      } else if (map.get(key) instanceof String) {
+        recompMap.put(key, new String[] { (String) map.get(key) });
       }
     }
     if (LOGGER.isTraceEnabled()) {
@@ -141,11 +137,11 @@ public class DocFormCommand {
     Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
     Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
     for (XWikiDocument xdoc : xdocs) {
-      if(notNewOrCreateAllowed(xdoc)) {
+      if (notNewOrCreateAllowed(xdoc)) {
         try {
           getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
           savedSuccessfully.add(xdoc.getDocumentReference());
-        } catch(DocumentSaveException dse) {
+        } catch (DocumentSaveException dse) {
           LOGGER.error("Exception saving document {}.", xdoc, dse);
           saveFailed.add(xdoc.getDocumentReference());
         }
@@ -153,29 +149,24 @@ public class DocFormCommand {
         saveFailed.add(xdoc.getDocumentReference());
       }
     }
-    Map<String, Set<DocumentReference>> docs = 
-        new HashMap<String, Set<DocumentReference>>();
+    Map<String, Set<DocumentReference>> docs = new HashMap<String, Set<DocumentReference>>();
     docs.put("successful", savedSuccessfully);
     docs.put("failed", saveFailed);
     return docs;
   }
 
   public boolean notNewOrCreateAllowed(XWikiDocument xdoc) {
-    return !xdoc.isNew() || "true".equals(getContext().getRequest().get(
-        "createIfNotExists"));
+    return !xdoc.isNew() || "true".equals(getContext().getRequest().get("createIfNotExists"));
   }
-  
-  XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context
-      ) throws XWikiException {
+
+  XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context) throws XWikiException {
     XWikiDocument doc = context.getWiki().getDocument(docRef, context);
     if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
       doc.setDefaultLanguage(context.getLanguage());
     }
-    if(!changedDocs.containsKey(serialize(docRef) + ";" + doc.getDefaultLanguage()
-        )) {
-      LOGGER.debug("getUpdateDoc: [" + serialize(docRef) + ";"
-          + doc.getDefaultLanguage() + "] with doc language [" + doc.getLanguage()
-          + "].");
+    if (!changedDocs.containsKey(serialize(docRef) + ";" + doc.getDefaultLanguage())) {
+      LOGGER.debug("getUpdateDoc: [" + serialize(docRef) + ";" + doc.getDefaultLanguage()
+          + "] with doc language [" + doc.getLanguage() + "].");
       applyCreationDateFix(doc, context);
       changedDocs.put(serialize(docRef) + ";" + doc.getDefaultLanguage(), doc);
     } else {
@@ -184,11 +175,10 @@ public class DocFormCommand {
     return doc;
   }
 
-  XWikiDocument getTranslatedDoc(DocumentReference docRef, XWikiContext context
-      ) throws XWikiException {
+  XWikiDocument getTranslatedDoc(DocumentReference docRef, XWikiContext context)
+      throws XWikiException {
     XWikiDocument tdoc;
-    if(!changedDocs.containsKey(serialize(docRef) + ";" + context.getLanguage())
-        ) {
+    if (!changedDocs.containsKey(serialize(docRef) + ";" + context.getLanguage())) {
       XWikiDocument doc = getUpdateDoc(docRef, context);
       tdoc = new AddTranslationCommand().getTranslatedDoc(doc, context.getLanguage());
       changedDocs.put(serialize(docRef) + ";" + context.getLanguage(), tdoc);
@@ -198,12 +188,12 @@ public class DocFormCommand {
     return tdoc;
   }
 
-  XWikiDocument setOrRemoveObj(XWikiDocument doc, DocFormRequestKey key, String value, 
+  XWikiDocument setOrRemoveObj(XWikiDocument doc, DocFormRequestKey key, String value,
       XWikiContext context) throws XWikiException {
     BaseObject obj = changedObjects.get(getObjCacheKey(key));
-    if(obj == null) {
+    if (obj == null) {
       obj = doc.getXObject(key.getClassRef(), key.getObjNb());
-      if((obj == null) || (key.getObjNb() < 0)) {
+      if ((obj == null) || (key.getObjNb() < 0)) {
         obj = doc.newXObject(key.getClassRef(), context);
         LOGGER.debug("setOrRemoveObj: new obj for key '{}'", key);
       }
@@ -213,8 +203,7 @@ public class DocFormCommand {
     if (obj != null) {
       if (key.isRemove()) {
         boolean success = doc.removeXObject(obj);
-        LOGGER.debug("setOrRemoveObj: removing obj for key '{}' was success '{}'", key, 
-            success);
+        LOGGER.debug("setOrRemoveObj: removing obj for key '{}' was success '{}'", key, success);
       } else {
         obj.set(key.getFieldName(), value, context);
         LOGGER.debug("setOrRemoveObj: set value '{}' for key '{}'", value, key);
@@ -224,15 +213,14 @@ public class DocFormCommand {
   }
 
   private String getObjCacheKey(DocFormRequestKey key) {
-    return serialize(key.getDocRef()) + DocFormRequestKeyParser.KEY_DELIM 
-        + serialize(key.getClassRef()) + DocFormRequestKeyParser.KEY_DELIM 
-        + key.getObjNb();
+    return serialize(key.getDocRef()) + DocFormRequestKeyParser.KEY_DELIM + serialize(
+        key.getClassRef()) + DocFormRequestKeyParser.KEY_DELIM + key.getObjNb();
   }
 
   void applyCreationDateFix(XWikiDocument doc, XWikiContext context) {
-    //FIXME Should be done when xwiki saves a new document. Unfortunately it is done
-    //      when you first get a document and than cached.
-    if(doc.isNew()) {
+    // FIXME Should be done when xwiki saves a new document. Unfortunately it is done
+    // when you first get a document and than cached.
+    if (doc.isNew()) {
       doc.setCreationDate(new Date());
       doc.setCreator(context.getUser());
     }
@@ -249,7 +237,7 @@ public class DocFormCommand {
       String param = paramObj.toString();
 
       String validate = validateParameter(param, request.get(param), context);
-      if(validate != null) {
+      if (validate != null) {
         result.put(param, validate);
       }
     }
@@ -261,26 +249,27 @@ public class DocFormCommand {
    * @deprecated since 2.2.0 instead use FormValidationService
    */
   @Deprecated
-  private String validateParameter(String param, String value,
-      XWikiContext context) {
-    if(param.matches(getFindObjectFieldInRequestRegex())){
+  private String validateParameter(String param, String value, XWikiContext context) {
+    if (param.matches(getFindObjectFieldInRequestRegex())) {
       int pos = 0;
-      if(param.matches(getRequestParamIncludesDocNameRegex())) { pos = 1; }
+      if (param.matches(getRequestParamIncludesDocNameRegex())) {
+        pos = 1;
+      }
       String[] paramSplit = param.split(DocFormRequestKeyParser.KEY_DELIM);
       String className = paramSplit[pos];
-      String fieldName = paramSplit[pos+2];
-      for(int i = pos+3; i < paramSplit.length; i++) {
+      String fieldName = paramSplit[pos + 2];
+      for (int i = pos + 3; i < paramSplit.length; i++) {
         fieldName += DocFormRequestKeyParser.KEY_DELIM + paramSplit[i];
       }
       return validateField(className, fieldName, value, context);
     }
     return null;
   }
-  
+
   String getFindObjectFieldInRequestRegex() {
     return "([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_){1,2}[-^]?(\\d)*_(.*)";
   }
-  
+
   private String getRequestParamIncludesDocNameRegex() {
     return "([a-zA-Z0-9]*\\.[a-zA-Z0-9]*_){2}[-^]?(\\d)*_(.*)";
   }
@@ -294,19 +283,19 @@ public class DocFormCommand {
     String isValidResult = null;
     BaseClass bclass = getBaseClass(className, context);
 
-    if(bclass != null) {
-      PropertyClass propclass = (PropertyClass)bclass.getField(fieldName);
+    if (bclass != null) {
+      PropertyClass propclass = (PropertyClass) bclass.getField(fieldName);
 
       String regexp = getFieldFromProperty(propclass, "validationRegExp");
       String validationMsg = getFieldFromProperty(propclass, "validationMessage");
       if ((regexp != null) && !regexp.trim().equals("")) {
         try {
-          if(!context.getUtil().match(regexp, value)) {
+          if (!context.getUtil().match(regexp, value)) {
             isValidResult = validationMsg;
           }
         } catch (MalformedPerl5PatternException exp) {
-          LOGGER.error("Failed to execute validation regex for field [" + fieldName
-              + "] in class [" + className + "].", exp);
+          LOGGER.error("Failed to execute validation regex for field [" + fieldName + "] in class ["
+              + className + "].", exp);
           isValidResult = validationMsg;
         }
       }
@@ -329,8 +318,7 @@ public class DocFormCommand {
 
   private BaseClass getBaseClass(String className, XWikiContext context) {
     BaseClass bclass = null;
-    DocumentReference bclassDocRef = getWebUtilsService().resolveDocumentReference(
-        className);
+    DocumentReference bclassDocRef = getWebUtilsService().resolveDocumentReference(className);
     try {
       bclass = context.getWiki().getDocument(bclassDocRef, context).getXClass();
     } catch (XWikiException exp) {
@@ -341,7 +329,7 @@ public class DocFormCommand {
 
   String collapse(String[] value) {
     List<String> valueList = new ArrayList<String>(Arrays.asList(value));
-    valueList.removeAll(Arrays.asList((String)null));
+    valueList.removeAll(Arrays.asList((String) null));
     valueList.removeAll(Arrays.asList(""));
     return StringUtils.join(valueList.toArray(), "|");
   }
@@ -361,14 +349,14 @@ public class DocFormCommand {
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
-  
+
   private IModelAccessFacade getModelAccessFacade() {
     return Utils.getComponent(IModelAccessFacade.class);
   }
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)((Execution)Utils.getComponent(Execution.class)).getContext(
-        ).getProperty("xwikicontext"); 
+    return (XWikiContext) ((Execution) Utils.getComponent(
+        Execution.class)).getContext().getProperty("xwikicontext");
   }
 
 }

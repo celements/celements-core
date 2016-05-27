@@ -36,8 +36,7 @@ public class LexicalParserTest {
   @Before
   public void setUp() throws Exception {
     mockEventHandler = createStrictMock(IEventHandler.class);
-    lexicalParser = new LexicalParser<IGenericLiteral>(ERulesLiteral.RULES_ARRAY,
-        mockEventHandler);
+    lexicalParser = new LexicalParser<IGenericLiteral>(ERulesLiteral.RULES_ARRAY, mockEventHandler);
   }
 
   @Test
@@ -55,9 +54,9 @@ public class LexicalParserTest {
     replayAll();
     lexicalParser.initEvent();
     lexicalParser.openArrayEvent();
-    //rule
+    // rule
     lexicalParser.openDictionaryEvent();
-    //isDeleted
+    // isDeleted
     lexicalParser.openPropertyEvent("isDeleted");
     lexicalParser.booleanEvent(true);
     lexicalParser.closePropertyEvent();
@@ -84,9 +83,9 @@ public class LexicalParserTest {
     replayAll();
     lexicalParser.initEvent();
     lexicalParser.openArrayEvent();
-    //rule
+    // rule
     lexicalParser.openDictionaryEvent();
-    //isDeleted
+    // isDeleted
     lexicalParser.openPropertyEvent("isDeleted");
     lexicalParser.booleanEvent(false);
     lexicalParser.closePropertyEvent();
@@ -145,39 +144,39 @@ public class LexicalParserTest {
     replayAll();
     lexicalParser.initEvent();
     lexicalParser.openArrayEvent();
-    //rule
+    // rule
     lexicalParser.openDictionaryEvent();
-    //actions
+    // actions
     lexicalParser.openPropertyEvent("actions");
     lexicalParser.openArrayEvent();
-    //action
+    // action
     lexicalParser.openDictionaryEvent();
     lexicalParser.openPropertyEvent("type");
     lexicalParser.stringEvent("addTo");
     lexicalParser.closePropertyEvent();
     lexicalParser.closeDictionaryEvent();
-    //end action
+    // end action
     lexicalParser.closeArrayEvent();
-    //end actions
+    // end actions
     lexicalParser.closePropertyEvent();
-    //conditions
+    // conditions
     lexicalParser.openPropertyEvent("conditions");
     lexicalParser.openArrayEvent();
-    //condition
+    // condition
     lexicalParser.openDictionaryEvent();
     lexicalParser.openPropertyEvent("type");
     lexicalParser.stringEvent("titleCondition");
     lexicalParser.closePropertyEvent();
     lexicalParser.closeDictionaryEvent();
-    //end condition
+    // end condition
     lexicalParser.closeArrayEvent();
-    //end conditions
+    // end conditions
     lexicalParser.closePropertyEvent();
-    //rulesname
+    // rulesname
     lexicalParser.openPropertyEvent("name");
     lexicalParser.stringEvent("Rule1");
     lexicalParser.closePropertyEvent();
-    //rule type
+    // rule type
     lexicalParser.openPropertyEvent("type");
     lexicalParser.stringEvent("any");
     lexicalParser.closePropertyEvent();
@@ -236,39 +235,39 @@ public class LexicalParserTest {
     replayAll();
     lexicalParser.initEvent();
     lexicalParser.openArrayEvent();
-    //rule
+    // rule
     lexicalParser.openDictionaryEvent();
-    //rule type
+    // rule type
     lexicalParser.openPropertyEvent("type");
     lexicalParser.stringEvent("any");
     lexicalParser.closePropertyEvent();
-    //conditions
+    // conditions
     lexicalParser.openPropertyEvent("conditions");
     lexicalParser.openArrayEvent();
-    //condition
+    // condition
     lexicalParser.openDictionaryEvent();
     lexicalParser.openPropertyEvent("type");
     lexicalParser.stringEvent("titleCondition");
     lexicalParser.closePropertyEvent();
     lexicalParser.closeDictionaryEvent();
-    //end condition
+    // end condition
     lexicalParser.closeArrayEvent();
-    //end conditions
+    // end conditions
     lexicalParser.closePropertyEvent();
-    //actions
+    // actions
     lexicalParser.openPropertyEvent("actions");
     lexicalParser.openArrayEvent();
-    //action
+    // action
     lexicalParser.openDictionaryEvent();
     lexicalParser.openPropertyEvent("type");
     lexicalParser.stringEvent("addTo");
     lexicalParser.closePropertyEvent();
     lexicalParser.closeDictionaryEvent();
-    //end action
+    // end action
     lexicalParser.closeArrayEvent();
-    //end actions
+    // end actions
     lexicalParser.closePropertyEvent();
-    //rulesname
+    // rulesname
     lexicalParser.openPropertyEvent("name");
     lexicalParser.stringEvent("Rule1");
     lexicalParser.closePropertyEvent();
@@ -280,28 +279,25 @@ public class LexicalParserTest {
     verifyAll();
   }
 
-
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(mockEventHandler);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(mockEventHandler);
     verify(mocks);
   }
 
   private enum ERulesLiteral implements IGenericLiteral {
-    OBJECT_VALUE(ECommand.VALUE_COMMAND),
-    RULE_ATTRIBUTE(OBJECT_VALUE, "name", "*"),
-    CON_OR_ACT_ATTRIBUTE(OBJECT_VALUE, "type"),
-    CONDITION_OR_ACTION_DICT(ECommand.DICTIONARY_COMMAND, CON_OR_ACT_ATTRIBUTE),
-    CONDITIONS_OR_ACTIONS_ARRAY(ECommand.ARRAY_COMMAND, CONDITION_OR_ACTION_DICT),
-    CONDITION_OR_ACTION_PROPERTY(CONDITIONS_OR_ACTIONS_ARRAY, "conditions", "actions"),
-    RULE_DICT(ECommand.DICTIONARY_COMMAND, CONDITION_OR_ACTION_PROPERTY, RULE_ATTRIBUTE),
-    RULES_ARRAY(ECommand.ARRAY_COMMAND, RULE_DICT);
-    
-    
+    OBJECT_VALUE(ECommand.VALUE_COMMAND), RULE_ATTRIBUTE(OBJECT_VALUE, "name",
+        "*"), CON_OR_ACT_ATTRIBUTE(OBJECT_VALUE, "type"), CONDITION_OR_ACTION_DICT(
+            ECommand.DICTIONARY_COMMAND, CON_OR_ACT_ATTRIBUTE), CONDITIONS_OR_ACTIONS_ARRAY(
+                ECommand.ARRAY_COMMAND, CONDITION_OR_ACTION_DICT), CONDITION_OR_ACTION_PROPERTY(
+                    CONDITIONS_OR_ACTIONS_ARRAY, "conditions", "actions"), RULE_DICT(
+                        ECommand.DICTIONARY_COMMAND, CONDITION_OR_ACTION_PROPERTY,
+                        RULE_ATTRIBUTE), RULES_ARRAY(ECommand.ARRAY_COMMAND, RULE_DICT);
+
     private ERulesLiteral[] literals;
     private ECommand command;
     private int nextLiteral = 0;
@@ -315,7 +311,7 @@ public class LexicalParserTest {
 
     private ERulesLiteral(ERulesLiteral literal, String... names) {
       this.command = ECommand.PROPERTY_COMMAND;
-      this.literals = new ERulesLiteral[] {literal};
+      this.literals = new ERulesLiteral[] { literal };
       this.names = names;
     }
 
@@ -340,10 +336,9 @@ public class LexicalParserTest {
       return literals[0];
     }
 
-    public IGenericLiteral getPropertyLiteralForKey(String key,
-        IGenericLiteral placeholder) {
+    public IGenericLiteral getPropertyLiteralForKey(String key, IGenericLiteral placeholder) {
       nextLiteral = 0; // properties in dictionary may occur multiple times
-                      // (once for each name) and are optional
+                       // (once for each name) and are optional
       ERulesLiteral propertyLiteral = getPropertyNameMap().get(key);
       if (propertyLiteral == null) {
         propertyLiteral = getPropertyNameMap().get("*");
@@ -360,8 +355,8 @@ public class LexicalParserTest {
             if (!propertyNameMap.containsKey(key)) {
               propertyNameMap.put(key, literal);
             } else {
-              throw new IllegalStateException("duplicate property literal for name ["
-                  + key + "] in dictionary [" + this + "].");
+              throw new IllegalStateException("duplicate property literal for name [" + key
+                  + "] in dictionary [" + this + "].");
             }
           }
         }
@@ -375,8 +370,8 @@ public class LexicalParserTest {
             + " dictionary but found [" + literal + "].");
       }
       if (literal.getNames() == null) {
-        throw new IllegalStateException("missing property names for property literal ["
-            + literal + "]");
+        throw new IllegalStateException("missing property names for property literal [" + literal
+            + "]");
       }
     }
 

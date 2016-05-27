@@ -30,9 +30,9 @@ public interface INavFilter<T> {
   public String getMenuPart();
 
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context);
-  
+
   public boolean includeTreeNode(TreeNode node, XWikiContext context);
-  
+
   public T convertObject(BaseObject baseObj, XWikiContext context);
 
 }

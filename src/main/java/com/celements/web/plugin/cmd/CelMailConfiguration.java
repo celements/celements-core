@@ -17,28 +17,22 @@ import com.xpn.xwiki.web.Utils;
  * It is important that the default smtp-server configuration for smtp-user, smtp-password
  * smtp-host, smtp-port AND extra-props must be kept integer. Thus all or none must be
  * taken from the XWikiPreferences. They MUST NOT BE MIXED with default server
- * configuration.
- * 
- * If they get mixed and default server configuration includes smtp-auth username and
- * password they can get undisclosed in the following attack scenario:
- * The smtp-host config is overwritten to some special server tracking username and
- * passwords. Mixing the configuration leads to the server default username and password
- * would be sent to this unfriendly server.
+ * configuration. If they get mixed and default server configuration includes smtp-auth
+ * username and password they can get undisclosed in the following attack scenario: The
+ * smtp-host config is overwritten to some special server tracking username and passwords.
+ * Mixing the configuration leads to the server default username and password would be
+ * sent to this unfriendly server.
  * 
  * @author fabian
  * @since 2.34.0
- *
  */
 public class CelMailConfiguration extends MailConfiguration {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CelMailConfiguration.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CelMailConfiguration.class);
 
-  public static final String MAIL_DEFAULT_ADMIN_EMAIL_KEY =
-      "celements.mail.default.admin_email";
+  public static final String MAIL_DEFAULT_ADMIN_EMAIL_KEY = "celements.mail.default.admin_email";
 
-  public static final String MAIL_DEFAULT_SMTP_FROM_KEY =
-      "celements.mail.default.smtp_from";
+  public static final String MAIL_DEFAULT_SMTP_FROM_KEY = "celements.mail.default.smtp_from";
 
   public CelMailConfiguration() {
     setPort(-1);
@@ -52,20 +46,16 @@ public class CelMailConfiguration extends MailConfiguration {
     }
     int port = getXWiki().getXWikiPreferenceAsInt("smtp_port", -1, getContext());
     setPort(port);
-    String smtpServerUsername = getXWiki().getXWikiPreference("smtp_server_username",
-        getContext());
-    String smtpServerPassword = getXWiki().getXWikiPreference("smtp_server_password",
-        getContext());
-    if (!StringUtils.isEmpty(smtpServerUsername)
-        && !StringUtils.isEmpty(smtpServerPassword)) {
-        setSmtpUsername(smtpServerUsername);
-        setSmtpPassword(smtpServerPassword);
+    String smtpServerUsername = getXWiki().getXWikiPreference("smtp_server_username", getContext());
+    String smtpServerPassword = getXWiki().getXWikiPreference("smtp_server_password", getContext());
+    if (!StringUtils.isEmpty(smtpServerUsername) && !StringUtils.isEmpty(smtpServerPassword)) {
+      setSmtpUsername(smtpServerUsername);
+      setSmtpPassword(smtpServerPassword);
     }
 
-    String javaMailExtraProps = getXWiki().getXWikiPreference("javamail_extra_props",
-        getContext());
+    String javaMailExtraProps = getXWiki().getXWikiPreference("javamail_extra_props", getContext());
     if (!StringUtils.isEmpty(javaMailExtraProps)) {
-        setExtraProperties(javaMailExtraProps);
+      setExtraProperties(javaMailExtraProps);
     }
   }
 
@@ -75,13 +65,12 @@ public class CelMailConfiguration extends MailConfiguration {
   }
 
   public String getDefaultGeneralSenderAddress() {
-    return getXWiki().getXWikiPreference("smtp_from", MAIL_DEFAULT_SMTP_FROM_KEY, "",
-        getContext());
+    return getXWiki().getXWikiPreference("smtp_from", MAIL_DEFAULT_SMTP_FROM_KEY, "", getContext());
   }
 
   boolean usesAuthentication_localConfig() {
-    return !StringUtils.isEmpty(getSmtpUsername_internal())
-        && !StringUtils.isEmpty(getSmtpPassword_internal());
+    return !StringUtils.isEmpty(getSmtpUsername_internal()) && !StringUtils.isEmpty(
+        getSmtpPassword_internal());
   }
 
   void checkHostConfiguration() {
@@ -98,33 +87,26 @@ public class CelMailConfiguration extends MailConfiguration {
     super.setHost(smtpServer);
     int port = (int) getXWiki().ParamAsLong("celements.mail.default.smtp_port", -1);
     setPort(port);
-    String smtpServerUsername = getXWiki().Param(
-        "celements.mail.default.smtp_server_username", "");
-    String smtpServerPassword = getXWiki().Param(
-        "celements.mail.default.smtp_server_password", "");
-    if (!StringUtils.isEmpty(smtpServerUsername)
-        && !StringUtils.isEmpty(smtpServerPassword)) {
+    String smtpServerUsername = getXWiki().Param("celements.mail.default.smtp_server_username", "");
+    String smtpServerPassword = getXWiki().Param("celements.mail.default.smtp_server_password", "");
+    if (!StringUtils.isEmpty(smtpServerUsername) && !StringUtils.isEmpty(smtpServerPassword)) {
       super.setSmtpUsername(smtpServerUsername);
       super.setSmtpPassword(smtpServerPassword);
     }
-    String javaMailExtraProps = getXWiki().Param(
-        "celements.mail.default.javamail_extra_props", "");
+    String javaMailExtraProps = getXWiki().Param("celements.mail.default.javamail_extra_props", "");
     if (!StringUtils.isEmpty(javaMailExtraProps)) {
       setExtraProperties(javaMailExtraProps);
     }
-    LOGGER.debug("setting default HostConfiguration smtp_server_username ["
-        + smtpServerUsername + "] using smtp-password ["
-        + !"".equals(smtpServerPassword) + "] and host [" + smtpServer + ":" + port
-        + "] and javaMailExtraProps [" + javaMailExtraProps + "].");
+    LOGGER.debug("setting default HostConfiguration smtp_server_username [" + smtpServerUsername
+        + "] using smtp-password [" + !"".equals(smtpServerPassword) + "] and host [" + smtpServer
+        + ":" + port + "] and javaMailExtraProps [" + javaMailExtraProps + "].");
   }
 
   boolean noHostConfig() {
     Properties testProperties = new Properties();
     appendExtraProperties_internal(testProperties, true);
-    return (!usesAuthentication_localConfig()
-        && StringUtils.isEmpty(getHost_internal())
-        && (getPort_internal() <= -1)
-        && testProperties.isEmpty());
+    return (!usesAuthentication_localConfig() && StringUtils.isEmpty(getHost_internal())
+        && (getPort_internal() <= -1) && testProperties.isEmpty());
   }
 
   String getHost_internal() {

@@ -48,9 +48,8 @@ public class ImageMapCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetImageUseMaps_simple() {
-    String rteContent = "<img "
-      + " src=\"/download/Content_attachments/FileBaseDoc/grundriss.png\""
-      + " usemap=\"#objektwahlImg\">";
+    String rteContent = "<img " + " src=\"/download/Content_attachments/FileBaseDoc/grundriss.png\""
+        + " usemap=\"#objektwahlImg\">";
     replayAll();
     List<String> useMaps = imgMapCmd.getImageUseMaps(rteContent);
     assertNotNull(useMaps);
@@ -62,9 +61,9 @@ public class ImageMapCommandTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetImageUseMaps() {
     String rteContent = "<p>\n<img style=\"border-style: initial; border-color: initial;"
-      + " border-image: initial; border-width: 0px;\""
-      + " src=\"/download/Content_attachments/FileBaseDoc/grundriss.png\""
-      + " border=\"0\" usemap=\"#objektwahlImg\">\n</p>";
+        + " border-image: initial; border-width: 0px;\""
+        + " src=\"/download/Content_attachments/FileBaseDoc/grundriss.png\""
+        + " border=\"0\" usemap=\"#objektwahlImg\">\n</p>";
     replayAll();
     List<String> useMaps = imgMapCmd.getImageUseMaps(rteContent);
     assertNotNull(useMaps);
@@ -73,12 +72,12 @@ public class ImageMapCommandTest extends AbstractBridgedComponentTestCase {
     verifyAll();
   }
 
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(xwiki);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(xwiki);
     verify(mocks);
   }

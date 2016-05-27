@@ -41,46 +41,49 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 public class NewCelementsTokenForUserCommand {
+
   QueryManager injected_queryManager;
-  
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewCelementsTokenForUserCommand.class);
 
   /**
-   * 
    * @param accountName
-   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
-   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param guestPlus.
+   *          if user is XWiki.XWikiGuest and guestPlus is true the account
+   *          XWiki.XWikiGuestPlus will be used to get the token.
    * @param context
    * @return token (or null if token can not be generated)
    * @throws XWikiException
    */
-  public String getNewCelementsTokenForUser(String accountName,
-      Boolean guestPlus, XWikiContext context) throws XWikiException {
+  public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus,
+      XWikiContext context) throws XWikiException {
     return getNewCelementsTokenForUser(accountName, guestPlus, 1440, context);
   }
+
   /**
-   * 
    * @param accountName
-   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
-   * XWiki.XWikiGuestPlus will be used to get the token.
-   * @param minutesValid how long should the token be valid in minutes.
+   * @param guestPlus.
+   *          if user is XWiki.XWikiGuest and guestPlus is true the account
+   *          XWiki.XWikiGuestPlus will be used to get the token.
+   * @param minutesValid
+   *          how long should the token be valid in minutes.
    * @param context
    * @return token (or null if token can not be generated)
    * @throws XWikiException
    */
-  public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus, 
-      int minutesValid, XWikiContext context) throws XWikiException {
+  public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus, int minutesValid,
+      XWikiContext context) throws XWikiException {
     LOGGER.debug("getNewCelementsTokenForUser: check for expired tokens.");
-    LOGGER.debug("getNewCelementsTokenForUser: with guestPlus [" + guestPlus
-        + "] for account [" + accountName + "].");
+    LOGGER.debug("getNewCelementsTokenForUser: with guestPlus [" + guestPlus + "] for account ["
+        + accountName + "].");
     String validkey = null;
     if (guestPlus && "XWiki.XWikiGuest".equals(accountName)) {
       accountName = "XWiki.XWikiGuestPlus";
     }
     XWikiDocument doc1 = context.getWiki().getDocument(accountName, context);
-    if (context.getWiki().exists(accountName, context)
-        && (doc1.getObject("XWiki.XWikiUsers") != null)) {
+    if (context.getWiki().exists(accountName, context) && (doc1.getObject(
+        "XWiki.XWikiUsers") != null)) {
       removeOutdatedTokens(doc1);
       validkey = getUniqueValidationKey(context);
       BaseObject obj = doc1.newObject("Classes.TokenClass", context);
@@ -96,9 +99,9 @@ public class NewCelementsTokenForUserCommand {
   }
 
   synchronized void removeOutdatedTokens(XWikiDocument userDoc) {
-    String xwql = "select obj.number " +
-        "from Document as doc, doc.object(Classes.TokenClass) as obj " +
-        "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
+    String xwql = "select obj.number "
+        + "from Document as doc, doc.object(Classes.TokenClass) as obj "
+        + "where doc.fullName = :doc and obj.validuntil < :now order by obj.number desc";
     try {
       DocumentReference docRef = userDoc.getDocumentReference();
       Query query = getQueryManagerComponent().createQuery(xwql, Query.XWQL);
@@ -107,14 +110,15 @@ public class NewCelementsTokenForUserCommand {
       query.setWiki(docRef.getLastSpaceReference().getParent().getName());
       List<Object> tokenResults = query.execute();
       LOGGER.trace("userDoc: " + userDoc);
-      LOGGER.trace("Tokens to delete: " + tokenResults.size() + " in wiki " + docRef.getLastSpaceReference().getParent().getName());
+      LOGGER.trace("Tokens to delete: " + tokenResults.size() + " in wiki "
+          + docRef.getLastSpaceReference().getParent().getName());
       DocumentReference tokenClassRef = getTokenClassDocRef(new WikiReference(
           userDoc.getDocumentReference().getLastSpaceReference().getParent()));
-      for(Object retNr : tokenResults) {
+      for (Object retNr : tokenResults) {
         int nr = Integer.parseInt(retNr.toString());
         BaseObject obj = userDoc.getXObject(tokenClassRef, nr);
         LOGGER.trace("deleting token " + nr + " of ref '" + tokenClassRef + "' obj is " + obj);
-        if(obj != null) {
+        if (obj != null) {
           userDoc.removeXObject(obj);
         }
       }
@@ -122,82 +126,81 @@ public class NewCelementsTokenForUserCommand {
       LOGGER.error("Exception querying for outdated tokens with xwql [" + xwql + "]", qe);
     }
   }
-  
+
   DocumentReference getTokenClassDocRef(WikiReference wikiRef) {
     return new DocumentReference(wikiRef.getName(), "Classes", "TokenClass");
   }
-  
+
   QueryManager getQueryManagerComponent() {
-    if(injected_queryManager != null) {
+    if (injected_queryManager != null) {
       return injected_queryManager;
     }
     return Utils.getComponent(QueryManager.class);
   }
-  
+
   IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  public String getUniqueValidationKey(XWikiContext context)
-      throws XWikiException {
+  public String getUniqueValidationKey(XWikiContext context) throws XWikiException {
     XWikiStoreInterface storage = context.getWiki().getStore();
-    
+
     String hql = "select str.value from BaseObject as obj, StringProperty as str ";
     hql += "where obj.className='XWiki.XWikiUsers' ";
     hql += "and obj.id=str.id.id ";
     hql += "and str.id.name='validkey' ";
     hql += "and str.value<>''";
     List<String> existingKeys = storage.search(hql, 0, 0, context);
-    
+
     String validkey = "";
-    while(validkey.equals("") || existingKeys.contains(validkey)){
+    while (validkey.equals("") || existingKeys.contains(validkey)) {
       validkey = context.getWiki().generateRandomString(24);
     }
-    
+
     return validkey;
   }
 
   /**
-   * 
    * @param accountName
-   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
-   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param guestPlus.
+   *          if user is XWiki.XWikiGuest and guestPlus is true the account
+   *          XWiki.XWikiGuestPlus will be used to get the token.
    * @param context
-   * @param minutesValid 
+   * @param minutesValid
    * @return token (or null if token can not be generated)
    * @throws XWikiException
    */
-  public String getNewCelementsTokenForUserWithAuthentication(String accountName,
-      Boolean guestPlus, int minutesValid, XWikiContext context) throws XWikiException {
+  public String getNewCelementsTokenForUserWithAuthentication(String accountName, Boolean guestPlus,
+      int minutesValid, XWikiContext context) throws XWikiException {
     accountName = authenticateForRequest(accountName, context);
     return getNewCelementsTokenForUser(accountName, guestPlus, minutesValid, context);
   }
 
   /**
-   * 
    * @param accountName
-   * @param guestPlus. if user is XWiki.XWikiGuest and guestPlus is true the account
-   * XWiki.XWikiGuestPlus will be used to get the token.
+   * @param guestPlus.
+   *          if user is XWiki.XWikiGuest and guestPlus is true the account
+   *          XWiki.XWikiGuestPlus will be used to get the token.
    * @param context
    * @return token (or null if token can not be generated)
    * @throws XWikiException
    */
-  public String getNewCelementsTokenForUserWithAuthentication(String accountName,
-      Boolean guestPlus, XWikiContext context) throws XWikiException {
+  public String getNewCelementsTokenForUserWithAuthentication(String accountName, Boolean guestPlus,
+      XWikiContext context) throws XWikiException {
     accountName = authenticateForRequest(accountName, context);
     return getNewCelementsTokenForUser(accountName, guestPlus, context);
   }
 
-  private String authenticateForRequest(String accountName, XWikiContext context
-      ) throws XWikiException {
-    if (!"".equals(context.getRequest().getParameter("j_username"))
-        && !"".equals(context.getRequest().getParameter("j_password"))) {
+  private String authenticateForRequest(String accountName, XWikiContext context)
+      throws XWikiException {
+    if (!"".equals(context.getRequest().getParameter("j_username")) && !"".equals(
+        context.getRequest().getParameter("j_password"))) {
       LOGGER.info("getNewCelementsTokenForUser: trying to authenticate  "
           + context.getRequest().getParameter("j_username"));
       Principal principal = context.getWiki().getAuthService().authenticate(
-          context.getRequest().getParameter("j_username"),
-          context.getRequest().getParameter("j_password"), context);
-      if(principal != null) {
+          context.getRequest().getParameter("j_username"), context.getRequest().getParameter(
+              "j_password"), context);
+      if (principal != null) {
         LOGGER.info("getNewCelementsTokenForUser: successfully autenthicated "
             + principal.getName());
         context.setUser(principal.getName());

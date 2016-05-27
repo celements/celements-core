@@ -26,8 +26,7 @@ import java.util.Set;
 
 public class MapHandler<K, L, E> {
 
-  public void mergeMultiMaps(Map<K, Map<L, Set<E>>> mergeMap,
-      Map<K, Map<L, Set<E>>> toMap) {
+  public void mergeMultiMaps(Map<K, Map<L, Set<E>>> mergeMap, Map<K, Map<L, Set<E>>> toMap) {
     if (mergeMap != null) {
       for (K key : mergeMap.keySet()) {
         put(key, mergeMap.get(key), toMap);

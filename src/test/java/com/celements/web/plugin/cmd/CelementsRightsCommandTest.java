@@ -36,22 +36,21 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase {
-  
+
   CelementsRightsCommand celRightsCmd = null;
   private XWikiContext context;
   private XWiki xwiki;
   private DocumentReference xwikiRightsClassRef;
-  
+
   @Before
   public void setUp_CelementsRightsCommandTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
-    xwikiRightsClassRef = new DocumentReference(context.getDatabase(), "XWiki",
-        "XWikiRights");
+    xwikiRightsClassRef = new DocumentReference(context.getDatabase(), "XWiki", "XWikiRights");
     celRightsCmd = new CelementsRightsCommand();
   }
-  
+
   @Test
   public void testIsValidGroups_oneGroup() {
     BaseObject rightsObj = new BaseObject();
@@ -59,21 +58,21 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("groups", groups);
     assertTrue(celRightsCmd.isValidGroups(rightsObj));
   }
-  
+
   public void testIsValidGroups_manyGroups() {
     BaseObject rightsObj = new BaseObject();
     String groups = "XWiki.Firstgroup,XWiki.Secondgroup";
     rightsObj.setLargeStringValue("groups", groups);
     assertFalse(celRightsCmd.isValidGroups(rightsObj));
   }
-  
+
   public void testIsValidGroups_noGroups() {
     BaseObject rightsObj = new BaseObject();
     String groups = "";
     rightsObj.setLargeStringValue("groups", groups);
     assertTrue(celRightsCmd.isValidGroups(rightsObj));
   }
-  
+
   @Test
   public void testIsValidUsers_noUser() {
     BaseObject rightsObj = new BaseObject();
@@ -81,7 +80,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("users", users);
     assertTrue(celRightsCmd.isValidUsers(rightsObj));
   }
-  
+
   @Test
   public void testIsValidUsers_anyUser() {
     BaseObject rightsObj = new BaseObject();
@@ -89,7 +88,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("users", users);
     assertFalse(celRightsCmd.isValidUsers(rightsObj));
   }
-  
+
   @Test
   public void testIsValidUsers_guestUser() {
     BaseObject rightsObj = new BaseObject();
@@ -97,7 +96,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("users", users);
     assertTrue(celRightsCmd.isValidUsers(rightsObj));
   }
-  
+
   @Test
   public void testIsValidUsers_manyUsers() {
     BaseObject rightsObj = new BaseObject();
@@ -105,7 +104,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("users", users);
     assertFalse(celRightsCmd.isValidUsers(rightsObj));
   }
-  
+
   @Test
   public void testIsValidLevels_view() {
     BaseObject rightsObj = new BaseObject();
@@ -113,7 +112,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("levels", levels);
     assertTrue(celRightsCmd.isValidLevels(rightsObj));
   }
-  
+
   @Test
   public void testIsValidLevels_edit() {
     BaseObject rightsObj = new BaseObject();
@@ -121,7 +120,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("levels", levels);
     assertTrue(celRightsCmd.isValidLevels(rightsObj));
   }
-  
+
   @Test
   public void testIsValidLevels_invalid_2levels() {
     BaseObject rightsObj = new BaseObject();
@@ -129,7 +128,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("levels", levels);
     assertFalse(celRightsCmd.isValidLevels(rightsObj));
   }
-  
+
   @Test
   public void testIsValidLevels_invalid_wronglevel() {
     BaseObject rightsObj = new BaseObject();
@@ -137,7 +136,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("levels", levels);
     assertFalse(celRightsCmd.isValidLevels(rightsObj));
   }
-  
+
   @Test
   public void testIsValidLevels_invalid_wronglevels() {
     BaseObject rightsObj = new BaseObject();
@@ -190,10 +189,8 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
   }
 
   @Test
-  public void testIsCelementsRights_oneValidUser_validLevel_delObject(
-      ) throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "TestDoc");
+  public void testIsCelementsRights_oneValidUser_validLevel_delObject() throws XWikiException {
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "TestDoc");
     XWikiDocument testDoc = new XWikiDocument(docRef);
     BaseObject rightsObj = new BaseObject();
     rightsObj.setXClassReference(xwikiRightsClassRef);
@@ -201,7 +198,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     rightsObj.setLargeStringValue("users", users);
     String levels = "view";
     rightsObj.setLargeStringValue("levels", levels);
-    testDoc.setXObjects(xwikiRightsClassRef, Arrays.<BaseObject>asList((BaseObject)null,
+    testDoc.setXObjects(xwikiRightsClassRef, Arrays.<BaseObject>asList((BaseObject) null,
         rightsObj));
     String fullName = "MySpace.TestDoc";
     expect(xwiki.getDocument(eq(fullName), same(context))).andReturn(testDoc).once();
@@ -226,7 +223,7 @@ public class CelementsRightsCommandTest extends AbstractBridgedComponentTestCase
     assertTrue(celRightsCmd.isCelementsRights(fullName, context));
     verify(xwiki);
   }
-  
+
   @Test
   public void testIsCelementsRights_emptyLevel() throws XWikiException {
     BaseObject rightsObj = new BaseObject();

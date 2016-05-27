@@ -41,8 +41,7 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   @Override
   public String getPrettyName() {
     String dictNameKey = PRETTYNAME_DICT_PREFIX + getName();
-    String dictionaryPrettyName = getWebUtilsService().getAdminMessageTool().get(
-        dictNameKey);
+    String dictionaryPrettyName = getWebUtilsService().getAdminMessageTool().get(dictNameKey);
     if (!dictNameKey.equals(dictionaryPrettyName)) {
       return dictionaryPrettyName;
     }
@@ -71,8 +70,8 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   }
 
   private DocumentReference getLocalTemplateRef(String renderMode) {
-    return new DocumentReference(getContext().getDatabase(),
-        "Templates", pageTypeImpl.getRenderTemplateForRenderMode(renderMode));
+    return new DocumentReference(getContext().getDatabase(), "Templates",
+        pageTypeImpl.getRenderTemplateForRenderMode(renderMode));
   }
 
   @Override

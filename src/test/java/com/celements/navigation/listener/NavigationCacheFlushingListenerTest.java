@@ -25,7 +25,7 @@ public class NavigationCacheFlushingListenerTest extends AbstractBridgedComponen
   @Before
   @SuppressWarnings("unchecked")
   public void setUp_NavigationCacheFlushingListenerTest() throws Exception {
-    listener = (NavigationCacheFlushingListener) Utils.getComponent(EventListener.class, 
+    listener = (NavigationCacheFlushingListener) Utils.getComponent(EventListener.class,
         NavigationCache.NAME);
     listener.navCache = createMockAndAddToDefault(IDocumentReferenceCache.class);
   }
@@ -33,8 +33,7 @@ public class NavigationCacheFlushingListenerTest extends AbstractBridgedComponen
   @After
   @SuppressWarnings("unchecked")
   public void tearDown_NavigationCacheFlushingListenerTest() throws Exception {
-    listener.navCache = Utils.getComponent(IDocumentReferenceCache.class, 
-        NavigationCache.NAME);
+    listener.navCache = Utils.getComponent(IDocumentReferenceCache.class, NavigationCache.NAME);
   }
 
   @Test

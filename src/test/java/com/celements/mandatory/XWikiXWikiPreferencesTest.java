@@ -40,8 +40,8 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
   public void setUp_XWikiXWikiPreferencesTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    mandatoryXWikiPref = (XWikiXWikiPreferences) Utils.getComponent(
-        IMandatoryDocumentRole.class, "celements.mandatory.wikipreferences");
+    mandatoryXWikiPref = (XWikiXWikiPreferences) Utils.getComponent(IMandatoryDocumentRole.class,
+        "celements.mandatory.wikipreferences");
   }
 
   @Test
@@ -71,8 +71,8 @@ public class XWikiXWikiPreferencesTest extends AbstractBridgedComponentTestCase 
   public void testSkip_illegalValue() {
     expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"))).andThrow(
         new NumberFormatException(null)).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"), eq(0L))
-        ).andReturn(0L).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mandatory.skipWikiPreferences"), eq(0L))).andReturn(
+        0L).anyTimes();
     replayDefault();
     mandatoryXWikiPref.skip();
     verifyDefault();

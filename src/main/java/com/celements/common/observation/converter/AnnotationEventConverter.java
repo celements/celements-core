@@ -168,8 +168,7 @@ public class AnnotationEventConverter extends AbstractXWikiEventConverter {
     if (origDoc != null) {
       String origParentFN = (String) remoteDataMap.get(ORIGDOC_PARENT);
       if (!Strings.isNullOrEmpty(origParentFN)) {
-        origDoc.setParentReference(
-            relativeRefResolver.resolve(origParentFN, EntityType.DOCUMENT));
+        origDoc.setParentReference(relativeRefResolver.resolve(origParentFN, EntityType.DOCUMENT));
       }
     }
     return doc;

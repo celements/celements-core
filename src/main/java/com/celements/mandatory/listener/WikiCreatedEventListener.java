@@ -53,8 +53,7 @@ public class WikiCreatedEventListener implements EventListener {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
@@ -72,8 +71,8 @@ public class WikiCreatedEventListener implements EventListener {
   public void onEvent(Event event, Object source, Object data) {
     WikiEvent wikiEvent = (WikiEvent) event;
     String database = wikiEvent.getWikiId();
-    LOGGER.debug("received WikiCreatedEvent for database '{}', remote state '{}'", 
-        database, remoteObservationManagerContext.isRemoteState());
+    LOGGER.debug("received WikiCreatedEvent for database '{}', remote state '{}'", database,
+        remoteObservationManagerContext.isRemoteState());
     if (!remoteObservationManagerContext.isRemoteState()) {
       String dbBackup = getContext().getDatabase();
       try {

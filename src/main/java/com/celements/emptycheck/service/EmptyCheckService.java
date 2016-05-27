@@ -20,8 +20,7 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class EmptyCheckService implements IEmptyCheckRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      EmptyCheckService.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(EmptyCheckService.class);
 
   @Requirement
   Map<String, IEmptyDocStrategyRole> emptyDocStrategies;
@@ -30,13 +29,12 @@ public class EmptyCheckService implements IEmptyCheckRole {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty(
-        "xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
-    DocumentReference nonEmptyChildRef = new NextNonEmptyChildrenCommand(
-        ).getNextNonEmptyChildren(documentRef);
+    DocumentReference nonEmptyChildRef = new NextNonEmptyChildrenCommand().getNextNonEmptyChildren(
+        documentRef);
     if (nonEmptyChildRef != null) {
       return nonEmptyChildRef;
     }
@@ -48,13 +46,11 @@ public class EmptyCheckService implements IEmptyCheckRole {
     for (String checkImplName : getCheckImplNamesConfig()) {
       if (emptyDocStrategies.keySet().contains(checkImplName)) {
         if (isEmptyRTEdoc) {
-          isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyRTEDocument(
-              docRef);
+          isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyRTEDocument(docRef);
         }
       } else if (!"".equals(checkImplName)) {
-        LOGGER.warn("wrong checkImpleNames configuration in ["
-            + getContext().getDatabase() + "] skipping implName [" + checkImplName
-            + "].");
+        LOGGER.warn("wrong checkImpleNames configuration in [" + getContext().getDatabase()
+            + "] skipping implName [" + checkImplName + "].");
       }
     }
     return isEmptyRTEdoc;
@@ -68,17 +64,16 @@ public class EmptyCheckService implements IEmptyCheckRole {
           isEmptyRTEdoc &= emptyDocStrategies.get(checkImplName).isEmptyDocument(docRef);
         }
       } else if (!"".equals(checkImplName)) {
-        LOGGER.warn("wrong checkImpleNames configuration in ["
-            + getContext().getDatabase() + "] skipping implName [" + checkImplName
-            + "].");
+        LOGGER.warn("wrong checkImpleNames configuration in [" + getContext().getDatabase()
+            + "] skipping implName [" + checkImplName + "].");
       }
     }
     return isEmptyRTEdoc;
   }
 
   List<String> getCheckImplNamesConfig() {
-    String implConfigNames = getContext().getWiki().getXWikiPreference(
-        EMPTYCHECK_MODULS_PREF_NAME, "celements.emptycheckModuls", "default", getContext());
+    String implConfigNames = getContext().getWiki().getXWikiPreference(EMPTYCHECK_MODULS_PREF_NAME,
+        "celements.emptycheckModuls", "default", getContext());
     if ((implConfigNames != null) && (!"".equals(implConfigNames))) {
       return Arrays.asList(implConfigNames.split("[;,]"));
     } else {

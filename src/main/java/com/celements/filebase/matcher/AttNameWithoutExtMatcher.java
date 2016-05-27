@@ -14,7 +14,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class AttNameWithoutExtMatcher implements IAttFileNameMatcherRole {
 
-  private static Logger LOGGER  = LoggerFactory.getLogger(AttNameWithoutExtMatcher.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(AttNameWithoutExtMatcher.class);
 
   public static final String ATT_NAME_WITHOUT_EXT_MATCHER = "attNameWithoutExtMatcher";
   static final Pattern ATT_NAME_MATCH_WITHOUT_EXT = Pattern.compile("\\.[^.]+$");
@@ -23,9 +23,9 @@ public class AttNameWithoutExtMatcher implements IAttFileNameMatcherRole {
 
   @Override
   public boolean accept(XWikiAttachment attachment) {
-    if((attachment == null) || (fileNamePattern == null)) {
-      LOGGER.debug("accept failed with Attachment [" + attachment + "] and " +
-          "fileNamePattern [" + fileNamePattern + "]");
+    if ((attachment == null) || (fileNamePattern == null)) {
+      LOGGER.debug("accept failed with Attachment [" + attachment + "] and " + "fileNamePattern ["
+          + fileNamePattern + "]");
       return false;
     }
     String[] split = ATT_NAME_MATCH_WITHOUT_EXT.split(attachment.getFilename());
