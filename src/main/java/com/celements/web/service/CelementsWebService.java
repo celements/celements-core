@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -14,6 +16,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
@@ -29,10 +32,13 @@ import com.xpn.xwiki.web.XWikiResponse;
 @Component
 public class CelementsWebService implements ICelementsWebServiceRole {
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(CelementsWebService.class);
-  
+  private static Logger _LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
+
   private List<String> supportedAdminLangList;
-  
+
+  @Requirement
+  IModelAccessFacade modelAccess;
+
   @Requirement
   private IWebUtilsService webUtilsService;
 
@@ -40,13 +46,13 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   public String getEmailAdressForUser(String username) {
     return getEmailAdressForUser(webUtilsService.resolveDocumentReference(username));
   }
-  
+
   @Override
   public String getEmailAdressForUser(DocumentReference userDocRef) {
     if (getContext().getWiki().exists(userDocRef, getContext())) {
@@ -58,20 +64,19 @@ public class CelementsWebService implements ICelementsWebServiceRole {
           return obj.getStringValue("email");
         }
       } catch (XWikiException exp) {
-        _LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef
-            + "]'", exp);
+        _LOGGER.error("Exception while getting a XWikiDocument. docRef:['" + userDocRef + "]'",
+            exp);
       }
     }
     return null;
   }
-  
+
   @Override
-  public int createUser(boolean validate) throws XWikiException{
+  public int createUser(boolean validate) throws XWikiException {
     String possibleLogins = new PossibleLoginsCommand().getPossibleLogins();
-    return createUser(getUniqueNameValueRequestMap(), possibleLogins, 
-        validate);
+    return createUser(getUniqueNameValueRequestMap(), possibleLogins, validate);
   }
-  
+
   @Override
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate) throws XWikiException {
@@ -80,50 +85,45 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       accountName = userData.get("xwikiname");
       userData.remove("xwikiname");
     } else {
-      while (accountName.equals("") || getContext().getWiki().exists(
-          webUtilsService.resolveDocumentReference("XWiki." + accountName), 
-          getContext())) {
-        accountName = getContext().getWiki().generateRandomString(12);
-      }
+      accountName = getNewRandomXWikiUserName(accountName);
     }
     String validkey = "";
     int success = -1;
-    if(areIdentifiersUnique(userData, possibleLogins, getContext())) {
-      if(!userData.containsKey("password")) {
+    if (areIdentifiersUnique(userData, possibleLogins, getContext())) {
+      if (!userData.containsKey("password")) {
         String password = getContext().getWiki().generateRandomString(8);
         userData.put("password", password);
       }
-      if(!userData.containsKey("validkey")) {
-        validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(
-            getContext());
+      if (!userData.containsKey("validkey")) {
+        validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
         userData.put("validkey", validkey);
       } else {
         validkey = userData.get("validkey");
       }
-      if(!userData.containsKey("active")) {
+      if (!userData.containsKey("active")) {
         userData.put("active", "0");
       }
       String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-      
-      success = getContext().getWiki().createUser(accountName, userData, 
-          webUtilsService.resolveDocumentReference("XWiki.XWikiUsers"), content, 
-          null, "edit", getContext());
+
+      success = getContext().getWiki().createUser(accountName, userData,
+          webUtilsService.resolveDocumentReference("XWiki.XWikiUsers"), content, null, "edit",
+          getContext());
     }
-    
-    if(success == 1){
+
+    if (success == 1) {
       // Set rights on user doc
       XWikiDocument doc = getContext().getWiki().getDocument(
           webUtilsService.resolveDocumentReference("XWiki." + accountName), getContext());
-      List<BaseObject> rightsObjs = doc.getXObjects(
-          webUtilsService.resolveDocumentReference("XWiki.XWikiRights"));
+      List<BaseObject> rightsObjs = doc.getXObjects(webUtilsService.resolveDocumentReference(
+          "XWiki.XWikiRights"));
       for (BaseObject rightObj : rightsObjs) {
-        if(rightObj.getStringValue("groups").equals("")){
-          rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer(
-              ).serialize(doc.getDocumentReference()));
+        if (rightObj.getStringValue("groups").equals("")) {
+          rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
+              doc.getDocumentReference()));
           rightObj.set("allow", "1", getContext());
           rightObj.set("levels", "view,edit,delete", getContext());
           rightObj.set("groups", "", getContext());
-        } else{
+        } else {
           rightObj.set("users", "", getContext());
           rightObj.set("allow", "1", getContext());
           rightObj.set("levels", "view,edit,delete", getContext());
@@ -131,47 +131,56 @@ public class CelementsWebService implements ICelementsWebServiceRole {
         }
       }
       getContext().getWiki().saveDocument(doc, getContext());
-      
-      if(validate) {
+
+      if (validate) {
         _LOGGER.info("send account validation mail with data: accountname='" + accountName
             + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
-        try{
-          new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(
-              userData.get("email"), validkey, webUtilsService.resolveDocumentReference(
-                  "Tools.AccountActivationMail"), 
-                  webUtilsService.getDefaultAdminLanguage());
-        } catch(XWikiException e){
-          _LOGGER.error("Exception while sending validation mail to '" + 
-              userData.get("email") + "'", e);
+        try {
+          new PasswordRecoveryAndEmailValidationCommand().sendValidationMessage(userData.get(
+              "email"), validkey, webUtilsService.resolveDocumentReference(
+                  "Tools.AccountActivationMail"), webUtilsService.getDefaultAdminLanguage());
+        } catch (XWikiException e) {
+          _LOGGER.error("Exception while sending validation mail to '" + userData.get("email")
+              + "'", e);
         }
       }
     }
     return success;
   }
-  
+
+  @Override
+  public String getNewRandomXWikiUserName(String accountName) {
+    while (Strings.isNullOrEmpty(accountName.trim()) || modelAccess.exists(
+        webUtilsService.resolveDocumentReference("XWiki." + accountName))) {
+      accountName = RandomStringUtils.randomAlphabetic(12);
+    }
+    return accountName;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
     Map<String, String[]> params = getContext().getRequest().getParameterMap();
     Map<String, String> resultMap = new HashMap<String, String>();
     for (String key : params.keySet()) {
-      if((params.get(key) != null) && (params.get(key).length > 0)) {
+      if ((params.get(key) != null) && (params.get(key).length > 0)) {
         resultMap.put(key, params.get(key)[0]);
       } else {
         resultMap.put(key, "");
       }
     }
     return resultMap;
-  }  
-  
-  private boolean areIdentifiersUnique(Map<String, String> userData, 
-      String possibleLogins, XWikiContext context) throws XWikiException {
+  }
+
+  private boolean areIdentifiersUnique(Map<String, String> userData, String possibleLogins,
+      XWikiContext context) throws XWikiException {
     boolean isUnique = true;
     for (String key : userData.keySet()) {
-      if(!"".equals(key.trim()) && (("," + possibleLogins + ",").indexOf("," + key + ",") >= 0)) {
-        String user = new UserNameForUserDataCommand().getUsernameForUserData(
-            userData.get(key), possibleLogins, context);
-        if((user == null) || (user.length() > 0)) { //user == "" means there is no such user
+      if (!"".equals(key.trim()) && (("," + possibleLogins + ",").indexOf("," + key + ",") >= 0)) {
+        String user = new UserNameForUserDataCommand().getUsernameForUserData(userData.get(key),
+            possibleLogins, context);
+        if ((user == null) || (user.length() > 0)) { // user == "" means there is no such
+                                                     // user
           isUnique = false;
         }
       }
@@ -182,20 +191,20 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public List<String> getSupportedAdminLanguages() {
     if (supportedAdminLangList == null) {
-      supportedAdminLangList =  Arrays.asList(new String[] {"de","fr","en","it"});
+      supportedAdminLangList = Arrays.asList(new String[] { "de", "fr", "en", "it" });
     }
     return supportedAdminLangList;
   }
-  
+
   @Override
   public boolean writeUTF8Response(String filename, String renderDocFullName) {
     boolean success = false;
-    if(getContext().getWiki().exists(webUtilsService.resolveDocumentReference(
-        renderDocFullName), getContext())) {
+    if (getContext().getWiki().exists(webUtilsService.resolveDocumentReference(renderDocFullName),
+        getContext())) {
       XWikiDocument renderDoc;
       try {
-        renderDoc = getContext().getWiki().getDocument(
-            webUtilsService.resolveDocumentReference(renderDocFullName), getContext());
+        renderDoc = getContext().getWiki().getDocument(webUtilsService.resolveDocumentReference(
+            renderDocFullName), getContext());
         adjustResponseHeader(filename, getContext().getResponse());
         setResponseContent(renderDoc, getContext().getResponse());
       } catch (XWikiException e) {
@@ -205,15 +214,15 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     }
     return success;
   }
-  
+
   private void adjustResponseHeader(String filename, XWikiResponse response) {
     response.setContentType("text/plain");
     String ofilename = Util.encodeURI(filename, getContext()).replaceAll("\\+", " ");
-    response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename + 
-        "\"; charset='UTF-8'");
+    response.addHeader("Content-disposition", "attachment; filename=\"" + ofilename
+        + "\"; charset='UTF-8'");
   }
-  
-  private void setResponseContent(XWikiDocument renderDoc, XWikiResponse response) 
+
+  private void setResponseContent(XWikiDocument renderDoc, XWikiResponse response)
       throws XWikiException {
     String renderedContent = new RenderCommand().renderDocument(renderDoc);
     byte[] data = {};
@@ -224,7 +233,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     }
     response.setContentLength(data.length + 3);
     try {
-      response.getOutputStream().write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
+      response.getOutputStream().write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
       response.getOutputStream().write(data);
     } catch (IOException e) {
       throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
