@@ -60,7 +60,7 @@ public class MenuService implements IMenuService {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public List<BaseObject> getMenuHeaders() {
@@ -73,8 +73,8 @@ public class MenuService implements IMenuService {
     ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
     resultList.addAll(menuHeadersMap.values());
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("getMenuHeaders_internal returning: "
-        + Arrays.deepToString(resultList.toArray()));
+      LOGGER.trace("getMenuHeaders_internal returning: " + Arrays.deepToString(
+          resultList.toArray()));
     }
     LOGGER.debug("getMenuHeaders_internal end");
     return resultList;
@@ -82,23 +82,21 @@ public class MenuService implements IMenuService {
 
   void addMenuHeaders(SortedMap<Integer, BaseObject> menuHeadersMap) {
     try {
-      List<String> result = queryManager.createQuery(getHeadersXWQL(), Query.XWQL
-          ).execute();
+      List<String> result = queryManager.createQuery(getHeadersXWQL(), Query.XWQL).execute();
       if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("addMenuHeaders received for " + getContext().getDatabase()
-          + ": " + Arrays.deepToString(result.toArray()));
+        LOGGER.trace("addMenuHeaders received for " + getContext().getDatabase() + ": "
+            + Arrays.deepToString(result.toArray()));
       }
-      for(String fullName : new HashSet<String>(result)) {
-        DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(
-            fullName);
+      for (String fullName : new HashSet<String>(result)) {
+        DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(fullName);
         if (accessService.hasview(menuBarDocRef)) {
-          List<BaseObject> headerObjList = getContext().getWiki().getDocument(
-              menuBarDocRef, getContext()).getXObjects(getMenuBarHeaderClassRef(
+          List<BaseObject> headerObjList = getContext().getWiki().getDocument(menuBarDocRef,
+              getContext()).getXObjects(getMenuBarHeaderClassRef(
                   menuBarDocRef.getWikiReference().getName()));
-          LOGGER.trace("addMenuHeaders: hasview for [" + 
-              webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + 
-              "] adding items [" + ((headerObjList != null) ?headerObjList.size() : "null"
-              ) + "].");
+          LOGGER.trace("addMenuHeaders: hasview for ["
+              + webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef)
+              + "] adding items [" + ((headerObjList != null) ? headerObjList.size() : "null")
+              + "].");
           if (headerObjList != null) {
             for (BaseObject obj : headerObjList) {
               if (obj != null) {
@@ -107,8 +105,8 @@ public class MenuService implements IMenuService {
             }
           }
         } else {
-          LOGGER.trace("addMenuHeaders: NO hasview for [" + 
-              webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + "].");
+          LOGGER.trace("addMenuHeaders: NO hasview for ["
+              + webUtilsService.getRefDefaultSerializer().serialize(menuBarDocRef) + "].");
         }
       }
     } catch (XWikiException exp) {
@@ -125,7 +123,6 @@ public class MenuService implements IMenuService {
   public DocumentReference getMenuBarHeaderClassRef(String database) {
     return new DocumentReference(database, "Celements", "MenuBarHeaderItemClass");
   }
-
 
   public DocumentReference getMenuBarSubItemClassRef() {
     return getMenuBarSubItemClassRef(getContext().getDatabase());
@@ -149,8 +146,8 @@ public class MenuService implements IMenuService {
     ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
     resultList.addAll(menuItemsMap.values());
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("getSubMenuItems_internal returning: "
-        + Arrays.deepToString(resultList.toArray()));
+      LOGGER.trace("getSubMenuItems_internal returning: " + Arrays.deepToString(
+          resultList.toArray()));
     }
     LOGGER.debug("getSubMenuItems_internal end");
     return resultList;
@@ -158,20 +155,18 @@ public class MenuService implements IMenuService {
 
   private void addMenuItems(TreeMap<Integer, BaseObject> menuItemsMap, Integer headerId) {
     try {
-      List<Object[]> result = queryManager.createQuery(getSubItemsXWQL(), Query.XWQL
-          ).bindValue("headerId", headerId).execute();
+      List<Object[]> result = queryManager.createQuery(getSubItemsXWQL(), Query.XWQL).bindValue(
+          "headerId", headerId).execute();
       if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("addMenuItems received for " + getContext().getDatabase()
-          + ": " + Arrays.deepToString(result.toArray()));
+        LOGGER.trace("addMenuItems received for " + getContext().getDatabase() + ": "
+            + Arrays.deepToString(result.toArray()));
       }
-      for(Object[] resultObj : result) {
+      for (Object[] resultObj : result) {
         String fullName = resultObj[0].toString();
         int objectNr = Integer.parseInt(resultObj[1].toString());
-        DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(
-            fullName);
-        BaseObject obj = getContext().getWiki().getDocument(menuBarDocRef, getContext()
-            ).getXObject(getMenuBarSubItemClassRef(menuBarDocRef.getWikiReference(
-                ).getName()), objectNr);
+        DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(fullName);
+        BaseObject obj = getContext().getWiki().getDocument(menuBarDocRef, getContext()).getXObject(
+            getMenuBarSubItemClassRef(menuBarDocRef.getWikiReference().getName()), objectNr);
         menuItemsMap.put(obj.getIntValue("itempos"), obj);
       }
     } catch (XWikiException e) {
@@ -183,8 +178,8 @@ public class MenuService implements IMenuService {
 
   private String getSubItemsXWQL() {
     return "select doc.fullName, subItem.number"
-      + " from Document as doc, doc.object(Celements.MenuBarSubItemClass) as subItem"
-      + " where subItem.header_id = :headerId";
+        + " from Document as doc, doc.object(Celements.MenuBarSubItemClass) as subItem"
+        + " where subItem.header_id = :headerId";
   }
 
 }

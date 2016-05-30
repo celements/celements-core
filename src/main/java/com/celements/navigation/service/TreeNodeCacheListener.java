@@ -37,8 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("TreeNodeCacheListener")
 public class TreeNodeCacheListener implements EventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      TreeNodeCacheListener.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(TreeNodeCacheListener.class);
 
   @Requirement
   ITreeNodeCache treeNodeCache;
@@ -48,8 +47,8 @@ public class TreeNodeCacheListener implements EventListener {
   }
 
   public List<Event> getEvents() {
-    return Arrays.asList((Event)new TreeNodeCreatedEvent(),
-        (Event)new TreeNodeUpdatedEvent(), (Event)new TreeNodeDeletedEvent());
+    return Arrays.asList((Event) new TreeNodeCreatedEvent(), (Event) new TreeNodeUpdatedEvent(),
+        (Event) new TreeNodeDeletedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -59,8 +58,8 @@ public class TreeNodeCacheListener implements EventListener {
           + document.getDocumentReference() + "].");
       treeNodeCache.flushMenuItemCache();
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "] -> skip.");
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "] -> skip.");
     }
   }
 

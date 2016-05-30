@@ -31,8 +31,7 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
@@ -63,16 +62,16 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
     }
     if (docRef != null) {
       try {
-        ret = getRightsService().hasAccessLevel(level.getIdentifier(), 
-            (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), 
-            webUtilsService.serializeRef(docRef), getContext());
+        ret = getRightsService().hasAccessLevel(level.getIdentifier(), (user != null
+            ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), webUtilsService.serializeRef(
+                docRef), getContext());
       } catch (XWikiException xwe) {
         // already being catched in XWikiRightServiceImpl.hasAccessLevel()
         LOGGER.error("should not happen", xwe);
       }
     }
-    LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", 
-        ref, level, user, ret);
+    LOGGER.debug("hasAccessLevel: for ref '{}', level '{}' and user '{}' returned '{}'", ref, level,
+        user, ret);
     return ret;
   }
 }

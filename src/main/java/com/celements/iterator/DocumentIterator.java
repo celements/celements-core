@@ -32,8 +32,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class DocumentIterator implements Iterator<XWikiDocument>,
-    Iterable<XWikiDocument> {
+public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWikiDocument> {
 
   private static Log _LOGGER = LogFactory.getFactory().getInstance(XObjectIterator.class);
 
@@ -110,7 +109,6 @@ public class DocumentIterator implements Iterator<XWikiDocument>,
   }
 
   /**
-   * 
    * @return
    */
   Iterator<String> getDocIterator() {

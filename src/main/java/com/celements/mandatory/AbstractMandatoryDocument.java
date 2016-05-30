@@ -41,7 +41,7 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
 
   @Requirement
   protected IWebUtilsService webUtilsService;
-  
+
   @Requirement
   protected IModelAccessFacade modelAccess;
 
@@ -76,8 +76,7 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
   }
 
   boolean notMainWiki() {
-    boolean notMainWiki = (getWiki() != null) && !getWiki().equals(getContext(
-        ).getMainXWiki());
+    boolean notMainWiki = (getWiki() != null) && !getWiki().equals(getContext().getMainXWiki());
     getLogger().debug("not main wiki '{}': {}", getWiki(), notMainWiki);
     return notMainWiki;
   }
@@ -108,8 +107,7 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
   protected void saveDoc(XWikiDocument doc, boolean dirty) throws XWikiException {
     if (dirty) {
       getLogger().info("updated doc '{}' for '{}'", doc, getName());
-      getContext().getWiki().saveDocument(doc, "autocreate mandatory " + getName(), 
-          getContext());
+      getContext().getWiki().saveDocument(doc, "autocreate mandatory " + getName(), getContext());
     } else {
       getLogger().debug("is uptodate '{}' for '{}'", doc, getName());
     }

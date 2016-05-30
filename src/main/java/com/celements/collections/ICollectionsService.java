@@ -29,9 +29,10 @@ import com.xpn.xwiki.objects.BaseObject;
 
 @ComponentRole
 public interface ICollectionsService {
+
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc);
-  
+
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2);
 }

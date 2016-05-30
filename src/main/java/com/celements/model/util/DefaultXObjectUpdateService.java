@@ -20,7 +20,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DefaultXObjectUpdateService.class);
-  
+
   @Requirement
   private IModelAccessFacade modelAccess;
 
@@ -28,8 +28,8 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   private IWebUtilsService webUtilsService;
 
   @Override
-  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap
-      ) throws ClassDocumentLoadException {
+  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap)
+      throws ClassDocumentLoadException {
     boolean hasChanged = false;
     Map<String, BaseObject> objMap = getObjectMap(doc, fieldMap.keySet());
     for (String field : fieldMap.keySet()) {
@@ -40,17 +40,17 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
       if (!ObjectUtils.equals(oldVal, newVal)) {
         modelAccess.setProperty(obj, fieldName, newVal);
         hasChanged = true;
-        LOGGER.trace("update: '" + field + "' has changed from '" + oldVal + "' to '" 
-            + newVal + "'");
+        LOGGER.trace("update: '" + field + "' has changed from '" + oldVal + "' to '" + newVal
+            + "'");
       }
     }
-    LOGGER.info("update: for doc " + doc + "' and map '" + fieldMap + "' hasChanged '" 
-        + hasChanged + "'");
+    LOGGER.info("update: for doc " + doc + "' and map '" + fieldMap + "' hasChanged '" + hasChanged
+        + "'");
     return hasChanged;
   }
-  
-  private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields
-      ) throws ClassDocumentLoadException {
+
+  private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields)
+      throws ClassDocumentLoadException {
     Map<String, BaseObject> ret = new HashMap<>();
     for (String field : fields) {
       String className = extractClassName(field);

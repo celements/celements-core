@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class LastChangedService implements ILastChangedRole {
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(LastChangedService.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(LastChangedService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -52,7 +52,7 @@ public class LastChangedService implements ILastChangedRole {
 
   @Override
   public Date getLastUpdatedDate() {
-    return getLastUpdatedDate((SpaceReference)null);
+    return getLastUpdatedDate((SpaceReference) null);
   }
 
   @Override
@@ -107,15 +107,15 @@ public class LastChangedService implements ILastChangedRole {
         lastChangedDate = lastChangedDoc.getDate();
         updateCachedDate(spaceRef, lastChangedDate, lastChangedDocRef);
       } catch (DocumentAccessException exp) {
-        _LOGGER.error("Failed to load last updated document '{}', '{}'.",
-            lastChangedDocRef, lastChangedDocLang, exp);
+        _LOGGER.error("Failed to load last updated document '{}', '{}'.", lastChangedDocRef,
+            lastChangedDocLang, exp);
       }
     } else {
       _LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for"
           + " space '{}'", spaceRef);
     }
-    _LOGGER.debug("internal_getLastChangeDate: return '{}' for space '{}'",
-        lastChangedDate, spaceRef);
+    _LOGGER.debug("internal_getLastChangeDate: return '{}' for space '{}'", lastChangedDate,
+        spaceRef);
     return lastChangedDate;
   }
 
@@ -127,15 +127,14 @@ public class LastChangedService implements ILastChangedRole {
       } else {
         WikiReference curWikiRef = webUtilsService.getWikiRef();
         getLastUpdatedWikiCache().put(curWikiRef, lastChangedDate);
-        getLastUpdatedSpaceCache().put(lastChangedDocRef.getLastSpaceReference(),
-            lastChangedDate);
+        getLastUpdatedSpaceCache().put(lastChangedDocRef.getLastSpaceReference(), lastChangedDate);
       }
     }
   }
 
   Map<SpaceReference, Date> getLastUpdatedSpaceCache() {
     if (lastUpdatedSpaceCache == null) {
-      //XXX why not use ConcurrentHashMap???
+      // XXX why not use ConcurrentHashMap???
       lastUpdatedSpaceCache = new HashMap<>();
     }
     return lastUpdatedSpaceCache;
@@ -143,7 +142,7 @@ public class LastChangedService implements ILastChangedRole {
 
   Map<WikiReference, Date> getLastUpdatedWikiCache() {
     if (lastUpdatedWikiCache == null) {
-      //XXX why not use ConcurrentHashMap???
+      // XXX why not use ConcurrentHashMap???
       lastUpdatedWikiCache = new HashMap<>();
     }
     return lastUpdatedWikiCache;

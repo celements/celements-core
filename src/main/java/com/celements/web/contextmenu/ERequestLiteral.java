@@ -26,15 +26,12 @@ import com.celements.sajson.ECommand;
 import com.celements.sajson.IGenericLiteral;
 
 public enum ERequestLiteral implements IGenericLiteral {
-  ELEMENT_ID(ECommand.VALUE_COMMAND),
-  ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND, ELEMENT_ID),
-  ELEM_ID_KEY(ECommand.PROPERTY_COMMAND, ELEM_IDS_ARRAY),
-  CSS_CLASS_NAME_VALUE(ECommand.VALUE_COMMAND),
-  CSS_CLASS_NAME(ECommand.PROPERTY_COMMAND, CSS_CLASS_NAME_VALUE),
-  CSS_CLASS(ECommand.DICTIONARY_COMMAND, CSS_CLASS_NAME, ELEM_ID_KEY),
-  REQUEST_ARRAY(ECommand.ARRAY_COMMAND, CSS_CLASS);
-  
-  
+  ELEMENT_ID(ECommand.VALUE_COMMAND), ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND,
+      ELEMENT_ID), ELEM_ID_KEY(ECommand.PROPERTY_COMMAND, ELEM_IDS_ARRAY), CSS_CLASS_NAME_VALUE(
+          ECommand.VALUE_COMMAND), CSS_CLASS_NAME(ECommand.PROPERTY_COMMAND,
+              CSS_CLASS_NAME_VALUE), CSS_CLASS(ECommand.DICTIONARY_COMMAND, CSS_CLASS_NAME,
+                  ELEM_ID_KEY), REQUEST_ARRAY(ECommand.ARRAY_COMMAND, CSS_CLASS);
+
   private ERequestLiteral[] literals;
   private ECommand command;
   private int nextLiteral = 0;
@@ -61,8 +58,7 @@ public enum ERequestLiteral implements IGenericLiteral {
     return literals[0];
   }
 
-  public IGenericLiteral getPropertyLiteralForKey(String key,
-      IGenericLiteral placeholder) {
+  public IGenericLiteral getPropertyLiteralForKey(String key, IGenericLiteral placeholder) {
     return placeholder;
   }
 

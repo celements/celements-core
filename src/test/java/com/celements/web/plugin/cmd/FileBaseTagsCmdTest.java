@@ -57,8 +57,8 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagSpaceName() {
     String celFileBaseName = "Content_attachments.FileBaseDoc";
-    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
-        same(context))).andReturn(celFileBaseName);
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
+        celFileBaseName);
     replay(xwiki, mockUtils);
     assertEquals("Content_attachments", fileBaseTagCmd.getTagSpaceName(context));
     verify(xwiki, mockUtils);
@@ -67,8 +67,8 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagSpaceName_onlySpaceName() {
     String celFileBaseName = "Content_attachments";
-    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
-        same(context))).andReturn(celFileBaseName);
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
+        celFileBaseName);
     replay(xwiki, mockUtils);
     assertEquals("Content_attachments", fileBaseTagCmd.getTagSpaceName(context));
     verify(xwiki, mockUtils);
@@ -78,17 +78,16 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagDocument_docExists_without_MenuItem() throws Exception {
     String celFileBaseName = "Content_attachments";
-    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
-        same(context))).andReturn(celFileBaseName).anyTimes();
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
+        celFileBaseName).anyTimes();
     String tagDocFN = celFileBaseName + ".tag0";
     expect(xwiki.exists(eq(tagDocFN), same(context))).andReturn(true);
-    expect(mockUtils.getSubNodesForParent(eq(""), eq(celFileBaseName),
-        isA(INavFilter.class), same(context))).andReturn(Collections.emptyList());
-    expect(xwiki.getDocument(eq(tagDocFN), same(context))).andReturn(new XWikiDocument()
-      ).once();
+    expect(mockUtils.getSubNodesForParent(eq(""), eq(celFileBaseName), isA(INavFilter.class), same(
+        context))).andReturn(Collections.emptyList());
+    expect(xwiki.getDocument(eq(tagDocFN), same(context))).andReturn(new XWikiDocument()).once();
     replay(xwiki, mockUtils);
-    assertNotNull("docAlready exists: expecting existing doc",
-        fileBaseTagCmd.getTagDocument("tag0", false, context));
+    assertNotNull("docAlready exists: expecting existing doc", fileBaseTagCmd.getTagDocument("tag0",
+        false, context));
     verify(xwiki, mockUtils);
   }
 
@@ -96,17 +95,15 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTagDocument_docExists() throws Exception {
     String celFileBaseName = "Content_attachments";
-    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""),
-        same(context))).andReturn(celFileBaseName).anyTimes();
+    expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
+        celFileBaseName).anyTimes();
     String tagDocFN = celFileBaseName + ".tag0";
     expect(xwiki.exists(eq(tagDocFN), same(context))).andReturn(true);
-    expect(mockUtils.getSubNodesForParent(eq(""), eq(celFileBaseName),
-        isA(INavFilter.class), same(context))).andReturn(Arrays.asList(new TreeNode(
-            new DocumentReference(context.getDatabase(), celFileBaseName, "tag0"), "",
-            0)));
+    expect(mockUtils.getSubNodesForParent(eq(""), eq(celFileBaseName), isA(INavFilter.class), same(
+        context))).andReturn(Arrays.asList(new TreeNode(new DocumentReference(context.getDatabase(),
+            celFileBaseName, "tag0"), "", 0)));
     XWikiDocument existingTagDoc = new XWikiDocument();
-    expect(xwiki.getDocument(eq(tagDocFN), same(context))).andReturn(existingTagDoc
-      ).once();
+    expect(xwiki.getDocument(eq(tagDocFN), same(context))).andReturn(existingTagDoc).once();
     replay(xwiki, mockUtils);
     assertSame("docAlready exists: expecting existing doc", existingTagDoc,
         fileBaseTagCmd.getTagDocument("tag0", false, context));

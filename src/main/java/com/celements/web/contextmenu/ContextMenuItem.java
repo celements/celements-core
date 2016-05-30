@@ -34,9 +34,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class ContextMenuItem {
-  
+
   public static String CONTEXTMENUITEM_CLASSNAME = "Celements2.ContextMenuItemClass";
-  
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(ContextMenuItem.class);
 
   private String cmiLink;
@@ -72,7 +72,7 @@ public class ContextMenuItem {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {
@@ -83,8 +83,7 @@ public class ContextMenuItem {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     vcontext.put("elemId", elemId);
     vcontext.put("origElemId", origElemId);
-    List<String> elemParams = Arrays.asList(elemIdParts).subList(0,
-          elemIdParts.length - 1);
+    List<String> elemParams = Arrays.asList(elemIdParts).subList(0, elemIdParts.length - 1);
     vcontext.put("elemParams", elemParams);
     try {
       getContext().put("vcontext", vcontext.clone());
@@ -107,14 +106,12 @@ public class ContextMenuItem {
   private void addShortCutDictionary(Builder builder) {
     builder.openProperty("shortcut");
     builder.openDictionary();
-    for (String sc_condition: getShortcut().split("\\|")) {
-      if (sc_condition.startsWith("keyCode")
-          && (sc_condition.indexOf(':') > 0)) {
+    for (String sc_condition : getShortcut().split("\\|")) {
+      if (sc_condition.startsWith("keyCode") && (sc_condition.indexOf(':') > 0)) {
         String[] parts = sc_condition.split(":");
         builder.openProperty(parts[0]);
         builder.addNumber(new BigDecimal(Integer.parseInt(parts[1])));
-      } else if (sc_condition.startsWith("charCode")
-          && (sc_condition.indexOf(':') > 0)) {
+      } else if (sc_condition.startsWith("charCode") && (sc_condition.indexOf(':') > 0)) {
         String[] parts = sc_condition.split(":");
         builder.addStringProperty(parts[0], parts[1]);
       } else {

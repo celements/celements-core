@@ -54,11 +54,10 @@ public class EntityReferenceRandomCompleterTest extends AbstractBridgedComponent
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     SpaceReference entityRef = new SpaceReference("mySpace", wikiRef);
     Capture<DocumentReference> randomDocRefCapture = new Capture<>();
-    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture))).andReturn(false
-        ).once();
+    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture))).andReturn(false).once();
     replayDefault();
-    DocumentReference randomDocRef =
-        (DocumentReference) randomCompleter.randomCompleteSpaceRef(entityRef);
+    DocumentReference randomDocRef = (DocumentReference) randomCompleter.randomCompleteSpaceRef(
+        entityRef);
     assertEquals(entityRef, randomDocRef.getLastSpaceReference());
     assertEquals(randomDocRefCapture.getValue(), randomDocRef);
     verifyDefault();
@@ -69,11 +68,9 @@ public class EntityReferenceRandomCompleterTest extends AbstractBridgedComponent
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     SpaceReference entityRef = new SpaceReference("mySpace", wikiRef);
     Capture<DocumentReference> randomDocRefCapture = new Capture<>();
-    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture))).andReturn(true
-        ).once();
+    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture))).andReturn(true).once();
     Capture<DocumentReference> randomDocRefCapture2 = new Capture<>();
-    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture2))).andReturn(false
-        ).once();
+    expect(docAccessBridgeMock.exists(capture(randomDocRefCapture2))).andReturn(false).once();
     replayDefault();
     EntityReference randomDocRef = randomCompleter.randomCompleteSpaceRef(entityRef);
     verifyDefault();
@@ -82,8 +79,7 @@ public class EntityReferenceRandomCompleterTest extends AbstractBridgedComponent
     assertNotNull(docRefFirst);
     assertNotNull(docRefSecond);
     assertEquals(entityRef, docRefFirst.getLastSpaceReference());
-    assertFalse("first and second capture may not be equal", docRefFirst.equals(
-        randomDocRef));
+    assertFalse("first and second capture may not be equal", docRefFirst.equals(randomDocRef));
     assertEquals(entityRef, docRefSecond.getLastSpaceReference());
     assertEquals(docRefSecond, randomDocRef);
   }

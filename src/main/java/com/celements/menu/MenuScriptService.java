@@ -41,7 +41,7 @@ public class MenuScriptService implements ScriptService {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public List<com.xpn.xwiki.api.Object> getMenuHeaders() {

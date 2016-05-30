@@ -23,10 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PageTypeReference is used to represent one pagetype 'id'. Instances of this class
- * may be used by scripts (non privileged code). Thus be carefull to NOT expose any
- * internal classes.
- *
+ * PageTypeReference is used to represent one pagetype 'id'. Instances of this class may
+ * be used by scripts (non privileged code). Thus be carefull to NOT expose any internal
+ * classes.
  */
 public class PageTypeReference {
 
@@ -36,8 +35,7 @@ public class PageTypeReference {
 
   private List<String> categories;
 
-  public PageTypeReference(String configName, String providerHint,
-      List<String> categories) {
+  public PageTypeReference(String configName, String providerHint, List<String> categories) {
     this.configName = configName;
     this.providerHint = providerHint;
     this.categories = new ArrayList<String>(categories);

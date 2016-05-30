@@ -54,20 +54,18 @@ public class CollectionsScriptServiceTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testGetObjectsOrdered() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyPage");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyPage");
     XWikiDocument xdoc = new XWikiDocument(docRef);
-    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
-        "MyClass");
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes", "MyClass");
     expect(xwiki.getDocument(same(docRef), same(context))).andReturn(xdoc).once();
     BaseObject expectedBO = new BaseObject();
     expectedBO.setStringValue("myField", "abcd");
     List<BaseObject> expResultList = Arrays.asList(expectedBO);
-    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"),
-        eq(true), (String) isNull(), eq(false))).andReturn(expResultList);
+    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"), eq(true),
+        (String) isNull(), eq(false))).andReturn(expResultList);
     replayAll();
-    List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(
-        docRef, classRef, "myField", true);
+    List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(docRef,
+        classRef, "myField", true);
     assertNotNull(resultList);
     assertEquals(1, resultList.size());
     assertEquals("abcd", resultList.get(0).getProperty("myField").getValue());
@@ -76,20 +74,18 @@ public class CollectionsScriptServiceTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testGetObjectsOrdered_orderByTwoFields() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyPage");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyPage");
     XWikiDocument xdoc = new XWikiDocument(docRef);
-    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes",
-        "MyClass");
+    DocumentReference classRef = new DocumentReference(context.getDatabase(), "Classes", "MyClass");
     expect(xwiki.getDocument(same(docRef), same(context))).andReturn(xdoc).once();
     BaseObject expectedBO = new BaseObject();
     expectedBO.setStringValue("myField", "abcd");
     List<BaseObject> expResultList = Arrays.asList(expectedBO);
-    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"),
-        eq(true), eq("myField2"), eq(false))).andReturn(expResultList);
+    expect(mockCollService.getObjectsOrdered(same(xdoc), eq(classRef), eq("myField"), eq(true), eq(
+        "myField2"), eq(false))).andReturn(expResultList);
     replayAll();
-    List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(
-        docRef, classRef, "myField", true, "myField2", false);
+    List<com.xpn.xwiki.api.Object> resultList = collScriptService.getObjectsOrdered(docRef,
+        classRef, "myField", true, "myField2", false);
     assertNotNull(resultList);
     assertEquals(1, resultList.size());
     assertEquals("abcd", resultList.get(0).getProperty("myField").getValue());

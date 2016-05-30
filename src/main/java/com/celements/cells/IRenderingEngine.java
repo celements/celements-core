@@ -28,9 +28,7 @@ public interface IRenderingEngine {
   public void renderCell(TreeNode node);
 
   /**
-   * 
    * @param spaceName
-   * 
    * @deprecated since 2.14.0 use renderPageLayout(SpaceReference) instead.
    */
   @Deprecated

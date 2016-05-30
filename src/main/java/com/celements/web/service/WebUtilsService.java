@@ -154,8 +154,8 @@ public class WebUtilsService implements IWebUtilsService {
   public DocumentReference getParentForLevel(int level) {
     _LOGGER.trace("getParentForLevel: start for level " + level);
     DocumentReference parent = null;
-    List<DocumentReference> parentList = getDocumentParentsList(getContext().getDoc()
-        .getDocumentReference(), true);
+    List<DocumentReference> parentList = getDocumentParentsList(
+        getContext().getDoc().getDocumentReference(), true);
     int startAtItem = (parentList.size() - level) + 1;
     if ((startAtItem > -1) && (startAtItem < parentList.size())) {
       parent = parentList.get(startAtItem);
@@ -262,8 +262,8 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<String> getAllowedLanguages() {
     if ((getContext() != null) && (getContext().getDoc() != null)) {
-      return getAllowedLanguages(getContext().getDoc().getDocumentReference()
-          .getLastSpaceReference().getName());
+      return getAllowedLanguages(
+          getContext().getDoc().getDocumentReference().getLastSpaceReference().getName());
     }
     return Collections.emptyList();
   }
@@ -340,8 +340,8 @@ public class WebUtilsService implements IWebUtilsService {
   public String getAdminLanguage(DocumentReference userRef) {
     String adminLanguage = null;
     try {
-      DocumentReference xwikiUsersClassRef = new DocumentReference(userRef.getWikiReference()
-          .getName(), "XWiki", "XWikiUsers");
+      DocumentReference xwikiUsersClassRef = new DocumentReference(
+          userRef.getWikiReference().getName(), "XWiki", "XWikiUsers");
       BaseObject userObj = getContext().getWiki().getDocument(userRef, getContext()).getXObject(
           xwikiUsersClassRef);
       if (userObj != null) {
@@ -359,8 +359,8 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public String getDefaultAdminLanguage() {
     String adminLanguage;
-    adminLanguage = getContext().getWiki().getSpacePreference("admin_language", getContext()
-        .getLanguage(), getContext());
+    adminLanguage = getContext().getWiki().getSpacePreference("admin_language",
+        getContext().getLanguage(), getContext());
     if ((adminLanguage == null) || ("".equals(adminLanguage))) {
       adminLanguage = getContext().getWiki().Param("celements.admin_language");
       if ((adminLanguage == null) || ("".equals(adminLanguage))) {
@@ -488,8 +488,9 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public boolean isAdminUser() {
     try {
-      if ((getContext().getXWikiUser() != null) && (getContext().getWiki()
-          .getRightService() != null) && (getContext().getDoc() != null)) {
+      if ((getContext().getXWikiUser() != null)
+          && (getContext().getWiki().getRightService() != null)
+          && (getContext().getDoc() != null)) {
         return (getContext().getWiki().getRightService().hasAdminRights(getContext())
             || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup", getContext()));
       } else {
@@ -535,10 +536,10 @@ public class WebUtilsService implements IWebUtilsService {
       BaseObject userObj = userDoc.getXObject(resolveDocumentReference("XWiki.XWikiUsers"));
       boolean isAdvancedAdmin = isAdminUser() && (user.startsWith("xwiki:") || ((userObj != null)
           && "Advanced".equals(userObj.getStringValue("usertype"))));
-      _LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user [" + user
-          .startsWith("xwiki:") + "] usertype [" + ((userObj != null) ? userObj.getStringValue(
-              "usertype") : "null") + "] returning [" + isAdvancedAdmin + "] db [" + getContext()
-                  .getDatabase() + "].");
+      _LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user ["
+          + user.startsWith("xwiki:") + "] usertype [" + ((userObj != null)
+              ? userObj.getStringValue("usertype") : "null") + "] returning [" + isAdvancedAdmin
+          + "] db [" + getContext().getDatabase() + "].");
       return isAdvancedAdmin;
     } catch (XWikiException exp) {
       _LOGGER.error("Failed to get user document for [" + user + "].", exp);
@@ -800,8 +801,8 @@ public class WebUtilsService implements IWebUtilsService {
     MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
     for (DocumentReference parentDocRef : documentParentsList) {
       String parentDocFN = serializer_default.serialize(parentDocRef);
-      parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN, getContext()
-          .getLanguage(), getContext()) + ",";
+      parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN,
+          getContext().getLanguage(), getContext()) + ",";
       parentsListStr += parentDocFN + ",";
     }
     docData.put("parentslist", parentsListStr.replaceAll(",*$", ""));
@@ -871,9 +872,9 @@ public class WebUtilsService implements IWebUtilsService {
         _LOGGER.error("Exception with rendering content: ", exp);
       }
       try {
-        docData.put("celrenderedcontent", replaceInternalWithExternalLinks(getCelementsRenderCmd()
-            .renderCelementsDocument(xwikiDoc.getDocumentReference(), getContext().getLanguage(),
-                "view"), host));
+        docData.put("celrenderedcontent", replaceInternalWithExternalLinks(
+            getCelementsRenderCmd().renderCelementsDocument(xwikiDoc.getDocumentReference(),
+                getContext().getLanguage(), "view"), host));
       } catch (XWikiException exp) {
         _LOGGER.error("Exception with rendering content: ", exp);
       }
@@ -1142,8 +1143,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   private DocumentReference getCentralTemplateRef(DocumentReference localTemplateRef) {
-    DocumentReference centralTemplateRef = new DocumentReference("celements2web", localTemplateRef
-        .getLastSpaceReference().getName(), localTemplateRef.getName());
+    DocumentReference centralTemplateRef = new DocumentReference("celements2web",
+        localTemplateRef.getLastSpaceReference().getName(), localTemplateRef.getName());
     return centralTemplateRef;
   }
 
@@ -1434,8 +1435,8 @@ public class WebUtilsService implements IWebUtilsService {
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
     WikiReference wikiRef = getWikiRef(toRef);
     if (!docRef.getWikiReference().equals(wikiRef)) {
-      docRef = new DocumentReference(docRef.getName(), new SpaceReference(docRef
-          .getLastSpaceReference().getName(), wikiRef));
+      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
+          docRef.getLastSpaceReference().getName(), wikiRef));
     }
     return docRef;
   }
@@ -1455,8 +1456,8 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public DocumentReference setWikiReference(DocumentReference docRef, String wikiName) {
     // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    return new DocumentReference(wikiName, docRef.getLastSpaceReference().getName(), docRef
-        .getName());
+    return new DocumentReference(wikiName, docRef.getLastSpaceReference().getName(),
+        docRef.getName());
   }
 
   @Override

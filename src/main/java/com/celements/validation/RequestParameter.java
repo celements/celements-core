@@ -24,8 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 public final class RequestParameter {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      RequestParameter.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(RequestParameter.class);
 
   private final String parameterName;
   private final String className;
@@ -100,8 +99,8 @@ public final class RequestParameter {
 
   @Override
   public String toString() {
-    return "FieldName [parameterName=" + parameterName + ", className=" + className
-        + ", objectNr=" + objectNr + ", fieldName=" + fieldName + "]";
+    return "FieldName [parameterName=" + parameterName + ", className=" + className + ", objectNr="
+        + objectNr + ", fieldName=" + fieldName + "]";
   }
 
 }

@@ -33,7 +33,7 @@ public class JSONDataFieldRow implements IDataFieldRow {
 
   public void remove() {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

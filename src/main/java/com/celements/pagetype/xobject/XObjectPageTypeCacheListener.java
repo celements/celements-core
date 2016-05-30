@@ -51,8 +51,8 @@ public class XObjectPageTypeCacheListener implements EventListener {
   }
 
   public List<Event> getEvents() {
-    return Arrays.asList((Event)new XObjectPageTypeCreatedEvent(),
-         (Event)new XObjectPageTypeDeletedEvent());
+    return Arrays.asList((Event) new XObjectPageTypeCreatedEvent(),
+        (Event) new XObjectPageTypeDeletedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -62,8 +62,8 @@ public class XObjectPageTypeCacheListener implements EventListener {
           + document.getDocumentReference() + "].");
       pageTypeCache.invalidateCacheForWiki(webUtilsService.getWikiRef(document));
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "] -> skip.");
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "] -> skip.");
     }
   }
 

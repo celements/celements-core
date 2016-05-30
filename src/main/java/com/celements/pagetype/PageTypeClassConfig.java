@@ -10,10 +10,9 @@ import com.celements.web.service.IWebUtilsService;
 
 @Component
 public class PageTypeClassConfig implements IPageTypeClassConfig {
-  
+
   @Requirement
   IWebUtilsService webUtils;
-  
 
   @Override
   public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef) {
@@ -28,8 +27,8 @@ public class PageTypeClassConfig implements IPageTypeClassConfig {
 
   @Override
   public DocumentReference getPageTypeClassRef(WikiReference wikiRef) {
-    return new DocumentReference(PAGE_TYPE_CLASS_DOC, new SpaceReference(
-        PAGE_TYPE_CLASS_SPACE, wikiRef));
+    return new DocumentReference(PAGE_TYPE_CLASS_DOC, new SpaceReference(PAGE_TYPE_CLASS_SPACE,
+        wikiRef));
   }
 
 }

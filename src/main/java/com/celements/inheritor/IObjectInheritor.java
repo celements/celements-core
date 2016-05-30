@@ -29,30 +29,39 @@ import com.xpn.xwiki.objects.BaseCollection;
 public interface IObjectInheritor {
 
   public BaseCollection getObject(String key);
+
   public void setIteratorFactory(IIteratorFactory<XObjectIterator> iteratorFactory);
-  
+
   public String getStringValue(String key);
+
   public String getStringValue(String key, String defaultValue);
-  
+
   public String getLargeStringValue(String key);
+
   public String getLargeStringValue(String key, String defaultValue);
-  
+
   public int getIntValue(String key);
+
   public int getIntValue(String key, int defaultValue);
-  
-  public long getLongValue(String key); 
+
+  public long getLongValue(String key);
+
   public long getLongValue(String key, long defaultValue);
-  
+
   public float getFloatValue(String key);
+
   public float getFloatValue(String key, float defaultValue);
-  
+
   public double getDoubleValue(String key);
+
   public double getDoubleValue(String key, double defaultValue);
-  
+
   public Date getDateValue(String key);
+
   public Date getDateValue(String key, Date defaultValue);
-  
+
   public List getListValue(String key);
+
   public List getListValue(String key, List defaultValue);
-  
+
 }

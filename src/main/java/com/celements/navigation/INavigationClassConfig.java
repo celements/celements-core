@@ -9,8 +9,7 @@ public interface INavigationClassConfig {
 
   public static final String MENU_NAME_CLASS_DOC = "MenuName";
   public static final String MENU_NAME_CLASS_SPACE = "Celements2";
-  public static final String MENU_NAME_CLASS = MENU_NAME_CLASS_SPACE + "."
-      + MENU_NAME_CLASS_DOC;
+  public static final String MENU_NAME_CLASS = MENU_NAME_CLASS_SPACE + "." + MENU_NAME_CLASS_DOC;
   public static final String MENU_NAME_FIELD = "menu_name";
   public static final String MENU_NAME_IMAGE_FIELD = "image";
   public static final String MENU_NAME_TOOLTIP_FIELD = "tooltip";
@@ -19,12 +18,12 @@ public interface INavigationClassConfig {
   public static final String MAPPED_MENU_ITEM_CLASS_SPACE = "Classes";
   public static final String MAPPED_MENU_ITEM_CLASS_DOC = "MenuItemClass";
   public static final String MAPPED_MENU_ITEM_CLASS = MAPPED_MENU_ITEM_CLASS_SPACE + "."
-        + MAPPED_MENU_ITEM_CLASS_DOC;
+      + MAPPED_MENU_ITEM_CLASS_DOC;
 
   public static final String NAVIGATION_CONFIG_CLASS_DOC = "NavigationConfigClass";
   public static final String NAVIGATION_CONFIG_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
-  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE
-        + "." + NAVIGATION_CONFIG_CLASS_DOC;
+  public static final String NAVIGATION_CONFIG_CLASS = NAVIGATION_CONFIG_CLASS_SPACE + "."
+      + NAVIGATION_CONFIG_CLASS_DOC;
 
   public static final String MENU_ELEMENT_NAME_FIELD = "menu_element_name";
   public static final String FROM_HIERARCHY_LEVEL_FIELD = "from_hierarchy_level";
@@ -39,8 +38,7 @@ public interface INavigationClassConfig {
 
   public static final String MENU_ITEM_CLASS_DOC = "MenuItem";
   public static final String MENU_ITEM_CLASS_SPACE = MENU_NAME_CLASS_SPACE;
-  public static final String MENU_ITEM_CLASS = MENU_ITEM_CLASS_SPACE + "."
-        + MENU_ITEM_CLASS_DOC;
+  public static final String MENU_ITEM_CLASS = MENU_ITEM_CLASS_SPACE + "." + MENU_ITEM_CLASS_DOC;
   public static final String MENU_POSITION_FIELD = "menu_position";
   public static final String PART_NAME_FIELD = "part_name";
   public static final String TARGET_FIELD = "link_target";
@@ -48,11 +46,15 @@ public interface INavigationClassConfig {
   public DocumentReference getMenuNameClassRef(String wikiName);
 
   public DocumentReference getNavigationConfigClassRef();
+
   public DocumentReference getNavigationConfigClassRef(String wikiName);
+
   public DocumentReference getNavigationConfigClassRef(WikiReference wikiRef);
 
   public DocumentReference getMenuItemClassRef();
+
   public DocumentReference getMenuItemClassRef(String wikiName);
+
   public DocumentReference getMenuItemClassRef(WikiReference wikiRef);
 
   public DocumentReference getNewMenuItemClassRef(String wikiName);

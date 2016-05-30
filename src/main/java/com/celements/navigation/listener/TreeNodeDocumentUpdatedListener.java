@@ -45,11 +45,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("TreeNodeDocumentUpdatedListener")
-public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentListener
-    implements EventListener {
+public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentListener implements
+    EventListener {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
-      TreeNodeDocumentUpdatedListener.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(TreeNodeDocumentUpdatedListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -64,7 +63,7 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   private NavigationClasses getNavClasses() {
@@ -78,7 +77,7 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
 
   public List<Event> getEvents() {
     LOGGER.trace("TreeNodeDocumentUpdatedListener getEvents");
-    return Arrays.asList((Event)new DocumentUpdatedEvent());
+    return Arrays.asList((Event) new DocumentUpdatedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -87,9 +86,8 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
     XWikiDocument origDoc = getOrginialDocument(source);
     if ((document != null) && (origDoc != null)
         && !remoteObservationManagerContext.isRemoteState()) {
-      LOGGER.debug("TreeNodeDocumentUpdatedListener onEvent: got event for ["
-          + event.getClass() + "] on document [" + document.getDocumentReference()
-          + "].");
+      LOGGER.debug("TreeNodeDocumentUpdatedListener onEvent: got event for [" + event.getClass()
+          + "] on document [" + document.getDocumentReference() + "].");
       if (isMenuItemAdded(document, origDoc)) {
         LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs added to "
             + document.getDocumentReference() + "]");
@@ -111,8 +109,8 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
         getObservationManager().notify(updTreeNodeEvent, source, getContext());
       }
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent ["
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }
@@ -142,24 +140,24 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
         getContext().getDatabase()));
     BaseObject menuItemOrigObj = origDoc.getXObject(getNavClasses().getMenuItemClassRef(
         getContext().getDatabase()));
-    LOGGER.trace("TreeNodeDocumentUpdatedListener checkMenuItemDiffs menuItemObj ["
-        + menuItemObj + "], menuItemOrigObj [" + menuItemOrigObj + "]");
+    LOGGER.trace("TreeNodeDocumentUpdatedListener checkMenuItemDiffs menuItemObj [" + menuItemObj
+        + "], menuItemOrigObj [" + menuItemOrigObj + "]");
     if ((menuItemObj != null) && (menuItemOrigObj != null)) {
       int newPos = menuItemObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
       int oldPos = menuItemOrigObj.getIntValue(NavigationClasses.MENU_POSITION_FIELD, -1);
       String newPart = menuItemObj.getStringValue(NavigationClasses.MENU_PART_FIELD);
       String oldPart = menuItemOrigObj.getStringValue(NavigationClasses.MENU_PART_FIELD);
-      LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs newPos ["
-          + newPos + "], oldPos [" + oldPos + "]");
+      LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs newPos [" + newPos
+          + "], oldPos [" + oldPos + "]");
       if (newPos != oldPos) {
         return true;
       } else if (!StringUtils.equals(newPart, oldPart)) {
-          return true;
+        return true;
       } else {
         DocumentReference parentRef = document.getParentReference();
         DocumentReference parentOrigRef = origDoc.getParentReference();
-        LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs parentRef ["
-            + parentRef + "], parentOrigRef [" + parentOrigRef + "]");
+        LOGGER.debug("TreeNodeDocumentUpdatedListener checkMenuItemDiffs parentRef [" + parentRef
+            + "], parentOrigRef [" + parentOrigRef + "]");
         if ((parentRef != null) && (parentOrigRef != null)) {
           return !parentRef.equals(parentOrigRef);
         } else {

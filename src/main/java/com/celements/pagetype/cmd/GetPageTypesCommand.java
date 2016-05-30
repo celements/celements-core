@@ -37,8 +37,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class GetPageTypesCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      GetPageTypesCommand.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(GetPageTypesCommand.class);
 
   private String _CEL_GETXOBJ_PAGETYPES_COUNTER = "celGetXObjectPageTypesCounter";
   private String _CEL_GETXOBJ_PAGETYPES_TOTALTIME = "celGetXObjectPageTypesTotelTime";
@@ -49,7 +48,8 @@ public class GetPageTypesCommand {
 
   /**
    * @deprecated since 1.100 instead use page type script service
-   *      com.celements.pagetype.service.PageTypeScriptService.getPageTypesByCategories()
+   *             com.celements.pagetype.service.PageTypeScriptService.
+   *             getPageTypesByCategories()
    */
   @Deprecated
   public List<String> getPageTypesForCategories(Set<String> catList, boolean onlyVisible,
@@ -89,8 +89,7 @@ public class GetPageTypesCommand {
       long timeUsed = endMillis - startMillis;
       Long totalTimeUsed = 0L;
       if (getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_TOTALTIME) != null) {
-        totalTimeUsed = (Long) getExecContext().getProperty(
-            _CEL_GETXOBJ_PAGETYPES_TOTALTIME);
+        totalTimeUsed = (Long) getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_TOTALTIME);
       }
       totalTimeUsed += timeUsed;
       getExecContext().setProperty(_CEL_GETXOBJ_PAGETYPES_TOTALTIME, totalTimeUsed);
@@ -100,8 +99,8 @@ public class GetPageTypesCommand {
     return pageTypeSet;
   }
 
-  private List<String> getPageTypesForOneDatabase(Set<String> catList,
-      boolean onlyVisible, XWikiContext context) {
+  private List<String> getPageTypesForOneDatabase(Set<String> catList, boolean onlyVisible,
+      XWikiContext context) {
     List<String> result = Collections.emptyList();
     try {
       result = context.getWiki().search(getPThql(catList, onlyVisible), context);
@@ -111,8 +110,8 @@ public class GetPageTypesCommand {
     return result;
   }
 
-  private Set<String> inMemoryFilterList(Set<String> catList,
-      Set<String> pageTypeSet, XWikiContext context) {
+  private Set<String> inMemoryFilterList(Set<String> catList, Set<String> pageTypeSet,
+      XWikiContext context) {
     catList = new HashSet<String>(catList);
     Set<String> filteredPTset = new HashSet<String>();
     for (String pageTypeFN : pageTypeSet) {
@@ -133,10 +132,9 @@ public class GetPageTypesCommand {
       hql += ", IntegerProperty as visible";
     }
     hql += " where doc.space='PageTypes' and doc.translation=0 and obj.name=doc.fullName "
-      + " and obj.className='Celements2.PageTypeProperties'";
+        + " and obj.className='Celements2.PageTypeProperties'";
     if (!catList.isEmpty() && !doesContainEmptyCategory(catList)) {
-      hql += " and catName.id.id=obj.id and catName.id.name='category'"
-        + " and catName.value in (";
+      hql += " and catName.id.id=obj.id and catName.id.name='category'" + " and catName.value in (";
       for (String catString : catList) {
         hql += "'" + catString + "', ";
       }
@@ -144,8 +142,7 @@ public class GetPageTypesCommand {
       hql += ")";
     }
     if (onlyVisible) {
-      hql += " and visible.id.id=obj.id and visible.id.name='visible'"
-        + " and visible.id.value=1 ";
+      hql += " and visible.id.id=obj.id and visible.id.name='visible'" + " and visible.id.value=1 ";
     }
     return hql;
   }

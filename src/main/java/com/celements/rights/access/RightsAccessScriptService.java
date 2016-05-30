@@ -50,8 +50,8 @@ public class RightsAccessScriptService implements ScriptService {
     return rightsAccess.hasAccessLevel(ref, level, user);
   }
 
-  public boolean hasAccessLevel(DocumentReference docRef, EAccessLevel level,
-      XWikiUser user, EPubUnpub unpublished) {
+  public boolean hasAccessLevel(DocumentReference docRef, EAccessLevel level, XWikiUser user,
+      EPubUnpub unpublished) {
     pubSrv.overridePubUnpub(unpublished);
     return hasAccessLevel(docRef, level, user);
   }

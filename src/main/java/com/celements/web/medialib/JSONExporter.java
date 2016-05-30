@@ -22,18 +22,19 @@ package com.celements.web.medialib;
 public class JSONExporter {
 
   private static JSONExporter exporter;
-  
-  private JSONExporter() { }
-  
+
+  private JSONExporter() {
+  }
+
   public static JSONExporter getInstance() {
-    if(exporter == null) {
+    if (exporter == null) {
       exporter = new JSONExporter();
     }
     return exporter;
   }
-  
+
   public String export(IDataProvider dataProvider) {
-    //TODO implement
+    // TODO implement
     return null;
   }
 }

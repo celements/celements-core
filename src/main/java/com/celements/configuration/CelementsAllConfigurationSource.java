@@ -38,8 +38,8 @@ import org.xwiki.configuration.internal.CompositeConfigurationSource;
  * Should be used when a configuration can be overriden by the user in his/her profile.
  */
 @Component("all")
-public class CelementsAllConfigurationSource extends CompositeConfigurationSource
-    implements Initializable {
+public class CelementsAllConfigurationSource extends CompositeConfigurationSource implements
+    Initializable {
 
   @Requirement("xwikiproperties")
   ConfigurationSource xwikiPropertiesSource;

@@ -23,7 +23,7 @@ import com.xpn.xwiki.web.Utils;
 @Component("treeNode")
 public class TreeNodeScriptService implements ScriptService {
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(TreeNodeScriptService.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(TreeNodeScriptService.class);
 
   @Requirement
   ITreeNodeService treeNodeService;
@@ -81,26 +81,26 @@ public class TreeNodeScriptService implements ScriptService {
   public int queryCount() {
     return treeNodeCache.queryCount();
   }
-  
+
   public String navReorderSave(DocumentReference docRef, String structureJSON) {
-    return new ReorderSaveCommand().reorderSave(getWebUtilsService(
-        ).getRefDefaultSerializer().serialize(docRef), structureJSON, getContext());
+    return new ReorderSaveCommand().reorderSave(
+        getWebUtilsService().getRefDefaultSerializer().serialize(docRef), structureJSON,
+        getContext());
   }
-  
+
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
     return getEmptyCheckService().getNextNonEmptyChildren(documentRef);
   }
-  
+
   private IEmptyCheckRole getEmptyCheckService() {
     return Utils.getComponent(IEmptyCheckRole.class);
   }
-  
+
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
-  public void moveTreeDocAfter(DocumentReference moveDocRef,
-      DocumentReference insertAfterDocRef) {
+  public void moveTreeDocAfter(DocumentReference moveDocRef, DocumentReference insertAfterDocRef) {
     try {
       treeNodeService.moveTreeDocAfter(moveDocRef, insertAfterDocRef);
     } catch (XWikiException exp) {

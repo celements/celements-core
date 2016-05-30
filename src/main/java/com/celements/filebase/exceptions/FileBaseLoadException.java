@@ -1,6 +1,5 @@
 package com.celements.filebase.exceptions;
 
-
 public class FileBaseLoadException extends Exception {
 
   private static final long serialVersionUID = -2592241907630457229L;

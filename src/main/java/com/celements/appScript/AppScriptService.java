@@ -24,7 +24,7 @@ import com.xpn.xwiki.util.Util;
 public class AppScriptService implements IAppScriptService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(AppScriptService.class);
-  
+
   @Requirement
   IEmptyCheckRole emptyCheck;
 
@@ -33,12 +33,12 @@ public class AppScriptService implements IAppScriptService {
 
   @Requirement
   Execution execution;
-  
+
   @Requirement
   EntityReferenceValueProvider defaultEntityReferenceValueProvider;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public int getStartIndex(String path) {
@@ -47,35 +47,30 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public String getAppActionName() {
-    return getContext().getWiki().Param(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY,
-        APP_SCRIPT_XPAGE);
+    return getContext().getWiki().Param(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY, APP_SCRIPT_XPAGE);
   }
 
   public boolean hasDocAppScript(String scriptName) {
-    boolean hasDocAppScript = hasLocalAppScript(scriptName)
-        || hasCentralAppScript(scriptName);
+    boolean hasDocAppScript = hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
     LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "] hasDocAppScript ["
         + hasDocAppScript + "]");
     return hasDocAppScript;
   }
 
   public boolean hasLocalAppScript(String scriptName) {
-    return !"".equals(scriptName) && docAppScriptExists(getLocalAppScriptDocRef(
-        scriptName));
+    return !"".equals(scriptName) && docAppScriptExists(getLocalAppScriptDocRef(scriptName));
   }
 
   private boolean docAppScriptExists(DocumentReference appScriptDocRef) {
-    boolean existsAppScriptDoc = getContext().getWiki().exists(appScriptDocRef,
-        getContext());
+    boolean existsAppScriptDoc = getContext().getWiki().exists(appScriptDocRef, getContext());
     boolean isNotEmptyAppScriptDoc = !emptyCheck.isEmptyRTEDocument(appScriptDocRef);
-    LOGGER.debug("docAppScriptExists check [" + appScriptDocRef + "]: exists ["
-        + existsAppScriptDoc + "] isNotEmpty [" + isNotEmptyAppScriptDoc + "]");
+    LOGGER.debug("docAppScriptExists check [" + appScriptDocRef + "]: exists [" + existsAppScriptDoc
+        + "] isNotEmpty [" + isNotEmptyAppScriptDoc + "]");
     return (existsAppScriptDoc && isNotEmptyAppScriptDoc);
   }
 
   public boolean hasCentralAppScript(String scriptName) {
-    return !"".equals(scriptName) && docAppScriptExists(getCentralAppScriptDocRef(
-        scriptName));
+    return !"".equals(scriptName) && docAppScriptExists(getCentralAppScriptDocRef(scriptName));
   }
 
   public DocumentReference getAppScriptDocRef(String scriptName) {
@@ -87,8 +82,7 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public DocumentReference getLocalAppScriptDocRef(String scriptName) {
-    return new DocumentReference(getContext().getDatabase(), APP_SCRIPT_SPACE_NAME,
-        scriptName);
+    return new DocumentReference(getContext().getDatabase(), APP_SCRIPT_SPACE_NAME, scriptName);
   }
 
   public DocumentReference getCentralAppScriptDocRef(String scriptName) {
@@ -104,12 +98,10 @@ public class AppScriptService implements IAppScriptService {
       String path = "/templates/" + getAppScriptTemplatePath(scriptName);
       LOGGER.debug("isAppScriptAvailable: check on [" + path + "].");
       getContext().getWiki().getResourceContentAsBytes(path);
-      LOGGER.trace("isAppScriptAvailable: Successful got app script [" + scriptName
-          + "].");
+      LOGGER.trace("isAppScriptAvailable: Successful got app script [" + scriptName + "].");
       return true;
     } catch (IOException exp) {
-      LOGGER.debug("isAppScriptAvailable: Failed to get app script [" + scriptName + "].",
-          exp);
+      LOGGER.debug("isAppScriptAvailable: Failed to get app script [" + scriptName + "].", exp);
       return false;
     }
   }
@@ -125,11 +117,10 @@ public class AppScriptService implements IAppScriptService {
     if (queryString.length() > 0 && !queryString.startsWith("/&")) {
       queryString = "&" + queryString;
     }
-    queryString = "xpage=" + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName 
-        + queryString;
+    queryString = "xpage=" + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName + queryString;
     if (scriptName.split("/").length <= 2) {
-      return getContext().getWiki().getURL(webUtils.resolveDocumentReference(
-          scriptName.replaceAll("/", ".")), "view", queryString, null, getContext());
+      return getContext().getWiki().getURL(webUtils.resolveDocumentReference(scriptName.replaceAll(
+          "/", ".")), "view", queryString, null, getContext());
     } else {
       return Util.escapeURL("/app/" + scriptName + "?" + queryString);
     }
@@ -142,8 +133,7 @@ public class AppScriptService implements IAppScriptService {
 
   public String getScriptNameFromDocRef(DocumentReference docRef) {
     String spaceName = docRef.getLastSpaceReference().getName();
-    if (spaceName.equals(defaultEntityReferenceValueProvider.getDefaultValue(
-          EntityType.SPACE))) {
+    if (spaceName.equals(defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE))) {
       return docRef.getName();
     } else {
       return spaceName + "/" + docRef.getName();
@@ -161,10 +151,9 @@ public class AppScriptService implements IAppScriptService {
   }
 
   public boolean isAppScriptRequest() {
-    //TODO exclude isOverlayRequest
-    return isAppScriptXpageRequest() || isAppScriptActionRequest()
-        || isAppScriptSpaceRequest() || isAppScriptOverwriteDocRef(
-            getContext().getDoc().getDocumentReference());
+    // TODO exclude isOverlayRequest
+    return isAppScriptXpageRequest() || isAppScriptActionRequest() || isAppScriptSpaceRequest()
+        || isAppScriptOverwriteDocRef(getContext().getDoc().getDocumentReference());
   }
 
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
@@ -174,12 +163,11 @@ public class AppScriptService implements IAppScriptService {
     if (!"-".equals(overwriteAppDocs)) {
       for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
         try {
-          DocumentReference overwAppDocRef = webUtils.resolveDocumentReference(
-              overwAppDocFN);
+          DocumentReference overwAppDocRef = webUtils.resolveDocumentReference(overwAppDocFN);
           overwAppDocList.add(overwAppDocRef);
         } catch (Exception exp) {
-          LOGGER.warn("Failed to parse appScript overwrite docs config part ["
-              + overwAppDocFN+ "] of complete config [" + overwriteAppDocs + "].");
+          LOGGER.warn("Failed to parse appScript overwrite docs config part [" + overwAppDocFN
+              + "] of complete config [" + overwriteAppDocs + "].");
         }
       }
     }
@@ -188,23 +176,22 @@ public class AppScriptService implements IAppScriptService {
 
   private boolean isAppScriptActionRequest() {
     Object appAction = getContext().get("appAction");
-    return (appAction != null) && ((Boolean)appAction);
+    return (appAction != null) && ((Boolean) appAction);
   }
 
   private boolean isAppScriptSpaceRequest() {
-    return "view".equals(getContext().getAction()) && getContext().getDoc(
-        ).getDocumentReference().getSpaceReferences().contains(getCurrentSpaceRef());
+    return "view".equals(getContext().getAction())
+        && getContext().getDoc().getDocumentReference().getSpaceReferences().contains(
+            getCurrentSpaceRef());
   }
 
   private SpaceReference getCurrentSpaceRef() {
-    return new SpaceReference(APP_SCRIPT_XPAGE, new WikiReference(getContext(
-        ).getDatabase()));
+    return new SpaceReference(APP_SCRIPT_XPAGE, new WikiReference(getContext().getDatabase()));
   }
 
   private boolean isAppScriptXpageRequest() {
     String xpageStr = getContext().getRequest().getParameter("xpage");
-    return APP_SCRIPT_XPAGE.equals(xpageStr)
-        && (getAppScriptNameFromRequestURL() != null);
+    return APP_SCRIPT_XPAGE.equals(xpageStr) && (getAppScriptNameFromRequestURL() != null);
   }
 
   String getAppScriptNameFromRequestURL() {

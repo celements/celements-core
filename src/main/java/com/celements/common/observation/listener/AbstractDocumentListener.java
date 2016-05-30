@@ -20,16 +20,16 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   protected void onLocalEvent(Event event, Object source, Object data) {
     XWikiDocument doc = (XWikiDocument) source;
     if (doc != null) {
-      getLogger().debug("onLocalEvent: got event '{}' on doc '{}'", event.getClass(), 
+      getLogger().debug("onLocalEvent: got event '{}' on doc '{}'", event.getClass(),
           doc.getDocumentReference());
       Event notifyEvent = getNotifyEvent(event, doc);
       if (notifyEvent != null) {
-        getLogger().debug("onLocalEvent: notifying event '{}' on doc '{}'", 
-            notifyEvent.getClass(), doc.getDocumentReference());
+        getLogger().debug("onLocalEvent: notifying event '{}' on doc '{}'", notifyEvent.getClass(),
+            doc.getDocumentReference());
         getObservationManager().notify(notifyEvent, source, getContext());
       } else {
-        getLogger().trace("onLocalEvent: skipped notifying event for event '{}' "
-            + "on doc '{}'", event.getClass(), doc.getDocumentReference());
+        getLogger().trace("onLocalEvent: skipped notifying event for event '{}' " + "on doc '{}'",
+            event.getClass(), doc.getDocumentReference());
       }
     }
   }
@@ -37,16 +37,18 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   @Override
   protected void onRemoteEvent(Event event, Object source, Object data) {
     if (getLogger().isTraceEnabled()) {
-      getLogger().trace("onRemoteEvent: skipped event '{}' on source '{}', data '{}'", 
+      getLogger().trace("onRemoteEvent: skipped event '{}' on source '{}', data '{}'",
           event.getClass(), source, data);
     }
   }
 
   /**
-   * @param event may not be null
-   * @param doc may not be null
-   * @return next event to notify on {@link ObservationManager}, null indicating nothing 
-   * to notify
+   * @param event
+   *          may not be null
+   * @param doc
+   *          may not be null
+   * @return next event to notify on {@link ObservationManager}, null indicating nothing
+   *         to notify
    */
   protected abstract Event getNotifyEvent(Event event, XWikiDocument doc);
 
@@ -58,11 +60,11 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
     }
     return bObj;
   }
-  
+
   /**
    * @param wikiRef
-   * @return the class ref for the object required on the triggered doc to qualify for 
-   * this listener
+   * @return the class ref for the object required on the triggered doc to qualify for
+   *         this listener
    */
   protected abstract DocumentReference getRequiredObjClassRef(WikiReference wikiRef);
 
@@ -77,16 +79,18 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   }
 
   /**
-   * Returns a new instance of the associated creating event or null of if listening on 
+   * Returns a new instance of the associated creating event or null of if listening on
    * {@link DocumentCreatingEvent}s is not required
+   * 
    * @param docRef
    * @return
    */
   protected abstract Event getCreatingEvent(DocumentReference docRef);
 
   /**
-   * Returns a new instance of the associated created event or null of if listening on 
+   * Returns a new instance of the associated created event or null of if listening on
    * {@link DocumentCreatedEvent}s is not required
+   * 
    * @param docRef
    * @return
    */
@@ -103,16 +107,18 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   }
 
   /**
-   * Returns a new instance of the associated updating event or null of if listening on 
+   * Returns a new instance of the associated updating event or null of if listening on
    * {@link DocumentUpdatingEvent}s is not required
+   * 
    * @param docRef
    * @return
    */
   protected abstract Event getUpdatingEvent(DocumentReference docRef);
 
   /**
-   * Returns a new instance of the associated updated event or null of if listening on 
+   * Returns a new instance of the associated updated event or null of if listening on
    * {@link DocumentUpdatedEvent}s is not required
+   * 
    * @param docRef
    * @return
    */
@@ -129,30 +135,30 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   }
 
   /**
-   * Returns a new instance of the associated deleting event or null of if listening on 
+   * Returns a new instance of the associated deleting event or null of if listening on
    * {@link DocumentDeletingEvent}s is not required
+   * 
    * @param docRef
    * @return
    */
   protected abstract Event getDeletingEvent(DocumentReference docRef);
 
   /**
-   * Returns a new instance of the associated deleted event or null of if listening on 
+   * Returns a new instance of the associated deleted event or null of if listening on
    * {@link DocumentDeletedEvent}s is not required
+   * 
    * @param docRef
    * @return
    */
   protected abstract Event getDeletedEvent(DocumentReference docRef);
 
   private boolean isEventING(Event event) {
-    return (event instanceof DocumentCreatingEvent) 
-        || (event instanceof DocumentUpdatingEvent)
+    return (event instanceof DocumentCreatingEvent) || (event instanceof DocumentUpdatingEvent)
         || (event instanceof DocumentDeletingEvent);
   }
 
   private boolean isEventED(Event event) {
-    return (event instanceof DocumentCreatedEvent) 
-        || (event instanceof DocumentUpdatedEvent)
+    return (event instanceof DocumentCreatedEvent) || (event instanceof DocumentUpdatedEvent)
         || (event instanceof DocumentDeletedEvent);
   }
 

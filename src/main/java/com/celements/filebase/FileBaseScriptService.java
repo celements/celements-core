@@ -23,11 +23,11 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 @Component("filebase")
 public class FileBaseScriptService implements ScriptService {
-  
+
   @Requirement
   IWebUtilsService webUtilsService;
-  
-  private static Logger _LOGGER  = LoggerFactory.getLogger(FileBaseScriptService.class);
+
+  private static Logger _LOGGER = LoggerFactory.getLogger(FileBaseScriptService.class);
 
   @Requirement
   IAttachmentServiceRole attachmentService;
@@ -39,22 +39,22 @@ public class FileBaseScriptService implements ScriptService {
     return attachmentService.clearFileName(fileName);
   }
 
-  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
+  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName,
       String userToken) {
     return tokenBasedUpload(attachToDocRef, fieldName, userToken, false);
   }
-  
-  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, 
-      String userToken, Boolean createIfNotExists) {
+
+  public int tokenBasedUpload(DocumentReference attachToDocRef, String fieldName, String userToken,
+      Boolean createIfNotExists) {
     try {
-      return new TokenBasedUploadCommand().tokenBasedUploadDocRef(attachToDocRef,
-          fieldName, userToken, createIfNotExists);
+      return new TokenBasedUploadCommand().tokenBasedUploadDocRef(attachToDocRef, fieldName,
+          userToken, createIfNotExists);
     } catch (XWikiException exp) {
       _LOGGER.error("token based attachment upload failed: ", exp);
     }
     return 0;
   }
-  
+
   public int deleteAttachmentList(List<AttachmentReference> attachmentRefList) {
     return attachmentService.deleteAttachmentList(attachmentRefList);
   }
@@ -70,22 +70,22 @@ public class FileBaseScriptService implements ScriptService {
     } catch (FileNotExistsException e) {
       _LOGGER.trace("Filebase could not find file [" + filename + "]");
     } catch (NoAccessRightsException nare) {
-      _LOGGER.info("User {} was refused {} access on file base document {}", 
-          nare.getUser(), nare.getExpectedAccessLevel(), nare.getEntityRef());
+      _LOGGER.info("User {} was refused {} access on file base document {}", nare.getUser(),
+          nare.getExpectedAccessLevel(), nare.getEntityRef());
     }
     return null;
   }
 
-  public List<Attachment> getFilesNameMatch(IAttachmentMatcher attMatcher
-      ) throws FileBaseLoadException {
+  public List<Attachment> getFilesNameMatch(IAttachmentMatcher attMatcher)
+      throws FileBaseLoadException {
     List<XWikiAttachment> xwikiAttList = filebaseService.getFilesNameMatch(attMatcher);
     List<Attachment> attList = new ArrayList<Attachment>();
-    for(XWikiAttachment xwikiAtt : xwikiAttList) {
+    for (XWikiAttachment xwikiAtt : xwikiAttList) {
       try {
         attList.add(attachmentService.getApiAttachment(xwikiAtt));
       } catch (NoAccessRightsException nare) {
-        _LOGGER.info("User {} was refused {} access on file base document {}", 
-            nare.getUser(), nare.getExpectedAccessLevel(), nare.getEntityRef());
+        _LOGGER.info("User {} was refused {} access on file base document {}", nare.getUser(),
+            nare.getExpectedAccessLevel(), nare.getEntityRef());
       }
     }
     return attList;

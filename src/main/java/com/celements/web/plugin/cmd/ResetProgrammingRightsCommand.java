@@ -49,8 +49,7 @@ public class ResetProgrammingRightsCommand {
             + context.getUser() + "] in database [" + context.getDatabase() + "].");
         transaction.commit();
       } catch (XWikiException exp) {
-        mLogger.error("resetCelements2webRights: failed to get a hibernate session: ",
-            exp);
+        mLogger.error("resetCelements2webRights: failed to get a hibernate session: ", exp);
       } finally {
         context.setDatabase(tenantDbName);
       }
@@ -59,8 +58,7 @@ public class ResetProgrammingRightsCommand {
   }
 
   private Session getNewHibSession(XWikiContext context) throws XWikiException {
-    Session session = context.getWiki().getHibernateStore().getSessionFactory(
-        ).openSession();
+    Session session = context.getWiki().getHibernateStore().getSessionFactory().openSession();
     context.getWiki().getHibernateStore().setDatabase(session, context);
     return session;
   }

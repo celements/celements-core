@@ -14,11 +14,11 @@ import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.StringProperty;
 
-public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase{
-  
+public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase {
+
   @Before
   public void setUp_BaseObjectComparatorTest() throws Exception {
-    
+
   }
 
   @Test
@@ -30,7 +30,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase{
     obj2.setStringValue("x", "b");
     assertTrue(comp.compare(obj1, obj2) > 0);
   }
-  
+
   @Test
   public void testCompare_onlyOneSort_inverted() {
     BaseObjectComparator comp = new BaseObjectComparator("x", false, "y", false);
@@ -100,7 +100,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase{
     obj2.setLongValue("y", 3);
     assertTrue(comp.compare(obj1, obj2) < 0);
   }
-  
+
   @Test
   public void testCompare_secondSort_inverted() {
     BaseObjectComparator comp = new BaseObjectComparator("x", false, "y", false);
@@ -190,7 +190,7 @@ public class BaseObjectComparatorTest extends AbstractBridgedComponentTestCase{
     prop2.setValue(new Date(541342131));
     assertEquals(-1, comp.compareField(prop1, prop2));
   }
-  
+
   @Test
   public void testGetValue() {
     BaseObjectComparator comp = new BaseObjectComparator("x", true, "y", true);

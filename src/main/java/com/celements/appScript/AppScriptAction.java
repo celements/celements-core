@@ -29,9 +29,9 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiAction;
 
 /**
- * Action called when the request URL has the "/app/" string in its path (this
- * is configured in <code>struts-config.xml</code>. It means the request is to
- * execute an application script and display its result in view mode.
+ * Action called when the request URL has the "/app/" string in its path (this is
+ * configured in <code>struts-config.xml</code>. It means the request is to execute an
+ * application script and display its result in view mode.
  * 
  * @version $Id$
  */

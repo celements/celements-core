@@ -17,40 +17,35 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class DefaultPresentationType implements IPresentationTypeRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      DefaultPresentationType.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(DefaultPresentationType.class);
 
-  private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS =
-    "cel_cm_navigation_menuitem";
+  private static final String _CEL_CM_NAV_MI_DEFAULT_CSSCLASS = "cel_cm_navigation_menuitem";
 
   @Requirement
   Execution execution;
 
   @Requirement
   IWebUtilsService webUtilsService;
-  
+
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
-
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
-      INavigation navigation) {
+  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
     try {
       LOGGER.debug("writeNodeContent for [" + docRef + "].");
-      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem,
-          navigation);
+      appendMenuItemLink(outStream, isFirstItem, isLastItem, docRef, isLeaf, numItem, navigation);
     } catch (XWikiException exp) {
       LOGGER.error("Failed to writeNodeContent for docRef [" + docRef + "].", exp);
     }
   }
 
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
-      INavigation nav) throws XWikiException {
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
+          throws XWikiException {
     String fullName = webUtilsService.getRefLocalSerializer().serialize(docRef);
     String tagName;
     if (nav.hasLink()) {
@@ -66,17 +61,14 @@ public class DefaultPresentationType implements IPresentationTypeRole {
       menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),
           getContext());
     }
-    String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(),
-        getContext());
+    String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(), getContext());
     if (!"".equals(tooltip)) {
       menuItemHTML += " " + tooltip;
     }
     String menuName = menuNameCmd.getMultilingualMenuName(fullName, nav.getNavLanguage(),
         getContext());
-    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
-        numItem);
-    menuItemHTML += " " + nav.addUniqueElementId(docRef)
-      + ">" + menuName + "</" + tagName + ">";
+    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem);
+    menuItemHTML += " " + nav.addUniqueElementId(docRef) + ">" + menuName + "</" + tagName + ">";
     outStream.append(menuItemHTML);
   }
 

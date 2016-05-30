@@ -19,7 +19,6 @@
  */
 package com.celements.navigation.cmd;
 
-
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -35,8 +34,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-public class GetMappedMenuItemsForParentCommandTest
-  extends AbstractBridgedComponentTestCase {
+public class GetMappedMenuItemsForParentCommandTest extends AbstractBridgedComponentTestCase {
 
   private GetMappedMenuItemsForParentCommand _getMenuItemsCmd;
   private XWikiContext _context;
@@ -54,20 +52,18 @@ public class GetMappedMenuItemsForParentCommandTest
   public void testGetTreeNodesForParentKey_emptyResult() throws XWikiException {
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     expect(_xwiki.getStore()).andReturn(store).anyTimes();
-    expect(store.searchDocumentsNames((String)anyObject(), eq(0), eq(0),
-        (List<?>)anyObject(), same(_context))).andReturn(new ArrayList<String>()
-            ).anyTimes();
+    expect(store.searchDocumentsNames((String) anyObject(), eq(0), eq(0), (List<?>) anyObject(),
+        same(_context))).andReturn(new ArrayList<String>()).anyTimes();
     replay(_xwiki, store);
     assertNotNull(_getMenuItemsCmd.getTreeNodesForParentKey("", _context));
     assertEquals(0, _getMenuItemsCmd.getTreeNodesForParentKey("", _context).size());
     verify(_xwiki, store);
   }
-  
+
   @Test
   public void testGetTreeNodesForParentKey_notActive() throws XWikiException {
     _getMenuItemsCmd.set_isActive(false);
-    assertEquals(0, _getMenuItemsCmd.getTreeNodesForParentKey("Space.Doc", _context
-        ).size());
+    assertEquals(0, _getMenuItemsCmd.getTreeNodesForParentKey("Space.Doc", _context).size());
   }
 
   @Test

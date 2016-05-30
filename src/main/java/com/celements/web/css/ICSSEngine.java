@@ -27,16 +27,16 @@ import com.xpn.xwiki.objects.BaseObject;
 public interface ICSSEngine {
 
   /**
-   * 
    * @param css
    * @param field
    * @param baseCSSList
    * @param context
    * @return the returned list is XWikiContext dependent and therefore may not be cached
-   *         or similar. The list is as a consequence too not thread safe.
-   *         TODO: Fix mix of API and backend. Extract business objects (controller)
-   *         from CSS classes and use them here.
+   *         or similar. The list is as a consequence too not thread safe. TODO: Fix mix
+   *         of API and backend. Extract business objects (controller) from CSS classes
+   *         and use them here.
    */
-  public List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList, XWikiContext context);
+  public List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
+      XWikiContext context);
 
 }

@@ -33,9 +33,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celCellsClasses")
 public class CellsClasses extends AbstractClassCollection {
 
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CellsClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CellsClasses.class);
 
   @Requirement
   ICellsClassConfig cellsClassConfig;
@@ -44,28 +42,25 @@ public class CellsClasses extends AbstractClassCollection {
    * @deprecated instead use ICellsClassConfig
    */
   @Deprecated
-  public static final String CELEMENTS_CELL_CLASS_SPACE = 
-      ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE;
+  public static final String CELEMENTS_CELL_CLASS_SPACE = ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE;
   /**
    * @deprecated instead use ICellsClassConfig
    */
   @Deprecated
-  public static final String CELEMENTS_CELL_CLASS_NAME =
-      ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME;
+  public static final String CELEMENTS_CELL_CLASS_NAME = ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME;
   /**
    * @deprecated instead use ICellsClassConfig
    */
   @Deprecated
-  public static final String CELEMENTS_CELL_CLASS =
-      ICellsClassConfig.CELEMENTS_CELL_CLASS;
+  public static final String CELEMENTS_CELL_CLASS = ICellsClassConfig.CELEMENTS_CELL_CLASS;
   /**
    * @deprecated instead use ICellsClassConfig
    */
   @Deprecated
-  public static final String CELLCLASS_IDNAME_FIELD =
-      ICellsClassConfig.CELLCLASS_IDNAME_FIELD;
+  public static final String CELLCLASS_IDNAME_FIELD = ICellsClassConfig.CELLCLASS_IDNAME_FIELD;
 
-  public CellsClasses() {}
+  public CellsClasses() {
+  }
 
   @Override
   protected void initClasses() throws XWikiException {
@@ -91,8 +86,7 @@ public class CellsClasses extends AbstractClassCollection {
    */
   @Deprecated
   public DocumentReference getCellClassRef(String wikiName) {
-    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE,
-        CELEMENTS_CELL_CLASS_NAME);
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME);
   }
 
   BaseClass getCellClass() throws XWikiException {
@@ -113,12 +107,12 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField(CELLCLASS_IDNAME_FIELD, "id attribute", 30);
     needsUpdate |= bclass.addTextField("css_classes", "CSS Classes", 30);
     needsUpdate |= bclass.addTextAreaField("css_styles", "CSS Styles", 15, 20);
-    
-    if(!"internal".equals(bclass.getCustomMapping())){
+
+    if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
       bclass.setCustomMapping("internal");
     }
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
@@ -136,16 +130,15 @@ public class CellsClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
     DocumentReference pageLayoutPropertiesClassRef = getPageLayoutPropertiesClassRef(
         getContext().getDatabase());
-    
+
     try {
-      doc = getContext().getWiki().getDocument(pageLayoutPropertiesClassRef,
-          getContext());
+      doc = getContext().getWiki().getDocument(pageLayoutPropertiesClassRef, getContext());
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get pageLayoutProperties class document.", exp);
       doc = new XWikiDocument(pageLayoutPropertiesClassRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(pageLayoutPropertiesClassRef);
     needsUpdate |= bclass.addTextField("prettyname", "Layout Pretty Name", 30);
@@ -153,14 +146,14 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("authors", "Authors", 30);
     needsUpdate |= bclass.addTextAreaField("license", "License", 15, 30);
     needsUpdate |= bclass.addTextField("version", "Version", 30);
-    needsUpdate |= bclass.addStaticListField("doctype", "Doctype", 1, false, 
-        "XHTML 1.1|HTML 5", "select");
-    
-    if(!"internal".equals(bclass.getCustomMapping())){
+    needsUpdate |= bclass.addStaticListField("doctype", "Doctype", 1, false, "XHTML 1.1|HTML 5",
+        "select");
+
+    if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
       bclass.setCustomMapping("internal");
     }
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
@@ -176,9 +169,8 @@ public class CellsClasses extends AbstractClassCollection {
   BaseClass getGroupCellClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference groupCellClassRef = getGroupCellClassRef(getContext().getDatabase()
-        );
-    
+    DocumentReference groupCellClassRef = getGroupCellClassRef(getContext().getDatabase());
+
     try {
       doc = getContext().getWiki().getDocument(groupCellClassRef, getContext());
     } catch (XWikiException exp) {
@@ -186,11 +178,11 @@ public class CellsClasses extends AbstractClassCollection {
       doc = new XWikiDocument(groupCellClassRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(groupCellClassRef);
     needsUpdate |= bclass.addTextField("render_layout", "Render Layout", 30);
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
@@ -229,12 +221,11 @@ public class CellsClasses extends AbstractClassCollection {
   BaseClass getTranslationBoxCellConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference translationBoxCellConfigClassRef =
-        cellsClassConfig.getTranslationBoxCellConfigClassRef(getContext().getDatabase());
+    DocumentReference translationBoxCellConfigClassRef = cellsClassConfig.getTranslationBoxCellConfigClassRef(
+        getContext().getDatabase());
 
     try {
-      doc = getContext().getWiki().getDocument(translationBoxCellConfigClassRef,
-          getContext());
+      doc = getContext().getWiki().getDocument(translationBoxCellConfigClassRef, getContext());
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get pageDepCellConfig class document.", exp);
       doc = new XWikiDocument(translationBoxCellConfigClassRef);

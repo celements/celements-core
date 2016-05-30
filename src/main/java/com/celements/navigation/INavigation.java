@@ -33,9 +33,10 @@ public interface INavigation {
 
   /**
    * setFromHierarchyLevel
-   * @param fromHierarchyLevel starting (including) at Hierarchy Level
-   *          1 = mainMenu , 0 = spaceMenu (including all first mainMenuItems
-   *           of all Spaces)
+   * 
+   * @param fromHierarchyLevel
+   *          starting (including) at Hierarchy Level 1 = mainMenu , 0 = spaceMenu
+   *          (including all first mainMenuItems of all Spaces)
    */
   public void setFromHierarchyLevel(int fromHierarchyLevel);
 
@@ -43,16 +44,17 @@ public interface INavigation {
 
   /**
    * setToHierarchyLevel
-   * @param toHierarchyLevel ending (including) with Hierarchy Level
+   * 
+   * @param toHierarchyLevel
+   *          ending (including) with Hierarchy Level
    */
   public void setToHierarchyLevel(int toHierarchyLevel);
 
   public void setMenuPart(String menuPart);
 
   /**
-   * 
-   * @param menuSpace (default: $doc.web)
-   * 
+   * @param menuSpace
+   *          (default: $doc.web)
    * @deprecated since 2.24.0 instead use setNodeSpace
    */
   @Deprecated
@@ -133,25 +135,25 @@ public interface INavigation {
 
   public String addUniqueElementId(DocumentReference docRef);
 
-  public String addCssClasses(DocumentReference docRef, boolean withCM,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem);
+  public String addCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
+      boolean isLastItem, boolean isLeaf, int numItem);
 
   public void setPresentationType(String presentationTypeHint);
-  
+
   public void setOffset(int offset);
-  
+
   public int getOffset();
 
   public void setNumberOfItem(int nrOfItem);
 
   public int getNumberOfItem();
-  
+
   /**
    * use hasMore() instead
    */
   @Deprecated
   public int getEffectiveNumberOfItems();
-  
+
   public boolean hasMore();
 
 }

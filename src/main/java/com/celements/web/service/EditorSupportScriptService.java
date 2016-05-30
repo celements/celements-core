@@ -17,40 +17,39 @@ import com.celements.web.utils.SuggestBaseClass;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("editorsupport")
-public class EditorSupportScriptService  implements ScriptService{
-    
-    @Requirement
-    private IFormValidationServiceRole formValidation;
-    
-    @Requirement
-    private Execution execution;
+public class EditorSupportScriptService implements ScriptService {
 
-    private XWikiContext getContext() {
-      return (XWikiContext)execution.getContext().getProperty("xwikicontext");
-    }
-    
-    public Map<ValidationType, Set<String>> validateField(String className, String fieldName, String value) {
-      return formValidation.validateField(className, fieldName, value);
-    }
-    
-    public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
-      return formValidation.validateRequest();
-    }
-    
-    public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference,
-        String fieldname) {
-      return new SuggestBaseClass(classreference, fieldname, getContext());
-    }
-    
-    public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
-        String input) {
-      return new SuggestListCommand().getSuggestList(classRef, fieldname, null, input, "",
-          "", 0, getContext());
-    }
-    
-    public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
-        List<String> excludes, String input, String firstCol, String secCol, int limit) {
-      return new SuggestListCommand().getSuggestList(classRef, fieldname, excludes,
-          input, firstCol, secCol, limit, getContext());
-    }
+  @Requirement
+  private IFormValidationServiceRole formValidation;
+
+  @Requirement
+  private Execution execution;
+
+  private XWikiContext getContext() {
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
+      String value) {
+    return formValidation.validateField(className, fieldName, value);
+  }
+
+  public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
+    return formValidation.validateRequest();
+  }
+
+  public SuggestBaseClass getSuggestBaseClass(DocumentReference classreference, String fieldname) {
+    return new SuggestBaseClass(classreference, fieldname, getContext());
+  }
+
+  public List<Object> getSuggestList(DocumentReference classRef, String fieldname, String input) {
+    return new SuggestListCommand().getSuggestList(classRef, fieldname, null, input, "", "", 0,
+        getContext());
+  }
+
+  public List<Object> getSuggestList(DocumentReference classRef, String fieldname,
+      List<String> excludes, String input, String firstCol, String secCol, int limit) {
+    return new SuggestListCommand().getSuggestList(classRef, fieldname, excludes, input, firstCol,
+        secCol, limit, getContext());
+  }
 }

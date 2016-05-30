@@ -1,6 +1,5 @@
 package com.celements.appScript;
 
-
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,7 +28,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
   public void setUp_AppScriptServiceTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    appScriptService = (AppScriptService)Utils.getComponent(IAppScriptService.class);
+    appScriptService = (AppScriptService) Utils.getComponent(IAppScriptService.class);
     preseveEmptyCheck = appScriptService.emptyCheck;
     emptyCheckMock = createMockAndAddToDefault(IEmptyCheckRole.class);
     appScriptService.emptyCheck = emptyCheckMock;
@@ -37,14 +36,14 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
   @After
   public void tearDown_AppScriptServiceTest() {
-     appScriptService.emptyCheck = preseveEmptyCheck;
+    appScriptService.emptyCheck = preseveEmptyCheck;
   }
 
   @Test
   public void testGetStartIndex_Space_Action() {
     String myAppScriptPath = "/app/myAppScript";
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq(IAppScriptService.APP_SCRIPT_XPAGE))).andReturn(
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        IAppScriptService.APP_SCRIPT_XPAGE))).andReturn(
             IAppScriptService.APP_SCRIPT_XPAGE).atLeastOnce();
     replayDefault();
     int startIndex = appScriptService.getStartIndex(myAppScriptPath);
@@ -54,8 +53,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsAppScriptRequest_appXpage() {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "noScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
@@ -64,9 +63,9 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.login").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.login").anyTimes();
     replayAll(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyAll(mockRequest);
@@ -104,14 +103,14 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "login");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "login");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.login,Content.WhatsNew").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.login,Content.WhatsNew").anyTimes();
     replayAll(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyAll(mockRequest);
@@ -122,14 +121,14 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "login");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "login");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.WhatsNew Content.login").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.WhatsNew Content.login").anyTimes();
     replayAll(mockRequest);
     assertTrue(appScriptService.isAppScriptRequest());
     verifyAll(mockRequest);
@@ -140,13 +139,13 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "login");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "login");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"),
-        eq("com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
+    expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"), eq(
+        "com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
             "-").anyTimes();
     replayAll(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
@@ -158,13 +157,13 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "noScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"),
-        eq("com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
+    expect(xwiki.getXWikiPreference(eq("appScriptOverwriteDocs"), eq(
+        "com.celements.appScript.overwriteDocs"), eq("-"), same(context))).andReturn(
             "-").anyTimes();
     replayAll(mockRequest);
     assertFalse(appScriptService.isAppScriptRequest());
@@ -173,8 +172,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAppScriptNameFromRequestURL_appXpage() {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "noScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
@@ -183,9 +182,9 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.login").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.login").anyTimes();
     replayAll(mockRequest);
     assertEquals("myScript", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
@@ -197,16 +196,16 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "pathTo", "myScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "pathTo",
+        "myScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn("/" +
-        IAppScriptService.APP_SCRIPT_XPAGE + "/pathTo/myScript").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq("app"))).andReturn("app").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/" + IAppScriptService.APP_SCRIPT_XPAGE
+        + "/pathTo/myScript").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        "app"))).andReturn("app").anyTimes();
     replayAll(mockRequest);
     assertEquals("pathTo/myScript", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
@@ -218,20 +217,18 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "pathTo", "pathTo2");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "pathTo",
+        "pathTo2");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn("/" +
-        IAppScriptService.APP_SCRIPT_XPAGE + "/pathTo/pathTo2/myScript"
-        ).anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq("app"))).andReturn("app").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/" + IAppScriptService.APP_SCRIPT_XPAGE
+        + "/pathTo/pathTo2/myScript").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        "app"))).andReturn("app").anyTimes();
     replayAll(mockRequest);
-    assertEquals("pathTo/pathTo2/myScript",
-        appScriptService.getAppScriptNameFromRequestURL());
+    assertEquals("pathTo/pathTo2/myScript", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
   }
 
@@ -246,10 +243,10 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn("/" +
-        IAppScriptService.APP_SCRIPT_XPAGE + "/myScript").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq("app"))).andReturn("app").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/" + IAppScriptService.APP_SCRIPT_XPAGE
+        + "/myScript").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        "app"))).andReturn("app").anyTimes();
     replayAll(mockRequest);
     assertEquals("myScript", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
@@ -260,17 +257,17 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "noScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq("app"))).andReturn("app").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.login").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        "app"))).andReturn("app").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.login").anyTimes();
     replayAll(mockRequest);
     assertEquals("", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
@@ -281,18 +278,18 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "login");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "login");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/login").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq("app"))).andReturn("app").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.WhatsNew Content.login").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        "app"))).andReturn("app").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.WhatsNew Content.login").anyTimes();
     replayAll(mockRequest);
     assertEquals("login", appScriptService.getAppScriptNameFromRequestURL());
     verifyAll(mockRequest);
@@ -304,24 +301,23 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "sub", "testScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "sub",
+        "testScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY),
-        eq("app"))).andReturn("app").anyTimes();
+    expect(xwiki.Param(eq(IAppScriptService.APP_SCRIPT_ACTION_NAME_CONF_PROPERTY), eq(
+        "app"))).andReturn("app").anyTimes();
     DocumentReference appScriptDocRef = new DocumentReference(context.getDatabase(),
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
     expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false);
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "sub/testScript");
     expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false);
-    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false
-        ).anyTimes();
-    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(false
-        ).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(
+        false).anyTimes();
     replayAll(mockRequest);
     assertFalse(appScriptService.hasDocAppScript("sub/testScript"));
     verifyAll(mockRequest);
@@ -333,8 +329,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "sub", "testScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "sub",
+        "testScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
@@ -351,8 +347,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "testScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "testScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
@@ -362,14 +358,13 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(true).anyTimes();
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false
-        ).anyTimes();
+    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(false).anyTimes();
     XWikiDocument appScriptDoc = new XWikiDocument(appScriptDocRef);
     appScriptDoc.setContent("this is no empty script!");
-    expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(appScriptDoc
-        ).anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME),
-        eq("celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
+    expect(xwiki.getDocument(eq(appScriptDocRef), same(context))).andReturn(
+        appScriptDoc).anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IEmptyCheckRole.EMPTYCHECK_MODULS_PREF_NAME), eq(
+        "celements.emptycheckModuls"), eq("default"), same(context))).andReturn(
             "default").anyTimes();
     replayAll(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference(context.getDatabase(),
@@ -384,8 +379,8 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     context.setRequest(mockRequest);
     context.setAction("view");
     context.put("appAction", true);
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "testScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "testScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
@@ -395,16 +390,14 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(appScriptDocRef), same(context))).andReturn(false).anyTimes();
     DocumentReference centralAppScriptDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
-    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(true
-        ).anyTimes();
+    expect(xwiki.exists(eq(centralAppScriptDocRef), same(context))).andReturn(true).anyTimes();
     XWikiDocument appScriptDoc = new XWikiDocument(appScriptDocRef);
     appScriptDoc.setContent("this is no empty script!");
     expect(xwiki.getDocument(eq(centralAppScriptDocRef), same(context))).andReturn(
         appScriptDoc).anyTimes();
-    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false
-        ).anyTimes();
-    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(true
-        ).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(appScriptDocRef))).andReturn(false).anyTimes();
+    expect(emptyCheckMock.isEmptyRTEDocument(eq(centralAppScriptDocRef))).andReturn(
+        true).anyTimes();
     replayAll(mockRequest);
     DocumentReference expectedAppDocRef = new DocumentReference("celements2web",
         IAppScriptService.APP_SCRIPT_SPACE_NAME, "testScript");
@@ -417,15 +410,15 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Main", "WebHome");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Main.WebHome").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Main.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("").anyTimes();
     replayAll(mockRequest);
     assertEquals("WebHome", appScriptService.getScriptNameFromURL());
@@ -437,15 +430,14 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Main", "Test");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main", "Test");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Main.Test").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Main.Test").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Main/Test").anyTimes();
     replayAll(mockRequest);
     assertEquals("Test", appScriptService.getScriptNameFromURL());
@@ -457,15 +449,15 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Test", "WebHome");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Test",
+        "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Test.WebHome").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Test.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Test/WebHome").anyTimes();
     replayAll(mockRequest);
     assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
@@ -477,15 +469,15 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Test", "WebHome");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Test",
+        "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Test.WebHome").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Test.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Test/").anyTimes();
     replayAll(mockRequest);
     assertEquals("Test/WebHome", appScriptService.getScriptNameFromURL());
@@ -497,15 +489,15 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("view");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Main", "WebHome");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Main.WebHome").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Main.WebHome").anyTimes();
     expect(mockRequest.getPathInfo()).andReturn("/Main/WebHome").anyTimes();
     replayAll(mockRequest);
     assertEquals("WebHome", appScriptService.getScriptNameFromURL());
@@ -517,17 +509,16 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
     context.setRequest(mockRequest);
     context.setAction("export");
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "TestSpace", "TestScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "TestSpace",
+        "TestScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     expect(mockRequest.getParameter(eq("xpage"))).andReturn("").anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("TestSpace.TestScript").anyTimes();
-    expect(mockRequest.getPathInfo()).andReturn("/export/TestSpace/TestScript"
-        ).anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "TestSpace.TestScript").anyTimes();
+    expect(mockRequest.getPathInfo()).andReturn("/export/TestSpace/TestScript").anyTimes();
     replayAll(mockRequest);
     assertEquals("TestSpace/TestScript", appScriptService.getScriptNameFromURL());
     verifyAll(mockRequest);
@@ -535,8 +526,7 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetScriptNameFromDocRef_defaultSpace() {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Main",
-        "WebHome");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Main", "WebHome");
     replayAll();
     assertEquals("WebHome", appScriptService.getScriptNameFromDocRef(docRef));
     verifyAll();
@@ -547,73 +537,68 @@ public class AppScriptServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "ScriptSpace",
         "TestScript");
     replayAll();
-    assertEquals("ScriptSpace/TestScript", appScriptService.getScriptNameFromDocRef(
-        docRef));
+    assertEquals("ScriptSpace/TestScript", appScriptService.getScriptNameFromDocRef(docRef));
     verifyAll();
   }
-  
+
   @Test
   public void testGetAppScriptURL_queryString_queryStringEmpty() {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
-        "someSpace", "someDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "someSpace", "someDoc");
     String scriptName = "someSpace/someDoc";
 
-    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc"), 
+    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc"),
         (String) isNull(), same(context))).andReturn("theURL").once();
-    
+
     replayAll();
     assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, null));
     verifyAll();
   }
-  
+
   @Test
   public void testGetAppScriptURL() {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
-        "someSpace", "someDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "someSpace", "someDoc");
     String scriptName = "someSpace/someDoc";
     String queryString = "string=a{sd]f&string2=a[sd}f";
 
-    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" 
-        + queryString), (String) isNull(), same(context))).andReturn("theURL").once();
-    
+    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" + queryString),
+        (String) isNull(), same(context))).andReturn("theURL").once();
+
     replayAll();
     assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, queryString));
     verifyAll();
   }
-  
+
   @Test
   public void testGetAppScriptURL_queryStringWithAmp() {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), 
-        "someSpace", "someDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "someSpace", "someDoc");
     String scriptName = "someSpace/someDoc";
     String queryString = "&string=a{sd]f&string2=a[sd}f";
 
-    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" 
-        + queryString), (String) isNull(), same(context))).andReturn("theURL").once();
-    
+    expect(xwiki.getURL(eq(docRef), eq("view"), eq("xpage=app&s=someSpace/someDoc&" + queryString),
+        (String) isNull(), same(context))).andReturn("theURL").once();
+
     replayAll();
     assertEquals("theURL", appScriptService.getAppScriptURL(scriptName, queryString));
     verifyAll();
   }
-  
+
   @Test
   public void testGetAppScriptURL_longName() {
     String scriptName = "path/to/my/appscript";
     String queryString = "string=a{sd]f&string2=a[sd}f";
-    
+
     replayAll();
     String url = appScriptService.getAppScriptURL(scriptName, queryString);
-    assertEquals("/app/" + scriptName + "?xpage=app&s=" + scriptName 
+    assertEquals("/app/" + scriptName + "?xpage=app&s=" + scriptName
         + "&string=a%7Bsd%5Df&string2=a%5Bsd%7Df", url);
     verifyAll();
   }
 
-
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replayDefault(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verifyDefault(mocks);
   }
 

@@ -12,14 +12,14 @@ public class PossibleLoginsCommand {
     String possibleLogins = getContext().getWiki().getXWikiPreference(
         OldCoreClasses.XWIKI_PREFERENCES_CELLOGIN_PROPERTY, "celements.login.userfields",
         "loginname", getContext());
-    if((possibleLogins == null) || "".equals(possibleLogins.trim())) {
+    if ((possibleLogins == null) || "".equals(possibleLogins.trim())) {
       possibleLogins = "loginname";
     }
     return possibleLogins;
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {

@@ -38,11 +38,9 @@ public interface IPageType {
 
   public boolean showFrame() throws XWikiException;
 
-  public com.xpn.xwiki.api.Object getPageTypeProperties()
-      throws XWikiException;
+  public com.xpn.xwiki.api.Object getPageTypeProperties() throws XWikiException;
 
-  public String getRenderTemplate(String renderMode)
-      throws XWikiException;
+  public String getRenderTemplate(String renderMode) throws XWikiException;
 
   public boolean hasPageTitle();
 

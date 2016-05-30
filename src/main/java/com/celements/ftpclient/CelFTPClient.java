@@ -26,8 +26,8 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
 
   /** A convenience method for connecting and logging in */
   @Override
-  public boolean connectAndLogin (String host, Integer port, String userName, String password
-      ) throws  IOException, UnknownHostException, FTPConnectionClosedException {
+  public boolean connectAndLogin(String host, Integer port, String userName, String password)
+      throws IOException, UnknownHostException, FTPConnectionClosedException {
     boolean success = false;
     if (port != null) {
       connect(host, port);
@@ -37,7 +37,7 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
     int reply = getReplyCode();
     if (FTPReply.isPositiveCompletion(reply))
       enterLocalPassiveMode();
-      success = login(userName, password);
+    success = login(userName, password);
     if (!success)
       disconnect();
     return success;
@@ -45,15 +45,17 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
 
   /** A convenience method for connecting and logging in */
   @Override
-  public boolean connectAndLogin (String host, String userName, String password
-      ) throws  IOException, UnknownHostException, FTPConnectionClosedException {
+  public boolean connectAndLogin(String host, String userName, String password) throws IOException,
+      UnknownHostException, FTPConnectionClosedException {
     return connectAndLogin(host, null, userName, password);
   }
-  
-  /** Turn passive transfer mode on or off. If Passive mode is active, a
-    * PASV command to be issued and interpreted before data transfers;
-    * otherwise, a PORT command will be used for data transfers. If you're
-    * unsure which one to use, you probably want Passive mode to be on. */
+
+  /**
+   * Turn passive transfer mode on or off. If Passive mode is active, a PASV command to be
+   * issued and interpreted before data transfers; otherwise, a PORT command will be used
+   * for data transfers. If you're unsure which one to use, you probably want Passive mode
+   * to be on.
+   */
   @Override
   public void setPassiveMode(boolean setPassive) {
     if (setPassive)
@@ -61,44 +63,45 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
     else
       enterLocalActiveMode();
   }
-  
+
   /** Use ASCII mode for file transfers */
   @Override
-  public boolean ascii () throws IOException {
+  public boolean ascii() throws IOException {
     return setFileType(FTP.ASCII_FILE_TYPE);
   }
-  
+
   /** Use Binary mode for file transfers */
   @Override
-  public boolean binary () throws IOException {
+  public boolean binary() throws IOException {
     return setFileType(FTP.BINARY_FILE_TYPE);
   }
-  
+
   /** Download a file from the server, and save it to the specified local file */
   @Override
-  public boolean downloadFile (String serverFile, String localFile)
-      throws IOException, FTPConnectionClosedException {
+  public boolean downloadFile(String serverFile, String localFile) throws IOException,
+      FTPConnectionClosedException {
     FileOutputStream out = new FileOutputStream(localFile);
     boolean result = retrieveFile(serverFile, out);
     out.close();
     return result;
   }
-  
+
   /** Upload a file to the server */
   @Override
-  public boolean uploadFile (String localFile, String serverFile) 
-      throws IOException, FTPConnectionClosedException {
+  public boolean uploadFile(String localFile, String serverFile) throws IOException,
+      FTPConnectionClosedException {
     FileInputStream in = new FileInputStream(localFile);
     boolean result = storeFile(serverFile, in);
     in.close();
     return result;
   }
-  
-  /** Get the list of files in the current directory as a Vector of Strings 
-    * (excludes subdirectories) */
+
+  /**
+   * Get the list of files in the current directory as a Vector of Strings (excludes
+   * subdirectories)
+   */
   @Override
-  public List<String> listFileNames () 
-      throws IOException, FTPConnectionClosedException {
+  public List<String> listFileNames() throws IOException, FTPConnectionClosedException {
     FTPFile[] files = listFiles();
     Vector<String> v = new Vector<String>();
     for (int i = 0; i < files.length; i++) {
@@ -107,12 +110,13 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
     }
     return v;
   }
-  
-  /** Get the list of subdirectories in the current directory as a Vector of Strings 
-    * (excludes files) */
+
+  /**
+   * Get the list of subdirectories in the current directory as a Vector of Strings
+   * (excludes files)
+   */
   @Override
-  public List<String> listSubdirNames () throws IOException,
-      FTPConnectionClosedException {
+  public List<String> listSubdirNames() throws IOException, FTPConnectionClosedException {
     FTPFile[] files = listFiles();
     Vector<String> v = new Vector<String>();
     for (int i = 0; i < files.length; i++) {
@@ -128,7 +132,7 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
       if (isConnected() && sendNoOp()) {
         return true;
       }
-    } catch(IOException exp) {
+    } catch (IOException exp) {
       _LOGGER.debug("isConnected failed with ioException.", exp);
     }
     return false;

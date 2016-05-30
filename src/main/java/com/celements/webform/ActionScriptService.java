@@ -15,37 +15,34 @@ import com.xpn.xwiki.api.Document;
 
 @Component("action")
 public class ActionScriptService implements ScriptService {
-  
+
   @Requirement
   private IActionServiceRole actionService;
-  
+
   @Requirement
   private Execution execution;
-  
+
   @SuppressWarnings("unchecked")
   public boolean executeAction(Document actionDoc) {
-    return actionService.executeAction(actionDoc, getContext().getRequest(
-        ).getParameterMap(), getContext().getDoc(), getContext());
+    return actionService.executeAction(actionDoc, getContext().getRequest().getParameterMap(),
+        getContext().getDoc(), getContext());
   }
-  
-  public boolean executeAction(Document actionDoc, 
-      Map<String, List<Object>> fakeRequestMap) {
+
+  public boolean executeAction(Document actionDoc, Map<String, List<Object>> fakeRequestMap) {
     Map<String, String[]> requestMap = new HashMap<String, String[]>();
     for (String key : fakeRequestMap.keySet()) {
       if (fakeRequestMap.get(key) != null) {
-        ArrayList<String> stringArray = new ArrayList<String>(fakeRequestMap.get(key
-            ).size());
+        ArrayList<String> stringArray = new ArrayList<String>(fakeRequestMap.get(key).size());
         for (Object value : fakeRequestMap.get(key)) {
           stringArray.add(value.toString());
         }
         requestMap.put(key, stringArray.toArray(new String[0]));
       }
     }
-    return actionService.executeAction(actionDoc, requestMap, getContext().getDoc(), 
-        getContext());
+    return actionService.executeAction(actionDoc, requestMap, getContext().getDoc(), getContext());
   }
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 }

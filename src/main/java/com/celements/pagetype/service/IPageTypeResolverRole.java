@@ -32,9 +32,9 @@ public interface IPageTypeResolverRole {
   public PageTypeReference getPageTypeRefForCurrentDoc();
 
   /**
-   * getPageTypeObject returns the page-type object attached to the given checkDoc.
-   * If the checkDoc isNew and thus has no objects it falls back to the wikiTemplateDoc
-   * in case one is defined in the request.
+   * getPageTypeObject returns the page-type object attached to the given checkDoc. If the
+   * checkDoc isNew and thus has no objects it falls back to the wikiTemplateDoc in case
+   * one is defined in the request.
    * 
    * @param checkDocRef
    * @return page-type object or null if non is present
@@ -42,8 +42,8 @@ public interface IPageTypeResolverRole {
   public BaseObject getPageTypeObject(XWikiDocument checkDocRef);
 
   /**
-   * getPageTypeRefForDoc gets the PageTypeRef defined by the PageType-xobject attached
-   * to the given document. It returns null if no valid PageType-xobject is found.
+   * getPageTypeRefForDoc gets the PageTypeRef defined by the PageType-xobject attached to
+   * the given document. It returns null if no valid PageType-xobject is found.
    * 
    * @param checkDoc
    * @return
@@ -51,8 +51,8 @@ public interface IPageTypeResolverRole {
   public PageTypeReference getPageTypeRefForDoc(XWikiDocument checkDoc);
 
   /**
-   * getDefaultPageTypeRefForDoc returns the PageTypeReference which is defined as
-   * default PageType in the current location (docRef).
+   * getDefaultPageTypeRefForDoc returns the PageTypeReference which is defined as default
+   * PageType in the current location (docRef).
    * 
    * @param docRef
    * @return
@@ -60,8 +60,8 @@ public interface IPageTypeResolverRole {
   public PageTypeReference getDefaultPageTypeRefForDoc(DocumentReference docRef);
 
   /**
-   * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the
-   * given document reference. If no explicit page-type is defined it returns the default
+   * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the given
+   * document reference. If no explicit page-type is defined it returns the default
    * PageTypeReference defined for the given document location.
    * 
    * @param docRef
@@ -70,8 +70,8 @@ public interface IPageTypeResolverRole {
   public PageTypeReference getPageTypeRefForDocWithDefault(DocumentReference docRef);
 
   /**
-   * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the
-   * given document. If no explicit page-type is defined it returns the default
+   * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the given
+   * document. If no explicit page-type is defined it returns the default
    * PageTypeReference defined for the given document location.
    * 
    * @param doc
@@ -80,8 +80,8 @@ public interface IPageTypeResolverRole {
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc);
 
   /**
-   * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the
-   * given document. If no explicit page-type is defined it returns the default
+   * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the given
+   * document. If no explicit page-type is defined it returns the default
    * PageTypeReference given by the caller.
    * 
    * @param doc

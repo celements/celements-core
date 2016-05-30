@@ -62,11 +62,10 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     setupImageCaptchaVerifierMock();
   }
 
-  public void setupImageCaptchaVerifierMock() throws Exception,
-      ComponentLifecycleException {
+  public void setupImageCaptchaVerifierMock() throws Exception, ComponentLifecycleException {
     origImgCaptchaVerifier = Utils.getComponent(CaptchaVerifier.class, "image");
-    captchaVerifyerDesc = getComponentManager().getComponentDescriptor(
-        CaptchaVerifier.class, "image");
+    captchaVerifyerDesc = getComponentManager().getComponentDescriptor(CaptchaVerifier.class,
+        "image");
     getComponentManager().release(origImgCaptchaVerifier);
     imgCaptchaVerifierMock = createMockAndAddToDefault(CaptchaVerifier.class);
     getComponentManager().registerComponent(captchaVerifyerDesc, imgCaptchaVerifierMock);
@@ -85,8 +84,8 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     expect(requestMock.get(eq("captcha_answer"))).andReturn(expectedAnwser).atLeastOnce();
     expect(requestMock.get(eq("captcha_type"))).andReturn("image").atLeastOnce();
     expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).atLeastOnce();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))
-        ).andReturn(true).once();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))).andReturn(
+        true).once();
     replayDefault();
     assertTrue(captchaService.checkCaptcha());
     verifyDefault();
@@ -98,8 +97,8 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     expect(requestMock.get(eq("captcha_answer"))).andReturn(wrongAnwser).atLeastOnce();
     expect(requestMock.get(eq("captcha_type"))).andReturn("image").atLeastOnce();
     expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).atLeastOnce();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(wrongAnwser))
-        ).andReturn(false).once();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(wrongAnwser))).andReturn(
+        false).once();
     replayDefault();
     assertFalse(captchaService.checkCaptcha());
     verifyDefault();
@@ -131,8 +130,8 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     expect(requestMock.get(eq("captcha_answer"))).andReturn(wrongAnwser).atLeastOnce();
     expect(requestMock.get(eq("captcha_type"))).andReturn("image").atLeastOnce();
     expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).atLeastOnce();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(wrongAnwser))
-        ).andThrow(new Exception()).once();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(wrongAnwser))).andThrow(
+        new Exception()).once();
     replayDefault();
     assertFalse(captchaService.checkCaptcha());
     verifyDefault();
@@ -144,10 +143,10 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     expect(requestMock.get(eq("captcha_answer"))).andReturn(expectedAnwser).atLeastOnce();
     expect(requestMock.get(eq("captcha_type"))).andReturn("image").atLeastOnce();
     expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).atLeastOnce();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))
-        ).andReturn(true).once();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))
-        ).andReturn(false).anyTimes();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))).andReturn(
+        true).once();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))).andReturn(
+        false).anyTimes();
     replayDefault();
     assertTrue(captchaService.checkCaptcha());
     // check answer caching
@@ -161,10 +160,10 @@ public class CaptchaServiceTest extends AbstractBridgedComponentTestCase {
     expect(requestMock.get(eq("captcha_answer"))).andReturn(expectedAnwser).atLeastOnce();
     expect(requestMock.get(eq("captcha_type"))).andReturn("image").atLeastOnce();
     expect(requestMock.get(eq("captcha_id"))).andReturn(sessionId).atLeastOnce();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))
-        ).andReturn(false).once();
-    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))
-        ).andReturn(false).anyTimes();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))).andReturn(
+        false).once();
+    expect(imgCaptchaVerifierMock.isAnswerCorrect(eq(sessionId), eq(expectedAnwser))).andReturn(
+        false).anyTimes();
     replayDefault();
     assertFalse(captchaService.checkCaptcha());
     // check answer caching

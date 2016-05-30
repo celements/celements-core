@@ -25,11 +25,9 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   public void setUp_WikiCreatedEventListenerTest() throws Exception {
     listener = (WikiCreatedEventListener) Utils.getComponent(EventListener.class,
         "celements.mandatory.WikiCreatedEventListener");
-    remoteObsMngContextMock = createMockAndAddToDefault(
-        RemoteObservationManagerContext.class);
+    remoteObsMngContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;
-    mandatoryDocCmpMock = createMockAndAddToDefault(
-        IMandatoryDocumentCompositorRole.class);
+    mandatoryDocCmpMock = createMockAndAddToDefault(IMandatoryDocumentCompositorRole.class);
     listener.mandatoryDocCmp = mandatoryDocCmpMock;
   }
 
@@ -48,11 +46,11 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   public void testOnEvent() {
     String database = "db";
     Event event = new WikiCreatedEvent(database);
-    
+
     expect(remoteObsMngContextMock.isRemoteState()).andReturn(false).atLeastOnce();
     mandatoryDocCmpMock.checkAllMandatoryDocuments();
     expectLastCall().andDelegateTo(new TestMandatoryDocumentCompositor(database)).once();
-    
+
     String db = getContext().getDatabase();
     replayDefault();
     listener.onEvent(event, null, null);
@@ -63,16 +61,16 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   @Test
   public void testOnEvent_remote() {
     expect(remoteObsMngContextMock.isRemoteState()).andReturn(true).atLeastOnce();
-    
+
     replayDefault();
     listener.onEvent(new WikiCreatedEvent(), null, null);
     verifyDefault();
   }
 
   private class TestMandatoryDocumentCompositor implements IMandatoryDocumentCompositorRole {
-    
+
     private final String database;
-    
+
     TestMandatoryDocumentCompositor(String database) {
       this.database = database;
     }
@@ -81,7 +79,7 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
     public void checkAllMandatoryDocuments() {
       assertEquals(database, getContext().getDatabase());
     }
-    
+
   }
 
 }

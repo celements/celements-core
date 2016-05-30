@@ -29,8 +29,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class InternalRightsFilter implements INavFilter<BaseObject> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      InternalRightsFilter.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(InternalRightsFilter.class);
   private String menuPart;
 
   public InternalRightsFilter() {
@@ -44,8 +43,8 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context) {
     try {
       return context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-          baseObj.getName(), context) && ("".equals(getMenuPart())
-              || getMenuPart().equals(baseObj.getStringValue("part_name")));
+          baseObj.getName(), context) && ("".equals(getMenuPart()) || getMenuPart().equals(
+              baseObj.getStringValue("part_name")));
     } catch (XWikiException e) {
       LOGGER.error(e);
       return false;
@@ -65,7 +64,9 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
 
   /**
    * includeTreeNode
-   * @param node MUST NOT be null
+   * 
+   * @param node
+   *          MUST NOT be null
    * @param context
    */
   public boolean includeTreeNode(TreeNode node, XWikiContext context) {
@@ -80,8 +81,8 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
   }
 
   private boolean checkMenuPart(TreeNode node, XWikiContext context) {
-    return ("".equals(getMenuPart()) || ("".equals(node.getParent())
-        && getMenuPart().equals(node.getPartName(context))));
+    return ("".equals(getMenuPart()) || ("".equals(node.getParent()) && getMenuPart().equals(
+        node.getPartName(context))));
   }
 
 }

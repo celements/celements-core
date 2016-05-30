@@ -41,38 +41,36 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
 
   @Override
   public XWikiUser checkAuth(XWikiContext context) throws XWikiException {
-    if ((context.getResponse() != null)
-        && !"".equals(context.getWiki().Param("celements.auth.P3P", ""))) {
-      context.getResponse().addHeader("P3P", "CP=\"" + context.getWiki().Param(
-          "celements.auth.P3P") + "\"");
+    if ((context.getResponse() != null) && !"".equals(context.getWiki().Param("celements.auth.P3P",
+        ""))) {
+      context.getResponse().addHeader("P3P", "CP=\"" + context.getWiki().Param("celements.auth.P3P")
+          + "\"");
     }
     if (context.getRequest() != null) {
       String token = context.getRequest().getParameter("token");
       String username = context.getRequest().getParameter("username");
       boolean hasToken = (token != null) && !"".equals(token);
       if (hasToken && (username != null) && !"".equals(username)) {
-        LOGGER.info("trying to authenticate user [" + username + "] with token ["
-            + hasToken + "].");
-          XWikiUser tokenUser = checkAuthByToken(username, token, context);
-          if (tokenUser != null) {
-            return tokenUser;
-          }
+        LOGGER.info("trying to authenticate user [" + username + "] with token [" + hasToken
+            + "].");
+        XWikiUser tokenUser = checkAuthByToken(username, token, context);
+        if (tokenUser != null) {
+          return tokenUser;
+        }
       }
-      LOGGER.info("checkAuth for token skipped or failed. user [" + username
-          + "] with token [" + hasToken + "].");
+      LOGGER.info("checkAuth for token skipped or failed. user [" + username + "] with token ["
+          + hasToken + "].");
     }
     return super.checkAuth(context);
   }
 
-  public XWikiUser checkAuthByToken(String loginname, String userToken,
-      XWikiContext context) throws XWikiException {
+  public XWikiUser checkAuthByToken(String loginname, String userToken, XWikiContext context)
+      throws XWikiException {
     if ((loginname != null) && !"".equals(loginname)) {
       String usernameByToken = getUsernameForToken(userToken, context);
-      if((usernameByToken != null) && !usernameByToken.equals("")
-          && (usernameByToken.equals("XWiki." + loginname) 
-          || usernameByToken.equals("xwiki:XWiki." + loginname))){
-        LOGGER.info("checkAuthByToken: user " + usernameByToken
-            + " identified by userToken.");
+      if ((usernameByToken != null) && !usernameByToken.equals("") && (usernameByToken.equals(
+          "XWiki." + loginname) || usernameByToken.equals("xwiki:XWiki." + loginname))) {
+        LOGGER.info("checkAuthByToken: user " + usernameByToken + " identified by userToken.");
         context.setUser(usernameByToken);
         return context.getXWikiUser();
       } else {
@@ -82,50 +80,47 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
     return null;
   }
 
-  public String getUsernameForToken(String userToken, XWikiContext context
-      ) throws XWikiException{
+  public String getUsernameForToken(String userToken, XWikiContext context) throws XWikiException {
 
     String hashedCode = encryptString("hash:SHA-512:", userToken);
     String userDoc = "";
-    
-    if((userToken != null) && (userToken.trim().length() > 0)){
-      
+
+    if ((userToken != null) && (userToken.trim().length() > 0)) {
+
       String hql = ", BaseObject as obj, Classes.TokenClass as token where ";
       hql += "doc.space='XWiki' ";
       hql += "and obj.name=doc.fullName ";
       hql += "and token.tokenvalue=? ";
       hql += "and token.validuntil>=? ";
       hql += "and obj.id=token.id ";
-      
+
       List<Object> parameterList = new Vector<Object>();
       parameterList.add(hashedCode);
       parameterList.add(new Date());
-      
+
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-      LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found "
-          + users.size() + " with parameters "
-          + Arrays.deepToString(parameterList.toArray()));
-      if(users == null || users.size() == 0) {
+      LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found " + users.size()
+          + " with parameters " + Arrays.deepToString(parameterList.toArray()));
+      if (users == null || users.size() == 0) {
         String db = context.getDatabase();
         context.setDatabase("xwiki");
         users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
         LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found "
-            + users.size() + " with parameters "
-            + Arrays.deepToString(parameterList.toArray()));
-        if(users != null && users.size() == 1) {
+            + users.size() + " with parameters " + Arrays.deepToString(parameterList.toArray()));
+        if (users != null && users.size() == 1) {
           users.add("xwiki:" + users.remove(0));
         }
         context.setDatabase(db);
       }
       int usersFound = 0;
       for (String tmpUserDoc : users) {
-        if(!tmpUserDoc.trim().equals("")) {
+        if (!tmpUserDoc.trim().equals("")) {
           usersFound++;
           userDoc = tmpUserDoc;
         }
       }
-      if(usersFound > 1){
+      if (usersFound > 1) {
         LOGGER.warn("Found more than one user for token '" + userToken + "'");
         return null;
       }
@@ -139,5 +134,5 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
   String encryptString(String encoding, String str) {
     return new PasswordClass().getEquivalentPassword(encoding, str);
   }
-  
+
 }

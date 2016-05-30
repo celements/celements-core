@@ -19,7 +19,6 @@
  */
 package com.celements.navigation.cmd;
 
-
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -47,23 +46,22 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
   public void testGetHandler() {
     restrSaveCmd.injected_Handler(null);
     assertNotNull(restrSaveCmd.getHandler(context));
-    assertEquals("Expecting RestructureSaveHandler handler.",
-        ReorderSaveHandler.class, restrSaveCmd.getHandler(context).getClass());
+    assertEquals("Expecting RestructureSaveHandler handler.", ReorderSaveHandler.class,
+        restrSaveCmd.getHandler(context).getClass());
   }
 
   @Test
   public void testInjected_Handler() {
     restrSaveCmd.injected_Handler(mockHandler);
     assertNotNull(restrSaveCmd.getHandler(context));
-    assertSame("Expecting injected handler object.",
-        mockHandler, restrSaveCmd.getHandler(context));
+    assertSame("Expecting injected handler object.", mockHandler, restrSaveCmd.getHandler(context));
   }
 
   @Test
   public void testRestructureSave() {
     String structureJSON = "[{\"CN1:MySpace.MyDoc\": [\"LIN1:MyDoc.Node1\","
-      + " \"LIN1:MyDoc.Node2\"]}, "
-      + "{\"CN1:MyDoc.Node1\": [\"LIN1:MyDoc.Node4\", \"LIN1:MyDoc.Node3\"]}]";
+        + " \"LIN1:MyDoc.Node2\"]}, "
+        + "{\"CN1:MyDoc.Node1\": [\"LIN1:MyDoc.Node4\", \"LIN1:MyDoc.Node3\"]}]";
     mockHandler.openEvent(isA(EReorderLiteral.class));
     expectLastCall().anyTimes();
     mockHandler.closeEvent(isA(EReorderLiteral.class));
@@ -72,8 +70,8 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
     expectLastCall().anyTimes();
     mockHandler.stringEvent(isA(String.class));
     expectLastCall().anyTimes();
-//    Set<String> dirtyParents = Collections.emptySet();
-//    expect(mockHandler.getDirtyParents()).andReturn(dirtyParents);
+    // Set<String> dirtyParents = Collections.emptySet();
+    // expect(mockHandler.getDirtyParents()).andReturn(dirtyParents);
     replayDefault();
     restrSaveCmd.reorderSave("MySpace.MyDoc", structureJSON, context);
     verifyDefault();
@@ -82,8 +80,8 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
   @Test
   public void testRestructureSave_noChanges() {
     String structureJSON = "[{\"CN1:MySpace.MyDoc\": [\"LIN1:MyDoc.Node1\","
-      + " \"LIN1:MyDoc.Node2\"]}, "
-      + "{\"CN1:MyDoc.Node1\": [\"LIN1:MyDoc.Node4\", \"LIN1:MyDoc.Node3\"]}]";
+        + " \"LIN1:MyDoc.Node2\"]}, "
+        + "{\"CN1:MyDoc.Node1\": [\"LIN1:MyDoc.Node4\", \"LIN1:MyDoc.Node3\"]}]";
     mockHandler.openEvent(isA(EReorderLiteral.class));
     expectLastCall().anyTimes();
     mockHandler.closeEvent(isA(EReorderLiteral.class));
@@ -92,8 +90,8 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
     expectLastCall().anyTimes();
     mockHandler.stringEvent(isA(String.class));
     expectLastCall().anyTimes();
-//    Set<String> dirtyParents = Collections.emptySet();
-//    expect(mockHandler.getDirtyParents()).andReturn(dirtyParents);
+    // Set<String> dirtyParents = Collections.emptySet();
+    // expect(mockHandler.getDirtyParents()).andReturn(dirtyParents);
     replayDefault();
     restrSaveCmd.reorderSave("MySpace.MyDoc", structureJSON, context);
     verifyDefault();

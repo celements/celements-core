@@ -43,23 +43,22 @@ public class Number implements IDataField {
 
   public void setColumnId() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setColumnPrettyName() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setType() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setValue() {
     // TODO Auto-generated method stub
-    
-  }
 
+  }
 
 }

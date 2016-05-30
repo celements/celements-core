@@ -27,30 +27,26 @@ import com.xpn.xwiki.api.Api;
 
 public class ContextMenuItemApi extends Api {
 
-  private static HashMap<XWikiContext, ContextMenuItemApi> 
-    contextMenuItemApiRegistry = new HashMap<XWikiContext, ContextMenuItemApi>();
+  private static HashMap<XWikiContext, ContextMenuItemApi> contextMenuItemApiRegistry = new HashMap<XWikiContext, ContextMenuItemApi>();
   private ContextMenuItem contextMenuItem;
-  
+
   public ContextMenuItemApi(com.xpn.xwiki.api.Object menuItem, String elemId,
       XWikiContext context) {
     this(new ContextMenuItem(menuItem.getXWikiObject(), elemId, context), context);
   }
 
-  public ContextMenuItemApi(ContextMenuItem contextMenuItem,
-      XWikiContext context) {
+  public ContextMenuItemApi(ContextMenuItem contextMenuItem, XWikiContext context) {
     super(context);
     this.contextMenuItem = contextMenuItem;
   }
 
   public static ContextMenuItemApi getAPIObject(ContextMenuItem contextMenuItem,
       XWikiContext context) {
-    //FIXME possible memory leak if registry is infinitly growing!!!
-      if (!contextMenuItemApiRegistry.containsKey(contextMenuItem)
-          && (contextMenuItem != null)) {
-        contextMenuItemApiRegistry.put(context,
-            new ContextMenuItemApi(contextMenuItem, context));
-      }
-      return contextMenuItemApiRegistry.get(contextMenuItem);
+    // FIXME possible memory leak if registry is infinitly growing!!!
+    if (!contextMenuItemApiRegistry.containsKey(contextMenuItem) && (contextMenuItem != null)) {
+      contextMenuItemApiRegistry.put(context, new ContextMenuItemApi(contextMenuItem, context));
+    }
+    return contextMenuItemApiRegistry.get(contextMenuItem);
   }
 
   public String toJSON() {

@@ -37,8 +37,8 @@ public class NavigationCacheFlushingListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event> asList(new NavigationCreatedEvent(), 
-        new NavigationUpdatedEvent(), new NavigationDeletedEvent());
+    return Arrays.<Event>asList(new NavigationCreatedEvent(), new NavigationUpdatedEvent(),
+        new NavigationDeletedEvent());
   }
 
   @Override

@@ -32,7 +32,7 @@ import com.xpn.xwiki.XWikiException;
 public interface ICelementsClassCollection {
 
   public void runUpdate(XWikiContext context) throws XWikiException;
-  
+
   public String getConfigName();
 
 }

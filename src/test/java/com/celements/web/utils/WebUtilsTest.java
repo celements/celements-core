@@ -60,7 +60,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   private WebUtils celUtils;
   private XWikiURLFactory mockURLFactory;
   private XWikiStoreInterface mockXStore;
-  
+
   @Before
   public void setUp_WebUtilsTest() throws Exception {
     celUtils = new WebUtils();
@@ -69,33 +69,33 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(getWikiMock().getStore()).andReturn(mockXStore).anyTimes();
     getContext().setURLFactory(mockURLFactory);
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
-    expect(registerComponentMock(CoreConfiguration.class).getDefaultDocumentSyntax()
-        ).andReturn(Syntax.XWIKI_2_0).anyTimes();
-    
+    expect(registerComponentMock(CoreConfiguration.class).getDefaultDocumentSyntax()).andReturn(
+        Syntax.XWIKI_2_0).anyTimes();
+
   }
-  
+
   @Test
   public void testCoveredQuotient() {
-    assertEquals(1, ((WebUtils)celUtils).coveredQuotient(5,5));
-    assertEquals(3, ((WebUtils)celUtils).coveredQuotient(2,5));
-    assertEquals(1, ((WebUtils)celUtils).coveredQuotient(8,4));
-    assertEquals(1, ((WebUtils)celUtils).coveredQuotient(8,2));
-    assertEquals(1, ((WebUtils)celUtils).coveredQuotient(8,7));
-    assertEquals(0, ((WebUtils)celUtils).coveredQuotient(8,0));
+    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(5, 5));
+    assertEquals(3, ((WebUtils) celUtils).coveredQuotient(2, 5));
+    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(8, 4));
+    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(8, 2));
+    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(8, 7));
+    assertEquals(0, ((WebUtils) celUtils).coveredQuotient(8, 0));
   }
 
   @Test
   public void testPrepareMaxCoverSet() {
-    ArrayList<String> threeElems = new ArrayList<String>(
-        Arrays.asList(new String[] {"1","lj","lizh"}));
-    assertEquals(3, ((WebUtils)celUtils).prepareMaxCoverSet(0, threeElems).size());
-    assertEquals(3, ((WebUtils)celUtils).prepareMaxCoverSet(1, threeElems).size());
-    assertEquals(3, ((WebUtils)celUtils).prepareMaxCoverSet(2, threeElems).size());
-    assertEquals(3, ((WebUtils)celUtils).prepareMaxCoverSet(3, threeElems).size());
-    assertEquals(6, ((WebUtils)celUtils).prepareMaxCoverSet(4, threeElems).size());
-    assertEquals(6, ((WebUtils)celUtils).prepareMaxCoverSet(5, threeElems).size());
-    assertEquals(6, ((WebUtils)celUtils).prepareMaxCoverSet(6, threeElems).size());
-    assertEquals(9, ((WebUtils)celUtils).prepareMaxCoverSet(7, threeElems).size());
+    ArrayList<String> threeElems = new ArrayList<String>(Arrays.asList(new String[] { "1", "lj",
+        "lizh" }));
+    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(0, threeElems).size());
+    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(1, threeElems).size());
+    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(2, threeElems).size());
+    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(3, threeElems).size());
+    assertEquals(6, ((WebUtils) celUtils).prepareMaxCoverSet(4, threeElems).size());
+    assertEquals(6, ((WebUtils) celUtils).prepareMaxCoverSet(5, threeElems).size());
+    assertEquals(6, ((WebUtils) celUtils).prepareMaxCoverSet(6, threeElems).size());
+    assertEquals(9, ((WebUtils) celUtils).prepareMaxCoverSet(7, threeElems).size());
   }
 
   @Test
@@ -124,37 +124,37 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertNotNull(celUtils.getParentForLevel(1, getContext()));
     assertEquals("", celUtils.getParentForLevel(1, getContext()));
   }
-  
+
   @Test
   public void testGetMaxConfiguredNavigationLevel_twoParents() throws Exception {
-    DocumentReference navigationConfigClassReference =
-      Navigation.getNavigationConfigClassReference(getContext().getDatabase());
+    DocumentReference navigationConfigClassReference = Navigation.getNavigationConfigClassReference(
+        getContext().getDatabase());
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
-        ).pageLayoutCmd = mockPageLayoutCmd;
+    ((TreeNodeService) Utils.getComponent(
+        ITreeNodeService.class)).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(getContext()))
-        ).andReturn(null).atLeastOnce();
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(
+        getContext()))).andReturn(null).atLeastOnce();
     expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
-    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "WebPreferences");
+    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(webPrefDoc
-        ).atLeastOnce();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(
+        webPrefDoc).atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(8, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));
     webPrefDoc.setXObjects(navigationConfigClassReference, navObjects);
-    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn("Skins.MySkin"
-        ).atLeastOnce();
+    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     replayDefault(mockPageLayoutCmd);
     int maxLevel = celUtils.getMaxConfiguredNavigationLevel(getContext());
     verifyDefault(mockPageLayoutCmd);
@@ -163,34 +163,34 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMaxConfiguredNavigationLevel_deletedObject_NPE() throws Exception {
-    DocumentReference navigationConfigClassReference =
-      Navigation.getNavigationConfigClassReference(getContext().getDatabase());
+    DocumentReference navigationConfigClassReference = Navigation.getNavigationConfigClassReference(
+        getContext().getDatabase());
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
-        ).pageLayoutCmd = mockPageLayoutCmd;
+    ((TreeNodeService) Utils.getComponent(
+        ITreeNodeService.class)).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(getContext()))
-        ).andReturn(null).atLeastOnce();
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(
+        getContext()))).andReturn(null).atLeastOnce();
     expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
-    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "WebPreferences");
+    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(webPrefDoc
-        ).atLeastOnce();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(
+        webPrefDoc).atLeastOnce();
     webPrefDoc.setXObject(0, createNavObj(5, webPrefDoc));
-//  skipping 1 --> webPrefDoc.setXObject(1, null); // deleting an object can lead to
-                        // a null pointer in the object list
-    webPrefDoc.setXObject(2,createNavObj(8, webPrefDoc));
-    webPrefDoc.setXObject(3,createNavObj(3, webPrefDoc));
+    // skipping 1 --> webPrefDoc.setXObject(1, null); // deleting an object can lead to
+    // a null pointer in the object list
+    webPrefDoc.setXObject(2, createNavObj(8, webPrefDoc));
+    webPrefDoc.setXObject(3, createNavObj(3, webPrefDoc));
     webPrefDoc.setXObject(4, createNavObj(8, webPrefDoc));
-    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn("Skins.MySkin"
-      ).atLeastOnce();
+    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     replayDefault(mockPageLayoutCmd);
     int maxLevel = celUtils.getMaxConfiguredNavigationLevel(getContext());
     verifyDefault(mockPageLayoutCmd);
@@ -203,32 +203,32 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
-        ).pageLayoutCmd = mockPageLayoutCmd;
+    ((TreeNodeService) Utils.getComponent(
+        ITreeNodeService.class)).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(getContext()))
-        ).andReturn(null).atLeastOnce();
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(
+        getContext()))).andReturn(null).atLeastOnce();
     expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
-    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "WebPreferences");
+    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(webPrefDoc
-        ).atLeastOnce();
-    DocumentReference xwikiPrefDocRef = new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiPreferences");
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(
+        webPrefDoc).atLeastOnce();
+    DocumentReference xwikiPrefDocRef = new DocumentReference(getContext().getDatabase(), "XWiki",
+        "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
-    expect(getWikiMock().getDocument(eq(xwikiPrefDocRef), eq(getContext()))).andReturn(xwikiPrefDoc
-        ).atLeastOnce();
+    expect(getWikiMock().getDocument(eq(xwikiPrefDocRef), eq(getContext()))).andReturn(
+        xwikiPrefDoc).atLeastOnce();
     DocumentReference skinDocRef = new DocumentReference(getContext().getDatabase(), "Skins",
         "MySkin");
     XWikiDocument skinDoc = new XWikiDocument(skinDocRef);
-    expect(getWikiMock().getDocument(eq(skinDocRef), eq(getContext()))).andReturn(skinDoc).atLeastOnce(
-        );
-    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn("Skins.MySkin"
-      ).atLeastOnce();
+    expect(getWikiMock().getDocument(eq(skinDocRef), eq(getContext()))).andReturn(
+        skinDoc).atLeastOnce();
+    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     replayDefault(mockPageLayoutCmd);
     int maxLevel = celUtils.getMaxConfiguredNavigationLevel(getContext());
     verifyDefault(mockPageLayoutCmd);
@@ -237,28 +237,28 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMaxConfiguredNavigationLevel_threeParents() throws Exception {
-    DocumentReference navigationConfigClassReference =
-      Navigation.getNavigationConfigClassReference(getContext().getDatabase());
+    DocumentReference navigationConfigClassReference = Navigation.getNavigationConfigClassReference(
+        getContext().getDatabase());
     InheritorFactory inheritorFact = new InheritorFactory();
     PageLayoutCommand mockPageLayoutCmd = createMock(PageLayoutCommand.class);
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     celUtils.injectInheritorFactory(inheritorFact);
-    ((TreeNodeService)Utils.getComponent(ITreeNodeService.class)
-        ).pageLayoutCmd = mockPageLayoutCmd;
+    ((TreeNodeService) Utils.getComponent(
+        ITreeNodeService.class)).pageLayoutCmd = mockPageLayoutCmd;
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
         "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(getContext()))
-        ).andReturn(null).atLeastOnce();
+    expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(
+        getContext()))).andReturn(null).atLeastOnce();
     expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(null).atLeastOnce();
-    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "WebPreferences");
+    DocumentReference webPrefDocRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(webPrefDoc
-        ).atLeastOnce();
-    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn("Skins.MySkin"
-      ).atLeastOnce();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(
+        webPrefDoc).atLeastOnce();
+    expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
@@ -267,30 +267,29 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     replayDefault(mockPageLayoutCmd);
     int maxLevel = celUtils.getMaxConfiguredNavigationLevel(getContext());
     verifyDefault(mockPageLayoutCmd);
-    assertEquals("Parents are a.b, b.c and c.d therefor maxlevel must be 5.",
-        5, maxLevel);
+    assertEquals("Parents are a.b, b.c and c.d therefor maxlevel must be 5.", 5, maxLevel);
   }
-  
+
   @Test
   public void testGetMajorVersion_nullDoc() {
-    assertEquals("1", ((WebUtils)celUtils).getMajorVersion(null));
+    assertEquals("1", ((WebUtils) celUtils).getMajorVersion(null));
   }
-  
+
   @Test
   public void testGetMajorVersion_noVersionSet() {
     XWikiDocument doc = new XWikiDocument();
-    assertEquals("1", ((WebUtils)celUtils).getMajorVersion(doc));
+    assertEquals("1", ((WebUtils) celUtils).getMajorVersion(doc));
   }
-  
+
   @Test
   public void testGetMajorVersion() {
     XWikiDocument doc = new XWikiDocument();
     doc.setVersion("28.82");
-    assertEquals("28", ((WebUtils)celUtils).getMajorVersion(doc));
+    assertEquals("28", ((WebUtils) celUtils).getMajorVersion(doc));
   }
-  
+
   @Test
-  public void testPrevMenuItem() throws XWikiException{
+  public void testPrevMenuItem() throws XWikiException {
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
@@ -306,23 +305,21 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setName(mItemFullName);
     menuItemItemDoc.setClassName("Celements2.MenuItem");
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
-    expect(getWikiMock().getDocument(eq(prevDoc.getDocumentReference()), same(getContext()))
-        ).andReturn(prevDoc).once();
-    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), "Celements2.MenuItem",
-        0);
+    expect(getWikiMock().getDocument(eq(prevDoc.getDocumentReference()), same(
+        getContext()))).andReturn(prevDoc).once();
+    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), "Celements2.MenuItem", 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getPrevMenuItem(doc.getDocumentReference())
-        ).andReturn(tnPrev).once();
+    expect(mockTreeNodeService.getPrevMenuItem(doc.getDocumentReference())).andReturn(
+        tnPrev).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(mItemFullName,
-        getContext());
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(mItemFullName, getContext());
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem1, prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
-  
+
   @Test
-  public void testPrevMenuItem_noPrev() throws XWikiException{
+  public void testPrevMenuItem_noPrev() throws XWikiException {
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
@@ -340,17 +337,16 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getPrevMenuItem(eq(prevDoc.getDocumentReference()))
-        ).andReturn(null).once();
+    expect(mockTreeNodeService.getPrevMenuItem(eq(prevDoc.getDocumentReference()))).andReturn(
+        null).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(prevFullName,
-        getContext());
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(prevFullName, getContext());
     assertNull(prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
-  
+
   @Test
-  public void testNextMenuItem() throws XWikiException{
+  public void testNextMenuItem() throws XWikiException {
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
@@ -366,19 +362,19 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     menuItemItemDoc.setName(mItemFullName);
     menuItemItemDoc.setClassName("Celements2.MenuItem");
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
-    expect(getWikiMock().getDocument(eq(nextDoc.getDocumentReference()), same(getContext()))
-        ).andReturn(nextDoc).once();
+    expect(getWikiMock().getDocument(eq(nextDoc.getDocumentReference()), same(
+        getContext()))).andReturn(nextDoc).once();
     TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))
-        ).andReturn(tnPrev).once();
+    expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))).andReturn(
+        tnPrev).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName,getContext());
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName, getContext());
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem2, prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
-  
+
   @Test
   public void getNextMenuItem_next_docNotInContextSpace() throws XWikiException {
     getContext().setDatabase("siblingPrevious");
@@ -397,22 +393,21 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     XWikiDocument nextDoc = new XWikiDocument();
     nextDoc.setFullName(nextFullName);
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
-    expect(getWikiMock().getDocument(eq(nextDoc.getDocumentReference()), same(getContext()))
-        ).andReturn(nextDoc).once();
-    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem",
-        0);
+    expect(getWikiMock().getDocument(eq(nextDoc.getDocumentReference()), same(
+        getContext()))).andReturn(nextDoc).once();
+    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))
-        ).andReturn(tnPrev).once();
+    expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))).andReturn(
+        tnPrev).once();
     replayDefault(mockTreeNodeService);
-    BaseObject nextMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName,getContext());
+    BaseObject nextMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName, getContext());
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
     verifyDefault(mockTreeNodeService);
   }
-  
+
   @Test
-  public void testNextMenuItem_noNext() throws XWikiException{
+  public void testNextMenuItem_noNext() throws XWikiException {
     String mItemFullName = "mySpace.myMenuItemDoc";
     XWikiDocument doc = new XWikiDocument();
     doc.setFullName(mItemFullName);
@@ -430,11 +425,10 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
-    expect(mockTreeNodeService.getNextMenuItem(eq(nextDoc.getDocumentReference()))
-        ).andReturn(null).once();
+    expect(mockTreeNodeService.getNextMenuItem(eq(nextDoc.getDocumentReference()))).andReturn(
+        null).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(nextFullName,
-        getContext());
+    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(nextFullName, getContext());
     assertNull(prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
@@ -442,24 +436,24 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetDocSection_empty() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc).atLeastOnce();
-    expect(doc.getTranslatedDocument(same(getContext()))).andReturn(new XWikiDocument()
-      ).atLeastOnce();
+    expect(doc.getTranslatedDocument(same(getContext()))).andReturn(
+        new XWikiDocument()).atLeastOnce();
     replayDefault(doc);
-    assertNull(((WebUtils)WebUtils.getInstance()).getDocSection("(?=<table)", fullName, 1,
+    assertNull(((WebUtils) WebUtils.getInstance()).getDocSection("(?=<table)", fullName, 1,
         getContext()));
     verifyDefault(doc);
   }
-  
+
   @Test
   public void testGetDocSection_first() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc).atLeastOnce();
@@ -468,20 +462,20 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(getWikiMock().getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}abc{/pre}"), eq(getContext().getDoc()), same(getContext()))
-        ).andReturn("abc").atLeastOnce();
+    expect(renderer.renderText(eq("{pre}abc{/pre}"), eq(getContext().getDoc()), same(
+        getContext()))).andReturn("abc").atLeastOnce();
     replayDefault(doc, renderer);
     System.out.println();
-    assertEquals("abc", ((WebUtils)WebUtils.getInstance()).getDocSection("(?=<table)",
-        fullName, 1, getContext()));
+    assertEquals("abc", ((WebUtils) WebUtils.getInstance()).getDocSection("(?=<table)", fullName, 1,
+        getContext()));
     verifyDefault(doc, renderer);
   }
-  
+
   @Test
   public void testGetDocSection_firstEmptyRTE() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -490,17 +484,19 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(getWikiMock().getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(getContext().getDoc()), same(getContext()))).andReturn("<table>blabla</table>").atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(getContext().getDoc()),
+        same(getContext()))).andReturn("<table>blabla</table>").atLeastOnce();
     replayDefault(doc, renderer);
-    assertEquals("<table>blabla</table>", ((WebUtils)WebUtils.getInstance()).getDocSection("(?=<table)", fullName, 1, getContext()));
+    assertEquals("<table>blabla</table>", ((WebUtils) WebUtils.getInstance()).getDocSection(
+        "(?=<table)", fullName, 1, getContext()));
     verifyDefault(doc, renderer);
   }
-  
+
   @Test
   public void testGetDocSection_middle() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -509,17 +505,19 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(getWikiMock().getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(getContext().getDoc()), same(getContext()))).andReturn("<table>blabla</table>").atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(getContext().getDoc()),
+        same(getContext()))).andReturn("<table>blabla</table>").atLeastOnce();
     replayDefault(doc, renderer);
-    assertEquals("<table>blabla</table>", ((WebUtils)WebUtils.getInstance()).getDocSection("(?=<table)", fullName, 2, getContext()));
+    assertEquals("<table>blabla</table>", ((WebUtils) WebUtils.getInstance()).getDocSection(
+        "(?=<table)", fullName, 2, getContext()));
     verifyDefault(doc, renderer);
   }
-  
+
   @Test
   public void testGetDocSection_last() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -528,22 +526,24 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(getWikiMock().getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(getContext().getDoc()), same(getContext()))).andReturn("<table>abc</table>").atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>abc</table>{/pre}"), eq(getContext().getDoc()), same(
+        getContext()))).andReturn("<table>abc</table>").atLeastOnce();
     replayDefault(doc, renderer);
-    assertEquals("<table>abc</table>", ((WebUtils)WebUtils.getInstance()).getDocSection("(?=<table)", fullName, 3, getContext()));
+    assertEquals("<table>abc</table>", ((WebUtils) WebUtils.getInstance()).getDocSection(
+        "(?=<table)", fullName, 3, getContext()));
     verifyDefault(doc, renderer);
   }
 
   @Test
   public void testCountSections_empty() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc).atLeastOnce();
-    expect(doc.getTranslatedDocument(same(getContext()))).andReturn(new XWikiDocument()
-      ).atLeastOnce();
+    expect(doc.getTranslatedDocument(same(getContext()))).andReturn(
+        new XWikiDocument()).atLeastOnce();
     replayDefault(doc);
     assertEquals(0, WebUtils.getInstance().countSections("", fullName, getContext()));
     verifyDefault(doc);
@@ -552,8 +552,8 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCountSections_one() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -564,12 +564,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals(1, WebUtils.getInstance().countSections("(?=<table)", fullName, getContext()));
     verifyDefault(doc);
   }
-  
+
   @Test
   public void testCountSections_emptyRTEStart() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -580,12 +580,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals(1, WebUtils.getInstance().countSections("(?=<table)", fullName, getContext()));
     verifyDefault(doc);
   }
-  
+
   @Test
   public void testCountSections_several() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -596,12 +596,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals(3, WebUtils.getInstance().countSections("(?=<table)", fullName, getContext()));
     verifyDefault(doc);
   }
-  
+
   @Test
   public void testGetDocSectionAsJSON() throws XWikiException {
     String fullName = "Space.DocName";
-    DocumentReference docRef = new DocumentReference(
-        getContext().getDatabase(), "Space", "DocName");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space",
+        "DocName");
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(doc.getFullName()).andReturn(fullName).anyTimes();
     XWikiDocument tdoc = new XWikiDocument();
@@ -610,14 +610,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(tdoc).atLeastOnce();
     XWikiRenderingEngine renderer = createMock(XWikiRenderingEngine.class);
     expect(getWikiMock().getRenderingEngine()).andReturn(renderer).atLeastOnce();
-    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"),
-        eq(getContext().getDoc()), same(getContext()))).andReturn("<table>blabla</table>"
-            ).atLeastOnce();
+    expect(renderer.renderText(eq("{pre}<table>blabla</table>{/pre}"), eq(getContext().getDoc()),
+        same(getContext()))).andReturn("<table>blabla</table>").atLeastOnce();
     replayDefault(doc, renderer);
-    String json ="[{\"content\" : \"<table>blabla</table>\", \"section\" : 2," +
-            " \"sectionNr\" : 3}]";
-    assertEquals(json, WebUtils.getInstance().getDocSectionAsJSON("(?=<table)", fullName,
-        2, getContext()));
+    String json = "[{\"content\" : \"<table>blabla</table>\", \"section\" : 2,"
+        + " \"sectionNr\" : 3}]";
+    assertEquals(json, WebUtils.getInstance().getDocSectionAsJSON("(?=<table)", fullName, 2,
+        getContext()));
     verifyDefault(doc, renderer);
   }
 
@@ -629,11 +628,12 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
     expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
-    expect(getWikiMock().getSpacePreference(eq("admin_language"), eq("de"), same(getContext()))
-        ).andReturn("de");
+    expect(getWikiMock().getSpacePreference(eq("admin_language"), eq("de"), same(
+        getContext()))).andReturn("de");
     replayDefault();
-    //getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version 4.5 thus why it must be
-    //set after calling replay
+    // getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version
+    // 4.5 thus why it must be
+    // set after calling replay
     getContext().setUser(userName);
     assertEquals("de", celUtils.getAdminLanguage(getContext()));
     verifyDefault();
@@ -646,16 +646,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     DocumentReference userDocRef = new DocumentReference(getContext().getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiUsers");
+    DocumentReference xwikiUserClassRef = new DocumentReference(getContext().getDatabase(), "XWiki",
+        "XWikiUsers");
     BaseObject userObj = new BaseObject();
     userObj.setXClassReference(xwikiUserClassRef);
     userObj.setStringValue("admin_language", "fr");
     userDoc.setXObject(0, userObj);
     expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
     replayDefault();
-    //getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version 4.5 thus why it must be
-    //set after calling replay
+    // getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version
+    // 4.5 thus why it must be
+    // set after calling replay
     getContext().setUser(userName);
     assertEquals("fr", celUtils.getAdminLanguage(getContext()));
     verifyDefault();
@@ -668,16 +669,17 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     DocumentReference userDocRef = new DocumentReference(getContext().getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiUsers");
+    DocumentReference xwikiUserClassRef = new DocumentReference(getContext().getDatabase(), "XWiki",
+        "XWikiUsers");
     BaseObject userObj = new BaseObject();
     userObj.setXClassReference(xwikiUserClassRef);
     userObj.setStringValue("admin_language", "fr");
     userDoc.setXObject(0, userObj);
     expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
     replayDefault();
-    //getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version 4.5 thus why it must be
-    //set after calling replay
+    // getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version
+    // 4.5 thus why it must be
+    // set after calling replay
     getContext().setUser("XWiki.NotMyUser");
     assertEquals("fr", celUtils.getAdminLanguage(userName, getContext()));
     verifyDefault();
@@ -687,21 +689,22 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
   public void testGetAdminLanguage_defaultToWebPreferences() throws XWikiException {
     getContext().setLanguage("de");
     String userName = "XWiki.MyUser";
-    expect(getWikiMock().getSpacePreference(eq("admin_language"), isA(String.class), same(getContext()))
-        ).andReturn("en");
+    expect(getWikiMock().getSpacePreference(eq("admin_language"), isA(String.class), same(
+        getContext()))).andReturn("en");
     DocumentReference userDocRef = new DocumentReference(getContext().getDatabase(), "XWiki",
         "MyUser");
     XWikiDocument userDoc = new XWikiDocument(userDocRef);
-    DocumentReference xwikiUserClassRef = new DocumentReference(getContext().getDatabase(),
-        "XWiki", "XWikiUsers");
+    DocumentReference xwikiUserClassRef = new DocumentReference(getContext().getDatabase(), "XWiki",
+        "XWikiUsers");
     BaseObject userObj = new BaseObject();
     userObj.setXClassReference(xwikiUserClassRef);
     userObj.setStringValue("admin_language", "");
     userDoc.setXObject(0, userObj);
     expect(getWikiMock().getDocument(eq(userDocRef), same(getContext()))).andReturn(userDoc);
     replayDefault();
-    //getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version 4.5 thus why it must be
-    //set after calling replay
+    // getContext().setUser calls xgetWikiMock().isVirtualMode in xgetWikiMock() version
+    // 4.5 thus why it must be
+    // set after calling replay
     getContext().setUser("XWiki.NotMyUser");
     assertEquals("en", celUtils.getAdminLanguage(userName, getContext()));
     verifyDefault();
@@ -729,62 +732,61 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(getWikiMock().getDocument(eq(parent2), same(getContext()))).andReturn(myParent2);
     List<String> docParentsList = Arrays.asList(fullName, parent1, parent2);
     replayDefault();
-    assertEquals(docParentsList, celUtils.getDocumentParentsList(fullName, true,
-        getContext()));
+    assertEquals(docParentsList, celUtils.getDocumentParentsList(fullName, true, getContext()));
     verifyDefault();
   }
-  
+
   @Test
   public void isAttachmentLink_null() {
     assertFalse(celUtils.isAttachmentLink(null));
   }
-  
+
   @Test
   public void isAttachmentLink_empty() {
     assertFalse(celUtils.isAttachmentLink(""));
   }
-  
+
   @Test
   public void isAttachmentLink_url() {
     assertFalse(celUtils.isAttachmentLink("/download/Space/Page/attachment.jpg"));
   }
-  
+
   @Test
   public void isAttachmentLink_is() {
     assertTrue(celUtils.isAttachmentLink("Space.Page;attachment.jpg"));
   }
-  
+
   @Test
   public void isAttachmentLink_isWithDb() {
     assertTrue(celUtils.isAttachmentLink("db:Space.Page;attachment.jpg"));
   }
-  
+
   @Test
-  public void testGetAttachmentListSorted_getAll() throws ClassNotFoundException, 
-      XWikiException, IOException {
+  public void testGetAttachmentListSorted_getAll() throws ClassNotFoundException, XWikiException,
+      IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsService).anyTimes();
-    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki", 
+    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiPreferences")), same(getContext()))).andReturn(null).anyTimes();
-    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("a.jpg").once();
-    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("b.jpg").once();
-    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("c.jpg").once();
-    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("d.jpg").once();
-    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("e.jpg").once();
-    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("f.jpg").once();
-    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("g.jpg").once();
-    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("h.jpg").once();
+    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "a.jpg").once();
+    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "b.jpg").once();
+    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "c.jpg").once();
+    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "d.jpg").once();
+    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "e.jpg").once();
+    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "f.jpg").once();
+    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "g.jpg").once();
+    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     getContext().setEngineContext(engContext);
-    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    expect(engContext.getMimeType((String) anyObject())).andReturn("image/jpg").anyTimes();
     replayDefault(engContext, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), getContext());
@@ -797,7 +799,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("b.jpg", in);
     doc.addAttachment("g.jpg", in);
     doc.addAttachment("f.jpg", in);
-    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc,
         "AttachmentAscendingNameComparator", true, 0, 0);
     verifyDefault(engContext, rightsService);
     assertEquals(8, result.size());
@@ -805,33 +807,33 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals("e.jpg", result.get(4).getFilename());
     assertEquals("h.jpg", result.get(7).getFilename());
   }
-  
+
   @Test
-  public void testGetAttachmentListSorted_getFirstPart() throws XWikiException, 
+  public void testGetAttachmentListSorted_getFirstPart() throws XWikiException,
       ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsService).anyTimes();
-    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki", 
+    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiPreferences")), same(getContext()))).andReturn(null).anyTimes();
-    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("a.jpg").once();
-    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("b.jpg").once();
-    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("c.jpg").once();
-    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("d.jpg").once();
-    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("e.jpg").once();
-    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("f.jpg").once();
-    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("g.jpg").once();
-    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("h.jpg").once();
+    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "a.jpg").once();
+    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "b.jpg").once();
+    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "c.jpg").once();
+    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "d.jpg").once();
+    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "e.jpg").once();
+    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "f.jpg").once();
+    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "g.jpg").once();
+    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     getContext().setEngineContext(engContext);
-    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    expect(engContext.getMimeType((String) anyObject())).andReturn("image/jpg").anyTimes();
     replayDefault(engContext, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), getContext());
@@ -844,7 +846,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("b.jpg", in);
     doc.addAttachment("g.jpg", in);
     doc.addAttachment("f.jpg", in);
-    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc,
         "AttachmentAscendingNameComparator", true, -1, 3);
     verifyDefault(engContext, rightsService);
     assertEquals(3, result.size());
@@ -852,33 +854,33 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals("b.jpg", result.get(1).getFilename());
     assertEquals("c.jpg", result.get(2).getFilename());
   }
-  
+
   @Test
   public void testGetAttachmentListSorted_getMiddlePart() throws XWikiException,
       ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsService).anyTimes();
-    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki", 
+    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiPreferences")), same(getContext()))).andReturn(null).anyTimes();
-    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("a.jpg").once();
-    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("b.jpg").once();
-    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("c.jpg").once();
-    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("d.jpg").once();
-    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("e.jpg").once();
-    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("f.jpg").once();
-    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("g.jpg").once();
-    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("h.jpg").once();
+    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "a.jpg").once();
+    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "b.jpg").once();
+    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "c.jpg").once();
+    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "d.jpg").once();
+    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "e.jpg").once();
+    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "f.jpg").once();
+    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "g.jpg").once();
+    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     getContext().setEngineContext(engContext);
-    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    expect(engContext.getMimeType((String) anyObject())).andReturn("image/jpg").anyTimes();
     replayDefault(engContext, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), getContext());
@@ -891,7 +893,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("b.jpg", in);
     doc.addAttachment("g.jpg", in);
     doc.addAttachment("f.jpg", in);
-    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc,
         "AttachmentAscendingNameComparator", true, 3, 3);
     verifyDefault(engContext, rightsService);
     assertEquals(3, result.size());
@@ -899,33 +901,33 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals("e.jpg", result.get(1).getFilename());
     assertEquals("f.jpg", result.get(2).getFilename());
   }
-  
+
   @Test
   public void testGetAttachmentListSorted_getLastPart() throws XWikiException,
       ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsService).anyTimes();
-    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki", 
+    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiPreferences")), same(getContext()))).andReturn(null).anyTimes();
-    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("a.jpg").once();
-    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("b.jpg").once();
-    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("c.jpg").once();
-    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("d.jpg").once();
-    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("e.jpg").once();
-    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("f.jpg").once();
-    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("g.jpg").once();
-    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("h.jpg").once();
+    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "a.jpg").once();
+    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "b.jpg").once();
+    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "c.jpg").once();
+    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "d.jpg").once();
+    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "e.jpg").once();
+    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "f.jpg").once();
+    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "g.jpg").once();
+    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     getContext().setEngineContext(engContext);
-    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    expect(engContext.getMimeType((String) anyObject())).andReturn("image/jpg").anyTimes();
     replayDefault(engContext, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), getContext());
@@ -938,40 +940,40 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("b.jpg", in);
     doc.addAttachment("g.jpg", in);
     doc.addAttachment("f.jpg", in);
-    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc,
         "AttachmentAscendingNameComparator", true, 6, 3);
     verifyDefault(engContext, rightsService);
     assertEquals(2, result.size());
     assertEquals("g.jpg", result.get(0).getFilename());
     assertEquals("h.jpg", result.get(1).getFilename());
   }
-  
+
   @Test
-  public void testGetAttachmentListSorted_getEmpty() throws XWikiException,
-      ClassNotFoundException, IOException {
+  public void testGetAttachmentListSorted_getEmpty() throws XWikiException, ClassNotFoundException,
+      IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsService).anyTimes();
-    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki", 
+    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiPreferences")), same(getContext()))).andReturn(null).anyTimes();
-    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("a.jpg").once();
-    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("b.jpg").once();
-    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("c.jpg").once();
-    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("d.jpg").once();
-    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("e.jpg").once();
-    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("f.jpg").once();
-    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("g.jpg").once();
-    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("h.jpg").once();
+    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "a.jpg").once();
+    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "b.jpg").once();
+    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "c.jpg").once();
+    expect(getWikiMock().clearName(eq("d.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "d.jpg").once();
+    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "e.jpg").once();
+    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "f.jpg").once();
+    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "g.jpg").once();
+    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     getContext().setEngineContext(engContext);
-    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    expect(engContext.getMimeType((String) anyObject())).andReturn("image/jpg").anyTimes();
     replayDefault(engContext, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), getContext());
@@ -984,7 +986,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("b.jpg", in);
     doc.addAttachment("g.jpg", in);
     doc.addAttachment("f.jpg", in);
-    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc,
         "AttachmentAscendingNameComparator", true, 7, 0);
     verifyDefault(engContext, rightsService);
     assertEquals(0, result.size());
@@ -995,28 +997,28 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
       ClassNotFoundException, IOException {
     XWikiRightService rightsService = createMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsService).anyTimes();
-    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki", 
+    expect(getWikiMock().getDocument(eq(new DocumentReference(getContext().getDatabase(), "XWiki",
         "XWikiPreferences")), same(getContext()))).andReturn(null).anyTimes();
-    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("a.jpg").once();
-    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("b.jpg").once();
-    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("c.jpg").once();
-    expect(getWikiMock().clearName(eq("d.txt"), eq(false), eq(true), same(getContext()))
-        ).andReturn("d.txt").once();
-    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("e.jpg").once();
-    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("f.jpg").once();
-    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("g.jpg").once();
-    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))
-        ).andReturn("h.jpg").once();
+    expect(getWikiMock().clearName(eq("a.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "a.jpg").once();
+    expect(getWikiMock().clearName(eq("b.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "b.jpg").once();
+    expect(getWikiMock().clearName(eq("c.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "c.jpg").once();
+    expect(getWikiMock().clearName(eq("d.txt"), eq(false), eq(true), same(getContext()))).andReturn(
+        "d.txt").once();
+    expect(getWikiMock().clearName(eq("e.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "e.jpg").once();
+    expect(getWikiMock().clearName(eq("f.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "f.jpg").once();
+    expect(getWikiMock().clearName(eq("g.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "g.jpg").once();
+    expect(getWikiMock().clearName(eq("h.jpg"), eq(false), eq(true), same(getContext()))).andReturn(
+        "h.jpg").once();
     XWikiEngineContext engContext = createMock(XWikiEngineContext.class);
     getContext().setEngineContext(engContext);
     expect(engContext.getMimeType("d.txt")).andReturn("txt").once();
-    expect(engContext.getMimeType((String)anyObject())).andReturn("image/jpg").anyTimes();
+    expect(engContext.getMimeType((String) anyObject())).andReturn("image/jpg").anyTimes();
     replayDefault(engContext, rightsService);
     DocumentReference docref = new DocumentReference("a", "b", "c");
     Document doc = new Document(new XWikiDocument(docref), getContext());
@@ -1030,7 +1032,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.addAttachment("b.jpg", in);
     doc.addAttachment("g.jpg", in);
     doc.addAttachment("f.jpg", in);
-    List<Attachment> result = celUtils.getAttachmentListSorted(doc, 
+    List<Attachment> result = celUtils.getAttachmentListSorted(doc,
         "AttachmentAscendingNameComparator", true, 2, 3);
     verifyDefault(engContext, rightsService);
     assertEquals(3, result.size());
@@ -1039,13 +1041,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     assertEquals("f.jpg", result.get(2).getFilename());
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
   private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
-    DocumentReference navigationConfigClassReference =
-      Navigation.getNavigationConfigClassReference(getContext().getDatabase());
+    DocumentReference navigationConfigClassReference = Navigation.getNavigationConfigClassReference(
+        getContext().getDatabase());
     BaseObject navObj = new BaseObject();
     navObj.setXClassReference(navigationConfigClassReference);
     navObj.setStringValue("menu_element_name", "mainMenu");

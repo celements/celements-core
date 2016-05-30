@@ -27,7 +27,7 @@ public class TestImgAttachment extends XWikiAttachment {
   public TestImgAttachment() {
     super();
   }
-  
+
   @Override
   public boolean isImage(XWikiContext context) {
     return true;

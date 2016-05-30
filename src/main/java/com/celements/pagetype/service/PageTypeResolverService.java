@@ -96,10 +96,9 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   public PageTypeReference getDefaultPageTypeRefForDoc(DocumentReference docRef) {
     FieldInheritor inheritor = new InheritorFactory().getConfigFieldInheritor(
         pageTypeClassCfg.getPageTypeClassRef(docRef.getWikiReference()), docRef);
-    String defPageTypeName = inheritor.getStringValue(
-        IPageTypeClassConfig.PAGE_TYPE_FIELD, "RichText");
-    PageTypeReference pageTypeRef = pageTypeService
-        .getPageTypeRefByConfigName(defPageTypeName);
+    String defPageTypeName = inheritor.getStringValue(IPageTypeClassConfig.PAGE_TYPE_FIELD,
+        "RichText");
+    PageTypeReference pageTypeRef = pageTypeService.getPageTypeRefByConfigName(defPageTypeName);
     if (pageTypeRef != null) {
       return pageTypeRef;
     }
@@ -122,21 +121,20 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
       }
       DocumentReference pageTypeClassRef = pageTypeClassCfg.getPageTypeClassRef(
           checkDoc.getDocumentReference().getWikiReference());
-      if ((checkDoc.getXObjects(pageTypeClassRef) != null)
-          && (checkDoc.getXObjects(pageTypeClassRef).size() > 0)) {
+      if ((checkDoc.getXObjects(pageTypeClassRef) != null) && (checkDoc.getXObjects(
+          pageTypeClassRef).size() > 0)) {
         BaseObject pageTypeObj = checkDoc.getXObject(pageTypeClassRef);
         if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("getPageTypeObject: page type object for class ["
-              + pageTypeClassRef + "] found for [" + checkDoc + "] with object details: "
-              + pageTypeObj.toXMLString());
+          LOGGER.trace("getPageTypeObject: page type object for class [" + pageTypeClassRef
+              + "] found for [" + checkDoc + "] with object details: " + pageTypeObj.toXMLString());
         } else {
-          LOGGER.debug("getPageTypeObject: page type object for class ["
-              + pageTypeClassRef + "] found for [" + checkDoc + "].");
+          LOGGER.debug("getPageTypeObject: page type object for class [" + pageTypeClassRef
+              + "] found for [" + checkDoc + "].");
         }
         return pageTypeObj;
       }
-      LOGGER.debug("getPageTypeObject: no page type object for class ["
-          + pageTypeClassRef + "] found for [" + checkDoc + "].");
+      LOGGER.debug("getPageTypeObject: no page type object for class [" + pageTypeClassRef
+          + "] found for [" + checkDoc + "].");
     } else {
       LOGGER.warn("getPageTypeObject: checkDoc parameter is null!");
     }

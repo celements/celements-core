@@ -30,26 +30,26 @@ public class BooleanTest {
 
   @Test
   public void testGetColumnId() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
   @Test
   public void testGetColumnPrettyName() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
   @Test
   public void testGetType() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
   @Test
   public void testGetValue() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
 }

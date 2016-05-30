@@ -47,7 +47,7 @@ public class TokenBasedUploadCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {
@@ -65,7 +65,7 @@ public class TokenBasedUploadCommand {
   public int tokenBasedUpload(Document attachToDoc, String fieldName, String userToken,
       XWikiContext context) throws XWikiException {
     String username = tokenAuthImpl.getUsernameForToken(userToken, context);
-    if((username != null) && !username.equals("")){
+    if ((username != null) && !username.equals("")) {
       LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       context.setUser(username);
       return attachToDoc.addAttachments(fieldName);
@@ -79,26 +79,22 @@ public class TokenBasedUploadCommand {
    * @deprecated since 2.59.1 instead use tokenBasedUploadDocRef
    */
   @Deprecated
-  public int tokenBasedUpload(String attachToDocFN, String fieldNamePrefix,
-      String userToken,  Boolean createIfNotExists, XWikiContext context
-      ) throws XWikiException {
+  public int tokenBasedUpload(String attachToDocFN, String fieldNamePrefix, String userToken,
+      Boolean createIfNotExists, XWikiContext context) throws XWikiException {
     return tokenBasedUploadDocRef(webUtilsService.resolveDocumentReference(attachToDocFN),
         fieldNamePrefix, userToken, createIfNotExists);
   }
 
-  public int tokenBasedUploadDocRef(DocumentReference attachToDocRef,
-      String fieldNamePrefix, String userToken, Boolean createIfNotExists
-      ) throws XWikiException {
+  public int tokenBasedUploadDocRef(DocumentReference attachToDocRef, String fieldNamePrefix,
+      String userToken, Boolean createIfNotExists) throws XWikiException {
     String username = tokenAuthImpl.getUsernameForToken(userToken, getContext());
-    if((username != null) && !username.equals("")){
+    if ((username != null) && !username.equals("")) {
       LOGGER.info("tokenBasedUpload: user " + username + " identified by userToken.");
       getContext().setUser(username);
-      //FIXME use IModelAccessFacade to access the document to ensure that new documents
-      //FIXME get created correctly. (JIRA: CELDEV-132)
-      XWikiDocument doc = getContext().getWiki().getDocument(attachToDocRef,
-          getContext());
-      if (createIfNotExists || getContext().getWiki().exists(attachToDocRef,
-          getContext())) {
+      // FIXME use IModelAccessFacade to access the document to ensure that new documents
+      // FIXME get created correctly. (JIRA: CELDEV-132)
+      XWikiDocument doc = getContext().getWiki().getDocument(attachToDocRef, getContext());
+      if (createIfNotExists || getContext().getWiki().exists(attachToDocRef, getContext())) {
         LOGGER.info("tokenBasedUpload: add attachment [" + fieldNamePrefix + "] to doc ["
             + attachToDocRef + "].");
         if (LOGGER.isTraceEnabled()) {
