@@ -47,8 +47,8 @@ public abstract class AbstractDocumentDeleteListener extends AbstractDocumentLis
         try {
           origDoc = getContext().getWiki().getDocument(docRef, getContext());
         } catch (XWikiException xwe) {
-          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", 
-              doc, event, xwe);
+          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", doc, event,
+              xwe);
         }
         doc.setOriginalDocument(origDoc);
       }

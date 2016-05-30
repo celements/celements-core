@@ -54,8 +54,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _context = getContext();
     _xwiki = createMock(XWiki.class);
     _context.setWiki(_xwiki);
-    _testClassRef = new DocumentReference(_context.getDatabase(), "Celements",
-        "TestClass");
+    _testClassRef = new DocumentReference(_context.getDatabase(), "Celements", "TestClass");
     _iterator = new XObjectIterator(_context);
     _iterator.setClassName(_testClassRef.getLastSpaceReference().getName() + "."
         + _testClassRef.getName());
@@ -90,17 +89,17 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     assertEquals(_docList, _iterator.getDocList());
   }
 
-//  @Test
-//  public void testSetDocList_resetIterators() throws Exception {
-//    _docList.add("Test.Doc");
-//    _iterator.setDocList(_docList);
-//    _iterator.inject_CurrentDoc(_testDoc);
-//    Iterator<String> firstDocIt = _iterator.getDocIterator();
-//    Iterator<BaseObject> firstObjIt = _iterator.getObjectIterator();
-//    _iterator.setDocList(_docList);
-//    assertNotSame(firstDocIt, _iterator.getDocIterator());
-//    assertNotSame(firstObjIt, _iterator.getObjectIterator());
-//  }
+  // @Test
+  // public void testSetDocList_resetIterators() throws Exception {
+  // _docList.add("Test.Doc");
+  // _iterator.setDocList(_docList);
+  // _iterator.inject_CurrentDoc(_testDoc);
+  // Iterator<String> firstDocIt = _iterator.getDocIterator();
+  // Iterator<BaseObject> firstObjIt = _iterator.getObjectIterator();
+  // _iterator.setDocList(_docList);
+  // assertNotSame(firstDocIt, _iterator.getDocIterator());
+  // assertNotSame(firstObjIt, _iterator.getObjectIterator());
+  // }
 
   @Test
   public void testMoveToNextDoc_emptyDocList() {
@@ -110,32 +109,32 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.moveToNextDoc();
       fail("Exception expected.");
-    } catch(NoSuchElementException ex) {
-      //expected behaviour
+    } catch (NoSuchElementException ex) {
+      // expected behaviour
     }
     verify(_xwiki);
   }
 
-//  @Test
-//  public void testMoveToNextDoc_resetObjectIterator() throws Exception {
-//    _iterator.inject_CurrentDoc(null); // reset Iterator
-//    String fullname = "Test.Doc";
-//    _docList.add(fullname);
-//    String fullname2 = "Test.Doc2";
-//    _docList.add(fullname2);
-//    _iterator.setDocList(_docList);
-//    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc
-//        ).anyTimes();
-//    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2
-//        ).anyTimes();
-//    replay(_xwiki);
-//    Iterator<BaseObject> firstObjectIterator = _iterator.getObjectIterator();
-//    _iterator.moveToNextDoc();
-//    Iterator<BaseObject> secondObjectIterator = _iterator.getObjectIterator();
-//    assertNotSame("moveToNextDoc must reset the ObjectIterator.",
-//        firstObjectIterator, secondObjectIterator);
-//    verify(_xwiki);
-//  }
+  // @Test
+  // public void testMoveToNextDoc_resetObjectIterator() throws Exception {
+  // _iterator.inject_CurrentDoc(null); // reset Iterator
+  // String fullname = "Test.Doc";
+  // _docList.add(fullname);
+  // String fullname2 = "Test.Doc2";
+  // _docList.add(fullname2);
+  // _iterator.setDocList(_docList);
+  // expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc
+  // ).anyTimes();
+  // expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2
+  // ).anyTimes();
+  // replay(_xwiki);
+  // Iterator<BaseObject> firstObjectIterator = _iterator.getObjectIterator();
+  // _iterator.moveToNextDoc();
+  // Iterator<BaseObject> secondObjectIterator = _iterator.getObjectIterator();
+  // assertNotSame("moveToNextDoc must reset the ObjectIterator.",
+  // firstObjectIterator, secondObjectIterator);
+  // verify(_xwiki);
+  // }
 
   @Test
   public void testMoveToNextDoc_updateCurrentDoc() throws Exception {
@@ -156,8 +155,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _iterator.moveToNextDoc();
     XWikiDocument secondDoc = _iterator.getCurrentDoc();
     assertNotNull(firstDoc);
-    assertNotSame("moveToNextDoc must update the currentDoc.",
-        firstDoc, secondDoc);
+    assertNotSame("moveToNextDoc must update the currentDoc.", firstDoc, secondDoc);
     verify(_xwiki);
   }
 
@@ -200,8 +198,8 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.getDocIterator();
       fail("Expecting exception.");
-    } catch(IllegalStateException ex) {
-      //expected behaviour
+    } catch (IllegalStateException ex) {
+      // expected behaviour
     }
   }
 
@@ -231,8 +229,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj.setXClassReference(_testClassRef);
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     _iterator.next();
@@ -251,8 +248,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     _iterator.next();
@@ -270,15 +266,14 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     try {
       _iterator.hasNext();
       fail("Expecting exception.");
-    } catch(IllegalStateException ex) {
-      //expected behaviour
+    } catch (IllegalStateException ex) {
+      // expected behaviour
     }
     verify(_xwiki);
   }
@@ -295,8 +290,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj.setXClassReference(_testClassRef);
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     assertSame("Expecting first object in list.", firstObj, _iterator.next());
@@ -318,8 +312,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj.setXClassReference(_testClassRef);
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     Vector<BaseObject> testObjs2 = new Vector<BaseObject>();
     BaseObject firstObj2 = new BaseObject();
     firstObj2.setXClassReference(_testClassRef);
@@ -328,8 +321,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj2.setXClassReference(_testClassRef);
     testObjs2.add(secondObj2);
     _testDoc2.setXObjects(_testClassRef, testObjs2);
-    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2
-        ).anyTimes();
+    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     assertSame("Expecting first object in list.", firstObj, _iterator.next());
@@ -356,15 +348,11 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj.setXClassReference(_testClassRef);
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
-    DocumentReference docRef0 = new DocumentReference(_context.getDatabase(), "Test",
-        "Doc0");
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
+    DocumentReference docRef0 = new DocumentReference(_context.getDatabase(), "Test", "Doc0");
     XWikiDocument testDoc0 = new XWikiDocument(docRef0);
-    expect(_xwiki.getDocument(eq(docRef0), same(_context))).andReturn(testDoc0).anyTimes(
-        );
-    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2
-        ).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef0), same(_context))).andReturn(testDoc0).anyTimes();
+    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     assertSame("Expecting first object in list.", firstObj, _iterator.next());
@@ -380,17 +368,16 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     _testDoc.setXObject(0, firstObj);
-    // skipping 2 -->   _testDoc.setXObject(2, null); // deleted second object
+    // skipping 2 --> _testDoc.setXObject(2, null); // deleted second object
     BaseObject thirdObject = new BaseObject();
     thirdObject.setXClassReference(_testClassRef);
     _testDoc.setXObject(3, thirdObject);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     assertSame("Expecting first object in list.", firstObj, _iterator.next());
-    assertSame("Expecting third object in list (skipping deleted second one).",
-        thirdObject, _iterator.next());
+    assertSame("Expecting third object in list (skipping deleted second one).", thirdObject,
+        _iterator.next());
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
@@ -405,15 +392,14 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc
-        ).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     try {
       _iterator.next();
       fail("Expecting exception.");
-    } catch(IllegalStateException ex) {
-      //expected behaviour
+    } catch (IllegalStateException ex) {
+      // expected behaviour
     }
     verify(_xwiki);
   }
@@ -425,14 +411,14 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.next();
       fail("Exception expected.");
-    } catch(NoSuchElementException ex) {
-      //expected behaviour
+    } catch (NoSuchElementException ex) {
+      // expected behaviour
     }
     verify(_xwiki);
   }
 
   @Test
-  public void testNext_withFilter() throws Exception{
+  public void testNext_withFilter() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
     String fullname2 = "Test.Doc2";
@@ -446,8 +432,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj.setStringValue("key1", "value1");
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     Vector<BaseObject> testObjs2 = new Vector<BaseObject>();
     BaseObject firstObj2 = new BaseObject();
     firstObj2.setXClassReference(_testClassRef);
@@ -456,8 +441,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     secondObj2.setXClassReference(_testClassRef);
     testObjs.add(secondObj2);
     _testDoc2.setXObjects(_testClassRef, testObjs2);
-    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2
-        ).anyTimes();
+    expect(_xwiki.getDocument(eq(_docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     _iterator.setFilter("key1", "value1");
@@ -468,7 +452,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testValidObject(){
+  public void testValidObject() {
     BaseObject firstObj = new BaseObject();
     firstObj.setStringValue("key1", "value1");
     _iterator.inject_NextObject(firstObj);
@@ -481,8 +465,8 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.remove();
       fail("Remove not supported.");
-    } catch(UnsupportedOperationException ex) {
-      //expected behaviour
+    } catch (UnsupportedOperationException ex) {
+      // expected behaviour
     }
   }
 
@@ -501,8 +485,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     thirdObj.setXClassReference(_testClassRef);
     testObjs.add(thirdObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     int count = 0;
@@ -520,8 +503,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   public void testIterator_foreach_noElements() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes(
-        );
+    expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     int count = 0;
@@ -532,8 +514,8 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     verify(_xwiki);
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
 }

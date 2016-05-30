@@ -32,23 +32,22 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.oldCoreLegacyClasses")
 public class OldCoreLegacyClasses extends AbstractClassCollection {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      OldCoreLegacyClasses.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreLegacyClasses.class);
 
   public static final String XWIKI_SKINS_CLASS_DOC = "XWikiSkins";
   public static final String XWIKI_SKINS_CLASS_SPACE = "XWiki";
   public static final String XWIKI_SKINS_CLASS = XWIKI_SKINS_CLASS_SPACE + "."
-        + XWIKI_SKINS_CLASS_DOC;
+      + XWIKI_SKINS_CLASS_DOC;
 
   public static final String TOOLS_BANNER_CLASS_DOC = "Banner";
   public static final String TOOLS_BANNER_CLASS_SPACE = "Tools";
   public static final String TOOLS_BANNER_CLASS = TOOLS_BANNER_CLASS_SPACE + "."
-        + TOOLS_BANNER_CLASS_DOC;
+      + TOOLS_BANNER_CLASS_DOC;
 
   public static final String TOOLS_FLASH_BANNER_CLASS_DOC = "FlashBanner";
   public static final String TOOLS_FLASH_BANNER_CLASS_SPACE = "Tools";
-  public static final String TOOLS_FLASH_BANNER_CLASS = TOOLS_FLASH_BANNER_CLASS_SPACE
-      + "." + TOOLS_FLASH_BANNER_CLASS_DOC;
+  public static final String TOOLS_FLASH_BANNER_CLASS = TOOLS_FLASH_BANNER_CLASS_SPACE + "."
+      + TOOLS_FLASH_BANNER_CLASS_DOC;
 
   public static final String MEDIALIB_CONFIG_CLASS_DOC = "MediaLibConfigClass";
   public static final String MEDIALIB_CONFIG_CLASS_SPACE = "Classes";
@@ -62,8 +61,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
 
   public static final String FORM_FIELD_CLASS_DOC = "FormFieldClass";
   public static final String FORM_FIELD_CLASS_SPACE = "Celements2";
-  public static final String FORM_FIELD_CLASS = FORM_FIELD_CLASS_SPACE + "."
-      + FORM_FIELD_CLASS_DOC;
+  public static final String FORM_FIELD_CLASS = FORM_FIELD_CLASS_SPACE + "." + FORM_FIELD_CLASS_DOC;
 
   @Override
   protected Log getLogger() {
@@ -85,8 +83,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getXWikiSkinsClassRef(String wikiName) {
-    return new DocumentReference(wikiName, XWIKI_SKINS_CLASS_SPACE,
-        XWIKI_SKINS_CLASS_DOC);
+    return new DocumentReference(wikiName, XWIKI_SKINS_CLASS_SPACE, XWIKI_SKINS_CLASS_DOC);
   }
 
   private BaseClass getExtended_XWikiSkinsClass() throws XWikiException {
@@ -105,16 +102,14 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("menu_elements", "Available Menu Elements", 30);
-    needsUpdate |= bclass.addTextField("skin_config_class_name",
-        "Skin Config Class Name", 30);
+    needsUpdate |= bclass.addTextField("skin_config_class_name", "Skin Config Class Name", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getFormFieldClassRef(String wikiName) {
-    return new DocumentReference(wikiName, FORM_FIELD_CLASS_SPACE,
-        FORM_FIELD_CLASS_DOC);
+    return new DocumentReference(wikiName, FORM_FIELD_CLASS_SPACE, FORM_FIELD_CLASS_DOC);
   }
 
   private BaseClass getFormFieldClass() throws XWikiException {
@@ -134,16 +129,14 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("fieldname", "fieldname", 30);
     needsUpdate |= addBooleanField(bclass, "isRequired", "is Required", "yesno", 0);
-    needsUpdate |= addBooleanField(bclass, "ruleSnippet", "Rule velocity Snippet",
-        "yesno", 0);
+    needsUpdate |= addBooleanField(bclass, "ruleSnippet", "Rule velocity Snippet", "yesno", 0);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getBannerClassRef(String wikiName) {
-    return new DocumentReference(wikiName, TOOLS_BANNER_CLASS_SPACE,
-        TOOLS_BANNER_CLASS_DOC);
+    return new DocumentReference(wikiName, TOOLS_BANNER_CLASS_SPACE, TOOLS_BANNER_CLASS_DOC);
   }
 
   private BaseClass getBannerClass() throws XWikiException {
@@ -181,8 +174,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + TOOLS_FLASH_BANNER_CLASS + " class document. ",
-          exp);
+      LOGGER.error("Failed to get " + TOOLS_FLASH_BANNER_CLASS + " class document. ", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -200,8 +192,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getMediaLibConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, MEDIALIB_CONFIG_CLASS_SPACE,
-        MEDIALIB_CONFIG_CLASS_DOC);
+    return new DocumentReference(wikiName, MEDIALIB_CONFIG_CLASS_SPACE, MEDIALIB_CONFIG_CLASS_DOC);
   }
 
   private BaseClass getMediaLibConfigClass() throws XWikiException {
@@ -230,8 +221,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getDocLibConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, DOCLIB_CONFIG_CLASS_SPACE,
-        DOCLIB_CONFIG_CLASS_DOC);
+    return new DocumentReference(wikiName, DOCLIB_CONFIG_CLASS_SPACE, DOCLIB_CONFIG_CLASS_DOC);
   }
 
   private BaseClass getDocLibConfigClass() throws XWikiException {
@@ -250,8 +240,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("browser_doc", "Browser document full name", 30);
-    needsUpdate |= bclass.addTextField("content_doc",
-        "Content default document (optional)", 30);
+    needsUpdate |= bclass.addTextField("content_doc", "Content default document (optional)", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;

@@ -34,10 +34,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celMenuClasses")
 public class MenuClasses extends CelementsClassCollection {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      MenuClasses.class);
+  private static Log mLogger = LogFactory.getFactory().getInstance(MenuClasses.class);
 
-  public MenuClasses() {}
+  public MenuClasses() {
+  }
 
   @Override
   protected void initClasses(XWikiContext context) throws XWikiException {
@@ -54,13 +54,12 @@ public class MenuClasses extends CelementsClassCollection {
     return "celMenuClasses";
   }
 
-  protected BaseClass getMenuBarHeaderItemClass(XWikiContext context
-      ) throws XWikiException {
+  protected BaseClass getMenuBarHeaderItemClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
-      "MenuBarHeaderItemClass");
-    
+        "MenuBarHeaderItemClass");
+
     try {
       doc = context.getWiki().getDocument(classRef, context);
     } catch (XWikiException e) {
@@ -68,25 +67,24 @@ public class MenuClasses extends CelementsClassCollection {
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("name", "Name (dictionary possible)", 30);
     needsUpdate |= bclass.addNumberField("header_id", "Header Id", 10, "integer");
     needsUpdate |= bclass.addNumberField("pos", "Position", 10, "integer");
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
   }
 
-  protected BaseClass getMenuBarSubItemClass(XWikiContext context
-      ) throws XWikiException {
+  protected BaseClass getMenuBarSubItemClass(XWikiContext context) throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = context.getWiki();
     boolean needsUpdate = false;
     DocumentReference classRef = new DocumentReference(context.getDatabase(), "Celements",
-      "MenuBarSubItemClass");
-    
+        "MenuBarSubItemClass");
+
     try {
       doc = xwiki.getDocument(classRef, context);
     } catch (XWikiException e) {
@@ -94,7 +92,7 @@ public class MenuClasses extends CelementsClassCollection {
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("name", "Name (dictionary possible)", 30);
@@ -102,7 +100,7 @@ public class MenuClasses extends CelementsClassCollection {
     needsUpdate |= bclass.addNumberField("itempos", "Position", 10, "integer");
     needsUpdate |= bclass.addTextField("link", "Link (velocity possible)", 30);
     needsUpdate |= bclass.addTextField("css_classes", "CSS Classes", 30);
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate, context);
     return bclass;
   }

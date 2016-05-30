@@ -26,13 +26,11 @@ import com.celements.sajson.ECommand;
 import com.celements.sajson.IGenericLiteral;
 
 public enum EReorderLiteral implements IGenericLiteral {
-  ELEMENT_ID(ECommand.VALUE_COMMAND),
-  ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND, ELEMENT_ID),
-  PARENT_CHILDREN_PROPERTY(ECommand.PROPERTY_COMMAND, ELEM_IDS_ARRAY),
-  REQUEST_DICT(ECommand.DICTIONARY_COMMAND, PARENT_CHILDREN_PROPERTY),
-  REQUEST_ARRAY(ECommand.ARRAY_COMMAND, REQUEST_DICT);
-  
-  
+  ELEMENT_ID(ECommand.VALUE_COMMAND), ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND,
+      ELEMENT_ID), PARENT_CHILDREN_PROPERTY(ECommand.PROPERTY_COMMAND,
+          ELEM_IDS_ARRAY), REQUEST_DICT(ECommand.DICTIONARY_COMMAND,
+              PARENT_CHILDREN_PROPERTY), REQUEST_ARRAY(ECommand.ARRAY_COMMAND, REQUEST_DICT);
+
   private EReorderLiteral[] literals;
   private ECommand command;
   private int nextLiteral = 0;
@@ -59,8 +57,7 @@ public enum EReorderLiteral implements IGenericLiteral {
     return literals[0];
   }
 
-  public IGenericLiteral getPropertyLiteralForKey(String key,
-      IGenericLiteral placeholder) {
+  public IGenericLiteral getPropertyLiteralForKey(String key, IGenericLiteral placeholder) {
     return placeholder;
   }
 }

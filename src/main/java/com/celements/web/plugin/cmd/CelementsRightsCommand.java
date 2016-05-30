@@ -33,23 +33,23 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class CelementsRightsCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      CelementsRightsCommand.class);
-  
+  private static Log mLogger = LogFactory.getFactory().getInstance(CelementsRightsCommand.class);
+
   public boolean isCelementsRights(String fullName, XWikiContext context) {
     try {
       XWikiDocument doc = context.getWiki().getDocument(fullName, context);
       Vector<BaseObject> rights = doc.getObjects("XWiki.XWikiRights");
-      if (rights != null){
+      if (rights != null) {
         for (BaseObject right : rights) {
           if (right != null) {
             boolean validGroups = isValidGroups(right);
             boolean validUsers = isValidUsers(right);
             boolean validLevels = isValidLevels(right);
             mLogger.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
-                + right.getNumber() + "] results: " + validGroups + ", " + validUsers
-                + ", " + validLevels);
-            if (!(validGroups && validUsers && validLevels)) return false;
+                + right.getNumber() + "] results: " + validGroups + ", " + validUsers + ", "
+                + validLevels);
+            if (!(validGroups && validUsers && validLevels))
+              return false;
           }
         }
       }
@@ -59,42 +59,39 @@ public class CelementsRightsCommand {
     }
     return false;
   }
-  
+
   boolean isValidGroups(BaseObject right) {
-    return ((getPropertyList(right, "groups").size() == 0) 
-        || ((getPropertyList(right, "groups").size() == 1) 
-            && (getPropertyList(right, "users").size() == 0)));
+    return ((getPropertyList(right, "groups").size() == 0) || ((getPropertyList(right,
+        "groups").size() == 1) && (getPropertyList(right, "users").size() == 0)));
   }
 
   boolean isValidUsers(BaseObject right) {
     if (getPropertyList(right, "users").size() == 0) {
       return true;
     }
-    if ((getPropertyList(right, "users").size() == 1)
-        && "XWiki.XWikiGuest".equals(getPropertyList(right, "users").get(0))
-        && (getPropertyList(right, "groups").size() == 0)) {
+    if ((getPropertyList(right, "users").size() == 1) && "XWiki.XWikiGuest".equals(getPropertyList(
+        right, "users").get(0)) && (getPropertyList(right, "groups").size() == 0)) {
       return true;
     }
     return false;
   }
-  
+
   boolean isValidLevels(BaseObject right) {
     List<String> levels = getPropertyList(right, "levels");
     if ((levels.size() == 0) || ((levels.size() == 1) && levels.contains("view"))) {
       return true;
-    }
-    else if ((levels.size() == 4) && levels.contains("view") && levels.contains("edit") 
+    } else if ((levels.size() == 4) && levels.contains("view") && levels.contains("edit")
         && levels.contains("delete") && levels.contains("undelete")) {
       return true;
     }
     return false;
   }
-  
+
   private List<String> getPropertyList(BaseObject right, String key) {
-    mLogger.trace("getPropertyList: key [" + key + "] value ["
-        + right.getLargeStringValue(key) + "] " );
-    if ((right.getLargeStringValue(key) == null)
-        || "".equals(right.getLargeStringValue(key))) return Collections.emptyList();
+    mLogger.trace("getPropertyList: key [" + key + "] value [" + right.getLargeStringValue(key)
+        + "] ");
+    if ((right.getLargeStringValue(key) == null) || "".equals(right.getLargeStringValue(key)))
+      return Collections.emptyList();
     return Arrays.asList(right.getLargeStringValue(key).split(","));
   }
 }

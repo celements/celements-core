@@ -9,13 +9,17 @@ public interface ICellsClassConfig {
   public static final String CELEMENTS_CELL_CLASS_SPACE = "Celements";
   public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
   public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
-    + CELEMENTS_CELL_CLASS_NAME;
+      + CELEMENTS_CELL_CLASS_NAME;
   public static final String CELLCLASS_IDNAME_FIELD = "idname";
 
   public DocumentReference getCellClassRef(String wikiName);
+
   public DocumentReference getPageLayoutPropertiesClassRef(String wikiName);
+
   public DocumentReference getGroupCellClassRef(String wikiName);
+
   public DocumentReference getPageDepCellConfigClassRef(String wikiName);
+
   public DocumentReference getTranslationBoxCellConfigClassRef(String wikiName);
 
 }

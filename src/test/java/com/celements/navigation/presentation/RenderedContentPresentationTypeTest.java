@@ -41,8 +41,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 
-public class RenderedContentPresentationTypeTest
-    extends AbstractBridgedComponentTestCase {
+public class RenderedContentPresentationTypeTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private INavigation nav;
@@ -56,8 +55,7 @@ public class RenderedContentPresentationTypeTest
   @Before
   public void setUp_RenderedContentPresentationTypeTest() throws Exception {
     context = getContext();
-    currentDocRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyCurrentDoc");
+    currentDocRef = new DocumentReference(context.getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     context.setDoc(currentDoc);
     nav = createMock(INavigation.class);
@@ -90,8 +88,8 @@ public class RenderedContentPresentationTypeTest
 
   @Test
   public void testWriteNodeContent() throws Exception {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "MyPage");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "MyPage");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     StringBuilder outStream = new StringBuilder();
@@ -99,32 +97,31 @@ public class RenderedContentPresentationTypeTest
     boolean isLastItem = false;
     boolean isLeaf = true;
     String expectedNodeContent = "expected rendered content for node";
-    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view"))
-        ).andReturn(expectedNodeContent);
+    expect(renderCmdMock.renderCelementsDocument(eq(currentDocRef), eq("view"))).andReturn(
+        expectedNodeContent);
     expect(nav.addUniqueElementId(eq(currentDocRef))).andReturn(
-    "id=\"N3:Content:Content.MyPage\"").once();
-    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem),
-        eq(isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
+        "id=\"N3:Content:Content.MyPage\"").once();
+    expect(nav.addCssClasses(eq(currentDocRef), eq(true), eq(isFirstItem), eq(isLastItem), eq(
+        isLeaf), eq(1))).andReturn("class=\"cel_cm_navigation_menuitem"
             + " first cel_nav_isLeaf RichText\"").once();
     replayAll();
-    vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf,
-        1, nav);
+    vtPresType.writeNodeContent(outStream, isFirstItem, isLastItem, currentDocRef, isLeaf, 1, nav);
     assertEquals("<div class=\"cel_cm_navigation_menuitem first cel_nav_isLeaf RichText\""
         + " id=\"N3:Content:Content.MyPage\">\n" + expectedNodeContent + "</div>\n",
         outStream.toString());
     verifyAll();
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(xwiki, testRenderEngine.getMock(), renderCmdMock, nav);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(xwiki, testRenderEngine.getMock(), renderCmdMock, nav);
     verify(mocks);
   }
@@ -141,13 +138,13 @@ public class RenderedContentPresentationTypeTest
     public XWikiRenderingEngine getMock() {
       return mockRenderEngine;
     }
-    
+
     public void addRenderer(String name, XWikiRenderer renderer) {
       throw new UnsupportedOperationException();
     }
 
-    public String convertMultiLine(String macroname, String params, String data,
-        String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+    public String convertMultiLine(String macroname, String params, String data, String allcontent,
+        XWikiVirtualMacro macro, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
@@ -172,15 +169,13 @@ public class RenderedContentPresentationTypeTest
       throw new UnsupportedOperationException();
     }
 
-    public String interpretText(String text, XWikiDocument includingdoc,
-        XWikiContext context) {
+    public String interpretText(String text, XWikiDocument includingdoc, XWikiContext context) {
       VelocityContext velocityContext = (VelocityContext) context.get("vcontext");
       storedVelocityContext.add((VelocityContext) velocityContext.clone());
       return mockRenderEngine.interpretText(text, includingdoc, context);
     }
 
-    public String renderDocument(XWikiDocument doc, XWikiContext context)
-        throws XWikiException {
+    public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
       throw new UnsupportedOperationException();
     }
 
@@ -189,13 +184,12 @@ public class RenderedContentPresentationTypeTest
       throw new UnsupportedOperationException();
     }
 
-    public String renderText(String text, XWikiDocument includingdoc,
-        XWikiContext context) {
+    public String renderText(String text, XWikiDocument includingdoc, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
-    public String renderText(String text, XWikiDocument contentdoc,
-        XWikiDocument includingdoc, XWikiContext context) {
+    public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
+        XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 

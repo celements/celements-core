@@ -31,15 +31,15 @@ public class DocMetaTagsCmd {
   public Map<String, String> getDocMetaTags(String language, String defaultLanguage,
       XWikiContext context) {
     // get DocumentSpecific Meta-Tag Keywords
-    Map<String, Map<String, String>> metaTagsLangMap =
-      getObjectsMappedByLanguage("Classes.MetaTag", context);
+    Map<String, Map<String, String>> metaTagsLangMap = getObjectsMappedByLanguage("Classes.MetaTag",
+        context);
     mergeMetaTagClassObjs(metaTagsLangMap, context);
-    Map<String, String> metaTags = new HashMap<String,String>();
+    Map<String, String> metaTags = new HashMap<String, String>();
     if (metaTagsLangMap.get(defaultLanguage) != null) {
       // get default language meta keys
       metaTags.putAll(metaTagsLangMap.get(defaultLanguage));
-      if ((defaultLanguage != null) && !defaultLanguage.equals(language)
-          && (metaTagsLangMap.get(language) != null)) {
+      if ((defaultLanguage != null) && !defaultLanguage.equals(language) && (metaTagsLangMap.get(
+          language) != null)) {
         // overwrite translated keys
         metaTags.putAll(metaTagsLangMap.get(language));
       }
@@ -56,20 +56,18 @@ public class DocMetaTagsCmd {
     }
   }
 
-  private Map<String,Map<String,String>> getObjectsMappedByLanguage(String className,
+  private Map<String, Map<String, String>> getObjectsMappedByLanguage(String className,
       XWikiContext context) {
-    Map<String,Map<String,String>> metaTagsLangMap =
-      new HashMap<String, Map<String, String>>();
+    Map<String, Map<String, String>> metaTagsLangMap = new HashMap<String, Map<String, String>>();
     Vector metaTagObjects = context.getDoc().getObjects(className);
     if (metaTagObjects != null) {
       for (java.lang.Object entry : metaTagObjects) {
         if (entry instanceof BaseObject) {
-          BaseObject baseObject = (BaseObject)entry;
+          BaseObject baseObject = (BaseObject) entry;
           String lang = baseObject.getStringValue("lang");
           String key = baseObject.getStringValue("key");
-          if((!"".equals(lang) && (!"".equals(key)))) {
-            getMetaTagsForLang(metaTagsLangMap, lang).put(key, baseObject.getStringValue(
-                "value"));
+          if ((!"".equals(lang) && (!"".equals(key)))) {
+            getMetaTagsForLang(metaTagsLangMap, lang).put(key, baseObject.getStringValue("value"));
           }
         }
       }
@@ -77,12 +75,12 @@ public class DocMetaTagsCmd {
     return metaTagsLangMap;
   }
 
-  private Map<String, String> getMetaTagsForLang(
-      Map<String, Map<String, String>> metaTagsLangMap, String lang) {
+  private Map<String, String> getMetaTagsForLang(Map<String, Map<String, String>> metaTagsLangMap,
+      String lang) {
     if (!metaTagsLangMap.containsKey(lang)) {
       metaTagsLangMap.put(lang, new HashMap<String, String>());
     }
     return metaTagsLangMap.get(lang);
   }
-  
+
 }

@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiException;
 
 @ComponentRole
 public interface ITreeNodeService {
-    
+
   public int getActiveMenuItemPos(int menuLevel, String menuPart);
 
   public int getMenuItemPos(DocumentReference docRef, String menuPart);
@@ -42,70 +42,62 @@ public interface ITreeNodeService {
   public boolean isTreeNode(DocumentReference docRef);
 
   /**
-   * 
-   * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
-   * getSubNodesForParent(EntityReference, String) instead
+   * @deprecated since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter) or
+   *             getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter);
-  
-  public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef,
-      INavFilter<T> filter);
-  
+
+  public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef, INavFilter<T> filter);
+
   /**
-   * 
-   * since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
-   * getSubNodesForParent(EntityReference, String) instead
-   *
-   * get all subnodes of a given parent document (by fullname).
+   * since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter) or
+   * getSubNodesForParent(EntityReference, String) instead get all subnodes of a given
+   * parent document (by fullname).
    * 
    * @param parent
-   * @param menuSpace (default: $doc.space)
-   * @param menuPart 
+   * @param menuSpace
+   *          (default: $doc.space)
+   * @param menuPart
    * @return (array of tree nodes)
    */
   @Deprecated
-  public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
-      String menuPart);
-  
+  public List<TreeNode> getSubNodesForParent(String parent, String menuSpace, String menuPart);
+
   public List<TreeNode> getSubNodesForParent(EntityReference entRef, String menuPart);
 
   /**
-   * 
-   * @deprecated since 2.14.0 use getSubNodesForParent(EntityReference, INavFilter)  or 
-   * getSubNodesForParent(EntityReference, String) instead
+   * @deprecated since 2.14.0 use getSubNodesForParent(EntityReference, INavFilter) or
+   *             getSubNodesForParent(EntityReference, String) instead
    */
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
       INavFilter<T> filter);
-  
+
   public Integer getMaxConfiguredNavigationLevel();
-  
+
   public TreeNode getPrevMenuItem(DocumentReference docRef) throws XWikiException;
-  
+
   public TreeNode getNextMenuItem(DocumentReference docRef) throws XWikiException;
-  
+
   public List<TreeNode> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart);
-  
+
   public void enableMappedMenuItems();
 
   public EntityReference getParentReference(DocumentReference docRef);
 
-  public EntityReference getParentEntityRef(DocumentReference docRef
-      ) throws XWikiException;
+  public EntityReference getParentEntityRef(DocumentReference docRef) throws XWikiException;
 
-  public void moveTreeDocAfter(DocumentReference moveDocRef,
-      DocumentReference insertAfterDocRef) throws XWikiException;
+  public void moveTreeDocAfter(DocumentReference moveDocRef, DocumentReference insertAfterDocRef)
+      throws XWikiException;
 
-  public TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef
-      ) throws XWikiException;
+  public TreeNode getTreeNodeForDocRef(DocumentReference moveDocRef) throws XWikiException;
 
-  public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef
-      ) throws XWikiException;
+  public List<TreeNode> getSiblingTreeNodes(DocumentReference moveDocRef) throws XWikiException;
 
   public void storeOrder(List<TreeNode> newTreeNodes);
-  
+
   public void storeOrder(List<TreeNode> newTreeNodes, boolean isMinorEdit);
 
 }

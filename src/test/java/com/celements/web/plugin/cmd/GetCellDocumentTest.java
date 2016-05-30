@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
+
   private XWikiContext context;
   private XWiki xwiki;
   private XWikiStoreInterface store;
@@ -63,14 +64,13 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
     paramList.add("field");
     paramList.add("value");
     expect(xwiki.getStore()).andReturn(store).anyTimes();
-    expect(store.searchDocuments((String)anyObject(), eq(paramList),same(context)))
-        .andReturn(docList).once();
+    expect(store.searchDocuments((String) anyObject(), eq(paramList), same(context))).andReturn(
+        docList).once();
     XWikiDocument lDoc = new XWikiDocument("Space", "Name");
     expect(plc.getLayoutPropDoc()).andReturn(lDoc).once();
     replay(plc, store, xwiki);
     cmd.injectPageLayoutCommand(plc);
-    XWikiDocument result = cmd.getCellDoc("Class.Name", "field", "value", 
-        context);
+    XWikiDocument result = cmd.getCellDoc("Class.Name", "field", "value", context);
     verify(plc, store, xwiki);
     assertEquals(doc, result);
   }
@@ -86,11 +86,10 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
     paramList.add("field");
     paramList.add("value");
     expect(xwiki.getStore()).andReturn(store).anyTimes();
-    expect(store.searchDocuments((String)anyObject(), eq(paramList),same(context)))
-        .andReturn(docList).once();
+    expect(store.searchDocuments((String) anyObject(), eq(paramList), same(context))).andReturn(
+        docList).once();
     replay(store, xwiki);
-    XWikiDocument result = cmd.getCellDoc("Space", "Class.Name", "field", "value", 
-        context);
+    XWikiDocument result = cmd.getCellDoc("Space", "Class.Name", "field", "value", context);
     verify(store, xwiki);
     assertEquals(doc, result);
   }

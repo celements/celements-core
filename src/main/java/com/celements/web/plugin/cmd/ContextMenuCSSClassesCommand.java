@@ -33,8 +33,8 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * TODO Unit Tests!!!
+ * 
  * @author fabian
- *
  */
 public class ContextMenuCSSClassesCommand {
 
@@ -69,7 +69,7 @@ public class ContextMenuCSSClassesCommand {
   }
 
   Set<String> getCMcssClassesOneDB(XWikiContext context) {
-    Set<String> cmCSSclasses = new HashSet<String>(); 
+    Set<String> cmCSSclasses = new HashSet<String>();
     try {
       List<Object> resultList = context.getWiki().search(getCMhql(), context);
       for (Object classNameObject : resultList) {
@@ -83,9 +83,8 @@ public class ContextMenuCSSClassesCommand {
 
   String getCMhql() {
     return "select doc.name from XWikiDocument as doc, BaseObject as obj"
-      + " where obj.name = doc.fullName and doc.space = 'CelementsContextMenu'"
-      + " and obj.className = 'Celements2.ContextMenuItemClass'";
+        + " where obj.name = doc.fullName and doc.space = 'CelementsContextMenu'"
+        + " and obj.className = 'Celements2.ContextMenuItemClass'";
   }
-
 
 }

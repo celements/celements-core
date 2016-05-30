@@ -33,11 +33,9 @@ import com.celements.web.service.IWebUtilsService;
 @Component
 public class FormValidationService implements IFormValidationServiceRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      FormValidationService.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(FormValidationService.class);
 
-  private static final MapHandler<String, ValidationType, String> MAPHANDLER =
-      new MapHandler<String, ValidationType, String>();
+  private static final MapHandler<String, ValidationType, String> MAPHANDLER = new MapHandler<String, ValidationType, String>();
 
   @Requirement
   private IWebUtilsService webUtils;
@@ -48,8 +46,7 @@ public class FormValidationService implements IFormValidationServiceRole {
   @Requirement
   private Map<String, IFieldValidationRuleRole> fieldValidationRules;
 
-  void injectValidationRules(
-      Map<String, IRequestValidationRuleRole> requestValidationRules,
+  void injectValidationRules(Map<String, IRequestValidationRuleRole> requestValidationRules,
       Map<String, IFieldValidationRuleRole> fieldValidationRules) {
     this.requestValidationRules = requestValidationRules;
     this.fieldValidationRules = fieldValidationRules;
@@ -66,8 +63,7 @@ public class FormValidationService implements IFormValidationServiceRole {
 
   public Map<String, Map<ValidationType, Set<String>>> validateMap(
       Map<String, String[]> requestMap) {
-    Map<String, Map<ValidationType, Set<String>>> ret =
-        new HashMap<String, Map<ValidationType, Set<String>>>();
+    Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<String, Map<ValidationType, Set<String>>>();
     Map<RequestParameter, String[]> convertedRequestMap = convertMapKeys(requestMap);
     for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
       LOGGER.trace("Calling validateRequest() for rule '" + validationRule + "'");
@@ -87,8 +83,8 @@ public class FormValidationService implements IFormValidationServiceRole {
     return convMap;
   }
 
-  public Map<ValidationType, Set<String>> validateField(String className,
-      String fieldName, String value) {
+  public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
+      String value) {
     Map<ValidationType, Set<String>> ret = new HashMap<ValidationType, Set<String>>();
     for (IFieldValidationRuleRole validationRule : fieldValidationRules.values()) {
       LOGGER.trace("Calling validateField() for rule '" + validationRule + "'");

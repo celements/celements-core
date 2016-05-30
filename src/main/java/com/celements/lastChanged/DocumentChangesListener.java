@@ -19,7 +19,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("lastChange-DocumentChangesListener")
 public class DocumentChangesListener implements EventListener {
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(DocumentChangesListener.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(DocumentChangesListener.class);
 
   @Requirement
   ILastChangedRole lastChangedSrv;
@@ -40,7 +40,7 @@ public class DocumentChangesListener implements EventListener {
     if ((source != null) && (source instanceof XWikiDocument)) {
       XWikiDocument doc = (XWikiDocument) source;
       DocumentReference docRef = doc.getDocumentReference();
-      ((LastChangedService)lastChangedSrv).invalidateCacheForSpaceRef(
+      ((LastChangedService) lastChangedSrv).invalidateCacheForSpaceRef(
           docRef.getLastSpaceReference());
     } else {
       _LOGGER.error("onEvent failed docref '{}'", source);

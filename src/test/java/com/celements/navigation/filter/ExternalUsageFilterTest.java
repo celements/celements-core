@@ -64,8 +64,7 @@ public class ExternalUsageFilterTest extends AbstractBridgedComponentTestCase {
     InternalRightsFilter rightsFilterNew = createMock(InternalRightsFilter.class);
     filter.setRightsFilter(rightsFilterNew);
     assertNotNull(filter.getRightsFilter());
-    assertSame("expecting injected filter object", rightsFilterNew,
-        filter.getRightsFilter());
+    assertSame("expecting injected filter object", rightsFilterNew, filter.getRightsFilter());
   }
 
   @Test
@@ -73,7 +72,7 @@ public class ExternalUsageFilterTest extends AbstractBridgedComponentTestCase {
     BaseObject baseObj = new BaseObject();
     expect(rightsService.hasProgrammingRights(same(context))).andReturn(true).anyTimes();
     replay(wiki, rightsService, rightsFilter);
-    assertSame(baseObj, filter.convertObject(baseObj , context).getXWikiObject());
+    assertSame(baseObj, filter.convertObject(baseObj, context).getXWikiObject());
     verify(wiki, rightsService, rightsFilter);
   }
 
@@ -89,8 +88,7 @@ public class ExternalUsageFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeMenuItem_delegate() {
     BaseObject baseObj = new BaseObject();
-    expect(rightsFilter.includeMenuItem(same(baseObj), same(context))).andReturn(true
-        ).once();
+    expect(rightsFilter.includeMenuItem(same(baseObj), same(context))).andReturn(true).once();
     replay(wiki, rightsService, rightsFilter);
     assertEquals(true, filter.includeMenuItem(baseObj, context));
     verify(wiki, rightsService, rightsFilter);

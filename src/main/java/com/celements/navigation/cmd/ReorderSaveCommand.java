@@ -30,12 +30,12 @@ import com.xpn.xwiki.XWikiContext;
 
 public class ReorderSaveCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ReorderSaveCommand.class);
+  private static Log mLogger = LogFactory.getFactory().getInstance(ReorderSaveCommand.class);
   private ReorderSaveHandler injected_Handler;
 
   /**
    * For Tests only!!!
+   * 
    * @param injectedHandler
    */
   void injected_Handler(ReorderSaveHandler injectedHandler) {
@@ -49,11 +49,9 @@ public class ReorderSaveCommand {
     return new ReorderSaveHandler(context);
   }
 
-  public String reorderSave(String fullName, String structureJSON,
-      XWikiContext context) {
+  public String reorderSave(String fullName, String structureJSON, XWikiContext context) {
     ReorderSaveHandler handler = getHandler(context);
-    Parser jsonParser = Parser.createLexicalParser(EReorderLiteral.REQUEST_ARRAY,
-        handler);
+    Parser jsonParser = Parser.createLexicalParser(EReorderLiteral.REQUEST_ARRAY, handler);
     try {
       jsonParser.parse(structureJSON);
       return "OK";

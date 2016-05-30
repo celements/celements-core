@@ -9,5 +9,5 @@ public class AddingAttachmentContentFailedException extends Exception {
   public AddingAttachmentContentFailedException(IOException exp) {
     super(exp);
   }
-  
+
 }

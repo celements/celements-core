@@ -10,7 +10,7 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 
 public class XObjectPageTypeCacheListenerTest extends AbstractBridgedComponentTestCase {
-  
+
   private static final String _COMPONENT_NAME = "XObjectPageTypeCacheListener";
   private XObjectPageTypeCacheListener eventListener;
 
@@ -30,8 +30,7 @@ public class XObjectPageTypeCacheListenerTest extends AbstractBridgedComponentTe
   }
 
   private XObjectPageTypeCacheListener getXObjectPageTypeCacheListener() {
-    return (XObjectPageTypeCacheListener) Utils.getComponent(EventListener.class,
-        _COMPONENT_NAME);
+    return (XObjectPageTypeCacheListener) Utils.getComponent(EventListener.class, _COMPONENT_NAME);
   }
 
 }

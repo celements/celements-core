@@ -21,16 +21,15 @@ public interface ICelFTPClient {
 
   public List<String> listFileNames() throws IOException, FTPConnectionClosedException;
 
-  public boolean connectAndLogin (String host, String userName, String password
-      ) throws  IOException, UnknownHostException, FTPConnectionClosedException;
+  public boolean connectAndLogin(String host, String userName, String password) throws IOException,
+      UnknownHostException, FTPConnectionClosedException;
 
-  public boolean connectAndLogin (String host, Integer port, String userName, String password
-      ) throws  IOException, UnknownHostException, FTPConnectionClosedException;
+  public boolean connectAndLogin(String host, Integer port, String userName, String password)
+      throws IOException, UnknownHostException, FTPConnectionClosedException;
 
   public boolean login(String username, String password) throws IOException;
 
-  public boolean login(String username, String password, String account
-      ) throws IOException;
+  public boolean login(String username, String password, String account) throws IOException;
 
   public boolean isConnectedAndReady();
 
@@ -42,7 +41,7 @@ public interface ICelFTPClient {
 
   public boolean binary() throws IOException;
 
-  public boolean ascii () throws IOException;
+  public boolean ascii() throws IOException;
 
   public String printWorkingDirectory() throws IOException;
 
@@ -66,8 +65,7 @@ public interface ICelFTPClient {
 
   public void enterLocalPassiveMode();
 
-  public boolean enterRemoteActiveMode(InetAddress host, int port
-      ) throws IOException;
+  public boolean enterRemoteActiveMode(InetAddress host, int port) throws IOException;
 
   public boolean enterRemotePassiveMode() throws IOException;
 
@@ -91,8 +89,7 @@ public interface ICelFTPClient {
 
   public boolean setFileType(int fileType) throws IOException;
 
-  public boolean setFileType(int fileType, int formatOrByteSize
-      ) throws IOException;
+  public boolean setFileType(int fileType, int formatOrByteSize) throws IOException;
 
   public boolean setFileStructure(int structure) throws IOException;
 
@@ -110,23 +107,19 @@ public interface ICelFTPClient {
 
   public boolean completePendingCommand() throws IOException;
 
-  public boolean retrieveFile(String remote, OutputStream local
-      ) throws IOException;
+  public boolean retrieveFile(String remote, OutputStream local) throws IOException;
 
   public InputStream retrieveFileStream(String remote) throws IOException;
 
-  public boolean storeFile(String remote, InputStream local
-      ) throws IOException;
+  public boolean storeFile(String remote, InputStream local) throws IOException;
 
   public OutputStream storeFileStream(String remote) throws IOException;
 
-  public boolean appendFile(String remote, InputStream local
-      ) throws IOException;
+  public boolean appendFile(String remote, InputStream local) throws IOException;
 
   public OutputStream appendFileStream(String remote) throws IOException;
 
-  public boolean storeUniqueFile(String remote, InputStream local
-      ) throws IOException;
+  public boolean storeUniqueFile(String remote, InputStream local) throws IOException;
 
   public OutputStream storeUniqueFileStream(String remote) throws IOException;
 
@@ -190,18 +183,16 @@ public interface ICelFTPClient {
 
   public FTPFile[] listFiles() throws IOException;
 
-  public FTPFile[] listFiles(String pathname, FTPFileFilter filter
-      ) throws IOException;
+  public FTPFile[] listFiles(String pathname, FTPFileFilter filter) throws IOException;
 
   public FTPFile[] listDirectories() throws IOException;
 
   public FTPFile[] listDirectories(String parent) throws IOException;
 
-  public FTPListParseEngine initiateListParsing(String pathname
-      ) throws IOException;
+  public FTPListParseEngine initiateListParsing(String pathname) throws IOException;
 
-  public FTPListParseEngine initiateListParsing(String parserKey,
-      String pathname) throws IOException;
+  public FTPListParseEngine initiateListParsing(String parserKey, String pathname)
+      throws IOException;
 
   public String getStatus() throws IOException;
 
@@ -251,13 +242,12 @@ public interface ICelFTPClient {
 
   public boolean getAutodetectUTF8();
 
-  public boolean downloadFile (String serverFile, String localFile) throws IOException,
-    FTPConnectionClosedException;
+  public boolean downloadFile(String serverFile, String localFile) throws IOException,
+      FTPConnectionClosedException;
 
-  public boolean uploadFile (String localFile, String serverFile) throws IOException,
-    FTPConnectionClosedException;
+  public boolean uploadFile(String localFile, String serverFile) throws IOException,
+      FTPConnectionClosedException;
 
-  public List<String> listSubdirNames () throws IOException,
-  FTPConnectionClosedException;
+  public List<String> listSubdirNames() throws IOException, FTPConnectionClosedException;
 
 }

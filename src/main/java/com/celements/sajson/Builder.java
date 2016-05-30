@@ -23,21 +23,18 @@ import java.io.StringWriter;
 import java.util.Stack;
 
 /**
- * Simple Api for JSON
- * 
- * The JSON Builder helps do generate a valid JSON expression based on event
- * handling.
+ * Simple Api for JSON The JSON Builder helps do generate a valid JSON expression based on
+ * event handling.
  * 
  * @author fabian
- *
  */
 
 public class Builder {
-  
+
   private Stack<ECommand> workerStack;
   private StringWriter jsonOutput;
   private boolean onFirstElement;
-  
+
   public Builder() {
     workerStack = new Stack<ECommand>();
     jsonOutput = new StringWriter();
@@ -50,7 +47,7 @@ public class Builder {
     }
     return jsonOutput.toString();
   }
-  
+
   public void openArray() {
     checkNoDictionary();
     workerStack.push(ECommand.ARRAY_COMMAND);
@@ -66,12 +63,11 @@ public class Builder {
   }
 
   private void checkNoDictionary() {
-    if (!workerStack.isEmpty()
-        && (workerStack.peek() == ECommand.DICTIONARY_COMMAND)) {
+    if (!workerStack.isEmpty() && (workerStack.peek() == ECommand.DICTIONARY_COMMAND)) {
       throw new IllegalStateException("Cannot added to a dictionary.");
     }
   }
-  
+
   public void closeArray() {
     checkForOpenCommand(ECommand.ARRAY_COMMAND);
     jsonOutput.append("]");
@@ -85,7 +81,7 @@ public class Builder {
     addOpeningPart("{");
     onFirstElement = true;
   }
-  
+
   public void closeDictionary() {
     checkForOpenCommand(ECommand.DICTIONARY_COMMAND);
     jsonOutput.append("}");
@@ -95,14 +91,14 @@ public class Builder {
 
   public void openProperty(String key) {
     if (workerStack.peek() != ECommand.DICTIONARY_COMMAND) {
-      throw new IllegalStateException("Properties may only be added "
-          + "to a dictionary but found " + workerStack.peek());
+      throw new IllegalStateException("Properties may only be added " + "to a dictionary but found "
+          + workerStack.peek());
     }
     workerStack.push(ECommand.PROPERTY_COMMAND);
     addOpeningPart(toJSONString(key) + " : ");
     onFirstElement = true;
   }
-  
+
   public void closeProperty() {
     checkForOpenCommand(ECommand.PROPERTY_COMMAND);
     if (jsonOutput.toString().endsWith(" : ")) {
@@ -116,7 +112,7 @@ public class Builder {
     openProperty(key);
     addString(value);
   }
-  
+
   public void addString(String value) {
     checkNoDictionary();
     addOpeningPart(toJSONString(value));
@@ -124,13 +120,12 @@ public class Builder {
   }
 
   private void implicitCloseProperty() {
-    if (!workerStack.isEmpty()
-        && (workerStack.peek() == ECommand.PROPERTY_COMMAND)) {
+    if (!workerStack.isEmpty() && (workerStack.peek() == ECommand.PROPERTY_COMMAND)) {
       workerStack.pop();
     }
     onFirstElement = false;
   }
-  
+
   public void addBoolean(Boolean value) {
     checkNoDictionary();
     if (value != null) {
@@ -140,7 +135,7 @@ public class Builder {
     }
     implicitCloseProperty();
   }
-  
+
   public void addNumber(Number value) {
     checkNoDictionary();
     if (value != null) {
@@ -172,7 +167,7 @@ public class Builder {
     addOpeningPart(toJSONString(null));
     implicitCloseProperty();
   }
-  
+
   /**
    * for internal use only (ONLY TESTS!!!)
    */
@@ -202,9 +197,8 @@ public class Builder {
     if (outStr == null) {
       return "null";
     } else {
-      return "\"" + outStr.replaceAll("\"", "\\\\\""
-          ).replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r"
-          ).replaceAll("\t", "\\\\t") + "\"";
+      return "\"" + outStr.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n").replaceAll("\r",
+          "\\\\r").replaceAll("\t", "\\\\t") + "\"";
     }
   }
 

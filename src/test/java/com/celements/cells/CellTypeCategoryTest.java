@@ -9,7 +9,6 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.category.IPageTypeCategoryRole;
 import com.xpn.xwiki.web.Utils;
 
-
 public class CellTypeCategoryTest extends AbstractComponentTest {
 
   private CellTypeCategory cellTypeCat;

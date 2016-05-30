@@ -37,12 +37,11 @@ public class ContextMenuScriptService implements ScriptService {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public String getAllContextMenuCSSClassesAsJSON() {
-    return new ContextMenuCSSClassesCommand().getAllContextMenuCSSClassesAsJSON(
-        getContext());
+    return new ContextMenuCSSClassesCommand().getAllContextMenuCSSClassesAsJSON(getContext());
   }
 
   public ContextMenuBuilderApi getContextMenuBuilder() {

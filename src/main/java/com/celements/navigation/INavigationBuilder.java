@@ -28,9 +28,9 @@ public interface INavigationBuilder {
   public String getLayoutTypeName();
 
   /**
-   * Deprecated the stream must be completely owned by the Builder
-   *            clients must use toString to get the content of the
-   *            stream.
+   * Deprecated the stream must be completely owned by the Builder clients must use
+   * toString to get the content of the stream.
+   * 
    * @param outStream
    */
   @Deprecated
@@ -40,8 +40,7 @@ public interface INavigationBuilder {
 
   public void closeMenuItemOut();
 
-  public void appendMenuItemLink(String menuItemName, String hrefLink,
-      String multilingualName, boolean isActive, boolean isLastItem,
-      String cssClasses);
+  public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
+      boolean isActive, boolean isLastItem, String cssClasses);
 
 }

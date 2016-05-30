@@ -34,21 +34,21 @@ public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_XWikiXWikiPreferencesTest() throws Exception {
-    mandatoryXWikiRights = (XWikiXWikiRights) Utils.getComponent(
-        IMandatoryDocumentRole.class, "celements.mandatory.wikirights");
+    mandatoryXWikiRights = (XWikiXWikiRights) Utils.getComponent(IMandatoryDocumentRole.class,
+        "celements.mandatory.wikirights");
   }
 
   @Test
   public void testDependsOnMandatoryDocuments() throws Exception {
     assertEquals(1, mandatoryXWikiRights.dependsOnMandatoryDocuments().size());
-    assertEquals("celements.MandatoryGroups", 
+    assertEquals("celements.MandatoryGroups",
         mandatoryXWikiRights.dependsOnMandatoryDocuments().get(0));
   }
 
   @Test
   public void testSkip() {
-    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))
-        ).andReturn(1L).anyTimes();
+    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))).andReturn(
+        1L).anyTimes();
     replayDefault();
     assertTrue(mandatoryXWikiRights.skip());
     verifyDefault();
@@ -58,8 +58,8 @@ public class XWikiXWikiRightsTest extends AbstractBridgedComponentTestCase {
   public void testSkip_illegalValue() {
     expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"))).andThrow(
         new NumberFormatException(null)).anyTimes();
-    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))
-        ).andReturn(0L).anyTimes();
+    expect(getWikiMock().ParamAsLong(eq("celements.mandatory.skipWikiRights"), eq(0L))).andReturn(
+        0L).anyTimes();
     replayDefault();
     assertFalse(mandatoryXWikiRights.skip());
     verifyDefault();

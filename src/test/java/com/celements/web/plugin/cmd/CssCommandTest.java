@@ -15,7 +15,6 @@ import com.celements.css.ICssExtensionRole;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSString;
 
-
 public class CssCommandTest extends AbstractBridgedComponentTestCase {
 
   private CssCommand cssCommand;
@@ -34,10 +33,8 @@ public class CssCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void test_includeApplicationDefaultCSS_registerMockComponent_emptyList(
-      ) throws Exception {
-    ICssExtensionRole testCssExtMock = registerComponentMock(ICssExtensionRole.class,
-        "testCssExt");
+  public void test_includeApplicationDefaultCSS_registerMockComponent_emptyList() throws Exception {
+    ICssExtensionRole testCssExtMock = registerComponentMock(ICssExtensionRole.class, "testCssExt");
     expect(testCssExtMock.getCssList()).andReturn(Collections.<CSS>emptyList()).once();
     replayDefault();
     List<CSS> cssList = cssCommand.includeApplicationDefaultCSS();
@@ -46,10 +43,8 @@ public class CssCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void test_includeApplicationDefaultCSS_registerMockComponent_oneElem(
-      ) throws Exception {
-    ICssExtensionRole testCssExtMock = registerComponentMock(ICssExtensionRole.class,
-        "testCssExt");
+  public void test_includeApplicationDefaultCSS_registerMockComponent_oneElem() throws Exception {
+    ICssExtensionRole testCssExtMock = registerComponentMock(ICssExtensionRole.class, "testCssExt");
     expect(testCssExtMock.getCssList()).andReturn(Arrays.<CSS>asList(new CSSString(
         ":celRes/test.css", getContext()))).once();
     replayDefault();

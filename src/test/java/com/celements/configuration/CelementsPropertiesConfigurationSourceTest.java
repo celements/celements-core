@@ -13,7 +13,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
 public class CelementsPropertiesConfigurationSourceTest extends AbstractComponentTest {
-  
+
   @Test
   public void test_initialize() throws Exception {
     registerComponentMock(Container.class);

@@ -28,13 +28,14 @@ import com.xpn.xwiki.web.Utils;
 public class CheckMandatoryDocuments {
 
   /**
-   * @deprecated instead use {@link IMandatoryDocumentCompositorRole#checkAllMandatoryDocuments()}
+   * @deprecated instead use
+   *             {@link IMandatoryDocumentCompositorRole#checkAllMandatoryDocuments()}
    */
   @Deprecated
   public void checkMandatoryDocuments() {
     IMandatoryDocumentCompositorRole mandatoryDocCmp = Utils.getComponent(
         IMandatoryDocumentCompositorRole.class);
-    if(mandatoryDocCmp != null) {
+    if (mandatoryDocCmp != null) {
       mandatoryDocCmp.checkAllMandatoryDocuments();
     }
   }

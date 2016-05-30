@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiException;
 public interface IClassCollectionRole {
 
   public void runUpdate() throws XWikiException;
-  
+
   public String getConfigName();
 
   public boolean isActivated();

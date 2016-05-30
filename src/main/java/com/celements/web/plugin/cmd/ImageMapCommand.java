@@ -36,50 +36,49 @@ public class ImageMapCommand {
 
   public static final String IMG_MAP_CONFIG_SET = "imageMapConfigSet";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ImageMapCommand.class);
-  
+  private static Log mLogger = LogFactory.getFactory().getInstance(ImageMapCommand.class);
+
   private XWikiContext context;
   private Set<String> imageMapSet;
 
   private Pattern useMapsPattern = Pattern.compile("<img [^>]*?usemap=\"([^\"]*)\"",
       Pattern.CASE_INSENSITIVE);
-  
+
   public ImageMapCommand(XWikiContext context) {
     this.context = context;
     imageMapSet = new HashSet<String>();
   }
 
   public void addMapConfig(String mapId) {
-    String hql = "select m.map, m.lang from Classes.ImageMapConfigClass as m " +
-        "where m.map_id='" + mapId + "'";
+    String hql = "select m.map, m.lang from Classes.ImageMapConfigClass as m " + "where m.map_id='"
+        + mapId + "'";
     List<Object[]> mapList = null;
     try {
       mapList = context.getWiki().search(hql, context);
     } catch (XWikiException e) {
       mLogger.error("Error searching for image map config", e);
     }
-    if(mapList != null) {
-      if(mapList.size() == 1) {
-        imageMapSet.add((String)mapList.get(0)[0]);
-      } else if(mapList.size() > 1) {
+    if (mapList != null) {
+      if (mapList.size() == 1) {
+        imageMapSet.add((String) mapList.get(0)[0]);
+      } else if (mapList.size() > 1) {
         String mapValue = "";
         for (Object[] map : mapList) {
-          if(context.getLanguage().equals(map[1])) {
-            mapValue = (String)map[0];
+          if (context.getLanguage().equals(map[1])) {
+            mapValue = (String) map[0];
             break;
-          } else if(context.getWiki().getSpacePreference("default_language", context)
-              .equals(map[1])) {
-            mapValue = (String)map[0];
+          } else if (context.getWiki().getSpacePreference("default_language", context).equals(
+              map[1])) {
+            mapValue = (String) map[0];
           }
         }
-        if(mapValue.trim().length() > 0) {
+        if (mapValue.trim().length() > 0) {
           imageMapSet.add(mapValue);
         }
       }
     }
   }
-  
+
   public String displayAllImageMapConfigs() {
     String maps = "";
     for (String map : imageMapSet) {

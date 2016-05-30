@@ -30,30 +30,28 @@ import com.xpn.xwiki.web.Utils;
 @Deprecated
 public class CheckClassesCommand {
 
-//  private static Log LOGGER = LogFactory.getFactory().getInstance(
-//      CheckClassesCommand.class);
+  // private static Log LOGGER = LogFactory.getFactory().getInstance(
+  // CheckClassesCommand.class);
 
   @Deprecated
   public static final String CLASS_PANEL_CONFIG_CLASS = OldCoreClasses.PANEL_CONFIG_CLASS;
 
   @Deprecated
-  public static final String MEDIALIB_CONFIG_CLASS_SPACE =
-      OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS_SPACE;
+  public static final String MEDIALIB_CONFIG_CLASS_SPACE = OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS_SPACE;
   @Deprecated
-  public static final String MEDIALIB_CONFIG_CLASS_NAME =
-      OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS_DOC;
+  public static final String MEDIALIB_CONFIG_CLASS_NAME = OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS_DOC;
   @Deprecated
-  public static final String MEDIALIB_CONFIG_CLASS =
-      OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
+  public static final String MEDIALIB_CONFIG_CLASS = OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
   /**
-   * @deprecated instead use {@link IClassesCompositorComponent#checkAllClassCollections()}
+   * @deprecated instead use
+   *             {@link IClassesCompositorComponent#checkAllClassCollections()}
    */
   @Deprecated
   public void checkClasses() {
     IClassesCompositorComponent compComponent = Utils.getComponent(
         IClassesCompositorComponent.class);
-    if(compComponent != null) {
+    if (compComponent != null) {
       compComponent.checkAllClassCollections();
     }
   }

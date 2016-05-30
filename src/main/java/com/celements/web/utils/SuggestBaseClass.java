@@ -34,72 +34,73 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 public class SuggestBaseClass {
+
   private static Log mLogger = LogFactory.getFactory().getInstance(SuggestBaseClass.class);
   private PropertyClass bc;
-  
-  public SuggestBaseClass(DocumentReference classreference, String fieldname, 
+
+  public SuggestBaseClass(DocumentReference classreference, String fieldname,
       XWikiContext context) {
     try {
       XWikiDocument doc = context.getWiki().getDocument(classreference, context);
-      bc = (PropertyClass)doc.getXClass().get(fieldname);
+      bc = (PropertyClass) doc.getXClass().get(fieldname);
     } catch (XWikiException e) {
       mLogger.error("Exception getting XWikiDocument for class " + classreference);
     }
   }
-  
 
   public List<String> getListFromString(String value) {
     return ListClass.getListFromString(value);
   }
-  
+
   public String getSeparators() {
-    if(bc instanceof ListClass) {
-      return ((ListClass)bc).getSeparators();
+    if (bc instanceof ListClass) {
+      return ((ListClass) bc).getSeparators();
     }
     return null;
   }
-  
+
   public String getSql() {
-    if(bc instanceof DBListClass) {
-      return ((DBListClass)bc).getSql();
+    if (bc instanceof DBListClass) {
+      return ((DBListClass) bc).getSql();
     }
     return null;
   }
-  
+
   public Boolean isMultiSelect() {
-    if(bc instanceof ListClass) {
-      return ((ListClass)bc).isMultiSelect();
+    if (bc instanceof ListClass) {
+      return ((ListClass) bc).isMultiSelect();
     }
     return null;
   }
-  
+
   public Boolean isRelationalStorage() {
-    if(bc instanceof ListClass) {
-      return ((ListClass)bc).isRelationalStorage();
+    if (bc instanceof ListClass) {
+      return ((ListClass) bc).isRelationalStorage();
     }
     return null;
   }
-  
+
   /**
-   * isPicker represents the class editor field 'Use Suggest'. Only ListClass and 
+   * isPicker represents the class editor field 'Use Suggest'. Only ListClass and
    * StringClass have the possibility of suggest.
+   * 
    * @return if the edit view of the specified field should use suggest. Returns null for
-   *          fields with no suggest possibility.
+   *         fields with no suggest possibility.
    */
   public Boolean isPicker() {
-    if(bc instanceof ListClass) {
-      return ((ListClass)bc).isPicker();
-    } else if(bc instanceof StringClass) {
-      return ((StringClass)bc).isPicker();
+    if (bc instanceof ListClass) {
+      return ((ListClass) bc).isPicker();
+    } else if (bc instanceof StringClass) {
+      return ((StringClass) bc).isPicker();
     }
     return null;
   }
-  
+
   public void setPicker(boolean value) {
-    if(bc instanceof ListClass) {
-      ((ListClass)bc).setPicker(value);
-    } else if(bc instanceof StringClass) {
-      ((StringClass)bc).setPicker(value);
+    if (bc instanceof ListClass) {
+      ((ListClass) bc).setPicker(value);
+    } else if (bc instanceof StringClass) {
+      ((StringClass) bc).setPicker(value);
     }
   }
 }

@@ -48,32 +48,30 @@ public class CssCommand {
   public static final String SKINS_USER_CSS_CLASS_SPACE = "Skins";
   public static final String SKINS_USER_CSS_CLASS_DOC = "UserCSS";
   public static final String SKINS_USER_CSS_CLASS = SKINS_USER_CSS_CLASS_SPACE + "."
-    + SKINS_USER_CSS_CLASS_DOC;
+      + SKINS_USER_CSS_CLASS_DOC;
 
   private static Logger LOGGER = LoggerFactory.getLogger(CssCommand.class);
 
   public DocumentReference getSkinsUserCssClassRef(String wikiName) {
-    return new DocumentReference(wikiName, SKINS_USER_CSS_CLASS_SPACE,
-        SKINS_USER_CSS_CLASS_DOC);
+    return new DocumentReference(wikiName, SKINS_USER_CSS_CLASS_SPACE, SKINS_USER_CSS_CLASS_DOC);
   }
 
-  public List<CSS> getAllCSS(XWikiContext context) throws XWikiException{
+  public List<CSS> getAllCSS(XWikiContext context) throws XWikiException {
     List<CSS> cssResultList = new ArrayList<CSS>();
     List<CSS> cssList = collectAllCSS(context);
-    
-    LOGGER.debug("List of CSS files built. There are " + cssList.size()
-        + " CSS files to include.");
-    
+
+    LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
+
     Set<CSS> includedCSS = new HashSet<CSS>();
     for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
       CSS css = (CSS) iterator.next();
-      if(!includedCSS.contains(css) && (css != null)){
+      if (!includedCSS.contains(css) && (css != null)) {
         LOGGER.debug("CSS to add to result List: " + css.toString());
         cssResultList.add(css);
         includedCSS.add(css);
       }
     }
-    
+
     return cssResultList;
   }
 
@@ -87,90 +85,85 @@ public class CssCommand {
     cssList.addAll(includeCSSPage("", context));
     return cssList;
   }
-  
-  public String displayAllCSS(XWikiContext context) throws XWikiException{
+
+  public String displayAllCSS(XWikiContext context) throws XWikiException {
     String CSS = "";
-    
+
     List<CSS> cssList = getAllCSS(context);
     for (CSS css : cssList) {
-      LOGGER.debug("displayAllCSS: displayInclude for [" + css.getCSS() + "]." );
+      LOGGER.debug("displayAllCSS: displayInclude for [" + css.getCSS() + "].");
       CSS += css.displayInclude(context);
     }
-    
+
     return CSS;
   }
-  
-  public List<CSS> getRTEContentCSS(XWikiContext context) throws XWikiException{
+
+  public List<CSS> getRTEContentCSS(XWikiContext context) throws XWikiException {
     List<CSS> cssResultList = new ArrayList<CSS>();
     List<CSS> cssList = collectAllCSS(context);
-    
-    LOGGER.debug("List of CSS files built. There are " + cssList.size()
-        + " CSS files to include.");
-    
+
+    LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
+
     Set<CSS> includedCSS = new HashSet<CSS>();
     for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
       CSS css = (CSS) iterator.next();
-      if((css != null) && !includedCSS.contains(css) && css.isContentCSS()){
+      if ((css != null) && !includedCSS.contains(css) && css.isContentCSS()) {
         LOGGER.debug("RTE content CSS to add to result List: " + css.toString());
         cssResultList.add(css);
         includedCSS.add(css);
       }
     }
-    
+
     return cssResultList;
   }
 
   public List<CSS> includeCSSPage(String css, XWikiContext context) {
     List<BaseObject> skins = null;
-    if (!new PageLayoutCommand().layoutExists(context.getDoc().getDocumentReference(
-        ).getLastSpaceReference())) {
+    if (!new PageLayoutCommand().layoutExists(
+        context.getDoc().getDocumentReference().getLastSpaceReference())) {
       XWikiDocument doc = context.getDoc();
       skins = doc.getXObjects(getSkinsUserCssClassRef(context.getDatabase()));
-      LOGGER.debug("CSS Page: " + doc.getDocumentReference() + " has attached "
-          + ((skins != null)?skins.size():"0") + " Skins.UserCSS objects.");
+      LOGGER.debug("CSS Page: " + doc.getDocumentReference() + " has attached " + ((skins != null)
+          ? skins.size() : "0") + " Skins.UserCSS objects.");
     }
     return includeCSS(css, "cel_css_list_page", skins, context);
   }
 
-  public List<CSS> includeCSSAfterPreferences(String css,
-      XWikiContext context) throws XWikiException{
+  public List<CSS> includeCSSAfterPreferences(String css, XWikiContext context)
+      throws XWikiException {
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
-    
-    if (vcontext != null){
-      
-      String space = (String)vcontext.get("stylesheet_space");
-      if((space == null) || space.trim().equals("")){
+
+    if (vcontext != null) {
+
+      String space = (String) vcontext.get("stylesheet_space");
+      if ((space == null) || space.trim().equals("")) {
         space = context.getDoc().getSpace();
       }
 
       LOGGER.debug("WebPreferences space is: '" + space + "'");
-      String baseCSS = context.getWiki().getSpacePreference("stylesheet", space,
-          "", context) + " ";
-      baseCSS = context.getWiki().getSpacePreference("stylesheets", space, "",
-          context) + " ";
-      
+      String baseCSS = context.getWiki().getSpacePreference("stylesheet", space, "", context) + " ";
+      baseCSS = context.getWiki().getSpacePreference("stylesheets", space, "", context) + " ";
+
       LOGGER.debug("CSS Prefs: has '" + baseCSS + "' as CSS to add.");
 
       List<BaseObject> baseList = new ArrayList<BaseObject>();
-      DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
-          "XWiki", "XWikiPreferences");
+      DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+          "XWikiPreferences");
       if (context.getWiki().exists(xwikiPrefDocRef, context)) {
-        baseList.addAll(addUserSkinCss(context.getWiki().getDocument(
-            xwikiPrefDocRef, context)));
+        baseList.addAll(addUserSkinCss(context.getWiki().getDocument(xwikiPrefDocRef, context)));
       }
       DocumentReference webPrefDocRef = new DocumentReference("WebPreferences",
           context.getDoc().getDocumentReference().getLastSpaceReference());
       if (context.getWiki().exists(webPrefDocRef, context)) {
-        baseList.addAll(addUserSkinCss(context.getWiki().getDocument(
-            webPrefDocRef, context)));
+        baseList.addAll(addUserSkinCss(context.getWiki().getDocument(webPrefDocRef, context)));
       }
       cssList = includeCSS(baseCSS + css, "cel_css_list_pref", baseList, context);
     }
-    
+
     return cssList;
   }
-  
+
   List<CSS> includeApplicationDefaultCSS() {
     List<CSS> cssList = Collections.emptyList();
     List<ICssExtensionRole> cssExtList = Utils.getComponentList(ICssExtensionRole.class);
@@ -184,20 +177,20 @@ public class CssCommand {
     return cssList;
   }
 
-  public List<CSS> includeCSSAfterSkin(String css, XWikiContext context){
+  public List<CSS> includeCSSAfterSkin(String css, XWikiContext context) {
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
-    
-    if (vcontext != null){
+
+    if (vcontext != null) {
       List<BaseObject> baseList = new ArrayList<BaseObject>();
-      baseList.addAll(addUserSkinCss((Document)vcontext.get("skin_doc")));
-      baseList.addAll(addUserSkinCss((Document)vcontext.get("after_skin_cssdoc")));
+      baseList.addAll(addUserSkinCss((Document) vcontext.get("skin_doc")));
+      baseList.addAll(addUserSkinCss((Document) vcontext.get("after_skin_cssdoc")));
       cssList = includeCSS(css, "cel_css_list_skin", baseList, context);
     }
     return cssList;
   }
-  
-  public List<CSS> includeCSSAfterPageType(String css, XWikiContext context){
+
+  public List<CSS> includeCSSAfterPageType(String css, XWikiContext context) {
     XWikiDocument pageTypeDoc = null;
     try {
       pageTypeDoc = PageTypeCommand.getInstance().getPageTypeObj(context.getDoc(),
@@ -207,64 +200,63 @@ public class CssCommand {
     }
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
-    
-    if ((pageTypeDoc != null) && (vcontext != null))  {
+
+    if ((pageTypeDoc != null) && (vcontext != null)) {
       List<BaseObject> baseList = new ArrayList<BaseObject>();
       baseList.addAll(addUserSkinCss(pageTypeDoc));
-      baseList.addAll(addUserSkinCss((Document)vcontext.get("after_pagetype_cssdoc")));
+      baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagetype_cssdoc")));
       cssList = includeCSS(css, "cel_css_list_pagetype", baseList, context);
     }
     return cssList;
   }
 
-  public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context){
+  public List<CSS> includeCSSAfterPageLayout(String css, XWikiContext context) {
     XWikiDocument pageLayoutDoc = null;
     pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     List<CSS> cssList = Collections.emptyList();
-    
-    if ((pageLayoutDoc != null) && (vcontext != null))  {
+
+    if ((pageLayoutDoc != null) && (vcontext != null)) {
       List<BaseObject> baseList = new ArrayList<BaseObject>();
       baseList.addAll(addUserSkinCss(pageLayoutDoc));
-      baseList.addAll(addUserSkinCss((Document)vcontext.get("after_pagelayout_cssdoc")));
+      baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagelayout_cssdoc")));
       cssList = includeCSS(css, "cel_css_list_pagelayout", baseList, context);
     }
     return cssList;
   }
 
   private List<BaseObject> addUserSkinCss(Document docAPI) {
-    if(docAPI != null) {
+    if (docAPI != null) {
       return addUserSkinCss(docAPI.getDocument());
     }
     return Collections.emptyList();
   }
 
   private List<BaseObject> addUserSkinCss(XWikiDocument docAPI) {
-    if(docAPI != null) {
+    if (docAPI != null) {
       List<BaseObject> objs = docAPI.getXObjects(getSkinsUserCssClassRef(
           docAPI.getDocumentReference().getWikiReference().getName()));
-      LOGGER.debug("CSS Skin: " + docAPI.getDocumentReference() + " has attached "
-          + ((objs != null)?objs.size():"0") + " Skins.UserCSS objects.");
-      if(objs != null){
+      LOGGER.debug("CSS Skin: " + docAPI.getDocumentReference() + " has attached " + ((objs != null)
+          ? objs.size() : "0") + " Skins.UserCSS objects.");
+      if (objs != null) {
         return objs;
       }
     }
     return Collections.emptyList();
   }
-  
+
   /**
-   * 
    * @param css
    * @param field
    * @param baseCSSList
    * @param context
    * @return the returned list is XWikiContext dependent and therefore may not be cached
-   *         or similar. The list is as a consequence too not thread safe.
-   *         TODO: Fix mix of API and backend. Extract business objects (controller)
-   *         from CSS classes and use them here.
+   *         or similar. The list is as a consequence too not thread safe. TODO: Fix mix
+   *         of API and backend. Extract business objects (controller) from CSS classes
+   *         and use them here.
    */
-  private List<CSS> includeCSS(String css, String field,
-      List<BaseObject> baseCSSList, XWikiContext context){
+  private List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
+      XWikiContext context) {
     return CSSEngine.getCSSEngine(context).includeCSS(css, field, baseCSSList, context);
   }
 

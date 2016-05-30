@@ -32,9 +32,7 @@ import com.xpn.xwiki.api.Api;
 
 public class PageLayoutApi extends Api {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      PageLayoutApi.class);
-
+  private static Log mLogger = LogFactory.getFactory().getInstance(PageLayoutApi.class);
 
   private PageLayoutCommand pageLayoutCmd;
   private SpaceReference layoutSpaceRef;
@@ -61,7 +59,6 @@ public class PageLayoutApi extends Api {
   }
 
   /**
-   * 
    * @param withDocHistory
    * @return successful
    */

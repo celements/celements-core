@@ -19,7 +19,7 @@ public class NavigationDeleteListenerTest extends AbstractBridgedComponentTestCa
 
   @Before
   public void setUp_NavigationDeleteListenerTest() throws Exception {
-    listener = (NavigationDeleteListener) Utils.getComponent(EventListener.class, 
+    listener = (NavigationDeleteListener) Utils.getComponent(EventListener.class,
         NavigationDeleteListener.NAME);
   }
 
@@ -31,8 +31,8 @@ public class NavigationDeleteListenerTest extends AbstractBridgedComponentTestCa
   @Test
   public void testGetRequiredObjClassRef() {
     WikiReference wikiRef = new WikiReference("myWiki");
-    assertEquals(Utils.getComponent(INavigationClassConfig.class
-        ).getNavigationConfigClassRef(wikiRef), listener.getRequiredObjClassRef(wikiRef));
+    assertEquals(Utils.getComponent(INavigationClassConfig.class).getNavigationConfigClassRef(
+        wikiRef), listener.getRequiredObjClassRef(wikiRef));
   }
 
   @Test

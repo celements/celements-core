@@ -6,7 +6,7 @@ import org.xwiki.model.reference.SpaceReference;
 
 @ComponentRole
 public interface INextFreeDocRole {
-  
+
   public static final String UNTITLED_NAME = "untitled";
 
   public DocumentReference getNextTitledPageDocRef(SpaceReference spaceRef, String title);

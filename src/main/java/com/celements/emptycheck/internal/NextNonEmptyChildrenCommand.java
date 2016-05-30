@@ -20,11 +20,9 @@ public class NextNonEmptyChildrenCommand {
 
   private Set<DocumentReference> visitedDocRefs;
 
-  public DocumentReference getNextNonEmptyChildren(
-      DocumentReference documentRef) {
+  public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
     if (getEmptyCheckService().isEmptyRTEDocument(documentRef)) {
-      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(documentRef,
-          "");
+      List<TreeNode> children = getTreeNodeService().getSubNodesForParent(documentRef, "");
       for (TreeNode childNode : children) {
         getVisitedDocRefs().add(documentRef);
         DocumentReference nextChild = childNode.getDocumentReference();
@@ -34,8 +32,8 @@ public class NextNonEmptyChildrenCommand {
             return result;
           }
         } else {
-          LOGGER.warn("getNextNonEmptyChildren_internal: recursion detected on ["
-              + nextChild + "].");
+          LOGGER.warn("getNextNonEmptyChildren_internal: recursion detected on [" + nextChild
+              + "].");
         }
       }
       return null;
@@ -43,19 +41,19 @@ public class NextNonEmptyChildrenCommand {
     return documentRef;
   }
 
- Set<DocumentReference> getVisitedDocRefs() {
-   if (visitedDocRefs == null) {
-     visitedDocRefs = new HashSet<DocumentReference>();
-   }
-   return visitedDocRefs;
- } 
+  Set<DocumentReference> getVisitedDocRefs() {
+    if (visitedDocRefs == null) {
+      visitedDocRefs = new HashSet<DocumentReference>();
+    }
+    return visitedDocRefs;
+  }
 
- ITreeNodeService getTreeNodeService() {
-   return Utils.getComponent(ITreeNodeService.class);
- }
+  ITreeNodeService getTreeNodeService() {
+    return Utils.getComponent(ITreeNodeService.class);
+  }
 
- IEmptyCheckRole getEmptyCheckService() {
-   return Utils.getComponent(IEmptyCheckRole.class);
- }
+  IEmptyCheckRole getEmptyCheckService() {
+    return Utils.getComponent(IEmptyCheckRole.class);
+  }
 
 }

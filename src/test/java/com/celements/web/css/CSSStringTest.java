@@ -51,8 +51,7 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
     String attLink = "Space.Page;test.css";
     CSSString cssFile = new CSSString(attLink, context);
     XWikiContext context = new XWikiContext();
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
-        AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     cssFile.testInjectAttURLcmd(attURLcmd);
     expect(attURLcmd.getAttachmentURL(eq(attLink), same(context))).andReturn(url).once();
     replayDefault();
@@ -79,12 +78,11 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
     CSSString cssFile = new CSSString("", "print", context);
     assertEquals("print", cssFile.getMedia());
   }
-  
+
   @Test
   public void testCSS_String_notContentCSS() {
     CSSString cssFile = new CSSString("/test/file.css", context);
-    assertFalse("Filename not ending in -content.css or _content.css",
-        cssFile.isContentCSS());
+    assertFalse("Filename not ending in -content.css or _content.css", cssFile.isContentCSS());
   }
 
   @Test
@@ -105,8 +103,7 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetAttachment() throws Exception {
-    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(
-        AttachmentURLCommand.class);
+    AttachmentURLCommand attURLcmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     String link = "XWiki.XWikiPreferences;myAttachment.css";
     String fullName = "XWiki.XWikiPreferences";
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "XWiki",
@@ -124,9 +121,8 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(doc);
     XWikiRightService rightSerivce = createMockAndAddToDefault(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightSerivce);
-    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), 
-        eq(getContext().getDatabase() + ":" + fullName), same(getContext()))
-        ).andReturn(true);
+    expect(rightSerivce.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq(
+        getContext().getDatabase() + ":" + fullName), same(getContext()))).andReturn(true);
     replayDefault();
     assertNotNull("attachment must not be null", cssFile.getAttachment());
     verifyDefault();

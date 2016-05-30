@@ -43,8 +43,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
 
   private static final String _ROBOTS_TXT_PAGE_TYPE = "Code";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      Robots_TXT.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(Robots_TXT.class);
 
   @Requirement("celements.celPageTypeClasses")
   IClassCollectionRole pageTypeClasses;
@@ -53,7 +52,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
   Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   private PageTypeClasses getPageTypeClasses() {
@@ -65,26 +64,24 @@ public class Robots_TXT implements IMandatoryDocumentRole {
   }
 
   public void checkDocuments() throws XWikiException {
-    LOGGER.trace("Start checkDocuments in robots_txt for database [" + getContext(
-        ).getDatabase() + "].");
+    LOGGER.trace("Start checkDocuments in robots_txt for database [" + getContext().getDatabase()
+        + "].");
     if (!isSkipCelementsRobots_txt()) {
-      LOGGER.trace("before checkRobots_txt for database ["
-          + getContext().getDatabase() + "].");
+      LOGGER.trace("before checkRobots_txt for database [" + getContext().getDatabase() + "].");
       checkRobots_txtDocument();
     } else {
-      LOGGER.info("skip mandatory checkRobots_txt for database ["
-          + getContext().getDatabase() + "], skipCelementsParam ["
-          + isSkipCelementsRobots_txt() + "].");
+      LOGGER.info("skip mandatory checkRobots_txt for database [" + getContext().getDatabase()
+          + "], skipCelementsParam [" + isSkipCelementsRobots_txt() + "].");
     }
-    LOGGER.trace("end checkDocuments in Robots_txt for database ["
-        + getContext().getDatabase() + "].");
+    LOGGER.trace("end checkDocuments in Robots_txt for database [" + getContext().getDatabase()
+        + "].");
   }
 
   boolean isSkipCelementsRobots_txt() {
-    boolean isSkip = getContext().getWiki().ParamAsLong(
-        "celements.mandatory.skipRobots_txt", 0) == 1L;
-    LOGGER.trace("skipCelementsRobots_txt for database ["
-        + getContext().getDatabase() + "] returning [" + isSkip + "].");
+    boolean isSkip = getContext().getWiki().ParamAsLong("celements.mandatory.skipRobots_txt",
+        0) == 1L;
+    LOGGER.trace("skipCelementsRobots_txt for database [" + getContext().getDatabase()
+        + "] returning [" + isSkip + "].");
     return isSkip;
   }
 
@@ -92,23 +89,21 @@ public class Robots_TXT implements IMandatoryDocumentRole {
     DocumentReference robotsTxtDocRef = getRobotsTxtDocRef(getContext().getDatabase());
     XWikiDocument robotsTxtDoc;
     if (!getContext().getWiki().exists(robotsTxtDocRef, getContext())) {
-      LOGGER.debug("Robots_txtDocument is missing that we create it. ["
-          + getContext().getDatabase() + "]");
+      LOGGER.debug("Robots_txtDocument is missing that we create it. [" + getContext().getDatabase()
+          + "]");
       robotsTxtDoc = new CreateDocumentCommand().createDocument(robotsTxtDocRef,
           _ROBOTS_TXT_PAGE_TYPE);
     } else {
       robotsTxtDoc = getContext().getWiki().getDocument(robotsTxtDocRef, getContext());
-      LOGGER.trace("Robots_txtDocument already exists. ["
-          + getContext().getDatabase() + "]");
+      LOGGER.trace("Robots_txtDocument already exists. [" + getContext().getDatabase() + "]");
     }
     if (robotsTxtDoc != null) {
       boolean dirty = checkPageType(robotsTxtDoc);
       dirty |= checkRobots_txt(robotsTxtDoc);
       if (dirty) {
-        LOGGER.info("Robots_txtDocument updated for [" + getContext().getDatabase()
-            + "].");
-        getContext().getWiki().saveDocument(robotsTxtDoc, "autocreate"
-            + " HTML.robots_txt.", getContext());
+        LOGGER.info("Robots_txtDocument updated for [" + getContext().getDatabase() + "].");
+        getContext().getWiki().saveDocument(robotsTxtDoc, "autocreate" + " HTML.robots_txt.",
+            getContext());
       } else {
         LOGGER.debug("Robots_txtDocument not saved. Everything uptodate. ["
             + getContext().getDatabase() + "].");
@@ -122,11 +117,10 @@ public class Robots_TXT implements IMandatoryDocumentRole {
   boolean checkRobots_txt(XWikiDocument robotsTxtDoc) throws XWikiException {
     if (StringUtils.isEmpty(robotsTxtDoc.getContent())) {
       robotsTxtDoc.setContent("User-agent: *\n\nCrawl-delay: 120\n"
-          + "# Angabe der Sitemap ist Agent-unabhaengig\n"
-          + "Sitemap: $doc.getExternalURL('view',"
+          + "# Angabe der Sitemap ist Agent-unabhaengig\n" + "Sitemap: $doc.getExternalURL('view',"
           + " 'ajax=1&xpage=celements_ajax&ajax_mode=sitemapxml')");
-      LOGGER.debug("Robots_txt missing content fixed for database ["
-          + getContext().getDatabase() + "].");
+      LOGGER.debug("Robots_txt missing content fixed for database [" + getContext().getDatabase()
+          + "].");
       return true;
     }
     return false;
@@ -135,8 +129,7 @@ public class Robots_TXT implements IMandatoryDocumentRole {
   boolean checkPageType(XWikiDocument robotsTxtDoc) throws XWikiException {
     DocumentReference pageTypeClassRef = getPageTypeClasses().getPageTypeClassRef(
         getContext().getDatabase());
-    BaseObject pageTypeObj = robotsTxtDoc.getXObject(pageTypeClassRef, false,
-        getContext());
+    BaseObject pageTypeObj = robotsTxtDoc.getXObject(pageTypeClassRef, false, getContext());
     if (pageTypeObj == null) {
       pageTypeObj = robotsTxtDoc.newXObject(pageTypeClassRef, getContext());
       pageTypeObj.setStringValue("page_type", _ROBOTS_TXT_PAGE_TYPE);

@@ -28,8 +28,8 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_XClassRegeRuleTest() throws Exception {
-    xClassRegexRule = (XClassRegexRule) Utils.getComponent(
-        IRequestValidationRuleRole.class, "XClassRegexValidation");
+    xClassRegexRule = (XClassRegexRule) Utils.getComponent(IRequestValidationRuleRole.class,
+        "XClassRegexValidation");
     bclassDocRef = new DocumentReference(getContext().getDatabase(), "Test", "TestClass");
   }
 
@@ -38,21 +38,21 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
 
     replayDefault();
-    Map<String, Map<ValidationType, Set<String>>> result =
-        xClassRegexRule.validateRequest(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> result = xClassRegexRule.validateRequest(
+        requestMap);
     verifyDefault();
 
-    assertTrue("Successful validation should result in an empty map",
-        (result != null) && result.isEmpty());
+    assertTrue("Successful validation should result in an empty map", (result != null)
+        && result.isEmpty());
   }
 
   @Test
   public void testValidate_valid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
-    DocumentReference bclassDocRef1 = new DocumentReference(getContext().getDatabase(), 
-        "Test", "TestClass1");
-    DocumentReference bclassDocRef2 = new DocumentReference(getContext().getDatabase(), 
-        "Test", "TestClass2");
+    DocumentReference bclassDocRef1 = new DocumentReference(getContext().getDatabase(), "Test",
+        "TestClass1");
+    DocumentReference bclassDocRef2 = new DocumentReference(getContext().getDatabase(), "Test",
+        "TestClass2");
     XWikiDocument doc1 = new XWikiDocument(bclassDocRef1);
     XWikiDocument doc2 = new XWikiDocument(bclassDocRef2);
     doc1.setXClass(bclass);
@@ -61,30 +61,29 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
     String param1 = "Test.TestClass1_0_testField";
     String param2 = "Test.TestClass2_0_testField";
-    requestMap.put(RequestParameter.create(param1), new String[]{"value1"});
-    requestMap.put(RequestParameter.create(param2), new String[]{"value2", "asdf"});
+    requestMap.put(RequestParameter.create(param1), new String[] { "value1" });
+    requestMap.put(RequestParameter.create(param2), new String[] { "value2", "asdf" });
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef1), same(getContext()))
-        ).andReturn(doc1).once();
-    expect(getWikiMock().getDocument(eq(bclassDocRef2), same(getContext()))
-        ).andReturn(doc2).times(2);
+    expect(getWikiMock().getDocument(eq(bclassDocRef1), same(getContext()))).andReturn(doc1).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef2), same(getContext()))).andReturn(doc2).times(
+        2);
 
     replayDefault();
-    Map<String, Map<ValidationType, Set<String>>> result =
-        xClassRegexRule.validateRequest(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> result = xClassRegexRule.validateRequest(
+        requestMap);
     verifyDefault();
 
-    assertTrue("Successful validation should result in an empty map",
-        (result != null) && result.isEmpty());
+    assertTrue("Successful validation should result in an empty map", (result != null)
+        && result.isEmpty());
   }
 
   @Test
   public void testValidate_invalid() throws XWikiException {
     BaseClass bclass = getBaseClass("testField");
-    DocumentReference bclassDocRef1 = new DocumentReference(getContext().getDatabase(), 
-        "Test", "TestClass1");
-    DocumentReference bclassDocRef2 = new DocumentReference(getContext().getDatabase(), 
-        "Test", "TestClass2");
+    DocumentReference bclassDocRef1 = new DocumentReference(getContext().getDatabase(), "Test",
+        "TestClass1");
+    DocumentReference bclassDocRef2 = new DocumentReference(getContext().getDatabase(), "Test",
+        "TestClass2");
     XWikiDocument doc1 = new XWikiDocument(bclassDocRef1);
     XWikiDocument doc2 = new XWikiDocument(bclassDocRef2);
     doc1.setXClass(bclass);
@@ -93,17 +92,16 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
     String param1 = "Test.TestClass1_0_testField";
     String param2 = "Test.TestClass2_0_testField";
-    requestMap.put(RequestParameter.create(param1), new String[]{""});
-    requestMap.put(RequestParameter.create(param2), new String[]{"", ""});
+    requestMap.put(RequestParameter.create(param1), new String[] { "" });
+    requestMap.put(RequestParameter.create(param2), new String[] { "", "" });
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef1), same(getContext()))
-        ).andReturn(doc1).once();
-    expect(getWikiMock().getDocument(eq(bclassDocRef2), same(getContext()))
-        ).andReturn(doc2).times(2);
+    expect(getWikiMock().getDocument(eq(bclassDocRef1), same(getContext()))).andReturn(doc1).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef2), same(getContext()))).andReturn(doc2).times(
+        2);
 
     replayDefault();
-    Map<String, Map<ValidationType, Set<String>>> result =
-        xClassRegexRule.validateRequest(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> result = xClassRegexRule.validateRequest(
+        requestMap);
     verifyDefault();
 
     assertNotNull(result);
@@ -124,12 +122,11 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))
-        ).andReturn(doc).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
 
     replayDefault();
-    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
-        "Test.TestClass", "testField", "value");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField("Test.TestClass",
+        "testField", "value");
     verifyDefault();
 
     assertNull("Successful validation should result in null", result);
@@ -141,12 +138,11 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))
-        ).andReturn(doc).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
 
     replayDefault();
-    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
-        "Test.TestClass", "testField", "");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField("Test.TestClass",
+        "testField", "");
     verifyDefault();
 
     assertNotNull(result);
@@ -160,14 +156,13 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
   public void testValidateField_invalidKey_class() throws XWikiException {
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))
-        ).andReturn(doc).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
 
     replayDefault();
-    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
-        "Test.TestClass", "testField", "");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField("Test.TestClass",
+        "testField", "");
     verifyDefault();
-    
+
     assertNull("Not existing class should be ignored by default", result);
   }
 
@@ -177,14 +172,13 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))
-        ).andReturn(doc).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
 
     replayDefault();
-    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
-        "Test.TestClass", "testField", "");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField("Test.TestClass",
+        "testField", "");
     verifyDefault();
-    
+
     assertNull("Not existing field should be ignored by default", result);
   }
 
@@ -193,24 +187,22 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     xClassRegexRule.configSrc = createMockAndAddToDefault(ConfigurationSource.class);
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
 
-    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))
-        ).andReturn(doc).once();
-    expect(xClassRegexRule.configSrc.getProperty(
-        eq("celements.validation.xClassRegex.ignoreInvalidKey"), eq(true))
-        ).andReturn(false).once();
+    expect(getWikiMock().getDocument(eq(bclassDocRef), same(getContext()))).andReturn(doc).once();
+    expect(xClassRegexRule.configSrc.getProperty(eq(
+        "celements.validation.xClassRegex.ignoreInvalidKey"), eq(true))).andReturn(false).once();
 
     replayDefault();
-    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField(
-        "Test.TestClass", "testField", "");
+    Map<ValidationType, Set<String>> result = xClassRegexRule.validateField("Test.TestClass",
+        "testField", "");
     verifyDefault();
 
     assertNotNull(result);
     assertEquals(1, result.size());
     assertTrue(result.containsKey(ValidationType.ERROR));
     assertEquals(1, result.get(ValidationType.ERROR).size());
-    assertEquals("cel_validation_xclassregex_invalidkey", result.get(ValidationType.ERROR
-        ).iterator().next());
-    
+    assertEquals("cel_validation_xclassregex_invalidkey", result.get(
+        ValidationType.ERROR).iterator().next());
+
     xClassRegexRule.configSrc = Utils.getComponent(ConfigurationSource.class);
   }
 
@@ -232,7 +224,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetFieldFromProperty_null() throws XWikiException{
+  public void testGetFieldFromProperty_null() throws XWikiException {
     PropertyClass propclass = new PropertyClass();
     assertEquals("", xClassRegexRule.getFieldFromProperty(propclass, "test"));
     propclass.put("test", null);
@@ -240,7 +232,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testGetFieldFromProperty() throws XWikiException{
+  public void testGetFieldFromProperty() throws XWikiException {
     BaseProperty prop = new StringProperty();
     prop.setValue("value");
     PropertyClass propclass = new PropertyClass();

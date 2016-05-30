@@ -38,8 +38,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CellRenderStrategy.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CellRenderStrategy.class);
 
   private ICellWriter cellWriter;
   private XWikiContext context;
@@ -60,9 +59,11 @@ public class CellRenderStrategy implements IRenderStrategy {
     cellWriter.closeLevel();
   }
 
-  public void endRenderChildren(EntityReference parentRef) {}
+  public void endRenderChildren(EntityReference parentRef) {
+  }
 
-  public void endRendering() {}
+  public void endRendering() {
+  }
 
   public String getMenuPart(TreeNode node) {
     return "";
@@ -95,27 +96,28 @@ public class CellRenderStrategy implements IRenderStrategy {
       XWikiDocument cellDoc = context.getWiki().getDocument(cellDocRef, context);
       BaseObject cellObj = cellDoc.getXObject(cellClasses.getCellClassRef(
           cellDocRef.getWikiReference().getName()));
-      if(cellObj != null) {
+      if (cellObj != null) {
         String cellObjCssClasses = cellObj.getStringValue("css_classes");
         if ((cellObjCssClasses != null) && !"".equals(cellObjCssClasses)) {
           cssClasses += " " + cellObjCssClasses;
         }
         cssStyles = cellObj.getStringValue("css_styles");
-        idname  = cellObj.getStringValue("idname");
+        idname = cellObj.getStringValue("idname");
       }
       if ((idname == null) || "".equals(idname)) {
-        String nodeFN = webUtilsService.getRefDefaultSerializer().serialize(node.getDocumentReference());
+        String nodeFN = webUtilsService.getRefDefaultSerializer().serialize(
+            node.getDocumentReference());
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
         idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
     } catch (XWikiException e) {
-      LOGGER.error("failed to get cell [" + node.getDocumentReference()
-          + "] document.", e);
+      LOGGER.error("failed to get cell [" + node.getDocumentReference() + "] document.", e);
     }
     cellWriter.openLevel(idname, cssClasses, cssStyles);
   }
 
-  public void startRenderChildren(EntityReference parentRef) {}
+  public void startRenderChildren(EntityReference parentRef) {
+  }
 
   public void startRendering() {
     cellWriter.clear();
@@ -136,11 +138,10 @@ public class CellRenderStrategy implements IRenderStrategy {
       LOGGER.debug("renderEmptyChildren: parent [" + node + "].");
       long millisec = System.currentTimeMillis();
       cellContent = getRendererCmd().renderCelementsCell(node.getDocumentReference());
-      LOGGER.info("renderEmptyChildren: rendered parent [" + node
-          + "]. Time used in millisec: " + (System.currentTimeMillis() - millisec));
+      LOGGER.info("renderEmptyChildren: rendered parent [" + node + "]. Time used in millisec: "
+          + (System.currentTimeMillis() - millisec));
     } catch (XWikiException exp) {
-      LOGGER.error("failed to get cell [" + node + "] document to render cell"
-          + " content.", exp);
+      LOGGER.error("failed to get cell [" + node + "] document to render cell" + " content.", exp);
     }
     cellWriter.appendContent(cellContent);
   }

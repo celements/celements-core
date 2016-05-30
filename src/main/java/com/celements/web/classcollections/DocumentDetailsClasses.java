@@ -31,15 +31,14 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component(DocumentDetailsClasses.NAME)
 public class DocumentDetailsClasses extends AbstractClassCollection {
-  
+
   public static final String NAME = "celements.documentDetails";
 
   public static final String UNPUBLISH_DATE_FIELD = "unpublishDate";
-  
+
   public static final String PUBLISH_DATE_FIELD = "publishDate";
-  
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      DocumentDetailsClasses.class);
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(DocumentDetailsClasses.class);
 
   public static final String FIELD_DOC_EXTRACT_CONTENT = "extract";
   public static final String FIELD_DOC_EXTRACT_LANGUAGE = "language";
@@ -54,7 +53,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     getDocumentPublicationClass();
     getDocumentExtractClass();
   }
-  
+
   public DocumentReference getDocumentPublicationClassRef(String wikiName) {
     return new DocumentReference(wikiName, "Classes", "DocumentPublication");
   }
@@ -62,8 +61,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
   BaseClass getDocumentPublicationClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = getDocumentPublicationClassRef(getContext(
-        ).getDatabase());
+    DocumentReference classRef = getDocumentPublicationClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
@@ -75,10 +73,10 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addDateField(PUBLISH_DATE_FIELD, "Publish Date (dd.MM.yyyy HH:mm)", 
+    needsUpdate |= bclass.addDateField(PUBLISH_DATE_FIELD, "Publish Date (dd.MM.yyyy HH:mm)",
         "dd.MM.yyyy HH:mm", 0);
-    needsUpdate |= bclass.addDateField(UNPUBLISH_DATE_FIELD, "Unpublish Date (dd.MM.yyyy " +
-        "HH:mm)", "dd.MM.yyyy HH:mm", 0);
+    needsUpdate |= bclass.addDateField(UNPUBLISH_DATE_FIELD, "Unpublish Date (dd.MM.yyyy "
+        + "HH:mm)", "dd.MM.yyyy HH:mm", 0);
 
     if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
@@ -119,7 +117,6 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
-
 
   public String getConfigName() {
     return "documentDetails";

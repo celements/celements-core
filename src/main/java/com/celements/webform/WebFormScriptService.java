@@ -13,17 +13,17 @@ import com.xpn.xwiki.XWikiContext;
 
 @Component("webform")
 public class WebFormScriptService implements ScriptService {
-  
+
   @Requirement
   private IWebFormServiceRole webFormService;
-  
+
   @Requirement
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   @SuppressWarnings("unchecked")
   public boolean isFormFilled() {
     return webFormService.isFormFilled(getContext().getRequest().getParameterMap(),
@@ -34,7 +34,7 @@ public class WebFormScriptService implements ScriptService {
   public boolean isFormFilled(String excludeFields) {
     Set<String> excludeSet = new HashSet<String>();
     for (String field : excludeFields.split(",")) {
-      if(!"".equals(field.trim()) && (field.trim().length() > 0)) {
+      if (!"".equals(field.trim()) && (field.trim().length() > 0)) {
         excludeSet.add(field);
       }
     }

@@ -19,7 +19,6 @@
  */
 package com.celements.navigation;
 
-
 public class ListBuilder implements INavigationBuilder {
 
   private StringBuilder outStream;
@@ -29,12 +28,12 @@ public class ListBuilder implements INavigationBuilder {
   public ListBuilder(String navUniqueId) {
     this.uniqueName = navUniqueId;
   }
-  
+
   public void openLevel(String mainUlCSSClasses) {
     outStream.append("<ul" + addCssClasses(mainUlCSSClasses) + ">");
     isFirstItem = true;
   }
-  
+
   private String addCssClasses(String cssClasses) {
     if (!"".equals(cssClasses.trim())) {
       return " class=\"" + cssClasses.trim() + "\" ";
@@ -67,8 +66,8 @@ public class ListBuilder implements INavigationBuilder {
     return uniqueId;
   }
 
-  String getCssClasses(boolean isFirstItem,
-      boolean isLastItem, boolean isActive, String additionalCssClasses) {
+  String getCssClasses(boolean isFirstItem, boolean isLastItem, boolean isActive,
+      String additionalCssClasses) {
     String cssClass = additionalCssClasses;
     if (isFirstItem) {
       cssClass += " first";
@@ -82,13 +81,11 @@ public class ListBuilder implements INavigationBuilder {
     return cssClass;
   }
 
-  public void appendMenuItemLink(String menuItemName, String hrefLink,
-      String multilingualName, boolean isActive, boolean isLastItem,
-      String cssClasses) {
-    outStream.append("<a " + addCssClasses(getCssClasses(isFirstItem,
-        isLastItem, isActive, cssClasses))
-        + " " + addUniqueElementId(menuItemName) + " href=\""
-        + hrefLink + "\">" + multilingualName + "</a>");
+  public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
+      boolean isActive, boolean isLastItem, String cssClasses) {
+    outStream.append("<a " + addCssClasses(getCssClasses(isFirstItem, isLastItem, isActive,
+        cssClasses)) + " " + addUniqueElementId(menuItemName) + " href=\"" + hrefLink + "\">"
+        + multilingualName + "</a>");
     isFirstItem = false;
   }
 

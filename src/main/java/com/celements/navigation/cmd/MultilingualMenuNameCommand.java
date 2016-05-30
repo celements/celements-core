@@ -53,22 +53,20 @@ public class MultilingualMenuNameCommand {
   public MultilingualMenuNameCommand() {
   }
 
-  public String getMultilingualMenuName(String fullName, String language,
-      XWikiContext context) {
+  public String getMultilingualMenuName(String fullName, String language, XWikiContext context) {
     try {
-      return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName,
-          language, context), false, context);
+      return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
+          false, context);
     } catch (XWikiException exp) {
       mLogger.error(exp);
       return "";
     }
   }
 
-  public String getMultilingualMenuName(com.xpn.xwiki.api.Object menuItem,
-      String language, XWikiContext context) {
+  public String getMultilingualMenuName(com.xpn.xwiki.api.Object menuItem, String language,
+      XWikiContext context) {
     if (menuItem != null) {
-      return getMultilingualMenuName(menuItem.getXWikiObject(), language, false,
-        context);
+      return getMultilingualMenuName(menuItem.getXWikiObject(), language, false, context);
     } else {
       return "";
     }
@@ -81,13 +79,13 @@ public class MultilingualMenuNameCommand {
 
   public String getMultilingualMenuName(BaseObject menuItem, String language,
       boolean allowEmptyMenuNames, XWikiContext context) {
-    //TODO write tests
+    // TODO write tests
     String menuName = "";
     if (menuItem != null) {
       String docFullName = menuItem.getName();
       try {
-        menuName = getMenuNameFromBaseObject(docFullName, getMenuNameBaseObject(
-            docFullName, language, context), allowEmptyMenuNames, context);
+        menuName = getMenuNameFromBaseObject(docFullName, getMenuNameBaseObject(docFullName,
+            language, context), allowEmptyMenuNames, context);
       } catch (XWikiException e) {
         mLogger.error(e);
       }
@@ -111,8 +109,8 @@ public class MultilingualMenuNameCommand {
   public String getMultilingualMenuNameOnly(String fullName, String language,
       boolean allowEmptyMenuNames, XWikiContext context) {
     try {
-      return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName,
-          language, context), allowEmptyMenuNames, context);
+      return getMenuNameFromBaseObject(fullName, getMenuNameBaseObject(fullName, language, context),
+          allowEmptyMenuNames, context);
     } catch (XWikiException exp) {
       mLogger.error("Failed to get MenuName for [" + fullName + "].", exp);
       if (allowEmptyMenuNames) {
@@ -124,13 +122,11 @@ public class MultilingualMenuNameCommand {
   }
 
   /**
-   * 
    * @param fullName
    * @param language
    * @param context
    * @return
    * @throws XWikiException
-   * 
    * @deprecated since 2.14.0 use getMenuNameBaseObject instead
    */
   @Deprecated
@@ -140,31 +136,29 @@ public class MultilingualMenuNameCommand {
     return menuNameObj;
   }
 
-  public BaseObject getMenuNameBaseObject(String fullName, String language,
-      XWikiContext context) throws XWikiException {
+  public BaseObject getMenuNameBaseObject(String fullName, String language, XWikiContext context)
+      throws XWikiException {
     XWikiDocument menuItemDoc = context.getWiki().getDocument(fullName, context);
     BaseObject menuNameObj = null;
     if (context.getWiki().isMultiLingual(context) && (menuItemDoc != null)
         && (menuItemDoc.getObject(CELEMENTS_MENU_NAME) != null)) {
       menuNameObj = menuItemDoc.getObject(CELEMENTS_MENU_NAME, "lang", language);
       if ((menuNameObj == null) || "".equals(menuNameObj.getStringValue("menu_name"))) {
-        String spaceDefaultLanguage = context.getWiki().getSpacePreference(
-            "default_language", menuItemDoc.getDocumentReference().getLastSpaceReference(
-                ).getName(), "", context);
-        menuNameObj = menuItemDoc.getObject(CELEMENTS_MENU_NAME, "lang",
-            spaceDefaultLanguage, false);
+        String spaceDefaultLanguage = context.getWiki().getSpacePreference("default_language",
+            menuItemDoc.getDocumentReference().getLastSpaceReference().getName(), "", context);
+        menuNameObj = menuItemDoc.getObject(CELEMENTS_MENU_NAME, "lang", spaceDefaultLanguage,
+            false);
       }
     }
     return menuNameObj;
   }
 
-  public String addNavImageStyle(String fullName, String language, XWikiContext context
-      ) throws XWikiException {
+  public String addNavImageStyle(String fullName, String language, XWikiContext context)
+      throws XWikiException {
     String menuItemHTML = "";
     BaseObject menuNameObj = getMenuNameBaseObject(fullName, language, context);
     if (menuNameObj != null) {
-      String attURL = webUtils.getAttachmentURL(menuNameObj.getStringValue(
-          "image"), context);
+      String attURL = webUtils.getAttachmentURL(menuNameObj.getStringValue("image"), context);
       if ((attURL != null) && (!"".equals(attURL))) {
         menuItemHTML += " style=\"background-image:url(" + attURL + ")\"";
       }
@@ -172,8 +166,8 @@ public class MultilingualMenuNameCommand {
     return menuItemHTML.trim();
   }
 
-  public String addToolTip(String fullName, String language, XWikiContext context
-      ) throws XWikiException {
+  public String addToolTip(String fullName, String language, XWikiContext context)
+      throws XWikiException {
     BaseObject menuNameObj = getMenuNameBaseObject(fullName, language, context);
     if (menuNameObj != null) {
       String tooltip = menuNameObj.getStringValue("tooltip");
@@ -189,7 +183,7 @@ public class MultilingualMenuNameCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 

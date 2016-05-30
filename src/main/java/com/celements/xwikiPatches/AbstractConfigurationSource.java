@@ -32,6 +32,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * @since 3.5M1
  */
 public abstract class AbstractConfigurationSource implements ConfigurationSource {
+
   /**
    * @param valueClass
    *          the class of the property

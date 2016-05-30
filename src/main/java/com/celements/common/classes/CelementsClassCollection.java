@@ -26,18 +26,15 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Extend CelementsClassCollection and make the implementor a named component.
- * Celements then will call your initClasses method on system start once or if it
- * is explicitly asked for.
+ * Extend CelementsClassCollection and make the implementor a named component. Celements
+ * then will call your initClasses method on system start once or if it is explicitly
+ * asked for.
  * 
- * @author fabian pichler
- * 
- * since 2.11.0
+ * @author fabian pichler since 2.11.0
  * @deprecated since 2.18.0 instead use AbstractClassCollection
  */
 @Deprecated
-public abstract class CelementsClassCollection
-    implements ICelementsClassCollection {
+public abstract class CelementsClassCollection implements ICelementsClassCollection {
 
   final public void runUpdate(XWikiContext context) throws XWikiException {
     if (isActivated(context)) {
@@ -47,20 +44,20 @@ public abstract class CelementsClassCollection
   }
 
   public boolean isActivated(XWikiContext context) {
-    return ("," + context.getWiki().getXWikiPreference("activated_classcollections",
-        context) + "," + context.getWiki().Param("celements.classcollections", "") + ","
-        ).contains("," + getConfigName() + ",");
+    return ("," + context.getWiki().getXWikiPreference("activated_classcollections", context) + ","
+        + context.getWiki().Param("celements.classcollections", "") + ",").contains(","
+            + getConfigName() + ",");
   }
 
-  protected void setContentAndSaveClassDocument(XWikiDocument doc,
-      boolean needsUpdate, XWikiContext context) throws XWikiException {
+  protected void setContentAndSaveClassDocument(XWikiDocument doc, boolean needsUpdate,
+      XWikiContext context) throws XWikiException {
     String content = doc.getContent();
     if ((content == null) || (content.equals(""))) {
       needsUpdate = true;
       doc.setContent(" ");
     }
-    
-    if (needsUpdate){
+
+    if (needsUpdate) {
       context.getWiki().saveDocument(doc, context);
     }
   }

@@ -39,17 +39,17 @@ import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Do not use this class directly. Instead use IMailSenderRole to send emails.
- * In the future it is planned, that IMailSenderRole will buffer, store and allow to
- * resent email messages, if temporary failure occur. You wont be able to take advantage
- * from this features if you directly access IMailObjectRole.
+ * Do not use this class directly. Instead use IMailSenderRole to send emails. In the
+ * future it is planned, that IMailSenderRole will buffer, store and allow to resent email
+ * messages, if temporary failure occur. You wont be able to take advantage from this
+ * features if you directly access IMailObjectRole.
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class CelSendMail implements IMailObjectRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(CelSendMail.class);
-  
+
   private Mail mail;
   private CelMailConfiguration mailConfiguration;
 
@@ -61,40 +61,41 @@ public class CelSendMail implements IMailObjectRole {
   @Deprecated
   public CelSendMail(XWikiContext context) {
   }
-  
+
   /**
    * @deprecated since 2.67.0 instead use Component Manager access to IMailObjectRole
    */
   @Deprecated
-  public CelSendMail() {}
-  
+  public CelSendMail() {
+  }
+
   @Override
   public void setFrom(String from) {
     getMailObject().setFrom(from);
   }
-  
+
   @Override
   public void setReplyTo(String replyTo) {
-    if((replyTo != null) && (replyTo.trim().length() > 0)) {
+    if ((replyTo != null) && (replyTo.trim().length() > 0)) {
       getMailObject().setHeader("reply-to", replyTo);
     }
   }
-  
+
   @Override
   public void setTo(String to) {
     getMailObject().setTo(to);
   }
-  
+
   @Override
   public void setCc(String cc) {
     getMailObject().setCc(cc);
   }
-  
+
   @Override
   public void setBcc(String bcc) {
     getMailObject().setBcc(bcc);
   }
-  
+
   @Override
   public void setSubject(String subject) {
     getMailObject().setSubject(subject);
@@ -111,7 +112,7 @@ public class CelSendMail implements IMailObjectRole {
   @Override
   public void setHtmlContent(String htmlContent, boolean isLatin1) {
     // TODO Probabely can be removed as soon as all installations are on xwiki 2+
-    if(isLatin1) {
+    if (isLatin1) {
       try {
         getMailObject().setHtmlPart(new String(htmlContent.getBytes(), "ISO-8859-1"));
       } catch (UnsupportedEncodingException e) {
@@ -120,60 +121,59 @@ public class CelSendMail implements IMailObjectRole {
     } else {
       getMailObject().setHtmlPart(htmlContent);
     }
-    if((getMailObject().getTextPart() == null)
-        || "".equals(getMailObject().getTextPart().trim())) {
+    if ((getMailObject().getTextPart() == null) || "".equals(
+        getMailObject().getTextPart().trim())) {
       String textContent = getContext().getMessageTool().get("cel_plain_text_mail") + "\r\n\r\n";
       textContent += plainTextCmd.convertToPlainText(htmlContent);
       getMailObject().setTextPart(textContent);
     }
   }
-  
+
   @Override
   public void setTextContent(String textContent) {
-    if((textContent != null) && (!"".equals(textContent))) {
+    if ((textContent != null) && (!"".equals(textContent))) {
       getMailObject().setTextPart(textContent);
     }
   }
-  
+
   @Override
   public void setAttachments(List<Attachment> attachments) {
-    if(attachments == null) {
+    if (attachments == null) {
       attachments = Collections.emptyList();
     }
     getMailObject().setAttachments(attachments);
   }
-  
+
   @Override
   public void setOthers(Map<String, String> others) {
-    if(others != null){
+    if (others != null) {
       for (String other : others.keySet()) {
         getMailObject().setHeader(other, others.get(other));
       }
     }
   }
-  
-  //TODO check if minimum required fields are set?
+
+  // TODO check if minimum required fields are set?
   @Override
   public int sendMail() {
     int sendResult = -999;
-    if(mail != null) {
-      LOGGER.trace("Sending Mail: \nfrom = '" + mail.getFrom() + "'\n" +
-          "replyTo='" + mail.getTo() + "'\n" + "\n" + mail);
-      MailSenderPluginApi mailPlugin = (MailSenderPluginApi)getContext().getWiki(
-          ).getPluginApi("mailsender", getContext());
+    if (mail != null) {
+      LOGGER.trace("Sending Mail: \nfrom = '" + mail.getFrom() + "'\n" + "replyTo='" + mail.getTo()
+          + "'\n" + "\n" + mail);
+      MailSenderPluginApi mailPlugin = (MailSenderPluginApi) getContext().getWiki().getPluginApi(
+          "mailsender", getContext());
       sendResult = mailPlugin.sendMail(mail, getMailConfiguration());
-      LOGGER.info("Sent Mail from '" + mail.getFrom() + "' to '" + mail.getTo() + 
-          "'. Result was '" + sendResult + "'. Time: " + 
-          Calendar.getInstance().getTimeInMillis());
+      LOGGER.info("Sent Mail from '" + mail.getFrom() + "' to '" + mail.getTo() + "'. Result was '"
+          + sendResult + "'. Time: " + Calendar.getInstance().getTimeInMillis());
     } else {
-      LOGGER.info("Mail Object is null. Send result was '" + sendResult + "'. Time: " + 
-          Calendar.getInstance().getTimeInMillis());
+      LOGGER.info("Mail Object is null. Send result was '" + sendResult + "'. Time: "
+          + Calendar.getInstance().getTimeInMillis());
     }
     return sendResult;
   }
 
   Mail getMailObject() {
-    if(mail == null) {
+    if (mail == null) {
       mail = new Mail();
     }
     return mail;
@@ -184,7 +184,7 @@ public class CelSendMail implements IMailObjectRole {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 

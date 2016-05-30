@@ -35,24 +35,23 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
   public void testDenyView() {
     replayDefault();
     assertFalse(defMenuAccessProvider.denyView(null));
-    assertFalse(defMenuAccessProvider.denyView(new DocumentReference(
-        context.getDatabase(), "Celements2", "CelMenuBar")));
+    assertFalse(defMenuAccessProvider.denyView(new DocumentReference(context.getDatabase(),
+        "Celements2", "CelMenuBar")));
     verifyDefault();
   }
 
   @Test
   public void testHasview_notLocal_central_hasAccess_XWikiGuest() throws Exception {
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-            eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar"),
-        eq("celements.menubar.guestview.Celements.MenuBar"), eq(0), same(context))
-        ).andReturn(0);
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar"), eq(
+        "celements.menubar.guestview.Celements.MenuBar"), eq(0), same(context))).andReturn(0);
     replayDefault();
     assertFalse(defMenuAccessProvider.hasview(menuBarDocRef));
     verifyDefault();
@@ -61,14 +60,14 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
   @Test
   public void testHasview_notLocal_central_hasAccess_user() throws Exception {
     String myUserName = "XWiki.myUser";
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq(myUserName),
-            eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq(myUserName), eq(
+        "celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
     replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
@@ -79,18 +78,17 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testHasview_Local_central_noAccess() throws Exception {
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-        eq("xwikidb:Celements.MenuBar"), same(context))).andReturn(false).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "xwikidb:Celements.MenuBar"), same(context))).andReturn(false).once();
 
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
-    expect(
-        rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-            eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
 
     replayDefault();
     assertFalse(defMenuAccessProvider.hasview(menuBarDocRef));
@@ -99,74 +97,73 @@ public class DefaultMenuAccessProviderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testHasview_local_central_hasAccess() throws Exception {
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-        eq("xwikidb:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "xwikidb:Celements.MenuBar"), same(context))).andReturn(true).once();
 
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-      eq("celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "celements2web:Celements.MenuBar"), same(context))).andReturn(true).once();
 
     replayDefault();
     assertTrue(defMenuAccessProvider.hasview(menuBarDocRef));
     verifyDefault();
   }
-  
+
   @Test
   public void testHasview_local_notCentral_hasAccess() throws Exception {
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(false).once();
 
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-      eq("xwikidb:Celements.MenuBar"), same(context))).andReturn(true).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "xwikidb:Celements.MenuBar"), same(context))).andReturn(true).once();
 
     replayDefault();
     assertTrue(defMenuAccessProvider.hasview(menuBarDocRef));
     verifyDefault();
   }
-  
+
   @Test
   public void testHasview_notLocal_central_noAccess() throws Exception {
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-      eq("celements2web:Celements.MenuBar"), same(context))).andReturn(false).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "celements2web:Celements.MenuBar"), same(context))).andReturn(false).once();
 
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(false).once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar"),
-        eq("celements.menubar.guestview.Celements.MenuBar"), eq(0), same(context))
-        ).andReturn(1);
+    expect(xwiki.getXWikiPreferenceAsInt(eq("CelMenuBar-Celements.MenuBar"), eq(
+        "celements.menubar.guestview.Celements.MenuBar"), eq(0), same(context))).andReturn(1);
     replayDefault();
     assertFalse(defMenuAccessProvider.hasview(menuBarDocRef));
     verifyDefault();
   }
-  
+
   @Test
   public void testHasview_local_notCentral_noAccess() throws Exception {
-    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web",
-        "Celements", "MenuBar");
+    DocumentReference menuBar2webDocRef = new DocumentReference("celements2web", "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBar2webDocRef), same(context))).andReturn(false).once();
 
-    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(),
-        "Celements", "MenuBar");
+    DocumentReference menuBarDocRef = new DocumentReference(context.getDatabase(), "Celements",
+        "MenuBar");
     expect(xwiki.exists(eq(menuBarDocRef), same(context))).andReturn(true).once();
-    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"),
-        eq("xwikidb:Celements.MenuBar"), same(context))).andReturn(false).once();
+    expect(rightsMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(
+        "xwikidb:Celements.MenuBar"), same(context))).andReturn(false).once();
 
     replayDefault();
     assertFalse(defMenuAccessProvider.hasview(menuBarDocRef));
     verifyDefault();
   }
-  
+
 }

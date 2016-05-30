@@ -45,21 +45,21 @@ import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * <p>
- * Action for serving skin files. It allows skins to be defined using XDocuments
- * as skins, by letting files be placed as text fields in an XWiki.XWikiSkins
- * object, or as attachments to the document, or as a file in the filesystem. If
- * the file is not found in the current skin, then it is searched in its base
- * skin, and eventually in the default base skins,
+ * Action for serving skin files. It allows skins to be defined using XDocuments as skins,
+ * by letting files be placed as text fields in an XWiki.XWikiSkins object, or as
+ * attachments to the document, or as a file in the filesystem. If the file is not found
+ * in the current skin, then it is searched in its base skin, and eventually in the
+ * default base skins,
  * </p>
  * <p>
- * This action indicates that the results should be publicly cacheable for 30
- * days.
+ * This action indicates that the results should be publicly cacheable for 30 days.
  * </p>
  * 
  * @version $Id: FileAction.java 28858 2010-05-13 20:43:41Z sdumitriu $
  * @since 1.0
  */
 public class FileAction extends SkinAction {
+
   /** Logging helper. */
   private static final Logger _Logger = LoggerFactory.getLogger(FileAction.class);
 
@@ -73,14 +73,13 @@ public class FileAction extends SkinAction {
   public static final String RESOURCES_DIRECTORY = "resources";
 
   /**
-   * The encoding to use when reading text resources from the filesystem and
-   * when sending css/javascript responses.
+   * The encoding to use when reading text resources from the filesystem and when sending
+   * css/javascript responses.
    */
   private static final String ENCODING = "UTF-8";
 
   @Override
-  public String render(String path, XWikiContext context) throws XWikiException,
-      IOException {
+  public String render(String path, XWikiContext context) throws XWikiException, IOException {
     XWiki xwiki = context.getWiki();
     // Since skin paths usually contain the name of skin document, it is likely
     // that the context document belongs to
@@ -130,8 +129,7 @@ public class FileAction extends SkinAction {
           // defaultbaseskin can only be on the filesystem, so don't try to use
           // it as a
           // skin document.
-          if (renderFileFromFilesystem(getSkinFilePath(filename, defaultbaseskin),
-              context)) {
+          if (renderFileFromFilesystem(getSkinFilePath(filename, defaultbaseskin), context)) {
             found = true;
             break;
           }
@@ -161,15 +159,15 @@ public class FileAction extends SkinAction {
   }
 
   /**
-   * Tries to serve a skin file using <tt>doc</tt> as a skin document. The file
-   * is searched in the following places:
+   * Tries to serve a skin file using <tt>doc</tt> as a skin document. The file is
+   * searched in the following places:
    * <ol>
-   * <li>As the content of a property with the same name as the requested
-   * filename, from an XWikiSkins object attached to the document.</li>
-   * <li>As the content of an attachment with the same name as the requested
-   * filename.</li>
-   * <li>As a file located on the filesystem, in the directory with the same
-   * name as the current document (in case the URL was actually pointing to
+   * <li>As the content of a property with the same name as the requested filename, from
+   * an XWikiSkins object attached to the document.</li>
+   * <li>As the content of an attachment with the same name as the requested filename.
+   * </li>
+   * <li>As a file located on the filesystem, in the directory with the same name as the
+   * current document (in case the URL was actually pointing to
    * <tt>/skins/directory/file</tt>).</li>
    * </ol>
    * 
@@ -179,8 +177,8 @@ public class FileAction extends SkinAction {
    *          The skin {@link XWikiDocument document}.
    * @param context
    *          The current {@link XWikiContext request context}.
-   * @return <tt>true</tt> if the attachment was found and the content was
-   *         successfully sent.
+   * @return <tt>true</tt> if the attachment was found and the content was successfully
+   *         sent.
    * @throws XWikiException
    *           If the attachment cannot be loaded.
    * @throws IOException
@@ -198,10 +196,9 @@ public class FileAction extends SkinAction {
           _Logger.debug(doc.getName() + " is not a document");
         }
       } else {
-        return renderFileFromObjectField(filename, doc, context)
-            || renderFileFromAttachment(filename, doc, context)
-            || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(
-                getSkinFilePath(filename, doc.getName()), context));
+        return renderFileFromObjectField(filename, doc, context) || renderFileFromAttachment(
+            filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
+                && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context));
       }
     } catch (IOException e) {
       throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
@@ -219,8 +216,7 @@ public class FileAction extends SkinAction {
    *          Path of the file that should be rendered.
    * @param context
    *          The current {@link XWikiContext request context}.
-   * @return <tt>true</tt> if the file was found and its content was
-   *         successfully sent.
+   * @return <tt>true</tt> if the file was found and its content was successfully sent.
    * @throws XWikiException
    *           If the response cannot be sent.
    */
@@ -264,14 +260,14 @@ public class FileAction extends SkinAction {
    *          The skin {@link XWikiDocument document}.
    * @param context
    *          The current {@link XWikiContext request context}.
-   * @return <tt>true</tt> if the object exists, and the field is set to a
-   *         non-empty value, and its content was successfully sent.
+   * @return <tt>true</tt> if the object exists, and the field is set to a non-empty
+   *         value, and its content was successfully sent.
    * @throws IOException
    *           If the response cannot be sent.
    */
   @Override
-  public boolean renderFileFromObjectField(String filename, XWikiDocument doc,
-      XWikiContext context) throws IOException {
+  public boolean renderFileFromObjectField(String filename, XWikiDocument doc, XWikiContext context)
+      throws IOException {
     _Logger.debug("... as object property");
     BaseObject object = doc.getObject("XWiki.XWikiSkins");
     String content = null;
@@ -306,23 +302,22 @@ public class FileAction extends SkinAction {
    *          The skin {@link XWikiDocument document}.
    * @param context
    *          The current {@link XWikiContext request context}.
-   * @return <tt>true</tt> if the attachment was found and its content was
-   *         successfully sent.
+   * @return <tt>true</tt> if the attachment was found and its content was successfully
+   *         sent.
    * @throws IOException
    *           If the response cannot be sent.
    * @throws XWikiException
    *           If the attachment cannot be loaded.
    */
   @Override
-  public boolean renderFileFromAttachment(String filename, XWikiDocument doc,
-      XWikiContext context) throws IOException, XWikiException {
+  public boolean renderFileFromAttachment(String filename, XWikiDocument doc, XWikiContext context)
+      throws IOException, XWikiException {
     _Logger.debug("... as attachment");
     try {
-      IAttFileNameMatcherRole matcher = Utils.getComponent(IAttFileNameMatcherRole.class, 
+      IAttFileNameMatcherRole matcher = Utils.getComponent(IAttFileNameMatcherRole.class,
           AttNameWithoutExtMatcher.ATT_NAME_WITHOUT_EXT_MATCHER);
       matcher.setFileNamePattern(filename);
-      XWikiAttachment attachment = getAttachmentService().getAttachmentFirstNameMatch(doc,
-          matcher);
+      XWikiAttachment attachment = getAttachmentService().getAttachmentFirstNameMatch(doc, matcher);
       XWiki xwiki = context.getWiki();
       XWikiResponse response = context.getResponse();
       String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
@@ -333,10 +328,8 @@ public class FileAction extends SkinAction {
         setupHeaders(response, mimetype, attachment.getDate(), data.length);
         response.getOutputStream().write(data);
       } else {
-        setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentSize(
-            context));
-        IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream()
-            );
+        setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentSize(context));
+        IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
       }
       return true;
     } catch (AttachmentNotExistsException anee) {

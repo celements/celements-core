@@ -52,9 +52,9 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetDefaultAdminSenderAddress() {
-    expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
-        ).andReturn("test@unit.test");
+    expect(xwiki.getXWikiPreference(eq("admin_email"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))).andReturn(
+            "test@unit.test");
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getDefaultAdminSenderAddress());
     verifyDefault();
@@ -62,9 +62,9 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetDefaultGeneralSenderAddress() {
-    expect(xwiki.getXWikiPreference(eq("smtp_from"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))
-        ).andReturn("test@unit.test");
+    expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
+            "test@unit.test");
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getDefaultGeneralSenderAddress());
     verifyDefault();
@@ -72,34 +72,34 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetFrom() {
-    expect(xwiki.getXWikiPreference(eq("smtp_from"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))
-        ).andReturn("test@unit.test").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
+            "test@unit.test").once();
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getFrom());
-    assertEquals("multiple reads must not lead to multiple config reads.",
-        "test@unit.test", celMailConfiguration.getFrom());
+    assertEquals("multiple reads must not lead to multiple config reads.", "test@unit.test",
+        celMailConfiguration.getFrom());
     verifyDefault();
   }
 
   @Test
   public void testGetFrom_setBackToEmpty() {
-    expect(xwiki.getXWikiPreference(eq("smtp_from"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))
-        ).andReturn("test@unit.test").times(2);
+    expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
+            "test@unit.test").times(2);
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getFrom());
     celMailConfiguration.setFrom("");
-    assertEquals("set back to empty must tricker the default configuration",
-        "test@unit.test", celMailConfiguration.getFrom());
+    assertEquals("set back to empty must tricker the default configuration", "test@unit.test",
+        celMailConfiguration.getFrom());
     verifyDefault();
   }
 
   @Test
   public void testGetFrom_overwrittenBy_setFrom() {
-    expect(xwiki.getXWikiPreference(eq("smtp_from"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))
-        ).andReturn("test@unit.test").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
+            "test@unit.test").anyTimes();
     replayDefault();
     celMailConfiguration.setFrom("myTest@specialUnit.test");
     assertEquals("myTest@specialUnit.test", celMailConfiguration.getFrom());
@@ -108,16 +108,16 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetFrom_fallbackToAdminEmailAdress() {
-    expect(xwiki.getXWikiPreference(eq("smtp_from"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("admin_email"),
-        eq(CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))
-        ).andReturn("test@unit.test").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_from"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_SMTP_FROM_KEY), eq(""), same(context))).andReturn(
+            "").once();
+    expect(xwiki.getXWikiPreference(eq("admin_email"), eq(
+        CelMailConfiguration.MAIL_DEFAULT_ADMIN_EMAIL_KEY), eq(""), same(context))).andReturn(
+            "test@unit.test").once();
     replayDefault();
     assertEquals("test@unit.test", celMailConfiguration.getFrom());
-    assertEquals("multiple reads must not lead to multiple config reads.",
-        "test@unit.test", celMailConfiguration.getFrom());
+    assertEquals("multiple reads must not lead to multiple config reads.", "test@unit.test",
+        celMailConfiguration.getFrom());
     verifyDefault();
   }
 
@@ -215,16 +215,16 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testReadServerDefaultHostConfiguration() {
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").anyTimes();
     replayDefault();
     celMailConfiguration.readServerDefaultHostConfiguration();
     assertEquals("mySmtpUserName", celMailConfiguration.getSmtpUsername_internal());
@@ -232,7 +232,7 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
     assertEquals("smtp.unit.test", celMailConfiguration.getHost_internal());
     assertEquals(567, celMailConfiguration.getPort_internal());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testValue", extProps.get("testProp"));
     assertEquals("value2", extProps.get("prop2"));
     verifyDefault();
@@ -240,33 +240,32 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSmtpUsername_fallbackToDefault_completeConfig() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").once();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).once();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").once();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).once();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").once();
     replayDefault();
     assertEquals("mySmtpUserName", celMailConfiguration.getSmtpUsername());
     assertEquals("myServerPassword", celMailConfiguration.getSmtpPassword());
     assertEquals("smtp.unit.test", celMailConfiguration.getHost());
     assertEquals(567, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testValue", extProps.get("testProp"));
     assertEquals("value2", extProps.get("prop2"));
     verifyDefault();
@@ -274,33 +273,32 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSmtpUsername_fallbackToDefault_onlyUsername() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("myLocalUsername").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").once();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).once();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "myLocalUsername").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").once();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).once();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").once();
     replayDefault();
     assertEquals("mySmtpUserName", celMailConfiguration.getSmtpUsername());
     assertEquals("myServerPassword", celMailConfiguration.getSmtpPassword());
     assertEquals("smtp.unit.test", celMailConfiguration.getHost());
     assertEquals(567, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testValue", extProps.get("testProp"));
     assertEquals("value2", extProps.get("prop2"));
     verifyDefault();
@@ -308,33 +306,32 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSmtpUsername_fallbackToDefault_onlyPassword() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("myLocalPassword").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").once();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).once();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "myLocalPassword").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").once();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).once();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").once();
     replayDefault();
     assertEquals("mySmtpUserName", celMailConfiguration.getSmtpUsername());
     assertEquals("myServerPassword", celMailConfiguration.getSmtpPassword());
     assertEquals("smtp.unit.test", celMailConfiguration.getHost());
     assertEquals(567, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testValue", extProps.get("testProp"));
     assertEquals("value2", extProps.get("prop2"));
     verifyDefault();
@@ -342,99 +339,97 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSmtpUsername_localHost() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("myLocalHost").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn(
+        "myLocalHost").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").anyTimes();
     replayDefault();
     assertNull(celMailConfiguration.getSmtpUsername());
     assertNull(celMailConfiguration.getSmtpPassword());
     assertEquals("myLocalHost", celMailConfiguration.getHost());
     assertEquals(25, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertTrue(extProps.isEmpty());
     verifyDefault();
   }
 
   @Test
   public void testGetSmtpUsername_localPort() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(567).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        567).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").anyTimes();
     replayDefault();
     assertNull(celMailConfiguration.getSmtpUsername());
     assertNull(celMailConfiguration.getSmtpPassword());
     assertEquals("", celMailConfiguration.getHost());
     assertEquals(567, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertTrue(extProps.isEmpty());
     verifyDefault();
   }
 
   @Test
   public void testGetSmtpUsername_localExtraProps() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("testLocalProp=testLocalValue,localProp2=valueLocal2").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "testLocalProp=testLocalValue,localProp2=valueLocal2").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").anyTimes();
     replayDefault();
     assertNull(celMailConfiguration.getSmtpUsername());
     assertNull(celMailConfiguration.getSmtpPassword());
     assertEquals("", celMailConfiguration.getHost());
     assertEquals(25, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testLocalValue", extProps.get("testLocalProp"));
     assertEquals("valueLocal2", extProps.get("localProp2"));
     assertNull(extProps.get("testProp"));
@@ -444,59 +439,56 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSmtpUsername_localUsernameAndPassword() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("myLocalPassword").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("myLocalUsername").once();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myServerPassword").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpUserName").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "myLocalPassword").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "myLocalUsername").once();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myServerPassword").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpUserName").anyTimes();
     replayDefault();
     assertEquals("myLocalUsername", celMailConfiguration.getSmtpUsername());
     assertEquals("myLocalPassword", celMailConfiguration.getSmtpPassword());
     assertEquals("", celMailConfiguration.getHost());
     assertEquals(25, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertTrue(extProps.isEmpty());
     verifyDefault();
   }
 
   @Test
   public void testGetSmtpUsername_fallbackToDefault_onlyUsername_NoPassword() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpAuthUserName").atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpAuthUserName").atLeastOnce();
     replayDefault();
     assertNull(celMailConfiguration.getSmtpUsername());
     verifyDefault();
@@ -504,96 +496,90 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetSmtpUsername_fallbackToDefault_usernameAndPassword() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myNotSecurePassword").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpAuthUserName").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myNotSecurePassword").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpAuthUserName").once();
     replayDefault();
     assertEquals("mySmtpAuthUserName", celMailConfiguration.getSmtpUsername());
-    assertTrue("after setting server_username usesAuthentication_localConfig must be"
-        + " true.", celMailConfiguration.usesAuthentication_localConfig());
+    assertTrue("after setting server_username usesAuthentication_localConfig must be" + " true.",
+        celMailConfiguration.usesAuthentication_localConfig());
     assertFalse("after setting server_username noHostConfig must be false.",
         celMailConfiguration.noHostConfig());
-    assertEquals("multiple reads must not lead to multiple config reads.",
-        "mySmtpAuthUserName", celMailConfiguration.getSmtpUsername());
-    assertEquals("setting any smtp-server config must deactivated fallback to"
-        + " 'localhost'", "", celMailConfiguration.getHost());
+    assertEquals("multiple reads must not lead to multiple config reads.", "mySmtpAuthUserName",
+        celMailConfiguration.getSmtpUsername());
+    assertEquals("setting any smtp-server config must deactivated fallback to" + " 'localhost'", "",
+        celMailConfiguration.getHost());
     verifyDefault();
   }
 
   @Test
   public void testGetSmtpPassword_fallbackToDefault_usernameAndPassword() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myNotSecurePassword").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("mySmtpAuthUserName").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myNotSecurePassword").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "mySmtpAuthUserName").once();
     replayDefault();
     assertEquals("myNotSecurePassword", celMailConfiguration.getSmtpPassword());
-    assertTrue("after setting server_username usesAuthentication_localConfig must be"
-        + " true.", celMailConfiguration.usesAuthentication_localConfig());
+    assertTrue("after setting server_username usesAuthentication_localConfig must be" + " true.",
+        celMailConfiguration.usesAuthentication_localConfig());
     assertFalse("after setting server_username noHostConfig must be false.",
         celMailConfiguration.noHostConfig());
-    assertEquals("multiple reads must not lead to multiple config reads.",
-        "myNotSecurePassword", celMailConfiguration.getSmtpPassword());
-    assertEquals("setting any smtp-server config must deactivated fallback to"
-        + " 'localhost'", "", celMailConfiguration.getHost());
+    assertEquals("multiple reads must not lead to multiple config reads.", "myNotSecurePassword",
+        celMailConfiguration.getSmtpPassword());
+    assertEquals("setting any smtp-server config must deactivated fallback to" + " 'localhost'", "",
+        celMailConfiguration.getHost());
     verifyDefault();
   }
 
   @Test
   public void testGetSmtpPassword_fallbackToDefault_only_password_NoUsername() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("myNotSecurePassword").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "myNotSecurePassword").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").once();
     replayDefault();
     assertNull(celMailConfiguration.getSmtpPassword());
     assertFalse("after setting only server_username usesAuthentication_localConfig must"
@@ -603,55 +589,52 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetHost_fallbackToDefault() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("smtp.unit.test").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn(
+        "smtp.unit.test").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     assertEquals("smtp.unit.test", celMailConfiguration.getHost());
-    assertEquals("multiple reads must not lead to multiple config reads.",
-        "smtp.unit.test", celMailConfiguration.getHost());
+    assertEquals("multiple reads must not lead to multiple config reads.", "smtp.unit.test",
+        celMailConfiguration.getHost());
     verifyDefault();
   }
 
   @Test
   public void testGetHost_fallbackToDefault_noDefaultHost_usingLocalhost() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     assertEquals("localhost", celMailConfiguration.getHost());
     assertEquals(25, celMailConfiguration.getPort());
@@ -662,26 +645,24 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetHost_fallbackToDefault_deactivatedDefaultHost() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("-").once();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("-").once();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     assertEquals("empty string defaults to 'localhost' in javamail!", "-",
         celMailConfiguration.getHost());
@@ -692,26 +673,24 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPort_fallbackToDefault() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(567L).once();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        567L).once();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     assertEquals(567, celMailConfiguration.getPort());
     assertEquals("multiple reads must not lead to multiple config reads.", 567,
@@ -721,26 +700,24 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPort_fallbackToDefault_noDefaultPort() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     assertEquals(25, celMailConfiguration.getPort());
     assertTrue("after not setting any smtp-server configuration noHostConfig must still"
@@ -750,34 +727,32 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testSetProps_fallbackToDefault() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("testProp=testValue,prop2=value2").once();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "testProp=testValue,prop2=value2").once();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testValue", extProps.get("testProp"));
     assertEquals("value2", extProps.get("prop2"));
     // multiple reads must not lead to multiple config reads.
     Properties extProps2 = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps2 , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps2, true);
     assertEquals("testValue", extProps2.get("testProp"));
     assertEquals("value2", extProps2.get("prop2"));
     verifyDefault();
@@ -785,29 +760,27 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testSetProps_fallbackToDefault_noDefaultProps() {
-    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))
-        ).andReturn(-1).anyTimes();
-    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))
-        ).andReturn(-1L).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))
-        ).andReturn("").anyTimes();
-    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))
-        ).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))
-        ).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server"), eq(""))).andReturn("").anyTimes();
+    expect(xwiki.getXWikiPreferenceAsInt(eq("smtp_port"), eq(-1), same(context))).andReturn(
+        -1).anyTimes();
+    expect(xwiki.ParamAsLong(eq("celements.mail.default.smtp_port"), eq(-1L))).andReturn(
+        -1L).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("javamail_extra_props"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.javamail_extra_props"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_password"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_password"), eq(""))).andReturn(
+        "").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("smtp_server_username"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.mail.default.smtp_server_username"), eq(""))).andReturn(
+        "").anyTimes();
     replayDefault();
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertTrue(extProps.isEmpty());
     assertTrue("after not setting any smtp-server configuration noHostConfig must still"
         + " be true.", celMailConfiguration.noHostConfig());
@@ -828,7 +801,7 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
     assertEquals("smtp.unit.test", celMailConfiguration.getHost());
     assertEquals(567, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertEquals("testValue", extProps.get("testProp"));
     assertEquals("value2", extProps.get("prop2"));
     verifyDefault();
@@ -844,7 +817,7 @@ public class CelMailConfigurationTest extends AbstractBridgedComponentTestCase {
     assertEquals("smtp.unit.test", celMailConfiguration.getHost());
     assertEquals(25, celMailConfiguration.getPort());
     Properties extProps = new Properties();
-    celMailConfiguration.appendExtraPropertiesTo(extProps , true);
+    celMailConfiguration.appendExtraPropertiesTo(extProps, true);
     assertTrue(extProps.isEmpty());
     verifyDefault();
   }

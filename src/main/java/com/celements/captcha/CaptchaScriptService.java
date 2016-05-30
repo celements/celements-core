@@ -10,18 +10,18 @@ import com.xpn.xwiki.XWikiContext;
 
 @Component("captcha")
 public class CaptchaScriptService implements ScriptService {
-  
+
   @Requirement
   private Execution execution;
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   public boolean checkCaptcha() {
     return new CaptchaCommand().checkCaptcha(getContext());
   }
-  
+
   public String getCaptchaId() {
     return new CaptchaCommand().getCaptchaId(getContext());
   }

@@ -30,20 +30,20 @@ public class JSONDataFieldRowTest {
 
   @Test
   public void testHasNext() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
   @Test
   public void testNext() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
   @Test
   public void testRemove() {
-    //TODO !!!
-//    fail("Not yet implemented");
+    // TODO !!!
+    // fail("Not yet implemented");
   }
 
 }

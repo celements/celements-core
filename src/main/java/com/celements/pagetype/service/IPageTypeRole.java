@@ -42,6 +42,6 @@ public interface IPageTypeRole {
 
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible);
-  
+
   public boolean setPageType(XWikiDocument doc, PageTypeReference pageTypeRef);
 }

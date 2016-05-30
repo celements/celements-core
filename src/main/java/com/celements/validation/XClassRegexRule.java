@@ -47,8 +47,7 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
   private static final String PROPERTY_FIELD_VAL_REGEX = "validationRegExp";
   private static final String PROPERTY_FIELD_VAL_MSG = "validationMessage";
 
-  private static final MapHandler<String, ValidationType, String> mapHandler =
-      new MapHandler<String, ValidationType, String>();
+  private static final MapHandler<String, ValidationType, String> mapHandler = new MapHandler<String, ValidationType, String>();
 
   @Requirement
   ConfigurationSource configSrc;
@@ -65,8 +64,7 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
 
   public Map<String, Map<ValidationType, Set<String>>> validateRequest(
       Map<RequestParameter, String[]> requestMap) {
-    Map<String, Map<ValidationType, Set<String>>> ret =
-        new HashMap<String, Map<ValidationType, Set<String>>>();
+    Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<String, Map<ValidationType, Set<String>>>();
     for (RequestParameter param : requestMap.keySet()) {
       for (String value : requestMap.get(param)) {
         mapHandler.put(param.getParameterName(), validateField(param.getClassName(),
@@ -77,8 +75,8 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
     return ret;
   }
 
-  public Map<ValidationType, Set<String>> validateField(String className, 
-      String fieldName, String value) {
+  public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
+      String value) {
     Map<ValidationType, Set<String>> ret = null;
     PropertyClass propertyClass = getBaseClassProperty(className, fieldName);
     if (propertyClass != null) {
@@ -89,16 +87,16 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
       }
       LOGGER.warn("invalid class/field key '{}'", className + "." + fieldName);
     }
-    LOGGER.trace("Returning validation map for field '{}' and value '{}': {}", 
-        className + "." + fieldName, value, ret);
+    LOGGER.trace("Returning validation map for field '{}' and value '{}': {}", className + "."
+        + fieldName, value, ret);
     return ret;
   }
 
   private PropertyClass getBaseClassProperty(String className, String fieldName) {
     PropertyClass propertyClass = null;
     try {
-      BaseClass bclass = getContext().getWiki().getDocument(
-          webUtils.resolveDocumentReference(className), getContext()).getXClass();
+      BaseClass bclass = getContext().getWiki().getDocument(webUtils.resolveDocumentReference(
+          className), getContext()).getXClass();
       if (bclass != null) {
         propertyClass = (PropertyClass) bclass.getField(fieldName);
       }
@@ -108,8 +106,8 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
     return propertyClass;
   }
 
-  private Map<ValidationType, Set<String>> matchPropertyValidationRegex(
-      PropertyClass propertyClass, String value) {
+  private Map<ValidationType, Set<String>> matchPropertyValidationRegex(PropertyClass propertyClass,
+      String value) {
     Map<ValidationType, Set<String>> ret = null;
     String regex = getFieldFromProperty(propertyClass, PROPERTY_FIELD_VAL_REGEX);
     String validationMsg = getFieldFromProperty(propertyClass, PROPERTY_FIELD_VAL_MSG);
@@ -133,8 +131,8 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
       try {
         return getContext().getUtil().match(regex, str);
       } catch (MalformedPerl5PatternException exc) {
-        LOGGER.error("Failed to execute validation regex for string '{}' and regex '{}'",
-            str, regex, exc);
+        LOGGER.error("Failed to execute validation regex for string '{}' and regex '{}'", str,
+            regex, exc);
       }
     }
     return false;
@@ -149,8 +147,7 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
   }
 
   private boolean ignoreInvalidKey() {
-    return configSrc.getProperty("celements.validation.xClassRegex.ignoreInvalidKey",
-        true);
+    return configSrc.getProperty("celements.validation.xClassRegex.ignoreInvalidKey", true);
   }
 
 }

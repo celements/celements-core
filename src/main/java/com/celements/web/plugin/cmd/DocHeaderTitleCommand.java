@@ -32,29 +32,27 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class DocHeaderTitleCommand {
-  
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      DocHeaderTitleCommand.class);
+
+  private static Log mLogger = LogFactory.getFactory().getInstance(DocHeaderTitleCommand.class);
 
   MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
 
   /**
-   * deprecated since 2.41.0
-   *                  use getDocHeaderTitle(DocumentReference docRef) instead
+   * deprecated since 2.41.0 use getDocHeaderTitle(DocumentReference docRef) instead
    */
   @Deprecated
   public String getDocHeaderTitle(String fullName, XWikiContext context) {
     DocumentReference docRef = getWebUtils().resolveDocumentReference(fullName);
     return getDocHeaderTitle(docRef);
   }
-  
+
   public String getDocHeaderTitle(DocumentReference docRef) {
     String docHeaderTitle = "";
     try {
       XWikiDocument theDoc = getContext().getWiki().getDocument(docRef, getContext());
       XWikiDocument theTDoc = theDoc.getTranslatedDocument(getContext());
-      BaseObject docTitelObj = theDoc.getXObject(getWebUtils(
-          ).resolveDocumentReference("Content.Title"));
+      BaseObject docTitelObj = theDoc.getXObject(getWebUtils().resolveDocumentReference(
+          "Content.Title"));
       if ((theTDoc.getTitle() != null) && !"".equals(theTDoc.getTitle())) {
         docHeaderTitle = theTDoc.getTitle();
       } else if ((theDoc.getTitle() != null) && !"".equals(theDoc.getTitle())) {
@@ -68,20 +66,20 @@ public class DocHeaderTitleCommand {
             docRef.getLastSpaceReference().getName() + "." + docRef.getName(),
             getContext().getLanguage(), false, getContext());
       }
-      if (!"".equals(getContext().getWiki().getSpacePreference("title", 
+      if (!"".equals(getContext().getWiki().getSpacePreference("title",
           docRef.getLastSpaceReference().getName(), "", getContext()))) {
-        docHeaderTitle = docHeaderTitle + getContext().getWiki().parseContent(getContext(
-            ).getWiki().getSpacePreference("title", docRef.getLastSpaceReference(
-                ).getName(), "", getContext()), getContext());
+        docHeaderTitle = docHeaderTitle + getContext().getWiki().parseContent(
+            getContext().getWiki().getSpacePreference("title",
+                docRef.getLastSpaceReference().getName(), "", getContext()), getContext());
       }
     } catch (Exception exp) {
       mLogger.error(exp);
     }
     return docHeaderTitle;
   }
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   Execution getExecution() {

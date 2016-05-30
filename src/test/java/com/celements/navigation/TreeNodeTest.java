@@ -19,7 +19,6 @@
  */
 package com.celements.navigation;
 
-
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -48,9 +47,9 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void test_ConstructorParentSpaceRef_partName_null() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), null, 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), null,
+        1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("", treeNodeTest.getPartName(getContext()));
@@ -59,9 +58,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void test_ConstructorParentSpaceRef_partName_empty() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), "", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), "", 1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("", treeNodeTest.getPartName(getContext()));
@@ -70,19 +68,19 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void test_ConstructorParentSpaceRef_partName() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), "mainNav", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())),
+        "mainNav", 1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("mainNav", treeNodeTest.getPartName(getContext()));
     verifyDefault();
   }
 
- @Test
+  @Test
   public void testEquals() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), "", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", 1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -97,8 +95,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHash() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), "", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", 1);
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyDefault();
@@ -106,8 +104,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHash_null_position() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), "", null);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", null);
     treeNode.setPosition(null);
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
@@ -116,9 +114,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testEquals_parentSpaceRefConstructor() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), "", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), "", 1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -126,9 +123,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHash_parentSpaceRefConstructor() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), "", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())), "", 1);
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyDefault();
@@ -138,8 +134,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
   public void testGetParentRef_spaceRef() {
     SpaceReference parentSpaceRef = new SpaceReference("MySpace", new WikiReference(
         context.getDatabase()));
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), parentSpaceRef, "", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), parentSpaceRef, "", 1);
     replayDefault();
     assertEquals(parentSpaceRef, treeNodeTest.getParentRef());
     verifyDefault();
@@ -149,8 +145,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
   public void testGetParentRef_docRef() {
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "myParentPage",
         "MySpace");
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), parentDocRef, 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), parentDocRef, 1);
     replayDefault();
     assertEquals(parentDocRef, treeNodeTest.getParentRef());
     verifyDefault();
@@ -158,9 +154,9 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testEquals_parentSpaceRefConstructorWithPartName() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), "mainNav", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())),
+        "mainNav", 1);
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -168,9 +164,9 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHash_parentSpaceRefConstructorWithPartName() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new SpaceReference("MySpace", new WikiReference(
-            context.getDatabase())), "mainNav", 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new SpaceReference("MySpace", new WikiReference(context.getDatabase())),
+        "mainNav", 1);
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
     verifyDefault();
@@ -178,9 +174,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testEquals_parentDocRefConstructor() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new DocumentReference(context.getDatabase(), "myParentPage",
-            "MySpace"), 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new DocumentReference(context.getDatabase(), "myParentPage", "MySpace"), 1);
     treeNode.setParent("MySpace.myParentPage");
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
@@ -189,9 +184,8 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHash_parentDocRefConstructor() {
-    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(),
-        "MySpace", "myPage"), new DocumentReference(context.getDatabase(), "myParentPage",
-            "MySpace"), 1);
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), new DocumentReference(context.getDatabase(), "myParentPage", "MySpace"), 1);
     treeNode.setParent("MySpace.myParentPage");
     replayDefault();
     assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());

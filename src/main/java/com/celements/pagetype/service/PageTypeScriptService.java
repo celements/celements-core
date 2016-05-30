@@ -48,29 +48,28 @@ public class PageTypeScriptService implements ScriptService {
   IPageTypeCategoryRole cellTypeCategory;
 
   public List<String> getAllPageTypes() {
-    return pageTypeService.getPageTypesConfigNamesForCategories(
-        pageTypeCategory.getAllTypeNames(), false);
+    return pageTypeService.getPageTypesConfigNamesForCategories(pageTypeCategory.getAllTypeNames(),
+        false);
   }
 
   public List<String> getAvailablePageTypes() {
-    return pageTypeService.getPageTypesConfigNamesForCategories(
-        pageTypeCategory.getAllTypeNames(), true);
+    return pageTypeService.getPageTypesConfigNamesForCategories(pageTypeCategory.getAllTypeNames(),
+        true);
   }
 
-  public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible
-      ) {
-    return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<String>(
-        catList), onlyVisible);
+  public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible) {
+    return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<String>(catList),
+        onlyVisible);
   }
 
   public List<String> getAllCellTypes() {
-    return pageTypeService.getPageTypesConfigNamesForCategories(
-        cellTypeCategory.getAllTypeNames(), false);
+    return pageTypeService.getPageTypesConfigNamesForCategories(cellTypeCategory.getAllTypeNames(),
+        false);
   }
 
   public List<String> getAvailableCellTypes() {
-    return pageTypeService.getPageTypesConfigNamesForCategories(
-        cellTypeCategory.getAllTypeNames(), true);
+    return pageTypeService.getPageTypesConfigNamesForCategories(cellTypeCategory.getAllTypeNames(),
+        true);
   }
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {

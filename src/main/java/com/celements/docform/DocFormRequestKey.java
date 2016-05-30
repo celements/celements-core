@@ -11,9 +11,9 @@ public class DocFormRequestKey {
   private final boolean remove;
   private final Integer objNb;
   private final String fieldName;
-  
-  public DocFormRequestKey(String key, DocumentReference docRef, 
-      DocumentReference classRef, boolean remove, Integer objNb, String fieldName) {
+
+  public DocFormRequestKey(String key, DocumentReference docRef, DocumentReference classRef,
+      boolean remove, Integer objNb, String fieldName) {
     this.keyString = key;
     this.docRef = docRef;
     this.classRef = classRef;
@@ -53,15 +53,14 @@ public class DocFormRequestKey {
 
   public boolean sameObject(DocFormRequestKey other) {
     return (this.classRef != null) && (this.objNb != null) && (this.objNb >= 0)
-        && ObjectUtils.equals(this.classRef, other.classRef) 
-        && ObjectUtils.equals(this.objNb, other.objNb);
+        && ObjectUtils.equals(this.classRef, other.classRef) && ObjectUtils.equals(this.objNb,
+            other.objNb);
   }
 
   @Override
   public String toString() {
-    return "DocFormRequestKey [keyString=" + keyString + ", docRef=" + docRef 
-        + ", classRef=" + classRef + ", remove=" + remove + ", objNb=" + objNb 
-        + ", fieldName=" + fieldName + "]";
+    return "DocFormRequestKey [keyString=" + keyString + ", docRef=" + docRef + ", classRef="
+        + classRef + ", remove=" + remove + ", objNb=" + objNb + ", fieldName=" + fieldName + "]";
   }
 
 }

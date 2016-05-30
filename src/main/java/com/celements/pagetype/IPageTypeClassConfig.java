@@ -9,13 +9,12 @@ public interface IPageTypeClassConfig {
 
   public static final String PAGE_TYPE_PROPERTIES_CLASS_SPACE = "Celements2";
   public static final String PAGE_TYPE_PROPERTIES_CLASS_DOC = "PageTypeProperties";
-  public static final String PAGE_TYPE_PROPERTIES_CLASS = 
-    PAGE_TYPE_PROPERTIES_CLASS_SPACE + "." + PAGE_TYPE_PROPERTIES_CLASS_DOC;
+  public static final String PAGE_TYPE_PROPERTIES_CLASS = PAGE_TYPE_PROPERTIES_CLASS_SPACE + "."
+      + PAGE_TYPE_PROPERTIES_CLASS_DOC;
 
   public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
-  public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "."
-      + PAGE_TYPE_CLASS_DOC;
+  public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "." + PAGE_TYPE_CLASS_DOC;
   public static final String PAGE_TYPE_FIELD = "page_type";
   public static final String PAGETYPE_PROP_HASPAGETITLE = "haspagetitle";
   public static final String PAGETYPE_PROP_RTE_HEIGHT = "rte_height";

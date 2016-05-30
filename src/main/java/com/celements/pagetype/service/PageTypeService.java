@@ -53,7 +53,7 @@ public class PageTypeService implements IPageTypeRole {
 
   @Requirement
   private IPageTypeClassConfig pageTypeClassConf;
-  
+
   @Requirement
   private IModelAccessFacade modelAccess;
 
@@ -80,8 +80,7 @@ public class PageTypeService implements IPageTypeRole {
   public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
       boolean onlyVisible) {
     List<String> pageTypeConfigNameList = new ArrayList<String>();
-    for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList,
-        onlyVisible)) {
+    for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList, onlyVisible)) {
       pageTypeConfigNameList.add(pageTypeRef.getConfigName());
     }
     LOGGER.debug("getPageTypesConfigNamesForCategories: return " + Arrays.deepToString(
@@ -108,8 +107,7 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   Map<String, PageTypeReference> getPageTypeRefsByConfigNames() {
-    Map<String, PageTypeReference> pageTypeRefsMap =
-      new HashMap<String, PageTypeReference>();
+    Map<String, PageTypeReference> pageTypeRefsMap = new HashMap<String, PageTypeReference>();
     for (PageTypeReference pageTypeRef : getAllPageTypeRefs()) {
       pageTypeRefsMap.put(pageTypeRef.getConfigName(), pageTypeRef);
     }
@@ -123,8 +121,7 @@ public class PageTypeService implements IPageTypeRole {
         pageTypeRefSet.add(pageTypeRef);
       }
     }
-    LOGGER.debug("getAllPageTypeRefs: return " + Arrays.deepToString(
-        pageTypeRefSet.toArray()));
+    LOGGER.debug("getAllPageTypeRefs: return " + Arrays.deepToString(pageTypeRefSet.toArray()));
     return pageTypeRefSet;
   }
 
@@ -137,18 +134,17 @@ public class PageTypeService implements IPageTypeRole {
         LOGGER.warn("getPageTypeRefsForCategories: skip pageTypeRef [" + pageTypeRef
             + "] because no categories found!");
       } else if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("getPageTypeRefsForCategories: test [" + pageTypeRef
-            + "] for categories [" + Arrays.deepToString(categories.toArray())
-            + "] size [" + categories.size() + "].");
+        LOGGER.trace("getPageTypeRefsForCategories: test [" + pageTypeRef + "] for categories ["
+            + Arrays.deepToString(categories.toArray()) + "] size [" + categories.size() + "].");
       }
       for (String category : pageTypeRef.getCategories()) {
         if (catList.contains(category)) {
           filteredPTset.add(pageTypeRef);
-          LOGGER.trace("getPageTypeRefsForCategories: added [" + pageTypeRef
-              + "] with category [" + category + "].");
+          LOGGER.trace("getPageTypeRefsForCategories: added [" + pageTypeRef + "] with category ["
+              + category + "].");
         } else {
-          LOGGER.trace("getPageTypeRefsForCategories: skip [" + pageTypeRef
-              + "] with category [" + category + "].");
+          LOGGER.trace("getPageTypeRefsForCategories: skip [" + pageTypeRef + "] with category ["
+              + category + "].");
         }
       }
     }
@@ -162,13 +158,11 @@ public class PageTypeService implements IPageTypeRole {
     checkNotNull(doc);
     checkNotNull(ref);
     try {
-      BaseObject obj = modelAccess.getOrCreateXObject(doc,
-          pageTypeClassConf.getPageTypeClassRef());
+      BaseObject obj = modelAccess.getOrCreateXObject(doc, pageTypeClassConf.getPageTypeClassRef());
       boolean hasChanged = !ref.getConfigName().equals(modelAccess.getProperty(obj,
           IPageTypeClassConfig.PAGE_TYPE_FIELD));
       if (hasChanged) {
-        modelAccess.setProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD,
-            ref.getConfigName());
+        modelAccess.setProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD, ref.getConfigName());
       }
       return hasChanged;
     } catch (ClassDocumentLoadException exc) {

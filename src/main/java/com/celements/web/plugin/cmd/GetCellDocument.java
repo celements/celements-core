@@ -32,19 +32,18 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class GetCellDocument {
 
   private PageLayoutCommand injected_pageLayoutCommand = null;
-  
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      GetCellDocument.class);
 
-  public XWikiDocument getCellDoc(String className, String field, String value, 
+  private static Log mLogger = LogFactory.getFactory().getInstance(GetCellDocument.class);
+
+  public XWikiDocument getCellDoc(String className, String field, String value,
       XWikiContext context) {
     PageLayoutCommand layoutCommand = getPageLayoutCommand();
-    return getCellDoc(layoutCommand.getLayoutPropDoc().getSpace(), className, 
-        field, value, context);
+    return getCellDoc(layoutCommand.getLayoutPropDoc().getSpace(), className, field, value,
+        context);
   }
-  
-  public XWikiDocument getCellDoc(String layoutSpace, String className, String field, 
-      String value, XWikiContext context) {
+
+  public XWikiDocument getCellDoc(String layoutSpace, String className, String field, String value,
+      XWikiContext context) {
     String hql = getHql();
     List<String> argsList = new ArrayList<String>();
     argsList.add(layoutSpace);
@@ -55,34 +54,30 @@ public class GetCellDocument {
     try {
       docs = context.getWiki().getStore().searchDocuments(hql, argsList, context);
     } catch (XWikiException e) {
-      mLogger.error("Exception while searching cell document in layout '" + layoutSpace +
-          "' with object of class '" + className + "' and field '" + field + "' == '" + 
-          value + "'.", e);
+      mLogger.error("Exception while searching cell document in layout '" + layoutSpace
+          + "' with object of class '" + className + "' and field '" + field + "' == '" + value
+          + "'.", e);
     }
-    if((docs != null) && (docs.size() >= 1)) {
+    if ((docs != null) && (docs.size() >= 1)) {
       return docs.get(0);
     }
     return null;
   }
 
   private String getHql() {
-    String hql = ", BaseObject as obj, StringProperty as str " +
-        "where doc.space = ? " +
-        "and obj.className = ? " +
-        "and obj.name = doc.fullName " +
-        "and obj.id = str.id.id " +
-        "and str.id.name = ? " +
-        "and str.value = ?";
+    String hql = ", BaseObject as obj, StringProperty as str " + "where doc.space = ? "
+        + "and obj.className = ? " + "and obj.name = doc.fullName " + "and obj.id = str.id.id "
+        + "and str.id.name = ? " + "and str.value = ?";
     return hql;
   }
 
   PageLayoutCommand getPageLayoutCommand() {
-    if(injected_pageLayoutCommand != null) {
+    if (injected_pageLayoutCommand != null) {
       return injected_pageLayoutCommand;
     }
     return new PageLayoutCommand();
   }
-  
+
   void injectPageLayoutCommand(PageLayoutCommand injectCommand) {
     injected_pageLayoutCommand = injectCommand;
   }

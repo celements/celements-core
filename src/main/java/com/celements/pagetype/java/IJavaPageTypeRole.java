@@ -29,5 +29,4 @@ public interface IJavaPageTypeRole {
 
   public boolean isUnconnectedParent();
 
-
 }

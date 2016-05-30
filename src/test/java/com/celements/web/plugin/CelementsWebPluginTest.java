@@ -45,17 +45,17 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   private CelementsWebPlugin plugin;
   private XWikiContext context;
   private XWiki xwiki;
-  
+
   @Before
   public void setUp_CelementsWebPluginTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
-    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
+    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     plugin = new CelementsWebPlugin("celementsweb", "CelementsWebPlugin", context);
   }
-  
+
   @Test
   public void testGetUsernameForToken() throws XWikiException {
     XWiki xwiki = createMock(XWiki.class);
@@ -67,18 +67,17 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getStore()).andReturn(store).once();
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", plugin.getUsernameForToken(userToken, context));
     assertTrue(captHQL.getValue().contains("token.tokenvalue=?"));
     assertTrue("There seems to be no database independent 'now' in hql.",
         captHQL.getValue().contains("token.validuntil>=?"));
-    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:",
-        userToken)));
+    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:", userToken)));
     verify(xwiki, store);
   }
-  
+
   @Test
   public void testGetUsernameForToken_userFromMainwiki() throws XWikiException {
     XWiki xwiki = createMock(XWiki.class);
@@ -91,20 +90,19 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     Capture<String> captHQL = new Capture<String>();
     Capture<String> captHQL2 = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(new ArrayList<String>()).once();
-    expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(new ArrayList<String>()).once();
+    expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("xwiki:Doc.Fullname", plugin.getUsernameForToken(userToken, context));
     assertTrue(captHQL2.getValue().contains("token.tokenvalue=?"));
     assertTrue("There seems to be no database independent 'now' in hql.",
         captHQL2.getValue().contains("token.validuntil>=?"));
-    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:",
-        userToken)));
+    assertTrue(captParams.getValue().contains(plugin.encryptString("hash:SHA-512:", userToken)));
     verify(xwiki, store);
   }
-  
+
   @Test
   public void testCheckAuthByToken_noUser() throws XWikiException {
     XWiki xwiki = createMock(XWiki.class);
@@ -115,12 +113,12 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getStore()).andReturn(store).once();
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).times(2);
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
     assertNull(plugin.checkAuthByToken(userToken, context));
   }
-  
+
   @Test
   public void testCheckAuthByToken() throws XWikiException {
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
@@ -130,37 +128,37 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getStore()).andReturn(store).once();
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", plugin.checkAuthByToken(userToken, context).getUser());
     assertEquals("Doc.Fullname", context.getXWikiUser().getUser());
     assertEquals("Doc.Fullname", context.getUser());
     verify(xwiki, store);
   }
-  
+
   @Test
   public void testEnableMappedMenuItems() {
     plugin.enableMappedMenuItems(context);
-    assertTrue(context.get(GetMappedMenuItemsForParentCommand.
-        CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
-    assertTrue(context.get(GetMappedMenuItemsForParentCommand.
-        CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
-    assertTrue(((GetMappedMenuItemsForParentCommand)context.get(
+    assertTrue(context.get(
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
+    assertTrue(context.get(
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
+    assertTrue(((GetMappedMenuItemsForParentCommand) context.get(
         GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).is_isActive());
-    
+
   }
 
   @Test
   public void testGetSupportedAdminLanguages() {
     assertNotNull(plugin.getSupportedAdminLanguages());
-    assertEquals(Arrays.asList(new String[] {"de","fr","en","it"}),
+    assertEquals(Arrays.asList(new String[] { "de", "fr", "en", "it" }),
         plugin.getSupportedAdminLanguages());
   }
 
   @Test
   public void testSetSupportedAdminLanguages() {
-    List<String> injectedLangList = Arrays.asList(new String[] {"bla","bli","blo"});
+    List<String> injectedLangList = Arrays.asList(new String[] { "bla", "bli", "blo" });
     plugin.setSupportedAdminLanguages(injectedLangList);
     assertNotNull(plugin.getSupportedAdminLanguages());
     assertEquals(injectedLangList, plugin.getSupportedAdminLanguages());
@@ -169,39 +167,39 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsFormFilled_false() {
     Map<String, String[]> map = new HashMap<String, String[]>();
-    map.put("xpage", new String[]{"celements_ajax", "underlay", "overlay"});
-    map.put("conf", new String[]{"OverlayConfig"});
-    map.put("language", new String[]{"de"});
+    map.put("xpage", new String[] { "celements_ajax", "underlay", "overlay" });
+    map.put("conf", new String[] { "OverlayConfig" });
+    map.put("language", new String[] { "de" });
     assertFalse(plugin.isFormFilled(map, null));
   }
 
   @Test
   public void testIsFormFilled_true() {
     Map<String, String[]> map = new HashMap<String, String[]>();
-    map.put("name", new String[]{"My Name"});
-    map.put("xpage", new String[]{"celements_ajax", "underlay", "overlay"});
-    map.put("conf", new String[]{"OverlayConfig"});
-    map.put("language", new String[]{"de"});
+    map.put("name", new String[] { "My Name" });
+    map.put("xpage", new String[] { "celements_ajax", "underlay", "overlay" });
+    map.put("conf", new String[] { "OverlayConfig" });
+    map.put("language", new String[] { "de" });
     assertTrue(plugin.isFormFilled(map, null));
   }
 
   @Test
   public void testIsFormFilled_true_oneParam() {
     Map<String, String[]> map = new HashMap<String, String[]>();
-    map.put("search", new String[]{"Search Term"});
+    map.put("search", new String[] { "Search Term" });
     assertTrue(plugin.isFormFilled(map, null));
   }
-  
+
   @Test
   public void testArrayContains_false() {
-    String[] array = {"overlay", "underlay", "middle"};
+    String[] array = { "overlay", "underlay", "middle" };
     assertFalse(plugin.arrayContains(array, "notavailable"));
     assertFalse(plugin.arrayContains(array, "overlayunderlay"));
   }
-  
+
   @Test
   public void testArrayContains_true() {
-    String[] array = {"overlay", "underlay", "middle"};
+    String[] array = { "overlay", "underlay", "middle" };
     assertTrue(plugin.arrayContains(array, "overlay"));
     assertTrue(plugin.arrayContains(array, "underlay"));
     assertTrue(plugin.arrayContains(array, "middle"));
@@ -209,7 +207,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPrepareVelocityContextService() {
-   assertNotNull(plugin.getPrepareVelocityContextService()); 
+    assertNotNull(plugin.getPrepareVelocityContextService());
   }
-  
+
 }

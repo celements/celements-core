@@ -68,22 +68,22 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCollapse_nullElems() {
-    assertEquals("abf|cdf", docFormCmd.collapse(new String[]{"abf", null, "cdf", null}));
+    assertEquals("abf|cdf", docFormCmd.collapse(new String[] { "abf", null, "cdf", null }));
   }
 
   @Test
   public void testCollapse_emptyStrings() {
-    assertEquals("", docFormCmd.collapse(new String[]{"",""}));
+    assertEquals("", docFormCmd.collapse(new String[] { "", "" }));
   }
 
   @Test
   public void testCollapse_someEmptyStrings() {
-    assertEquals("abc|dfg", docFormCmd.collapse(new String[]{"abc","","","dfg"}));
+    assertEquals("abc|dfg", docFormCmd.collapse(new String[] { "abc", "", "", "dfg" }));
   }
 
   @Test
   public void testCollapse_trailingEmptyStrings() {
-    assertEquals("abc3|df2g", docFormCmd.collapse(new String[]{"","abc3","df2g",""}));
+    assertEquals("abc3|df2g", docFormCmd.collapse(new String[] { "", "abc3", "df2g", "" }));
   }
 
   @Test
@@ -97,7 +97,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     assertEquals(doc, updateDoc);
     verifyDefault();
   }
-  
+
   @Test
   public void setOrRemoveObj_fromCache() throws XWikiException {
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
@@ -112,7 +112,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.setOrRemoveObj(docMock, key, value, context);
     verifyDefault();
   }
-  
+
   @Test
   public void setOrRemoveObj_get() throws XWikiException {
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
@@ -124,14 +124,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     String value = "value";
     objMock.set(eq("hi"), eq(value), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key, value, context);
     verifyDefault();
-    
+
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
   }
-  
+
   @Test
   public void setOrRemoveObj_get_notExists() throws XWikiException {
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
@@ -144,14 +144,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     String value = "value";
     objMock.set(eq("hi"), eq(value), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key, value, context);
     verifyDefault();
-    
+
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
   }
-  
+
   @Test
   public void setOrRemoveObj_create() throws XWikiException {
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
@@ -170,16 +170,16 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:B.C_0", objMock2);
     objMock2.set(eq("bla"), eq(value2), same(context));
     expectLastCall();
-    
+
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key1, value1, context);
     docFormCmd.setOrRemoveObj(docMock, key2, value2, context);
     verifyDefault();
-    
+
     assertEquals(objMock1, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_-1"));
     assertEquals(objMock2, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:B.C_0"));
   }
-  
+
   @Test
   public void setOrRemoveObj_remove_fromCache() throws XWikiException {
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
@@ -188,14 +188,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     expect(docMock.removeXObject(same(objMock))).andReturn(true).once();
-    
+
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key, "", context);
     verifyDefault();
-    
+
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
   }
-  
+
   @Test
   public void setOrRemoveObj_remove() throws XWikiException {
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
@@ -205,11 +205,11 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     expect(docMock.getXObject(eq(classRef), eq(0))).andReturn(objMock).once();
     expect(docMock.removeXObject(same(objMock))).andReturn(true).once();
-    
+
     replayDefault();
     docFormCmd.setOrRemoveObj(docMock, key, "", context);
     verifyDefault();
-    
+
     assertEquals(objMock, docFormCmd.getChangedObjects().get("db:Sp.Doc_db:A.B_0"));
   }
 
@@ -231,26 +231,24 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference bclassDocRef = new DocumentReference(db, "Test", "TestClass");
     XWikiDocument doc = new XWikiDocument(bclassDocRef);
     doc.setXClass(bclass);
-    expect(xwiki.getDocument(eq(bclassDocRef), same(context))).andReturn(doc
-        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(bclassDocRef), same(context))).andReturn(doc).atLeastOnce();
     replayDefault();
-    String result = docFormCmd.validateField("Test.TestClass", "testField", "value",
-        context);
+    String result = docFormCmd.validateField("Test.TestClass", "testField", "value", context);
     assertNull("Successful validation should result in answoer null", result);
     result = docFormCmd.validateField("Test.TestClass", "testField", "", context);
     assertEquals("msg", result);
     verifyDefault();
   }
-  
+
   @Test
-  public void testGetFieldFromProperty() throws XWikiException{
+  public void testGetFieldFromProperty() throws XWikiException {
     BaseProperty prop = new StringProperty();
     prop.setValue("value");
     PropertyClass propclass = new PropertyClass();
     propclass.put("test", prop);
     assertEquals("value", docFormCmd.getFieldFromProperty(propclass, "test"));
   }
-  
+
   @Test
   public void testGetFindObjectFieldInRequestRegex_noMatch() {
     assertFalse("".matches(docFormCmd.getFindObjectFieldInRequestRegex()));
@@ -259,11 +257,10 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     assertFalse("Space.Doc_Class.Name_+3_field".matches(
         docFormCmd.getFindObjectFieldInRequestRegex()));
   }
-  
+
   @Test
   public void testGetFindObjectFieldInRequestRegex_match() {
-    assertTrue("Space.Doc_0_field_one".matches(
-        docFormCmd.getFindObjectFieldInRequestRegex()));
+    assertTrue("Space.Doc_0_field_one".matches(docFormCmd.getFindObjectFieldInRequestRegex()));
     assertTrue("Space.Doc_Class.Name_3_field".matches(
         docFormCmd.getFindObjectFieldInRequestRegex()));
     assertTrue("Space.Doc_Class.Name_-3_field".matches(
@@ -271,11 +268,11 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     assertTrue("Space.Doc_Class.Name_^3_field".matches(
         docFormCmd.getFindObjectFieldInRequestRegex()));
   }
-  
+
   @Test
   public void testApplyCreationDateFix() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "Test", "Doc"));
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Test",
+        "Doc"));
     doc.setCreationDate(new Date(0));
     doc.setCreator("");
     replayDefault();
@@ -291,8 +288,8 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testUpdateDocFromMap() throws XWikiException {
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("Oh.Noes_A.B_0_blabla", new String[]{"Blabla Value"});
-    data.put("C.D_1_blabla2", new String[]{"Another Blabla Value"});
+    data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
+    data.put("C.D_1_blabla2", new String[] { "Another Blabla Value" });
     BaseObject obj = createMock(BaseObject.class);
     obj.setNumber(1);
     expectLastCall().once();
@@ -315,22 +312,19 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
     DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
     defaultDoc.setXObjects(cdClassRef, cDobjects);
-    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc
-        ).times(2);
+    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).times(2);
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<BaseObject>();
     cDobjects2.add(obj2);
     DocumentReference abClassRef = new DocumentReference(db, "A", "B");
     specificDoc.setXObjects(abClassRef, cDobjects2);
     DocumentReference doc2Ref = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc
-        ).once();
+    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
     expect(request.getParameter(eq("template"))).andReturn("");
     replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", 
-        data, context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
     verifyDefault(obj, obj2);
     assertTrue(changedDocs.contains(defaultDoc));
     assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());
@@ -339,21 +333,18 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
-  public void testUpdateDocFromMap_newFromTemplate_titleAndContent() 
-      throws XWikiException {
+  public void testUpdateDocFromMap_newFromTemplate_titleAndContent() throws XWikiException {
     context.setLanguage("de");
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("Oh.Noes_title", new String[]{"Blabla Value"});
-    data.put("content", new String[]{"Another Blabla Value"});
+    data.put("Oh.Noes_title", new String[] { "Blabla Value" });
+    data.put("content", new String[] { "Another Blabla Value" });
     DocumentReference fullNameRef = new DocumentReference(db, "Full", "Name");
     XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
     DocumentReference specificDocRef = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc
-        ).times(2);
+    expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).times(2);
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     DocumentReference doc2Ref = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc
-        ).once();
+    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
     expect(request.getParameter(eq("template"))).andReturn("Templates.MyTempl");
@@ -361,17 +352,18 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument templDoc = new XWikiDocument(templRef);
     expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
     XWikiStoreInterface store = createMockAndAddToDefault(XWikiStoreInterface.class);
-//    //TODO is there a better method to match the parameter? -> eq and same do not work
-//    //     since loadXWikiDoc create a new XWikiDocument
-//    expect(store.loadXWikiDoc(isA(XWikiDocument.class), same(context))).andReturn(defaultDoc);
-//    expect(store.loadXWikiDoc(isA(XWikiDocument.class), same(context))).andReturn(specificDoc);
+    // //TODO is there a better method to match the parameter? -> eq and same do not work
+    // // since loadXWikiDoc create a new XWikiDocument
+    // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
+    // same(context))).andReturn(defaultDoc);
+    // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
+    // same(context))).andReturn(specificDoc);
     expect(xwiki.getStore()).andReturn(store).anyTimes();
     replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data,
-        context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
     verifyDefault();
-    //TODO Check how it works - getTranslatedDoc seems to create a new object which leads
-    //     to getContent() and getTitle() to be empty -> does it work correctly anyways?
+    // TODO Check how it works - getTranslatedDoc seems to create a new object which leads
+    // to getContent() and getTitle() to be empty -> does it work correctly anyways?
     assertTrue(changedDocs.contains(defaultDoc));
     assertEquals("de", defaultDoc.getDefaultLanguage());
     assertTrue(changedDocs.contains(specificDoc));
@@ -381,8 +373,8 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testUpdateDocFromMap_newFromTemplate() throws XWikiException {
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("Oh.Noes_A.B_0_blabla", new String[]{"Blabla Value"});
-    data.put("C.D_1_blabla2", new String[]{"Another Blabla Value"});
+    data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
+    data.put("C.D_1_blabla2", new String[] { "Another Blabla Value" });
     BaseObject obj = createMock(BaseObject.class);
     obj.setNumber(1);
     expectLastCall().once();
@@ -406,16 +398,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     DocumentReference doc1Ref = new DocumentReference(db, "Full", "Name");
-    expect(xwiki.getDocument(eq(doc1Ref), same(context))).andReturn(defaultDoc
-        ).times(2);
+    expect(xwiki.getDocument(eq(doc1Ref), same(context))).andReturn(defaultDoc).times(2);
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<BaseObject>();
     cDobjects2.add(obj2);
     DocumentReference abClassRef = new DocumentReference(db, "A", "B");
     specificDoc.setXObjects(abClassRef, cDobjects2);
     DocumentReference doc2Ref = new DocumentReference(db, "Oh", "Noes");
-    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc
-        ).once();
+    expect(xwiki.getDocument(eq(doc2Ref), same(context))).andReturn(specificDoc).once();
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
     context.setRequest(request);
     expect(request.getParameter(eq("template"))).andReturn("Templates.MyTempl");
@@ -423,15 +413,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument templDoc = new XWikiDocument(templRef);
     expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
     replayDefault();
-    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", 
-        data, context);
+    Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
     verifyDefault(obj, obj2);
     assertTrue(changedDocs.contains(defaultDoc));
     assertEquals(2, defaultDoc.getXObjects(cdClassRef).size());
     assertTrue(changedDocs.contains(specificDoc));
     assertEquals(1, specificDoc.getXObjects(abClassRef).size());
   }
-  
+
   @Test
   public void testUpdateDocFromMap_content() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
@@ -441,14 +430,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("content", new String[] {value});
-    
+    data.put("content", new String[] { value });
+
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
     expect(docMock.isNew()).andReturn(false).times(3);
     expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
     expect(docMock.getLanguage()).andReturn(context.getLanguage()).anyTimes();
-    expect(docMock.getTranslatedDocument(eq(context.getLanguage()), same(context))
-        ).andReturn(docMock).once();
+    expect(docMock.getTranslatedDocument(eq(context.getLanguage()), same(context))).andReturn(
+        docMock).once();
     docMock.setContent(eq(value));
     expectLastCall().once();
 
@@ -456,7 +445,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.updateDocFromMap(docRef, data, context);
     verifyDefault();
   }
-  
+
   @Test
   public void testUpdateDocFromMap_objWithContentField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
@@ -466,8 +455,8 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("A.B_0_content", new String[] {value});
-    
+    data.put("A.B_0_content", new String[] { value });
+
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
     expect(docMock.isNew()).andReturn(false).times(3);
     expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
@@ -479,7 +468,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.updateDocFromMap(docRef, data, context);
     verifyDefault();
   }
-  
+
   @Test
   public void testUpdateDocFromMap_title() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
@@ -489,14 +478,14 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("title", new String[] {value});
-    
+    data.put("title", new String[] { value });
+
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
     expect(docMock.isNew()).andReturn(false).times(3);
     expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
     expect(docMock.getLanguage()).andReturn(context.getLanguage()).anyTimes();
-    expect(docMock.getTranslatedDocument(eq(context.getLanguage()), same(context))
-        ).andReturn(docMock).once();
+    expect(docMock.getTranslatedDocument(eq(context.getLanguage()), same(context))).andReturn(
+        docMock).once();
     docMock.setTitle(eq(value));
     expectLastCall().once();
 
@@ -504,7 +493,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.updateDocFromMap(docRef, data, context);
     verifyDefault();
   }
-  
+
   @Test
   public void testUpdateDocFromMap_objWithTitleField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
@@ -514,8 +503,8 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<String, String[]>();
-    data.put("A.B_0_title", new String[] {value});
-    
+    data.put("A.B_0_title", new String[] { value });
+
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
     expect(docMock.isNew()).andReturn(false).times(3);
     expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
@@ -527,7 +516,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     docFormCmd.updateDocFromMap(docRef, data, context);
     verifyDefault();
   }
-  
+
   @Test
   public void testPrepareMapForDocUpdate() {
     Map<String, Object> inMap = new HashMap<String, Object>();
@@ -536,7 +525,7 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     String val1 = "Value1";
     String val2 = "Value2";
     inMap.put(key1, val1);
-    inMap.put(key2, new String[]{ val1, val2 });
+    inMap.put(key2, new String[] { val1, val2 });
     inMap.put("key3", new Object());
     Map<String, String[]> result = docFormCmd.prepareMapForDocUpdate(inMap);
     assertEquals(2, result.size());
