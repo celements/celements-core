@@ -232,6 +232,7 @@ public class GetNotMappedMenuItemsForParentCommand {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.utils.IWebUtils#queryCount()
    */
   public int queryCount() {
@@ -240,6 +241,7 @@ public class GetNotMappedMenuItemsForParentCommand {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   synchronized public void flushMenuItemCache(XWikiContext context) {

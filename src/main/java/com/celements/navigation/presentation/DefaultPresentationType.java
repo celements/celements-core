@@ -45,7 +45,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
 
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
-          throws XWikiException {
+      throws XWikiException {
     String fullName = webUtilsService.getRefLocalSerializer().serialize(docRef);
     String tagName;
     if (nav.hasLink()) {

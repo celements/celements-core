@@ -45,7 +45,6 @@ import com.celements.navigation.Navigation;
 import com.celements.navigation.NavigationClasses;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
-import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
 import com.celements.navigation.filter.INavFilter;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.web.plugin.cmd.PageLayoutCommand;

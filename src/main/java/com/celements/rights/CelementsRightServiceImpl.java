@@ -22,7 +22,7 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
   @Override
   public boolean checkRight(String userOrGroupName, XWikiDocument doc, String accessLevel,
       boolean user, boolean allow, boolean global, XWikiContext context)
-          throws XWikiRightNotFoundException, XWikiException {
+      throws XWikiRightNotFoundException, XWikiException {
     if (getPubSrv().isPublishActive() && getPubSrv().isRestrictedRightsAction(accessLevel)) {
       // default behaviour: no object -> published
       if (!getPubSrv().isPubOverride() && (getPubSrv().isUnpubOverride() || getPubSrv().isPublished(

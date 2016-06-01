@@ -51,6 +51,7 @@ public class TreeNodeCache implements ITreeNodeCache {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.utils.IWebUtils#queryCount()
    */
   public int queryCount() {
@@ -71,6 +72,7 @@ public class TreeNodeCache implements ITreeNodeCache {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   public void flushMenuItemCache() {

@@ -48,6 +48,7 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getTemplateDocument()
    */
   public Document getTemplateDocument() throws XWikiException {
@@ -60,6 +61,7 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getPageType()
    */
   public String getPageType() {
@@ -68,6 +70,7 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getPageTypeObject()
    */
   public com.xpn.xwiki.api.Object getPageTypeObject() {
@@ -81,6 +84,7 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#showFrame()
    */
   public boolean showFrame() throws XWikiException {
@@ -89,6 +93,7 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getPageTypeProperties()
    */
   public com.xpn.xwiki.api.Object getPageTypeProperties() throws XWikiException {
@@ -102,6 +107,7 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getRenderTemplate(java.lang.String)
    */
   public String getRenderTemplate(String renderMode) throws XWikiException {

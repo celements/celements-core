@@ -5,8 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
-
 public class XHTMLtoHTML5cleanupTest {
 
   XHTMLtoHTML5cleanup cleaner;

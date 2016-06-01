@@ -48,11 +48,11 @@ public interface IAttachmentServiceRole {
 
   public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename,
       String username, String comment) throws AttachmentToBigException,
-          AddingAttachmentContentFailedException, DocumentSaveException;
+      AddingAttachmentContentFailedException, DocumentSaveException;
 
   public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
-          AddingAttachmentContentFailedException, DocumentSaveException;
+      AddingAttachmentContentFailedException, DocumentSaveException;
 
   public String clearFileName(String fileName);
 

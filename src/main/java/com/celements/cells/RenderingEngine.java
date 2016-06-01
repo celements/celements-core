@@ -45,6 +45,7 @@ public class RenderingEngine implements IRenderingEngine {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.cells.IRenderingEngine#renderCell(
    * com.xpn.xwiki.objects.BaseObject)
    */
@@ -58,6 +59,7 @@ public class RenderingEngine implements IRenderingEngine {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.cells.IRenderingEngine#renderSubCells(java.lang.String)
    */
   @Deprecated
@@ -68,6 +70,7 @@ public class RenderingEngine implements IRenderingEngine {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.cells.IRenderingEngine#renderSubCells(
    * org.xwiki.model.reference.SpaceReference)
    */
