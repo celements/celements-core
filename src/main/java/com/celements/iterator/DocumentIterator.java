@@ -24,23 +24,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWiki;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWikiDocument> {
 
-  private static Log _LOGGER = LogFactory.getFactory().getInstance(XObjectIterator.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(XObjectIterator.class);
 
   private List<String> _docList;
-
-  private XWikiContext _context;
-
-  private XWiki _xwiki;
 
   private Iterator<String> _docIterator;
 
@@ -48,18 +48,25 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
 
   /**
    * Constructor
-   * 
+   */
+  public DocumentIterator() {
+  }
+
+  /**
+   * Constructor
+   *
    * @param XWiki
    *          context
+   * @deprecated instead use DocumentIterator()
    */
+  @Deprecated
   public DocumentIterator(XWikiContext context) {
-    _context = context;
-    _xwiki = _context.getWiki();
   }
 
   /**
    * Checks if iterator has a next object
    */
+  @Override
   public boolean hasNext() {
     while ((_currentDoc == null) && (getDocIterator().hasNext())) {
       moveToNextDoc();
@@ -74,6 +81,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
    * @exception NoSuchElementException
    *              iteration has no more elements.
    */
+  @Override
   public XWikiDocument next() {
     if (hasNext()) {
       XWikiDocument theCurrentDoc = _currentDoc;
@@ -89,18 +97,20 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
   void moveToNextDoc() {
     try {
       String fullname;
+      DocumentReference docRef;
       do {
         fullname = getDocIterator().next();
-        _LOGGER.debug("moveToNextDoc fullname [" + fullname + "]");
-      } while (!_xwiki.exists(fullname, _context) && getDocIterator().hasNext());
-      if (_xwiki.exists(fullname, _context)) {
-        _LOGGER.info("moveToNextDoc found next doc [" + fullname + "]");
-        _currentDoc = _xwiki.getDocument(fullname, _context);
+        _LOGGER.debug("moveToNextDoc fullname [{}]", fullname);
+        docRef = getWebUtils().resolveDocumentReference(fullname);
+      } while (!getModelAccess().exists(docRef) && getDocIterator().hasNext());
+      if (getModelAccess().exists(docRef)) {
+        _LOGGER.info("moveToNextDoc found next doc [{}]", docRef);
+        _currentDoc = getModelAccess().getDocument(docRef);
       } else {
         _LOGGER.info("moveToNextDoc no next doc found.");
         _currentDoc = null;
       }
-    } catch (XWikiException exp) {
+    } catch (DocumentLoadException | DocumentNotExistsException exp) {
       // If getDocument failed, getDocIterator still moved on by one document in
       // list.
       // Hence the while loop in 'next' moves on to the next document in list.
@@ -123,7 +133,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
 
   /**
    * Gets the current document
-   * 
+   *
    * @return current document
    */
   XWikiDocument getCurrentDoc() {
@@ -135,7 +145,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param testCurrentDoc
    */
   void inject_CurrentDoc(XWikiDocument testCurrentDoc) {
@@ -144,16 +154,17 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
 
   /**
    * Remove is not supported
-   * 
+   *
    * @throws UnsupportedOperationException
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }
 
   /**
    * Set the document list
-   * 
+   *
    * @param document
    *          list
    */
@@ -164,7 +175,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
 
   /**
    * Gets the document list
-   * 
+   *
    * @return document list
    */
   List<String> getDocList() {
@@ -173,14 +184,24 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
 
   /**
    * Get a copy of the document list
-   * 
+   *
    * @return document list
    */
   public List<String> getDocListCopy() {
     return new ArrayList<String>(_docList);
   }
 
+  @Override
   public Iterator<XWikiDocument> iterator() {
     return this;
   }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
 }
