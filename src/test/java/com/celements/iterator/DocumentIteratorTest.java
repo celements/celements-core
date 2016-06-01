@@ -19,6 +19,7 @@
  */
 package com.celements.iterator;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,13 +30,15 @@ import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
+public class DocumentIteratorTest extends AbstractComponentTest {
 
   private DocumentIterator _iterator;
   private XWikiContext _context;
@@ -43,15 +46,24 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
   private XWikiDocument _testDoc1;
   private XWikiDocument _testDoc2;
   private List<String> _docList;
+  private IWebUtilsService webUtilsMock;
+  private String fullname1;
+  private String fullname2;
+  private DocumentReference docRef1;
+  private DocumentReference docRef2;
 
   @Before
   public void setUp_DocumentIteratorTest() throws Exception {
+    webUtilsMock = registerComponentMock(IWebUtilsService.class);
     _context = getContext();
-    _xwiki = createMock(XWiki.class);
-    _context.setWiki(_xwiki);
-    _iterator = new DocumentIterator(_context);
-    _testDoc1 = new XWikiDocument();
-    _testDoc2 = new XWikiDocument();
+    _xwiki = getWikiMock();
+    fullname1 = "Test.Doc1";
+    fullname2 = "Test.Doc2";
+    docRef1 = new DocumentReference(_context.getDatabase(), "Test", "Doc1");
+    docRef2 = new DocumentReference(_context.getDatabase(), "Test", "Doc2");
+    _iterator = new DocumentIterator();
+    _testDoc1 = new XWikiDocument(docRef1);
+    _testDoc2 = new XWikiDocument(docRef2);
     _docList = new ArrayList<String>();
   }
 
@@ -77,43 +89,45 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
   public void testMoveToNextDoc_emptyDocList() {
     _iterator.inject_CurrentDoc(null);
     _iterator.setDocList(new ArrayList<String>());
-    replay(_xwiki);
+    replayDefault();
     try {
       _iterator.moveToNextDoc();
       fail("Exception expected.");
     } catch (NoSuchElementException ex) {
       // expected behaviour
     }
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testMoveToNextDoc_updateCurrentDoc() throws Exception {
     _iterator.inject_CurrentDoc(null); // reset Iterator
-    String fullname1 = "Test.Doc1";
-    String fullname2 = "Test.Doc2";
     _docList.add(fullname1);
     _docList.add(fullname2);
     _iterator.setDocList(_docList);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(new XWikiDocument()).once();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(new XWikiDocument()).once();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(true).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
-    replay(_xwiki);
+    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(new XWikiDocument(
+        docRef1)).once();
+    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(new XWikiDocument(
+        docRef2)).once();
+    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    replayDefault();
     XWikiDocument firstDoc = _iterator.getCurrentDoc();
     _iterator.moveToNextDoc();
     XWikiDocument secondDoc = _iterator.getCurrentDoc();
     assertNotSame("moveToNextDoc must update the currentDoc.", firstDoc, secondDoc);
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testGetCurrentDoc_emptyDocList() {
     _iterator.inject_CurrentDoc(null);
     _iterator.setDocList(new ArrayList<String>());
-    replay(_xwiki);
+    replayDefault();
     assertNull(_iterator.getCurrentDoc());
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
@@ -142,68 +156,67 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testHasNext_true() throws Exception {
-    String fullname1 = "Test.Doc1";
-    String fullname2 = "Test.Doc2";
     _docList.add(fullname1);
     _docList.add(fullname2);
-    _testDoc1.setFullName(fullname1);
-    _testDoc2.setFullName(fullname2);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(_testDoc1).anyTimes();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2).anyTimes();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(true).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(_testDoc1).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
+    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    replay(_xwiki);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    replayDefault();
     _iterator.next();
     assertTrue(_iterator.hasNext());
     _iterator.next();
     assertFalse(_iterator.hasNext());
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testHasNext_skipDoc() throws Exception {
-    String fullname1 = "Test.Doc1";
-    String fullname2 = "Test.Doc2";
     _docList.add(fullname1);
     _docList.add(fullname2);
-    _testDoc2.setFullName(fullname1);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(null).anyTimes();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2).anyTimes();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(false).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(null).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).anyTimes();
+    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(false).anyTimes();
+    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    replay(_xwiki);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    replayDefault();
     assertTrue(_iterator.hasNext());
     assertNotNull(_iterator.next());
     assertFalse(_iterator.hasNext());
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testHasNext_false() throws Exception {
     String fullname = "Test.Doc";
+    DocumentReference docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
     _docList.add(fullname);
-    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc1).anyTimes();
-    expect(_xwiki.exists(eq(fullname), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef), same(_context))).andReturn(_testDoc1).anyTimes();
+    expect(_xwiki.exists(eq(docRef), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    replay(_xwiki);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname))).andReturn(docRef).once();
+    replayDefault();
     _iterator.next();
     assertEquals(false, _iterator.hasNext());
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
   public void testNext_noMoreElementsException() throws Exception {
     _iterator.setDocList(_docList);
-    replay(_xwiki);
+    replayDefault();
     try {
       _iterator.next();
       fail("Exception expected.");
     } catch (NoSuchElementException ex) {
       // expected behaviour
     }
-    verify(_xwiki);
+    verifyDefault();
   }
 
   @Test
@@ -218,18 +231,16 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIterator_foreach() throws Exception {
-    String fullname1 = "Test.Doc1";
-    String fullname2 = "Test.Doc2";
     _docList.add(fullname1);
     _docList.add(fullname2);
-    _testDoc1.setFullName(fullname1);
-    _testDoc2.setFullName(fullname2);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(_testDoc1).once();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2).once();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(true).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.getDocument(eq(docRef1), same(_context))).andReturn(_testDoc1).once();
+    expect(_xwiki.getDocument(eq(docRef2), same(_context))).andReturn(_testDoc2).once();
+    expect(_xwiki.exists(eq(docRef1), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.exists(eq(docRef2), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
-    replay(_xwiki);
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname1))).andReturn(docRef1).once();
+    expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
+    replayDefault();
     int count = 0;
     List<String> resultList = new ArrayList<String>();
     for (XWikiDocument doc : _iterator) {
@@ -238,7 +249,7 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     }
     assertEquals(resultList, _docList);
     assertEquals(2, count);
-    verify(_xwiki);
+    verifyDefault();
   }
 
   // *****************************************************************
