@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWikiDocument> {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(XObjectIterator.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(DocumentIterator.class);
 
   private List<String> _docList;
 
