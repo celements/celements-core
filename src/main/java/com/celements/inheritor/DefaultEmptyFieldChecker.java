@@ -26,39 +26,39 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.NumberProperty;
 
 public class DefaultEmptyFieldChecker implements IEmptyFieldChecker {
-  
+
   final public boolean isEmpty(BaseProperty property) {
     if ((property != null) && (property.getValue() != null)) {
       if (property instanceof BaseStringProperty) {
-        return isEmptyString((BaseStringProperty)property);
+        return isEmptyString((BaseStringProperty) property);
       }
-      if (property instanceof NumberProperty){
-        return isEmptyNumber((NumberProperty)property);
-      }   
+      if (property instanceof NumberProperty) {
+        return isEmptyNumber((NumberProperty) property);
+      }
       if (property instanceof DateProperty) {
-        return isEmptyDate((DateProperty)property);
+        return isEmptyDate((DateProperty) property);
       }
       if (property instanceof ListProperty) {
-        return isEmptyList((ListProperty)property);
+        return isEmptyList((ListProperty) property);
       }
     }
     return true;
   }
-  
-  public boolean isEmptyString(BaseStringProperty property){
+
+  public boolean isEmptyString(BaseStringProperty property) {
     return property.getValue().equals("");
   }
-  
-  public boolean isEmptyNumber(NumberProperty property){
-    return (property.getValue().toString().equals("0") ||
-        property.getValue().toString().equals("0.0"));
+
+  public boolean isEmptyNumber(NumberProperty property) {
+    return (property.getValue().toString().equals("0") || property.getValue().toString().equals(
+        "0.0"));
   }
-  
-  public boolean isEmptyDate(DateProperty property){
+
+  public boolean isEmptyDate(DateProperty property) {
     return (property.getValue() == null);
   }
-  
-  public boolean isEmptyList(ListProperty property){
+
+  public boolean isEmptyList(ListProperty property) {
     return (property.getList().size() == 0);
   }
 }

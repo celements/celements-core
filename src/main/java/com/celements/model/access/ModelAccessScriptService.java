@@ -26,8 +26,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component(ModelAccessScriptService.NAME)
 public class ModelAccessScriptService implements ScriptService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      ModelAccessScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelAccessScriptService.class);
 
   public static final String NAME = "modelAccess";
 
@@ -49,8 +48,8 @@ public class ModelAccessScriptService implements ScriptService {
     } catch (DocumentLoadException exc) {
       LOGGER.error("Failed to load doc '{}'", docRef, exc);
     } catch (NoAccessRightsException exc) {
-      LOGGER.error("no '{}' access rights for user '{}' on doc '{}'.",
-          exc.getExpectedAccessLevel(), exc.getUser(), docRef, exc);
+      LOGGER.error("no '{}' access rights for user '{}' on doc '{}'.", exc.getExpectedAccessLevel(),
+          exc.getUser(), docRef, exc);
     }
     return ret;
   }
@@ -58,16 +57,16 @@ public class ModelAccessScriptService implements ScriptService {
   public Document getOrCreateDocument(DocumentReference docRef) {
     Document ret = null;
     try {
-      if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW)
-          && rightsAccess.hasAccessLevel(docRef, EAccessLevel.EDIT)) {
+      if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW) && rightsAccess.hasAccessLevel(
+          docRef, EAccessLevel.EDIT)) {
         XWikiDocument doc = modelAccess.getOrCreateDocument(docRef);
         ret = modelAccess.getApiDocument(doc);
       }
     } catch (DocumentLoadException exc) {
       LOGGER.error("Failed to load doc '{}'", docRef, exc);
     } catch (NoAccessRightsException exc) {
-      LOGGER.error("no '{}' access rights for user '{}' on doc '{}'.",
-          exc.getExpectedAccessLevel(), exc.getUser(), docRef, exc);
+      LOGGER.error("no '{}' access rights for user '{}' on doc '{}'.", exc.getExpectedAccessLevel(),
+          exc.getUser(), docRef, exc);
     }
     return ret;
   }
@@ -76,18 +75,16 @@ public class ModelAccessScriptService implements ScriptService {
     return modelAccess.exists(docRef);
   }
 
-  public com.xpn.xwiki.api.Object getObject(DocumentReference docRef,
-      DocumentReference classRef) {
+  public com.xpn.xwiki.api.Object getObject(DocumentReference docRef, DocumentReference classRef) {
     return getObject(docRef, classRef, null, null);
   }
 
-  public com.xpn.xwiki.api.Object getObject(DocumentReference docRef,
-      DocumentReference classRef, String key, Object value) {
+  public com.xpn.xwiki.api.Object getObject(DocumentReference docRef, DocumentReference classRef,
+      String key, Object value) {
     com.xpn.xwiki.api.Object ret = null;
     try {
       if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
-        ret = modelAccess.getApiObjectWithoutRightCheck(modelAccess.getXObject(docRef,
-            classRef));
+        ret = modelAccess.getApiObjectWithoutRightCheck(modelAccess.getXObject(docRef, classRef));
       }
     } catch (DocumentNotExistsException exc) {
       LOGGER.info("Doc does not exist '{}'", docRef, exc);
@@ -107,11 +104,11 @@ public class ModelAccessScriptService implements ScriptService {
   /**
    * programming rights needed
    */
-  public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef,
-      String key, Object value) {
+  public com.xpn.xwiki.api.Object getObject(Document doc, DocumentReference classRef, String key,
+      Object value) {
     if (doc != null) {
-      return modelAccess.getApiObjectWithoutRightCheck(modelAccess.getXObject(
-          doc.getDocument(), classRef, key, value));
+      return modelAccess.getApiObjectWithoutRightCheck(modelAccess.getXObject(doc.getDocument(),
+          classRef, key, value));
     }
     return null;
   }
@@ -131,8 +128,8 @@ public class ModelAccessScriptService implements ScriptService {
     List<com.xpn.xwiki.api.Object> ret = ImmutableList.of();
     try {
       if (rightsAccess.hasAccessLevel(docRef, EAccessLevel.VIEW)) {
-        ret = modelAccess.getApiObjectsWithoutRightChecks(modelAccess.getXObjects(docRef,
-            classRef, key, values));
+        ret = modelAccess.getApiObjectsWithoutRightChecks(modelAccess.getXObjects(docRef, classRef,
+            key, values));
       }
     } catch (DocumentNotExistsException exc) {
       LOGGER.info("Doc does not exist '{}'", docRef, exc);
@@ -142,23 +139,22 @@ public class ModelAccessScriptService implements ScriptService {
     return ret;
   }
 
-  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
-      DocumentReference classRef) {
+  public List<com.xpn.xwiki.api.Object> getObjects(Document doc, DocumentReference classRef) {
     return getObjects(doc, classRef, null, null);
   }
 
-  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
-      DocumentReference classRef, String key, Object value) {
+  public List<com.xpn.xwiki.api.Object> getObjects(Document doc, DocumentReference classRef,
+      String key, Object value) {
     return getObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   /**
    * programming rights needed
    */
-  public List<com.xpn.xwiki.api.Object> getObjects(Document doc,
-      DocumentReference classRef, String key, Collection<?> values) {
-    return modelAccess.getApiObjectsWithoutRightChecks(modelAccess.getXObjects(
-        doc.getDocument(), classRef, key, values));
+  public List<com.xpn.xwiki.api.Object> getObjects(Document doc, DocumentReference classRef,
+      String key, Collection<?> values) {
+    return modelAccess.getApiObjectsWithoutRightChecks(modelAccess.getXObjects(doc.getDocument(),
+        classRef, key, values));
   }
 
   /**
@@ -168,8 +164,8 @@ public class ModelAccessScriptService implements ScriptService {
     com.xpn.xwiki.api.Object ret = null;
     if (doc != null) {
       try {
-        ret = modelAccess.getApiObjectWithoutRightCheck(modelAccess.newXObject(
-            doc.getDocument(), classRef));
+        ret = modelAccess.getApiObjectWithoutRightCheck(modelAccess.newXObject(doc.getDocument(),
+            classRef));
       } catch (ClassDocumentLoadException exc) {
         LOGGER.error("Failed to create object '{}' on doc '{}'", classRef, doc, exc);
       }
@@ -187,8 +183,7 @@ public class ModelAccessScriptService implements ScriptService {
   /**
    * programming rights needed
    */
-  public boolean removeObjects(Document doc,
-      List<com.xpn.xwiki.api.Object> objsToRemove) {
+  public boolean removeObjects(Document doc, List<com.xpn.xwiki.api.Object> objsToRemove) {
     return modelAccess.removeXObjects(doc.getDocument(), toXObject(objsToRemove));
   }
 
@@ -202,8 +197,7 @@ public class ModelAccessScriptService implements ScriptService {
   /**
    * programming rights needed
    */
-  public boolean removeObjects(Document doc, DocumentReference classRef, String key,
-      Object value) {
+  public boolean removeObjects(Document doc, DocumentReference classRef, String key, Object value) {
     return removeObjects(doc, classRef, key, Arrays.asList(value));
   }
 

@@ -37,59 +37,56 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
   public void testGetMappedMenuItemsForParentCmd() {
     assertFalse(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
   }
-  
+
   @Test
   public void testGetMappedMenuItemsForParentCmd_injected() {
-    GetMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      new GetMappedMenuItemsForParentCommand();
+    GetMappedMenuItemsForParentCommand testGetMenuItemCommand = new GetMappedMenuItemsForParentCommand();
     testGetMenuItemCommand.set_isActive(true);
     treeNodeCache.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     assertEquals(testGetMenuItemCommand, treeNodeCache.getMappedMenuItemsForParentCmd());
     assertTrue(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
   }
-  
+
   @Test
   public void testGetNotMappedMenuItemsForParentCmd() {
     assertNotNull(treeNodeCache.getNotMappedMenuItemsForParentCmd());
   }
-  
+
   @Test
   public void testGetNotMappedMenuItemsForParentCmd_injected() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      new GetNotMappedMenuItemsForParentCommand();
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = new GetNotMappedMenuItemsForParentCommand();
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     assertNotNull(treeNodeCache.getNotMappedMenuItemsForParentCmd());
     assertSame("Expecting injected cmd object", testGetMenuItemCommand,
         treeNodeCache.getNotMappedMenuItemsForParentCmd());
   }
-  
+
   @Test
   public void testGetNotMappedMenuItemsForParentCmd_singleton() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      treeNodeCache.getNotMappedMenuItemsForParentCmd();
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = treeNodeCache.getNotMappedMenuItemsForParentCmd();
     assertNotNull(testGetMenuItemCommand);
     assertSame("Expecting injected cmd object", testGetMenuItemCommand,
         treeNodeCache.getNotMappedMenuItemsForParentCmd());
   }
-  
+
   @Test
   public void testGetMappedMenuItemsForParentCmd_injectedByContext() {
     GetMappedMenuItemsForParentCommand testGetMenuItemCommand = new GetMappedMenuItemsForParentCommand();
     testGetMenuItemCommand.set_isActive(true);
-    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, 
+    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY,
         testGetMenuItemCommand);
     assertTrue(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
-    
+
     testGetMenuItemCommand.set_isActive(false);
-    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, 
+    context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY,
         testGetMenuItemCommand);
     assertFalse(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
   }
 
   @Test
   public void testQueryCount() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      createMock(GetNotMappedMenuItemsForParentCommand.class);
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
+        GetNotMappedMenuItemsForParentCommand.class);
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     expect(testGetMenuItemCommand.queryCount()).andReturn(15);
     replayAll(testGetMenuItemCommand);
@@ -99,8 +96,8 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testFlushMenuItemCache() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand =
-      createMock(GetNotMappedMenuItemsForParentCommand.class);
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
+        GetNotMappedMenuItemsForParentCommand.class);
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     testGetMenuItemCommand.flushMenuItemCache(same(context));
     expectLastCall().once();
@@ -109,13 +106,12 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
     verifyAll(testGetMenuItemCommand);
   }
 
-
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(mockStore, wiki);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(mockStore, wiki);
     verify(mocks);
   }

@@ -34,7 +34,7 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
-public class ContextMenuCSSClassesCommandTest extends AbstractBridgedComponentTestCase{
+public class ContextMenuCSSClassesCommandTest extends AbstractBridgedComponentTestCase {
 
   private ContextMenuCSSClassesCommand cmCssClassesCmd;
   private XWikiContext context;
@@ -63,8 +63,7 @@ public class ContextMenuCSSClassesCommandTest extends AbstractBridgedComponentTe
 
   @Test
   public void testGetCMcssClassesOneDB() throws Exception {
-    List<Object> cmStringList = new ArrayList<Object>(Arrays.asList(
-        "abcClass", "secondClass"));
+    List<Object> cmStringList = new ArrayList<Object>(Arrays.asList("abcClass", "secondClass"));
     expect(xwiki.search(isA(String.class), same(context))).andReturn(cmStringList);
     replay(xwiki);
     Set<String> resultSet = cmCssClassesCmd.getCMcssClassesOneDB(context);
@@ -75,8 +74,8 @@ public class ContextMenuCSSClassesCommandTest extends AbstractBridgedComponentTe
 
   @Test
   public void testGetCMcssClassesOneDB_preventDouplicates() throws Exception {
-    List<Object> cmStringList = new ArrayList<Object>(Arrays.asList(
-        "abcClass", "secondClass","abcClass", "secondClass","thirdClass"));
+    List<Object> cmStringList = new ArrayList<Object>(Arrays.asList("abcClass", "secondClass",
+        "abcClass", "secondClass", "thirdClass"));
     expect(xwiki.search(isA(String.class), same(context))).andReturn(cmStringList);
     replay(xwiki);
     Set<String> resultSet = cmCssClassesCmd.getCMcssClassesOneDB(context);
@@ -102,11 +101,10 @@ public class ContextMenuCSSClassesCommandTest extends AbstractBridgedComponentTe
   public void testGetCM_CSSclasses() throws Exception {
     context.setAction("view");
     context.setDatabase("myCelements");
-    List<Object> cmStringList = new ArrayList<Object>(Arrays.asList(
-        "abcClass", "secondClass"));
+    List<Object> cmStringList = new ArrayList<Object>(Arrays.asList("abcClass", "secondClass"));
     expect(xwiki.search(isA(String.class), same(context))).andReturn(cmStringList);
-    List<Object> cmStringList2 = new ArrayList<Object>(Arrays.asList(
-        "abcClass", "secondClass","abcClass", "secondClass","thirdClass"));
+    List<Object> cmStringList2 = new ArrayList<Object>(Arrays.asList("abcClass", "secondClass",
+        "abcClass", "secondClass", "thirdClass"));
     expect(xwiki.search(isA(String.class), same(context))).andReturn(cmStringList2);
     replay(xwiki);
     List<String> resultSet = cmCssClassesCmd.getCM_CSSclasses(context);

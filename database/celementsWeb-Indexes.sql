@@ -10,6 +10,10 @@ ALTER TABLE xwikidoc
       ADD INDEX `elementsIDX` (`XWD_ELEMENTS`),
       ADD INDEX `classXMLindex` (`XWD_CLASS_XML`(30));
 
+ALTER TABLE xwikirecyclebin
+      ADD INDEX `fullNameDateIDX` (`XDD_FULLNAME`, `XDD_DATE`),
+      ADD INDEX `dateFullNameIDX` (`XDD_DATE`, `XDD_FULLNAME`);
+
 ALTER TABLE xwikiobjects
       ADD INDEX `classnameIDX` (`XWO_CLASSNAME`),
       ADD INDEX `docnameIDX` (`XWO_NAME`,`XWO_NUMBER`),

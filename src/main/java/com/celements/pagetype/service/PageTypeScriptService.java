@@ -19,7 +19,6 @@
  */
 package com.celements.pagetype.service;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +30,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.category.IPageTypeCategoryRole;
 
 @Component("pageType")
 public class PageTypeScriptService implements ScriptService {
@@ -41,26 +41,35 @@ public class PageTypeScriptService implements ScriptService {
   @Requirement
   IPageTypeResolverRole pageTypeResolver;
 
+  @Requirement
+  IPageTypeCategoryRole pageTypeCategory;
+
+  @Requirement("cellTypeCategory")
+  IPageTypeCategoryRole cellTypeCategory;
+
   public List<String> getAllPageTypes() {
-    return getPageTypesByCategories(Arrays.asList("", "pageType"), false);
+    return pageTypeService.getPageTypesConfigNamesForCategories(pageTypeCategory.getAllTypeNames(),
+        false);
   }
 
   public List<String> getAvailablePageTypes() {
-    return getPageTypesByCategories(Arrays.asList("", "pageType"), true);
+    return pageTypeService.getPageTypesConfigNamesForCategories(pageTypeCategory.getAllTypeNames(),
+        true);
   }
 
-  public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible
-      ) {
-    return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<String>(
-        catList), onlyVisible);
+  public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible) {
+    return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<String>(catList),
+        onlyVisible);
   }
 
   public List<String> getAllCellTypes() {
-    return getPageTypesByCategories(Arrays.asList("celltype"), false);
+    return pageTypeService.getPageTypesConfigNamesForCategories(cellTypeCategory.getAllTypeNames(),
+        false);
   }
 
   public List<String> getAvailableCellTypes() {
-    return getPageTypesByCategories(Arrays.asList("celltype"), true);
+    return pageTypeService.getPageTypesConfigNamesForCategories(cellTypeCategory.getAllTypeNames(),
+        true);
   }
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {

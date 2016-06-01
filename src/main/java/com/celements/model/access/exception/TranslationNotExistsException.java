@@ -13,8 +13,7 @@ public class TranslationNotExistsException extends DocumentAccessException {
     this.lang = lang;
   }
 
-  public TranslationNotExistsException(DocumentReference docRef, String lang,
-      Throwable cause) {
+  public TranslationNotExistsException(DocumentReference docRef, String lang, Throwable cause) {
     super(docRef, cause);
     this.lang = lang;
   }

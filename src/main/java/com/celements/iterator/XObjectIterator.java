@@ -40,8 +40,8 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Iterator class
+ * 
  * @author Philipp Buser
- *
  */
 public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObject> {
 
@@ -62,23 +62,24 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Constructor
-   * @param XWiki context
+   * 
+   * @param XWiki
+   *          context
    */
   public XObjectIterator(XWikiContext context) {
-   _context = context;
-   _xwiki = _context.getWiki();
+    _context = context;
+    _xwiki = _context.getWiki();
   }
-  
+
   /**
    * Checks if iterator has a next object
    */
   public boolean hasNext() {
-    while ((_nextObject == null) && (getDocIterator().hasNext()
-        || getObjectIterator().hasNext())) {
+    while ((_nextObject == null) && (getDocIterator().hasNext() || getObjectIterator().hasNext())) {
       if (getObjectIterator().hasNext()) {
         _nextObject = getObjectIterator().next();
-        if (_key != null && _value != null){
-          if (!isValidObject()){
+        if (_key != null && _value != null) {
+          if (!isValidObject()) {
             _nextObject = null;
           }
         }
@@ -90,13 +91,13 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
   }
 
   boolean isValidObject() {
-      return ((_nextObject != null) && (_value.equals(getValue())));
+    return ((_nextObject != null) && (_value.equals(getValue())));
   }
 
   private Object getValue() {
     try {
-      if (_nextObject.get(_key) != null){
-        return ((BaseProperty)_nextObject.get(_key)).getValue();
+      if (_nextObject.get(_key) != null) {
+        return ((BaseProperty) _nextObject.get(_key)).getValue();
       }
     } catch (XWikiException exp) {
       mLogger.warn("Failed to get a propery with key [" + _key + "]", exp);
@@ -108,7 +109,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
    * Returns the next element in the iteration.
    *
    * @return the next element in the iteration.
-   * @exception NoSuchElementException iteration has no more elements.
+   * @exception NoSuchElementException
+   *              iteration has no more elements.
    */
   public BaseObject next() {
     if (hasNext()) {
@@ -125,8 +127,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
   void moveToNextDoc() {
     try {
       String nextFN = getDocIterator().next();
-      DocumentReference nextDocRef = Utils.getComponent(IWebUtilsService.class
-          ).resolveDocumentReference(nextFN);
+      DocumentReference nextDocRef = Utils.getComponent(
+          IWebUtilsService.class).resolveDocumentReference(nextFN);
       _currentDoc = _xwiki.getDocument(nextDocRef, _context);
       _objectIterator = null;
     } catch (XWikiException exp) {
@@ -136,9 +138,10 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
       mLogger.error("Failed to get next xwiki document.", exp);
     }
   }
-  
+
   /**
    * Gets the object iterator
+   * 
    * @return XObjectIterator
    */
   Iterator<BaseObject> getObjectIterator() {
@@ -150,6 +153,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the document iterator
+   * 
    * @return XObjectIterator
    */
   Iterator<String> getDocIterator() {
@@ -164,6 +168,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Get the objects for the current document
+   * 
    * @return
    */
   List<BaseObject> getObjectsForCurrentDoc() {
@@ -173,8 +178,8 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
     if (getCurrentDoc() == null) {
       return Collections.emptyList();
     }
-    List<BaseObject> objs = getCurrentDoc().getXObjects(getWebUtilsService(
-        ).resolveDocumentReference(_xwikiClassName));
+    List<BaseObject> objs = getCurrentDoc().getXObjects(
+        getWebUtilsService().resolveDocumentReference(_xwikiClassName));
     if (objs != null) {
       return objs;
     } else {
@@ -184,6 +189,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the current document
+   * 
    * @return current document
    */
   XWikiDocument getCurrentDoc() {
@@ -192,14 +198,16 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * FOR TESTS ONLY!!!
+   * 
    * @param testCurrentDoc
    */
   void inject_CurrentDoc(XWikiDocument testCurrentDoc) {
     _currentDoc = testCurrentDoc;
   }
-  
+
   /**
    * FOR TESTS ONLY!!!
+   * 
    * @param nextObject
    */
   void inject_NextObject(BaseObject nextObject) {
@@ -208,6 +216,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Remove is not supported
+   * 
    * @throws UnsupportedOperationException
    */
   public void remove() {
@@ -216,7 +225,9 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Set the document list
-   * @param document list
+   * 
+   * @param document
+   *          list
    */
   public void setDocList(List<String> docList) {
     _objectIterator = null;
@@ -227,6 +238,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the document list
+   * 
    * @return document list
    */
   List<String> getDocList() {
@@ -235,6 +247,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Get a copy of the document list
+   * 
    * @return document list
    */
   public List<String> getDocListCopy() {
@@ -243,7 +256,9 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Sets the class name
-   * @param class name
+   * 
+   * @param class
+   *          name
    */
   public void setClassName(String className) {
     _xwikiClassName = className;
@@ -251,26 +266,28 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the class name
+   * 
    * @return class name
    */
   public String getClassName() {
     return _xwikiClassName;
   }
-  
+
   /**
    * Sets the filter
+   * 
    * @param filter
    */
-  public void setFilter(String key, Object value){
+  public void setFilter(String key, Object value) {
     _key = key;
     _value = value;
   }
-  
-  String getFilterKey(){
+
+  String getFilterKey() {
     return _key;
   }
-  
-  Object getFilterValue(){
+
+  Object getFilterValue() {
     return _value;
   }
 

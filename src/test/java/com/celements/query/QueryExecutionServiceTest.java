@@ -26,8 +26,7 @@ public class QueryExecutionServiceTest extends AbstractBridgedComponentTestCase 
 
   @Before
   public void setUp_CelementsWebScriptServiceTest() throws Exception {
-    queryExecService = (QueryExecutionService) Utils.getComponent(
-        IQueryExecutionServiceRole.class);
+    queryExecService = (QueryExecutionService) Utils.getComponent(IQueryExecutionServiceRole.class);
     storeMock = createMockAndAddToDefault(XWikiHibernateStore.class);
     expect(getWikiMock().getHibernateStore()).andReturn(storeMock).anyTimes();
   }
@@ -38,11 +37,10 @@ public class QueryExecutionServiceTest extends AbstractBridgedComponentTestCase 
     Map<String, Object> binds = new HashMap<String, Object>();
     binds.put("key", "someVal");
     int ret = 5;
-    Capture<HibernateCallback<Integer>> hibCallbackCapture = 
-        new Capture<HibernateCallback<Integer>>();
+    Capture<HibernateCallback<Integer>> hibCallbackCapture = new Capture<HibernateCallback<Integer>>();
 
-    expect(storeMock.executeWrite(same(getContext()), eq(true), 
-        capture(hibCallbackCapture))).andReturn(ret).once();
+    expect(storeMock.executeWrite(same(getContext()), eq(true), capture(
+        hibCallbackCapture))).andReturn(ret).once();
 
     assertEquals("xwikidb", getContext().getDatabase());
     replayDefault();

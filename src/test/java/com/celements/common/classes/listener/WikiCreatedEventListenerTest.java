@@ -25,8 +25,7 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   public void setUp_WikiCreatedEventListenerTest() throws Exception {
     listener = (WikiCreatedEventListener) Utils.getComponent(EventListener.class,
         "celements.classes.WikiCreatedEventListener");
-    remoteObsMngContextMock = createMockAndAddToDefault(
-        RemoteObservationManagerContext.class);
+    remoteObsMngContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class);
     listener.remoteObservationManagerContext = remoteObsMngContextMock;
     classesCmpMock = createMockAndAddToDefault(IClassesCompositorComponent.class);
     listener.classesCompositor = classesCmpMock;
@@ -47,11 +46,11 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   public void testOnEvent() {
     String database = "db";
     Event event = new WikiCreatedEvent(database);
-    
+
     expect(remoteObsMngContextMock.isRemoteState()).andReturn(false).atLeastOnce();
     classesCmpMock.checkAllClassCollections();
     expectLastCall().andDelegateTo(new TestClassesCompositor(database)).once();
-    
+
     String db = getContext().getDatabase();
     replayDefault();
     listener.onEvent(event, null, null);
@@ -62,16 +61,16 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   @Test
   public void testOnEvent_remote() {
     expect(remoteObsMngContextMock.isRemoteState()).andReturn(true).atLeastOnce();
-    
+
     replayDefault();
     listener.onEvent(new WikiCreatedEvent(), null, null);
     verifyDefault();
   }
 
   private class TestClassesCompositor implements IClassesCompositorComponent {
-    
+
     private final String database;
-    
+
     TestClassesCompositor(String database) {
       this.database = database;
     }
@@ -85,7 +84,7 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
     public boolean isActivated(String name) {
       throw new UnsupportedOperationException();
     }
-    
+
   }
 
 }

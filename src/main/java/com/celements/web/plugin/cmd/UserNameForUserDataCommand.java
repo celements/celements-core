@@ -34,17 +34,15 @@ import com.xpn.xwiki.web.Utils;
 
 public class UserNameForUserDataCommand {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      UserNameForUserDataCommand.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(UserNameForUserDataCommand.class);
 
-  public String getUsernameForUserData(String login, String possibleLogins,
-      XWikiContext context) throws XWikiException{
+  public String getUsernameForUserData(String login, String possibleLogins, XWikiContext context)
+      throws XWikiException {
     String userDoc = "";
-    
-    if((login != null) && (login.trim().length() > 0)
-        && (possibleLogins != null)){
+
+    if ((login != null) && (login.trim().length() > 0) && (possibleLogins != null)) {
       String[] fields = possibleLogins.split(",");
-      
+
       String hql = ", BaseObject as obj, StringProperty as str where ";
       hql += "doc.space='XWiki' ";
       hql += "and obj.name=doc.fullName ";
@@ -52,53 +50,54 @@ public class UserNameForUserDataCommand {
       hql += "and obj.id=str.id.id ";
       hql += "and (";
       for (int i = 0; i < fields.length; i++) {
-        if(i > 0){ hql += "or "; }
+        if (i > 0) {
+          hql += "or ";
+        }
         hql += "str.id.name='" + fields[i] + "' ";
       }
       hql += ") and lower(str.value)='" + login.toLowerCase().replace("'", "''") + "'";
-      
+
       XWikiStoreInterface storage = context.getWiki().getStore();
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, context);
       LOGGER.info("searching users for " + login + " and found " + users.size());
-      
+
       int usersFound = 0;
       for (String tmpUserDoc : users) {
-        if(!tmpUserDoc.trim().equals("")) {
+        if (!tmpUserDoc.trim().equals("")) {
           usersFound++;
           userDoc = tmpUserDoc;
         }
       }
-      if(usersFound > 1){
-        LOGGER.warn("Found more than one user for login '" + login
-            + "' in possible fields '" + possibleLogins + "'");
+      if (usersFound > 1) {
+        LOGGER.warn("Found more than one user for login '" + login + "' in possible fields '"
+            + possibleLogins + "'");
         return null;
       }
-      
-      if((userDoc.trim().length() == 0)
-          && (possibleLogins.matches("(.*,)?loginname(,.*)?"))){
-        if(!login.startsWith("XWiki.")){
+
+      if ((userDoc.trim().length() == 0) && (possibleLogins.matches("(.*,)?loginname(,.*)?"))) {
+        if (!login.startsWith("XWiki.")) {
           login = "XWiki." + login;
         }
-        if(context.getWiki().exists(login, context)){
+        if (context.getWiki().exists(login, context)) {
           userDoc = login;
         } else {
           List<String> argsList = new ArrayList<String>();
           argsList.add(login.replaceAll("XWiki.", ""));
-          List<XWikiDocument> docs = storage.searchDocuments("where lower(doc.name)=?", 
-              argsList, context);
-          if(docs.size() == 1) {
-            userDoc = Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer(
-                ).serialize(docs.get(0).getDocumentReference());
-          } else if(docs.size() > 1) {
+          List<XWikiDocument> docs = storage.searchDocuments("where lower(doc.name)=?", argsList,
+              context);
+          if (docs.size() == 1) {
+            userDoc = Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer().serialize(
+                docs.get(0).getDocumentReference());
+          } else if (docs.size() > 1) {
             return null;
           }
         }
       }
     }
-    
-    LOGGER.info("Find login for '" + login + "' in fields: '"
-        + possibleLogins + "' Result: '" + userDoc + "'");
-    
+
+    LOGGER.info("Find login for '" + login + "' in fields: '" + possibleLogins + "' Result: '"
+        + userDoc + "'");
+
     return userDoc;
   }
 }

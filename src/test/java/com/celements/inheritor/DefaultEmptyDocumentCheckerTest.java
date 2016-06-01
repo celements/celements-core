@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package com.celements.inheritor;
+
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -26,40 +27,40 @@ import org.junit.Test;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class DefaultEmptyDocumentCheckerTest extends AbstractBridgedComponentTestCase{
-  
+public class DefaultEmptyDocumentCheckerTest extends AbstractBridgedComponentTestCase {
+
   private IEmptyDocumentChecker _emptyDocumentChecker;
-  
+
   @Before
   public void setUp_DefaultEmptyFieldCheckerTest() throws Exception {
     _emptyDocumentChecker = new DefaultEmptyDocumentChecker();
   }
-  
+
   @Test
-  public void testIsEmpty_documentNotExist(){
+  public void testIsEmpty_documentNotExist() {
     assertTrue(_emptyDocumentChecker.isEmpty(null));
   }
-  
+
   @Test
-  public void testIsEmpty_emptyTitle(){
+  public void testIsEmpty_emptyTitle() {
     XWikiDocument doc = new XWikiDocument();
     doc.setTitle("Title");
     assertFalse(_emptyDocumentChecker.isEmptyTitle(doc));
     doc.setTitle("");
     assertTrue(_emptyDocumentChecker.isEmptyTitle(doc));
   }
-  
+
   @Test
-  public void testIsEmpty_emptyContent(){
+  public void testIsEmpty_emptyContent() {
     XWikiDocument doc = new XWikiDocument();
     doc.setContent("Content");
     assertFalse(_emptyDocumentChecker.isEmptyContent(doc));
     doc.setContent("");
     assertTrue(_emptyDocumentChecker.isEmptyContent(doc));
   }
-  
+
   @Test
-  public void testIsEmpty(){
+  public void testIsEmpty() {
     XWikiDocument doc = new XWikiDocument();
     doc.setTitle("Title");
     doc.setContent("Content");

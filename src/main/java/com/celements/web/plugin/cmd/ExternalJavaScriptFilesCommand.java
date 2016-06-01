@@ -48,8 +48,8 @@ public class ExternalJavaScriptFilesCommand {
 
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
-  public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS = 
-    JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE + "." + JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC;
+  public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS = JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE
+      + "." + JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC;
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       ExternalJavaScriptFilesCommand.class);
@@ -61,7 +61,7 @@ public class ExternalJavaScriptFilesCommand {
   private List<String> extJSnotFoundList;
   private boolean displayedAll = false;
   private AttachmentURLCommand attUrlCmd_injected = null;
-  
+
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
     extJSfileSet = new HashSet<String>();
@@ -99,7 +99,7 @@ public class ExternalJavaScriptFilesCommand {
     jsonBuilder.addBoolean(true);
     jsonBuilder.closeDictionary();
     return "<span class='cel_lazyloadJS' style='display: none;'>" + jsonBuilder.getJSON()
-        +"</span>";
+        + "</span>";
   }
 
   public String addExtJSfileOnce(String jsFile) {
@@ -112,8 +112,7 @@ public class ExternalJavaScriptFilesCommand {
 
   public String addExtJSfileOnce(String jsFile, String action, String params) {
     if (!extJSAttUrlSet.contains(jsFile)) {
-      if (getAttUrlCmd().isAttachmentLink(jsFile)
-          || getAttUrlCmd().isOnDiskLink(jsFile)) {
+      if (getAttUrlCmd().isAttachmentLink(jsFile) || getAttUrlCmd().isOnDiskLink(jsFile)) {
         extJSAttUrlSet.add(jsFile);
       }
       String attUrl;
@@ -149,47 +148,47 @@ public class ExternalJavaScriptFilesCommand {
         extJSfileList.add(jsFileUrl);
       }
     }
-    if(!displayedAll) {
+    if (!displayedAll) {
       jsIncludes2 = "";
     }
     return jsIncludes2;
   }
 
   AttachmentURLCommand getAttUrlCmd() {
-    if(attUrlCmd_injected  != null) {
+    if (attUrlCmd_injected != null) {
       return attUrlCmd_injected;
     }
     return new AttachmentURLCommand();
   }
-  
+
   void injectAttUrlCmd(AttachmentURLCommand attUrlCmd) {
     attUrlCmd_injected = attUrlCmd;
   }
-  
+
   void injectDisplayAll(boolean displayedAll) {
     this.displayedAll = displayedAll;
   }
 
   String getExtStringForJsFile(String jsFile) {
-    return "<script type=\"text/javascript\" src=\"" 
-        + StringEscapeUtils.escapeHtml(jsFile) + "\"></script>";
+    return "<script type=\"text/javascript\" src=\"" + StringEscapeUtils.escapeHtml(jsFile)
+        + "\"></script>";
   }
 
   public String getAllExternalJavaScriptFiles() throws XWikiException {
     VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
     if ((vcontext != null) && vcontext.containsKey("skin_doc")) {
-      addAllExtJSfilesFromDoc(context.getWiki().getDocument(getWebUtils(
-          ).resolveDocumentReference(((Document)vcontext.get("skin_doc")).getFullName()),
-          context));
+      addAllExtJSfilesFromDoc(context.getWiki().getDocument(getWebUtils().resolveDocumentReference(
+          ((Document) vcontext.get("skin_doc")).getFullName()), context));
     }
     addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
         context.getDatabase(), "XWiki", "XWikiPreferences"), context));
     addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-        context.getDatabase(), context.getDoc().getDocumentReference(
-            ).getLastSpaceReference().getName(), "WebPreferences"), context));
+        context.getDatabase(),
+        context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
+        "WebPreferences"), context));
     addAllExtJSfilesFromDoc(context.getDoc());
     XWikiDocument pagetype = getPageTypeDoc(context.getDoc());
-    if(pagetype != null){
+    if (pagetype != null) {
       addAllExtJSfilesFromDoc(pagetype);
     }
     notifyExtJavaScriptFileListener();
@@ -213,8 +212,7 @@ public class ExternalJavaScriptFilesCommand {
 
   private Map<String, IExtJSFilesListener> getListenerMap() {
     try {
-      return Utils.getComponent(IWebUtilsService.class).lookupMap(
-          IExtJSFilesListener.class);
+      return Utils.getComponent(IWebUtilsService.class).lookupMap(IExtJSFilesListener.class);
     } catch (ComponentLookupException exp) {
       LOGGER.error("Failed to get IExtJSFilesListener components.", exp);
     }
@@ -225,45 +223,43 @@ public class ExternalJavaScriptFilesCommand {
     String jsIncludes2 = "";
     for (String jsFile : getJavaScriptExternalFilePaths(doc)) {
       String addJSinclude = addExtJSfileOnce(jsFile);
-      if(!"".equals(addJSinclude)) {
+      if (!"".equals(addJSinclude)) {
         jsIncludes2 = jsIncludes2 + addJSinclude + "\n";
       }
     }
     return jsIncludes2;
   }
 
-  private XWikiDocument getPageTypeDoc(XWikiDocument doc) throws XWikiException{
-  LOGGER.trace("entering with doc: '" + ((doc != null)?doc.getDocumentReference():"null")
-      + "'");
+  private XWikiDocument getPageTypeDoc(XWikiDocument doc) throws XWikiException {
+    LOGGER.trace("entering with doc: '" + ((doc != null) ? doc.getDocumentReference() : "null")
+        + "'");
     XWikiDocument pagetypeDoc = null;
     BaseObject obj = doc.getXObject(new DocumentReference(context.getDatabase(),
         PageTypeCommand.PAGE_TYPE_CLASS_SPACE, PageTypeCommand.PAGE_TYPE_CLASS_DOC));
     LOGGER.debug("Celements2.PageType object: '" + obj + "'");
-    if((obj != null) && (obj instanceof BaseObject)){
+    if ((obj != null) && (obj instanceof BaseObject)) {
       String pagetypeName = obj.getStringValue("page_type");
       LOGGER.debug("PageType name is: '" + pagetypeName + "'");
-      if((pagetypeName != null) && (!pagetypeName.equals(""))){
-        pagetypeDoc = context.getWiki().getDocument(getWebUtils(
-            ).resolveDocumentReference(new PageTypeCommand().completePageTypeDocName(
-                pagetypeName)), context);
+      if ((pagetypeName != null) && (!pagetypeName.equals(""))) {
+        pagetypeDoc = context.getWiki().getDocument(getWebUtils().resolveDocumentReference(
+            new PageTypeCommand().completePageTypeDocName(pagetypeName)), context);
       }
     }
-  
-    LOGGER.trace("ending. PageType is: '"
-        + ((pagetypeDoc != null)?pagetypeDoc.getDocumentReference():"null") + "'");
+
+    LOGGER.trace("ending. PageType is: '" + ((pagetypeDoc != null)
+        ? pagetypeDoc.getDocumentReference() : "null") + "'");
     return pagetypeDoc;
   }
-  
+
   private List<String> getJavaScriptExternalFilePaths(XWikiDocument doc) {
-    List<BaseObject> javaScriptFiles = doc.getXObjects(new DocumentReference(
-        context.getDatabase(), JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE,
-        JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC));
+    List<BaseObject> javaScriptFiles = doc.getXObjects(new DocumentReference(context.getDatabase(),
+        JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE, JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC));
     Vector<String> jsFiles = new Vector<String>();
     if (javaScriptFiles != null) {
-      for(Object filepath : javaScriptFiles) {
+      for (Object filepath : javaScriptFiles) {
         if ((filepath != null) && (filepath instanceof BaseObject)) {
           BaseObject filepathObj = (BaseObject) filepath;
-          if(!"".equals(filepathObj.getStringValue("filepath"))) {
+          if (!"".equals(filepathObj.getStringValue("filepath"))) {
             jsFiles.add(filepathObj.getStringValue("filepath"));
           }
         }

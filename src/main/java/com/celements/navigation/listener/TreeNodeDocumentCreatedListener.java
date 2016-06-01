@@ -41,11 +41,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("TreeNodeDocumentCreatedListener")
-public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentListener
-    implements EventListener {
+public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentListener implements
+    EventListener {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
-      TreeNodeDocumentCreatedListener.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(TreeNodeDocumentCreatedListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -60,7 +59,7 @@ public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentLis
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   private NavigationClasses getNavClasses() {
@@ -72,7 +71,7 @@ public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentLis
   }
 
   public List<Event> getEvents() {
-    return Arrays.asList((Event)new DocumentCreatedEvent());
+    return Arrays.asList((Event) new DocumentCreatedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -90,8 +89,8 @@ public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentLis
         getObservationManager().notify(newTreeNodeEvent, source, getContext());
       }
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent ["
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }

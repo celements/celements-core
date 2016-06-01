@@ -1,8 +1,10 @@
 package com.celements.pagetype.java;
 
-import java.util.List;
+import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
+
+import com.celements.pagetype.category.IPageTypeCategoryRole;
 
 @ComponentRole
 public interface IJavaPageTypeRole {
@@ -13,7 +15,9 @@ public interface IJavaPageTypeRole {
    */
   public String getName();
 
-  public List<String> getCategories();
+  public Set<IPageTypeCategoryRole> getCategories();
+
+  public Set<String> getCategoryNames();
 
   public boolean hasPageTitle();
 

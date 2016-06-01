@@ -33,7 +33,6 @@ import com.xpn.xwiki.XWikiContext;
  * TreeNodeCache must be a singleton to ensure efficient caching
  * 
  * @author Fabian Pichler
- *
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
@@ -45,11 +44,13 @@ public class TreeNodeCache implements ITreeNodeCache {
 
   @Requirement
   Execution execution;
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
    * @see com.celements.web.utils.IWebUtils#queryCount()
    */
   public int queryCount() {
@@ -61,14 +62,15 @@ public class TreeNodeCache implements ITreeNodeCache {
     notMappedMenuItemCommand = testGetMenuItemCommand;
   }
 
-  public GetNotMappedMenuItemsForParentCommand getNotMappedMenuItemsForParentCmd() {
+  synchronized public GetNotMappedMenuItemsForParentCommand getNotMappedMenuItemsForParentCmd() {
     if (notMappedMenuItemCommand == null) {
       notMappedMenuItemCommand = new GetNotMappedMenuItemsForParentCommand();
     }
     return notMappedMenuItemCommand;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   public void flushMenuItemCache() {
@@ -85,11 +87,10 @@ public class TreeNodeCache implements ITreeNodeCache {
       return injected_GetMappedMenuItemCommand;
     }
     XWikiContext context = getContext();
-    if (context.get(
-        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null
-        && context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY
-            ) instanceof GetMappedMenuItemsForParentCommand) {
-      return (GetMappedMenuItemsForParentCommand)context.get(
+    if (context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null
+        && context.get(
+            GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) instanceof GetMappedMenuItemsForParentCommand) {
+      return (GetMappedMenuItemsForParentCommand) context.get(
           GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY);
     }
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();

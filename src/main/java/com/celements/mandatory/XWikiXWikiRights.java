@@ -53,8 +53,7 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   @Override
   protected boolean skip() {
-    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiRights", 
-        0) == 1L;
+    return getContext().getWiki().ParamAsLong("celements.mandatory.skipWikiRights", 0) == 1L;
   }
 
   @Override
@@ -68,31 +67,28 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
   }
 
   boolean checkAccessRights(XWikiDocument wikiPrefDoc) throws XWikiException {
-    BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(),
-        false, getContext());
+    BaseObject editRightsObj = wikiPrefDoc.getXObject(getGlobalRightsRef(), false, getContext());
     if (editRightsObj == null) {
       LOGGER.trace("checkAccessRights [" + getWiki() + "], global rights class exists: "
           + getContext().getWiki().exists(getGlobalRightsRef(), getContext()));
-      LOGGER.trace("checkAccessRights [" + getWiki() + "], XWiki.ContentEditorsGroup"
-          + " exists: " + getContext().getWiki().exists(new DocumentReference(getWiki(),
-              "XWiki", "ContentEditorsGroup"), getContext()));
+      LOGGER.trace("checkAccessRights [" + getWiki() + "], XWiki.ContentEditorsGroup" + " exists: "
+          + getContext().getWiki().exists(new DocumentReference(getWiki(), "XWiki",
+              "ContentEditorsGroup"), getContext()));
       editRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), getContext());
       editRightsObj.set("groups", "XWiki.ContentEditorsGroup", getContext());
       editRightsObj.set("levels", "edit,delete,undelete", getContext());
       editRightsObj.set("users", "", getContext());
       editRightsObj.set("allow", 1, getContext());
-      BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), 
-          getContext());
-      LOGGER.trace("checkAccessRights [" + getWiki() + "], XWiki.ContentEditorsGroup"
-          + " exists: " + getContext().getWiki().exists(new DocumentReference(getWiki(),
-              "XWiki", "XWikiAdminGroup"), getContext()));
+      BaseObject adminRightsObj = wikiPrefDoc.newXObject(getGlobalRightsRef(), getContext());
+      LOGGER.trace("checkAccessRights [" + getWiki() + "], XWiki.ContentEditorsGroup" + " exists: "
+          + getContext().getWiki().exists(new DocumentReference(getWiki(), "XWiki",
+              "XWikiAdminGroup"), getContext()));
       adminRightsObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
-      adminRightsObj.set("levels", "admin,edit,comment,delete,undelete,register",
-          getContext());
+      adminRightsObj.set("levels", "admin,edit,comment,delete,undelete,register", getContext());
       adminRightsObj.set("users", "", getContext());
       adminRightsObj.set("allow", 1, getContext());
-      LOGGER.debug("XWikiPreferences missing access rights fixed for database ["
-          + getWiki() + "].");
+      LOGGER.debug("XWikiPreferences missing access rights fixed for database [" + getWiki()
+          + "].");
       return true;
     }
     return false;

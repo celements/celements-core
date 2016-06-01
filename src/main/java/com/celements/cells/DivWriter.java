@@ -29,13 +29,13 @@ public class DivWriter implements ICellWriter {
 
   public void openLevel(String idname, String cssClasses, String cssStyles) {
     getOut().append("<div");
-    if((idname != null) && !"".equals(idname)) {
+    if ((idname != null) && !"".equals(idname)) {
       getOut().append(" id=\"" + idname + "\"");
     }
-    if((cssClasses != null) && !"".equals(cssClasses)) {
+    if ((cssClasses != null) && !"".equals(cssClasses)) {
       getOut().append(" class=\"" + cssClasses + "\"");
     }
-    if((cssStyles != null) && !"".equals(cssStyles)) {
+    if ((cssStyles != null) && !"".equals(cssStyles)) {
       getOut().append(" style=\"" + cssStyles.replaceAll("[\n\r]", "") + "\"");
     }
     getOut().append(">");

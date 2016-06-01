@@ -14,5 +14,5 @@ public class XDocRecursionException extends Exception {
   public DocumentReference getParentRef() {
     return parentRef;
   }
-  
+
 }

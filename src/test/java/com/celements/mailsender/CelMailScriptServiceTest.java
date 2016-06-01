@@ -9,11 +9,10 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 
-
 public class CelMailScriptServiceTest extends AbstractBridgedComponentTestCase {
-  
+
   private CelMailScriptService cmss;
-  
+
   @Before
   public void setUp_CelMailScriptServiceTest() throws Exception {
     cmss = (CelMailScriptService) Utils.getComponent(ScriptService.class, "celmail");

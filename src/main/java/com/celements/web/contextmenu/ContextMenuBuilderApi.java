@@ -33,11 +33,9 @@ public class ContextMenuBuilderApi extends com.xpn.xwiki.api.Api {
     cmiBuilder = new ContextMenuBuilder();
   }
 
-  public List<ContextMenuItemApi> getCMItemsForClassAndId(String className,
-      String elemId) {
+  public List<ContextMenuItemApi> getCMItemsForClassAndId(String className, String elemId) {
     List<ContextMenuItemApi> cmiList = new ArrayList<ContextMenuItemApi>();
-    for(ContextMenuItem cmiObj : cmiBuilder.getCMItemsForClassAndId(className,
-        elemId, context)) {
+    for (ContextMenuItem cmiObj : cmiBuilder.getCMItemsForClassAndId(className, elemId, context)) {
       cmiList.add(ContextMenuItemApi.getAPIObject(cmiObj, context));
     }
     return cmiList;
@@ -46,7 +44,7 @@ public class ContextMenuBuilderApi extends com.xpn.xwiki.api.Api {
   public void addElementsCMforClassNames(String jsonDictionary) {
     cmiBuilder.addElementsCMforClassNames(jsonDictionary, context);
   }
-  
+
   public String getCMIjson() {
     return cmiBuilder.getCMIjson(context);
   }

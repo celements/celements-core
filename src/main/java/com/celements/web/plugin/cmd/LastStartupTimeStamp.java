@@ -45,8 +45,8 @@ public class LastStartupTimeStamp {
   }
 
   public String getFileModificationDate(String path, XWikiContext context) {
-      return getLastChangedTimeStamp(context.getWiki().getResourceLastModificationDate(
-          FileAction.RESOURCES_DIRECTORY + FileAction.DELIMITER + path));
+    return getLastChangedTimeStamp(context.getWiki().getResourceLastModificationDate(
+        FileAction.RESOURCES_DIRECTORY + FileAction.DELIMITER + path));
   }
 
 }

@@ -29,8 +29,8 @@ import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 
 public class DefaultCelementsRenderingEngine extends DefaultXWikiRenderingEngine {
 
-  public DefaultCelementsRenderingEngine(List<String> rendererList,
-      XWikiContext context) throws XWikiException {
+  public DefaultCelementsRenderingEngine(List<String> rendererList, XWikiContext context)
+      throws XWikiException {
     super(context.getWiki(), context);
     Set<String> rendererSet = new HashSet<String>(rendererList);
     for (String rendererName : getRendererNames()) {

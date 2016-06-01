@@ -1,24 +1,27 @@
 package com.celements.pagetype.java;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.python.google.common.collect.Sets;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.Lists;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase {
+public class DefaultPageTypeConfigTest extends AbstractComponentTest {
 
   private IJavaPageTypeRole pageTypeImplMock;
   private DefaultPageTypeConfig testPageType;
@@ -36,8 +39,7 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     testPageType = new DefaultPageTypeConfig(pageTypeImplMock);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
     componentManager.release(webUtilsService);
-    webUtilsManagDesc = componentManager.getComponentDescriptor(IWebUtilsService.class,
-        "default");
+    webUtilsManagDesc = componentManager.getComponentDescriptor(IWebUtilsService.class, "default");
     webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     componentManager.registerComponent(webUtilsManagDesc, webUtilsMock);
   }
@@ -59,8 +61,9 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetCategories() {
-    List<String> expectedCategories = Arrays.asList("", "pageType");
-    expect(pageTypeImplMock.getCategories()).andReturn(expectedCategories).anyTimes();
+    Set<String> expectedCategoriesSet = Sets.newHashSet("", "pageType");
+    List<String> expectedCategories = Lists.newArrayList(expectedCategoriesSet);
+    expect(pageTypeImplMock.getCategoryNames()).andReturn(expectedCategoriesSet).anyTimes();
     replayDefault();
     assertEquals(expectedCategories, testPageType.getCategories());
     verifyDefault();
@@ -109,8 +112,7 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef))).andReturn(
         expectedViewTemplates);
     replayDefault();
-    assertEquals(expectedViewTemplates, testPageType.getRenderTemplateForRenderMode(
-        "view"));
+    assertEquals(expectedViewTemplates, testPageType.getRenderTemplateForRenderMode("view"));
     verifyDefault();
   }
 
@@ -125,8 +127,7 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef))).andReturn(
         expectedEditTemplates);
     replayDefault();
-    assertEquals(expectedEditTemplates, testPageType.getRenderTemplateForRenderMode(
-        "edit"));
+    assertEquals(expectedEditTemplates, testPageType.getRenderTemplateForRenderMode("edit"));
     verifyDefault();
   }
 
@@ -143,6 +144,31 @@ public class DefaultPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     expect(pageTypeImplMock.isVisible()).andReturn(true).anyTimes();
     replayDefault();
     assertTrue(testPageType.isVisible());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPrettyName_inDict() {
+    String pageTypeName = "thePageTypeName";
+    String expectedPrettyName = "My Dictionary Pretty Name";
+    String dictKey = DefaultPageTypeConfig.PRETTYNAME_DICT_PREFIX + pageTypeName;
+    getMessageToolStub().injectMessage(dictKey, expectedPrettyName);
+    expect(webUtilsMock.getAdminMessageTool()).andReturn(getMessageToolStub()).anyTimes();
+    expect(pageTypeImplMock.getName()).andReturn(pageTypeName).anyTimes();
+    replayDefault();
+    assertEquals(expectedPrettyName, testPageType.getPrettyName());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getPrettyName_notInDict() {
+    String pageTypeName = "thePageTypeName";
+    String dictKey = DefaultPageTypeConfig.PRETTYNAME_DICT_PREFIX + pageTypeName;
+    getMessageToolStub().injectMessage(dictKey, dictKey);
+    expect(webUtilsMock.getAdminMessageTool()).andReturn(getMessageToolStub()).anyTimes();
+    expect(pageTypeImplMock.getName()).andReturn(pageTypeName).anyTimes();
+    replayDefault();
+    assertEquals(pageTypeName, testPageType.getPrettyName());
     verifyDefault();
   }
 

@@ -20,8 +20,8 @@ public interface IQueryExecutionServiceRole {
 
   public int executeWriteHQL(String hql, Map<String, Object> binds) throws XWikiException;
 
-  public int executeWriteHQL(String hql, Map<String, Object> binds, WikiReference wikiRef
-      ) throws XWikiException;
+  public int executeWriteHQL(String hql, Map<String, Object> binds, WikiReference wikiRef)
+      throws XWikiException;
 
   public DocumentReference executeAndGetDocRef(Query query) throws QueryException;
 

@@ -53,7 +53,7 @@ public class CSSBaseObject extends CSS {
 
   @Override
   public boolean isAlternate() {
-    if(obj != null) {
+    if (obj != null) {
       return obj.getIntValue("alternate", -1) == 1;
     } else {
       return false;
@@ -62,7 +62,7 @@ public class CSSBaseObject extends CSS {
 
   @Override
   public String getTitle() {
-    if(obj != null) {
+    if (obj != null) {
       return obj.getStringValue("title");
     } else {
       return "";
@@ -71,7 +71,7 @@ public class CSSBaseObject extends CSS {
 
   @Override
   public String getMedia() {
-    if(obj != null) {
+    if (obj != null) {
       return obj.getStringValue("media");
     } else {
       return "";
@@ -80,10 +80,9 @@ public class CSSBaseObject extends CSS {
 
   @Override
   public boolean isContentCSS() {
-    if((obj != null) && 
-        ((obj.getIntValue("is_rte_content") == 1) || 
-        obj.getStringValue("cssname").endsWith("-content.css") || 
-        obj.getStringValue("cssname").endsWith("_content.css"))){
+    if ((obj != null) && ((obj.getIntValue("is_rte_content") == 1) || obj.getStringValue(
+        "cssname").endsWith("-content.css") || obj.getStringValue("cssname").endsWith(
+            "_content.css"))) {
       return true;
     } else {
       return false;
@@ -94,22 +93,22 @@ public class CSSBaseObject extends CSS {
   public Attachment getAttachment() {
     if (isAttachment()) {
       String cssName = getCssBasePath();
-      DocumentReference addDocRef = getWebUtilsService(
-          ).resolveDocumentReference(attURLcmd.getPageFullName(cssName));
+      DocumentReference addDocRef = getWebUtilsService().resolveDocumentReference(
+          attURLcmd.getPageFullName(cssName));
       LOGGER.debug("getAttachment for [" + cssName + "].");
       try {
         XWikiDocument attDoc = context.getWiki().getDocument(addDocRef, context);
-        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(attDoc, 
+        XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(attDoc,
             attURLcmd.getAttachmentName(obj.getStringValue("cssname")));
         return getAttachmentService().getApiAttachment(att);
       } catch (XWikiException xwe) {
         LOGGER.error("Exception getting attachment document.", xwe);
       } catch (AttachmentNotExistsException anee) {
-        LOGGER.warn("Couldn't find CSS [{}] on doc [{}]", obj.getStringValue(
-            "cssname"), addDocRef, anee);
+        LOGGER.warn("Couldn't find CSS [{}] on doc [{}]", obj.getStringValue("cssname"), addDocRef,
+            anee);
       } catch (NoAccessRightsException e) {
-        LOGGER.error("No rights to view CSS [{}] on doc [{}]", obj.getStringValue(
-            "cssname"), addDocRef, e);
+        LOGGER.error("No rights to view CSS [{}] on doc [{}]", obj.getStringValue("cssname"),
+            addDocRef, e);
       }
     }
     return null;
@@ -127,9 +126,9 @@ public class CSSBaseObject extends CSS {
   @Override
   public String getCssBasePath() {
     String str = "";
-    if(obj != null) {
+    if (obj != null) {
       str = obj.getStringValue("cssname");
-      if((str != null) && !"".equals(str) && !str.contains(":") && !str.startsWith("/")) {
+      if ((str != null) && !"".equals(str) && !str.contains(":") && !str.startsWith("/")) {
         str = obj.getDocumentReference().getWikiReference().getName() + ":" + str;
       }
     }

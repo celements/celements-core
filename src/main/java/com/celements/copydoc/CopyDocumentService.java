@@ -39,8 +39,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean check(XWikiDocument doc1, XWikiDocument doc2,
-      Collection<BaseObject> toIgnore) {
+  public boolean check(XWikiDocument doc1, XWikiDocument doc2, Collection<BaseObject> toIgnore) {
     try {
       return copyInternal(doc1, doc2, toIgnore, false);
     } catch (ClassDocumentLoadException exc) {
@@ -50,14 +49,14 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc
-      ) throws ClassDocumentLoadException, DocumentSaveException {
+  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc)
+      throws ClassDocumentLoadException, DocumentSaveException {
     return copyAndSave(srcDoc, trgDoc, null);
   }
 
   @Override
-  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc,
-      Set<BaseObject> toIgnore) throws ClassDocumentLoadException, DocumentSaveException {
+  public boolean copyAndSave(XWikiDocument srcDoc, XWikiDocument trgDoc, Set<BaseObject> toIgnore)
+      throws ClassDocumentLoadException, DocumentSaveException {
     boolean hasChanged = copy(srcDoc, trgDoc, toIgnore);
     if (hasChanged) {
       modelAccess.saveDocument(trgDoc, "copy from " + srcDoc);
@@ -66,14 +65,14 @@ public class CopyDocumentService implements ICopyDocumentRole {
   }
 
   @Override
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc
-      ) throws ClassDocumentLoadException {
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc)
+      throws ClassDocumentLoadException {
     return copy(srcDoc, trgDoc, null);
   }
 
   @Override
-  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc,
-      Collection<BaseObject> toIgnore) throws ClassDocumentLoadException {
+  public boolean copy(XWikiDocument srcDoc, XWikiDocument trgDoc, Collection<BaseObject> toIgnore)
+      throws ClassDocumentLoadException {
     return copyInternal(srcDoc, trgDoc, toIgnore, true);
   }
 
@@ -82,7 +81,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
     hasChanged |= copyObjects(srcDoc, trgDoc, toIgnore, set);
-    LOGGER.info("for source '" + srcDoc + "', target '" + trgDoc  + "', set '" + set 
+    LOGGER.info("for source '" + srcDoc + "', target '" + trgDoc + "', set '" + set
         + "' has changed: " + hasChanged);
     return hasChanged;
   }
@@ -96,8 +95,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setLanguage(srcLang);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' language changed from '" + trgLang 
-          + "' to '" + srcLang + "'");
+      LOGGER.trace("for doc '" + trgDoc + "' language changed from '" + trgLang + "' to '" + srcLang
+          + "'");
     }
     int srcTransl = srcDoc.getTranslation();
     int trgTransl = trgDoc.getTranslation();
@@ -106,8 +105,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setTranslation(srcTransl);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' translation changed from '" + trgTransl
-          + "' to '" + srcTransl + "'");
+      LOGGER.trace("for doc '" + trgDoc + "' translation changed from '" + trgTransl + "' to '"
+          + srcTransl + "'");
     }
     String srcTitle = srcDoc.getTitle();
     String trgTitle = trgDoc.getTitle();
@@ -116,8 +115,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setTitle(srcTitle);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' title changed from '" + trgTitle + "' to '" 
-          + srcTitle + "'");
+      LOGGER.trace("for doc '" + trgDoc + "' title changed from '" + trgTitle + "' to '" + srcTitle
+          + "'");
     }
     String srcContent = srcDoc.getContent();
     String trgContent = trgDoc.getContent();
@@ -126,29 +125,29 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setContent(srcContent);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' content changed from '" + trgContent
-          + "' to '" + srcContent + "'");
+      LOGGER.trace("for doc '" + trgDoc + "' content changed from '" + trgContent + "' to '"
+          + srcContent + "'");
     }
     return hasChanged;
   }
 
-  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc,
-      Collection<BaseObject> toIgnore, boolean set) throws ClassDocumentLoadException {
+  boolean copyObjects(XWikiDocument srcDoc, XWikiDocument trgDoc, Collection<BaseObject> toIgnore,
+      boolean set) throws ClassDocumentLoadException {
     boolean hasChanged = false;
     for (DocumentReference classRef : getAllClassRefs(srcDoc, trgDoc)) {
       List<BaseObject> srcObjs = getXObjects(srcDoc, classRef, toIgnore);
       List<BaseObject> trgObjs = getXObjects(trgDoc, classRef, toIgnore);
       hasChanged |= createOrUpdateObjects(trgDoc, srcObjs, trgObjs, set);
-      hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs))
-          || (!set && !trgObjs.isEmpty());
+      hasChanged |= (set && modelAccess.removeXObjects(trgDoc, trgObjs)) || (!set
+          && !trgObjs.isEmpty());
     }
     return hasChanged;
   }
 
   Set<DocumentReference> getAllClassRefs(XWikiDocument srcDoc, XWikiDocument trgDoc) {
     Set<DocumentReference> ret = new HashSet<>();
-    for (DocumentReference classRef : Iterables.concat(modelAccess.getXObjects(srcDoc
-        ).keySet(), modelAccess.getXObjects(trgDoc).keySet())) {
+    for (DocumentReference classRef : Iterables.concat(modelAccess.getXObjects(srcDoc).keySet(),
+        modelAccess.getXObjects(trgDoc).keySet())) {
       ret.add(webUtilsService.checkWikiRef(classRef, trgDoc));
     }
     return ret;
@@ -208,7 +207,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
           modelAccess.setProperty(trgObj, name, srcVal);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name 
+        LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name
             + "' changed from '" + trgVal + "' to '" + srcVal + "'");
       }
       trgProps.remove(name);
@@ -216,7 +215,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
     for (String name : trgProps) {
       trgObj.removeField(name);
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name 
+      LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name
           + "' set to null");
     }
     return hasChanged;

@@ -9,8 +9,7 @@ public interface ISchedulerClassConfig {
 
   public static final String XWIKI_SPACE = "XWiki";
   public static final String CLASS_SCHEDULER_JOB_NAME = "SchedulerJobClass";
-  public static final String CLASS_SCHEDULER_JOB = XWIKI_SPACE + "."
-      + CLASS_SCHEDULER_JOB_NAME;
+  public static final String CLASS_SCHEDULER_JOB = XWIKI_SPACE + "." + CLASS_SCHEDULER_JOB_NAME;
 
   public static final String PROP_JOB_NAME = "jobName";
   public static final String PROP_JOB_DESCRIPTION = "jobDescription";

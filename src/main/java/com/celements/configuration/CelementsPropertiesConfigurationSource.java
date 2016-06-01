@@ -35,9 +35,9 @@ import org.xwiki.configuration.internal.CommonsConfigurationSource;
 import org.xwiki.container.Container;
 
 @Component("celementsproperties")
-public class CelementsPropertiesConfigurationSource extends CommonsConfigurationSource
-    implements Initializable {
-  
+public class CelementsPropertiesConfigurationSource extends CommonsConfigurationSource implements
+    Initializable {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(
       CelementsPropertiesConfigurationSource.class);
 
@@ -50,12 +50,10 @@ public class CelementsPropertiesConfigurationSource extends CommonsConfiguration
   public void initialize() throws InitializationException {
     URL propertiesURL;
     try {
-      propertiesURL = container.getApplicationContext().getResource(
-          CELEMENTS_PROPERTIES_FILE);
+      propertiesURL = container.getApplicationContext().getResource(CELEMENTS_PROPERTIES_FILE);
       setConfiguration(new PropertiesConfiguration(propertiesURL));
     } catch (ConfigurationException | MalformedURLException exc) {
-      LOGGER.warn("Failed to load configuration file '{}'", CELEMENTS_PROPERTIES_FILE,
-          exc);
+      LOGGER.warn("Failed to load configuration file '{}'", CELEMENTS_PROPERTIES_FILE, exc);
       setConfiguration(new BaseConfiguration());
     }
   }

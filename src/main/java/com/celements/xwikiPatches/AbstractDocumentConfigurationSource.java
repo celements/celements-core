@@ -31,38 +31,42 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
- * Common features for all Document sources (ie configuration data coming from
- * wiki pages).
+ * Common features for all Document sources (ie configuration data coming from wiki
+ * pages).
  * 
  * @version $Id$
  * @since 2.0M2
  */
-public abstract class AbstractDocumentConfigurationSource
-      extends AbstractConfigurationSource {
+public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource {
+
   /**
    * @see #getDocumentAccessBridge()
    */
   @Requirement
   private DocumentAccessBridge documentAccessBridge;
 
-  /** @see #getCurrentWikiReference() */
+  /**
+   * @see #getCurrentWikiReference()
+   */
   @Requirement
   private ModelContext modelContext;
 
-  /** @see #getCurrentWikiReference() */
+  /**
+   * @see #getCurrentWikiReference()
+   */
   @Requirement
   private ModelConfiguration modelConfig;
 
   /**
-   * @return the document reference of the document containing an XWiki Object
-   *         with configuration data or null if there no such document in which
-   *         case this configuration source will be skipped
+   * @return the document reference of the document containing an XWiki Object with
+   *         configuration data or null if there no such document in which case this
+   *         configuration source will be skipped
    */
   protected abstract DocumentReference getDocumentReference();
 
   /**
-   * @return the XWiki Class reference of the XWiki Object containing the
-   *         configuration properties
+   * @return the XWiki Class reference of the XWiki Object containing the configuration
+   *         properties
    */
   protected abstract DocumentReference getClassReference();
 
@@ -78,8 +82,8 @@ public abstract class AbstractDocumentConfigurationSource
    */
   protected WikiReference getCurrentWikiReference() {
     if (this.modelContext.getCurrentEntityReference() != null) {
-      return (WikiReference) this.modelContext.getCurrentEntityReference(
-          ).extractReference(EntityType.WIKI);
+      return (WikiReference) this.modelContext.getCurrentEntityReference().extractReference(
+          EntityType.WIKI);
     }
 
     return new WikiReference(this.modelConfig.getDefaultReferenceValue(EntityType.WIKI));
@@ -141,8 +145,7 @@ public abstract class AbstractDocumentConfigurationSource
     DocumentReference documentReference = getFailsafeDocumentReference();
     DocumentReference classReference = getFailsafeClassReference();
     if (documentReference != null && classReference != null) {
-      result = getDocumentAccessBridge().getProperty(documentReference, classReference,
-          key);
+      result = getDocumentAccessBridge().getProperty(documentReference, classReference, key);
     } else {
       result = null;
     }

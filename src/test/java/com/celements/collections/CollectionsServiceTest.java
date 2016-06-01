@@ -16,8 +16,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
+
   private CollectionsService collectionsService;
-  
+
   @Before
   public void setUp_CollectionsServiceTest() throws Exception {
     collectionsService = (CollectionsService) Utils.getComponent(ICollectionsService.class);
@@ -25,41 +26,39 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetObjectsOrdered_docNull() {
-    List<BaseObject> list = collectionsService.getObjectsOrdered(null, getBOClassRef(), "", 
-        false);
+    List<BaseObject> list = collectionsService.getObjectsOrdered(null, getBOClassRef(), "", false);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
-  
+
   @Test
   public void testGetObjectsOrdered_noObjects() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "S", "D"));
-    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1",
-        true, "s2", false);
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+        "D"));
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1", true,
+        "s2", false);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
-  
+
   @Test
   public void testGetObjectsOrdered_oneObject() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "S", "D"));
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+        "D"));
     doc.addXObject(getSortTestBaseObjects().get(0));
-    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1",
-        true, "s2", true);
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1", true,
+        "s2", true);
     assertEquals(1, list.size());
   }
 
   @Test
   public void testGetObjectsOrdered_onlyOneFieldSort() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "S", "D"));
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+        "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
-    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1",
-        true);
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1", true);
     assertEquals(5, list.size());
     assertEquals("a", list.get(0).getStringValue("s1"));
     assertEquals("b", list.get(1).getStringValue("s1"));
@@ -69,16 +68,16 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals("c", list.get(3).getStringValue("s1"));
     assertEquals("d", list.get(4).getStringValue("s1"));
   }
-  
+
   @Test
   public void testGetObjectsOrdered_severalObjects_asc() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "S", "D"));
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+        "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
-    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(),  "s1",
-        true, "d", true);
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "s1", true,
+        "d", true);
     assertEquals(5, list.size());
     assertEquals("a", list.get(0).getStringValue("s1"));
     assertEquals("b", list.get(1).getStringValue("s1"));
@@ -88,16 +87,16 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals("c", list.get(3).getStringValue("s1"));
     assertEquals("d", list.get(4).getStringValue("s1"));
   }
-  
+
   @Test
   public void testGetObjectsOrdered_severalObjects_desc() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "S", "D"));
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+        "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
-    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "i",
-        false, "l", false);
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "i", false,
+        "l", false);
     assertEquals(5, list.size());
     assertEquals(3, list.get(0).getIntValue("i"));
     assertEquals(2, list.get(1).getIntValue("i"));
@@ -108,16 +107,16 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(1, list.get(3).getIntValue("l"));
     assertEquals(1, list.get(4).getIntValue("i"));
   }
-  
+
   @Test
   public void testGetObjectsOrdered_severalObjects_unset_fields() {
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext(
-        ).getDatabase(), "S", "D"));
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "S",
+        "D"));
     for (BaseObject obj : getSortTestBaseObjects()) {
       doc.addXObject(obj);
     }
-    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), 
-        "dnull", true, "s1", true);
+    List<BaseObject> list = collectionsService.getObjectsOrdered(doc, getBOClassRef(), "dnull",
+        true, "s1", true);
     assertEquals(5, list.size());
     assertNull(list.get(0).getDateValue("dnull"));
     assertEquals("a", list.get(0).getStringValue("s1"));
@@ -127,11 +126,11 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(200l, list.get(3).getDateValue("dnull").getTime());
     assertEquals(400l, list.get(4).getDateValue("dnull").getTime());
   }
-  
+
   private DocumentReference getBOClassRef() {
     return new DocumentReference(getContext().getDatabase(), "Classes", "TestClass");
   }
-  
+
   private List<BaseObject> getSortTestBaseObjects() {
     List<BaseObject> objs = new ArrayList<BaseObject>();
     BaseObject obj = new BaseObject();

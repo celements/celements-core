@@ -25,13 +25,15 @@ import org.apache.commons.logging.LogFactory;
 import com.celements.pagetype.IPageType;
 import com.celements.pagetype.PageType;
 import com.celements.pagetype.PageTypeApi;
+import com.celements.pagetype.xobject.XObjectPageTypeProvider;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * @deprecated since 2.21.0 instead use com.celements.pagetype.service.PageTypeResolverService
+ * @deprecated since 2.21.0 instead use
+ *             com.celements.pagetype.service.PageTypeResolverService
  */
 @Deprecated
 public class PageTypeCommand {
@@ -51,22 +53,20 @@ public class PageTypeCommand {
    */
   @Deprecated
   public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
-       + PAGE_TYPE_CLASS_DOC;
+      + PAGE_TYPE_CLASS_DOC;
 
-  
   private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeCommand.class);
-  
+
   public static IPageType getApiInstance(XWikiContext context) throws XWikiException {
     Object obj = context.get("pageTypeApi");
     if ((obj == null) || !(obj instanceof IPageType)) {
       context.put("pageTypeApi", new PageTypeApi(context.getDoc().getFullName(), context));
     }
-    return ((IPageType)context.get("pageTypeApi"));
+    return ((IPageType) context.get("pageTypeApi"));
   }
-  
+
   /**
    * @return new PageTypeCommand instance
-   * 
    * @deprecated instead please use new PageTypeCommand()
    */
   @Deprecated
@@ -74,19 +74,19 @@ public class PageTypeCommand {
     return new PageTypeCommand();
   }
 
-  public BaseObject getPageTypeObject(XWikiDocument doc, XWikiContext context){
-    if((doc != null) && doc.isNew()) {
+  public BaseObject getPageTypeObject(XWikiDocument doc, XWikiContext context) {
+    if ((doc != null) && doc.isNew()) {
       doc = getTemplateDoc(doc, context);
     }
-    if ((doc != null) && (doc.getObjects(PAGE_TYPE_CLASSNAME) != null)
-        && (doc.getObjects(PAGE_TYPE_CLASSNAME).size() > 0)) {
+    if ((doc != null) && (doc.getObjects(PAGE_TYPE_CLASSNAME) != null) && (doc.getObjects(
+        PAGE_TYPE_CLASSNAME).size() > 0)) {
       return doc.getObject(PAGE_TYPE_CLASSNAME);
     }
     return null;
   }
 
-  public String getPageType(XWikiDocument doc, XWikiContext context){
-    //TODO get default PageType from WebPreferences
+  public String getPageType(XWikiDocument doc, XWikiContext context) {
+    // TODO get default PageType from WebPreferences
     return getPageTypeWithDefault(doc, "RichText", context);
   }
 
@@ -95,7 +95,7 @@ public class PageTypeCommand {
     String pageType = "";
     if (doc != null) {
       BaseObject pageTypeObj = getPageTypeObject(doc, context);
-      if(pageTypeObj != null) {
+      if (pageTypeObj != null) {
         pageType = pageTypeObj.getStringValue("page_type");
       }
     }
@@ -108,8 +108,8 @@ public class PageTypeCommand {
   XWikiDocument getTemplateDoc(XWikiDocument doc, XWikiContext context) {
     if (context.getRequest() != null) {
       String templName = context.getRequest().get("template");
-      if((templName != null) && !"".equals(templName.trim())
-          && context.getWiki().exists(templName, context)) {
+      if ((templName != null) && !"".equals(templName.trim()) && context.getWiki().exists(templName,
+          context)) {
         try {
           doc = context.getWiki().getDocument(templName, context);
         } catch (XWikiException e) {
@@ -128,7 +128,7 @@ public class PageTypeCommand {
     if (pageTypeName.indexOf('.') > 0) {
       return pageTypeName;
     } else {
-      return "PageTypes." + pageTypeName;
+      return XObjectPageTypeProvider.DEFAULT_PAGE_TYPES_SPACE + "." + pageTypeName;
     }
   }
 
@@ -136,8 +136,8 @@ public class PageTypeCommand {
     return new PageType(getPageTypeDocFN(currentDoc, context));
   }
 
-  public PageType getPageTypeWithDefaultObj(XWikiDocument currentDoc,
-      String defaultPageType, XWikiContext context) {
+  public PageType getPageTypeWithDefaultObj(XWikiDocument currentDoc, String defaultPageType,
+      XWikiContext context) {
     String pageTypeDocName = getPageTypeWithDefault(currentDoc, defaultPageType, context);
     if ((pageTypeDocName != null) && !"".equals(pageTypeDocName)) {
       return new PageType(completePageTypeDocName(pageTypeDocName));
@@ -150,13 +150,12 @@ public class PageTypeCommand {
   }
 
   public String getPrettyName(XWikiDocument doc, XWikiContext context) {
-    return getPageTypeObj(doc, context).getPageTypeProperties(context).getStringValue(
-        "type_name");
+    return getPageTypeObj(doc, context).getPageTypeProperties(context).getStringValue("type_name");
   }
 
   public boolean isVisible(XWikiDocument doc, XWikiContext context) {
-    return getPageTypeObj(doc, context).getPageTypeProperties(context).getIntValue(
-        "visible", 0) > 0;
+    return getPageTypeObj(doc, context).getPageTypeProperties(context).getIntValue("visible",
+        0) > 0;
   }
 
 }

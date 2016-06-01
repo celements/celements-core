@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class WebFormService implements IWebFormServiceRole {
-  
+
   final String PARAM_XPAGE = "xpage";
   final String PARAM_CONF = "conf";
   final String PARAM_AJAX_MODE = "ajax_mode";
@@ -16,17 +16,15 @@ public class WebFormService implements IWebFormServiceRole {
   final String PARAM_XREDIRECT = "xredirect";
 
   @Override
-  public boolean isFormFilled(Map<String, String[]> parameterMap,
-      Set<String> additionalFields) {
+  public boolean isFormFilled(Map<String, String[]> parameterMap, Set<String> additionalFields) {
     boolean isFilled = false;
-    if(parameterMap.size() > getIsFilledModifier(parameterMap, additionalFields)) {
+    if (parameterMap.size() > getIsFilledModifier(parameterMap, additionalFields)) {
       isFilled = true;
     }
     return isFilled;
   }
-  
-  short getIsFilledModifier(Map<String, String[]> parameterMap, 
-      Set<String> additionalFields) {
+
+  short getIsFilledModifier(Map<String, String[]> parameterMap, Set<String> additionalFields) {
     List<String> standardParams = new ArrayList<String>();
     standardParams.add(PARAM_XPAGE);
     standardParams.add(PARAM_CONF);
@@ -35,36 +33,36 @@ public class WebFormService implements IWebFormServiceRole {
     standardParams.add(PARAM_LANGUAGE);
     standardParams.add(PARAM_XREDIRECT);
     short modifier = 0;
-    if(parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_CONF) && 
-        arrayContains(parameterMap.get(PARAM_XPAGE), "overlay")) {
+    if (parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_CONF)
+        && arrayContains(parameterMap.get(PARAM_XPAGE), "overlay")) {
       modifier += 1;
     }
-    if(parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_AJAX_MODE) && 
-        arrayContains(parameterMap.get(PARAM_XPAGE), "celements_ajax")) {
+    if (parameterMap.containsKey(PARAM_XPAGE) && parameterMap.containsKey(PARAM_AJAX_MODE)
+        && arrayContains(parameterMap.get(PARAM_XPAGE), "celements_ajax")) {
       modifier += 1;
-      if(parameterMap.containsKey(PARAM_SKIN)) {
+      if (parameterMap.containsKey(PARAM_SKIN)) {
         modifier += 1;
       }
     }
-    if(parameterMap.containsKey(PARAM_XPAGE)) {
+    if (parameterMap.containsKey(PARAM_XPAGE)) {
       modifier += 1;
     }
-    if(parameterMap.containsKey(PARAM_XREDIRECT)) {
+    if (parameterMap.containsKey(PARAM_XREDIRECT)) {
       modifier += 1;
     }
-    if(parameterMap.containsKey(PARAM_LANGUAGE)) {
+    if (parameterMap.containsKey(PARAM_LANGUAGE)) {
       modifier += 1;
     }
-    if((additionalFields != null) && additionalFields.size() > 0) {
+    if ((additionalFields != null) && additionalFields.size() > 0) {
       for (String param : additionalFields) {
-        if(!standardParams.contains(param) && parameterMap.containsKey(param)) {
+        if (!standardParams.contains(param) && parameterMap.containsKey(param)) {
           modifier += 1;
         }
       }
     }
     return modifier;
   }
-  
+
   private boolean arrayContains(String[] array, String value) {
     Arrays.sort(array);
     return (Arrays.binarySearch(array, value) >= 0);

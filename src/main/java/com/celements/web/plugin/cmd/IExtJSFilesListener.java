@@ -24,7 +24,6 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface IExtJSFilesListener {
 
-  public void beforeAllExtFinish(
-      ExternalJavaScriptFilesCommand externalJavaScriptFilesCommand);
+  public void beforeAllExtFinish(ExternalJavaScriptFilesCommand externalJavaScriptFilesCommand);
 
 }

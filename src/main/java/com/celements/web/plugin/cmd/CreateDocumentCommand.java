@@ -35,10 +35,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * 
  * @deprecated instead use {@link IModelAccessFacade#createDocument(DocumentReference)}
- * and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
- *
+ *             and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
  */
 @Deprecated
 public class CreateDocumentCommand {
@@ -46,10 +44,9 @@ public class CreateDocumentCommand {
   private static Logger LOGGER = LoggerFactory.getLogger(CreateDocumentCommand.class);
 
   /**
-   * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)}
-   * and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
-   * 
-   * createDocument creates a new document if it does not exist
+   * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)} and
+   *             {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
+   *             createDocument creates a new document if it does not exist
    * @param docRef
    * @param pageType
    * @return
@@ -65,23 +62,22 @@ public class CreateDocumentCommand {
   }
 
   /**
-   * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)}
-   * and {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)}
-   * <br>
-   * createDocument creates a new document if it does not exist
+   * @deprecated use {@link IModelAccessFacade#createDocument(DocumentReference)} and
+   *             {@link IPageTypeRole#setPageType(XWikiDocument, PageTypeReference)} <br>
+   *             createDocument creates a new document if it does not exist
    * @param docRef
    * @param pageType
    * @param withSave
    * @return
-   * @throws XWikiException 
+   * @throws XWikiException
    */
   @Deprecated
-  public XWikiDocument createDocument(DocumentReference docRef, String pageType, 
-      boolean withSave) throws XWikiException {
+  public XWikiDocument createDocument(DocumentReference docRef, String pageType, boolean withSave)
+      throws XWikiException {
     try {
       XWikiDocument doc = getModelAccess().createDocument(docRef);
-      PageTypeReference ptRef = getPageTypeService().getPageTypeRefByConfigName(
-          Strings.nullToEmpty(pageType));
+      PageTypeReference ptRef = getPageTypeService().getPageTypeRefByConfigName(Strings.nullToEmpty(
+          pageType));
       String pageTypeStr = "";
       if (ptRef != null) {
         getPageTypeService().setPageType(doc, ptRef);
@@ -109,5 +105,5 @@ public class CreateDocumentCommand {
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
   }
-  
+
 }

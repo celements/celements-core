@@ -24,9 +24,8 @@ import org.junit.Test;
 
 import com.celements.sajson.Parser;
 
-
 public class ERequestLiteralTest {
-  
+
   private Parser cmReqParser;
 
   @Before
@@ -38,15 +37,15 @@ public class ERequestLiteralTest {
   @Test
   public void testContextMenuJSON() throws Exception {
     String cmTestRequest = "[{\"cmClassName\": \"cel_cm_agenda\","
-      + " \"elemIds\": [\"Agenda.Event1\"]},"
-      + " {\"cmClassName\": \"cel_cm_navigation_menuitem\","
-      + " \"elemIds\": [\"N1:Content.aktuelles\", \"N1:Content.NewsBox\","
-      + " \"N1:Content.aktuellesBlog\", \"N1:Content.AgendaTest2\","
-      + " \"N1:Content.Kontakt\", \"N1:Content.Suche\","
-      + " \"N1:Content.mitglieder\", \"N1:Content.organisation\","
-      + " \"N1:Content.clinicalaffairs\", \"N1:Content.weiterbildung\","
-      + " \"N1:Content.publikum\", \"N1:Content.professionals\","
-      + " \"N1:Content.rheumaschweiz\", \"N1:Content.links\"]}]";
+        + " \"elemIds\": [\"Agenda.Event1\"]},"
+        + " {\"cmClassName\": \"cel_cm_navigation_menuitem\","
+        + " \"elemIds\": [\"N1:Content.aktuelles\", \"N1:Content.NewsBox\","
+        + " \"N1:Content.aktuellesBlog\", \"N1:Content.AgendaTest2\","
+        + " \"N1:Content.Kontakt\", \"N1:Content.Suche\","
+        + " \"N1:Content.mitglieder\", \"N1:Content.organisation\","
+        + " \"N1:Content.clinicalaffairs\", \"N1:Content.weiterbildung\","
+        + " \"N1:Content.publikum\", \"N1:Content.professionals\","
+        + " \"N1:Content.rheumaschweiz\", \"N1:Content.links\"]}]";
     cmReqParser.parse(cmTestRequest);
   }
 }

@@ -40,13 +40,11 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Extend CelementsClassCollection and make the implementor a named component.
- * Celements then will call your initClasses method on system start once or if it
- * is explicitly asked for.
+ * Extend CelementsClassCollection and make the implementor a named component. Celements
+ * then will call your initClasses method on system start once or if it is explicitly
+ * asked for.
  * 
- * @author fabian pichler
- * 
- * since 2.18.0
+ * @author fabian pichler since 2.18.0
  */
 public abstract class AbstractClassCollection implements IClassCollectionRole {
 
@@ -73,8 +71,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   @Override
   public boolean isActivated() {
     return ("," + getContext().getWiki().getXWikiPreference("activated_classcollections",
-        getContext()) + "," + getContext().getWiki().Param("celements.classcollections",
-            "") + ",").contains("," + getConfigName() + ",");
+        getContext()) + "," + getContext().getWiki().Param("celements.classcollections", "")
+        + ",").contains("," + getConfigName() + ",");
   }
 
   protected XWikiDocument getClassDoc(DocumentReference classRef) {
@@ -87,8 +85,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     }
   }
 
-  protected void setContentAndSaveClassDocument(XWikiDocument doc, boolean needsUpdate
-      ) throws XWikiException {
+  protected void setContentAndSaveClassDocument(XWikiDocument doc, boolean needsUpdate)
+      throws XWikiException {
     if (Strings.nullToEmpty(doc.getContent()).isEmpty()) {
       needsUpdate = true;
       doc.setContent(" ");
@@ -107,8 +105,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   abstract protected Log getLogger();
 
-  protected final boolean addBooleanField(BaseClass bclass, String name,
-      String prettyName, String displayType, int defaultValue) {
+  protected final boolean addBooleanField(BaseClass bclass, String name, String prettyName,
+      String displayType, int defaultValue) {
     if (bclass.get(name) == null) {
       BooleanClass element = new BooleanClass();
       element.setName(name);
@@ -122,8 +120,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addTextField(BaseClass bclass, String name, String prettyName,
-      int size, String validationRegExp, String validationMessage) {
+  protected final boolean addTextField(BaseClass bclass, String name, String prettyName, int size,
+      String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       StringClass element = new StringClass();
       element.setName(name);
@@ -138,9 +136,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addTextAreaField(BaseClass bclass, String name,
-      String prettyName, int cols, int rows, String validationRegExp,
-      String validationMessage) {
+  protected final boolean addTextAreaField(BaseClass bclass, String name, String prettyName,
+      int cols, int rows, String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       TextAreaClass element = new TextAreaClass();
       element.setName(name);
@@ -156,9 +153,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addNumberField(BaseClass bclass, String name,
-      String prettyName, int size, String ntype, String validationRegExp,
-      String validationMessage) {
+  protected final boolean addNumberField(BaseClass bclass, String name, String prettyName, int size,
+      String ntype, String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       NumberClass element = new NumberClass();
       element.setName(name);
@@ -194,9 +190,9 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addDBListField(BaseClass bclass, String name,
-      String prettyName, int size, boolean multiSelect, boolean useSuggest, String sql,
-      String validationRegExp, String validationMessage) {
+  protected final boolean addDBListField(BaseClass bclass, String name, String prettyName, int size,
+      boolean multiSelect, boolean useSuggest, String sql, String validationRegExp,
+      String validationMessage) {
     if (bclass.get(name) == null) {
       DBListClass element = new DBListClass();
       element.setName(name);

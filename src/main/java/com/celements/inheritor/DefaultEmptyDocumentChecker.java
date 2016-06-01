@@ -24,21 +24,21 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DefaultEmptyDocumentChecker implements IEmptyDocumentChecker {
 
   public boolean isEmpty(XWikiDocument doc) {
-    if (doc != null){
+    if (doc != null) {
       return (isEmptyContent(doc) && isEmptyTitle(doc));
     }
     return true;
   }
 
   public boolean isEmptyContent(XWikiDocument doc) {
-    if (doc != null){
+    if (doc != null) {
       return doc.getContent().equals("");
     }
     return true;
   }
 
   public boolean isEmptyTitle(XWikiDocument doc) {
-    if (doc != null){
+    if (doc != null) {
       return doc.getTitle().equals("");
     }
     return true;

@@ -33,8 +33,7 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      ClassesCompositorComponent.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassesCompositorComponent.class);
 
   @Requirement
   private Map<String, IClassCollectionRole> classCollectionMap;
@@ -51,12 +50,10 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public void checkAllClassCollections() {
-    LOGGER.info("start checkAllClassCollections for wiki '{}'", getContext(
-        ).getDatabase());
+    LOGGER.info("start checkAllClassCollections for wiki '{}'", getContext().getDatabase());
     checkClassCollections();
     checkOldClassCollections();
-    LOGGER.debug("finish checkAllClassCollections for wiki '{}'", getContext(
-        ).getDatabase());
+    LOGGER.debug("finish checkAllClassCollections for wiki '{}'", getContext().getDatabase());
   }
 
   @Deprecated
@@ -65,8 +62,8 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
       try {
         classCollection.runUpdate(getContext());
       } catch (XWikiException xwe) {
-        LOGGER.error("Exception checking class collection '{}'", 
-            classCollection.getConfigName(), xwe);
+        LOGGER.error("Exception checking class collection '{}'", classCollection.getConfigName(),
+            xwe);
       }
     }
   }
@@ -76,8 +73,8 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
       try {
         classCollection.runUpdate();
       } catch (XWikiException xwe) {
-        LOGGER.error("Exception checking class collection '{}'",
-            classCollection.getConfigName(), xwe);
+        LOGGER.error("Exception checking class collection '{}'", classCollection.getConfigName(),
+            xwe);
       }
     }
   }

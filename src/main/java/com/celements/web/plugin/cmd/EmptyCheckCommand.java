@@ -46,11 +46,11 @@ public class EmptyCheckCommand {
    **/
   @Deprecated
   public boolean isEmptyRTEDocument(String fullname, XWikiContext context) {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(),
-        fullname.split("\\.")[0], fullname.split("\\.")[1]);
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), fullname.split(
+        "\\.")[0], fullname.split("\\.")[1]);
     return isEmptyRTEDocument(docRef);
   }
-  
+
   /**
    * @deprecated since 2.29.0 use instead IEmptyCheckRole component
    **/
@@ -58,7 +58,7 @@ public class EmptyCheckCommand {
   public boolean isEmptyRTEDocument(DocumentReference docRef) {
     return getEmptyCheckService().isEmptyRTEDocument(docRef);
   }
-  
+
   /**
    * @deprecated since 2.29.0 use instead IEmptyCheckRole component
    **/
@@ -66,16 +66,15 @@ public class EmptyCheckCommand {
   public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
     return getDefaultEmptyDocStrategy().isEmptyRTEDocumentTranslated(docRef);
   }
-  
+
   /**
    * @deprecated since 2.29.0 use instead IEmptyCheckRole component
    **/
   @Deprecated
-  public boolean isEmptyRTEDocumentDefault(DocumentReference docRef,
-      XWikiContext context) {
+  public boolean isEmptyRTEDocumentDefault(DocumentReference docRef, XWikiContext context) {
     return getDefaultEmptyDocStrategy().isEmptyRTEDocumentDefault(docRef);
   }
-  
+
   /**
    * @deprecated since 2.29.0 use instead IEmptyCheckRole component
    **/

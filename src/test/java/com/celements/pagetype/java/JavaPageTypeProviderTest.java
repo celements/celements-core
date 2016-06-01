@@ -1,5 +1,6 @@
 package com.celements.pagetype.java;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -10,13 +11,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
+import com.google.common.collect.Sets;
 import com.xpn.xwiki.web.Utils;
 
-public class JavaPageTypeProviderTest extends AbstractBridgedComponentTestCase {
+public class JavaPageTypeProviderTest extends AbstractComponentTest {
 
   private static final String _TEST_PAGE_TYPE = "TestPageType";
   private JavaPageTypeProvider ptProvider;
@@ -25,14 +27,14 @@ public class JavaPageTypeProviderTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_JavaPageTypeProviderTest() throws Exception {
-    ptProvider = (JavaPageTypeProvider) Utils.getComponent(
-        IPageTypeProviderRole.class, JavaPageTypeProvider.PROVIDER_HINT);
+    ptProvider = (JavaPageTypeProvider) Utils.getComponent(IPageTypeProviderRole.class,
+        JavaPageTypeProvider.PROVIDER_HINT);
     testPageType = createMockAndAddToDefault(IJavaPageTypeRole.class);
     ptProvider.javaPageTypesMap.put(_TEST_PAGE_TYPE, testPageType);
-    pageTypeRef = new PageTypeReference(_TEST_PAGE_TYPE,
-        JavaPageTypeProvider.PROVIDER_HINT, Arrays.asList(""));
+    pageTypeRef = new PageTypeReference(_TEST_PAGE_TYPE, JavaPageTypeProvider.PROVIDER_HINT,
+        Arrays.asList(""));
     expect(testPageType.getName()).andReturn(_TEST_PAGE_TYPE).anyTimes();
-    expect(testPageType.getCategories()).andReturn(Arrays.asList("", "pageType")).anyTimes();
+    expect(testPageType.getCategoryNames()).andReturn(Sets.newHashSet("", "pageType")).anyTimes();
   }
 
   @After

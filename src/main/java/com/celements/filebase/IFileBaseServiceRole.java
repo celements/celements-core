@@ -16,10 +16,10 @@ public interface IFileBaseServiceRole {
 
   public boolean existsFileNameEqual(String filename) throws FileBaseLoadException;
 
-  public XWikiAttachment getFileNameEqual(String filename
-      ) throws FileNotExistsException, FileBaseLoadException;
+  public XWikiAttachment getFileNameEqual(String filename) throws FileNotExistsException,
+      FileBaseLoadException;
 
-  public List<XWikiAttachment> getFilesNameMatch(IAttachmentMatcher attMatcher
-      ) throws FileBaseLoadException;
+  public List<XWikiAttachment> getFilesNameMatch(IAttachmentMatcher attMatcher)
+      throws FileBaseLoadException;
 
 }

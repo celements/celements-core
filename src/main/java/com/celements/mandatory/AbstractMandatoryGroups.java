@@ -43,7 +43,7 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
   }
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   protected abstract String commitName();
@@ -57,8 +57,7 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
       XWikiDocument editorGroupDoc = new CreateDocumentCommand().createDocument(groupRef,
           "UserGroup");
       if (editorGroupDoc != null) {
-        editorGroupDoc.newXObject(getGroupClassRef(getContext().getDatabase()),
-            getContext());
+        editorGroupDoc.newXObject(getGroupClassRef(getContext().getDatabase()), getContext());
         getContext().getWiki().saveDocument(editorGroupDoc, "autocreate " + commitName()
             + " group.", getContext());
       }

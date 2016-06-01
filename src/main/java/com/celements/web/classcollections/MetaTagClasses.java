@@ -31,13 +31,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.metaTag.classes")
 public class MetaTagClasses extends AbstractClassCollection {
-  
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(MetaTagClasses.class);
 
   public static final String META_TAG_CLASS_SPACE = "Classes";
   public static final String META_TAG_CLASS_DOC = "MetaTagClass";
-  public static final String META_TAG_CLASS = META_TAG_CLASS_SPACE + "."
-        + META_TAG_CLASS_DOC;
+  public static final String META_TAG_CLASS = META_TAG_CLASS_SPACE + "." + META_TAG_CLASS_DOC;
 
   @Override
   protected Log getLogger() {
@@ -52,7 +51,7 @@ public class MetaTagClasses extends AbstractClassCollection {
   protected void initClasses() throws XWikiException {
     getMetaTagClass();
   }
-  
+
   public DocumentReference getMetaTagClassRef(String wikiName) {
     return new DocumentReference(wikiName, META_TAG_CLASS_SPACE, META_TAG_CLASS_DOC);
   }

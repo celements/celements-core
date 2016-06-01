@@ -33,9 +33,8 @@ import org.xwiki.observation.event.Event;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 
-public class XObjectPageTypeDocumentCreatedListenerTest
-    extends AbstractBridgedComponentTestCase {
-  
+public class XObjectPageTypeDocumentCreatedListenerTest extends AbstractBridgedComponentTestCase {
+
   private static final String _COMPONENT_NAME = "XObjectPageTypeDocumentCreatedListener";
   private XObjectPageTypeDocumentCreatedListener eventListener;
 
@@ -56,8 +55,8 @@ public class XObjectPageTypeDocumentCreatedListenerTest
 
   @Test
   public void testGetEvents() {
-    List<String> expectedEventClassList = Arrays.asList(new DocumentCreatedEvent(
-        ).getClass().getName());
+    List<String> expectedEventClassList = Arrays.asList(
+        new DocumentCreatedEvent().getClass().getName());
     replayDefault();
     List<Event> actualEventList = eventListener.getEvents();
     assertEquals(expectedEventClassList.size(), actualEventList.size());

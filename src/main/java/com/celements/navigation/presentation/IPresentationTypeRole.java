@@ -9,9 +9,8 @@ import com.celements.navigation.INavigation;
 @ComponentRole
 public interface IPresentationTypeRole {
 
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
-      INavigation navigation);
+  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation);
 
   public String getDefaultCssClass();
 

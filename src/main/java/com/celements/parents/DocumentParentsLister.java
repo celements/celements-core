@@ -56,8 +56,7 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     return parents;
   }
 
-  public void setPrimaryParents(List<DocumentReference> parents
-      ) throws XDocRecursionException {
+  private void setPrimaryParents(List<DocumentReference> parents) throws XDocRecursionException {
     for (String providerName : getPrimaryProviderNames()) {
       IDocParentProviderRole provider = docParentProviderMap.get(providerName);
       DocumentReference docRef = Iterables.getLast(parents);
@@ -67,8 +66,8 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     }
   }
 
-  public boolean setSecondaryProviderParent(List<DocumentReference> parents
-      ) throws XDocRecursionException {
+  private boolean setSecondaryProviderParent(List<DocumentReference> parents)
+      throws XDocRecursionException {
     DocumentReference docRef = Iterables.getLast(parents);
     List<DocumentReference> nextParents = Collections.emptyList();
     Iterator<String> iter = getSecondaryProviderNames().iterator();
@@ -99,8 +98,8 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     return ret;
   }
 
-  private void setParent(List<DocumentReference> parents, DocumentReference toAdd
-      ) throws XDocRecursionException {
+  private void setParent(List<DocumentReference> parents, DocumentReference toAdd)
+      throws XDocRecursionException {
     if (!parents.contains(toAdd)) {
       parents.add(toAdd);
     } else {

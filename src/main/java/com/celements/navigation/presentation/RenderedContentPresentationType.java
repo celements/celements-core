@@ -16,18 +16,16 @@ public class RenderedContentPresentationType implements IPresentationTypeRole {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       RenderedContentPresentationType.class);
 
-  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS =
-    "cel_cm_presentation_treenode";
+  private static final String _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS = "cel_cm_presentation_treenode";
 
   RenderCommand renderCmd;
 
-  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
-      INavigation nav) {
+  public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
     outStream.append("<div ");
-    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
-        numItem) + " ");
+    outStream.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem)
+        + " ");
     outStream.append(nav.addUniqueElementId(docRef) + ">\n");
     try {
       outStream.append(getRenderCommand().renderCelementsDocument(docRef, "view"));

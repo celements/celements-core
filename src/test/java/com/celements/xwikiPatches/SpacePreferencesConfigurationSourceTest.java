@@ -34,8 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class SpacePreferencesConfigurationSourceTest
-      extends AbstractBridgedComponentTestCase {
+public class SpacePreferencesConfigurationSourceTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private SpacePreferencesConfigurationSource spacePrefConfig;
@@ -60,8 +59,8 @@ public class SpacePreferencesConfigurationSourceTest
         "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefRef);
     BaseObject webPrefObj = new BaseObject();
-    DocumentReference xwikiPrefClassRef = new DocumentReference(context.getDatabase(),
-        "XWiki", "XWikiPreferences");
+    DocumentReference xwikiPrefClassRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
     webPrefObj.setXClassReference(xwikiPrefClassRef);
     webPrefObj.setStringValue("default_language", "en");
     webPrefDoc.addXObject(webPrefObj);

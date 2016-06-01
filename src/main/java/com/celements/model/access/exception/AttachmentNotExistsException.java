@@ -22,14 +22,13 @@ public class AttachmentNotExistsException extends Exception {
     super(attRef != null ? attRef.toString() : "null", cause);
     this.attRef = attRef;
   }
-  
-  public AttachmentNotExistsException(IAttachmentMatcher attMatcher, 
-      DocumentReference docRef) {
+
+  public AttachmentNotExistsException(IAttachmentMatcher attMatcher, DocumentReference docRef) {
     super(attMatcher != null ? attMatcher.toString() : "null");
     this.attMatcher = attMatcher;
     this.docRef = docRef;
   }
-  
+
   public DocumentReference getDocumentReference() {
     if (attRef != null) {
       return attRef.getDocumentReference();
@@ -40,7 +39,7 @@ public class AttachmentNotExistsException extends Exception {
   public AttachmentReference getAttachmentReference() {
     return attRef;
   }
-  
+
   public IAttachmentMatcher getAttachmentMatcher() {
     return attMatcher;
   }

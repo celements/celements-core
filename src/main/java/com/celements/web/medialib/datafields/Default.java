@@ -21,8 +21,8 @@ package com.celements.web.medialib.datafields;
 
 public class Default implements IDataField {
 
-  //TODO wie String behandeln
-  
+  // TODO wie String behandeln
+
   public String getColumnId() throws IllegalStateException {
     // TODO Auto-generated method stub
     return null;
@@ -45,23 +45,22 @@ public class Default implements IDataField {
 
   public void setColumnId() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setColumnPrettyName() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setType() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void setValue() {
     // TODO Auto-generated method stub
-    
-  }
 
+  }
 
 }

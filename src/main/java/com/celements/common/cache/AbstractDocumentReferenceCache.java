@@ -24,8 +24,7 @@ import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public abstract class AbstractDocumentReferenceCache<K> 
-    implements IDocumentReferenceCache<K> {
+public abstract class AbstractDocumentReferenceCache<K> implements IDocumentReferenceCache<K> {
 
   private Map<WikiReference, Map<K, Set<DocumentReference>>> cache = new HashMap<>();
 
@@ -42,8 +41,7 @@ public abstract class AbstractDocumentReferenceCache<K>
   protected Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
@@ -56,14 +54,14 @@ public abstract class AbstractDocumentReferenceCache<K>
   }
 
   @Override
-  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef
-      ) throws CacheLoadingException {
+  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef)
+      throws CacheLoadingException {
     return ImmutableSet.copyOf(Iterables.concat(getCache(wikiRef).values()));
   }
 
   @Override
-  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef, K key
-      ) throws CacheLoadingException {
+  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef, K key)
+      throws CacheLoadingException {
     Set<DocumentReference> ret = getCache(wikiRef).get(key);
     if (ret != null) {
       ret = ImmutableSet.copyOf(ret);
@@ -85,8 +83,8 @@ public abstract class AbstractDocumentReferenceCache<K>
     }
   }
 
-  private synchronized Map<K, Set<DocumentReference>> getCache(WikiReference wikiRef
-      ) throws CacheLoadingException {
+  private synchronized Map<K, Set<DocumentReference>> getCache(WikiReference wikiRef)
+      throws CacheLoadingException {
     if (wikiRef == null) {
       wikiRef = webUtils.getWikiRef();
     }
@@ -100,8 +98,8 @@ public abstract class AbstractDocumentReferenceCache<K>
     return cache.get(wikiRef);
   }
 
-  private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef
-      ) throws QueryException, XWikiException {
+  private Map<K, Set<DocumentReference>> loadCache(WikiReference wikiRef) throws QueryException,
+      XWikiException {
     getLogger().debug("loadCache: start for wiki '{}'", wikiRef);
     Map<K, Set<DocumentReference>> cache = new HashMap<>();
     for (DocumentReference docRef : executeXWQL(wikiRef)) {
@@ -130,14 +128,12 @@ public abstract class AbstractDocumentReferenceCache<K>
   protected abstract DocumentReference getCacheClassRef(WikiReference wikiRef);
 
   /**
-   * 
    * @param docRef
    *          a result element
    * @return the keys for the given result
    * @throws XWikiException
    */
-  protected abstract Collection<K> getKeysForResult(DocumentReference docRef
-      ) throws XWikiException;
+  protected abstract Collection<K> getKeysForResult(DocumentReference docRef) throws XWikiException;
 
   protected abstract Logger getLogger();
 

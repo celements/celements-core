@@ -8,11 +8,9 @@ import org.xwiki.model.reference.WikiReference;
 @ComponentRole
 public interface IRTEConfigClassConfig {
 
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC =
-      "RTEConfigTypePropertiesClass";
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC = "RTEConfigTypePropertiesClass";
   public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = "Classes";
 
-  
   public DocumentReference getRTEConfigTypePropertiesClassRef(EntityReference inRef);
 
   public DocumentReference getRTEConfigTypePropertiesClassRef(WikiReference wikiRef);

@@ -70,8 +70,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testExtractDocFN_NavigationCreateID() {
     Navigation helpNav = new Navigation("N1");
-    helpNav.setNodeSpace(new SpaceReference("MySpace", new WikiReference(
-        context.getDatabase())));
+    helpNav.setNodeSpace(new SpaceReference("MySpace", new WikiReference(context.getDatabase())));
     String menuItemName = "MySpace.MyDoc";
     String navUniqLiId = helpNav.getUniqueId(menuItemName);
     assertEquals("getUniqueId in Navigation returns [" + navUniqLiId + "] which cannot be"
@@ -89,8 +88,8 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testMarkParentDirty() {
-    DocumentReference parentRef = new DocumentReference(context.getDatabase(),
-        "MyStructDoc", "MyParentDoc");
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MyStructDoc",
+        "MyParentDoc");
     restrSaveCmd.markParentDirty(parentRef);
     assertEquals(1, restrSaveCmd.getDirtyParents().size());
     assertTrue(restrSaveCmd.getDirtyParents().contains(parentRef));
@@ -99,8 +98,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testReadPropertyKey() {
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
     replayDefault();
     restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
@@ -162,26 +160,25 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
 
   @Test
   public void testParentReference_DocumentReference_entityRef() {
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "MyDoc1");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "MyDoc1");
     XWikiDocument xdoc = new XWikiDocument(docRef);
-    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "ParentDoc");
-    xdoc.setParentReference((EntityReference)parentRef);
+    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "ParentDoc");
+    xdoc.setParentReference((EntityReference) parentRef);
     assertEquals(xdoc.getParentReference().getClass(), DocumentReference.class);
   }
 
   @Test
   public void testConvertToDocRef() {
     String parentFN = "MySpace.ParentDoc";
-    assertEquals(DocumentReference.class, restrSaveCmd.convertToDocRef(parentFN
-        ).getClass());
+    assertEquals(DocumentReference.class, restrSaveCmd.convertToDocRef(parentFN).getClass());
   }
-  
+
   @Test
   public void testGetRelativeParentReference() {
-    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(),
-        "MySpace", "ParentDoc");
+    DocumentReference parentRef = new DocumentReference(getContext().getDatabase(), "MySpace",
+        "ParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     EntityReference parentEntityRef = restrSaveCmd.getRelativeParentReference();
     assertEquals(parentEntityRef.getClass(), EntityReference.class);
@@ -191,8 +188,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testReadPropertyKey_notexists() {
     restrSaveCmd.inject_current(EReorderLiteral.PARENT_CHILDREN_PROPERTY);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(false);
     replayDefault();
     restrSaveCmd.readPropertyKey("CN1:MySpace:MySpace.MyDoc");
@@ -206,8 +202,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setParentReference(parentRef);
@@ -220,10 +215,8 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
-    assertEquals("expecting increment afterwards.", new Integer(1),
-        restrSaveCmd.getCurrentPos());
-    assertEquals("expecting position reset.", 0,
-        menuItemObj.getIntValue("menu_position"));
+    assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
+    assertEquals("expecting position reset.", 0, menuItemObj.getIntValue("menu_position"));
     assertTrue("expecting parent in dirtyParents after position changed.",
         restrSaveCmd.getDirtyParents().contains(parentRef));
     assertEquals(1, restrSaveCmd.getDirtyParents().size());
@@ -236,8 +229,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
     XWikiDocument xdoc = new XWikiDocument(docRef);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -252,13 +244,12 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
-    assertEquals("expecting increment afterwards.", new Integer(1),
-        restrSaveCmd.getCurrentPos());
+    assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
-    assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(oldParentRef));
-    assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(parentRef));
+    assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
+        oldParentRef));
+    assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
+        parentRef));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
     verifyDefault();
   }
@@ -269,8 +260,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
     XWikiDocument xdoc = new XWikiDocument(docRef);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -285,15 +275,13 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
-    assertEquals("expecting increment afterwards.", new Integer(1),
-        restrSaveCmd.getCurrentPos());
+    assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
-    assertEquals("expecting position reset.", 0,
-        menuItemObj.getIntValue("menu_position"));
-    assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(oldParentRef));
-    assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents(
-      ).contains(parentRef));
+    assertEquals("expecting position reset.", 0, menuItemObj.getIntValue("menu_position"));
+    assertTrue("expecting old parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
+        oldParentRef));
+    assertTrue("expecting new parent in dirtyParents.", restrSaveCmd.getDirtyParents().contains(
+        parentRef));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
     verifyDefault();
   }
@@ -302,8 +290,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   public void testStringEvent_emptyParentForRootElement() throws Exception {
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
     restrSaveCmd.inject_ParentRef(null);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
     XWikiDocument xdoc = new XWikiDocument(docRef);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -318,11 +305,9 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
-    assertEquals("expecting increment afterwards.", new Integer(1),
-        restrSaveCmd.getCurrentPos());
+    assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
     assertNull("expecting parent reset.", xdoc.getParentReference());
-    assertEquals("expecting position reset.", 0,
-        menuItemObj.getIntValue("menu_position"));
+    assertEquals("expecting position reset.", 0, menuItemObj.getIntValue("menu_position"));
     assertEquals(2, restrSaveCmd.getDirtyParents().size());
     verifyDefault();
   }
@@ -333,8 +318,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setParentReference(parentRef);
@@ -345,11 +329,9 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
-    assertEquals("expecting increment afterwards.", new Integer(1),
-        restrSaveCmd.getCurrentPos());
+    assertEquals("expecting increment afterwards.", new Integer(1), restrSaveCmd.getCurrentPos());
     assertEquals("expecting parent reset.", parentRef, xdoc.getParentReference());
-    assertEquals("expecting position reset.", 0,
-        menuItemObj.getIntValue("menu_position"));
+    assertEquals("expecting position reset.", 0, menuItemObj.getIntValue("menu_position"));
     assertTrue("noChanges --> no parents need to be updated",
         restrSaveCmd.getDirtyParents().isEmpty());
     verifyDefault();

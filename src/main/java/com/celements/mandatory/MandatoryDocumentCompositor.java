@@ -39,7 +39,7 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       MandatoryDocumentCompositor.class);
-  
+
   @Requirement
   Map<String, IMandatoryDocumentRole> mandatoryDocumentsMap;
 
@@ -47,12 +47,11 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
   Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public void checkAllMandatoryDocuments() {
-    LOGGER.info("checkAllMandatoryDocuments for wiki [" + getContext().getDatabase()
-        + "].");
+    LOGGER.info("checkAllMandatoryDocuments for wiki [" + getContext().getDatabase() + "].");
     for (String mandatoryDocKey : getMandatoryDocumentsList()) {
       IMandatoryDocumentRole mandatoryDoc = mandatoryDocumentsMap.get(mandatoryDocKey);
       try {
@@ -67,14 +66,12 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
   }
 
   List<String> getMandatoryDocumentsList() {
-    Collection<String> mandatoryDocElemKeys = new ArrayList<String>(
-        mandatoryDocumentsMap.keySet());
+    Collection<String> mandatoryDocElemKeys = new ArrayList<String>(mandatoryDocumentsMap.keySet());
     List<String> mandatoryDocExecList = new Vector<String>();
     do {
       for (String mandatoryDocElemKey : mandatoryDocElemKeys) {
-        if (mandatoryDocExecList.containsAll(
-            mandatoryDocumentsMap.get(mandatoryDocElemKey).dependsOnMandatoryDocuments())
-            ) {
+        if (mandatoryDocExecList.containsAll(mandatoryDocumentsMap.get(
+            mandatoryDocElemKey).dependsOnMandatoryDocuments())) {
           mandatoryDocExecList.add(mandatoryDocElemKey);
         }
       }

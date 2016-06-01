@@ -28,13 +28,13 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * All configuration options for the Template Path transformation to access
- * templates on disk based on inheritance.
- * 
+ * All configuration options for the Template Path transformation to access templates on
+ * disk based on inheritance.
  */
 @Component
 public class DefaultTemplatePathTransformationConfiguration implements
     TemplatePathTransformationConfiguration, Initializable {
+
   /**
    * Prefix for configuration keys for the Icon transformation module.
    */

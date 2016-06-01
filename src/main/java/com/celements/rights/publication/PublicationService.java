@@ -44,8 +44,7 @@ public class PublicationService implements IPublicationServiceRole {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
@@ -53,22 +52,22 @@ public class PublicationService implements IPublicationServiceRole {
     EPubUnpub val = getPubUnpubFromContext();
     return EPubUnpub.PUBLISHED == val || EPubUnpub.UNPUBLISHED == val;
   }
-  
+
   @Override
   public boolean isPubOverride() {
     return EPubUnpub.PUBLISHED == getPubUnpubFromContext();
   }
-  
+
   @Override
   public boolean isUnpubOverride() {
     return EPubUnpub.UNPUBLISHED == getPubUnpubFromContext();
   }
-  
+
   EPubUnpub getPubUnpubFromContext() {
     EPubUnpub val = null;
     Object valObj = execution.getContext().getProperty(OVERRIDE_PUB_CHECK);
-    if((valObj != null) && (valObj instanceof EPubUnpub)) {
-      val = (EPubUnpub)execution.getContext().getProperty(OVERRIDE_PUB_CHECK);
+    if ((valObj != null) && (valObj instanceof EPubUnpub)) {
+      val = (EPubUnpub) execution.getContext().getProperty(OVERRIDE_PUB_CHECK);
     }
     return val;
   }
@@ -80,8 +79,7 @@ public class PublicationService implements IPublicationServiceRole {
 
   List<BaseObject> getPublishObjects(XWikiDocument doc) {
     if (doc != null) {
-      return modelAccess.getXObjects(doc, getPublicationClassReference(
-          doc.getDocumentReference()));
+      return modelAccess.getXObjects(doc, getPublicationClassReference(doc.getDocumentReference()));
     }
     return Collections.emptyList();
   }
@@ -91,19 +89,19 @@ public class PublicationService implements IPublicationServiceRole {
   }
 
   DocumentReference getPublicationClassReference(EntityReference entityRef) {
-    return ((DocumentDetailsClasses)documentDetailsClasses
-        ).getDocumentPublicationClassRef(webUtilsService.getWikiRef(entityRef).getName());
+    return ((DocumentDetailsClasses) documentDetailsClasses).getDocumentPublicationClassRef(
+        webUtilsService.getWikiRef(entityRef).getName());
   }
 
   @Override
   public boolean isRestrictedRightsAction(String accessLevel) {
     return "view".equals(accessLevel) || "comment".equals(accessLevel);
   }
-  
+
   @Override
   public boolean isPublishActive() {
     DocumentReference forDocRef = null;
-    if(documentAccessBridge.getCurrentDocumentReference() != null) {
+    if (documentAccessBridge.getCurrentDocumentReference() != null) {
       forDocRef = documentAccessBridge.getCurrentDocumentReference();
     }
     return isPublishActive(forDocRef);
@@ -112,13 +110,13 @@ public class PublicationService implements IPublicationServiceRole {
   @Override
   public boolean isPublishActive(DocumentReference docRef) {
     String space = null;
-    if(docRef != null) {
+    if (docRef != null) {
       space = docRef.getLastSpaceReference().getName();
     }
-    String isActive = getContext().getWiki().getSpacePreference("publishdate_active", space,
-        "-1", getContext());
-    if("-1".equals(isActive)) {
-      isActive = getContext().getWiki().getXWikiPreference("publishdate_active", 
+    String isActive = getContext().getWiki().getSpacePreference("publishdate_active", space, "-1",
+        getContext());
+    if ("-1".equals(isActive)) {
+      isActive = getContext().getWiki().getXWikiPreference("publishdate_active",
           "celements.publishdate.active", "0", getContext());
     }
     return "1".equals(isActive);
@@ -128,18 +126,18 @@ public class PublicationService implements IPublicationServiceRole {
   public boolean isPublished(XWikiDocument doc) {
     List<BaseObject> objs = getPublishObjects(doc);
     boolean isPublished = false;
-    if(!objs.isEmpty()) {
-      for(BaseObject obj : objs) {
+    if (!objs.isEmpty()) {
+      for (BaseObject obj : objs) {
         isPublished |= isAfterStart(obj) && isBeforeEnd(obj);
       }
     } else {
-      LOGGER.debug("no publish objects found for '{}': no limits set means always"
-          + " published", doc);
+      LOGGER.debug("no publish objects found for '{}': no limits set means always" + " published",
+          doc);
       isPublished = true;
     }
     return isPublished;
   }
-  
+
   boolean isAfterStart(BaseObject obj) {
     Calendar cal = GregorianCalendar.getInstance();
     Date pubDate = obj.getDateValue(DocumentDetailsClasses.PUBLISH_DATE_FIELD);

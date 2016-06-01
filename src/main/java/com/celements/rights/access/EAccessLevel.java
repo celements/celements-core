@@ -5,13 +5,8 @@ import java.util.Map;
 
 public enum EAccessLevel {
 
-  VIEW("view"), 
-  COMMENT("comment"),
-  EDIT("edit"),
-  DELETE("delete"),
-  UNDELETE("undelete"),
-  REGISTER("register"),
-  PROGRAMMING("programming");
+  VIEW("view"), COMMENT("comment"), EDIT("edit"), DELETE("delete"), UNDELETE("undelete"), REGISTER(
+      "register"), PROGRAMMING("programming");
 
   private final String identifier;
   private final static Map<String, EAccessLevel> idMap = new HashMap<>();

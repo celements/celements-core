@@ -1,5 +1,6 @@
 package com.celements.pagetype.java;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.context.Execution;
@@ -14,6 +15,8 @@ import com.xpn.xwiki.web.Utils;
  * DefaultPageTypeConfig may be exposed to non privileged code (e.g. scripts)
  */
 public class DefaultPageTypeConfig implements IPageTypeConfig {
+
+  public static final String PRETTYNAME_DICT_PREFIX = "cel_pagetype_prettyname_";
 
   private IJavaPageTypeRole pageTypeImpl;
 
@@ -37,10 +40,9 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public String getPrettyName() {
-    String dictNameKey = "cel_pagetype_prettyname_" + getName();
-    String dictionaryPrettyName = getWebUtilsService().getAdminMessageTool().get(
-        dictNameKey);
-    if (dictNameKey.equals(dictionaryPrettyName)) {
+    String dictNameKey = PRETTYNAME_DICT_PREFIX + getName();
+    String dictionaryPrettyName = getWebUtilsService().getAdminMessageTool().get(dictNameKey);
+    if (!dictNameKey.equals(dictionaryPrettyName)) {
       return dictionaryPrettyName;
     }
     return getName();
@@ -58,7 +60,7 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public List<String> getCategories() {
-    return pageTypeImpl.getCategories();
+    return new ArrayList<String>(pageTypeImpl.getCategoryNames());
   }
 
   @Override
@@ -68,8 +70,8 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   }
 
   private DocumentReference getLocalTemplateRef(String renderMode) {
-    return new DocumentReference(getContext().getDatabase(),
-        "Templates", pageTypeImpl.getRenderTemplateForRenderMode(renderMode));
+    return new DocumentReference(getContext().getDatabase(), "Templates",
+        pageTypeImpl.getRenderTemplateForRenderMode(renderMode));
   }
 
   @Override

@@ -12,18 +12,18 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("legacyskin")
-public class LegacySkinScriptService implements ScriptService{
+public class LegacySkinScriptService implements ScriptService {
 
   @Requirement
   private Execution execution;
-  
+
   @Requirement
   private IPrepareVelocityContext prepareVelocityContext;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
     BaseObject skinConfigObj = new SkinConfigObjCommand().getSkinConfigObj();
     if (skinConfigObj != null) {
@@ -32,11 +32,11 @@ public class LegacySkinScriptService implements ScriptService{
       return null;
     }
   }
-  
+
   public int showRightPanels() {
     return prepareVelocityContext.showRightPanels();
   }
-  
+
   public int showLeftPanels() {
     return prepareVelocityContext.showLeftPanels();
   }

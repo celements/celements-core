@@ -8,8 +8,7 @@ public class CellsClassConfig implements ICellsClassConfig {
 
   @Override
   public DocumentReference getCellClassRef(String wikiName) {
-    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE,
-        CELEMENTS_CELL_CLASS_NAME);
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, CELEMENTS_CELL_CLASS_NAME);
   }
 
   @Override

@@ -38,30 +38,26 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   public void setUp_WebUtilsServiceTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    docParentsLister = (DocumentParentsLister) Utils.getComponent(
-        IDocumentParentsListerRole.class);
+    docParentsLister = (DocumentParentsLister) Utils.getComponent(IDocumentParentsListerRole.class);
     docParentProviderMapBackup = docParentsLister.docParentProviderMap;
     docParentsLister.docParentProviderMap = new HashMap<String, IDocParentProviderRole>();
-    docParentsLister.docParentProviderMap.put(XDocParents.DOC_PROVIDER_NAME, 
+    docParentsLister.docParentProviderMap.put(XDocParents.DOC_PROVIDER_NAME,
         docParentProviderMapBackup.get(XDocParents.DOC_PROVIDER_NAME));
-    docParentsLister.pageTypeResolver = createMockAndAddToDefault(
-        IPageTypeResolverRole.class);
-    docParentsLister.pageTypeProvider = createMockAndAddToDefault(
-        IPageTypeProviderRole.class);
+    docParentsLister.pageTypeResolver = createMockAndAddToDefault(IPageTypeResolverRole.class);
+    docParentsLister.pageTypeProvider = createMockAndAddToDefault(IPageTypeProviderRole.class);
   }
 
   @After
   public void tearDown_DocumentParentsListerTest() {
     docParentsLister.docParentProviderMap = docParentProviderMapBackup;
     docParentsLister.pageTypeResolver = Utils.getComponent(IPageTypeResolverRole.class);
-    docParentsLister.pageTypeProvider = Utils.getComponent(IPageTypeProviderRole.class, 
+    docParentsLister.pageTypeProvider = Utils.getComponent(IPageTypeProviderRole.class,
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER);
   }
 
   @Test
   public void testGetDocumentParentsList_not_include() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "mySpace",
@@ -83,14 +79,12 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_not_include_testProvider_empty(
-      ) throws Exception {
+  public void testGetDocumentParentsList_not_include_testProvider_empty() throws Exception {
     IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(
@@ -102,14 +96,12 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_not_include_testProvider_hasParent(
-      ) throws Exception {
+  public void testGetDocumentParentsList_not_include_testProvider_hasParent() throws Exception {
     IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
 
@@ -118,15 +110,14 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     XWikiDocument testProviderParentDoc = new XWikiDocument(testProviderParentRef);
     expect(xwiki.getDocument(eq(testProviderParentRef), same(context))).andReturn(
         testProviderParentDoc).once();
-    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(true
-        ).anyTimes();
+    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(true).anyTimes();
 
     expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(Arrays.asList(
         testProviderParentRef)).once();
     expectParentPageType(testProviderParentRef, true);
     expect(testProviderMock.getDocumentParentsList(eq(testProviderParentRef))).andReturn(
         Collections.<DocumentReference>emptyList()).once();
-    
+
     List<DocumentReference> docParentsList = Arrays.asList(testProviderParentRef);
     replayDefault();
     assertEquals(docParentsList, docParentsLister.getDocumentParentsList(docRef, false));
@@ -135,8 +126,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_includeDoc() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "mySpace",
@@ -155,8 +145,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     expect(xwiki.getDocument(eq(parentRef2), same(context))).andReturn(docP2).once();
     expect(xwiki.exists(eq(parentRef2), same(context))).andReturn(true).anyTimes();
 
-    List<DocumentReference> docParentsList = Arrays.asList(docRef, parentRef1,
-        parentRef2);
+    List<DocumentReference> docParentsList = Arrays.asList(docRef, parentRef1, parentRef2);
     replayDefault();
     assertEquals(docParentsList, docParentsLister.getDocumentParentsList(docRef, true));
     verifyDefault();
@@ -168,8 +157,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     DocumentReference parentRef1 = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     DocumentReference parentRef2 = new DocumentReference(context.getDatabase(), "mySpace",
@@ -195,18 +183,17 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     XWikiDocument testProviderParentDoc = new XWikiDocument(testProviderParentRef);
     expect(xwiki.getDocument(eq(testProviderParentRef), same(context))).andReturn(
         testProviderParentDoc).once();
-    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(false
-        ).anyTimes();
+    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(false).anyTimes();
 
-    expect(testProviderMock.getDocumentParentsList(eq(parentRef2))).andReturn(
-        Arrays.asList(testProviderParentRef, testProviderParentRef2)).once();
+    expect(testProviderMock.getDocumentParentsList(eq(parentRef2))).andReturn(Arrays.asList(
+        testProviderParentRef, testProviderParentRef2)).once();
     expectParentPageType(testProviderParentRef, true);
     expectParentPageType(testProviderParentRef2, true);
     expect(testProviderMock.getDocumentParentsList(eq(testProviderParentRef))).andReturn(
         Collections.<DocumentReference>emptyList()).once();
 
-    List<DocumentReference> docParentsList = Arrays.asList(docRef, parentRef1,
-        parentRef2, testProviderParentRef);
+    List<DocumentReference> docParentsList = Arrays.asList(docRef, parentRef1, parentRef2,
+        testProviderParentRef);
     replayDefault();
     assertEquals(docParentsList, docParentsLister.getDocumentParentsList(docRef, true));
     verifyDefault();
@@ -214,8 +201,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocumentParentsList_includeDoc_notexist() throws Exception {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
 
     XWikiDocument doc = new XWikiDocument(docRef);
 
@@ -229,14 +215,12 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_includeDoc_notexist_testProvider(
-      ) throws Exception {
+  public void testGetDocumentParentsList_includeDoc_notexist_testProvider() throws Exception {
     IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).anyTimes();
@@ -246,8 +230,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     XWikiDocument testProviderParentDoc = new XWikiDocument(testProviderParentRef);
     expect(xwiki.getDocument(eq(testProviderParentRef), same(context))).andReturn(
         testProviderParentDoc).once();
-    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(false
-        ).anyTimes();
+    expect(xwiki.exists(eq(testProviderParentRef), same(context))).andReturn(false).anyTimes();
 
     expect(testProviderMock.getDocumentParentsList(eq(docRef))).andReturn(Arrays.asList(
         testProviderParentRef)).once();
@@ -267,8 +250,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).anyTimes();
@@ -287,14 +269,12 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
-  public void testGetDocumentParentsList_includeDoc_testProvider_recursive(
-      ) throws Exception {
+  public void testGetDocumentParentsList_includeDoc_testProvider_recursive() throws Exception {
     IDocParentProviderRole testProviderMock = createMockAndAddToDefault(
         IDocParentProviderRole.class);
     docParentsLister.docParentProviderMap.put("TestProvider", testProviderMock);
 
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
-        "myDoc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).times(2);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
@@ -317,13 +297,13 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
   }
 
   private void expectParentPageType(DocumentReference docRef, boolean isParent) {
-    PageTypeReference pageTypeRef = new PageTypeReference("pagetype-" + docRef, "", 
+    PageTypeReference pageTypeRef = new PageTypeReference("pagetype-" + docRef, "",
         Collections.<String>emptyList());
-    expect(docParentsLister.pageTypeResolver.getPageTypeRefForDocWithDefault(eq(docRef))
-        ).andReturn(pageTypeRef).once();
+    expect(docParentsLister.pageTypeResolver.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        pageTypeRef).once();
     IPageTypeConfig confMock = createMockAndAddToDefault(IPageTypeConfig.class);
-    expect(docParentsLister.pageTypeProvider.getPageTypeByReference(same(pageTypeRef))
-        ).andReturn(confMock).once();
+    expect(docParentsLister.pageTypeProvider.getPageTypeByReference(same(pageTypeRef))).andReturn(
+        confMock).once();
     expect(confMock.isUnconnectedParent()).andReturn(isParent).once();
   }
 

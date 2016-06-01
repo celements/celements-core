@@ -20,8 +20,7 @@ public class AttNameWithoutExtMatcherTest extends AbstractBridgedComponentTestCa
   @Before
   public void setUp_AttNameWithoutExtMatcherTest() {
     attNameWOextMatcher = (AttNameWithoutExtMatcher) Utils.getComponent(
-        IAttFileNameMatcherRole.class,
-        AttNameWithoutExtMatcher.ATT_NAME_WITHOUT_EXT_MATCHER);
+        IAttFileNameMatcherRole.class, AttNameWithoutExtMatcher.ATT_NAME_WITHOUT_EXT_MATCHER);
   }
 
   @Test
@@ -34,8 +33,8 @@ public class AttNameWithoutExtMatcherTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testAccept_match() {
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myDoc");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiAttachment imgAtt = new XWikiAttachment(doc, "image.jpg");
     attNameWOextMatcher.setFileNamePattern("image");
@@ -46,8 +45,8 @@ public class AttNameWithoutExtMatcherTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testAccept_noMatch() {
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myDoc");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myDoc");
     XWikiDocument doc = new XWikiDocument(docRef);
     XWikiAttachment imgAtt = new XWikiAttachment(doc, "image.jpg.zip");
     attNameWOextMatcher.setFileNamePattern("image");

@@ -15,8 +15,7 @@ import com.xpn.xwiki.XWikiException;
 @Component
 public class MenuAccessService implements IMenuAccessServiceRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      MenuAccessService.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(MenuAccessService.class);
 
   @Requirement
   Map<String, IMenuAccessProviderRole> accessProviderMap;
@@ -25,7 +24,7 @@ public class MenuAccessService implements IMenuAccessServiceRole {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public boolean hasview(DocumentReference menuBarDocRef) {
@@ -38,12 +37,12 @@ public class MenuAccessService implements IMenuAccessServiceRole {
             + getContext().getDatabase() + "].");
         try {
           boolean newHasView = accessProvider.hasview(menuBarDocRef);
-          LOGGER.debug("check has view for [" + getContext().getUser() + "] on ["
-              + menuBarDocRef + "] and provider [" + accessProvider.getClass() + "]"
-              + " results in [" + newHasView + "].");
+          LOGGER.debug("check has view for [" + getContext().getUser() + "] on [" + menuBarDocRef
+              + "] and provider [" + accessProvider.getClass() + "]" + " results in [" + newHasView
+              + "].");
           if (!newHasView && accessProvider.denyView(menuBarDocRef)) {
-            LOGGER.debug("deny view for [" + getContext().getUser() + "] on ["
-                + menuBarDocRef + "] and provider [" + accessProvider.getClass() + "]"
+            LOGGER.debug("deny view for [" + getContext().getUser() + "] on [" + menuBarDocRef
+                + "] and provider [" + accessProvider.getClass() + "]"
                 + " thus returning false and cancel hasview check.");
             return false;
           } else if (allowForDeny) {
@@ -57,8 +56,8 @@ public class MenuAccessService implements IMenuAccessServiceRole {
               + " hasview on [" + menuBarDocRef + "].", exp);
         }
       }
-      LOGGER.debug("deny view for [" + getContext().getUser() + "] on ["
-          + menuBarDocRef + "] ends with result [" + hasview + "].");
+      LOGGER.debug("deny view for [" + getContext().getUser() + "] on [" + menuBarDocRef
+          + "] ends with result [" + hasview + "].");
       return hasview;
     }
     return false;

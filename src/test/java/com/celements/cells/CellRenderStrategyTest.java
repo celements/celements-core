@@ -66,16 +66,14 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
   public void testPageTypeCmd() {
     renderer.rendererCmd = null;
     assertNotNull(renderer.getRendererCmd());
-    assertSame("Expecting singleton.", renderer.getRendererCmd(), 
-        renderer.getRendererCmd());
+    assertSame("Expecting singleton.", renderer.getRendererCmd(), renderer.getRendererCmd());
   }
 
   @Test
   public void testInject_ctRendererCmd() {
     renderer.rendererCmd = mockctRendererCmd;
     assertNotNull(renderer.getRendererCmd());
-    assertSame("Expecting injected mock object.", mockctRendererCmd,
-        renderer.getRendererCmd());
+    assertSame("Expecting injected mock object.", mockctRendererCmd, renderer.getRendererCmd());
   }
 
   @Test
@@ -113,8 +111,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsRenderCell() {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
-        "MasterCell");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     assertFalse(renderer.isRenderCell(null));
     assertTrue(renderer.isRenderCell(new TreeNode(docRef, "", 0)));
   }
@@ -126,8 +123,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
         context.getDatabase()));
     expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
     replayAll();
-    assertEquals("expecting default layout space", defaultLayout,
-        renderer.getSpaceReference());
+    assertEquals("expecting default layout space", defaultLayout, renderer.getSpaceReference());
     verifyAll();
   }
 
@@ -165,8 +161,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testStartRenderCell() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
-        "MasterCell");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, "", 0);
@@ -192,8 +187,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testStartRenderCell_noCssClasses() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
-        "MasterCell");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, "", 0);
@@ -217,8 +211,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testStartRenderCell_auto_id_for_null() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
-        "MasterCell");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, "", 0);
@@ -243,8 +236,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testStartRenderCell_auto_id_forEmpty() throws XWikiException {
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin",
-        "MasterCell");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, "", 0);
@@ -322,26 +314,24 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testRenderEmptyChildren() throws XWikiException {
-    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin",
-        "MasterCell");
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode cellNode = new TreeNode(cellRef, "", 0);
     String cellContentExpected = "Cell test content Skin.MasterCell";
     expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(
         cellContentExpected).once();
-    //ASSERT
+    // ASSERT
     outWriterMock.appendContent(eq(cellContentExpected));
     replayAll();
     renderer.renderEmptyChildren(cellNode);
     verifyAll();
   }
 
-
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
     verify(mocks);
   }

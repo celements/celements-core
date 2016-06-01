@@ -25,7 +25,7 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
 
   public static final String FILEBASE_SINGLE_DOC = "filebase.singleDoc";
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(SingleDocFileBaseService.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(SingleDocFileBaseService.class);
 
   @Requirement
   IAttachmentServiceRole attService;
@@ -43,8 +43,7 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
     String fileBaseDocFN = configuration.getProperty(FILEBASE_CONFIG_FIELD);
     if (!Strings.isNullOrEmpty(fileBaseDocFN) && !"-".equals(fileBaseDocFN)) {
       try {
-        DocumentReference fileBaseDocRef = webUtils.resolveDocumentReference(
-            fileBaseDocFN);
+        DocumentReference fileBaseDocRef = webUtils.resolveDocumentReference(fileBaseDocFN);
         return modelAccess.getOrCreateDocument(fileBaseDocRef);
       } catch (DocumentLoadException exp) {
         _LOGGER.error("Failed to load FileBaseDocument.", exp);
@@ -72,8 +71,8 @@ public class SingleDocFileBaseService implements IFileBaseServiceRole {
   }
 
   @Override
-  public List<XWikiAttachment> getFilesNameMatch(IAttachmentMatcher attMatcher
-      ) throws FileBaseLoadException {
+  public List<XWikiAttachment> getFilesNameMatch(IAttachmentMatcher attMatcher)
+      throws FileBaseLoadException {
     return attService.getAttachmentsNameMatch(getFileBaseDoc(), attMatcher);
   }
 

@@ -55,8 +55,8 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("myCat",
-        "pageTypeCat", "CelCat")), false);
+    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("myCat", "pageTypeCat",
+        "CelCat")), false);
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
     assertTrue(pThql.contains(", BaseObject as obj"));
@@ -79,8 +79,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql_secondList() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("pageTypeCat")),
-        false);
+    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("pageTypeCat")), false);
     assertTrue(pThql.contains("('pageTypeCat')"));
   }
 
@@ -102,11 +101,10 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
     assertTrue(pThql.contains(" and obj.className='Celements2.PageTypeProperties' "));
   }
 
-
   @Test
   public void testGetPThql_onlyVisible() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("myCat",
-        "pageTypeCat", "CelCat")), true);
+    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("myCat", "pageTypeCat",
+        "CelCat")), true);
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
     assertTrue(pThql.contains(", BaseObject as obj"));
@@ -150,8 +148,8 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql_emptyCategory() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("", "pageTypeCat")),
-        false) + " ";
+    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("", "pageTypeCat")), false)
+        + " ";
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
     assertTrue(pThql.contains(", BaseObject as obj"));
@@ -190,24 +188,20 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
     Set<String> catList = new HashSet<String>(Arrays.asList(""));
     expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
         allPTList).times(2);
-    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
-      ).anyTimes();
-    expect(xwiki.exists(eq("PageTypes.Code"), same(context))).andReturn(true
-      ).anyTimes();
+    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.exists(eq("PageTypes.Code"), same(context))).andReturn(true).anyTimes();
     XWikiDocument ptRTE = new XWikiDocument();
     BaseObject ptRTEProp = new BaseObject();
     ptRTEProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     ptRTEProp.setStringValue("category", "");
     ptRTE.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptRTEProp);
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(ptRTE 
-      ).anyTimes();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(ptRTE).anyTimes();
     XWikiDocument ptCode = new XWikiDocument();
     BaseObject ptCodeProp = new BaseObject();
     ptCodeProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     ptCodeProp.setStringValue("category", "cellType");
     ptCode.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptCodeProp);
-    expect(xwiki.getDocument(eq("PageTypes.Code"), same(context))).andReturn(ptCode
-      ).anyTimes();
+    expect(xwiki.getDocument(eq("PageTypes.Code"), same(context))).andReturn(ptCode).anyTimes();
     replay(xwiki);
     List expectedList = Arrays.asList("PageTypes.RichText");
     List<String> resultList = gptCmd.getPageTypesForCategories(catList, false, context);
@@ -222,24 +216,20 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
     Set<String> catList = new HashSet<String>(Arrays.asList(""));
     expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
         allPTList).times(2);
-    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true
-      ).anyTimes();
-    expect(xwiki.exists(eq("PageTypes.Code"), same(context))).andReturn(true
-      ).anyTimes();
+    expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.exists(eq("PageTypes.Code"), same(context))).andReturn(true).anyTimes();
     XWikiDocument ptRTE = new XWikiDocument();
     BaseObject ptRTEProp = new BaseObject();
     ptRTEProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
-    //ptRTEProp.setStringValue("category", null);
+    // ptRTEProp.setStringValue("category", null);
     ptRTE.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptRTEProp);
-    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(ptRTE 
-      ).anyTimes();
+    expect(xwiki.getDocument(eq("PageTypes.RichText"), same(context))).andReturn(ptRTE).anyTimes();
     XWikiDocument ptCode = new XWikiDocument();
     BaseObject ptCodeProp = new BaseObject();
     ptCodeProp.setClassName(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     ptCodeProp.setStringValue("category", "cellType");
     ptCode.addObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS, ptCodeProp);
-    expect(xwiki.getDocument(eq("PageTypes.Code"), same(context))).andReturn(ptCode
-      ).anyTimes();
+    expect(xwiki.getDocument(eq("PageTypes.Code"), same(context))).andReturn(ptCode).anyTimes();
     replay(xwiki);
     List expectedList = Arrays.asList("PageTypes.RichText");
     List<String> resultList = gptCmd.getPageTypesForCategories(catList, false, context);

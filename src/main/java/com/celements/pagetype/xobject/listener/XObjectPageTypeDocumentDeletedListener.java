@@ -38,8 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component(XObjectPageTypeDocumentDeletedListener.NAME)
-public class XObjectPageTypeDocumentDeletedListener
-    extends AbstractXObjectPageTypeDocumentListener implements EventListener {
+public class XObjectPageTypeDocumentDeletedListener extends AbstractXObjectPageTypeDocumentListener
+    implements EventListener {
 
   public static final String NAME = "XObjectPageTypeDocumentDeletedListener";
 
@@ -53,7 +53,7 @@ public class XObjectPageTypeDocumentDeletedListener
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public String getName() {
@@ -61,7 +61,7 @@ public class XObjectPageTypeDocumentDeletedListener
   }
 
   public List<Event> getEvents() {
-    return Arrays.asList((Event)new DocumentDeletedEvent());
+    return Arrays.asList((Event) new DocumentDeletedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -69,18 +69,17 @@ public class XObjectPageTypeDocumentDeletedListener
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
-          document));
+      BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(document));
       if (pageTypePropObj != null) {
         LOGGER.debug("XObjectPageTypeDocumentDeletedListener onEvent deleted from "
             + document.getDocumentReference() + "]");
-        XObjectPageTypeDeletedEvent delXObjectPageTypeEvent =
-            new XObjectPageTypeDeletedEvent(document.getDocumentReference());
+        XObjectPageTypeDeletedEvent delXObjectPageTypeEvent = new XObjectPageTypeDeletedEvent(
+            document.getDocumentReference());
         getObservationManager().notify(delXObjectPageTypeEvent, source, getContext());
       }
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent ["
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }

@@ -44,9 +44,10 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
+
   RemoteUserValidator cmd;
   XWikiContext context;
-  
+
   @Before
   public void setUp_RemoteUserValidatorTest() throws Exception {
     cmd = new RemoteUserValidator();
@@ -62,8 +63,8 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(request.getHttpServletRequest()).andReturn(httpRequest).once();
     expect(httpRequest.getRemoteHost()).andReturn("  ");
     replay(httpRequest, request);
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", 
-        cmd.isValidUserJSON("", "", "", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.isValidUserJSON("",
+        "", "", null, context));
     verify(httpRequest, request);
   }
 
@@ -78,13 +79,13 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     context.setWiki(wiki);
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("loginname"), same(context))).andReturn("").once();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("loginname"), same(
+        context))).andReturn("").once();
     replay(celementsweb, httpRequest, request);
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
-    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_username_password\"}", 
+    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_username_password\"}",
         cmd.isValidUserJSON("blabla@mail.com", "", "", null, context));
     verify(celementsweb, httpRequest, request);
   }
@@ -101,24 +102,24 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
     Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context)))
-        .andReturn(principal).once();
+    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
+        principal).once();
     expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
     User user = createMock(User.class);
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
     expect(user.isUserInGroup(eq("grp"))).andReturn(false);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))
-        ).andReturn("email,loginname").once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").once();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
+        context))).andReturn("XWiki.7sh2lya35").once();
     replay(auth, celementsweb, httpRequest, principal, request, user, xwiki);
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
-    assertEquals("{\"access\" : \"false\", \"error\" : \"user_not_in_group\"}", 
-        cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"user_not_in_group\"}", cmd.isValidUserJSON(
+        "blabla@mail.com", "pwd", "grp", null, context));
     verify(auth, celementsweb, httpRequest, principal, request, user, xwiki);
   }
 
@@ -134,27 +135,28 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
     Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(principal).once();
+    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
+        principal).once();
     expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
     User user = createMock(User.class);
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context)))
-        .andReturn("1").atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context))).andReturn(
+        "1").atLeastOnce();
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq("XWiki.7sh2lya35"), same(context))).andReturn(doc).once();
     expect(doc.getIntValue(eq("XWiki.XWikiUsers"), eq("active"))).andReturn(0).once();
     expect(user.isUserInGroup(eq("grp"))).andReturn(true);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-        .andReturn("email,loginname").once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").once();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
+        context))).andReturn("XWiki.7sh2lya35").once();
     replay(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
-    assertEquals("{\"access\" : \"false\", \"error\" : \"useraccount_inactive\"}", 
+    assertEquals("{\"access\" : \"false\", \"error\" : \"useraccount_inactive\"}",
         cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null, context));
     verify(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
   }
@@ -171,30 +173,30 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
     Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context)))
-        .andReturn(principal).once();
+    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
+        principal).once();
     expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
     User user = createMock(User.class);
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
-    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context)))
-    .andReturn("1").atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context))).andReturn(
+        "1").atLeastOnce();
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq("XWiki.7sh2lya35"), same(context))).andReturn(doc).once();
     expect(doc.getIntValue(eq("XWiki.XWikiUsers"), eq("active"))).andReturn(1).once();
     expect(user.isUserInGroup(eq("grp"))).andReturn(true);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-        .andReturn("email,loginname").once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").once();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
+        context))).andReturn("XWiki.7sh2lya35").once();
     replay(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
     context.setUser("xwiki:XWiki.superadmin");
-    assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", " +
-        "\"group_membership\" : {}}", cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp",
-        null, context));
+    assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
+        + "\"group_membership\" : {}}", cmd.isValidUserJSON("blabla@mail.com", "pwd", "grp", null,
+            context));
     verify(auth, celementsweb, doc, httpRequest, principal, request, user, xwiki);
   }
 
@@ -212,14 +214,13 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     XWikiAuthService auth = createMock(XWikiAuthService.class);
     expect(xwiki.getAuthService()).andReturn(auth).once();
     Principal principal = createMock(Principal.class);
-    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context)))
-        .andReturn(principal).once();
+    expect(auth.authenticate(eq("XWiki.7sh2lya35"), eq("pwd"), same(context))).andReturn(
+        principal).once();
     expect(principal.getName()).andReturn("XWiki.7sh2lya35").anyTimes();
     User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user)
-        .anyTimes();
-    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context)))
-    .andReturn("1").atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).anyTimes();
+    expect(xwiki.getXWikiPreference(eq("auth_active_check"), same(context))).andReturn(
+        "1").atLeastOnce();
     XWikiDocument doc = createMock(XWikiDocument.class);
     expect(xwiki.getDocument(eq("XWiki.7sh2lya35"), same(context))).andReturn(doc).once();
     expect(doc.getIntValue(eq("XWiki.XWikiUsers"), eq("active"))).andReturn(1).once();
@@ -227,12 +228,12 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(user.isUserInGroup(eq("XWiki.TestGroup1"))).andReturn(true).anyTimes();
     expect(user.isUserInGroup(eq("XWiki.TestGroup2"))).andReturn(false).anyTimes();
     expect(user.isUserInGroup(eq("XWiki.TestGroup3"))).andReturn(true).anyTimes();
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-        .andReturn("email,loginname").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").anyTimes();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").anyTimes();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
+        context))).andReturn("XWiki.7sh2lya35").anyTimes();
     List<String> retGroup = new ArrayList<String>();
     retGroup.add("XWiki.TestGroup1");
     retGroup.add("XWiki.TestGroup2");
@@ -242,14 +243,14 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(messageTool.get(eq("cel_groupname_TestGroup1"))).andReturn("grp1").anyTimes();
     expect(messageTool.get(eq("cel_groupname_TestGroup2"))).andReturn("grp2").anyTimes();
     expect(messageTool.get(eq("cel_groupname_TestGroup3"))).andReturn("grp3").anyTimes();
-    replay(auth, celementsweb, context, doc, httpRequest, messageTool, principal, request,
-        user, xwiki);
-    assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", " +
-        "\"group_membership\" : {\"grp1\" : \"true\", \"grp2\"" +
-        " : \"false\", \"grp3\" : \"true\"}}", cmd.isValidUserJSON(
-        "blabla@mail.com", "pwd", "XWiki.MemOfGroup", retGroup, context));
-    verify(auth, celementsweb, context, doc, httpRequest, messageTool, principal, request,
-        user, xwiki);
+    replay(auth, celementsweb, context, doc, httpRequest, messageTool, principal, request, user,
+        xwiki);
+    assertEquals("{\"access\" : \"true\", \"username\" : \"blabla@mail.com\", "
+        + "\"group_membership\" : {\"grp1\" : \"true\", \"grp2\""
+        + " : \"false\", \"grp3\" : \"true\"}}", cmd.isValidUserJSON("blabla@mail.com", "pwd",
+            "XWiki.MemOfGroup", retGroup, context));
+    verify(auth, celementsweb, context, doc, httpRequest, messageTool, principal, request, user,
+        xwiki);
   }
 
   @Test
@@ -259,14 +260,12 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsGroupMember_blackListOtherDB() {
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "xwiki:XWiki.Admin", 
-        context));
+    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "xwiki:XWiki.Admin", context));
   }
 
   @Test
   public void testIsGroupMember_blackListAllGroup() {
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "XWiki.XWikiAllGroup", 
-        context));
+    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "XWiki.XWikiAllGroup", context));
   }
 
   @Test
@@ -275,16 +274,15 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     context.setWiki(xwiki);
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-    .andReturn("email,loginname").once();
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").once();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
+        context))).andReturn("XWiki.7sh2lya35").once();
     User user = createMock(User.class);
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
     expect(user.isUserInGroup(eq("XWiki.TestGroup"))).andReturn(false).once();
     replay(celementsweb, user, xwiki);
-    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "XWiki.TestGroup", 
-        context));
+    assertEquals("false", cmd.isGroupMember("blabla@mail.com", "XWiki.TestGroup", context));
     verify(celementsweb, user, xwiki);
   }
 
@@ -294,39 +292,38 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     context.setWiki(xwiki);
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-    .andReturn("email,loginname").once();
-    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").once();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").once();
+    expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
+        context))).andReturn("XWiki.7sh2lya35").once();
     User user = createMock(User.class);
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).once();
     expect(user.isUserInGroup(eq("XWiki.TestGroup"))).andReturn(true).once();
     replay(celementsweb, user, xwiki);
-    assertEquals("true", cmd.isGroupMember("blabla@mail.com", "XWiki.TestGroup", 
-        context));
+    assertEquals("true", cmd.isGroupMember("blabla@mail.com", "XWiki.TestGroup", context));
     verify(celementsweb, user, xwiki);
   }
-  
+
   @Test
   public void testGetResultJSON() {
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", 
-        cmd.getResultJSON(null, false, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", 
-        cmd.getResultJSON(null, true, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", 
-        cmd.getResultJSON("", true, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", 
-        cmd.getResultJSON("haXX0r", true, "access_denied", null, context));
-    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_group\"}", 
-        cmd.getResultJSON("user@synventis.com", false, "wrong_group", null, context));
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", " +
-        "\"group_membership\" : {}}", cmd.getResultJSON("user@synventis.com", true, "", 
-        null, context));
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", " +
-        "\"group_membership\" : {}}", cmd.getResultJSON("user@synventis.com", true, null, 
-        null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON(null,
+        false, "access_denied", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON(null,
+        true, "access_denied", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON("",
+        true, "access_denied", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"access_denied\"}", cmd.getResultJSON(
+        "haXX0r", true, "access_denied", null, context));
+    assertEquals("{\"access\" : \"false\", \"error\" : \"wrong_group\"}", cmd.getResultJSON(
+        "user@synventis.com", false, "wrong_group", null, context));
+    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
+        + "\"group_membership\" : {}}", cmd.getResultJSON("user@synventis.com", true, "", null,
+            context));
+    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
+        + "\"group_membership\" : {}}", cmd.getResultJSON("user@synventis.com", true, null, null,
+            context));
   }
-  
+
   @Test
   public void testGetResultJSON_withReturnGroups() throws XWikiException {
     XWikiContext context = createMock(XWikiContext.class);
@@ -334,13 +331,12 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(context.getWiki()).andReturn(xwiki).anyTimes();
     CelementsWebPlugin celementsweb = createMock(CelementsWebPlugin.class);
     cmd.injectCelementsWeb(celementsweb);
-    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context)))
-    .andReturn("email,loginname").atLeastOnce();
-    expect(celementsweb.getUsernameForUserData(eq("user@synventis.com"), 
-        eq("email,loginname"), same(context))).andReturn("XWiki.7sh2lya35").atLeastOnce();
+    expect(xwiki.getXWikiPreference(eq("cellogin"), eq("loginname"), same(context))).andReturn(
+        "email,loginname").atLeastOnce();
+    expect(celementsweb.getUsernameForUserData(eq("user@synventis.com"), eq("email,loginname"),
+        same(context))).andReturn("XWiki.7sh2lya35").atLeastOnce();
     User user = createMock(User.class);
-    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user)
-        .atLeastOnce();
+    expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).atLeastOnce();
     expect(user.isUserInGroup(eq("XWiki.TestGroup1"))).andReturn(true).atLeastOnce();
     expect(user.isUserInGroup(eq("XWiki.TestGroup2"))).andReturn(false).atLeastOnce();
     List<String> returnGroups = new ArrayList<String>();
@@ -350,13 +346,13 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(messageTool.get(eq("cel_groupname_TestGroup1"))).andReturn("grp1").anyTimes();
     expect(messageTool.get(eq("cel_groupname_TestGroup2"))).andReturn("grp2").anyTimes();
     replay(celementsweb, context, messageTool, user, xwiki);
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", " +
-        "\"group_membership\" : {\"grp1\" : \"true\"}}", 
-        cmd.getResultJSON("user@synventis.com", true, null, returnGroups, context));
+    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
+        + "\"group_membership\" : {\"grp1\" : \"true\"}}", cmd.getResultJSON("user@synventis.com",
+            true, null, returnGroups, context));
     returnGroups.add("XWiki.TestGroup2");
-    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", " +
-        "\"group_membership\" : {\"grp1\" : \"true\", \"grp2\" : \"false\"}}", 
-        cmd.getResultJSON("user@synventis.com", true, null, returnGroups, context));
+    assertEquals("{\"access\" : \"true\", \"username\" : \"user@synventis.com\", "
+        + "\"group_membership\" : {\"grp1\" : \"true\", \"grp2\" : \"false\"}}", cmd.getResultJSON(
+            "user@synventis.com", true, null, returnGroups, context));
     verify(celementsweb, context, messageTool, user, xwiki);
   }
 

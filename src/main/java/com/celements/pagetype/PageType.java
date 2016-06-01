@@ -33,25 +33,24 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 /**
- *TODO merge/move with/to XObjectPageTypeConfig or PageTypeService
+ * TODO merge/move with/to XObjectPageTypeConfig or PageTypeService
  */
 public class PageType {
 
-//  private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
+  // private static Log LOGGER = LogFactory.getFactory().getInstance(PageType.class);
 
   /**
    * @deprecated since 2.18.0 instead use PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS
    */
   @Deprecated
-  public static final String PAGE_TYPE_PROPERTIES =
-    PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS;
+  public static final String PAGE_TYPE_PROPERTIES = PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS;
 
   /**
    * @deprecated since 2.29.1 instead use pageTypeDocRef
    */
   @Deprecated
   private String pageTypeFN;
-  
+
   private DocumentReference pageTypeDocRef;
 
   /**
@@ -65,26 +64,23 @@ public class PageType {
 
   public PageType(DocumentReference pageTypeDocRef) {
     this.pageTypeDocRef = pageTypeDocRef;
-    this.pageTypeFN = getWebUtilsService().getRefLocalSerializer().serialize(
-        pageTypeDocRef);
+    this.pageTypeFN = getWebUtilsService().getRefLocalSerializer().serialize(pageTypeDocRef);
   }
 
   public String getConfigName(XWikiContext context) {
-    DocumentReference pageTypeDocRef = getWebUtilsService().resolveDocumentReference(
-        getFullName());
+    DocumentReference pageTypeDocRef = getWebUtilsService().resolveDocumentReference(getFullName());
     return pageTypeDocRef.getName();
   }
 
   public XWikiDocument getTemplateDocument(XWikiContext context) throws XWikiException {
     XWikiDocument templateDoc = null;
-    
-    if(context.getWiki().exists(pageTypeFN, context)){
-      templateDoc = context.getWiki().getDocument(pageTypeFN,
-          context);
+
+    if (context.getWiki().exists(pageTypeFN, context)) {
+      templateDoc = context.getWiki().getDocument(pageTypeFN, context);
     } else {
       templateDoc = context.getWiki().getDocument("celements2web:" + pageTypeFN, context);
     }
-    
+
     return templateDoc;
   }
 
@@ -102,8 +98,7 @@ public class PageType {
 
   public BaseObject getPageTypeProperties(XWikiContext context) {
     try {
-      return getTemplateDocument(context).getObject(
-          PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
+      return getTemplateDocument(context).getObject(PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS);
     } catch (XWikiException e) {
       return null;
     }
@@ -115,9 +110,8 @@ public class PageType {
   }
 
   public boolean showFrame(XWikiContext context) {
-    if (!"login".equals(context.getAction())
-      && (getPageTypeProperties(context) != null)
-      && (getPageTypeProperties(context).getIntValue("show_frame") == 0)) {
+    if (!"login".equals(context.getAction()) && (getPageTypeProperties(context) != null)
+        && (getPageTypeProperties(context).getIntValue("show_frame") == 0)) {
       return false;
     }
     return true;
@@ -137,14 +131,13 @@ public class PageType {
     return "";
   }
 
-  public String getRenderTemplate(String renderMode, XWikiContext context
-      ) throws XWikiException {
+  public String getRenderTemplate(String renderMode, XWikiContext context) throws XWikiException {
     String specView = getRenderTemplateForRenderMode(renderMode, context);
     return specView;
   }
-  
-  String getRenderTemplateForRenderMode(String renderMode, XWikiContext context
-      ) throws XWikiException {
+
+  String getRenderTemplateForRenderMode(String renderMode, XWikiContext context)
+      throws XWikiException {
     String specView = null;
     if (getPageTypeProperties(context) != null) {
       specView = getPageTypeProperties(context).getStringValue("page_" + renderMode);
@@ -153,13 +146,13 @@ public class PageType {
     return specView;
   }
 
-  //TODO check where to move to. RenderCommand or PageTypeTemplateResolver?
+  // TODO check where to move to. RenderCommand or PageTypeTemplateResolver?
   public String resolveTemplatePath(String specView, XWikiContext context) {
-    //TODO replace implementation with WebUtils getInheritedTemplatedPath
-    if((specView != null) && (specView.trim().length() > 0)
-        && !context.getWiki().exists(specView, context)) {
-      if (!specView.startsWith("celements2web:")
-          && context.getWiki().exists("celements2web:" + specView, context)) {
+    // TODO replace implementation with WebUtils getInheritedTemplatedPath
+    if ((specView != null) && (specView.trim().length() > 0) && !context.getWiki().exists(specView,
+        context)) {
+      if (!specView.startsWith("celements2web:") && context.getWiki().exists("celements2web:"
+          + specView, context)) {
         specView = "celements2web:" + specView;
       } else {
         specView = ":" + specView.replaceAll("celements2web:", "");

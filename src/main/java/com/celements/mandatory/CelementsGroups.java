@@ -44,8 +44,8 @@ public class CelementsGroups extends AbstractMandatoryGroups {
     checkGroup(getLayoutEditorGroupRef(getContext().getDatabase()));
     checkGroup(getAdminGroupRef(getContext().getDatabase()));
     checkGroup(getAllGroupRef(getContext().getDatabase()));
-    LOGGER.trace("end checkDocuments in CelementsGroups for database ["
-        + getContext().getDatabase() + "].");
+    LOGGER.trace("end checkDocuments in CelementsGroups for database [" + getContext().getDatabase()
+        + "].");
   }
 
   public DocumentReference getAdminGroupRef(String wikiName) {

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -61,10 +62,11 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     listener.modelAccess = Utils.getComponent(IModelAccessFacade.class);
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
     listener.injecExecution(Utils.getComponent(Execution.class));
-    listener.injectRemoteObservationManagerContext(remoteObsManContextMock = 
-        createMockAndAddToDefault(RemoteObservationManagerContext.class));
-    listener.injectObservationManager(obsManagerMock = 
-        createMockAndAddToDefault(ObservationManager.class));
+    listener.injectRemoteObservationManagerContext(
+        remoteObsManContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class));
+    listener.injectObservationManager(obsManagerMock = createMockAndAddToDefault(
+        ObservationManager.class));
+    listener.configSrc = Utils.getComponent(ConfigurationSource.class);
 
     deletingEventMock = createMockAndAddToDefault(Event.class);
     deletedEventMock = createMockAndAddToDefault(Event.class);
@@ -77,16 +79,16 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
       eventClasses.add(theEvent.getClass());
     }
     assertEquals(2, eventClasses.size());
-    assertTrue("Expecting registration for DocumentDeletingEvent",
-        eventClasses.contains(DocumentDeletingEvent.class));
-    assertTrue("Expecting registration for DocumentDeletedEvent events",
-        eventClasses.contains(DocumentDeletedEvent.class));
+    assertTrue("Expecting registration for DocumentDeletingEvent", eventClasses.contains(
+        DocumentDeletingEvent.class));
+    assertTrue("Expecting registration for DocumentDeletedEvent events", eventClasses.contains(
+        DocumentDeletedEvent.class));
   }
 
   @Test
   public void testOnEvent_nullDoc_ing() {
     Event event = new DocumentDeletingEvent();
-    
+
     replayDefault();
     listener.onEvent(event, null, context);
     verifyDefault();
@@ -95,7 +97,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
   @Test
   public void testOnEvent_nullDoc_ed() {
     Event event = new DocumentDeletedEvent();
-    
+
     replayDefault();
     listener.onEvent(event, null, context);
     verifyDefault();
@@ -106,7 +108,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     Event event = new DocumentDeletingEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(true).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -117,7 +119,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     Event event = new DocumentDeletedEvent();
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(true).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -130,7 +132,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -143,7 +145,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(null).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -157,7 +159,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -171,7 +173,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(origDocMock).once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -186,7 +188,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -206,7 +208,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
     expect(origDocMock.clone()).andReturn(origDocMock).once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -219,11 +221,10 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(null).once();
     expect(wiki.exists(eq(docRef), same(context))).andReturn(false).once();
-    expect(wiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException()
-        ).once();
+    expect(wiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException()).once();
     docMock.setOriginalDocument(isNull(XWikiDocument.class));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -238,7 +239,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletedEventMock), same(docMock), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     listener.onEvent(event, docMock, context);
     verifyDefault();
@@ -275,7 +276,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     protected Logger getLogger() {
       return LOGGER;
     }
-    
+
   }
 
 }

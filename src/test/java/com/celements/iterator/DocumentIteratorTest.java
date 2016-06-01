@@ -53,8 +53,8 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     _testDoc1 = new XWikiDocument();
     _testDoc2 = new XWikiDocument();
     _docList = new ArrayList<String>();
-  }  
-  
+  }
+
   @Test
   public void testSetDocList() {
     _docList.add("Test.Doc");
@@ -81,8 +81,8 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.moveToNextDoc();
       fail("Exception expected.");
-    } catch(NoSuchElementException ex) {
-      //expected behaviour
+    } catch (NoSuchElementException ex) {
+      // expected behaviour
     }
     verify(_xwiki);
   }
@@ -95,20 +95,15 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname1);
     _docList.add(fullname2);
     _iterator.setDocList(_docList);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(
-        new XWikiDocument()).once();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(
-      new XWikiDocument()).once();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(
-        true).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(
-        true).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(new XWikiDocument()).once();
+    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(new XWikiDocument()).once();
+    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
     replay(_xwiki);
     XWikiDocument firstDoc = _iterator.getCurrentDoc();
     _iterator.moveToNextDoc();
     XWikiDocument secondDoc = _iterator.getCurrentDoc();
-    assertNotSame("moveToNextDoc must update the currentDoc.",
-        firstDoc, secondDoc);
+    assertNotSame("moveToNextDoc must update the currentDoc.", firstDoc, secondDoc);
     verify(_xwiki);
   }
 
@@ -126,8 +121,8 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.getDocIterator();
       fail("Expecting exception.");
-    } catch(IllegalStateException ex) {
-      //expected behaviour
+    } catch (IllegalStateException ex) {
+      // expected behaviour
     }
   }
 
@@ -153,14 +148,10 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname2);
     _testDoc1.setFullName(fullname1);
     _testDoc2.setFullName(fullname2);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(_testDoc1
-        ).anyTimes();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2
-        ).anyTimes();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(
-        true).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(
-        true).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(_testDoc1).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2).anyTimes();
+    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     _iterator.next();
@@ -169,7 +160,7 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testHasNext_skipDoc() throws Exception {
     String fullname1 = "Test.Doc1";
@@ -177,14 +168,10 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname1);
     _docList.add(fullname2);
     _testDoc2.setFullName(fullname1);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(null
-        ).anyTimes();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2
-        ).anyTimes();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(
-        false).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(
-        true).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(null).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2).anyTimes();
+    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(false).anyTimes();
+    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     assertTrue(_iterator.hasNext());
@@ -192,20 +179,18 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     assertFalse(_iterator.hasNext());
     verify(_xwiki);
   }
-  
+
   @Test
   public void testHasNext_false() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc1
-        ).anyTimes();
-    expect(_xwiki.exists(eq(fullname), same(_context))).andReturn(
-        true).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname), same(_context))).andReturn(_testDoc1).anyTimes();
+    expect(_xwiki.exists(eq(fullname), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     _iterator.next();
     assertEquals(false, _iterator.hasNext());
-    verify(_xwiki); 
+    verify(_xwiki);
   }
 
   @Test
@@ -215,22 +200,22 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     try {
       _iterator.next();
       fail("Exception expected.");
-    } catch(NoSuchElementException ex) {
-      //expected behaviour
+    } catch (NoSuchElementException ex) {
+      // expected behaviour
     }
     verify(_xwiki);
   }
-  
+
   @Test
   public void testRemove() {
     try {
       _iterator.remove();
       fail("Remove not supported.");
-    } catch(UnsupportedOperationException ex) {
-      //expected behaviour
+    } catch (UnsupportedOperationException ex) {
+      // expected behaviour
     }
   }
-  
+
   @Test
   public void testIterator_foreach() throws Exception {
     String fullname1 = "Test.Doc1";
@@ -239,14 +224,10 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname2);
     _testDoc1.setFullName(fullname1);
     _testDoc2.setFullName(fullname2);
-    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(_testDoc1
-        ).once();
-    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2
-        ).once();
-    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(
-        true).anyTimes();
-    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(
-        true).anyTimes();
+    expect(_xwiki.getDocument(eq(fullname1), same(_context))).andReturn(_testDoc1).once();
+    expect(_xwiki.getDocument(eq(fullname2), same(_context))).andReturn(_testDoc2).once();
+    expect(_xwiki.exists(eq(fullname1), same(_context))).andReturn(true).anyTimes();
+    expect(_xwiki.exists(eq(fullname2), same(_context))).andReturn(true).anyTimes();
     _iterator.setDocList(_docList);
     replay(_xwiki);
     int count = 0;
@@ -260,8 +241,8 @@ public class DocumentIteratorTest extends AbstractBridgedComponentTestCase {
     verify(_xwiki);
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
 }

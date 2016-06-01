@@ -44,11 +44,10 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   public void testDeleteMenuItem() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myDocument");
-    expect(mockRightService.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"),
-        eq("mySpace.myDocument"), same(context))).andReturn(false).once();
+    expect(mockRightService.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), eq(
+        "mySpace.myDocument"), same(context))).andReturn(false).once();
     replayAll();
-    assertFalse("expecting false because of no edit rights", celWebService.deleteMenuItem(
-        docRef));
+    assertFalse("expecting false because of no edit rights", celWebService.deleteMenuItem(docRef));
     verifyAll();
   }
 
@@ -68,44 +67,39 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
   public void testGetHumanReadableSize_PartSize_dech() {
     context.setLanguage("de-ch");
     assertEquals("de-ch", "2.6 MB", celWebService.getHumanReadableSize(2563210, true));
-    assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true,
-        "fr"));
+    assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true, "fr"));
   }
 
   @Test
   public void testGetHumanReadableSize_PartSize_de_country_CH() {
     context.setLanguage("de");
-    assertEquals("de-ch", "1'006.7 MiB", celWebService.getHumanReadableSize(1055563210,
-        false, celWebService.getLocal("de", "ch")));
-    assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true,
-        "fr"));
+    assertEquals("de-ch", "1'006.7 MiB", celWebService.getHumanReadableSize(1055563210, false,
+        celWebService.getLocal("de", "ch")));
+    assertEquals("fr", "2,6 MB", celWebService.getHumanReadableSize(2563210, true, "fr"));
   }
 
   @Test
   public void testGetLocal() {
-    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
-        "de"));
+    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal("de"));
     assertEquals("12.312.312", formater.format(12312312L));
   }
 
   @Test
   public void testGetLocal_country() {
-    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
-        "de", "ch"));
+    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal("de", "ch"));
     assertEquals("12'312'312", formater.format(12312312L));
   }
 
   @Test
   public void testGetLocal_country_illegal_combination() {
-    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal(
-        "en", "ch"));
+    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal("en", "ch"));
     assertEquals("12,312,312", formater.format(12312312L));
   }
 
   @Test
   public void testIsAppScriptRequest_appXpage() {
-    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(),
-        "Content", "noScript");
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "noScript");
     XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
     context.setDoc(contextDoc);
     XWikiRequest mockRequest = createMock(XWikiRequest.class);
@@ -114,39 +108,39 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     expect(mockRequest.getParameter(eq("xpage"))).andReturn(
         IAppScriptService.APP_SCRIPT_XPAGE).anyTimes();
     expect(mockRequest.getParameter(eq("s"))).andReturn("myScript").anyTimes();
-    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS),
-        eq(IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))
-        ).andReturn("Content.login").anyTimes();
+    expect(xwiki.getXWikiPreference(eq(IAppScriptService.APP_SCRIPT_XWPREF_OVERW_DOCS), eq(
+        IAppScriptService.APP_SCRIPT_CONF_OVERW_DOCS), eq("-"), same(context))).andReturn(
+            "Content.login").anyTimes();
     replayAll(mockRequest);
     assertTrue(celWebService.isAppScriptRequest());
     verifyAll(mockRequest);
   }
-  
+
   @Test
   public void testGetCurrentPageURL_isAppScriptRequest() {
     IAppScriptService appScriptServiceMock = createMock(AppScriptService.class);
     celWebService.appScriptService = appScriptServiceMock;
     String queryString = "myQueryString";
     String scriptName = "myScript/Name";
-    
+
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(true).once();
     expect(appScriptServiceMock.getScriptNameFromURL()).andReturn(scriptName).once();
-    expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString))
-        ).andReturn("theURL").once();
-    
+    expect(appScriptServiceMock.getAppScriptURL(eq(scriptName), eq(queryString))).andReturn(
+        "theURL").once();
+
     replayAll(appScriptServiceMock);
     assertEquals("theURL", celWebService.getCurrentPageURL(queryString));
     verifyAll(appScriptServiceMock);
   }
-  
+
   @Test
   public void testGetCurrentPageURL_isNotAppScriptRequest() {
     IAppScriptService appScriptServiceMock = createMock(AppScriptService.class);
     celWebService.appScriptService = appScriptServiceMock;
     String queryString = "my[Query}String";
-    
+
     expect(appScriptServiceMock.isAppScriptRequest()).andReturn(false).once();
-    
+
     replayAll(appScriptServiceMock);
     assertEquals("?my%5BQuery%7DString", celWebService.getCurrentPageURL(queryString));
     verifyAll(appScriptServiceMock);
@@ -166,12 +160,12 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
     verifyAll();
   }
 
-  private void replayAll(Object ... mocks) {
+  private void replayAll(Object... mocks) {
     replay(xwiki, mockRightService);
     replay(mocks);
   }
 
-  private void verifyAll(Object ... mocks) {
+  private void verifyAll(Object... mocks) {
     verify(xwiki, mockRightService);
     verify(mocks);
   }
