@@ -317,6 +317,7 @@ public class WebUtils implements IWebUtils {
 
   /*
    * (non-Javadoc)
+   * 
    * @see com.celements.web.utils.IWebUtils#getConfigDocByInheritance(com.xpn.xwiki.doc.
    * XWikiDocument, java.lang.String, com.xpn.xwiki.XWikiContext)
    */

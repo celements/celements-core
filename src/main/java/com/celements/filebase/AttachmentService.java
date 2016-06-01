@@ -92,7 +92,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   @Override
   public XWikiAttachment addAttachment(XWikiDocument doc, byte[] data, String filename,
       String username, String comment) throws AttachmentToBigException,
-          AddingAttachmentContentFailedException, DocumentSaveException {
+      AddingAttachmentContentFailedException, DocumentSaveException {
     ByteArrayInputStream dataStream = null;
     try {
       dataStream = new ByteArrayInputStream(data);
@@ -105,7 +105,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   @Override
   public XWikiAttachment addAttachment(XWikiDocument doc, InputStream in, String filename,
       String username, String comment) throws AttachmentToBigException,
-          AddingAttachmentContentFailedException, DocumentSaveException {
+      AddingAttachmentContentFailedException, DocumentSaveException {
     // We do not want to change the document in xwiki cache in case an exception happens
     // those not saved changes would be left in memory
     XWikiDocument theDoc = (XWikiDocument) doc.clone();

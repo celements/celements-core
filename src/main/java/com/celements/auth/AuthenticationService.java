@@ -11,7 +11,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
-import com.celements.web.service.CelementsWebScriptService;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

@@ -492,7 +492,7 @@ public class Navigation implements INavigation {
 
   private void writeMenuItemWithSubmenu(StringBuilder outStream, String parent, int numMoreLevels,
       DocumentReference docRef, boolean isFirstItem, boolean isLastItem, int numItem)
-          throws XWikiException {
+      throws XWikiException {
     boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels),
         getContext());
     String fullName = getWebUtilsService().getRefLocalSerializer().serialize(docRef);

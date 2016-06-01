@@ -780,7 +780,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc, boolean bWithObjects,
       boolean bWithRendering, boolean bWithAttachmentContent, boolean bWithVersions)
-          throws XWikiException {
+      throws XWikiException {
     Map<String, String> docData = new LinkedHashMap<String, String>();
     DocumentReference docRef = xwikiDoc.getDocumentReference();
     docData.put("web", docRef.getLastSpaceReference().getName());
@@ -828,7 +828,7 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
     docData.put("menuName", menuNameCmd.getMultilingualMenuName(serializer_default.serialize(
         xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
-        // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
+    // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
     /**
      * TODO add Attachments for (XWikiAttachment attach : xwikiDoc.getAttachmentList()) {

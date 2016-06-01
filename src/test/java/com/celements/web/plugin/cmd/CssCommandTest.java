@@ -1,7 +1,7 @@
 package com.celements.web.plugin.cmd;
 
-import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
