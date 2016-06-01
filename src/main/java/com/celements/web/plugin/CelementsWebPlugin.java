@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.auth.AccountActivationFailedException;
 import com.celements.auth.AuthenticationService;
 import com.celements.auth.IAuthenticationServiceRole;
 import com.celements.mailsender.IMailSenderRole;
@@ -123,8 +124,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * getSubMenuItemsForParent get all submenu items of given parent document (by
-   * fullname).
+   * getSubMenuItemsForParent
+   * get all submenu items of given parent document (by fullname).
    * 
    * @param parent
    * @param menuSpace
@@ -222,8 +223,9 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.22.0 instead use NewCelementsTokenForUserCommand.
-   *             getNewCelementsTokenForUserWithAutentication
+   * @deprecated since 2.22.0
+   *             instead use
+   *             NewCelementsTokenForUserCommand.getNewCelementsTokenForUserWithAutentication
    */
   @Deprecated
   public String getNewCelementsTokenForUser(String accountName, Boolean guestPlus,
@@ -233,8 +235,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationService #getPasswordHash(String, String)}
+   * @deprecated since 2.59 instead use {@link AuthenticationService
+   *             #getPasswordHash(String, String)}
    */
   @Deprecated
   public String encryptString(String encoding, String str) {
@@ -242,18 +244,23 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationService #activateAccount(String)}
+   * @deprecated since 2.59 instead use {@link AuthenticationService
+   *             #activateAccount(String)}
    */
   @Deprecated
   public Map<String, String> activateAccount(String activationCode, XWikiContext context)
       throws XWikiException {
-    return getAuthenticationService().activateAccount(activationCode);
+    try {
+      return getAuthenticationService().activateAccount(activationCode);
+    } catch (AccountActivationFailedException authExp) {
+      throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+          XWikiException.ERROR_XWIKI_UNKNOWN, "activateAccount failed.", authExp);
+    }
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link CelementsWebService #getEmailAdressForUser(DocumentReference)}
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   *             #getEmailAdressForUser(DocumentReference)}
    */
   @Deprecated
   public String getEmailAdressForUser(String username, XWikiContext context) {
@@ -289,8 +296,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link WebUtilsService #getAttachmentsForDocs(List)}
+   * @deprecated since 2.59 instead use {@link WebUtilsService
+   *             #getAttachmentsForDocs(List)}
    */
   @Deprecated
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN, XWikiContext context) {
@@ -298,8 +305,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.11.7 instead use renderCelementsDocument on celementsweb
-   *             scriptService
+   * @deprecated since 2.11.7 instead use renderCelementsDocument
+   *             on celementsweb scriptService
    */
   @Deprecated
   public String renderCelementsPageType(XWikiDocument doc, IPageType pageType, XWikiContext context)
@@ -346,8 +353,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link CelementsWebService #getUniqueNameValueRequestMap()}
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   *             #getUniqueNameValueRequestMap()}
    */
   @Deprecated
   public Map<String, String> getUniqueNameValueRequestMap(XWikiContext context) {
@@ -355,7 +362,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link CelementsWebService #createUser(boolean)}
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   *             #createUser(boolean)}
    */
   @Deprecated
   public int createUser(boolean validate, XWikiContext context) throws XWikiException {
@@ -371,8 +379,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link CelementsWebService #createUser(Map, String, boolean)}
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   *             #createUser(Map, String, boolean)}
    */
   @Deprecated
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
@@ -448,8 +456,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link AuthenticationService #checkAuth(String, String, String, String, Boolean)}
+   * @deprecated since 2.59 instead use {@link AuthenticationService
+   *             #checkAuth(String, String, String, String, Boolean)}
    */
   @Deprecated
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
@@ -459,7 +467,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link ITreeNodeService #enableMappedMenuItems()}
+   * @deprecated since 2.59 instead use {@link ITreeNodeService
+   *             #enableMappedMenuItems()}
    */
   @Deprecated
   public void enableMappedMenuItems(XWikiContext context) {
@@ -469,8 +478,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link ActionService #executeAction(Document, Map, XWikiDocument, XWikiContext)}
+   * @deprecated since 2.59 instead use {@link ActionService
+   *             #executeAction(Document, Map, XWikiDocument, XWikiContext)}
    */
   @Deprecated
   public boolean executeAction(Document actionDoc, Map<String, String[]> request,
@@ -479,8 +488,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link CelementsWebService #getSupportedAdminLanguages()}
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   *             #getSupportedAdminLanguages()}
    */
   @Deprecated
   public List<String> getSupportedAdminLanguages() {
@@ -497,8 +506,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link CelementsWebService #writeUTF8Response(String, String)}
+   * @deprecated since 2.59 instead use {@link CelementsWebService
+   *             #writeUTF8Response(String, String)}
    */
   @Deprecated
   public boolean writeUTF8Response(String filename, String renderDocFullName,
@@ -507,7 +516,8 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link WebFormService #isFormFilled(Map, Set)}
+   * @deprecated since 2.59 instead use {@link WebFormService
+   *             #isFormFilled(Map, Set)}
    */
   @Deprecated
   public boolean isFormFilled(Map<String, String[]> parameterMap, Set<String> additionalFields) {

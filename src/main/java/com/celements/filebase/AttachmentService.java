@@ -50,8 +50,8 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -62,11 +62,12 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.web.XWikiResponse;
 
 /**
- * This Service makes the methods in the XWiki UploadAction-Class accessible by other
- * means. In celements we especially need them for the TokenBasedUpload because the
- * addAttachment on the Document class is buggy.
+ * This Service makes the methods in the XWiki UploadAction-Class accessible
+ * by other means. In celements we especially need them for the TokenBasedUpload because
+ * the addAttachment on the Document class is buggy.
  * 
- * @author fabian since 2.28.0
+ * @author fabian
+ *         since 2.28.0
  */
 @Component
 public class AttachmentService implements IAttachmentServiceRole {
@@ -83,7 +84,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   Execution execution;
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  IRightsAccessFacadeRole rightsAccess;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -177,9 +178,11 @@ public class AttachmentService implements IAttachmentServiceRole {
    *          the {@link FileUploadPlugin} holding the form data
    * @param doc
    *          the target document
-   * @return {@code true} if the file was successfully attached, {@code false} otherwise.
+   * @return {@code true} if the file was successfully attached, {@code false}
+   *         otherwise.
    * @throws XWikiException
-   *           if the form data cannot be accessed, or if the database operation failed
+   *           if the form data cannot be accessed, or if the database operation
+   *           failed
    */
   @Override
   public boolean uploadAttachment(String fieldName, String filename, FileUploadPlugin fileupload,
@@ -259,9 +262,9 @@ public class AttachmentService implements IAttachmentServiceRole {
   }
 
   /**
-   * Extract the corresponding attachment name for a given file field. It can either be
-   * specified in a separate form input field, or it is extracted from the original
-   * filename.
+   * Extract the corresponding attachment name for a given file field. It can
+   * either be specified in a separate form input field, or it is extracted from
+   * the original filename.
    * 
    * @param fieldName
    *          the target file field
@@ -271,8 +274,8 @@ public class AttachmentService implements IAttachmentServiceRole {
    *          the {@link FileUploadPlugin} holding the form data
    * @return a valid attachment name
    * @throws XWikiException
-   *           if the form data cannot be accessed, or if the specified filename is
-   *           invalid
+   *           if the form data cannot be accessed, or if the specified filename
+   *           is invalid
    */
   String getFileName(String fieldName, String fieldNamePrefix, FileUploadPlugin fileupload)
       throws XWikiException {
@@ -425,7 +428,7 @@ public class AttachmentService implements IAttachmentServiceRole {
     for (DocumentReference docRef : attachmentMap.keySet()) {
       int nrDeletedOnDoc = 0;
       try {
-        XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+        XWikiDocument doc = modelAccess.getDocument(docRef);
         // Analogue to class DeleteAttachmentAction
         String versionCommentList = "";
         for (String filename : attachmentMap.get(docRef)) {
@@ -448,11 +451,12 @@ public class AttachmentService implements IAttachmentServiceRole {
           // the newdoc.originalDoc as well
           doc.setOriginalDocument(doc);
           // Also save the document and attachment metadata
-          getContext().getWiki().saveDocument(doc, getContext());
+          modelAccess.saveDocument(doc, "deleted " + nrDeletedOnDoc + " attachments");
         }
         nrDeleted += nrDeletedOnDoc;
-      } catch (XWikiException xwe) {
-        _LOGGER.error("Exception deleting Attachments on doch " + docRef, xwe);
+      } catch (XWikiException | DocumentLoadException | DocumentNotExistsException
+          | DocumentSaveException xwe) {
+        _LOGGER.error("Exception deleting Attachments on doc '{}'", docRef, xwe);
       }
     }
     return nrDeleted;
@@ -528,7 +532,7 @@ public class AttachmentService implements IAttachmentServiceRole {
   @Override
   public Attachment getApiAttachment(XWikiAttachment attachment) throws NoAccessRightsException {
     XWikiDocument doc = attachment.getDoc();
-    if (webUtilsService.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
+    if (rightsAccess.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
       return getApiAttachmentWithoutRightChecks(attachment);
     }
     throw new NoAccessRightsException(doc.getDocumentReference(), getContext().getXWikiUser(),

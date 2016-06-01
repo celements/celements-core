@@ -27,7 +27,7 @@ import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 
-import com.xpn.xwiki.XWikiException;
+import com.celements.model.access.exception.DocumentLoadException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class AbstractDocumentDeleteListener extends AbstractDocumentListener {
@@ -45,10 +45,10 @@ public abstract class AbstractDocumentDeleteListener extends AbstractDocumentLis
       XWikiDocument origDoc = doc.getOriginalDocument();
       if ((origDoc == null) && (event instanceof DocumentDeletingEvent)) {
         try {
-          origDoc = getContext().getWiki().getDocument(docRef, getContext());
-        } catch (XWikiException xwe) {
-          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", doc, event,
-              xwe);
+          origDoc = modelAccess.getOrCreateDocument(docRef);
+        } catch (DocumentLoadException docLoadExp) {
+          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", 
+              doc, event, docLoadExp);
         }
         doc.setOriginalDocument(origDoc);
       }

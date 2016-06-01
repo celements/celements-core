@@ -1,5 +1,6 @@
 package com.celements.auth;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -156,41 +157,42 @@ public class AuthenticationScriptService implements ScriptService {
     return getNewCelementsTokenForUser(false);
   }
 
-  /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
-   */
-  public Map<String, String> activateAccount(String activationCode) throws XWikiException {
-    return authenticationService.activateAccount(activationCode);
+  public Map<String, String> activateAccount(String activationCode) {
+    try {
+      return authenticationService.activateAccount(activationCode);
+    } catch (AccountActivationFailedException authExp) {
+      _LOGGER.info("Failed to activate account", authExp);
+    }
+    return Collections.emptyMap();
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
    */
   public String getUniqueValidationKey() throws XWikiException {
     return new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
    */
   public String recoverPassword() throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword();
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
    */
   public String recoverPassword(String account) throws XWikiException {
     return new PasswordRecoveryAndEmailValidationCommand().recoverPassword(account, account);
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
    */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins) throws XWikiException {
@@ -199,8 +201,8 @@ public class AuthenticationScriptService implements ScriptService {
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
+   * and write the exception in a log-file
    */
   public XWikiUser checkAuth(String logincredential, String password, String rememberme,
       String possibleLogins, boolean noRedirect) throws XWikiException {
@@ -242,7 +244,7 @@ public class AuthenticationScriptService implements ScriptService {
 
   /**
    * API to check rights on a document for a given user or group
-   * 
+   *
    * @param level
    *          right to check (view, edit, comment, delete)
    * @param user

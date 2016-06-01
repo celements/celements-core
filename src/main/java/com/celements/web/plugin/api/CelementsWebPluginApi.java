@@ -679,7 +679,7 @@ public class CelementsWebPluginApi extends Api {
    *             {@link AuthenticationScriptService #activateAccount(String)}
    */
   @Deprecated
-  public Map<String, String> activateAccount(String activationCode) throws XWikiException {
+  public Map<String, String> activateAccount(String activationCode) {
     return getAuthenticationScriptService().activateAccount(activationCode);
   }
 
