@@ -25,4 +25,6 @@ public interface ICelementsWebServiceRole {
   public void setSupportedAdminLanguages(List<String> supportedAdminLangList);
 
   public boolean writeUTF8Response(String filename, String renderDocFullName);
+
+  public String getNewRandomXWikiUserName(String accountName);
 }

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -14,6 +16,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
@@ -32,6 +35,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private static Logger _LOGGER = LoggerFactory.getLogger(CelementsWebService.class);
 
   private List<String> supportedAdminLangList;
+
+  @Requirement
+  IModelAccessFacade modelAccess;
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -79,10 +85,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       accountName = userData.get("xwikiname");
       userData.remove("xwikiname");
     } else {
-      while (accountName.equals("") || getContext().getWiki().exists(
-          webUtilsService.resolveDocumentReference("XWiki." + accountName), getContext())) {
-        accountName = getContext().getWiki().generateRandomString(12);
-      }
+      accountName = getNewRandomXWikiUserName(accountName);
     }
     String validkey = "";
     int success = -1;
@@ -143,6 +146,15 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       }
     }
     return success;
+  }
+
+  @Override
+  public String getNewRandomXWikiUserName(String accountName) {
+    while (Strings.isNullOrEmpty(accountName) || modelAccess.exists(
+        webUtilsService.resolveDocumentReference("XWiki." + accountName))) {
+      accountName = RandomStringUtils.randomAlphabetic(12);
+    }
+    return accountName;
   }
 
   @SuppressWarnings("unchecked")
