@@ -14,7 +14,12 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.rendering.RenderCommand;
+import com.celements.web.UserCreateException;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -23,6 +28,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiResponse;
 
@@ -35,6 +41,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
 
   @Requirement
   private IWebUtilsService webUtilsService;
+
+  @Requirement
+  IModelAccessFacade modelAccess;
 
   @Requirement
   private Execution execution;
@@ -74,61 +83,92 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public synchronized int createUser(Map<String, String> userData, String possibleLogins,
       boolean validate) throws XWikiException {
+    try {
+      if (createNewUser(userData, possibleLogins, validate) != null) {
+        return 1;
+      }
+    } catch (UserCreateException uce) {
+      if (uce.getCause() instanceof XWikiException) {
+        throw (XWikiException) uce.getCause();
+      } else {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_UNKNOWN, "failed to create user", uce);
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public synchronized XWikiUser createNewUser(Map<String, String> userData, String possibleLogins,
+      boolean validate) throws UserCreateException {
     String accountName = "";
+    String accountFullName = null;
     if (userData.containsKey("xwikiname")) {
       accountName = userData.get("xwikiname");
       userData.remove("xwikiname");
     } else {
       while (accountName.equals("") || getContext().getWiki().exists(
-          webUtilsService.resolveDocumentReference("XWiki." + accountName), getContext())) {
+          webUtilsService.resolveDocumentReference(accountFullName), getContext())) {
         accountName = getContext().getWiki().generateRandomString(12);
+        accountFullName = "XWiki." + accountName;
       }
     }
     String validkey = "";
     int success = -1;
-    if (areIdentifiersUnique(userData, possibleLogins, getContext())) {
-      if (!userData.containsKey("password")) {
-        String password = getContext().getWiki().generateRandomString(8);
-        userData.put("password", password);
-      }
-      if (!userData.containsKey("validkey")) {
-        validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
-        userData.put("validkey", validkey);
-      } else {
-        validkey = userData.get("validkey");
-      }
-      if (!userData.containsKey("active")) {
-        userData.put("active", "0");
-      }
-      String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
+    try {
+      if (areIdentifiersUnique(userData, possibleLogins, getContext())) {
+        if (!userData.containsKey("password")) {
+          String password = getContext().getWiki().generateRandomString(8);
+          userData.put("password", password);
+        }
+        if (!userData.containsKey("validkey")) {
+          validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
+          userData.put("validkey", validkey);
+        } else {
+          validkey = userData.get("validkey");
+        }
+        if (!userData.containsKey("active")) {
+          userData.put("active", "0");
+        }
+        String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
 
-      success = getContext().getWiki().createUser(accountName, userData,
-          webUtilsService.resolveDocumentReference("XWiki.XWikiUsers"), content, null, "edit",
-          getContext());
+        success = getContext().getWiki().createUser(accountName, userData,
+            webUtilsService.resolveDocumentReference("XWiki.XWikiUsers"), content, null, "edit",
+            getContext());
+      }
+    } catch (XWikiException excp) {
+      _LOGGER.error("Exception while creating a new user", excp);
+      throw new UserCreateException(excp);
     }
 
+    XWikiUser newUser = null;
     if (success == 1) {
-      userData.put(CREATED_USER_NAME_MAP_KEY, accountName);
       // Set rights on user doc
-      XWikiDocument doc = getContext().getWiki().getDocument(
-          webUtilsService.resolveDocumentReference("XWiki." + accountName), getContext());
-      List<BaseObject> rightsObjs = doc.getXObjects(webUtilsService.resolveDocumentReference(
-          "XWiki.XWikiRights"));
-      for (BaseObject rightObj : rightsObjs) {
-        if (rightObj.getStringValue("groups").equals("")) {
-          rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
-              doc.getDocumentReference()));
-          rightObj.set("allow", "1", getContext());
-          rightObj.set("levels", "view,edit,delete", getContext());
-          rightObj.set("groups", "", getContext());
-        } else {
-          rightObj.set("users", "", getContext());
-          rightObj.set("allow", "1", getContext());
-          rightObj.set("levels", "view,edit,delete", getContext());
-          rightObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
+      try {
+        XWikiDocument doc = modelAccess.getDocument(webUtilsService.resolveDocumentReference(
+            accountFullName));
+        List<BaseObject> rightsObjs = doc.getXObjects(webUtilsService.resolveDocumentReference(
+            "XWiki.XWikiRights"));
+        for (BaseObject rightObj : rightsObjs) {
+          if (rightObj.getStringValue("groups").equals("")) {
+            rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
+                doc.getDocumentReference()));
+            rightObj.set("allow", "1", getContext());
+            rightObj.set("levels", "view,edit,delete", getContext());
+            rightObj.set("groups", "", getContext());
+          } else {
+            rightObj.set("users", "", getContext());
+            rightObj.set("allow", "1", getContext());
+            rightObj.set("levels", "view,edit,delete", getContext());
+            rightObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
+          }
         }
+        modelAccess.saveDocument(doc, "added rights objects to created user");
+        newUser = new XWikiUser(accountFullName);
+      } catch (DocumentLoadException | DocumentNotExistsException | DocumentSaveException excp) {
+        _LOGGER.error("Exception while trying to add rights to newly created user", excp);
+        throw new UserCreateException(excp);
       }
-      getContext().getWiki().saveDocument(doc, getContext());
 
       if (validate) {
         _LOGGER.info("send account validation mail with data: accountname='" + accountName
@@ -140,10 +180,11 @@ public class CelementsWebService implements ICelementsWebServiceRole {
         } catch (XWikiException e) {
           _LOGGER.error("Exception while sending validation mail to '" + userData.get("email")
               + "'", e);
+          throw new UserCreateException(e);
         }
       }
     }
-    return success;
+    return newUser;
   }
 
   @SuppressWarnings("unchecked")
