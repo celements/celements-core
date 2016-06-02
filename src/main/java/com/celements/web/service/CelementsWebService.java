@@ -108,6 +108,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
     }
 
     if (success == 1) {
+      userData.put(CREATED_USER_NAME_MAP_KEY, accountName);
       // Set rights on user doc
       XWikiDocument doc = getContext().getWiki().getDocument(
           webUtilsService.resolveDocumentReference("XWiki." + accountName), getContext());

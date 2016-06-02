@@ -11,6 +11,8 @@ import com.xpn.xwiki.XWikiException;
 @ComponentRole
 public interface ICelementsWebServiceRole {
 
+  public static final String CREATED_USER_NAME_MAP_KEY = "cel_createdUserName";
+
   public String getEmailAdressForUser(DocumentReference userDocRef);
 
   public int createUser(boolean validate) throws XWikiException;
