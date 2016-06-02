@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -99,8 +101,8 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   }
 
   @Override
-  public synchronized XWikiUser createNewUser(Map<String, String> userData, String possibleLogins,
-      boolean validate) throws UserCreateException {
+  public synchronized @NotNull XWikiUser createNewUser(@NotNull Map<String, String> userData,
+      @NotNull String possibleLogins, @NotNull boolean validate) throws UserCreateException {
     String accountName = "";
     String accountFullName = null;
     if (userData.containsKey("xwikiname")) {
@@ -183,6 +185,9 @@ public class CelementsWebService implements ICelementsWebServiceRole {
           throw new UserCreateException(e);
         }
       }
+    }
+    if (newUser == null) {
+      throw new UserCreateException("Failed to create a new user");
     }
     return newUser;
   }
