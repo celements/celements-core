@@ -145,33 +145,8 @@ public class CelementsWebService implements ICelementsWebServiceRole {
 
     XWikiUser newUser = null;
     if (success == 1) {
-      // Set rights on user doc
-      try {
-        XWikiDocument doc = modelAccess.getDocument(webUtilsService.resolveDocumentReference(
-            accountFullName));
-        List<BaseObject> rightsObjs = doc.getXObjects(webUtilsService.resolveDocumentReference(
-            "XWiki.XWikiRights"));
-        for (BaseObject rightObj : rightsObjs) {
-          if (rightObj.getStringValue("groups").equals("")) {
-            rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
-                doc.getDocumentReference()));
-            rightObj.set("allow", "1", getContext());
-            rightObj.set("levels", "view,edit,delete", getContext());
-            rightObj.set("groups", "", getContext());
-          } else {
-            rightObj.set("users", "", getContext());
-            rightObj.set("allow", "1", getContext());
-            rightObj.set("levels", "view,edit,delete", getContext());
-            rightObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
-          }
-        }
-        modelAccess.saveDocument(doc, "added rights objects to created user");
-        newUser = new XWikiUser(accountFullName);
-      } catch (DocumentLoadException | DocumentNotExistsException | DocumentSaveException excp) {
-        _LOGGER.error("Exception while trying to add rights to newly created user", excp);
-        throw new UserCreateException(excp);
-      }
-
+      setRightsOnUserDoc(accountFullName);
+      newUser = new XWikiUser(accountFullName);
       if (validate) {
         _LOGGER.info("send account validation mail with data: accountname='" + accountName
             + "', email='" + userData.get("email") + "', validkey='" + validkey + "'");
@@ -190,6 +165,33 @@ public class CelementsWebService implements ICelementsWebServiceRole {
       throw new UserCreateException("Failed to create a new user");
     }
     return newUser;
+  }
+
+  void setRightsOnUserDoc(@NotNull String accountFullName) throws UserCreateException {
+    try {
+      XWikiDocument doc = modelAccess.getDocument(webUtilsService.resolveDocumentReference(
+          accountFullName));
+      List<BaseObject> rightsObjs = doc.getXObjects(webUtilsService.resolveDocumentReference(
+          "XWiki.XWikiRights"));
+      for (BaseObject rightObj : rightsObjs) {
+        if (rightObj.getStringValue("groups").equals("")) {
+          rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
+              doc.getDocumentReference()));
+          rightObj.set("allow", "1", getContext());
+          rightObj.set("levels", "view,edit,delete", getContext());
+          rightObj.set("groups", "", getContext());
+        } else {
+          rightObj.set("users", "", getContext());
+          rightObj.set("allow", "1", getContext());
+          rightObj.set("levels", "view,edit,delete", getContext());
+          rightObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
+        }
+      }
+      modelAccess.saveDocument(doc, "added rights objects to created user");
+    } catch (DocumentLoadException | DocumentNotExistsException | DocumentSaveException excp) {
+      _LOGGER.error("Exception while trying to add rights to newly created user", excp);
+      throw new UserCreateException(excp);
+    }
   }
 
   @SuppressWarnings("unchecked")
