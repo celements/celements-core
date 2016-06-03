@@ -102,7 +102,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
 
   @Override
   public synchronized @NotNull XWikiUser createNewUser(@NotNull Map<String, String> userData,
-      @NotNull String possibleLogins, @NotNull boolean validate) throws UserCreateException {
+      @NotNull String possibleLogins, boolean validate) throws UserCreateException {
     String accountName = "";
     String accountFullName = null;
     if (userData.containsKey("xwikiname")) {
