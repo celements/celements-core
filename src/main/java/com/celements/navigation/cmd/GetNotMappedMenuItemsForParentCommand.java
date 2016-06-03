@@ -66,7 +66,7 @@ public class GetNotMappedMenuItemsForParentCommand {
   /**
    * use for tests only!!!
    */
-  void injectMapForTests(String wikiName, HashMap<String, List<TreeNode>> myWikiTestMap) {
+  void injectMapForTests(String wikiName, Map<String, List<TreeNode>> myWikiTestMap) {
     menuItems.put(wikiName, myWikiTestMap);
   }
 
@@ -135,6 +135,7 @@ public class GetNotMappedMenuItemsForParentCommand {
                 (Integer) docData[3]);
             treeNode.setPartNameGetStrategy(new IPartNameGetStrategy() {
 
+              @Override
               public String getPartName(String fullName, XWikiContext context) {
                 try {
                   XWikiDocument itemdoc = context.getWiki().getDocument(fullName, context);
@@ -232,7 +233,7 @@ public class GetNotMappedMenuItemsForParentCommand {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.utils.IWebUtils#queryCount()
    */
   public int queryCount() {
@@ -241,7 +242,7 @@ public class GetNotMappedMenuItemsForParentCommand {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
   synchronized public void flushMenuItemCache(XWikiContext context) {
