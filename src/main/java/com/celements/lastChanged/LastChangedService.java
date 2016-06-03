@@ -2,9 +2,9 @@ package com.celements.lastChanged;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,16 +134,14 @@ public class LastChangedService implements ILastChangedRole {
 
   Map<SpaceReference, Date> getLastUpdatedSpaceCache() {
     if (lastUpdatedSpaceCache == null) {
-      // XXX why not use ConcurrentHashMap???
-      lastUpdatedSpaceCache = new HashMap<>();
+      lastUpdatedSpaceCache = new ConcurrentHashMap<>();
     }
     return lastUpdatedSpaceCache;
   }
 
   Map<WikiReference, Date> getLastUpdatedWikiCache() {
     if (lastUpdatedWikiCache == null) {
-      // XXX why not use ConcurrentHashMap???
-      lastUpdatedWikiCache = new HashMap<>();
+      lastUpdatedWikiCache = new ConcurrentHashMap<>();
     }
     return lastUpdatedWikiCache;
   }
