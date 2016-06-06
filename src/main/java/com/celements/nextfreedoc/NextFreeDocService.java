@@ -1,8 +1,8 @@
 package com.celements.nextfreedoc;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Singleton;
 
@@ -22,6 +22,7 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Singleton
 @Component
@@ -30,7 +31,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   private static Logger LOGGER = LoggerFactory.getLogger(NextFreeDocService.class);
 
   // TODO refactor to org.xwiki.cache.CacheManager
-  private final Map<DocumentReference, Long> numCache = new ConcurrentHashMap<DocumentReference, Long>();
+  private final Map<DocumentReference, Long> numCache = new HashMap<>();
 
   @Requirement
   private QueryManager queryManager;
@@ -57,7 +58,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   }
 
   private synchronized long getNextTitledPageNum(DocumentReference baseDocRef) {
-    long num = getHighestNum_internal(baseDocRef);
+    long num = getHighestNum(baseDocRef);
     while (!isAvailableDocRef(createDocRef(baseDocRef, num))) {
       num += 1;
     }
@@ -67,9 +68,17 @@ public class NextFreeDocService implements INextFreeDocRole {
 
   private boolean isAvailableDocRef(DocumentReference newDocRef) {
     try {
-      return (modelAccess.createDocument(newDocRef).getLock(getContext()) == null);
-    } catch (XWikiException | DocumentLoadException | DocumentAlreadyExistsException exp) {
-      LOGGER.info("Failed to check new document reference [{}].", newDocRef, exp);
+      XWikiDocument doc = modelAccess.createDocument(newDocRef);
+      if (doc.getLock(getContext()) == null) {
+        // TODO use (not yet existing) ModelLockService.aquireLock(doc) for cluster concurrency
+        // safety
+        doc.setLock(getContext().getUser(), getContext());
+        return true;
+      }
+    } catch (DocumentAlreadyExistsException exp) {
+      LOGGER.trace("New docRef already exists '{}'", newDocRef, exp);
+    } catch (XWikiException | DocumentLoadException exp) {
+      LOGGER.error("Failed to check new docRef '{}'", newDocRef, exp);
     }
     return false;
   }
@@ -82,7 +91,13 @@ public class NextFreeDocService implements INextFreeDocRole {
     return ret;
   }
 
-  long getHighestNum_internal(DocumentReference baseDocRef) {
+  /**
+   * NOTE: only use in synchronized context due to numCache
+   *
+   * @param baseDocRef
+   * @return
+   */
+  long getHighestNum(DocumentReference baseDocRef) {
     Long num = numCache.get(baseDocRef);
     try {
       int offset = 0, limit = 8;

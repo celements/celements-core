@@ -156,7 +156,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     nextFreeDocService.injectNum(spaceRef, name, 5);
 
     replayDefault();
-    long ret = nextFreeDocService.getHighestNum_internal(baseDocRef);
+    long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
 
     assertEquals(5, ret);
@@ -174,7 +174,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         name + 5, name + 4)).once();
 
     replayDefault();
-    long ret = nextFreeDocService.getHighestNum_internal(baseDocRef);
+    long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
 
     assertEquals(6, ret);
@@ -197,7 +197,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     expect(queryExecutorMock.execute(same(query))).andReturn(Collections.emptyList()).once();
 
     replayDefault();
-    long ret = nextFreeDocService.getHighestNum_internal(baseDocRef);
+    long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
 
     assertEquals(1, ret);
@@ -218,7 +218,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         "hql"))).andThrow(new QueryException("", null, null)).once();
 
     replayDefault();
-    long ret = nextFreeDocService.getHighestNum_internal(baseDocRef);
+    long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
 
     assertEquals(1, ret);
@@ -236,7 +236,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         null)).once();
 
     replayDefault();
-    long ret = nextFreeDocService.getHighestNum_internal(baseDocRef);
+    long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
 
     assertEquals(1, ret);
@@ -271,7 +271,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         + "5")).once();
 
     replayDefault();
-    long ret = nextFreeDocService.getHighestNum_internal(baseDocRef);
+    long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
 
     assertEquals(6, ret);
