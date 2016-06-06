@@ -42,8 +42,8 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
         PageTypeReference thePageTypeRef = new PageTypeReference(javaPageType.getName(),
             PROVIDER_HINT, new ArrayList<String>(javaPageType.getCategoryNames()));
         theNewMap.put(thePageTypeRef, javaPageType);
-        javaPageTypeRefsMap = Collections.unmodifiableMap(theNewMap);
       }
+      javaPageTypeRefsMap = Collections.unmodifiableMap(theNewMap);
     }
   }
 
