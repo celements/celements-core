@@ -40,8 +40,8 @@ public class LastChangedService implements ILastChangedRole {
   @Requirement
   IModelAccessFacade modelAccess;
 
-  private final Map<WikiReference, Date> lastUpdatedWikiCache = new ConcurrentHashMap<>();
-  private final Map<SpaceReference, Date> lastUpdatedSpaceCache = new ConcurrentHashMap<>();
+  final Map<WikiReference, Date> lastUpdatedWikiCache = new ConcurrentHashMap<>();
+  final Map<SpaceReference, Date> lastUpdatedSpaceCache = new ConcurrentHashMap<>();
 
   synchronized void invalidateCacheForSpaceRef(SpaceReference spaceRef) {
     if (hasSpaceRestriction(spaceRef)) {
@@ -110,8 +110,8 @@ public class LastChangedService implements ILastChangedRole {
             lastChangedDocLang, exp);
       }
     } else {
-      LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for"
-          + " space '{}'", spaceRef);
+      LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for" + " space '{}'",
+          spaceRef);
     }
     LOGGER.debug("internal_getLastChangeDate: return '{}' for space '{}'", lastChangedDate,
         spaceRef);
