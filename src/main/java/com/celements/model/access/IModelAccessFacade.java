@@ -320,12 +320,12 @@ public interface IModelAccessFacade {
 
   public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull XObjectField<T> field);
 
-  public void setProperty(BaseObject obj, String name, Object value);
+  public boolean setProperty(BaseObject obj, String name, Object value);
 
   public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
       @NotNull XObjectFieldValue<T> field) throws DocumentLoadException, DocumentNotExistsException;
 
-  public <T> void setProperty(@NotNull XWikiDocument doc, @NotNull XObjectFieldValue<T> field)
+  public <T> boolean setProperty(@NotNull XWikiDocument doc, @NotNull XObjectFieldValue<T> field)
       throws ClassDocumentLoadException;
 
   /**

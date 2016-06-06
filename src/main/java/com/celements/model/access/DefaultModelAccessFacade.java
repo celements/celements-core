@@ -564,11 +564,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void setProperty(BaseObject obj, String name, Object value) {
-    if (value instanceof Collection) {
-      value = Joiner.on('|').join((Iterable<?>) value);
+  public boolean setProperty(BaseObject obj, String name, Object value) {
+    boolean hasChange = !Objects.equal(value, getProperty(obj, name));
+    if (hasChange) {
+      if (value instanceof Collection) {
+        value = Joiner.on('|').join((Iterable<?>) value);
+      }
+      obj.set(name, value, getContext());
     }
-    obj.set(name, value, getContext());
+    return hasChange;
   }
 
   @Override
@@ -580,10 +584,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public <T> void setProperty(XWikiDocument doc, XObjectFieldValue<T> field)
+  public <T> boolean setProperty(XWikiDocument doc, XObjectFieldValue<T> field)
       throws ClassDocumentLoadException {
     try {
-      setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(), field.getValue());
+      return setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(), field
+          .getValue());
     } catch (ClassCastException ex) {
       throw new IllegalArgumentException("XObjectField ill defined: " + field, ex);
     }
