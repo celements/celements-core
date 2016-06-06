@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class LastChangedService implements ILastChangedRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(LastChangedService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(LastChangedService.class);
 
   @Requirement
   IWebUtilsService webUtilsService;
@@ -40,13 +40,13 @@ public class LastChangedService implements ILastChangedRole {
   @Requirement
   IModelAccessFacade modelAccess;
 
-  private Map<WikiReference, Date> lastUpdatedWikiCache;
-  private Map<SpaceReference, Date> lastUpdatedSpaceCache;
+  private final Map<WikiReference, Date> lastUpdatedWikiCache = new ConcurrentHashMap<>();
+  private final Map<SpaceReference, Date> lastUpdatedSpaceCache = new ConcurrentHashMap<>();
 
   synchronized void invalidateCacheForSpaceRef(SpaceReference spaceRef) {
     if (hasSpaceRestriction(spaceRef)) {
-      getLastUpdatedSpaceCache().remove(spaceRef);
-      getLastUpdatedWikiCache().remove(webUtilsService.getWikiRef(spaceRef));
+      lastUpdatedSpaceCache.remove(spaceRef);
+      lastUpdatedWikiCache.remove(webUtilsService.getWikiRef(spaceRef));
     }
   }
 
@@ -73,17 +73,16 @@ public class LastChangedService implements ILastChangedRole {
 
   @Override
   public Date getLastUpdatedDate(SpaceReference spaceRef) {
+    Date date = null;
     if (hasSpaceRestriction(spaceRef)) {
-      if (getLastUpdatedSpaceCache().containsKey(spaceRef)) {
-        return getLastUpdatedSpaceCache().get(spaceRef);
-      }
+      date = lastUpdatedSpaceCache.get(spaceRef);
     } else {
-      WikiReference curWikiRef = webUtilsService.getWikiRef();
-      if (getLastUpdatedWikiCache().containsKey(curWikiRef)) {
-        return getLastUpdatedWikiCache().get(curWikiRef);
-      }
+      date = lastUpdatedWikiCache.get(webUtilsService.getWikiRef());
     }
-    return internal_getLastChangeDate(spaceRef);
+    if (date == null) {
+      date = internal_getLastChangeDate(spaceRef);
+    }
+    return date;
   }
 
   Date internal_getLastChangeDate(SpaceReference spaceRef) {
@@ -107,14 +106,14 @@ public class LastChangedService implements ILastChangedRole {
         lastChangedDate = lastChangedDoc.getDate();
         updateCachedDate(spaceRef, lastChangedDate, lastChangedDocRef);
       } catch (DocumentAccessException exp) {
-        _LOGGER.error("Failed to load last updated document '{}', '{}'.", lastChangedDocRef,
+        LOGGER.error("Failed to load last updated document '{}', '{}'.", lastChangedDocRef,
             lastChangedDocLang, exp);
       }
     } else {
-      _LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for"
+      LOGGER.info("internal_getLastChangeDate: empty lastChangedDocuments list for"
           + " space '{}'", spaceRef);
     }
-    _LOGGER.debug("internal_getLastChangeDate: return '{}' for space '{}'", lastChangedDate,
+    LOGGER.debug("internal_getLastChangeDate: return '{}' for space '{}'", lastChangedDate,
         spaceRef);
     return lastChangedDate;
   }
@@ -123,27 +122,12 @@ public class LastChangedService implements ILastChangedRole {
       DocumentReference lastChangedDocRef) {
     if (lastChangedDate != null) {
       if (hasSpaceRestriction(spaceRef)) {
-        getLastUpdatedSpaceCache().put(spaceRef, lastChangedDate);
+        lastUpdatedSpaceCache.put(spaceRef, lastChangedDate);
       } else {
-        WikiReference curWikiRef = webUtilsService.getWikiRef();
-        getLastUpdatedWikiCache().put(curWikiRef, lastChangedDate);
-        getLastUpdatedSpaceCache().put(lastChangedDocRef.getLastSpaceReference(), lastChangedDate);
+        lastUpdatedWikiCache.put(webUtilsService.getWikiRef(), lastChangedDate);
+        lastUpdatedSpaceCache.put(lastChangedDocRef.getLastSpaceReference(), lastChangedDate);
       }
     }
-  }
-
-  Map<SpaceReference, Date> getLastUpdatedSpaceCache() {
-    if (lastUpdatedSpaceCache == null) {
-      lastUpdatedSpaceCache = new ConcurrentHashMap<>();
-    }
-    return lastUpdatedSpaceCache;
-  }
-
-  Map<WikiReference, Date> getLastUpdatedWikiCache() {
-    if (lastUpdatedWikiCache == null) {
-      lastUpdatedWikiCache = new ConcurrentHashMap<>();
-    }
-    return lastUpdatedWikiCache;
   }
 
   @Override
@@ -181,7 +165,7 @@ public class LastChangedService implements ILastChangedRole {
       }
       return query.setLimit(numEntries).execute();
     } catch (QueryException exp) {
-      _LOGGER.error("Failed to create whats-new query for space [" + space + "].", exp);
+      LOGGER.error("Failed to create whats-new query for space [" + space + "].", exp);
     }
     return Collections.emptyList();
   }
