@@ -35,7 +35,7 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
     return javaPageTypeRefsMap;
   }
 
-  private synchronized void initilizeTypeRefsMap() {
+  synchronized void initilizeTypeRefsMap() {
     if (javaPageTypeRefsMap == null) {
       Map<PageTypeReference, IJavaPageTypeRole> theNewMap = new HashMap<>();
       for (IJavaPageTypeRole javaPageType : javaPageTypesMap.values()) {

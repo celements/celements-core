@@ -59,4 +59,25 @@ public class JavaPageTypeProviderTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_initilizeTypeRefsMap() {
+    ptProvider.javaPageTypesMap.clear();
+    assertNull(ptProvider.javaPageTypeRefsMap);
+    replayDefault();
+    ptProvider.initilizeTypeRefsMap();
+    verifyDefault();
+    assertNotNull(ptProvider.javaPageTypeRefsMap);
+    assertEquals(ptProvider.javaPageTypeRefsMap.size(), 0);
+  }
+
+  @Test
+  public void test_initilizeTypeRefsMap_withElement() {
+    assertNull(ptProvider.javaPageTypeRefsMap);
+    replayDefault();
+    ptProvider.initilizeTypeRefsMap();
+    verifyDefault();
+    assertNotNull(ptProvider.javaPageTypeRefsMap);
+    assertEquals(ptProvider.javaPageTypeRefsMap.size(), 1);
+  }
+
 }
