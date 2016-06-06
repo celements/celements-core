@@ -59,8 +59,8 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
     Date lastUpdated = lastChangedServ.internal_getLastChangeDate(spaceRef);
     verifyDefault();
     assertNull(lastUpdated);
-    assertTrue(lastChangedServ.getLastUpdatedWikiCache().isEmpty());
-    assertTrue(lastChangedServ.getLastUpdatedSpaceCache().isEmpty());
+    assertTrue(lastChangedServ.lastUpdatedWikiCache.isEmpty());
+    assertTrue(lastChangedServ.lastUpdatedSpaceCache.isEmpty());
   }
 
   @Test
@@ -89,8 +89,8 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_getLastChangeDate_nullLangResponse() throws Exception {
     String mySpaceName = "mySpace";
-    SpaceReference spaceRef = new SpaceReference(mySpaceName, new WikiReference(
-        context.getDatabase()));
+    SpaceReference spaceRef = new SpaceReference(mySpaceName, new WikiReference(context
+        .getDatabase()));
     Query mockQuery = createMockAndAddToDefault(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
     expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
