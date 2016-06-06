@@ -21,21 +21,22 @@ public class XObjectField<T> {
 
   private final Class<T> token;
 
-  public XObjectField(@NotNull DocumentReference classRef, @NotNull String name, Class<T> token) {
+  public XObjectField(@NotNull DocumentReference classRef, @NotNull String name,
+      @NotNull Class<T> token) {
     this.classRef = Objects.requireNonNull(classRef);
     this.name = Objects.requireNonNull(Strings.emptyToNull(name));
     this.token = Objects.requireNonNull(token);
   }
 
   public XObjectField(@Nullable String wiki, @NotNull String classSpace, @NotNull String className,
-      @NotNull String name, Class<T> token) {
+      @NotNull String name, @NotNull Class<T> token) {
     this(new DocumentReference(Objects.requireNonNull(Strings.emptyToNull(className)),
         new SpaceReference(Objects.requireNonNull(Strings.emptyToNull(classSpace)), getWebUtils()
             .resolveWikiReference(wiki))), name, token);
   }
 
   public XObjectField(@NotNull String classSpace, @NotNull String className, @NotNull String name,
-      Class<T> token) {
+      @NotNull Class<T> token) {
     this(null, classSpace, className, name, token);
   }
 
@@ -75,7 +76,7 @@ public class XObjectField<T> {
     return getWebUtils().serializeRef(getClassRef(), local) + "." + getName();
   }
 
-  static IWebUtilsService getWebUtils() {
+  protected static IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
