@@ -24,9 +24,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -129,6 +133,8 @@ public interface IWebUtilsService {
 
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
 
+  public WikiReference resolveWikiReference(String wikiName);
+
   public AttachmentReference resolveAttachmentReference(String fullName);
 
   public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef);
@@ -137,6 +143,34 @@ public interface IWebUtilsService {
 
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef);
+
+  /**
+   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
+   * requested generic type
+   *
+   * @param name
+   *          to be resolved
+   * @param token
+   *          for the reference type
+   * @return a resolved reference
+   */
+  public <T extends EntityReference> T resolveReference(@NotNull String name,
+      @NotNull Class<T> token);
+
+  /**
+   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
+   * requested generic type
+   *
+   * @param name
+   *          to be resolved
+   * @param token
+   *          for the reference type
+   * @param baseRef
+   *          a reference used as base for resolving
+   * @return a resolved reference
+   */
+  public <T extends EntityReference> T resolveReference(@NotNull String name,
+      @NotNull Class<T> token, @Nullable EntityReference baseRef);
 
   public boolean isAdminUser();
 
