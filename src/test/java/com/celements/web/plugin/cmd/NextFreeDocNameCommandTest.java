@@ -17,6 +17,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
@@ -51,6 +52,8 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
     XWikiDocument theDoc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+    storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
+    expectLastCall().once();
 
     replayDefault();
     assertEquals(serialize(docRef), nextFreeDocNameCmd.getNextTitledPageFullName(spaceRef.getName(),
@@ -80,6 +83,8 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
     XWikiDocument theDoc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+    storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
+    expectLastCall().once();
 
     replayDefault();
     assertEquals(docRef, nextFreeDocNameCmd.getNextTitledPageDocRef(spaceRef.getName(), title,
@@ -109,6 +114,8 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
     XWikiDocument theDoc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+    storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
+    expectLastCall().once();
 
     replayDefault();
     assertEquals(serialize(docRef), nextFreeDocNameCmd.getNextUntitledPageFullName(
@@ -138,6 +145,8 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
     XWikiDocument theDoc = new XWikiDocument(docRef);
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+    storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
+    expectLastCall().once();
 
     replayDefault();
     assertEquals(docRef.getName(), nextFreeDocNameCmd.getNextUntitledPageName(spaceRef.getName(),
