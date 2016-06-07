@@ -25,6 +25,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
@@ -69,6 +70,8 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     XWikiDocument doc3 = new XWikiDocument(docRef3);
     expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
     expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+    storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
+    expectLastCall().once();
 
     replayDefault();
     DocumentReference ret = nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
@@ -126,6 +129,8 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     XWikiDocument doc3 = new XWikiDocument(docRef3);
     expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
     expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+    storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
+    expectLastCall().once();
 
     replayDefault();
     DocumentReference ret = nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
