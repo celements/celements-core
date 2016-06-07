@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -17,20 +17,27 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentAlreadyExistsException;
+import com.celements.model.access.exception.DocumentLoadException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Singleton
 @Component
 public class NextFreeDocService implements INextFreeDocRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(NextFreeDocService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(NextFreeDocService.class);
 
   // TODO refactor to org.xwiki.cache.CacheManager
-  private final Map<DocumentReference, Long> numCache = new HashMap<DocumentReference, Long>();
+  private final Map<DocumentReference, Long> numCache = new HashMap<>();
 
   @Requirement
   private QueryManager queryManager;
+
+  @Requirement
+  IModelAccessFacade modelAccess;
 
   @Requirement
   private Execution execution;
@@ -50,7 +57,7 @@ public class NextFreeDocService implements INextFreeDocRole {
     return getNextTitledPageDocRef(spaceRef, UNTITLED_NAME);
   }
 
-  private long getNextTitledPageNum(DocumentReference baseDocRef) {
+  private synchronized long getNextTitledPageNum(DocumentReference baseDocRef) {
     long num = getHighestNum(baseDocRef);
     while (!isAvailableDocRef(createDocRef(baseDocRef, num))) {
       num += 1;
@@ -61,11 +68,17 @@ public class NextFreeDocService implements INextFreeDocRole {
 
   private boolean isAvailableDocRef(DocumentReference newDocRef) {
     try {
-      return (!getContext().getWiki().exists(newDocRef, getContext())
-          && (getContext().getWiki().getDocument(newDocRef, getContext()).getLock(
-              getContext()) == null));
-    } catch (XWikiException exp) {
-      LOGGER.info("Failed to check new document reference [" + newDocRef + "].", exp);
+      XWikiDocument doc = modelAccess.createDocument(newDocRef);
+      if (doc.getLock(getContext()) == null) {
+        // TODO use (not yet existing) ModelLockService.aquireLock(doc) for cluster concurrency
+        // safety
+        doc.setLock(getContext().getUser(), getContext());
+        return true;
+      }
+    } catch (DocumentAlreadyExistsException exp) {
+      LOGGER.trace("New docRef already exists '{}'", newDocRef, exp);
+    } catch (XWikiException | DocumentLoadException exp) {
+      LOGGER.error("Failed to check new docRef '{}'", newDocRef, exp);
     }
     return false;
   }
@@ -78,6 +91,12 @@ public class NextFreeDocService implements INextFreeDocRole {
     return ret;
   }
 
+  /**
+   * NOTE: only use in synchronized context due to numCache
+   *
+   * @param baseDocRef
+   * @return
+   */
   long getHighestNum(DocumentReference baseDocRef) {
     Long num = numCache.get(baseDocRef);
     try {
@@ -90,12 +109,12 @@ public class NextFreeDocService implements INextFreeDocRole {
         limit *= 2;
       }
     } catch (QueryException queryExc) {
-      LOGGER.error("Error executing query '" + getHighestNumHQL() + "'", queryExc);
+      LOGGER.error("Error executing query '{}'", getHighestNumHQL(), queryExc);
     }
     if (num == null) {
       num = 1L;
     }
-    LOGGER.debug("getHighestNum: for baseDocRef '" + baseDocRef + "' got '" + num + "'");
+    LOGGER.debug("getHighestNum: for baseDocRef '{}' got '{}'", baseDocRef, num);
     return num;
   }
 
@@ -124,15 +143,15 @@ public class NextFreeDocService implements INextFreeDocRole {
           num = Long.parseLong(numStr) + 1;
           break;
         } else {
-          LOGGER.warn("extractNumFromResults: given name '" + name
-              + "' does not start with expected prefix '" + prefix + "'");
+          LOGGER.warn("extractNumFromResults: given name '{}' does not start with expected"
+              + " prefix '{}'", name, prefix);
         }
       } catch (NumberFormatException nfExc) {
-        LOGGER.debug("extractNumFromResults: unable to parse digit in '" + name + "'");
+        LOGGER.debug("extractNumFromResults: unable to parse digit in '{}'", name);
       }
     }
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("extractNumFromResults: got '" + num + "' from docs: " + results);
+      LOGGER.trace("extractNumFromResults: got '{}' from docs: {}", num, results);
     }
     return num;
   }
