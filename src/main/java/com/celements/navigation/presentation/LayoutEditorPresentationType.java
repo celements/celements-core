@@ -21,8 +21,7 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       LayoutEditorPresentationType.class);
 
-  private static final String _CEL_CM_CELLEDITOR_MENUITEM =
-    "cel_cm_celleditor_menuitem";
+  private static final String _CEL_CM_CELLEDITOR_MENUITEM = "cel_cm_celleditor_menuitem";
 
   @Requirement("celements.celCellsClasses")
   IClassCollectionRole cellsClasses;
@@ -42,8 +41,8 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
   }
 
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem,
-      INavigation nav) throws XWikiException {
+      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
+      throws XWikiException {
     String fullName = webUtilsService.getRefLocalSerializer().serialize(docRef);
     String tagName;
     if (nav.hasLink()) {
@@ -59,17 +58,15 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
       menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),
           getContext());
     }
-    String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(),
-        getContext());
+    String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(), getContext());
     if (!"".equals(tooltip)) {
       menuItemHTML += " " + tooltip;
     }
     String menuName = menuNameCmd.getMultilingualMenuName(fullName, nav.getNavLanguage(),
         getContext());
-    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf,
-        numItem);
-    menuItemHTML += " " + nav.addUniqueElementId(docRef)
-      + ">" + menuName + getIdName(docRef) + "</" + tagName + ">";
+    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem);
+    menuItemHTML += " " + nav.addUniqueElementId(docRef) + ">" + menuName + getIdName(docRef) + "</"
+        + tagName + ">";
     outStream.append(menuItemHTML);
   }
 
@@ -77,8 +74,7 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
     XWikiDocument theDoc;
     try {
       theDoc = getContext().getWiki().getDocument(docRef, getContext());
-      return theDoc.getXObject(getCellsClasses().getCellClassRef(getContext().getDatabase(
-          )));
+      return theDoc.getXObject(getCellsClasses().getCellClassRef(getContext().getDatabase()));
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get document [" + docRef + "].", exp);
     }
@@ -88,8 +84,7 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
   String getIdName(DocumentReference docRef) {
     BaseObject cellPropertiesObj = getCellProperties(docRef);
     if (cellPropertiesObj != null) {
-      String idName = cellPropertiesObj.getStringValue(
-          CellsClasses.CELLCLASS_IDNAME_FIELD);
+      String idName = cellPropertiesObj.getStringValue(CellsClasses.CELLCLASS_IDNAME_FIELD);
       if (!StringUtils.isEmpty(idName)) {
         return " (#" + idName + ")";
       }

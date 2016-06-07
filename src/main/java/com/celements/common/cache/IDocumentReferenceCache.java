@@ -15,12 +15,12 @@ public interface IDocumentReferenceCache<K> {
    * @return all cached doc refs in the provided wiki
    * @throws CacheLoadingException
    */
-  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef
-      ) throws CacheLoadingException;
+  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef)
+      throws CacheLoadingException;
 
   /**
-   * Tries to determine the wiki itself via given key or context. If this behaviour is 
-   * not desired, use {@link #getCachedDocRefs(WikiReference, Object)}
+   * Tries to determine the wiki itself via given key or context. If this behaviour is not
+   * desired, use {@link #getCachedDocRefs(WikiReference, Object)}
    * 
    * @param key
    *          the cache key
@@ -37,8 +37,8 @@ public interface IDocumentReferenceCache<K> {
    * @return all cached doc refs for the given key in the provided wiki
    * @throws CacheLoadingException
    */
-  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef, K key
-      ) throws CacheLoadingException;
+  public Set<DocumentReference> getCachedDocRefs(WikiReference wikiRef, K key)
+      throws CacheLoadingException;
 
   /**
    * @param wikiRef

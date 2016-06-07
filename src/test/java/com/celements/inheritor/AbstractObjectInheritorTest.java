@@ -35,24 +35,25 @@ import com.celements.iterator.XObjectIterator;
 import com.xpn.xwiki.objects.BaseCollection;
 
 public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCase {
-    
+
   private TestInheritor _testInheritor;
 
   @Before
   public void setUp_AbstractObjectInheritorTest() throws Exception {
     _testInheritor = new TestInheritor();
   }
-  
+
   @Test
   public void testGetIteratorFactory_notSame() {
-    _testInheritor.setIteratorFactory(getTestIteratorFactory(new ArrayList<String>()));  
-    assertNotSame(getTestIteratorFactory(new ArrayList<String>()), _testInheritor.getIteratorFactory());
+    _testInheritor.setIteratorFactory(getTestIteratorFactory(new ArrayList<String>()));
+    assertNotSame(getTestIteratorFactory(new ArrayList<String>()),
+        _testInheritor.getIteratorFactory());
   }
-  
+
   @Test
   public void testGetStringValue_isNull() {
     assertEquals("", _testInheritor.getStringValue("myField"));
-    assertEquals("myDefaultValue", _testInheritor.getStringValue("myField","myDefaultValue"));
+    assertEquals("myDefaultValue", _testInheritor.getStringValue("myField", "myDefaultValue"));
   }
 
   @Test
@@ -62,16 +63,16 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
     assertEquals("myValue", _testInheritor.getStringValue("myField"));
-    assertEquals("myValue", _testInheritor.getStringValue("myField","myDefaultValue"));
+    assertEquals("myValue", _testInheritor.getStringValue("myField", "myDefaultValue"));
     verify(testColl);
-  }  
+  }
 
   @Test
   public void testGetLargeStringValue_isNull() {
     assertEquals("", _testInheritor.getLargeStringValue("myField"));
-    assertEquals("myDefaultValue", _testInheritor.getLargeStringValue("myField","myDefaultValue"));
+    assertEquals("myDefaultValue", _testInheritor.getLargeStringValue("myField", "myDefaultValue"));
   }
-  
+
   @Test
   public void testGetLargeStringValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -79,16 +80,16 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
     assertEquals("myValue", _testInheritor.getLargeStringValue("myField"));
-    assertEquals("myValue", _testInheritor.getLargeStringValue("myField","myDefaultValue"));
+    assertEquals("myValue", _testInheritor.getLargeStringValue("myField", "myDefaultValue"));
     verify(testColl);
   }
 
   @Test
   public void testGetIntValue_isNull() {
     assertEquals(0, _testInheritor.getIntValue("myField"));
-    assertEquals(-1, _testInheritor.getIntValue("myField",-1));
+    assertEquals(-1, _testInheritor.getIntValue("myField", -1));
   }
-  
+
   @Test
   public void testGetIntValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -96,16 +97,16 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
     assertEquals(123, _testInheritor.getIntValue("myField"));
-    assertEquals(123, _testInheritor.getIntValue("myField",321));
+    assertEquals(123, _testInheritor.getIntValue("myField", 321));
     verify(testColl);
   }
 
   @Test
   public void testGetLongValue_isNull() {
     assertEquals(0l, _testInheritor.getLongValue("myField"));
-    assertEquals(-1l, _testInheritor.getLongValue("myField",-1l));
+    assertEquals(-1l, _testInheritor.getLongValue("myField", -1l));
   }
-  
+
   @Test
   public void testGetLongValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -113,16 +114,16 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
     assertEquals(123l, _testInheritor.getLongValue("myField"));
-    assertEquals(123l, _testInheritor.getLongValue("myField",321l));
+    assertEquals(123l, _testInheritor.getLongValue("myField", 321l));
     verify(testColl);
   }
 
   @Test
   public void testGetFloatValue_isNull() {
     assertEquals(0, _testInheritor.getFloatValue("myField"), 0.001);
-    assertEquals(987.65f, _testInheritor.getFloatValue("myField",987.65f), 0.001);
+    assertEquals(987.65f, _testInheritor.getFloatValue("myField", 987.65f), 0.001);
   }
-  
+
   @Test
   public void testGetFloatValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -130,16 +131,16 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
     assertEquals(123.45f, _testInheritor.getFloatValue("myField"), 0.001);
-    assertEquals(123.45f, _testInheritor.getFloatValue("myField",987.65f), 0.001);
+    assertEquals(123.45f, _testInheritor.getFloatValue("myField", 987.65f), 0.001);
     verify(testColl);
   }
 
   @Test
   public void testGetDoubleValue_isNull() {
     assertEquals(0.00, _testInheritor.getDoubleValue("myField"), 0.001);
-    assertEquals(987.65, _testInheritor.getDoubleValue("myField",987.65), 0.001);
+    assertEquals(987.65, _testInheritor.getDoubleValue("myField", 987.65), 0.001);
   }
-  
+
   @Test
   public void testGetDoubleValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -147,7 +148,7 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
     assertEquals(123.45, _testInheritor.getDoubleValue("myField"), 0.001);
-    assertEquals(123.45, _testInheritor.getDoubleValue("myField",987.65), 0.001);
+    assertEquals(123.45, _testInheritor.getDoubleValue("myField", 987.65), 0.001);
     verify(testColl);
   }
 
@@ -157,7 +158,7 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     assertEquals(null, _testInheritor.getDateValue("myField"));
     assertEquals(date, _testInheritor.getDateValue("myField", date));
   }
-  
+
   @Test
   public void testGetDateValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -176,7 +177,7 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     assertEquals(null, _testInheritor.getListValue("myField"));
     assertEquals(mylist, _testInheritor.getListValue("myField", mylist));
   }
-  
+
   @Test
   public void testGetListValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
@@ -188,12 +189,11 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
     assertEquals(mylist, _testInheritor.getListValue("myField", new ArrayList<String>()));
     verify(testColl);
   }
- 
-  
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
-  
+
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
+
   public final class TestInheritor extends AbstractObjectInheritor {
 
     private BaseCollection baseColl;
@@ -207,9 +207,10 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
       baseColl = testBaseColl;
     }
   }
-  
+
   private IIteratorFactory<XObjectIterator> getTestIteratorFactory(final List<String> docList) {
     return new IIteratorFactory<XObjectIterator>() {
+
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(getContext());
         iterator.setClassName("myTestClass");

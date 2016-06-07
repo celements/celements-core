@@ -7,7 +7,6 @@ import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
 public interface IWebFormServiceRole {
-    
-  public boolean isFormFilled(Map<String, String[]> parameterMap, 
-      Set<String> additionalFields);
+
+  public boolean isFormFilled(Map<String, String[]> parameterMap, Set<String> additionalFields);
 }

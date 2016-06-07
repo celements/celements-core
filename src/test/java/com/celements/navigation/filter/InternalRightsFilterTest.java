@@ -54,8 +54,7 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetMenuPart_NotNull() {
     filter = new InternalRightsFilter();
-    assertNotNull("Must not be null (leads to NPE in checkMenuPart!).",
-        filter.getMenuPart());
+    assertNotNull("Must not be null (leads to NPE in checkMenuPart!).", filter.getMenuPart());
   }
 
   @Test
@@ -85,8 +84,8 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
     String docFullName = "MySpace.MyDoc";
     BaseObject baseObj = new BaseObject();
     baseObj.setName(docFullName);
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(false);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(false);
     replay(wiki, rightsService);
     assertFalse(filter.includeMenuItem(baseObj, context));
     verify(wiki, rightsService);
@@ -98,8 +97,8 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
     BaseObject baseObj = new BaseObject();
     baseObj.setName(docFullName);
     filter.setMenuPart("");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(true);
     replay(wiki, rightsService);
     assertTrue(filter.includeMenuItem(baseObj, context));
     verify(wiki, rightsService);
@@ -112,8 +111,8 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
     baseObj.setName(docFullName);
     baseObj.setStringValue("part_name", "anotherPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(true);
     replay(wiki, rightsService);
     assertFalse(filter.includeMenuItem(baseObj, context));
     verify(wiki, rightsService);
@@ -126,8 +125,8 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
     baseObj.setName(docFullName);
     baseObj.setStringValue("part_name", "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(true);
     replay(wiki, rightsService);
     assertTrue(filter.includeMenuItem(baseObj, context));
     verify(wiki, rightsService);
@@ -140,8 +139,8 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
     baseObj.setName(docFullName);
     baseObj.setStringValue("part_name", "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andThrow(new XWikiException());
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andThrow(new XWikiException());
     replay(wiki, rightsService);
     assertFalse(filter.includeMenuItem(baseObj, context));
     verify(wiki, rightsService);
@@ -150,10 +149,10 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeTreeNode_noViewRights() throws Exception {
     String docFullName = "MySpace.MyDoc";
-    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), (String)null, 0);
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(false);
+    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
+        (String) null, 0);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(false);
     replay(wiki, rightsService);
     assertFalse(filter.includeTreeNode(node, context));
     verify(wiki, rightsService);
@@ -162,11 +161,11 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeTreeNode_hasViewRights_noMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
-    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), (String)null, 0);
+    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
+        (String) null, 0);
     filter.setMenuPart("");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(true);
     replay(wiki, rightsService);
     assertTrue(filter.includeTreeNode(node, context));
     verify(wiki, rightsService);
@@ -175,12 +174,12 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeTreeNode_hasViewRights_wrongMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
-    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), "", 0);
+    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
+        "", 0);
     node.setPartName("anotherPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(true);
     replay(wiki, rightsService);
     assertFalse(filter.includeTreeNode(node, context));
     verify(wiki, rightsService);
@@ -189,12 +188,12 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeTreeNode_hasViewRights_matchingMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
-    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), "", 0);
+    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
+        "", 0);
     node.setPartName("mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andReturn(true);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andReturn(true);
     replay(wiki, rightsService);
     assertTrue(filter.includeTreeNode(node, context));
     verify(wiki, rightsService);
@@ -203,12 +202,12 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIncludeTreeNode_Exception() throws Exception {
     String docFullName = "MySpace.MyDoc";
-    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
-        "MyDoc"), "", 0);
+    TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
+        "", 0);
     node.setPartName("mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()),
-        eq(docFullName), same(context))).andThrow(new XWikiException());
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
+        context))).andThrow(new XWikiException());
     replay(wiki, rightsService);
     assertFalse(filter.includeTreeNode(node, context));
     verify(wiki, rightsService);

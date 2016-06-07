@@ -37,11 +37,10 @@ public class PageTypeClassCollection extends AbstractClassCollection {
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
   public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
   public static final String PAGE_TYPE_CLASSNAME = PAGE_TYPE_CLASS_SPACE + "."
-       + PAGE_TYPE_CLASS_DOC;
+      + PAGE_TYPE_CLASS_DOC;
   public static final String PAGE_TYPE_FIELD = "page_type";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      PageTypeClassCollection.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeClassCollection.class);
 
   @Override
   protected Log getLogger() {
@@ -51,7 +50,7 @@ public class PageTypeClassCollection extends AbstractClassCollection {
   @Override
   protected void initClasses() throws XWikiException {
     // TODO Auto-generated method stub
-    
+
   }
 
   public String getConfigName() {

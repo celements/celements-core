@@ -24,16 +24,14 @@ import java.util.Stack;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class LexicalParser<T extends IGenericLiteral>
-    implements ILexicalParser<T> {
+public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<T> {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      LexicalParser.class);
+  private static Log mLogger = LogFactory.getFactory().getInstance(LexicalParser.class);
 
   private Stack<T> workerStack = new Stack<T>();
   private T startLiteral;
   private IEventHandler<T> eventHandler;
-  
+
   public LexicalParser(T startLiteral, IEventHandler<T> eventHandler) {
     this.startLiteral = startLiteral;
     this.eventHandler = eventHandler;
@@ -63,7 +61,7 @@ public class LexicalParser<T extends IGenericLiteral>
     checkStackState(ECommand.DICTIONARY_COMMAND);
     openLiteral();
   }
-  
+
   public void closeDictionaryEvent() {
     if (workerStack.peek().getCommand() == ECommand.PROPERTY_COMMAND) {
       workerStack.pop(); // remove optional property command
@@ -89,8 +87,9 @@ public class LexicalParser<T extends IGenericLiteral>
   }
 
   /**
-   * important to allow unordered property lists in dictionaries / objects
-   * (see www.json.org : An object is an unordered set of name/value pairs. )
+   * important to allow unordered property lists in dictionaries / objects (see
+   * www.json.org : An object is an unordered set of name/value pairs. )
+   * 
    * @param key
    */
   @SuppressWarnings("unchecked")
@@ -100,8 +99,8 @@ public class LexicalParser<T extends IGenericLiteral>
     T nextLiteral = (T) workerStack.peek().getPropertyLiteralForKey(key, placeholder);
     if (nextLiteral != null) {
       workerStack.push(nextLiteral);
-      mLogger.debug("fix property literal on stack: " + workerStack.peek()
-          + " ; " + workerStack.peek().getCommand());
+      mLogger.debug("fix property literal on stack: " + workerStack.peek() + " ; "
+          + workerStack.peek().getCommand());
     } else {
       throw new IllegalStateException("illegal key value [" + key + "] in dictionary ["
           + workerStack.peek() + "]. Stack: " + workerStack.toString());
@@ -115,7 +114,7 @@ public class LexicalParser<T extends IGenericLiteral>
     mLogger.debug("string-value: " + value + " ");
     closeLiteral(); // close VALUE_COMMAND
   }
-  
+
   public void booleanEvent(boolean value) {
     checkStackState(ECommand.VALUE_COMMAND);
     eventHandler.openEvent(workerStack.peek());
@@ -126,42 +125,38 @@ public class LexicalParser<T extends IGenericLiteral>
 
   final public void finishEvent() {
     if (!workerStack.isEmpty()) {
-      throw new IllegalStateException("SyntaxError: finishEvent on nonempty"
-          + " stack:" + workerStack.peek());
+      throw new IllegalStateException("SyntaxError: finishEvent on nonempty" + " stack:"
+          + workerStack.peek());
     }
   }
 
   final private void checkStackState(ECommand expectedCommand) {
-    if (!workerStack.isEmpty()
-        && (workerStack.peek().getCommand() != expectedCommand)
+    if (!workerStack.isEmpty() && (workerStack.peek().getCommand() != expectedCommand)
         && (workerStack.peek().getCommand() == ECommand.ARRAY_COMMAND)) {
       openLiteral();
-      mLogger.debug("reopen " + workerStack.peek() + " ; "
-          + workerStack.peek().getCommand());
+      mLogger.debug("reopen " + workerStack.peek() + " ; " + workerStack.peek().getCommand());
     }
-    if (workerStack.isEmpty()
-        || (workerStack.peek().getCommand() != expectedCommand)) {
-      throw new IllegalStateException("Expecting: "
-          + workerStack.peek().getCommand() + " for " + workerStack.peek()
-          + " but received " + expectedCommand + ". "
-          + "Stack: " + workerStack.toString());
+    if (workerStack.isEmpty() || (workerStack.peek().getCommand() != expectedCommand)) {
+      throw new IllegalStateException("Expecting: " + workerStack.peek().getCommand() + " for "
+          + workerStack.peek() + " but received " + expectedCommand + ". " + "Stack: "
+          + workerStack.toString());
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   private void advanceToNextDictionaryProperty() {
     T nextLiteral = (T) workerStack.peek().getNextLiteral();
     if (nextLiteral != null) {
       workerStack.push(nextLiteral);
-      mLogger.debug("advance open: " + workerStack.peek()
-          + " ; " + workerStack.peek().getCommand());
+      mLogger.debug("advance open: " + workerStack.peek() + " ; "
+          + workerStack.peek().getCommand());
     }
   }
 
   @SuppressWarnings("unchecked")
   private void openLiteral() {
     T currentLiteral = workerStack.peek();
-    workerStack.push((T)currentLiteral.getFirstLiteral());
+    workerStack.push((T) currentLiteral.getFirstLiteral());
     eventHandler.openEvent(currentLiteral);
     mLogger.debug("open " + currentLiteral + " ; " + currentLiteral.getCommand());
   }

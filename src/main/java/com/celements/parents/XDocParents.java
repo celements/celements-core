@@ -15,7 +15,7 @@ import com.xpn.xwiki.XWikiException;
 
 @Component(XDocParents.DOC_PROVIDER_NAME)
 public class XDocParents implements IDocParentProviderRole {
-  
+
   private static Logger _LOGGER = LoggerFactory.getLogger(XDocParents.class);
 
   public static final String DOC_PROVIDER_NAME = "xwiki";
@@ -24,7 +24,7 @@ public class XDocParents implements IDocParentProviderRole {
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   @Override
@@ -32,8 +32,8 @@ public class XDocParents implements IDocParentProviderRole {
     ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
     try {
       DocumentReference nextParent = getParentRef(docRef);
-      while ((nextParent != null) && getContext().getWiki().exists(nextParent,
-          getContext()) && !docParents.contains(nextParent)) {
+      while ((nextParent != null) && getContext().getWiki().exists(nextParent, getContext())
+          && !docParents.contains(nextParent)) {
         docParents.add(nextParent);
         nextParent = getParentRef(nextParent);
       }
@@ -44,8 +44,7 @@ public class XDocParents implements IDocParentProviderRole {
   }
 
   private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
-      return getContext().getWiki().getDocument(docRef, getContext()
-          ).getParentReference();
+    return getContext().getWiki().getDocument(docRef, getContext()).getParentReference();
   }
 
 }

@@ -42,21 +42,20 @@ public class SkinConfigObjCommandTest extends AbstractBridgedComponentTestCase {
     skinObj.setXClassReference(skinClassRef);
     skinObj.setStringValue("skin_config_class_name", "Skins.Nautica05ConfigClass");
     skinDoc.addXObject(skinObj);
-    expect(xwiki.getDocument(eq(skinDocRef), same(context))).andReturn(skinDoc
-        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(skinDocRef), same(context))).andReturn(skinDoc).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(
         "Skins.Nautica05BlankSkin").anyTimes();
-    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace", "WebPreferences");
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
     expect(xwiki.getDocument(eq("mySpace.WebPreferences"), same(context))).andReturn(
         webPrefDoc).atLeastOnce();
-    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
-        "XWiki", "XWikiPreferences");
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
     BaseObject expectedSkinConfObj = new BaseObject();
-    DocumentReference skinConfigClassRef = new DocumentReference(context.getDatabase(),
-        "Skins", "Nautica05ConfigClass");
+    DocumentReference skinConfigClassRef = new DocumentReference(context.getDatabase(), "Skins",
+        "Nautica05ConfigClass");
     expectedSkinConfObj.setXClassReference(skinConfigClassRef);
     xwikiPrefDoc.addXObject(expectedSkinConfObj);
     expect(xwiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(
@@ -74,26 +73,24 @@ public class SkinConfigObjCommandTest extends AbstractBridgedComponentTestCase {
         "Nautica05BlankSkin");
     XWikiDocument skinDoc = new XWikiDocument(skinDocRef);
     BaseObject skinObj = new BaseObject();
-    DocumentReference skinClassRef = new DocumentReference("celements2web", "XWiki",
-        "XWikiSkins");
+    DocumentReference skinClassRef = new DocumentReference("celements2web", "XWiki", "XWikiSkins");
     skinObj.setXClassReference(skinClassRef);
     skinObj.setStringValue("skin_config_class_name", "Skins.Nautica05ConfigClass");
     skinDoc.addXObject(skinObj);
-    expect(xwiki.getDocument(eq(skinDocRef), same(context))).andReturn(skinDoc
-        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(skinDocRef), same(context))).andReturn(skinDoc).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("skin"), same(context))).andReturn(
         "celements2web:Skins.Nautica05BlankSkin").anyTimes();
-    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(),
-        "mySpace", "WebPreferences");
+    DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(), "mySpace",
+        "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
     expect(xwiki.getDocument(eq("mySpace.WebPreferences"), same(context))).andReturn(
         webPrefDoc).atLeastOnce();
-    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(),
-        "XWiki", "XWikiPreferences");
+    DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
+        "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
     BaseObject expectedSkinConfObj = new BaseObject();
-    DocumentReference skinConfigClassRef = new DocumentReference(context.getDatabase(),
-        "Skins", "Nautica05ConfigClass");
+    DocumentReference skinConfigClassRef = new DocumentReference(context.getDatabase(), "Skins",
+        "Nautica05ConfigClass");
     expectedSkinConfObj.setXClassReference(skinConfigClassRef);
     xwikiPrefDoc.addXObject(expectedSkinConfObj);
     expect(xwiki.getDocument(eq("XWiki.XWikiPreferences"), same(context))).andReturn(

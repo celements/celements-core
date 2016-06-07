@@ -44,33 +44,38 @@ public class RTEConfig {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(RTEConfig.class);
 
-  /**@Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC **/
+  /**
+   * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC
+   **/
   @Deprecated
-  private static final String RTE_CONFIG_TYPE_PROP_CLASS_NAME =
-        "RTEConfigTypePropertiesClass";
-  /**@Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE **/
+  private static final String RTE_CONFIG_TYPE_PROP_CLASS_NAME = "RTEConfigTypePropertiesClass";
+  /**
+   * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE
+   **/
   @Deprecated
   public static final String RTE_CONFIG_TYPE_PROP_CLASS_SPACE = "Classes";
   public static final String RTE_CONFIG_TYPE_CLASS_SPACE = "Classes";
   public static final String RTE_CONFIG_TYPE_CLASS_NAME = "RTEConfigTypeClass";
   public static final String CONFIG_CLASS_NAME = RTE_CONFIG_TYPE_CLASS_SPACE + "."
-        + RTE_CONFIG_TYPE_CLASS_NAME;
+      + RTE_CONFIG_TYPE_CLASS_NAME;
   public static final String CONFIG_PROP_NAME = "rteconfig";
-  /**@Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS **/
+  /**
+   * @Deprecated instead use RTEConfigClass.RTE_CONFIG_TYPE_PRPOP_CLASS
+   **/
   @Deprecated
   public static final String PROP_CLASS_NAME = RTE_CONFIG_TYPE_PROP_CLASS_SPACE + "."
-        + RTE_CONFIG_TYPE_PROP_CLASS_NAME;
+      + RTE_CONFIG_TYPE_PROP_CLASS_NAME;
 
-  private final static Map<String, String> rteConfigFieldDefaults =
-      new HashMap<String, String>();
-      static {
-        rteConfigFieldDefaults.put("blockformats", "rte_heading1=h1,rte_text=p");
-      };
+  private final static Map<String, String> rteConfigFieldDefaults = new HashMap<String, String>();
+
+  static {
+    rteConfigFieldDefaults.put("blockformats", "rte_heading1=h1,rte_text=p");
+  };
 
   private PageTypeCommand injectedPageTypeInstance;
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {
@@ -89,31 +94,31 @@ public class RTEConfig {
   public String getRTEConfigField(String name) throws XWikiException {
     XWikiDocument doc = getContext().getDoc();
     String resultConfig = "";
-    
+
     // Doc
     resultConfig = getPreferenceFromConfigObject(name, doc);
-    if("".equals(resultConfig.trim())) {
+    if ("".equals(resultConfig.trim())) {
       resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, doc);
     }
-    
+
     // PageType
-    if("".equals(resultConfig.trim())) {
+    if ("".equals(resultConfig.trim())) {
       resultConfig = getRTEConfigFieldFromPageType(name);
     }
-    
+
     // WebPreferences
-    if("".equals(resultConfig.trim())) {
+    if ("".equals(resultConfig.trim())) {
       String space = getContext().getDoc().getSpace();
       resultConfig = getRTEConfigFieldFromPreferenceDoc(name, space + ".WebPreferences");
     }
-    
+
     // XWikiPreferences
-    if("".equals(resultConfig.trim())) {
+    if ("".equals(resultConfig.trim())) {
       resultConfig = getRTEConfigFieldFromPreferenceDoc(name, "XWiki.XWikiPreferences");
     }
 
     // xwiki.cfg
-    if("".equals(resultConfig.trim())) {
+    if ("".equals(resultConfig.trim())) {
       resultConfig = getContext().getWiki().Param("celements.rteconfig." + name,
           rteConfigFieldDefaults.get(name));
     }
@@ -122,59 +127,53 @@ public class RTEConfig {
 
   private String getRTEConfigFieldFromPageType(String name) throws XWikiException {
     String resultConfig = "";
-    String pageTypeDocFN = getPageType().getPageTypeDocFN(getContext().getDoc(),
-        getContext());
-    if ((pageTypeDocFN != null) && getContext().getWiki().exists(pageTypeDocFN,
-        getContext())) {
-      XWikiDocument pageTypeDoc = getContext().getWiki().getDocument(pageTypeDocFN,
-          getContext());
+    String pageTypeDocFN = getPageType().getPageTypeDocFN(getContext().getDoc(), getContext());
+    if ((pageTypeDocFN != null) && getContext().getWiki().exists(pageTypeDocFN, getContext())) {
+      XWikiDocument pageTypeDoc = getContext().getWiki().getDocument(pageTypeDocFN, getContext());
       resultConfig = getPreferenceFromConfigObject(name, pageTypeDoc);
-      if("".equals(resultConfig.trim())) {
-        resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME,
-            pageTypeDoc);
+      if ("".equals(resultConfig.trim())) {
+        resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, pageTypeDoc);
       }
     }
     return resultConfig;
   }
 
-  private String getRTEConfigFieldFromPreferenceDoc(String name, String docName
-      ) throws XWikiException {
+  private String getRTEConfigFieldFromPreferenceDoc(String name, String docName)
+      throws XWikiException {
     XWikiDocument prefDoc = getContext().getWiki().getDocument(docName, getContext());
     String resultConfig = "";
     resultConfig = getPreferenceFromConfigObject(name, prefDoc);
-    if("".equals(resultConfig.trim())) {
+    if ("".equals(resultConfig.trim())) {
       resultConfig = getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, prefDoc);
-      if("".equals(resultConfig.trim())) {
-        resultConfig = getPreferenceFromPreferenceObject("rte_" + name,
-            "XWiki.XWikiPreferences", prefDoc);
+      if ("".equals(resultConfig.trim())) {
+        resultConfig = getPreferenceFromPreferenceObject("rte_" + name, "XWiki.XWikiPreferences",
+            prefDoc);
       }
     }
     return resultConfig;
   }
 
-  String getPreferenceFromConfigObject(String name, XWikiDocument doc
-      ) throws XWikiException {
-    String configDocName = getPreferenceFromPreferenceObject(CONFIG_PROP_NAME,
-        CONFIG_CLASS_NAME, doc);
-    if(!"".equals(configDocName.trim())){
-      XWikiDocument configDoc = getContext().getWiki().getDocument(configDocName,
-          getContext());
+  String getPreferenceFromConfigObject(String name, XWikiDocument doc) throws XWikiException {
+    String configDocName = getPreferenceFromPreferenceObject(CONFIG_PROP_NAME, CONFIG_CLASS_NAME,
+        doc);
+    if (!"".equals(configDocName.trim())) {
+      XWikiDocument configDoc = getContext().getWiki().getDocument(configDocName, getContext());
       return getPreferenceFromPreferenceObject(name, PROP_CLASS_NAME, configDoc);
     }
     return "";
   }
 
-  String getPreferenceFromPreferenceObject(String name, String className,
-      XWikiDocument doc) {
+  String getPreferenceFromPreferenceObject(String name, String className, XWikiDocument doc) {
     BaseObject prefObj = doc.getObject(className);
-    if(prefObj != null) {
+    if (prefObj != null) {
       return prefObj.getStringValue(name);
     }
     return "";
   }
-  
+
   /**
    * FOR TESTS ONLY!!!
+   * 
    * @param test_Instance
    */
   public void injectPageTypeInstance(PageTypeCommand test_Instance) {
@@ -203,8 +202,7 @@ public class RTEConfig {
   }
 
   private String getRteConfigsXWQL() {
-    return "from doc.object(" + PROP_CLASS_NAME + ") as rteConfig"
-        + " where doc.translation = 0";
+    return "from doc.object(" + PROP_CLASS_NAME + ") as rteConfig" + " where doc.translation = 0";
   }
 
   private QueryManager getQueryManager() {

@@ -37,14 +37,12 @@ public class RenameCommand {
   private IWebUtils injectedWebUtils;
 
   /**
-   * 
    * @param spaceName
    * @param newSpaceName
    * @param context
    * @return renamed pages
    */
-  public List<String> renameSpace(String spaceName, String newSpaceName,
-      XWikiContext context) {
+  public List<String> renameSpace(String spaceName, String newSpaceName, XWikiContext context) {
     ArrayList<String> renamedPages = new ArrayList<String>();
     try {
       for (String docName : context.getWiki().getSpaceDocsName(spaceName, context)) {
@@ -54,15 +52,15 @@ public class RenameCommand {
           renamedPages.add(docName);
         } else {
           mLogger.error("renameSpace: Failed to rename Document [" + fullname + "] to ["
-            + newDocName + "].");
+              + newDocName + "].");
         }
       }
       if (!renamedPages.isEmpty()) {
         getWebUtils().flushMenuItemCache(context);
       }
     } catch (XWikiException exp) {
-      mLogger.error("renameSpace: Failed to rename Space [" + spaceName + "] to ["
-          + newSpaceName + "].", exp);
+      mLogger.error("renameSpace: Failed to rename Space [" + spaceName + "] to [" + newSpaceName
+          + "].", exp);
     }
     return renamedPages;
   }
@@ -76,6 +74,7 @@ public class RenameCommand {
 
   /**
    * FOR TEST ONLY!!!!
+   * 
    * @param mockWebUtils
    */
   void inject_webUtils(IWebUtils mockWebUtils) {
@@ -86,26 +85,25 @@ public class RenameCommand {
     return renameDoc(fullname, newDocName, false, context);
   }
 
-  boolean renameDoc(String fullname, String newDocName,
-      boolean flushMenuCacheExternal, XWikiContext context) {
-    if (context.getWiki().exists(fullname, context) && !context.getWiki().exists(
-        newDocName, context)) {
+  boolean renameDoc(String fullname, String newDocName, boolean flushMenuCacheExternal,
+      XWikiContext context) {
+    if (context.getWiki().exists(fullname, context) && !context.getWiki().exists(newDocName,
+        context)) {
       try {
-        XWikiDocument thePage = context.getWiki().getDocument(fullname,
-            context);
+        XWikiDocument thePage = context.getWiki().getDocument(fullname, context);
         thePage.rename(newDocName, context);
         if (!flushMenuCacheExternal) {
           getWebUtils().flushMenuItemCache(context);
         }
         return true;
       } catch (XWikiException exp) {
-        mLogger.error("renameDoc: Failed to rename Document [" + fullname + "] to ["
-            + newDocName + "].", exp);
+        mLogger.error("renameDoc: Failed to rename Document [" + fullname + "] to [" + newDocName
+            + "].", exp);
       }
     }
     mLogger.warn("renameDoc: Failed to rename Document [" + fullname + " ; "
-        + context.getWiki().exists(fullname, context) + "] to ["
-        + newDocName + " ; " + context.getWiki().exists(newDocName, context) + "].");
+        + context.getWiki().exists(fullname, context) + "] to [" + newDocName + " ; "
+        + context.getWiki().exists(newDocName, context) + "].");
     return false;
   }
 

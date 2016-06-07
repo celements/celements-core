@@ -10,8 +10,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
 @Component
-public class EntityReferenceRandomCompleter
-  implements IEntityReferenceRandomCompleterRole {
+public class EntityReferenceRandomCompleter implements IEntityReferenceRandomCompleterRole {
 
   @Requirement
   private DocumentAccessBridge documentAccessBridge;

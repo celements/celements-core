@@ -23,12 +23,15 @@ import java.util.Comparator;
 
 import com.xpn.xwiki.api.Attachment;
 
-public class AttachmentDescendingNameComparator implements Comparator<Attachment>{
-	/* (non-Javadoc)
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
-	public int compare(Attachment attachmentOne, Attachment attachmentTwo) {
-		return -attachmentOne.getFilename().toLowerCase().replace('_', '-'
-		    ).compareTo(attachmentTwo.getFilename().toLowerCase().replace('_', '-'));
-	}
+public class AttachmentDescendingNameComparator implements Comparator<Attachment> {
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+   */
+  public int compare(Attachment attachmentOne, Attachment attachmentTwo) {
+    return -attachmentOne.getFilename().toLowerCase().replace('_', '-').compareTo(
+        attachmentTwo.getFilename().toLowerCase().replace('_', '-'));
+  }
 }

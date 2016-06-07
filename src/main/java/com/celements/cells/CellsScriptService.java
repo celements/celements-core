@@ -38,8 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("cells")
 public class CellsScriptService implements ScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CellsScriptService.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(CellsScriptService.class);
 
   @Requirement
   Execution execution;
@@ -47,8 +46,8 @@ public class CellsScriptService implements ScriptService {
   private PageDependentDocumentReferenceCommand injected_pageDepDocRefCmd;
 
   public DocumentReference getPageDependentDocRef(DocumentReference cellDocRef) {
-    return getPageDepDocRefCmd().getDocumentReference(getContext().getDoc(
-        ).getDocumentReference(), cellDocRef);
+    return getPageDepDocRefCmd().getDocumentReference(getContext().getDoc().getDocumentReference(),
+        cellDocRef);
   }
 
   public DocumentReference getPageDependentDocRef(DocumentReference currentPageRef,
@@ -58,8 +57,7 @@ public class CellsScriptService implements ScriptService {
 
   public DocumentReference getPageDependentDocRef(DocumentReference currentPageRef,
       DocumentReference cellDocRef, boolean isInheritable) {
-    return getPageDepDocRefCmd().getDocumentReference(currentPageRef, cellDocRef,
-        isInheritable);
+    return getPageDepDocRefCmd().getDocumentReference(currentPageRef, cellDocRef, isInheritable);
   }
 
   public Document getPageDependentTranslatedDocument(Document currentDoc,
@@ -68,36 +66,34 @@ public class CellsScriptService implements ScriptService {
       return getPageDepDocRefCmd().getTranslatedDocument(getCurrentXWikiDoc(currentDoc),
           cellDocRef).newDocument(getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get xwiki document for ["
-          + currentDoc.getDocumentReference() + "].", exp);
+      LOGGER.error("Failed to get xwiki document for [" + currentDoc.getDocumentReference() + "].",
+          exp);
     }
     return currentDoc;
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
   private XWikiDocument getCurrentXWikiDoc(Document currentDoc) throws XWikiException {
-    return getCurrentXWikiDocDef(currentDoc).getTranslatedDocument(
-        currentDoc.getLanguage(), getContext());
+    return getCurrentXWikiDocDef(currentDoc).getTranslatedDocument(currentDoc.getLanguage(),
+        getContext());
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch
-   * and write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
+   * write the exception in a log-file
    */
   private XWikiDocument getCurrentXWikiDocDef(Document currentDoc) throws XWikiException {
-    return getContext().getWiki().getDocument(currentDoc.getDocumentReference(),
-        getContext());
+    return getContext().getWiki().getDocument(currentDoc.getDocumentReference(), getContext());
   }
 
   public String getDepCellSpaceSuffix(DocumentReference cellDocRef) {
     try {
       return getPageDepDocRefCmd().getDepCellSpace(cellDocRef);
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get depCellSpaceSuffix for cellDocRef [" + cellDocRef
-          + "].", exp);
+      LOGGER.error("Failed to get depCellSpaceSuffix for cellDocRef [" + cellDocRef + "].", exp);
     }
     return "";
   }
@@ -135,22 +131,19 @@ public class CellsScriptService implements ScriptService {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   PageDependentDocumentReferenceCommand getPageDepDocRefCmd() {
     if (injected_pageDepDocRefCmd != null) {
       return injected_pageDepDocRefCmd;
     }
-    PageDependentDocumentReferenceCommand pageDepDocRefCmd =
-        new PageDependentDocumentReferenceCommand();
-    pageDepDocRefCmd.setCurrentLayoutRef(new PageLayoutCommand(
-        ).getCurrentRenderingLayout());
+    PageDependentDocumentReferenceCommand pageDepDocRefCmd = new PageDependentDocumentReferenceCommand();
+    pageDepDocRefCmd.setCurrentLayoutRef(new PageLayoutCommand().getCurrentRenderingLayout());
     return pageDepDocRefCmd;
   }
 
-  void inject_pageDepDocRefCmd(PageDependentDocumentReferenceCommand mockPageDepDocRefCmd
-      ) {
+  void inject_pageDepDocRefCmd(PageDependentDocumentReferenceCommand mockPageDepDocRefCmd) {
     injected_pageDepDocRefCmd = mockPageDepDocRefCmd;
   }
 

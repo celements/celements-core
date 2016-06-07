@@ -26,10 +26,14 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.NumberProperty;
 
 public interface IEmptyFieldChecker {
-  
+
   public boolean isEmpty(BaseProperty property);
+
   public boolean isEmptyString(BaseStringProperty property);
+
   public boolean isEmptyNumber(NumberProperty property);
+
   public boolean isEmptyDate(DateProperty property);
+
   public boolean isEmptyList(ListProperty property);
 }

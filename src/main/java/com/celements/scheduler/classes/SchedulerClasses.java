@@ -39,7 +39,7 @@ public class SchedulerClasses extends AbstractClassCollection {
     DocumentReference docRef = classConf.getSchedulerJobClassRef();
     XWikiDocument doc;
     boolean needsUpdate = false;
-    
+
     try {
       doc = getContext().getWiki().getDocument(docRef, getContext());
     } catch (XWikiException xwe) {
@@ -47,36 +47,31 @@ public class SchedulerClasses extends AbstractClassCollection {
       doc = new XWikiDocument(docRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
-    bclass.setDocumentReference(docRef);  
-    needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_JOB_NAME, "Job Name",
-        60);
+    bclass.setDocumentReference(docRef);
+    needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_JOB_NAME, "Job Name", 60);
     needsUpdate |= bclass.addTextAreaField(ISchedulerClassConfig.PROP_JOB_DESCRIPTION,
         "Job Description", 45, 10);
-    needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_JOB_CLASS, "Job Class",
-        60);
+    needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_JOB_CLASS, "Job Class", 60);
     needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_STATUS, "Status", 30);
-    needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_CRON, "Cron Expression",
-        30);
-    needsUpdate |= bclass.addTextAreaField(ISchedulerClassConfig.PROP_SCRIPT,
-        "Job Script", 60, 10);
-    // make sure that the script field is of type pure text so that wysiwyg editor is 
+    needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_CRON, "Cron Expression", 30);
+    needsUpdate |= bclass.addTextAreaField(ISchedulerClassConfig.PROP_SCRIPT, "Job Script", 60, 10);
+    // make sure that the script field is of type pure text so that wysiwyg editor is
     // never used for it
-    TextAreaClass scriptField = (TextAreaClass) bclass.getField(
-        ISchedulerClassConfig.PROP_SCRIPT);
+    TextAreaClass scriptField = (TextAreaClass) bclass.getField(ISchedulerClassConfig.PROP_SCRIPT);
     // get editor returns lowercase but the values are actually camelcase
     if (scriptField.getEditor() != "puretext") {
-        scriptField.setStringValue("editor", "PureText");
-        needsUpdate = true;
+      scriptField.setStringValue("editor", "PureText");
+      needsUpdate = true;
     }
     needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_CONTEXT_USER,
         "Job execution context user", 30);
     needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_CONTEXT_LANG,
         "Job execution context lang", 30);
     needsUpdate |= bclass.addTextField(ISchedulerClassConfig.PROP_CONTEXT_DATABASE,
-        "Job execution context database",30);
-    
+        "Job execution context database", 30);
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }

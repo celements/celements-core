@@ -53,8 +53,8 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false);
     context.setWiki(xwiki);
     replay(xwiki);
-    assertFalse("expecting true if translation successfully created",
-        addTransCmd.addTranslation(docRef, "fr"));
+    assertFalse("expecting true if translation successfully created", addTransCmd.addTranslation(
+        docRef, "fr"));
     verify(xwiki);
   }
 
@@ -68,8 +68,8 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false);
     context.setWiki(xwiki);
     replay(xwiki);
-    assertFalse("expecting true if translation successfully created",
-        addTransCmd.addTranslation(fullName, "fr", context));
+    assertFalse("expecting true if translation successfully created", addTransCmd.addTranslation(
+        fullName, "fr", context));
     verify(xwiki);
   }
 
@@ -92,10 +92,9 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expectLastCall();
     context.setWiki(xwiki);
     replay(xwiki, mainDoc);
-    assertFalse("expecting false if no new translation was created",
-        addTransCmd.addTranslation(docRef, "fr"));
-    assertEquals("expecting translation flag to be set to 1.", 1,
-        transDoc.getTranslation());
+    assertFalse("expecting false if no new translation was created", addTransCmd.addTranslation(
+        docRef, "fr"));
+    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
     verify(xwiki, mainDoc);
   }
 
@@ -120,10 +119,9 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expectLastCall();
     context.setWiki(xwiki);
     replay(xwiki, mainDoc);
-    assertFalse("expecting false if no new translation was created",
-        addTransCmd.addTranslation(fullName, "fr", context));
-    assertEquals("expecting translation flag to be set to 1.", 1,
-        transDoc.getTranslation());
+    assertFalse("expecting false if no new translation was created", addTransCmd.addTranslation(
+        fullName, "fr", context));
+    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
     verify(xwiki, mainDoc);
   }
 
@@ -148,17 +146,14 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expectLastCall();
     context.setWiki(xwiki);
     replay(xwiki, mainDoc);
-    assertTrue("expecting true if translation successfully created",
-        addTransCmd.addTranslation(docRef, "fr"));
+    assertTrue("expecting true if translation successfully created", addTransCmd.addTranslation(
+        docRef, "fr"));
     XWikiDocument transDoc = transDocCapture.getValue();
-    assertEquals("expecting document language to be set.", "fr",
-        transDoc.getLanguage());
+    assertEquals("expecting document language to be set.", "fr", transDoc.getLanguage());
     assertEquals("expecting document default language to be set.", "de",
         transDoc.getDefaultLanguage());
-    assertEquals("expecting translation flag to be set to 1.", 1,
-        transDoc.getTranslation());
-    assertTrue("expecting metadata dirty status set to true.",
-        transDoc.isMetaDataDirty());
+    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
+    assertTrue("expecting metadata dirty status set to true.", transDoc.isMetaDataDirty());
     assertTrue("expecting transdoc to be 'new'.", transDoc.isNew());
     verify(xwiki, mainDoc);
   }
@@ -186,17 +181,14 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expectLastCall();
     context.setWiki(xwiki);
     replay(xwiki, mainDoc);
-    assertTrue("expecting true if translation successfully created",
-        addTransCmd.addTranslation(fullName, "fr", context));
+    assertTrue("expecting true if translation successfully created", addTransCmd.addTranslation(
+        fullName, "fr", context));
     XWikiDocument transDoc = transDocCapture.getValue();
-    assertEquals("expecting document language to be set.", "fr",
-        transDoc.getLanguage());
+    assertEquals("expecting document language to be set.", "fr", transDoc.getLanguage());
     assertEquals("expecting document default language to be set.", "de",
         transDoc.getDefaultLanguage());
-    assertEquals("expecting translation flag to be set to 1.", 1,
-        transDoc.getTranslation());
-    assertTrue("expecting metadata dirty status set to true.",
-        transDoc.isMetaDataDirty());
+    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
+    assertTrue("expecting metadata dirty status set to true.", transDoc.isMetaDataDirty());
     assertTrue("expecting transdoc to be 'new'.", transDoc.isNew());
     verify(xwiki, mainDoc);
   }
@@ -222,10 +214,8 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     assertEquals("expecting document language to be set.", "fr", transDoc.getLanguage());
     assertEquals("expecting document default language to be set.", "de",
         transDoc.getDefaultLanguage());
-    assertEquals("expecting translation flag to be set to 1.", 1,
-        transDoc.getTranslation());
-    assertTrue("expecting metadata dirty status set to true.",
-        transDoc.isMetaDataDirty());
+    assertEquals("expecting translation flag to be set to 1.", 1, transDoc.getTranslation());
+    assertTrue("expecting metadata dirty status set to true.", transDoc.isMetaDataDirty());
     assertTrue("expecting transdoc to be 'new'.", transDoc.isNew());
     assertEquals("main doc content must be copied in translation.", mainDocContent,
         transDoc.getContent());

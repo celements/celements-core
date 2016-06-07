@@ -48,49 +48,44 @@ public class DivWriterTest {
     String returnedString = divWriter.getAsString();
     assertTrue("Must start with '<div ' but got '" + returnedString + "'",
         returnedString.startsWith("<div "));
-    assertTrue("Must end with '>' but got '" + returnedString + "'",
-        returnedString.endsWith(">"));
+    assertTrue("Must end with '>' but got '" + returnedString + "'", returnedString.endsWith(">"));
     String idExpected = " id=\"" + idname + "\"";
-    assertTrue("Must contain '" + idExpected  + "' but got '" + returnedString + "'",
+    assertTrue("Must contain '" + idExpected + "' but got '" + returnedString + "'",
         returnedString.contains(idExpected));
     String cssClassExpected = " class=\"" + cssClasses + "\"";
-    assertTrue("Must contain '" + cssClassExpected  + "' but got '" + returnedString
-        + "'", returnedString.contains(cssClassExpected));
+    assertTrue("Must contain '" + cssClassExpected + "' but got '" + returnedString + "'",
+        returnedString.contains(cssClassExpected));
     String cssStylesExpected = "width:100px;height:10px;";
-    assertTrue("Must contain '" + cssStylesExpected  + "' but got '" + returnedString
-        + "'", returnedString.contains(cssStylesExpected));
+    assertTrue("Must contain '" + cssStylesExpected + "' but got '" + returnedString + "'",
+        returnedString.contains(cssStylesExpected));
   }
 
   @Test
   public void testOpenLevel_id_null() {
     String cssClasses = "classes";
     divWriter.openLevel(null, cssClasses, "");
-    assertEquals("<div class=\"" + cssClasses + "\">",
-        divWriter.getAsString());
+    assertEquals("<div class=\"" + cssClasses + "\">", divWriter.getAsString());
   }
 
   @Test
   public void testOpenLevel_id_empty() {
     String cssClasses = "classes";
     divWriter.openLevel("", cssClasses, "");
-    assertEquals("<div class=\"" + cssClasses + "\">",
-        divWriter.getAsString());
+    assertEquals("<div class=\"" + cssClasses + "\">", divWriter.getAsString());
   }
-  
+
   @Test
   public void testOpenLevel_cssClasses_null() {
     String idname = "newId";
     divWriter.openLevel(idname, null, "");
-    assertEquals("<div id=\"" + idname + "\">",
-        divWriter.getAsString());
+    assertEquals("<div id=\"" + idname + "\">", divWriter.getAsString());
   }
 
   @Test
   public void testOpenLevel_cssClasses_empty() {
     String idname = "newId";
     divWriter.openLevel(idname, "", "");
-    assertEquals("<div id=\"" + idname + "\">",
-        divWriter.getAsString());
+    assertEquals("<div id=\"" + idname + "\">", divWriter.getAsString());
   }
 
   @Test
@@ -101,12 +96,12 @@ public class DivWriterTest {
     assertTrue("Must start with '<div '", divWriter.getAsString().startsWith("<div "));
     assertTrue("Must end with '>'", divWriter.getAsString().endsWith(">"));
     String cssClassExpected = " class=\"" + cssClasses + "\"";
-    assertTrue("Must contain '" + cssClassExpected  + "'",
-        divWriter.getAsString().contains(cssClassExpected));
-    assertFalse("Must not contain any style values.",
-        divWriter.getAsString().contains(" style=\""));
+    assertTrue("Must contain '" + cssClassExpected + "'", divWriter.getAsString().contains(
+        cssClassExpected));
+    assertFalse("Must not contain any style values.", divWriter.getAsString().contains(
+        " style=\""));
   }
-  
+
   @Test
   public void testOpenLevel_cssStyles_null() {
     String idname = "newId";
@@ -115,18 +110,18 @@ public class DivWriterTest {
     assertTrue("Must start with '<div '", divWriter.getAsString().startsWith("<div "));
     assertTrue("Must end with '>'", divWriter.getAsString().endsWith(">"));
     String cssClassExpected = " class=\"" + cssClasses + "\"";
-    assertTrue("Must contain '" + cssClassExpected  + "'",
-        divWriter.getAsString().contains(cssClassExpected));
-    assertFalse("Must not contain any style values.",
-        divWriter.getAsString().contains(" style=\""));
+    assertTrue("Must contain '" + cssClassExpected + "'", divWriter.getAsString().contains(
+        cssClassExpected));
+    assertFalse("Must not contain any style values.", divWriter.getAsString().contains(
+        " style=\""));
   }
 
   @Test
   public void testGetOut() {
     StringBuilder out = divWriter.getOut();
     assertNotNull("lacy initalization expected", out);
-    assertSame("out buffer may not be reset without calling startRendering in between",
-        out, divWriter.getOut());
+    assertSame("out buffer may not be reset without calling startRendering in between", out,
+        divWriter.getOut());
   }
 
   @Test
@@ -141,16 +136,15 @@ public class DivWriterTest {
   public void testClear() {
     divWriter.getOut().append("blabla");
     divWriter.clear();
-    assertEquals("clear must reset the output stream",
-        "", divWriter.getAsString());
+    assertEquals("clear must reset the output stream", "", divWriter.getAsString());
   }
 
   @Test
   public void testAppendContent() {
     String content = "blablabla";
     divWriter.appendContent(content);
-    assertEquals("appendContent must add the given content to the output stream",
-        content, divWriter.getAsString());
+    assertEquals("appendContent must add the given content to the output stream", content,
+        divWriter.getAsString());
   }
 
 }

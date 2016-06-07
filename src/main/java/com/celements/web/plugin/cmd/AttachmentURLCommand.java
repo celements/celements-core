@@ -53,35 +53,32 @@ public class AttachmentURLCommand {
 
   public String getAttachmentURLPrefix(String action) {
     XWikiURLFactory urlf = getContext().getURLFactory();
-    return urlf.createResourceURL("", true, getContext()).toString().replace("/skin/", "/"
-        + action + "/");
+    return urlf.createResourceURL("", true, getContext()).toString().replace("/skin/", "/" + action
+        + "/");
   }
 
   public String getAttachmentURL(String link, String action, XWikiContext context) {
     String url = link;
-    if(isAttachmentLink(link)) {
+    if (isAttachmentLink(link)) {
       String attName = getAttachmentName(link);
       try {
         XWikiDocument doc = context.getWiki().getDocument(getPageFullName(link), context);
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
         url = doc.getAttachmentURL(attName, action, context);
-        url += "?version=" + new LastStartupTimeStamp().getLastChangedTimeStamp(
-            att.getDate());
+        url += "?version=" + new LastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
       } catch (XWikiException exp) {
-        LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link)
-            + " and file " + attName, exp);
+        LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link) + " and file "
+            + attName, exp);
         url = link;
       } catch (AttachmentNotExistsException anee) {
-        LOGGER.warn("Attachment not found for link [{}] and action [{}]", link, action, 
-            anee);
+        LOGGER.warn("Attachment not found for link [{}] and action [{}]", link, action, anee);
         return null;
       }
-    } else if(isOnDiskLink(link)) {
+    } else if (isOnDiskLink(link)) {
       String path = link.trim().substring(1);
-      url = context.getWiki().getSkinFile(path, true, context).replace("/skin/", "/"
-          + action + "/");
-      url += "?version=" + new LastStartupTimeStamp().getFileModificationDate(path,
-          context);
+      url = context.getWiki().getSkinFile(path, true, context).replace("/skin/", "/" + action
+          + "/");
+      url += "?version=" + new LastStartupTimeStamp().getFileModificationDate(path, context);
     }
     if (url.startsWith("?")) {
       url = context.getDoc().getURL("view", context) + url;
@@ -99,7 +96,7 @@ public class AttachmentURLCommand {
 
   public boolean isAttachmentLink(String link) {
     boolean isAttachmentLink = false;
-    if(link != null) {
+    if (link != null) {
       String regex = "([\\w\\-]*:)?([\\w\\-]*\\.[\\w\\-]*){1};.*";
       isAttachmentLink = link.matches(regex);
     }
@@ -108,30 +105,29 @@ public class AttachmentURLCommand {
 
   public boolean isOnDiskLink(String link) {
     boolean isAttachmentLink = false;
-    if(link != null) {
+    if (link != null) {
       String regex = "^:[/\\w\\-\\.]*";
       isAttachmentLink = link.trim().matches(regex);
     }
     return isAttachmentLink;
   }
 
-  public String getExternalAttachmentURL(String fileName, String action,
-      XWikiContext context) {
+  public String getExternalAttachmentURL(String fileName, String action, XWikiContext context) {
     try {
-      return context.getURLFactory().getServerURL(context).toExternalForm(
-          ) + getAttachmentURL(fileName, action, context);
+      return context.getURLFactory().getServerURL(context).toExternalForm() + getAttachmentURL(
+          fileName, action, context);
     } catch (MalformedURLException exp) {
       LOGGER.error("Failed to getServerURL.", exp);
     }
     return "";
   }
-  
+
   private IAttachmentServiceRole getAttachmentService() {
     return Utils.getComponent(IAttachmentServiceRole.class);
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {

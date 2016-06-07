@@ -50,7 +50,7 @@ public class ParserTest {
     jsonParser.parse("[\"cel_cm_agenda\",\"cel_cm_navigation_menuitem\"]");
     verify(jsonEventHandlerMock);
   }
-  
+
   @Test
   public void testParse_dictionary() throws Exception {
     jsonEventHandlerMock.initEvent();
@@ -68,48 +68,47 @@ public class ParserTest {
     jsonEventHandlerMock.finishEvent();
     replay(jsonEventHandlerMock);
     jsonParser.parse("{\"elemId\" : \"Content.Agenda\","
-        + " \"cmClassNames\" : [ \"cel_cm_agenda\","
-        + "\"cel_cm_navigation_menuitem\"]}");
+        + " \"cmClassNames\" : [ \"cel_cm_agenda\"," + "\"cel_cm_navigation_menuitem\"]}");
     verify(jsonEventHandlerMock);
   }
-  
+
   @Test
   public void testParse_dictionaryInArray() throws Exception {
     jsonEventHandlerMock.initEvent();
     jsonEventHandlerMock.openArrayEvent();
-    //rule
+    // rule
     jsonEventHandlerMock.openDictionaryEvent();
-    //actions
+    // actions
     jsonEventHandlerMock.openPropertyEvent("actions");
     jsonEventHandlerMock.openArrayEvent();
-    //action
+    // action
     jsonEventHandlerMock.openDictionaryEvent();
     jsonEventHandlerMock.openPropertyEvent("actionType");
     jsonEventHandlerMock.stringEvent("addTo");
     jsonEventHandlerMock.closePropertyEvent();
     jsonEventHandlerMock.closeDictionaryEvent();
-    //end action
+    // end action
     jsonEventHandlerMock.closeArrayEvent();
-    //end actions
+    // end actions
     jsonEventHandlerMock.closePropertyEvent();
-    //conditions
+    // conditions
     jsonEventHandlerMock.openPropertyEvent("conditions");
     jsonEventHandlerMock.openArrayEvent();
-    //condition
+    // condition
     jsonEventHandlerMock.openDictionaryEvent();
     jsonEventHandlerMock.openPropertyEvent("conditionType");
     jsonEventHandlerMock.stringEvent("titleCondition");
     jsonEventHandlerMock.closePropertyEvent();
     jsonEventHandlerMock.closeDictionaryEvent();
-    //end condition
+    // end condition
     jsonEventHandlerMock.closeArrayEvent();
-    //end conditions
+    // end conditions
     jsonEventHandlerMock.closePropertyEvent();
-    //rulesname
+    // rulesname
     jsonEventHandlerMock.openPropertyEvent("rulesname");
     jsonEventHandlerMock.stringEvent("Rule1");
     jsonEventHandlerMock.closePropertyEvent();
-    //rule type
+    // rule type
     jsonEventHandlerMock.openPropertyEvent("type");
     jsonEventHandlerMock.stringEvent("any");
     jsonEventHandlerMock.closePropertyEvent();
@@ -119,15 +118,13 @@ public class ParserTest {
     // end rules
     jsonEventHandlerMock.finishEvent();
     replay(jsonEventHandlerMock);
-    String jsonStr = "[{"
-      + "\"actions\":[{\"actionType\" : \"addTo\"}],"
-      + "\"conditions\":[{\"conditionType\" : \"titleCondition\"}],"
-      + "\"rulesname\":\"Rule1\",\"type\":\"any\""
-      + "}]";
+    String jsonStr = "[{" + "\"actions\":[{\"actionType\" : \"addTo\"}],"
+        + "\"conditions\":[{\"conditionType\" : \"titleCondition\"}],"
+        + "\"rulesname\":\"Rule1\",\"type\":\"any\"" + "}]";
     jsonParser.parse(jsonStr);
     verify(jsonEventHandlerMock);
   }
-  
+
   @Test
   public void testParse_dictionaryWithBoolean_true() throws Exception {
     jsonEventHandlerMock.initEvent();
@@ -141,7 +138,7 @@ public class ParserTest {
     jsonParser.parse("{\"isDeleted\" : true }");
     verify(jsonEventHandlerMock);
   }
-  
+
   @Test
   public void testParse_dictionaryWithBoolean_false() throws Exception {
     jsonEventHandlerMock.initEvent();
@@ -155,5 +152,5 @@ public class ParserTest {
     jsonParser.parse("{\"isDeleted\" : false }");
     verify(jsonEventHandlerMock);
   }
-  
+
 }

@@ -26,10 +26,12 @@ public class DocFormRequestKeyParser {
   /**
    * Parses a given key string to {@link DocFormRequestKey} object
    * 
-   * @param key syntax: "[{fullName}_]{className}_[-|^]{objNb}_{fieldName}" whereas 
-   * fullName is optional and objNb can be preceded by "-" to create or "^" to delete the 
-   * object
-   * @param defaultDocRef used if no fullName is provided in the key
+   * @param key
+   *          syntax: "[{fullName}_]{className}_[-|^]{objNb}_{fieldName}" whereas fullName
+   *          is optional and objNb can be preceded by "-" to create or "^" to delete the
+   *          object
+   * @param defaultDocRef
+   *          used if no fullName is provided in the key
    * @return key or null
    */
   public DocFormRequestKey parse(String key, DocumentReference defaultDocRef) {
@@ -52,15 +54,14 @@ public class DocFormRequestKeyParser {
     if (validate(ret)) {
       return ret;
     } else {
-      throw new IllegalArgumentException("Illegal request key '" + ret  + "'");
+      throw new IllegalArgumentException("Illegal request key '" + ret + "'");
     }
   }
 
-  private DocumentReference parseDocRef(List<String> keyParts, 
-      DocumentReference defaultDocRef) {
+  private DocumentReference parseDocRef(List<String> keyParts, DocumentReference defaultDocRef) {
     DocumentReference ret = null;
-    if ((keyParts.size() > 1) && (keyParts.get(1).matches(REGEX_FULLNAME) 
-        || keyParts.get(1).matches(REGEX_WHITELIST))) {
+    if ((keyParts.size() > 1) && (keyParts.get(1).matches(REGEX_FULLNAME) || keyParts.get(
+        1).matches(REGEX_WHITELIST))) {
       String fullName = keyParts.remove(0);
       if (fullName.matches(REGEX_FULLNAME)) {
         ret = getWebUtils().resolveDocumentReference(fullName);
@@ -76,8 +77,8 @@ public class DocFormRequestKeyParser {
   }
 
   private boolean isPropertyKey(List<String> keyParts) {
-    return (keyParts.size() > 1) && keyParts.get(0).matches(REGEX_FULLNAME) 
-        && !keyParts.get(1).matches("nb"); // to skip "{classeName}_nb" keys
+    return (keyParts.size() > 1) && keyParts.get(0).matches(REGEX_FULLNAME) && !keyParts.get(
+        1).matches("nb"); // to skip "{classeName}_nb" keys
   }
 
   private DocumentReference parseClassRef(List<String> keyParts) {
@@ -133,13 +134,14 @@ public class DocFormRequestKeyParser {
   }
 
   /**
-   * Parses given key strings to {@link DocFormRequestKey} objects. 
-   * See {@link #parse(String, DocumentReference)}
+   * Parses given key strings to {@link DocFormRequestKey} objects. See
+   * {@link #parse(String, DocumentReference)}
+   * 
    * @param keys
    * @param defaultDocRef
    * @return list of keys with no null elements
    */
-  public Collection<DocFormRequestKey> parse(Collection<String> keys, 
+  public Collection<DocFormRequestKey> parse(Collection<String> keys,
       DocumentReference defaultDocRef) {
     Collection<DocFormRequestKey> ret = new ArrayList<DocFormRequestKey>();
     for (String keyString : keys) {
@@ -153,7 +155,7 @@ public class DocFormRequestKeyParser {
     return ret;
   }
 
-  private boolean filterRequestKeySetForRemove(Collection<DocFormRequestKey> keys, 
+  private boolean filterRequestKeySetForRemove(Collection<DocFormRequestKey> keys,
       DocFormRequestKey key) {
     boolean ret = true;
     Iterator<DocFormRequestKey> iter = keys.iterator();

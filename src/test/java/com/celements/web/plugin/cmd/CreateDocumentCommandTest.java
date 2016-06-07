@@ -49,27 +49,26 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testCreateDocument_exists() throws Exception {
     String pageType = "RichText";
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myNewDocument");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(true).once();
     replayDefault();
-    assertNull("only create document if NOT exists.",
-        createDocumentCmd.createDocument(docRef, pageType));
+    assertNull("only create document if NOT exists.", createDocumentCmd.createDocument(docRef,
+        pageType));
     verifyDefault();
   }
 
   @Test
   public void testCreateDocument_noPageType() throws Exception {
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myNewDocument");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc)
-        .once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(""))).andReturn(null).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
-    getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false),
-        same(getContext()));
+    getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false), same(
+        getContext()));
     expectLastCall().once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, null);
@@ -84,22 +83,18 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testCreateDocument() throws Exception {
     String pageType = "RichText";
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myNewDocument");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc
-        ).once();
-    PageTypeReference ptRef = new PageTypeReference(pageType, "",
-        Collections.<String>emptyList());
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef
-        ).once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
+    PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
+    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
-    expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))
-        ).andReturn(true).once();
+    expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true).once();
     Capture<XWikiDocument> docCaptcher2 = new Capture<>();
-    getWikiMock().saveDocument(capture(docCaptcher2), eq("init RichText-document"),
-        eq(false), same(getContext()));
+    getWikiMock().saveDocument(capture(docCaptcher2), eq("init RichText-document"), eq(false), same(
+        getContext()));
     expectLastCall().once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType);
@@ -116,19 +111,15 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testCreateDocument_noSave() throws Exception {
     String pageType = "RichText";
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myNewDocument");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc
-        ).once();
-    PageTypeReference ptRef = new PageTypeReference(pageType, "",
-        Collections.<String>emptyList());
-    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef
-        ).once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
+    PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
+    expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
-    expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true
-        ).once();
+    expect(pageTypeServiceMock.setPageType(capture(docCaptcher), eq(ptRef))).andReturn(true).once();
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType, false);
     XWikiDocument captNewDoc = docCaptcher.getValue();
@@ -142,11 +133,11 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testCreateDocument_XWE() throws Exception {
     String pageType = "RichText";
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
-        "mySpace", "myNewDocument");
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
+        "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext())))
-        .andThrow(new XWikiException()).once();
+    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andThrow(
+        new XWikiException()).once();
     replayDefault();
     try {
       createDocumentCmd.createDocument(docRef, pageType, false);

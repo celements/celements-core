@@ -134,8 +134,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     List<DocumentReference> docParentsList = Arrays.asList(parentRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(includeDoc)))
-        .andReturn(docParentsList).once();
+    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(
+        includeDoc))).andReturn(docParentsList).once();
     replayDefault();
     assertSame(docParentsList, webUtilsService.getDocumentParentsList(docRef, includeDoc));
     verifyDefault();
@@ -149,8 +149,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     DocumentReference parentRef = new DocumentReference(context.getDatabase(), "mySpace",
         "parent1");
     List<DocumentReference> docParentsList = Arrays.asList(parentRef);
-    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(includeDoc)))
-        .andReturn(docParentsList).once();
+    expect(webUtilsService.docParentsLister.getDocumentParentsList(eq(docRef), eq(
+        includeDoc))).andReturn(docParentsList).once();
     replayDefault();
     assertSame(docParentsList, webUtilsService.getDocumentParentsList(docRef, includeDoc));
     verifyDefault();
@@ -185,8 +185,8 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     XWikiDocument doc = createMock(XWikiDocument.class);
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
-    expect(doc.getTranslatedDocument(same(context))).andReturn(new XWikiDocument(transDocRef))
-        .once();
+    expect(doc.getTranslatedDocument(same(context))).andReturn(new XWikiDocument(
+        transDocRef)).once();
 
     replayDefault(doc);
     assertNull(webUtilsService.getDocSection("(?=<table)", docRef, 1));

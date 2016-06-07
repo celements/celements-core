@@ -36,10 +36,10 @@ public class ContentInheritor {
   private IIteratorFactory<DocumentIterator> _iteratorFactory;
   private IEmptyDocumentChecker _emptyDocumentChecker;
   private String _language;
-  
-  public ContentInheritor(){
+
+  public ContentInheritor() {
   }
-  
+
   public void setIteratorFactory(IIteratorFactory<DocumentIterator> iteratorFactory) {
     _iteratorFactory = iteratorFactory;
   }
@@ -47,69 +47,69 @@ public class ContentInheritor {
   protected IIteratorFactory<DocumentIterator> getIteratorFactory() {
     return _iteratorFactory;
   }
-  
-  public void setLanguage(String language){
+
+  public void setLanguage(String language) {
     _language = language;
   }
 
-  protected String getLanguage(){
+  protected String getLanguage() {
     if (_language != null) {
       return _language;
     } else {
       return getContext().getLanguage();
     }
   }
-  
-  public String getTitle(){
+
+  public String getTitle() {
     return getTitle("");
   }
-  
-  public String getTitle(String defaultValue){
+
+  public String getTitle(String defaultValue) {
     if (getDocument() != null)
       return getDocument().getTitle();
     else
       return defaultValue;
   }
-  
-  public String getTranslatedTitle(XWikiContext context){
+
+  public String getTranslatedTitle(XWikiContext context) {
     return getTranslatedTitle(context, "");
   }
-  
-  public String getTranslatedTitle(XWikiContext context, String defaultValue){
+
+  public String getTranslatedTitle(XWikiContext context, String defaultValue) {
     if (getTranslatedDocument(context) != null)
       return getTranslatedDocument(context).getTitle();
-    else 
-      return defaultValue;
-  }
-  
-  public String getContent(){
-    return getContent("");
-  }
-  
-  public String getContent(String defaultValue){
-    if (getDocument() != null)
-      return getDocument().getContent(); 
     else
       return defaultValue;
   }
-  
-  public String getTranslatedContent(XWikiContext context){
+
+  public String getContent() {
+    return getContent("");
+  }
+
+  public String getContent(String defaultValue) {
+    if (getDocument() != null)
+      return getDocument().getContent();
+    else
+      return defaultValue;
+  }
+
+  public String getTranslatedContent(XWikiContext context) {
     return getTranslatedContent(context, "");
   }
-  
-  public String getTranslatedContent(XWikiContext context, String defaultValue){
+
+  public String getTranslatedContent(XWikiContext context, String defaultValue) {
     if (getTranslatedDocument(context) != null)
       return getTranslatedDocument(context).getContent();
     else
       return defaultValue;
   }
-  
-  public XWikiDocument getDocument(){
+
+  public XWikiDocument getDocument() {
     return getDoc();
   }
-  
-  XWikiDocument getTranslatedDocument(XWikiContext context){
-    if (getLanguage() == null){
+
+  XWikiDocument getTranslatedDocument(XWikiContext context) {
+    if (getLanguage() == null) {
       throw new IllegalStateException("No language given.");
     }
     return getDoc();
@@ -121,7 +121,7 @@ public class ContentInheritor {
     }
     DocumentIterator iterator = getIteratorFactory().createIterator();
     _LOGGER.info("ContentInheritor getDoc before while : " + iterator.hasNext());
-    while(iterator.hasNext()){
+    while (iterator.hasNext()) {
       try {
         XWikiDocument doc = iterator.next();
         _LOGGER.debug("ContentInheritor getDoc next: " + doc);
@@ -137,13 +137,13 @@ public class ContentInheritor {
     }
     return null;
   }
-  
-  public void setEmptyDocumentChecker(IEmptyDocumentChecker emptyDocumentChecker){
+
+  public void setEmptyDocumentChecker(IEmptyDocumentChecker emptyDocumentChecker) {
     _emptyDocumentChecker = emptyDocumentChecker;
   }
-  
-  IEmptyDocumentChecker getEmptyDocumentChecker(){
-    if (_emptyDocumentChecker == null){
+
+  IEmptyDocumentChecker getEmptyDocumentChecker() {
+    if (_emptyDocumentChecker == null) {
       _emptyDocumentChecker = new DefaultEmptyDocumentChecker();
     }
     return _emptyDocumentChecker;

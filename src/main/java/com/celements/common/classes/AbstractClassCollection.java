@@ -24,6 +24,9 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,18 +40,19 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Extend CelementsClassCollection and make the implementor a named component.
- * Celements then will call your initClasses method on system start once or if it
- * is explicitly asked for.
+ * Extend CelementsClassCollection and make the implementor a named component. Celements
+ * then will call your initClasses method on system start once or if it is explicitly
+ * asked for.
  * 
- * @author fabian pichler
- * 
- * since 2.18.0
+ * @author fabian pichler since 2.18.0
  */
 public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   @Requirement
   protected Execution execution;
+
+  @Requirement
+  protected IModelAccessFacade modelAccess;
 
   protected XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -67,27 +71,33 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
   @Override
   public boolean isActivated() {
     return ("," + getContext().getWiki().getXWikiPreference("activated_classcollections",
-        getContext()) + "," + getContext().getWiki().Param("celements.classcollections",
-            "") + ",").contains("," + getConfigName() + ",");
+        getContext()) + "," + getContext().getWiki().Param("celements.classcollections", "")
+        + ",").contains("," + getConfigName() + ",");
   }
 
   protected XWikiDocument getClassDoc(DocumentReference classRef) {
     try {
-      return getContext().getWiki().getDocument(classRef, getContext());
-    } catch (XWikiException xwe) {
-      getLogger().error("Failed getting classDoc for classRef '" + classRef + "'", xwe);
+      return modelAccess.getOrCreateDocument(classRef);
+    } catch (DocumentLoadException docLoadExp) {
+      getLogger().error("Failed getting classDoc for classRef '" + classRef + "'",
+          docLoadExp);
       return new XWikiDocument(classRef);
     }
   }
 
-  protected void setContentAndSaveClassDocument(XWikiDocument doc, boolean needsUpdate
-      ) throws XWikiException {
+  protected void setContentAndSaveClassDocument(XWikiDocument doc, boolean needsUpdate)
+      throws XWikiException {
     if (Strings.nullToEmpty(doc.getContent()).isEmpty()) {
       needsUpdate = true;
       doc.setContent(" ");
     }
     if (needsUpdate) {
-      getContext().getWiki().saveDocument(doc, getContext());
+      try {
+        modelAccess.saveDocument(doc, "update class definition");
+      } catch (DocumentSaveException exp) {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_UNKNOWN, "failed to save class update", exp);
+      }
     }
   }
 
@@ -95,8 +105,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   abstract protected Log getLogger();
 
-  protected final boolean addBooleanField(BaseClass bclass, String name,
-      String prettyName, String displayType, int defaultValue) {
+  protected final boolean addBooleanField(BaseClass bclass, String name, String prettyName,
+      String displayType, int defaultValue) {
     if (bclass.get(name) == null) {
       BooleanClass element = new BooleanClass();
       element.setName(name);
@@ -110,8 +120,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addTextField(BaseClass bclass, String name, String prettyName,
-      int size, String validationRegExp, String validationMessage) {
+  protected final boolean addTextField(BaseClass bclass, String name, String prettyName, int size,
+      String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       StringClass element = new StringClass();
       element.setName(name);
@@ -126,9 +136,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addTextAreaField(BaseClass bclass, String name,
-      String prettyName, int cols, int rows, String validationRegExp,
-      String validationMessage) {
+  protected final boolean addTextAreaField(BaseClass bclass, String name, String prettyName,
+      int cols, int rows, String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       TextAreaClass element = new TextAreaClass();
       element.setName(name);
@@ -144,9 +153,8 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addNumberField(BaseClass bclass, String name,
-      String prettyName, int size, String ntype, String validationRegExp,
-      String validationMessage) {
+  protected final boolean addNumberField(BaseClass bclass, String name, String prettyName, int size,
+      String ntype, String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       NumberClass element = new NumberClass();
       element.setName(name);
@@ -182,9 +190,9 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     return false;
   }
 
-  protected final boolean addDBListField(BaseClass bclass, String name,
-      String prettyName, int size, boolean multiSelect, boolean useSuggest, String sql,
-      String validationRegExp, String validationMessage) {
+  protected final boolean addDBListField(BaseClass bclass, String name, String prettyName, int size,
+      boolean multiSelect, boolean useSuggest, String sql, String validationRegExp,
+      String validationMessage) {
     if (bclass.get(name) == null) {
       DBListClass element = new DBListClass();
       element.setName(name);

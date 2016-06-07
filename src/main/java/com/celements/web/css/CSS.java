@@ -33,8 +33,8 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * TODO make an API class but which is given back to velocity calls.
+ * 
  * @author edoardo
- *
  */
 public abstract class CSS extends Api {
 
@@ -47,22 +47,22 @@ public abstract class CSS extends Api {
 
   protected AttachmentURLCommand attURLcmd;
 
-  public String displayInclude(XWikiContext context){
+  public String displayInclude(XWikiContext context) {
     String cssPath = getCSS(context);
     if (cssPath != null) {
       String media = getMedia();
       if (StringUtils.isBlank(media)) {
         media = "all";
       }
-      return "<link rel=\"" + (isAlternate() ? "alternate " : "") + "stylesheet\" "
-          + "title=\"" + getTitle() + "\" media=\"" + media + "\" type=\"text/css\" "
-          + "href=\"" + cssPath + "\" />\n";
+      return "<link rel=\"" + (isAlternate() ? "alternate " : "") + "stylesheet\" " + "title=\""
+          + getTitle() + "\" media=\"" + media + "\" type=\"text/css\" " + "href=\"" + cssPath
+          + "\" />\n";
     } else {
       return "<!-- WARNING: css file not found: " + getCssBasePath() + " -->\n";
     }
   }
 
-  public String toString (XWikiContext context){
+  public String toString(XWikiContext context) {
     return getMedia() + " - " + getCSS(context);
   }
 
@@ -89,9 +89,9 @@ public abstract class CSS extends Api {
   protected String getURLFromString(String str, XWikiContext context) {
     return getAttachmentURLcmd().getAttachmentURL(str, context);
   }
-  
+
   /**
-   *  for Tests only !!!
+   * for Tests only !!!
    **/
   @Deprecated
   void testInjectUtils(IWebUtils utils) {
@@ -110,7 +110,7 @@ public abstract class CSS extends Api {
   }
 
   /**
-   *  for Tests only !!!
+   * for Tests only !!!
    **/
   void testInjectAttURLcmd(AttachmentURLCommand attURLcmd) {
     this.attURLcmd = attURLcmd;
@@ -126,7 +126,7 @@ public abstract class CSS extends Api {
   protected IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
-  
+
   protected IAttachmentServiceRole getAttachmentService() {
     return Utils.getComponent(IAttachmentServiceRole.class);
   }

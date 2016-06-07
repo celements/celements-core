@@ -14,11 +14,11 @@ import com.celements.common.observation.converter.Local;
  */
 @Component(LocalEventListener.NAME)
 public class LocalEventListener extends org.xwiki.observation.remote.internal.LocalEventListener {
-  
+
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalEventListener.class);
-  
+
   public static final String NAME = "observation.remote";
-  
+
   @Override
   public String getName() {
     return NAME;

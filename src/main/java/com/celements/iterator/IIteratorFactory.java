@@ -21,6 +21,7 @@ package com.celements.iterator;
 
 import java.util.Iterator;
 
-public interface IIteratorFactory<T extends Iterator<?>>{
+public interface IIteratorFactory<T extends Iterator<?>> {
+
   public T createIterator();
 }

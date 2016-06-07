@@ -30,7 +30,7 @@ public class RTEConfigTemplateService implements IRTEConfigTemplateRole {
   protected Execution execution;
 
   protected XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   @Requirement("celements.rteConfigClasses")
@@ -43,27 +43,26 @@ public class RTEConfigTemplateService implements IRTEConfigTemplateRole {
   public List<BaseObject> getRTETemplateList() throws XWikiException {
     XWikiDocument doc = getContext().getDoc();
     List<BaseObject> templateList = new ArrayList<BaseObject>();
-    
+
     // Doc
     templateList = getTemplateListFromDoc(doc.getDocumentReference());
-    
+
     // PageType
     if (templateList.isEmpty()) {
       templateList = getRTEConfigTemplateListFromPageType();
     }
-    
+
     // WebPreferences
     if (templateList.isEmpty()) {
-      String space = getContext().getDoc().getDocumentReference().getLastSpaceReference(
-          ).getName();
+      String space = getContext().getDoc().getDocumentReference().getLastSpaceReference().getName();
       templateList = getTemplateListFromDoc(new DocumentReference(getWikiName(), space,
           "WebPreferences"));
     }
-    
+
     // XWikiPreferences
     if (templateList.isEmpty()) {
-      templateList = getTemplateListFromDoc(new DocumentReference(
-          getWikiName(), "XWiki", "XWikiPreferences"));
+      templateList = getTemplateListFromDoc(new DocumentReference(getWikiName(), "XWiki",
+          "XWikiPreferences"));
     }
 
     return templateList;
@@ -84,11 +83,10 @@ public class RTEConfigTemplateService implements IRTEConfigTemplateRole {
     return getContext().getDatabase();
   }
 
-  private List<BaseObject> getTemplateListFromDoc(DocumentReference docRef
-      ) throws XWikiException {
+  private List<BaseObject> getTemplateListFromDoc(DocumentReference docRef) throws XWikiException {
     XWikiDocument tempDoc = getContext().getWiki().getDocument(docRef, getContext());
-    List<BaseObject> templList = tempDoc.getXObjects(getRteConfigClasses(
-        ).getRTEConfigTemplateClassRef(getWikiName()));
+    List<BaseObject> templList = tempDoc.getXObjects(
+        getRteConfigClasses().getRTEConfigTemplateClassRef(getWikiName()));
     if (templList != null) {
       return templList;
     }

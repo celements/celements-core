@@ -38,8 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component(XObjectPageTypeDocumentCreatedListener.NAME)
-public class XObjectPageTypeDocumentCreatedListener
-    extends AbstractXObjectPageTypeDocumentListener implements EventListener {
+public class XObjectPageTypeDocumentCreatedListener extends AbstractXObjectPageTypeDocumentListener
+    implements EventListener {
 
   public static final String NAME = "XObjectPageTypeDocumentCreatedListener";
 
@@ -53,7 +53,7 @@ public class XObjectPageTypeDocumentCreatedListener
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public String getName() {
@@ -61,7 +61,7 @@ public class XObjectPageTypeDocumentCreatedListener
   }
 
   public List<Event> getEvents() {
-    return Arrays.asList((Event)new DocumentCreatedEvent());
+    return Arrays.asList((Event) new DocumentCreatedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -69,18 +69,17 @@ public class XObjectPageTypeDocumentCreatedListener
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + document.getDocumentReference() + "].");
-      BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
-          document));
+      BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(document));
       if (pageTypePropObj != null) {
         LOGGER.debug("XObjectPageTypeDocumentCreatedListener onEvent added to "
             + document.getDocumentReference() + "]");
-        XObjectPageTypeCreatedEvent newXObjectPageTypeEvent =
-            new XObjectPageTypeCreatedEvent(document.getDocumentReference());
+        XObjectPageTypeCreatedEvent newXObjectPageTypeEvent = new XObjectPageTypeCreatedEvent(
+            document.getDocumentReference());
         getObservationManager().notify(newXObjectPageTypeEvent, source, getContext());
       }
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent ["
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }

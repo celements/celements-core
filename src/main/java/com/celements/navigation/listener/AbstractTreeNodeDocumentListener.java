@@ -28,11 +28,10 @@ import com.celements.web.service.IWebUtilsService;
 public abstract class AbstractTreeNodeDocumentListener {
 
   /**
-   * The observation manager that will be use to fire user creation events.
-   * Note: We can't have the OM as a requirement, since it would create an
-   * infinite initialization loop, causing a stack overflow error (this event
-   * listener would require an initialized OM and the OM requires a list of
-   * initialized event listeners)
+   * The observation manager that will be use to fire user creation events. Note: We can't
+   * have the OM as a requirement, since it would create an infinite initialization loop,
+   * causing a stack overflow error (this event listener would require an initialized OM
+   * and the OM requires a list of initialized event listeners)
    */
   private ObservationManager observationManager;
 
@@ -40,7 +39,7 @@ public abstract class AbstractTreeNodeDocumentListener {
     if (this.observationManager == null) {
       try {
         this.observationManager = getWebUtilsService().lookup(ObservationManager.class);
-  
+
       } catch (ComponentLookupException e) {
         throw new RuntimeException(
             "Cound not retrieve an Observation Manager against the component manager");
@@ -50,7 +49,7 @@ public abstract class AbstractTreeNodeDocumentListener {
   }
 
   abstract protected IWebUtilsService getWebUtilsService();
-  
+
   abstract protected Logger getLogger();
 
 }

@@ -26,14 +26,14 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * Configuration properties for the celements Template inheritance Path transformation.
  * <p>
- * You can override the default values for each of the configuration properties
- * below by defining them in XWiki's global configuration file using a prefix of
+ * You can override the default values for each of the configuration properties below by
+ * defining them in XWiki's global configuration file using a prefix of
  * "celRendering.transformation.templatePath" followed by the property name. For example:
  * <code>celRendering.transformation.templatePath.mappings = ...</code>
- * 
  */
 @ComponentRole
 public interface TemplatePathTransformationConfiguration {
+
   /**
    * @return the mappings between a set of characters representing a path on disk (eg
    *         ":Templates.", ":Ajax.") and a path on disk (eg "celTemplates/", "celAjax/")

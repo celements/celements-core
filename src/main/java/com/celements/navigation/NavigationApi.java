@@ -45,52 +45,47 @@ public class NavigationApi extends Api {
     this.navigation = navigation;
   }
 
-  public static NavigationApi getAPIObject(INavigation navigation,
-      XWikiContext context) {
+  public static NavigationApi getAPIObject(INavigation navigation, XWikiContext context) {
     return new NavigationApi(navigation, context);
   }
 
   public static NavigationApi createNavigation(XWikiContext context) {
-    return getAPIObject(new Navigation(Navigation.newNavIdForContext(context)),
-        context);
+    return getAPIObject(new Navigation(Navigation.newNavIdForContext(context)), context);
   }
 
   /**
-   * getMultilingualMenuName DOES NOT allow empty menu names as return value
-   * in contrast to getMultilingualMenuNameOnly
+   * getMultilingualMenuName DOES NOT allow empty menu names as return value in contrast
+   * to getMultilingualMenuNameOnly
    * 
    * @param fullName
    * @param language
    * @return
    */
   public String getMultilingualMenuName(String fullName, String language) {
-    return navigation.getMenuNameCmd().getMultilingualMenuName(fullName, language,
-        context);
+    return navigation.getMenuNameCmd().getMultilingualMenuName(fullName, language, context);
   }
 
-  public String getMultilingualMenuName(com.xpn.xwiki.api.Object menuItem,
-      String language) {
-    return navigation.getMenuNameCmd().getMultilingualMenuName(menuItem, language,
-        context);
+  public String getMultilingualMenuName(com.xpn.xwiki.api.Object menuItem, String language) {
+    return navigation.getMenuNameCmd().getMultilingualMenuName(menuItem, language, context);
   }
 
-  public String getMultilingualMenuName(com.xpn.xwiki.api.Object menuItem,
-      String language, boolean allowEmptyMenuNames) {
-    return navigation.getMenuNameCmd().getMultilingualMenuName(menuItem.getXWikiObject(),
-        language, allowEmptyMenuNames, context);
+  public String getMultilingualMenuName(com.xpn.xwiki.api.Object menuItem, String language,
+      boolean allowEmptyMenuNames) {
+    return navigation.getMenuNameCmd().getMultilingualMenuName(menuItem.getXWikiObject(), language,
+        allowEmptyMenuNames, context);
   }
 
   /**
-   * getMultilingualMenuNameOnly DOES allow empty menu names as return value
-   * in contrast to getMultilingualMenuName
+   * getMultilingualMenuNameOnly DOES allow empty menu names as return value in contrast
+   * to getMultilingualMenuName
    * 
    * @param fullName
    * @param language
    * @return
    */
   public String getMultilingualMenuNameOnly(String fullName, String language) {
-    return navigation.getMenuNameCmd().getMultilingualMenuNameOnly(fullName, language,
-        true, context);
+    return navigation.getMenuNameCmd().getMultilingualMenuNameOnly(fullName, language, true,
+        context);
   }
 
   public String getMultilingualMenuNameOnly(String fullName, String language,
@@ -102,11 +97,11 @@ public class NavigationApi extends Api {
   public String includeNavigation() {
     return navigation.includeNavigation();
   }
-  
+
   public String includeNavigation(DocumentReference parentRef) {
     return navigation.includeNavigation(parentRef);
   }
-  
+
   public int getMenuItemPos(String fullName) {
     return navigation.getMenuItemPos(fullName, context);
   }
@@ -114,12 +109,10 @@ public class NavigationApi extends Api {
   public int getActiveMenuItemPos(int menuLevel) {
     return navigation.getActiveMenuItemPos(menuLevel, context);
   }
-  
-  public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(
-      int menuLevel) {
+
+  public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel) {
     return navigation.getMenuItemsForHierarchyLevel(menuLevel, context);
   }
-
 
   public void setFromHierarchyLevel(int fromHierarchyLevel) {
     navigation.setFromHierarchyLevel(fromHierarchyLevel);
@@ -128,15 +121,14 @@ public class NavigationApi extends Api {
   public void setToHierarchyLevel(int toHierarchyLevel) {
     navigation.setToHierarchyLevel(toHierarchyLevel);
   }
-  
+
   public void setMenuPart(String menuPart) {
     navigation.setMenuPart(menuPart);
   }
 
   /**
-   * 
-   * @param menuSpace (default: $doc.web)
-   * 
+   * @param menuSpace
+   *          (default: $doc.web)
    * @deprecated since 2.57.0 instead use setNodeSpace
    */
   public void setMenuSpace(String menuSpace) {
@@ -163,8 +155,8 @@ public class NavigationApi extends Api {
   }
 
   private DocumentReference getNavigationConfigClassRef(XWikiDocument doc) {
-    return getNavigationClasses().getNavigationConfigClassRef(getWebUtilsService(
-        ).getWikiRef(doc.getDocumentReference()).getName());
+    return getNavigationClasses().getNavigationConfigClassRef(getWebUtilsService().getWikiRef(
+        doc.getDocumentReference()).getName());
   }
 
   public void loadConfigByName(String configName) {
@@ -176,8 +168,7 @@ public class NavigationApi extends Api {
    */
   @Deprecated
   public void loadConfigFromDoc(String fullName) {
-    DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(
-        fullName);
+    DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(fullName);
     loadConfig_internal(configDocRef, null);
   }
 
@@ -186,8 +177,7 @@ public class NavigationApi extends Api {
    */
   @Deprecated
   public void loadConfigFromDoc(String fullName, int objNum) {
-    DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(
-        fullName);
+    DocumentReference configDocRef = getWebUtilsService().resolveDocumentReference(fullName);
     loadConfig_internal(configDocRef, objNum);
   }
 
@@ -223,9 +213,8 @@ public class NavigationApi extends Api {
           + doc.getDocumentReference() + "].");
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc));
     } else {
-      LOGGER.debug("get xobject objNum [" + objNum + "] for ["
-          + getNavigationConfigClassRef(doc) + "] on doc [" + doc.getDocumentReference()
-          + "].");
+      LOGGER.debug("get xobject objNum [" + objNum + "] for [" + getNavigationConfigClassRef(doc)
+          + "] on doc [" + doc.getDocumentReference() + "].");
       navConfigXobj = doc.getXObject(getNavigationConfigClassRef(doc), objNum);
     }
     return navConfigXobj;
@@ -324,7 +313,7 @@ public class NavigationApi extends Api {
   public int getEffectiveNumberOfItems() {
     return navigation.getEffectiveNumberOfItems();
   }
-  
+
   public boolean hasMore() {
     return navigation.hasMore();
   }

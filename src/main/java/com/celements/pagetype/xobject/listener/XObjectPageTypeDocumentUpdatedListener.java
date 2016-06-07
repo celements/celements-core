@@ -42,8 +42,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component(XObjectPageTypeDocumentUpdatedListener.NAME)
-public class XObjectPageTypeDocumentUpdatedListener
-    extends AbstractXObjectPageTypeDocumentListener implements EventListener {
+public class XObjectPageTypeDocumentUpdatedListener extends AbstractXObjectPageTypeDocumentListener
+    implements EventListener {
 
   public static final String NAME = "XObjectPageTypeDocumentUpdatedListener";
 
@@ -57,7 +57,7 @@ public class XObjectPageTypeDocumentUpdatedListener
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public String getName() {
@@ -67,7 +67,7 @@ public class XObjectPageTypeDocumentUpdatedListener
 
   public List<Event> getEvents() {
     LOGGER.trace("XObjectPageTypeDocumentUpdatedListener getEvents");
-    return Arrays.asList((Event)new DocumentUpdatedEvent());
+    return Arrays.asList((Event) new DocumentUpdatedEvent());
   }
 
   public void onEvent(Event event, Object source, Object data) {
@@ -77,62 +77,55 @@ public class XObjectPageTypeDocumentUpdatedListener
     if ((document != null) && (origDoc != null)
         && !remoteObservationManagerContext.isRemoteState()) {
       LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent: got event for ["
-          + event.getClass() + "] on document [" + document.getDocumentReference()
-          + "].");
+          + event.getClass() + "] on document [" + document.getDocumentReference() + "].");
       if (isPageTypePropertiesAdded(document, origDoc)) {
         LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent added to "
             + document.getDocumentReference() + "]");
-        XObjectPageTypeCreatedEvent newXObjectPageTypeEvent =
-            new XObjectPageTypeCreatedEvent(document.getDocumentReference());
+        XObjectPageTypeCreatedEvent newXObjectPageTypeEvent = new XObjectPageTypeCreatedEvent(
+            document.getDocumentReference());
         getObservationManager().notify(newXObjectPageTypeEvent, source, getContext());
       } else if (isPageTypePropertiesDeleted(document, origDoc)) {
-        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent"
-            + " deleted from " + document.getDocumentReference() + "]");
-        XObjectPageTypeDeletedEvent delXObjectPageTypeEvent = new
-            XObjectPageTypeDeletedEvent(document.getDocumentReference());
+        LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent" + " deleted from "
+            + document.getDocumentReference() + "]");
+        XObjectPageTypeDeletedEvent delXObjectPageTypeEvent = new XObjectPageTypeDeletedEvent(
+            document.getDocumentReference());
         getObservationManager().notify(delXObjectPageTypeEvent, source, getContext());
       }
       if (isPageTypePropertiesUpdated(document, origDoc)) {
         LOGGER.debug("XObjectPageTypeDocumentUpdatedListener onEvent updated on "
             + document.getDocumentReference() + "]");
-        XObjectPageTypeUpdatedEvent updXObjectPageTypeEvent =
-            new XObjectPageTypeUpdatedEvent(document.getDocumentReference());
+        XObjectPageTypeUpdatedEvent updXObjectPageTypeEvent = new XObjectPageTypeUpdatedEvent(
+            document.getDocumentReference());
         getObservationManager().notify(updXObjectPageTypeEvent, source, getContext());
       }
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent ["
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "], isLocalEvent ["
           + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
     }
   }
 
   boolean isPageTypePropertiesAdded(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
-        document));
-    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(
-        document));
+    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(document));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(document));
     LOGGER.trace("isPageTypePropertiesAdded pageTypePropObj [" + pageTypePropObj
         + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
     return ((pageTypePropObj != null) && (pageTypePropOrigObj == null));
   }
 
   boolean isPageTypePropertiesDeleted(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
-        document));
-    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(
-        document));
+    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(document));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(document));
     LOGGER.trace("isPageTypePropertiesDeleted pageTypePropObj [" + pageTypePropObj
         + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
     return ((pageTypePropObj == null) && (pageTypePropOrigObj != null));
   }
 
   boolean isPageTypePropertiesUpdated(XWikiDocument document, XWikiDocument origDoc) {
-    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(
-        document));
-    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(
-        document));
-    LOGGER.trace("isPageTypePropertiesUpdated pageTypePropObj ["
-        + pageTypePropObj + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
+    BaseObject pageTypePropObj = document.getXObject(getPageTypePropertiesClassRef(document));
+    BaseObject pageTypePropOrigObj = origDoc.getXObject(getPageTypePropertiesClassRef(document));
+    LOGGER.trace("isPageTypePropertiesUpdated pageTypePropObj [" + pageTypePropObj
+        + "], pageTypePropOrigObj [" + pageTypePropOrigObj + "]");
     boolean hasDiff = false;
     if ((pageTypePropObj != null) && (pageTypePropOrigObj != null)) {
       hasDiff |= hasStringDiff(pageTypePropObj, pageTypePropOrigObj,
@@ -163,26 +156,26 @@ public class XObjectPageTypeDocumentUpdatedListener
       String fieldName) {
     String newValue = pageTypePropObj.getStringValue(fieldName);
     String oldValue = pageTypePropOrigObj.getStringValue(fieldName);
-    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
-        + "] new value [" + newValue + "], old value [" + oldValue + "]");
+    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName + "] new value ["
+        + newValue + "], old value [" + oldValue + "]");
     return (!StringUtils.equals(newValue, oldValue));
   }
 
-  private boolean hasBooleanDiff(BaseObject pageTypePropObj,
-      BaseObject pageTypePropOrigObj, String fieldName) {
+  private boolean hasBooleanDiff(BaseObject pageTypePropObj, BaseObject pageTypePropOrigObj,
+      String fieldName) {
     int newValue = pageTypePropObj.getIntValue(fieldName, -1);
     int oldValue = pageTypePropOrigObj.getIntValue(fieldName, -1);
-    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
-        + "] new value [" + newValue + "], old value [" + oldValue + "]");
+    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName + "] new value ["
+        + newValue + "], old value [" + oldValue + "]");
     return (newValue != oldValue);
   }
 
-  private boolean hasIntegerDiff(BaseObject pageTypePropObj,
-      BaseObject pageTypePropOrigObj, String fieldName) {
+  private boolean hasIntegerDiff(BaseObject pageTypePropObj, BaseObject pageTypePropOrigObj,
+      String fieldName) {
     int newValue = pageTypePropObj.getIntValue(fieldName);
     int oldValue = pageTypePropOrigObj.getIntValue(fieldName);
-    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName
-        + "] new value [" + newValue + "], old value [" + oldValue + "]");
+    LOGGER.debug("isPageTypePropertiesUpdated diff check for field [" + fieldName + "] new value ["
+        + newValue + "], old value [" + oldValue + "]");
     return (newValue != oldValue);
   }
 

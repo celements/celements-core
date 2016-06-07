@@ -39,16 +39,13 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     requestValidationRuleMock2 = createMock(IRequestValidationRuleRole.class);
     fieldValidationRuleMock1 = createMock(IFieldValidationRuleRole.class);
     fieldValidationRuleMock2 = createMock(IFieldValidationRuleRole.class);
-    Map<String, IRequestValidationRuleRole> requestValidationRules =
-        new HashMap<String, IRequestValidationRuleRole>();
-    Map<String, IFieldValidationRuleRole> fieldValidationRules =
-        new HashMap<String, IFieldValidationRuleRole>();
+    Map<String, IRequestValidationRuleRole> requestValidationRules = new HashMap<String, IRequestValidationRuleRole>();
+    Map<String, IFieldValidationRuleRole> fieldValidationRules = new HashMap<String, IFieldValidationRuleRole>();
     requestValidationRules.put("mock1", requestValidationRuleMock1);
     requestValidationRules.put("mock2", requestValidationRuleMock2);
     fieldValidationRules.put("mock1", fieldValidationRuleMock1);
     fieldValidationRules.put("mock2", fieldValidationRuleMock2);
-    formValidationService.injectValidationRules(requestValidationRules,
-        fieldValidationRules);
+    formValidationService.injectValidationRules(requestValidationRules, fieldValidationRules);
   }
 
   @Test
@@ -57,16 +54,14 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     requestMap.put("asdf", new String[] { "1" });
     requestMap.put("qwer", new String[] { "2", "3" });
 
-    expect(requestValidationRuleMock1.validateRequest(
-        formValidationService.convertMapKeys(requestMap))).andReturn(getEmptyRetMap()
-            ).once();
-    expect(requestValidationRuleMock2.validateRequest(
-        formValidationService.convertMapKeys(requestMap))).andReturn(getEmptyRetMap()
-            ).once();
+    expect(requestValidationRuleMock1.validateRequest(formValidationService.convertMapKeys(
+        requestMap))).andReturn(getEmptyRetMap()).once();
+    expect(requestValidationRuleMock2.validateRequest(formValidationService.convertMapKeys(
+        requestMap))).andReturn(getEmptyRetMap()).once();
 
     replayAll();
-    Map<String, Map<ValidationType, Set<String>>> validationMap =
-        formValidationService.validateMap(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> validationMap = formValidationService.validateMap(
+        requestMap);
     verifyAll();
     assertNotNull(validationMap);
     assertEquals(0, validationMap.size());
@@ -84,15 +79,14 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     innerMap.put(ValidationType.ERROR, set);
     map.put("asdf", innerMap);
 
-    expect(requestValidationRuleMock1.validateRequest(
-        formValidationService.convertMapKeys(requestMap))).andReturn(map).once();
-    expect(requestValidationRuleMock2.validateRequest(
-        formValidationService.convertMapKeys(requestMap))).andReturn(getEmptyRetMap()
-            ).once();
+    expect(requestValidationRuleMock1.validateRequest(formValidationService.convertMapKeys(
+        requestMap))).andReturn(map).once();
+    expect(requestValidationRuleMock2.validateRequest(formValidationService.convertMapKeys(
+        requestMap))).andReturn(getEmptyRetMap()).once();
 
     replayAll();
-    Map<String, Map<ValidationType, Set<String>>> validationMap =
-        formValidationService.validateMap(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> validationMap = formValidationService.validateMap(
+        requestMap);
     verifyAll();
 
     assertNotNull(validationMap);
@@ -131,14 +125,14 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     innerMap.put(ValidationType.ERROR, set);
     map2.put("qwer", innerMap);
 
-    expect(requestValidationRuleMock1.validateRequest(
-        formValidationService.convertMapKeys(requestMap))).andReturn(map1).once();
-    expect(requestValidationRuleMock2.validateRequest(
-        formValidationService.convertMapKeys(requestMap))).andReturn(map2).once();
+    expect(requestValidationRuleMock1.validateRequest(formValidationService.convertMapKeys(
+        requestMap))).andReturn(map1).once();
+    expect(requestValidationRuleMock2.validateRequest(formValidationService.convertMapKeys(
+        requestMap))).andReturn(map2).once();
 
     replayAll();
-    Map<String, Map<ValidationType, Set<String>>> validationMap =
-        formValidationService.validateMap(requestMap);
+    Map<String, Map<ValidationType, Set<String>>> validationMap = formValidationService.validateMap(
+        requestMap);
     verifyAll();
 
     assertNotNull(validationMap);
@@ -166,14 +160,14 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     String fieldName = "myFieldName";
     String value = "myValue";
 
-    expect(fieldValidationRuleMock1.validateField(eq(className), eq(fieldName),
-        eq(value))).andReturn(new HashMap<ValidationType, Set<String>>()).once();
-    expect(fieldValidationRuleMock2.validateField(eq(className), eq(fieldName),
-        eq(value))).andReturn(new HashMap<ValidationType, Set<String>>()).once();
+    expect(fieldValidationRuleMock1.validateField(eq(className), eq(fieldName), eq(
+        value))).andReturn(new HashMap<ValidationType, Set<String>>()).once();
+    expect(fieldValidationRuleMock2.validateField(eq(className), eq(fieldName), eq(
+        value))).andReturn(new HashMap<ValidationType, Set<String>>()).once();
 
     replayAll();
-    Map<ValidationType, Set<String>> validationSet =
-        formValidationService.validateField(className, fieldName, value);
+    Map<ValidationType, Set<String>> validationSet = formValidationService.validateField(className,
+        fieldName, value);
     verifyAll();
     assertNotNull(validationSet);
     assertEquals(0, validationSet.size());
@@ -189,14 +183,14 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     set.add("invalid");
     map.put(ValidationType.ERROR, set);
 
-    expect(fieldValidationRuleMock1.validateField(eq(className), eq(fieldName),
-        eq(value))).andReturn(map).once();
-    expect(fieldValidationRuleMock2.validateField(eq(className), eq(fieldName),
-        eq(value))).andReturn(new HashMap<ValidationType, Set<String>>()).once();
+    expect(fieldValidationRuleMock1.validateField(eq(className), eq(fieldName), eq(
+        value))).andReturn(map).once();
+    expect(fieldValidationRuleMock2.validateField(eq(className), eq(fieldName), eq(
+        value))).andReturn(new HashMap<ValidationType, Set<String>>()).once();
 
     replayAll();
-    Map<ValidationType, Set<String>> validationMap =
-        formValidationService.validateField(className, fieldName, value);
+    Map<ValidationType, Set<String>> validationMap = formValidationService.validateField(className,
+        fieldName, value);
     verifyAll();
 
     assertNotNull(validationMap);
@@ -221,14 +215,14 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     set.add("invalid3");
     map2.put(ValidationType.ERROR, set);
 
-    expect(fieldValidationRuleMock1.validateField(eq(className), eq(fieldName),
-        eq(value))).andReturn(map1).once();
-    expect(fieldValidationRuleMock2.validateField(eq(className), eq(fieldName),
-        eq(value))).andReturn(map2).once();
+    expect(fieldValidationRuleMock1.validateField(eq(className), eq(fieldName), eq(
+        value))).andReturn(map1).once();
+    expect(fieldValidationRuleMock2.validateField(eq(className), eq(fieldName), eq(
+        value))).andReturn(map2).once();
 
     replayAll();
-    Map<ValidationType, Set<String>> validationMap =
-        formValidationService.validateField(className, fieldName, value);
+    Map<ValidationType, Set<String>> validationMap = formValidationService.validateField(className,
+        fieldName, value);
     verifyAll();
 
     assertNotNull(validationMap);
@@ -241,18 +235,18 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
   }
 
   private Map<String, Map<ValidationType, Set<String>>> getEmptyRetMap() {
-    return new HashMap<String, Map<ValidationType,Set<String>>>();
+    return new HashMap<String, Map<ValidationType, Set<String>>>();
   }
 
   private void replayAll(Object... mocks) {
-    replay(xwiki, requestValidationRuleMock1, requestValidationRuleMock2,
-        fieldValidationRuleMock1, fieldValidationRuleMock2);
+    replay(xwiki, requestValidationRuleMock1, requestValidationRuleMock2, fieldValidationRuleMock1,
+        fieldValidationRuleMock2);
     replay(mocks);
   }
 
   private void verifyAll(Object... mocks) {
-    verify(xwiki, requestValidationRuleMock1, requestValidationRuleMock2,
-        fieldValidationRuleMock1, fieldValidationRuleMock2);
+    verify(xwiki, requestValidationRuleMock1, requestValidationRuleMock2, fieldValidationRuleMock1,
+        fieldValidationRuleMock2);
     verify(mocks);
   }
 

@@ -71,8 +71,7 @@ public class MultilingualMenuNameCommandTest extends AbstractBridgedComponentTes
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replay(xwiki);
-    assertEquals("", menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de",
-        context));
+    assertEquals("", menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de", context));
     verify(xwiki);
   }
 
@@ -89,9 +88,8 @@ public class MultilingualMenuNameCommandTest extends AbstractBridgedComponentTes
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     expect(webUtils.getAttachmentURL(eq(""), same(context))).andReturn(null);
     replay(xwiki, webUtils);
-    assertEquals("", menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de",
-        context));
-    verify(xwiki,webUtils);
+    assertEquals("", menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de", context));
+    verify(xwiki, webUtils);
   }
 
   @Test
@@ -106,12 +104,12 @@ public class MultilingualMenuNameCommandTest extends AbstractBridgedComponentTes
     expect(xwiki.getDocument(eq(currentDoc.getFullName()), same(context))).andReturn(
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
-    expect(webUtils.getAttachmentURL(eq("Content.Home;navImage.jpg"), same(context))
-        ).andReturn(attachmentURL);
+    expect(webUtils.getAttachmentURL(eq("Content.Home;navImage.jpg"), same(context))).andReturn(
+        attachmentURL);
     replay(xwiki, webUtils);
     assertEquals("style=\"background-image:url(" + attachmentURL + ")\"",
         menuNameCmd.addNavImageStyle(currentDoc.getFullName(), "de", context));
-    verify(xwiki,webUtils);
+    verify(xwiki, webUtils);
   }
 
   @Test
@@ -127,9 +125,9 @@ public class MultilingualMenuNameCommandTest extends AbstractBridgedComponentTes
         currentDoc).anyTimes();
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replay(xwiki, webUtils);
-    assertEquals("title=\"Tool tip for test\"",
-        menuNameCmd.addToolTip(currentDoc.getFullName(), "de", context));
-    verify(xwiki,webUtils);
+    assertEquals("title=\"Tool tip for test\"", menuNameCmd.addToolTip(currentDoc.getFullName(),
+        "de", context));
+    verify(xwiki, webUtils);
   }
 
   @Test
@@ -139,7 +137,7 @@ public class MultilingualMenuNameCommandTest extends AbstractBridgedComponentTes
     expect(xwiki.isMultiLingual(same(context))).andReturn(true).anyTimes();
     replay(xwiki, webUtils);
     assertEquals("", menuNameCmd.addToolTip(currentDoc.getFullName(), "de", context));
-    verify(xwiki,webUtils);
+    verify(xwiki, webUtils);
   }
 
 }

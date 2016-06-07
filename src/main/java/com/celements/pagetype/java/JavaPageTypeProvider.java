@@ -1,6 +1,7 @@
 package com.celements.pagetype.java;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
   @Requirement
   Map<String, IJavaPageTypeRole> javaPageTypesMap;
 
-  Map<PageTypeReference, IJavaPageTypeRole> javaPageTypeRefsMap;
+  volatile Map<PageTypeReference, IJavaPageTypeRole> javaPageTypeRefsMap;
 
   @Override
   public List<PageTypeReference> getPageTypes() {
@@ -29,14 +30,21 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
 
   private Map<PageTypeReference, IJavaPageTypeRole> getPageTypeRefsMap() {
     if (javaPageTypeRefsMap == null) {
-      javaPageTypeRefsMap = new HashMap<PageTypeReference, IJavaPageTypeRole>();
+      initilizeTypeRefsMap();
+    }
+    return javaPageTypeRefsMap;
+  }
+
+  synchronized void initilizeTypeRefsMap() {
+    if (javaPageTypeRefsMap == null) {
+      Map<PageTypeReference, IJavaPageTypeRole> theNewMap = new HashMap<>();
       for (IJavaPageTypeRole javaPageType : javaPageTypesMap.values()) {
         PageTypeReference thePageTypeRef = new PageTypeReference(javaPageType.getName(),
             PROVIDER_HINT, new ArrayList<String>(javaPageType.getCategoryNames()));
-        javaPageTypeRefsMap.put(thePageTypeRef, javaPageType);
+        theNewMap.put(thePageTypeRef, javaPageType);
       }
+      javaPageTypeRefsMap = Collections.unmodifiableMap(theNewMap);
     }
-    return javaPageTypeRefsMap;
   }
 
   @Override

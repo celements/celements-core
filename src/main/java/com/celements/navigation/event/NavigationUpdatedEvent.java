@@ -32,27 +32,30 @@ public class NavigationUpdatedEvent extends AbstractDocumentEvent {
 
   /**
    * Constructor initializing the event filter with an
-   * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-   * other document delete event.
+   * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that
+   * this event will match any other document delete event.
    */
   public NavigationUpdatedEvent() {
     super();
   }
-  
+
   /**
-   * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-   * meaning that this event will match only delete events affecting the same document.
+   * Constructor initializing the event filter with a
+   * {@link org.xwiki.observation.event.filter.FixedNameEventFilter}, meaning that this
+   * event will match only delete events affecting the same document.
    * 
-   * @param documentReference the reference of the document to match
+   * @param documentReference
+   *          the reference of the document to match
    */
   public NavigationUpdatedEvent(DocumentReference documentReference) {
     super(documentReference);
   }
-  
+
   /**
    * Constructor using a custom {@link EventFilter}.
    * 
-   * @param eventFilter the filter to use for matching events
+   * @param eventFilter
+   *          the filter to use for matching events
    */
   public NavigationUpdatedEvent(EventFilter eventFilter) {
     super(eventFilter);

@@ -29,10 +29,11 @@ import org.junit.Test;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWikiContext;
 
-public class ParseObjStoreCommandTest extends AbstractBridgedComponentTestCase{
+public class ParseObjStoreCommandTest extends AbstractBridgedComponentTestCase {
+
   ParseObjStoreCommand cmd;
   XWikiContext context;
-  
+
   @Before
   public void setUp_ParseObjStoreCommandTest() throws Exception {
     context = new XWikiContext();
@@ -68,39 +69,34 @@ public class ParseObjStoreCommandTest extends AbstractBridgedComponentTestCase{
 
   @Test
   public void testGetObjStoreOptionsMap_wrongFormattedRadio1() {
-    Map<String, String> map = cmd.getObjStoreOptionsMap("hi;member:Isch bin!;10;20;;0;;3", 
-        context);
+    Map<String, String> map = cmd.getObjStoreOptionsMap("hi;member:Isch bin!;10;20;;0;;3", context);
     System.out.println(map);
     assertTrue(map.containsKey("hi;member:Isch bin!;10;20;;0;;3"));
   }
 
   @Test
   public void testGetObjStoreOptionsMap_wrongFormattedRadio2() {
-    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!", 
-        context);
+    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!", context);
     assertTrue(map.containsKey("member:Isch bin!"));
   }
 
   @Test
   public void testGetObjStoreOptionsMap_wrongFormattedRadio3() {
-    Map<String, String> map = cmd.getObjStoreOptionsMap("memberIsch bin!;10;20;;0;;3", 
-        context);
+    Map<String, String> map = cmd.getObjStoreOptionsMap("memberIsch bin!;10;20;;0;;3", context);
     assertTrue(map.containsKey("memberIsch bin!;10;20;;0;;3"));
   }
 
   @Test
   public void testGetObjStoreOptionsMap_aRadio() {
-    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!;10;20;;0;;3", 
-        context);
+    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!;10;20;;0;;3", context);
     assertTrue(map.containsKey("member:3"));
     assertTrue(map.containsValue("Isch bin!"));
   }
 
   @Test
   public void testGetObjStoreOptionsMap_mixedCheckboxesAndRadio() {
-    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!;10;20;;0;;3" +
-        "\nHi\nthen\n\n  \n", 
-        context);
+    Map<String, String> map = cmd.getObjStoreOptionsMap("member:Isch bin!;10;20;;0;;3"
+        + "\nHi\nthen\n\n  \n", context);
     assertTrue(map.containsKey("member:3"));
     assertTrue(map.containsValue("Isch bin!"));
     assertTrue(map.containsKey("Hi"));

@@ -13,14 +13,13 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.xpn.xwiki.XWikiException;
 
 @Component("rteconfig")
-public class RTEConfigScriptService implements ScriptService{
-  
+public class RTEConfigScriptService implements ScriptService {
+
   @Requirement
   IDefaultEmptyDocStrategyRole defaultEmptyDocStrategyRole;
 
-  private static Logger _LOGGER  = LoggerFactory.getLogger(
-      RTEConfigScriptService.class);
-  
+  private static Logger _LOGGER = LoggerFactory.getLogger(RTEConfigScriptService.class);
+
   public String getRTEConfigField(String name) {
     try {
       return new RTEConfig().getRTEConfigField(name);
@@ -29,11 +28,11 @@ public class RTEConfigScriptService implements ScriptService{
     }
     return "";
   }
-  
+
   public boolean isEmptyRTEString(String rteContent) {
     return defaultEmptyDocStrategyRole.isEmptyRTEString(rteContent);
   }
-  
+
   public List<DocumentReference> getRTEConfigsList() {
     return new RTEConfig().getRTEConfigsList();
   }

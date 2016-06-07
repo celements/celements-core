@@ -17,9 +17,8 @@ import com.celements.web.service.IWebUtilsService;
 
 @Component(NavigationParents.NAME)
 public class NavigationParents implements IDocParentProviderRole {
-  
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      NavigationParents.class);
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(NavigationParents.class);
 
   public static final String NAME = "navigation";
 

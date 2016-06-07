@@ -27,15 +27,14 @@ public class JavaPageTypeProviderTest extends AbstractComponentTest {
 
   @Before
   public void setUp_JavaPageTypeProviderTest() throws Exception {
-    ptProvider = (JavaPageTypeProvider) Utils.getComponent(
-        IPageTypeProviderRole.class, JavaPageTypeProvider.PROVIDER_HINT);
+    ptProvider = (JavaPageTypeProvider) Utils.getComponent(IPageTypeProviderRole.class,
+        JavaPageTypeProvider.PROVIDER_HINT);
     testPageType = createMockAndAddToDefault(IJavaPageTypeRole.class);
     ptProvider.javaPageTypesMap.put(_TEST_PAGE_TYPE, testPageType);
-    pageTypeRef = new PageTypeReference(_TEST_PAGE_TYPE,
-        JavaPageTypeProvider.PROVIDER_HINT, Arrays.asList(""));
+    pageTypeRef = new PageTypeReference(_TEST_PAGE_TYPE, JavaPageTypeProvider.PROVIDER_HINT,
+        Arrays.asList(""));
     expect(testPageType.getName()).andReturn(_TEST_PAGE_TYPE).anyTimes();
-    expect(testPageType.getCategoryNames()).andReturn(Sets.newHashSet("", "pageType")
-        ).anyTimes();
+    expect(testPageType.getCategoryNames()).andReturn(Sets.newHashSet("", "pageType")).anyTimes();
   }
 
   @After
@@ -58,6 +57,27 @@ public class JavaPageTypeProviderTest extends AbstractComponentTest {
     assertNotNull(pageTypeConfig);
     assertEquals(_TEST_PAGE_TYPE, pageTypeConfig.getName());
     verifyDefault();
+  }
+
+  @Test
+  public void test_initilizeTypeRefsMap() {
+    ptProvider.javaPageTypesMap.clear();
+    assertNull(ptProvider.javaPageTypeRefsMap);
+    replayDefault();
+    ptProvider.initilizeTypeRefsMap();
+    verifyDefault();
+    assertNotNull(ptProvider.javaPageTypeRefsMap);
+    assertEquals(ptProvider.javaPageTypeRefsMap.size(), 0);
+  }
+
+  @Test
+  public void test_initilizeTypeRefsMap_withElement() {
+    assertNull(ptProvider.javaPageTypeRefsMap);
+    replayDefault();
+    ptProvider.initilizeTypeRefsMap();
+    verifyDefault();
+    assertNotNull(ptProvider.javaPageTypeRefsMap);
+    assertEquals(ptProvider.javaPageTypeRefsMap.size(), 1);
   }
 
 }

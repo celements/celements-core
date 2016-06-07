@@ -1,5 +1,6 @@
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -9,24 +10,26 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.nextfreedoc.NextFreeDocService;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
-public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase {
+@Deprecated
+public class NextFreeDocNameCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
   private NextFreeDocNameCommand nextFreeDocNameCmd;
-  
+
   private SpaceReference spaceRef;
-  private XWikiDocument docMock;
   private int num = 5;
+  private XWikiStoreInterface storeMock;
 
   @Before
   public void setUp_NextFreeDocNameCommandTest() throws Exception {
@@ -34,22 +37,24 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
     xwiki = getWikiMock();
     nextFreeDocNameCmd = new NextFreeDocNameCommand();
     spaceRef = new SpaceReference("mySpace", new WikiReference(context.getDatabase()));
-    docMock = createMockAndAddToDefault(XWikiDocument.class);
+    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
   }
 
   @Test
   public void testGetNextTitledPageFullName() throws Exception {
     String title = "asdf";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
-    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, 
-        title, num);
-    
+    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
+        num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
-    expect(docMock.getLock(same(context))).andReturn(null).once();
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+
     replayDefault();
-    assertEquals(serialize(docRef), nextFreeDocNameCmd.getNextTitledPageFullName(
-        spaceRef.getName(), title, context));
+    assertEquals(serialize(docRef), nextFreeDocNameCmd.getNextTitledPageFullName(spaceRef.getName(),
+        title, context));
     verifyDefault();
   }
 
@@ -60,7 +65,7 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
       nextFreeDocNameCmd.getNextTitledPageFullName("", "product", context);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
@@ -69,15 +74,16 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
   public void testGetNextTitledPageDocRef() throws Exception {
     String title = "asdf";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
-    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, 
-        title, num);
-    
+    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
+        num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
-    expect(docMock.getLock(same(context))).andReturn(null).once();
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+
     replayDefault();
-    assertEquals(docRef, nextFreeDocNameCmd.getNextTitledPageDocRef(spaceRef.getName(), 
-        title, context));
+    assertEquals(docRef, nextFreeDocNameCmd.getNextTitledPageDocRef(spaceRef.getName(), title,
+        context));
     verifyDefault();
   }
 
@@ -88,7 +94,7 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
       nextFreeDocNameCmd.getNextTitledPageDocRef("", "product", context);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
@@ -97,12 +103,13 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
   public void testGetNextUntitledPageFullName() throws Exception {
     String title = "untitled";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
-    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, 
-        title, num);
-    
+    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
+        num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
-    expect(docMock.getLock(same(context))).andReturn(null).once();
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+
     replayDefault();
     assertEquals(serialize(docRef), nextFreeDocNameCmd.getNextUntitledPageFullName(
         spaceRef.getName(), context));
@@ -116,7 +123,7 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
       nextFreeDocNameCmd.getNextUntitledPageFullName("", context);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
@@ -125,15 +132,16 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
   public void testGetNextUntitledPageName() throws Exception {
     String title = "untitled";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
-    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, 
-        title, num);
-    
+    ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
+        num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
-    expect(docMock.getLock(same(context))).andReturn(null).once();
+    XWikiDocument theDoc = new XWikiDocument(docRef);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
+
     replayDefault();
-    assertEquals(docRef.getName(), nextFreeDocNameCmd.getNextUntitledPageName(
-        spaceRef.getName(), context));
+    assertEquals(docRef.getName(), nextFreeDocNameCmd.getNextUntitledPageName(spaceRef.getName(),
+        context));
     verifyDefault();
   }
 
@@ -144,14 +152,13 @@ public class NextFreeDocNameCommandTest extends AbstractBridgedComponentTestCase
       nextFreeDocNameCmd.getNextUntitledPageName("", context);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
-  
+
   private String serialize(DocumentReference docRef) {
-    return Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer().serialize(
-        docRef);
+    return Utils.getComponent(IWebUtilsService.class).getRefLocalSerializer().serialize(docRef);
   }
 
 }

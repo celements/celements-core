@@ -63,20 +63,17 @@ public class Navigation implements INavigation {
    * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS_DOC
    */
   @Deprecated
-  public static final String NAVIGATION_CONFIG_CLASS_DOC =
-    NavigationClasses.NAVIGATION_CONFIG_CLASS_DOC;
+  public static final String NAVIGATION_CONFIG_CLASS_DOC = NavigationClasses.NAVIGATION_CONFIG_CLASS_DOC;
   /**
    * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS_SPACE
    */
   @Deprecated
-  public static final String NAVIGATION_CONFIG_CLASS_SPACE =
-    NavigationClasses.NAVIGATION_CONFIG_CLASS_SPACE;
+  public static final String NAVIGATION_CONFIG_CLASS_SPACE = NavigationClasses.NAVIGATION_CONFIG_CLASS_SPACE;
   /**
    * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS
    */
   @Deprecated
-  public static final String NAVIGATION_CONFIG_CLASS =
-    NavigationClasses.NAVIGATION_CONFIG_CLASS;
+  public static final String NAVIGATION_CONFIG_CLASS = NavigationClasses.NAVIGATION_CONFIG_CLASS;
 
   private INavigationBuilder navBuilder;
 
@@ -88,8 +85,8 @@ public class Navigation implements INavigation {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(Navigation.class);
 
-  private static final String _NAVIGATION_COUNTER_KEY =
-    NavigationApi.class.getCanonicalName() + "_NavigationCounter";
+  private static final String _NAVIGATION_COUNTER_KEY = NavigationApi.class.getCanonicalName()
+      + "_NavigationCounter";
 
   private static final String _LANGUAGE_MENU_DATA_TYPE = "languages";
 
@@ -99,7 +96,7 @@ public class Navigation implements INavigation {
   IWebUtils utils;
 
   private boolean navigationEnabled;
-  
+
   String configName;
   int fromHierarchyLevel;
   int toHierarchyLevel;
@@ -107,7 +104,7 @@ public class Navigation implements INavigation {
   SpaceReference nodeSpaceRef;
   private int showInactiveToLevel;
   private int offset = 0;
-  private int nrOfItemsPerPage = -1; 
+  private int nrOfItemsPerPage = -1;
 
   private String cmCssClass;
 
@@ -116,7 +113,7 @@ public class Navigation implements INavigation {
   private String emptyDictKeySuffix;
 
   private String dataType;
-  
+
   private String navInclude = null;
 
   private IPresentationTypeRole presentationType = null;
@@ -151,8 +148,7 @@ public class Navigation implements INavigation {
       setLayoutType(LIST_LAYOUT_TYPE);
     } catch (UnknownLayoutTypeException exp) {
       LOGGER.fatal("Native List Layout Type not available!", exp);
-      throw new IllegalStateException("Native List Layout Type not available!",
-          exp);
+      throw new IllegalStateException("Native List Layout Type not available!", exp);
     }
     this.nodeSpaceRef = null;
     this.mainUlCssClasses = "";
@@ -173,9 +169,8 @@ public class Navigation implements INavigation {
     return navBuilder.getLayoutTypeName();
   }
 
-  public void setLayoutType(String layoutType
-      ) throws UnknownLayoutTypeException {
-    //TODO implement a component role
+  public void setLayoutType(String layoutType) throws UnknownLayoutTypeException {
+    // TODO implement a component role
     if (LIST_LAYOUT_TYPE.equals(layoutType)) {
       this.navBuilder = new ListBuilder(uniqueName);
     } else {
@@ -214,9 +209,10 @@ public class Navigation implements INavigation {
 
   /**
    * setFromHierarchyLevel
-   * @param fromHierarchyLevel starting (including) at Hierarchy Level
-   *          1 = mainMenu , 0 = spaceMenu (including all first mainMenuItems
-   *           of all Spaces)
+   * 
+   * @param fromHierarchyLevel
+   *          starting (including) at Hierarchy Level 1 = mainMenu , 0 = spaceMenu
+   *          (including all first mainMenuItems of all Spaces)
    */
   @Override
   public void setFromHierarchyLevel(int fromHierarchyLevel) {
@@ -227,7 +223,9 @@ public class Navigation implements INavigation {
 
   /**
    * setToHierarchyLevel
-   * @param toHierarchyLevel ending (including) with Hierarchy Level
+   * 
+   * @param toHierarchyLevel
+   *          ending (including) with Hierarchy Level
    */
   @Override
   public void setToHierarchyLevel(int toHierarchyLevel) {
@@ -240,9 +238,8 @@ public class Navigation implements INavigation {
   }
 
   /**
-   * 
-   * @param menuSpace (default: $doc.web)
-   * 
+   * @param menuSpace
+   *          (default: $doc.web)
    * @deprecated since 2.24.0 instead use setNodeSpace
    */
   @Deprecated
@@ -270,8 +267,7 @@ public class Navigation implements INavigation {
   @Override
   public String includeNavigation() {
     if (fromHierarchyLevel > 0) {
-      DocumentReference parentRef = getWebUtilsService().getParentForLevel(
-          fromHierarchyLevel);
+      DocumentReference parentRef = getWebUtilsService().getParentForLevel(fromHierarchyLevel);
       if ((fromHierarchyLevel == 1) || (parentRef != null)) {
         return includeNavigation(parentRef);
       }
@@ -285,21 +281,21 @@ public class Navigation implements INavigation {
   @Override
   public String includeNavigation(DocumentReference parentRef) {
     LOGGER.debug("includeNavigation: navigationEnabled [" + navigationEnabled + "].");
-    if(navInclude == null) {
-      if(navigationEnabled){
+    if (navInclude == null) {
+      if (navigationEnabled) {
         StringBuilder outStream = new StringBuilder();
         if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
-            try {
-              addNavigationForParent(outStream, parentRef, getNumLevels());
-            } catch (XWikiException e) {
-              LOGGER.error("addNavigationForParent failed for [" + parentRef + "].", e);
-            }
+          try {
+            addNavigationForParent(outStream, parentRef, getNumLevels());
+          } catch (XWikiException e) {
+            LOGGER.error("addNavigationForParent failed for [" + parentRef + "].", e);
+          }
         } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
           navBuilder.useStream(outStream);
           generateLanguageMenu(navBuilder, getContext());
         }
         navInclude = outStream.toString();
-      } else{
+      } else {
         navInclude = "";
       }
     }
@@ -317,14 +313,13 @@ public class Navigation implements INavigation {
   @Override
   public SpaceReference getNodeSpaceRef() {
     if (nodeSpaceRef == null) {
-      SpaceReference currentSpaceRef = getContext().getDoc().getDocumentReference(
-        ).getLastSpaceReference();
+      SpaceReference currentSpaceRef = getContext().getDoc().getDocumentReference().getLastSpaceReference();
       if (fromHierarchyLevel == 1) {
         if (isEmptyMainMenu(currentSpaceRef) && getWebUtilsService().hasParentSpace(
             currentSpaceRef.getName())) {
           // is main Menu and no mainMenuItem found ; user has edit rights
-          nodeSpaceRef = getWebUtilsService().resolveSpaceReference(getWebUtilsService(
-              ).getParentSpace(currentSpaceRef.getName()));
+          nodeSpaceRef = getWebUtilsService().resolveSpaceReference(
+              getWebUtilsService().getParentSpace(currentSpaceRef.getName()));
         }
       }
       if (nodeSpaceRef == null) {
@@ -342,25 +337,22 @@ public class Navigation implements INavigation {
 
   public boolean isEmptyMainMenu(SpaceReference spaceRef) {
     getNavFilter().setMenuPart(getMenuPartForLevel(1));
-    return getTreeNodeService().getSubNodesForParent(spaceRef, getNavFilter()
-        ).size() == 0;
+    return getTreeNodeService().getSubNodesForParent(spaceRef, getNavFilter()).size() == 0;
   }
 
   @Override
   public boolean isEmpty() {
     getNavFilter().setMenuPart(getMenuPartForLevel(fromHierarchyLevel));
-    EntityReference parentRef = getWebUtilsService().getParentForLevel(
-        fromHierarchyLevel);
-    LOGGER.debug("isEmpty: parentRef [" + parentRef + "] for level [" + fromHierarchyLevel
-        + "]");
+    EntityReference parentRef = getWebUtilsService().getParentForLevel(fromHierarchyLevel);
+    LOGGER.debug("isEmpty: parentRef [" + parentRef + "] for level [" + fromHierarchyLevel + "]");
     if (parentRef == null) {
       LOGGER.info("isEmpty: no subnode for level [" + fromHierarchyLevel + "] found.");
       return true;
     }
     List<TreeNode> subNodeList = getTreeNodeService().getSubNodesForParent(parentRef,
         getNavFilter());
-    LOGGER.info("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef ["
-        + parentRef + "] -> [" + subNodeList.isEmpty() + "].");
+    LOGGER.info("isEmpty: subNodeList size [" + subNodeList.size() + "] for parentRef [" + parentRef
+        + "] -> [" + subNodeList.isEmpty() + "].");
     return subNodeList.isEmpty();
   }
 
@@ -379,9 +371,9 @@ public class Navigation implements INavigation {
   private int getNumLevels() {
     return toHierarchyLevel - fromHierarchyLevel + 1;
   }
-  
-  void addNavigationForParent(StringBuilder outStream, EntityReference parentRef,
-      int numMoreLevels) throws XWikiException {
+
+  void addNavigationForParent(StringBuilder outStream, EntityReference parentRef, int numMoreLevels)
+      throws XWikiException {
     LOGGER.debug("addNavigationForParent: parent [" + parentRef + "] numMoreLevels ["
         + numMoreLevels + "].");
     if (numMoreLevels > 0) {
@@ -391,8 +383,7 @@ public class Navigation implements INavigation {
       }
       List<TreeNode> currentMenuItems = getCurrentMenuItems(numMoreLevels, parent);
       if (currentMenuItems.size() > 0) {
-        outStream.append("<ul " + addUniqueContainerId(parent) + " "
-            + getMainUlCSSClasses() + ">");
+        outStream.append("<ul " + addUniqueContainerId(parent) + " " + getMainUlCSSClasses() + ">");
         boolean isFirstItem = true;
         int numItem = 0;
         if (this.getOffset() > 0) {
@@ -401,24 +392,23 @@ public class Navigation implements INavigation {
         for (TreeNode treeNode : currentMenuItems) {
           numItem = numItem + 1;
           DocumentReference nodeRef = treeNode.getDocumentReference();
-          boolean isLastItem = (currentMenuItems.lastIndexOf(treeNode)
-              == (currentMenuItems.size() - 1));
+          boolean isLastItem = (currentMenuItems.lastIndexOf(treeNode) == (currentMenuItems.size()
+              - 1));
           writeMenuItemWithSubmenu(outStream, parent, numMoreLevels, nodeRef, isFirstItem,
               isLastItem, numItem);
           isFirstItem = false;
         }
         outStream.append("</ul>");
       } else if ((getCurrentLevel(numMoreLevels) == 1) && hasedit()) {
-        LOGGER.trace("addNavigationForParent: empty navigation hint for parent ["
-            + parentRef + "] numMoreLevels [" + numMoreLevels + "], currentLevel ["
-            + getCurrentLevel(numMoreLevels) + "].");
+        LOGGER.trace("addNavigationForParent: empty navigation hint for parent [" + parentRef
+            + "] numMoreLevels [" + numMoreLevels + "], currentLevel [" + getCurrentLevel(
+                numMoreLevels) + "].");
         // is main Menu and no mainMenuItem found ; user has edit rights
         outStream.append("<ul class=\"cel_nav_empty\">");
         openMenuItemOut(outStream, null, true, true, false, 1);
-        outStream.append("<span " + addUniqueElementId(null)
-            + " " + addCssClasses(null, true, true, true, false, 1)
-            + ">" + getWebUtilsService().getAdminMessageTool().get(getEmptyDictKey())
-            + "</span>");
+        outStream.append("<span " + addUniqueElementId(null) + " " + addCssClasses(null, true, true,
+            true, false, 1) + ">" + getWebUtilsService().getAdminMessageTool().get(
+                getEmptyDictKey()) + "</span>");
         closeMenuItemOut(outStream);
         outStream.append("</ul>");
       } else {
@@ -496,15 +486,15 @@ public class Navigation implements INavigation {
   }
 
   private boolean hasedit() throws XWikiException {
-    return getContext().getWiki().getRightService().hasAccessLevel("edit",
-        getContext().getUser(), getContext().getDoc().getFullName(), getContext());
+    return getContext().getWiki().getRightService().hasAccessLevel("edit", getContext().getUser(),
+        getContext().getDoc().getFullName(), getContext());
   }
 
-  private void writeMenuItemWithSubmenu(StringBuilder outStream, String parent,
-      int numMoreLevels, DocumentReference docRef, boolean isFirstItem,
-      boolean isLastItem, int numItem) throws XWikiException {
-    boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels
-        ), getContext());
+  private void writeMenuItemWithSubmenu(StringBuilder outStream, String parent, int numMoreLevels,
+      DocumentReference docRef, boolean isFirstItem, boolean isLastItem, int numItem)
+      throws XWikiException {
+    boolean showSubmenu = showSubmenuForMenuItem(docRef, getCurrentLevel(numMoreLevels),
+        getContext());
     String fullName = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
     boolean isLeaf = isLeaf(fullName, getContext());
     openMenuItemOut(outStream, docRef, isFirstItem, isLastItem, isLeaf, numItem);
@@ -515,11 +505,10 @@ public class Navigation implements INavigation {
     closeMenuItemOut(outStream);
   }
 
-  void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem,
-      boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem
-      ) throws XWikiException {
-    getPresentationType().writeNodeContent(outStream, isFirstItem, isLastItem, docRef,
-          isLeaf, numItem, this);
+  void writeMenuItemContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
+      DocumentReference docRef, boolean isLeaf, int numItem) throws XWikiException {
+    getPresentationType().writeNodeContent(outStream, isFirstItem, isLastItem, docRef, isLeaf,
+        numItem, this);
   }
 
   private boolean isLeaf(String fullName, XWikiContext context) {
@@ -547,17 +536,16 @@ public class Navigation implements INavigation {
     outStream.append("<!-- IE6 --></li>");
   }
 
-  void openMenuItemOut(StringBuilder outStream, DocumentReference docRef,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem) {
-    outStream.append("<li" + addCssClasses(docRef, false, isFirstItem, isLastItem, isLeaf,
-        numItem) + ">");
+  void openMenuItemOut(StringBuilder outStream, DocumentReference docRef, boolean isFirstItem,
+      boolean isLastItem, boolean isLeaf, int numItem) {
+    outStream.append("<li" + addCssClasses(docRef, false, isFirstItem, isLastItem, isLeaf, numItem)
+        + ">");
   }
 
   @Override
-  public String addCssClasses(DocumentReference docRef, boolean withCM,
-      boolean isFirstItem, boolean isLastItem, boolean isLeaf, int numItem) {
-    String cssClasses = getCssClasses(docRef, withCM, isFirstItem, isLastItem, isLeaf,
-        numItem);
+  public String addCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
+      boolean isLastItem, boolean isLeaf, int numItem) {
+    String cssClasses = getCssClasses(docRef, withCM, isFirstItem, isLastItem, isLeaf, numItem);
     if (!"".equals(cssClasses.trim())) {
       return " class=\"" + cssClasses + "\"";
     }
@@ -585,21 +573,19 @@ public class Navigation implements INavigation {
   @Override
   public String getUniqueId(String fullName) {
     String theMenuSpace = getMenuSpace(getContext());
-    if ((fullName != null) && !"".equals(fullName)){
+    if ((fullName != null) && !"".equals(fullName)) {
       return uniqueName + ":" + theMenuSpace + ":" + fullName;
     } else {
       return uniqueName + ":" + theMenuSpace + ":" + menuPart + ":";
     }
   }
 
-  boolean showSubmenuForMenuItem(DocumentReference docRef, int currentLevel,
-      XWikiContext context) {
-    return (isShowAll() || isBelowShowAllHierarchy(currentLevel)
-        || isActiveMenuItem(docRef));
+  boolean showSubmenuForMenuItem(DocumentReference docRef, int currentLevel, XWikiContext context) {
+    return (isShowAll() || isBelowShowAllHierarchy(currentLevel) || isActiveMenuItem(docRef));
   }
 
   private boolean isBelowShowAllHierarchy(int currentLevel) {
-    return (currentLevel <  showInactiveToLevel);
+    return (currentLevel < showInactiveToLevel);
   }
 
   String getCssClasses(DocumentReference docRef, boolean withCM, boolean isFirstItem,
@@ -614,7 +600,7 @@ public class Navigation implements INavigation {
     if (isLastItem) {
       cssClass += " last";
     }
-    if (numItem%2 == 0) {
+    if (numItem % 2 == 0) {
       cssClass += " cel_nav_even";
     } else {
       cssClass += " cel_nav_odd";
@@ -650,8 +636,8 @@ public class Navigation implements INavigation {
     try {
       String docFN = getWebUtilsService().getRefLocalSerializer().serialize(docRef);
       XWikiRightService rightService = getContext().getWiki().getRightService();
-      boolean isRestricted = !rightService.hasAccessLevel("view", "XWiki.XWikiGuest",
-          docFN, getContext());
+      boolean isRestricted = !rightService.hasAccessLevel("view", "XWiki.XWikiGuest", docFN,
+          getContext());
       LOGGER.debug("isRestrictedRights for [" + docFN + "] returns [" + isRestricted
           + "] using rights service [" + rightService.getClass().getName() + "].");
       return isRestricted;
@@ -673,30 +659,28 @@ public class Navigation implements INavigation {
   }
 
   String getPageTypeConfigName(DocumentReference docRef) {
-    PageTypeReference pageTypeRef = getPageTypeResolverService(
-        ).getPageTypeRefForDocWithDefault(docRef);
+    PageTypeReference pageTypeRef = getPageTypeResolverService().getPageTypeRefForDocWithDefault(
+        docRef);
     String getPageTypeConfigName = pageTypeRef.getConfigName();
     return getPageTypeConfigName;
   }
 
   boolean isActiveMenuItem(DocumentReference docRef) {
-      DocumentReference currentDocRef = getContext().getDoc().getDocumentReference();
-      List<DocumentReference> docParentList = getWebUtilsService().getDocumentParentsList(
-          currentDocRef, true);
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("isActiveMenuItem: for [" + docRef + "] with ["
-            + docParentList.size() + "] parents ["
-            + Arrays.deepToString(docParentList.toArray(new DocumentReference[0]))
-            + "].");
-      }
-      return (docRef != null) && (docParentList.contains(docRef)
-          || docRef.equals(currentDocRef));
+    DocumentReference currentDocRef = getContext().getDoc().getDocumentReference();
+    List<DocumentReference> docParentList = getWebUtilsService().getDocumentParentsList(
+        currentDocRef, true);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("isActiveMenuItem: for [" + docRef + "] with [" + docParentList.size()
+          + "] parents [" + Arrays.deepToString(docParentList.toArray(new DocumentReference[0]))
+          + "].");
+    }
+    return (docRef != null) && (docParentList.contains(docRef) || docRef.equals(currentDocRef));
   }
 
   @Override
   public String getMenuLink(DocumentReference docRef) {
     String docURL = getContext().getWiki().getURL(docRef, "view", getContext());
-    //FIX for bug in xwiki url-factory 2.7.2
+    // FIX for bug in xwiki url-factory 2.7.2
     if ("".equals(docURL)) {
       docURL = "/";
     }
@@ -733,20 +717,17 @@ public class Navigation implements INavigation {
 
   @Override
   public int getActiveMenuItemPos(int menuLevel, XWikiContext context) {
-    return WebUtils.getInstance().getActiveMenuItemPos(menuLevel, menuPart,
-        context);
+    return WebUtils.getInstance().getActiveMenuItemPos(menuLevel, menuPart, context);
   }
 
   @Override
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel,
       XWikiContext context) {
-    return WebUtils.getInstance().getMenuItemsForHierarchyLevel(menuLevel,
-        menuPart, context);
+    return WebUtils.getInstance().getMenuItemsForHierarchyLevel(menuLevel, menuPart, context);
   }
 
   @Override
-  public String getPrevMenuItemFullName(String fullName,
-      XWikiContext context) {
+  public String getPrevMenuItemFullName(String fullName, XWikiContext context) {
     BaseObject prevMenuItem = null;
     try {
       prevMenuItem = WebUtils.getInstance().getPrevMenuItem(fullName, context);
@@ -761,8 +742,7 @@ public class Navigation implements INavigation {
   }
 
   @Override
-  public String getNextMenuItemFullName(String fullName,
-      XWikiContext context) {
+  public String getNextMenuItemFullName(String fullName, XWikiContext context) {
     BaseObject nextMenuItem = null;
     try {
       nextMenuItem = WebUtils.getInstance().getNextMenuItem(fullName, context);
@@ -782,23 +762,20 @@ public class Navigation implements INavigation {
   }
 
   /**
-   * 
-   * Look for a Celements2.NavigationConfigClass object
-   * on the WebPreferences, XWiki.XWikiPreferences or skin_doc in this
-   * order an take the first place where any Celements2.NavigationConfigClass
-   * object was found. If NO object for the given menu_element_name (configName)
-   * at the selected place is found. This navigation should be set to disabled
-   * and includeNavigation must return an empty string.
+   * Look for a Celements2.NavigationConfigClass object on the WebPreferences,
+   * XWiki.XWikiPreferences or skin_doc in this order an take the first place where any
+   * Celements2.NavigationConfigClass object was found. If NO object for the given
+   * menu_element_name (configName) at the selected place is found. This navigation should
+   * be set to disabled and includeNavigation must return an empty string.
    */
   @Override
   public void loadConfigByName(String configName, XWikiContext context) {
     XWikiDocument doc = context.getDoc();
-    try{
-      BaseObject prefObj = utils.getConfigDocByInheritance(doc,
-          NAVIGATION_CONFIG_CLASS, context).getObject(NAVIGATION_CONFIG_CLASS,
-              "menu_element_name", configName, false);
+    try {
+      BaseObject prefObj = utils.getConfigDocByInheritance(doc, NAVIGATION_CONFIG_CLASS,
+          context).getObject(NAVIGATION_CONFIG_CLASS, "menu_element_name", configName, false);
       loadConfigFromObject(prefObj);
-    } catch(XWikiException e){
+    } catch (XWikiException e) {
       LOGGER.error(e, e);
     }
   }
@@ -814,12 +791,12 @@ public class Navigation implements INavigation {
       showInactiveToLevel = prefObj.getIntValue("show_inactive_to_level", 0);
       menuPart = prefObj.getStringValue("menu_part");
       setMenuSpace(prefObj.getStringValue("menu_space"));
-      if (!"".equals(prefObj.getStringValue("data_type"))
-          && (prefObj.getStringValue("data_type") != null)) {
+      if (!"".equals(prefObj.getStringValue("data_type")) && (prefObj.getStringValue(
+          "data_type") != null)) {
         dataType = prefObj.getStringValue("data_type");
       }
-      if (!"".equals(prefObj.getStringValue("layout_type"))
-          && (prefObj.getStringValue("layout_type") != null)) {
+      if (!"".equals(prefObj.getStringValue("layout_type")) && (prefObj.getStringValue(
+          "layout_type") != null)) {
         try {
           setLayoutType(prefObj.getStringValue("layout_type"));
         } catch (UnknownLayoutTypeException exp) {
@@ -827,7 +804,7 @@ public class Navigation implements INavigation {
         }
       }
       int itemsPerPage = prefObj.getIntValue(INavigationClassConfig.ITEMS_PER_PAGE);
-      if(itemsPerPage > 0) {
+      if (itemsPerPage > 0) {
         nrOfItemsPerPage = itemsPerPage;
       }
       String presentationTypeStr = prefObj.getStringValue(
@@ -836,22 +813,21 @@ public class Navigation implements INavigation {
         setPresentationType(presentationTypeStr);
       }
       setCMcssClass(prefObj.getStringValue("cm_css_class"));
-//        setMenuTypeByTypeName(prefObj.getStringValue("menu_type"));
-    } else{
+      // setMenuTypeByTypeName(prefObj.getStringValue("menu_type"));
+    } else {
       navigationEnabled = false;
     }
   }
 
-  private void generateLanguageMenu(INavigationBuilder navBuilder,
-      XWikiContext context) {
+  private void generateLanguageMenu(INavigationBuilder navBuilder, XWikiContext context) {
     List<String> langs = getWebUtilsService().getAllowedLanguages();
     mainUlCssClasses += " language";
     navBuilder.openLevel(mainUlCssClasses);
     for (String language : langs) {
       navBuilder.openMenuItemOut();
       boolean isLastItem = (langs.lastIndexOf(language) == (langs.size() - 1));
-      navBuilder.appendMenuItemLink(language, "?language=" + language, getLanguageName(
-          language, context), language.equals(getNavLanguage()), isLastItem, cmCssClass);
+      navBuilder.appendMenuItemLink(language, "?language=" + language, getLanguageName(language,
+          context), language.equals(getNavLanguage()), isLastItem, cmCssClass);
       navBuilder.closeMenuItemOut();
     }
     navBuilder.closeLevel();
@@ -859,12 +835,11 @@ public class Navigation implements INavigation {
 
   private String getLanguageName(String lang, XWikiContext context) {
     XWikiMessageTool msg = context.getMessageTool();
-    String space = context.getDoc().getDocumentReference().getLastSpaceReference().getName();    
-    if(!msg.get("nav_cel_" + space + "_" + lang + "_" + lang).equals(
-          "nav_cel_" + space + "_" + lang + "_" + lang)) {
+    String space = context.getDoc().getDocumentReference().getLastSpaceReference().getName();
+    if (!msg.get("nav_cel_" + space + "_" + lang + "_" + lang).equals("nav_cel_" + space + "_"
+        + lang + "_" + lang)) {
       return msg.get("nav_cel_" + space + "_" + lang + "_" + lang);
-    } else if(!msg.get("nav_cel_" + lang + "_" + lang).equals(
-    	  "nav_cel_" + lang + "_" + lang)) {
+    } else if (!msg.get("nav_cel_" + lang + "_" + lang).equals("nav_cel_" + lang + "_" + lang)) {
       return msg.get("nav_cel_" + lang + "_" + lang);
     } else {
       return msg.get("cel_" + lang + "_" + lang);
@@ -886,14 +861,14 @@ public class Navigation implements INavigation {
   }
 
   /**
-   *  for Tests only !!!
+   * for Tests only !!!
    **/
   public void testInjectUtils(IWebUtils utils) {
     this.utils = utils;
   }
 
   /**
-   *  for Tests only !!!
+   * for Tests only !!!
    **/
   public INavigationBuilder getNavBuilder() {
     return navBuilder;
@@ -945,7 +920,7 @@ public class Navigation implements INavigation {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)getExecution().getContext().getProperty("xwikicontext");
+    return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
   }
 
   private Execution getExecution() {
@@ -993,40 +968,38 @@ public class Navigation implements INavigation {
   public int getNumberOfItem() {
     return this.nrOfItemsPerPage;
   }
-  
+
   @Deprecated
   @Override
   public int getEffectiveNumberOfItems() {
     Tidy tidy = new Tidy();
     tidy.setXHTML(true);
-    ByteArrayInputStream includeIn = new ByteArrayInputStream(includeNavigation(
-        ).getBytes());
+    ByteArrayInputStream includeIn = new ByteArrayInputStream(includeNavigation().getBytes());
     Document dom = tidy.parseDOM(includeIn, null);
     NodeList uls = dom.getElementsByTagName("ul");
     int elems = 0;
-    if(uls.getLength() > 0) {
+    if (uls.getLength() > 0) {
       elems = uls.item(0).getChildNodes().getLength();
     }
     return elems;
   }
-  
+
   void inject_navInclude(String navInclude) {
     this.navInclude = navInclude;
   }
-  
+
   @Override
   public boolean hasMore() {
-    DocumentReference parentRef = getWebUtilsService().getParentForLevel(
-        fromHierarchyLevel);
+    DocumentReference parentRef = getWebUtilsService().getParentForLevel(fromHierarchyLevel);
     String parent = "";
     if (parentRef != null) {
       parent = getWebUtilsService().getRefLocalSerializer().serialize(parentRef);
     }
     List<TreeNode> currentMenuItems = getCurrentMenuItems(fromHierarchyLevel, parent);
-    LOGGER.debug("hasMore: parentRef [" + parentRef + "] currentMenuItems.size() [" 
-        + currentMenuItems.size() + "] offset [" + offset + "]"
-        + " nrOfItemsPerPage [" + nrOfItemsPerPage + "] fromHierarchyLevel ["
-        + fromHierarchyLevel + "] parent [" + parent + "]");
+    LOGGER.debug("hasMore: parentRef [" + parentRef + "] currentMenuItems.size() ["
+        + currentMenuItems.size() + "] offset [" + offset + "]" + " nrOfItemsPerPage ["
+        + nrOfItemsPerPage + "] fromHierarchyLevel [" + fromHierarchyLevel + "] parent [" + parent
+        + "]");
     return currentMenuItems.size() > 0;
   }
 

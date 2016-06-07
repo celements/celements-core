@@ -43,11 +43,12 @@ public class InheritorFactory {
   private PageLayoutCommand injectedPageLayoutCmd;
   IWebUtilsService _webUtilsService;
 
-  public FieldInheritor getFieldInheritor(final String className,
-      final List<String> docList, XWikiContext context) {
+  public FieldInheritor getFieldInheritor(final String className, final List<String> docList,
+      XWikiContext context) {
     final XWikiContext localContext = context;
     FieldInheritor inheritor = new FieldInheritor();
     inheritor.setIteratorFactory(new IIteratorFactory<XObjectIterator>() {
+
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(localContext);
         iterator.setClassName(className);
@@ -57,12 +58,12 @@ public class InheritorFactory {
     });
     return inheritor;
   }
-  
-  public ContentInheritor getContentInheritor(final List<String> docList, 
-      XWikiContext context) {
+
+  public ContentInheritor getContentInheritor(final List<String> docList, XWikiContext context) {
     final XWikiContext localContext = context;
     ContentInheritor inheritor = new ContentInheritor();
     inheritor.setIteratorFactory(new IIteratorFactory<DocumentIterator>() {
+
       public DocumentIterator createIterator() {
         DocumentIterator iterator = new DocumentIterator(localContext);
         iterator.setDocList(docList);
@@ -74,8 +75,8 @@ public class InheritorFactory {
 
   public FieldInheritor getNavigationFieldInheritor(String className, String fullName,
       XWikiContext context) {
-    return getFieldInheritor(className, getWebUtils().getDocumentParentsList(fullName,
-        true, context), context);
+    return getFieldInheritor(className, getWebUtils().getDocumentParentsList(fullName, true,
+        context), context);
   }
 
   public FieldInheritor getConfigDocFieldInheritor(String className, String fullName,
@@ -88,7 +89,7 @@ public class InheritorFactory {
       inheritanceList.add(pageLayoutForDoc + ".WebHome");
     }
     String skinDocName = context.getWiki().getSpacePreference("skin", context);
-    if (skinDocName != null){
+    if (skinDocName != null) {
       inheritanceList.add(skinDocName);
     }
     return getFieldInheritor(className, inheritanceList, context);
@@ -114,6 +115,7 @@ public class InheritorFactory {
 
   /**
    * FOR TESTS ONLY!!!
+   * 
    * @param injectedWebUtils
    */
   void inject_TEST_WebUtils(IWebUtils injectedWebUtils) {
@@ -133,9 +135,8 @@ public class InheritorFactory {
       DocumentReference docRef) {
     String className = getRefSerializer().serialize(classDocRef);
     String fullName = getRefSerializer().serialize(docRef);
-    return getFieldInheritor(className, Arrays.asList(fullName,
-        getSpacePreferencesFullName(fullName), getXWikiPreferencesFullName(fullName)),
-        getContext());
+    return getFieldInheritor(className, Arrays.asList(fullName, getSpacePreferencesFullName(
+        fullName), getXWikiPreferencesFullName(fullName)), getContext());
   }
 
   private String getXWikiPreferencesFullName(String fullName) {

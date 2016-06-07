@@ -69,8 +69,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getDocument() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -83,8 +83,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_getDocument_failed() throws Exception {
     Throwable cause = new XWikiException();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andThrow(
         cause).once();
     replayDefault();
@@ -127,10 +127,10 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     modelAccess.webUtilsService = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference().getLastSpaceReference())))
-        .andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(webUtilsMock.getDefaultLanguage(eq(
+        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -146,12 +146,12 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     modelAccess.webUtilsService = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference().getLastSpaceReference())))
-        .andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
-    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(Collections
-        .<String>emptyList());
+    expect(webUtilsMock.getDefaultLanguage(eq(
+        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
+    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
+        Collections.<String>emptyList());
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -170,12 +170,12 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     modelAccess.webUtilsService = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference().getLastSpaceReference())))
-        .andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
-    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(Arrays
-        .asList("en", "fr"));
+    expect(webUtilsMock.getDefaultLanguage(eq(
+        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
+    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
+        Arrays.asList("en", "fr"));
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     Capture<XWikiDocument> tdocCapture = new Capture<>();
@@ -184,8 +184,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     theTdoc.setLanguage("en");
     theTdoc.setNew(false);
     theTdoc.setSyntax(Syntax.XWIKI_1_0);
-    expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))).andReturn(theTdoc)
-        .once();
+    expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))).andReturn(
+        theTdoc).once();
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "en");
     verifyDefault();
@@ -245,8 +245,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_createDocument_alreadyExists() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     replayDefault();
     try {
       modelAccess.createDocument(doc.getDocumentReference());
@@ -269,8 +269,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getOrCreateDocument_get() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -284,8 +284,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_getOrCreateDocument_get_failed() throws Exception {
     Throwable cause = new XWikiException();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andThrow(
         cause).once();
     replayDefault();
@@ -341,8 +341,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_exists_true() {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     replayDefault();
     boolean ret = modelAccess.exists(doc.getDocumentReference());
     verifyDefault();
@@ -566,8 +566,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getXObjects_docRef() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -836,8 +836,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     String val = "val";
     addObj(classRef, field.getName(), val);
 
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true)
-        .once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
 

@@ -23,7 +23,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-
 public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
 
   private LastChangedService lastChangedServ;
@@ -36,7 +35,7 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_AbstractBridgedComponentTestCase() throws Exception {
-    lastChangedServ = (LastChangedService)Utils.getComponent(ILastChangedRole.class);
+    lastChangedServ = (LastChangedService) Utils.getComponent(ILastChangedRole.class);
     context = getContext();
     queryManagerMock = createMockAndAddToDefault(QueryManager.class);
     lastChangedServ.queryManager = queryManagerMock;
@@ -52,33 +51,28 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_getLastChangeDate_emptyDocumentsList() throws Exception {
     Query mockQuery = createMockAndAddToDefault(Query.class);
-    expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(
-        mockQuery).once();
-    expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery
-        ).once();
+    expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
+    expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
     expect(mockQuery.setLimit(eq(1))).andReturn(mockQuery).once();
     expect(mockQuery.execute()).andReturn(Collections.emptyList()).once();
     replayDefault();
     Date lastUpdated = lastChangedServ.internal_getLastChangeDate(spaceRef);
     verifyDefault();
     assertNull(lastUpdated);
-    assertTrue(lastChangedServ.getLastUpdatedWikiCache().isEmpty());
-    assertTrue(lastChangedServ.getLastUpdatedSpaceCache().isEmpty());
+    assertTrue(lastChangedServ.lastUpdatedWikiCache.isEmpty());
+    assertTrue(lastChangedServ.lastUpdatedSpaceCache.isEmpty());
   }
 
   @Test
   public void testInternal_getLastChangeDate_emptyLangResponse() throws Exception {
     Query mockQuery = createMockAndAddToDefault(Query.class);
-    expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(
-        mockQuery).once();
-    expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery
-        ).once();
+    expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
+    expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
     expect(mockQuery.setLimit(eq(1))).andReturn(mockQuery).once();
     DocumentReference docRef = new DocumentReference("myDoc", spaceRef);
     String firstDocFN = mySpaceName + ".myDoc";
-    expect(webUtilsMock.resolveDocumentReference(eq(firstDocFN))).andReturn(docRef
-        ).anyTimes();
-    Object[] firstRow = new Object[]{firstDocFN, ""};
+    expect(webUtilsMock.resolveDocumentReference(eq(firstDocFN))).andReturn(docRef).anyTimes();
+    Object[] firstRow = new Object[] { firstDocFN, "" };
     List<Object[]> testResult = Arrays.<Object[]>asList(firstRow);
     expect(mockQuery.<Object[]>execute()).andReturn(testResult).once();
     expect(modelAccessMock.exists(eq(docRef))).andReturn(true).anyTimes();
@@ -95,19 +89,16 @@ public class LastChangedServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_getLastChangeDate_nullLangResponse() throws Exception {
     String mySpaceName = "mySpace";
-    SpaceReference spaceRef = new SpaceReference(mySpaceName, new WikiReference(
-        context.getDatabase()));
+    SpaceReference spaceRef = new SpaceReference(mySpaceName, new WikiReference(context
+        .getDatabase()));
     Query mockQuery = createMockAndAddToDefault(Query.class);
-    expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(
-        mockQuery).once();
-    expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery
-        ).once();
+    expect(queryManagerMock.createQuery(isA(String.class), eq("xwql"))).andReturn(mockQuery).once();
+    expect(mockQuery.bindValue(eq("spaceName"), eq(mySpaceName))).andReturn(mockQuery).once();
     expect(mockQuery.setLimit(eq(1))).andReturn(mockQuery).once();
     DocumentReference docRef = new DocumentReference("myDoc", spaceRef);
     String firstDocFN = mySpaceName + ".myDoc";
-    expect(webUtilsMock.resolveDocumentReference(eq(firstDocFN))).andReturn(docRef
-        ).anyTimes();
-    Object[] firstRow = new Object[]{firstDocFN, null};
+    expect(webUtilsMock.resolveDocumentReference(eq(firstDocFN))).andReturn(docRef).anyTimes();
+    Object[] firstRow = new Object[] { firstDocFN, null };
     List<Object[]> testResult = Arrays.<Object[]>asList(firstRow);
     expect(mockQuery.<Object[]>execute()).andReturn(testResult).once();
     XWikiDocument doc = new XWikiDocument(docRef);

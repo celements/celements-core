@@ -15,12 +15,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 public class DocHeaderTitleCommandTest extends AbstractBridgedComponentTestCase {
-  
+
   DocHeaderTitleCommand command;
   DocumentReference docRef;
   XWikiDocument doc;
   XWiki wiki;
-  
+
   @Before
   public void setUp_DocHeaderTitleCommandTest() throws Exception {
     command = new DocHeaderTitleCommand();
@@ -37,18 +37,17 @@ public class DocHeaderTitleCommandTest extends AbstractBridgedComponentTestCase 
     expect(wiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc);
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(doc);
     expect(doc.getTitle()).andReturn("").anyTimes();
-    DocumentReference objRef = new DocumentReference(getContext().getDatabase(), 
-        "Content", "Title");
+    DocumentReference objRef = new DocumentReference(getContext().getDatabase(), "Content",
+        "Title");
     BaseObject obj = new BaseObject();
     expect(doc.getXObject(eq(objRef))).andReturn(obj);
     MultilingualMenuNameCommand mmnc = createMock(MultilingualMenuNameCommand.class);
     command.menuNameCmd = mmnc;
-    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false), 
-        same(getContext()))).andReturn("Home");
-    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference(
-        ).getName()), eq(""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
-    expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))
-        ).andReturn(spacePrefTitle);
+    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false), same(
+        getContext()))).andReturn("Home");
+    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference().getName()), eq(
+        ""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
+    expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))).andReturn(spacePrefTitle);
     replay(doc, mmnc, wiki);
     assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle(docRef));
     verify(doc, mmnc, wiki);
@@ -56,31 +55,29 @@ public class DocHeaderTitleCommandTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testGetDocHeaderTitle_doc_theDoc_differentSpace() throws XWikiException {
-    DocumentReference theDocRef = new DocumentReference(getContext().getDatabase(),
-        "TheDocSpace", "TheDoc");
+    DocumentReference theDocRef = new DocumentReference(getContext().getDatabase(), "TheDocSpace",
+        "TheDoc");
     String spacePrefTitle = " - " + theDocRef.getLastSpaceReference().getName();
     XWikiDocument theDoc = createMock(XWikiDocument.class);
     expect(wiki.getDocument(eq(theDocRef), same(getContext()))).andReturn(theDoc);
     expect(theDoc.getTranslatedDocument(same(getContext()))).andReturn(theDoc);
     expect(theDoc.getTitle()).andReturn("").anyTimes();
-    DocumentReference objRef = new DocumentReference(getContext().getDatabase(), 
-        "Content", "Title");
+    DocumentReference objRef = new DocumentReference(getContext().getDatabase(), "Content",
+        "Title");
     BaseObject obj = new BaseObject();
     expect(theDoc.getXObject(eq(objRef))).andReturn(obj);
     MultilingualMenuNameCommand mmnc = createMock(MultilingualMenuNameCommand.class);
     command.menuNameCmd = mmnc;
-    expect(mmnc.getMultilingualMenuNameOnly(eq("TheDocSpace.TheDoc"), eq("de"), eq(false), 
-        same(getContext()))).andReturn("TheDoc");
-    expect(wiki.getSpacePreference(eq("title"), eq(theDocRef.getLastSpaceReference(
-        ).getName()), eq(""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
-    expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))
-        ).andReturn(spacePrefTitle);
+    expect(mmnc.getMultilingualMenuNameOnly(eq("TheDocSpace.TheDoc"), eq("de"), eq(false), same(
+        getContext()))).andReturn("TheDoc");
+    expect(wiki.getSpacePreference(eq("title"), eq(theDocRef.getLastSpaceReference().getName()), eq(
+        ""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
+    expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))).andReturn(spacePrefTitle);
     replay(doc, mmnc, theDoc, wiki);
-    assertEquals(theDocRef.getName() + " - TheDocSpace", command.getDocHeaderTitle(
-        theDocRef));
+    assertEquals(theDocRef.getName() + " - TheDocSpace", command.getDocHeaderTitle(theDocRef));
     verify(doc, mmnc, theDoc, wiki);
   }
-  
+
   @Deprecated
   @Test
   public void testGetDocHeaderTitle_fullName() throws XWikiException {
@@ -88,21 +85,20 @@ public class DocHeaderTitleCommandTest extends AbstractBridgedComponentTestCase 
     expect(wiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc);
     expect(doc.getTranslatedDocument(same(getContext()))).andReturn(doc);
     expect(doc.getTitle()).andReturn("").anyTimes();
-    DocumentReference objRef = new DocumentReference(getContext().getDatabase(), 
-        "Content", "Title");
+    DocumentReference objRef = new DocumentReference(getContext().getDatabase(), "Content",
+        "Title");
     BaseObject obj = new BaseObject();
     expect(doc.getXObject(eq(objRef))).andReturn(obj);
     MultilingualMenuNameCommand mmnc = createMock(MultilingualMenuNameCommand.class);
     command.menuNameCmd = mmnc;
-    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false), 
-        same(getContext()))).andReturn("Home");
-    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference(
-        ).getName()), eq(""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
-    expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))
-        ).andReturn(spacePrefTitle);
+    expect(mmnc.getMultilingualMenuNameOnly(eq("Content.Home"), eq("de"), eq(false), same(
+        getContext()))).andReturn("Home");
+    expect(wiki.getSpacePreference(eq("title"), eq(docRef.getLastSpaceReference().getName()), eq(
+        ""), same(getContext()))).andReturn(spacePrefTitle).anyTimes();
+    expect(wiki.parseContent(eq(spacePrefTitle), same(getContext()))).andReturn(spacePrefTitle);
     replay(doc, mmnc, wiki);
-    assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle(
-        "Content.Home", getContext()));
+    assertEquals(docRef.getName() + spacePrefTitle, command.getDocHeaderTitle("Content.Home",
+        getContext()));
     verify(doc, mmnc, wiki);
   }
 }

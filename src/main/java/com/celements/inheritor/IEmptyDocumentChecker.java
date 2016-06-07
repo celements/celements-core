@@ -22,8 +22,10 @@ package com.celements.inheritor;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface IEmptyDocumentChecker {
-  
+
   public boolean isEmpty(XWikiDocument doc);
+
   public boolean isEmptyContent(XWikiDocument doc);
+
   public boolean isEmptyTitle(XWikiDocument doc);
 }

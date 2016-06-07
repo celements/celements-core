@@ -54,7 +54,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     tokenAuthImpl = new TokenLDAPAuthServiceImpl();
     store = createMock(XWikiStoreInterface.class);
     expect(xwiki.getStore()).andReturn(store).anyTimes();
-    //context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
+    // context.setUser calls xwiki.isVirtualMode in xwiki version 4.5
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
   }
 
@@ -65,8 +65,8 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     userDocs.add("Doc.Fullname");
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertEquals("Doc.Fullname", tokenAuthImpl.getUsernameForToken(userToken, context));
     assertTrue(captHQL.getValue().contains("token.tokenvalue=?"));
@@ -89,13 +89,12 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     Capture<String> captHQL = new Capture<String>();
     Capture<String> captHQL2 = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(new ArrayList<String>()).once();
-    expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(new ArrayList<String>()).once();
+    expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
-    assertEquals("xwiki:Doc.Fullname", tokenAuthImpl.getUsernameForToken(userToken,
-        context));
+    assertEquals("xwiki:Doc.Fullname", tokenAuthImpl.getUsernameForToken(userToken, context));
     assertTrue(captHQL2.getValue().contains("token.tokenvalue=?"));
     assertTrue("There seems to be no database independent 'now' in hql.",
         captHQL2.getValue().contains("token.validuntil>=?"));
@@ -103,19 +102,19 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
         userToken)));
     verify(xwiki, store);
   }
-  
+
   @Test
   public void testCheckAuthByToken_noUser() throws XWikiException {
     String userToken = "123456789012345678901234";
     List<String> userDocs = new Vector<String>();
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).times(2);
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
     assertNull(tokenAuthImpl.checkAuthByToken("abcd", userToken, context));
   }
-  
+
   @Test
   public void testCheckAuthByToken_admin() throws XWikiException {
     String userToken = "123456789012345678901234";
@@ -126,13 +125,12 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
     List<String> emptyList = Collections.emptyList();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(emptyList).once();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(emptyList).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
-    XWikiUser loggedInUser = tokenAuthImpl.checkAuthByToken(loginName, userToken,
-        context);
+    XWikiUser loggedInUser = tokenAuthImpl.checkAuthByToken(loginName, userToken, context);
     verify(xwiki, store);
     assertNotNull(loggedInUser);
     String expectedUserName = "xwiki:" + username;
@@ -140,7 +138,7 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     assertEquals(expectedUserName, context.getXWikiUser().getUser());
     assertEquals(expectedUserName, context.getUser());
   }
-  
+
   @Test
   public void testCheckAuthByToken() throws XWikiException {
     String userToken = "123456789012345678901234";
@@ -150,16 +148,15 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     userDocs.add(username);
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
-    assertEquals(username, tokenAuthImpl.checkAuthByToken(loginName, userToken, context
-        ).getUser());
+    assertEquals(username, tokenAuthImpl.checkAuthByToken(loginName, userToken, context).getUser());
     assertEquals(username, context.getXWikiUser().getUser());
     assertEquals(username, context.getUser());
     verify(xwiki, store);
   }
-  
+
   @Test
   public void testCheckAuthByToken_wrongUserName() throws XWikiException {
     String userToken = "123456789012345678901234";
@@ -169,15 +166,15 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     userDocs.add(username);
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store);
     assertNull(tokenAuthImpl.checkAuthByToken("abcde", userToken, context));
     assertNull(context.getXWikiUser());
     assertEquals("XWiki.XWikiGuest", context.getUser());
     verify(xwiki, store);
   }
-  
+
   @Test
   public void testCheckAuthXWikiContext_noRequest() throws XWikiException {
     replay(xwiki, store);
@@ -198,8 +195,8 @@ public class TokenLDAPAuthServiceImplTest extends AbstractBridgedComponentTestCa
     userDocs.add(username);
     Capture<String> captHQL = new Capture<String>();
     Capture<List<?>> captParams = new Capture<List<?>>();
-    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), 
-        capture(captParams), same(context))).andReturn(userDocs).once();
+    expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
+        context))).andReturn(userDocs).once();
     replay(xwiki, store, request);
     assertEquals(username, tokenAuthImpl.checkAuth(context).getUser());
     assertEquals(username, context.getXWikiUser().getUser());

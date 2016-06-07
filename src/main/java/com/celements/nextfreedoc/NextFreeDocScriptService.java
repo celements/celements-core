@@ -10,22 +10,22 @@ import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.xpn.xwiki.XWikiContext;
 
 @Component("nextfreedoc")
-public class NextFreeDocScriptService implements ScriptService{
+public class NextFreeDocScriptService implements ScriptService {
 
   @Requirement
   private Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   public DocumentReference getNextTitledPageDocRef(String space, String title) {
     if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
       return new NextFreeDocNameCommand().getNextTitledPageDocRef(space, title, getContext());
     }
     return null;
   }
-  
+
   public String getNextUntitledPageFullName(String space) {
     if ((space != null) && !"".equals(space)) {
       return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, getContext());

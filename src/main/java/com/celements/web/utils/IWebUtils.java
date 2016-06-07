@@ -52,15 +52,15 @@ public interface IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
-  public List<String> getDocumentParentsList(String fullName,
-      boolean includeDoc, XWikiContext context);
+  public List<String> getDocumentParentsList(String fullName, boolean includeDoc,
+      XWikiContext context);
 
   /**
    * @deprecated since 2.14.0 use isEmptyRTEDocument in EmptyCheckCommand class instead.
    */
   @Deprecated
   public boolean isEmptyRTEDocument(XWikiDocument localdoc);
-  
+
   /**
    * @deprecated since 2.14.0 use isEmptyRTEString in EmptyCheckCommand class instead.
    */
@@ -71,44 +71,38 @@ public interface IWebUtils {
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
-  public int getActiveMenuItemPos(int menuLevel, String menuPart,
-      XWikiContext context);
+  public int getActiveMenuItemPos(int menuLevel, String menuPart, XWikiContext context);
 
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
-  public int getMenuItemPos(String fullName, String menuPart,
-      XWikiContext context);
+  public int getMenuItemPos(String fullName, String menuPart, XWikiContext context);
 
   /**
    * get all submenu items of given parent document (by fullname).
    * 
    * @param parent
-   * @param menuSpace (default: $doc.space)
-   * @param menuPart 
+   * @param menuSpace
+   *          (default: $doc.space)
+   * @param menuPart
    * @return (array of menuitems)
-   * 
    * @deprecated since 2.17.0 instead use TreeNodeService.getSubNodesForParent
    */
   @Deprecated
-  public List<Object> getSubMenuItemsForParent(
-      String parent, String menuSpace, String menuPart, XWikiContext context);
+  public List<Object> getSubMenuItemsForParent(String parent, String menuSpace, String menuPart,
+      XWikiContext context);
 
-  
   /**
-   * @deprecated since 2.17.0 instead use TreeNodeService
-   * 
-   * getMenuItemsForHierarchyLevel
-   * get all submenu items of given parent document (by fullname).
-   * 
+   * @deprecated since 2.17.0 instead use TreeNodeService getMenuItemsForHierarchyLevel
+   *             get all submenu items of given parent document (by fullname).
    * @param menuLevel
-   * @param menuPart 
+   * @param menuPart
    * @return (array of menuitems)
    */
   @Deprecated
-  public List<Object> getMenuItemsForHierarchyLevel(
-      int menuLevel, String menuPart, XWikiContext context);
+  public List<Object> getMenuItemsForHierarchyLevel(int menuLevel, String menuPart,
+      XWikiContext context);
 
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
@@ -120,75 +114,68 @@ public interface IWebUtils {
    * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
   @Deprecated
-  public List<BaseObject> getSubMenuItemsForParent_internal(
-      String parent, String menuSpace, String menuPart, XWikiContext context);
-
-  /**
-   * getSubNodesForParent
-   * get all subnodes of a given parent document (by fullname).
-   * 
-   * @param parent
-   * @param menuSpace (default: $doc.space)
-   * @param menuPart 
-   * @return (array of tree nodes)
-   * 
-   * @deprecated since 2.14.0 instead use TreeNodeService directly
-   */
-  @Deprecated
-  public List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
+  public List<BaseObject> getSubMenuItemsForParent_internal(String parent, String menuSpace,
       String menuPart, XWikiContext context);
 
   /**
+   * getSubNodesForParent get all subnodes of a given parent document (by fullname).
    * 
+   * @param parent
+   * @param menuSpace
+   *          (default: $doc.space)
+   * @param menuPart
+   * @return (array of tree nodes)
+   * @deprecated since 2.14.0 instead use TreeNodeService directly
+   */
+  @Deprecated
+  public List<TreeNode> getSubNodesForParent(String parent, String menuSpace, String menuPart,
+      XWikiContext context);
+
+  /**
    * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
   @Deprecated
-  public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace,
-      INavFilter<T> filter, XWikiContext context);
+  public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace, INavFilter<T> filter,
+      XWikiContext context);
 
   /**
-   * 
    * @param <T>
    * @param parent
    * @param menuSpace
    * @param filter
    * @param context
    * @return
-   * 
    * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context);
 
+  /**
+   * @deprecated since 2.17.0 instead use TreeNodeService
+   */
+  @Deprecated
+  public BaseObject getPrevMenuItem(String fullName, XWikiContext context) throws XWikiException;
 
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
   @Deprecated
-  public BaseObject getPrevMenuItem(String fullName,
-      XWikiContext context) throws XWikiException;
-  
-  /**
-   * @deprecated since 2.17.0 instead use TreeNodeService
-   */
-  @Deprecated
-  public BaseObject getNextMenuItem(String fullName,
-      XWikiContext context) throws XWikiException;
+  public BaseObject getNextMenuItem(String fullName, XWikiContext context) throws XWikiException;
 
   /**
    * @deprecated since 2.17.0 instead use InheritorFactory().getConfigDocFieldInheritor
    */
   @Deprecated
-  public XWikiDocument getConfigDocByInheritance(XWikiDocument doc,
-      String className, XWikiContext context) throws XWikiException;
-  
+  public XWikiDocument getConfigDocByInheritance(XWikiDocument doc, String className,
+      XWikiContext context) throws XWikiException;
+
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
-  public String getDocSectionAsJSON(String regex, String fullName, int part, 
-      XWikiContext context) throws XWikiException;
+  public String getDocSectionAsJSON(String regex, String fullName, int part, XWikiContext context)
+      throws XWikiException;
 
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
@@ -201,8 +188,7 @@ public interface IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
   @Deprecated
-  public IPageType getPageTypeApi(String fullName, XWikiContext context
-      ) throws XWikiException;
+  public IPageType getPageTypeApi(String fullName, XWikiContext context) throws XWikiException;
 
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
@@ -220,8 +206,7 @@ public interface IWebUtils {
    * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
-  public XWikiMessageTool getMessageTool(String adminLanguage,
-      XWikiContext context);
+  public XWikiMessageTool getMessageTool(String adminLanguage, XWikiContext context);
 
   /**
    * @deprecated since 2.14.0 instead use WebUtilsService directly
@@ -234,13 +219,13 @@ public interface IWebUtils {
    */
   @Deprecated
   public String getAdminLanguage(XWikiContext context);
-  
+
   /**
    * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
   @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context);
-  
+
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService directly
    */
@@ -263,8 +248,8 @@ public interface IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService directly
    */
   @Deprecated
-  public List<Attachment> getAttachmentListSorted(Document doc,
-      String comparator) throws ClassNotFoundException;
+  public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
+      throws ClassNotFoundException;
 
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService directly
@@ -277,22 +262,20 @@ public interface IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService directly
    */
   @Deprecated
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly);
-  
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly);
+
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService directly
    */
   @Deprecated
-  public String getAttachmentListSortedAsJSON(Document doc, String comparator,
-      boolean imagesOnly, int start, int nb);
+  public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
+      int start, int nb);
 
   /**
    * @deprecated since 2.17.0 instead use ImageService directly
    */
   @Deprecated
-  public List<Attachment> getRandomImages(String fullName, int num,
-      XWikiContext context);
+  public List<Attachment> getRandomImages(String fullName, int num, XWikiContext context);
 
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService directly
@@ -316,9 +299,9 @@ public interface IWebUtils {
    * @deprecated since 2.17.0 instead use WebUtilsService.getUserNameForDocRef
    */
   @Deprecated
-  public String getUserNameForDocName(String authorDocName,
-      XWikiContext context) throws XWikiException;
-  
+  public String getUserNameForDocName(String authorDocName, XWikiContext context)
+      throws XWikiException;
+
   /**
    * @deprecated instead use AttachmentURLCommand directly
    */

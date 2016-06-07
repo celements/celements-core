@@ -21,7 +21,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public abstract class AbstractEventListener implements EventListener {
 
   static final String CFG_SRC_KEY = "celements.observation.disabledListener";
-  
+
   private volatile boolean disabled = false;
 
   @Requirement
@@ -60,18 +60,17 @@ public abstract class AbstractEventListener implements EventListener {
   }
 
   protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   public synchronized boolean isDisabled() {
     return disabled || configSrc.getProperty(CFG_SRC_KEY, List.class).contains(getName());
   }
-  
+
   public synchronized void enable() {
     disabled = false;
   }
-  
+
   public synchronized void disable() {
     disabled = true;
   }
@@ -87,8 +86,7 @@ public abstract class AbstractEventListener implements EventListener {
     } else if ((event == null) || (source == null)) {
       getLogger().warn("onEvent: got null event '{}' or source '{}'", event, source);
     } else {
-      getLogger().trace("onEvent: '{}', source '{}', data '{}'", event.getClass(), source,
-          data);
+      getLogger().trace("onEvent: '{}', source '{}', data '{}'", event.getClass(), source, data);
       if (isLocalEvent()) {
         onLocalEvent(event, source, data);
       } else {

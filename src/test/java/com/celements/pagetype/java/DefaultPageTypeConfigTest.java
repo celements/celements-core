@@ -39,8 +39,7 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     testPageType = new DefaultPageTypeConfig(pageTypeImplMock);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
     componentManager.release(webUtilsService);
-    webUtilsManagDesc = componentManager.getComponentDescriptor(IWebUtilsService.class,
-        "default");
+    webUtilsManagDesc = componentManager.getComponentDescriptor(IWebUtilsService.class, "default");
     webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     componentManager.registerComponent(webUtilsManagDesc, webUtilsMock);
   }
@@ -64,8 +63,7 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
   public void testGetCategories() {
     Set<String> expectedCategoriesSet = Sets.newHashSet("", "pageType");
     List<String> expectedCategories = Lists.newArrayList(expectedCategoriesSet);
-    expect(pageTypeImplMock.getCategoryNames()).andReturn(expectedCategoriesSet
-        ).anyTimes();
+    expect(pageTypeImplMock.getCategoryNames()).andReturn(expectedCategoriesSet).anyTimes();
     replayDefault();
     assertEquals(expectedCategories, testPageType.getCategories());
     verifyDefault();
@@ -114,8 +112,7 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef))).andReturn(
         expectedViewTemplates);
     replayDefault();
-    assertEquals(expectedViewTemplates, testPageType.getRenderTemplateForRenderMode(
-        "view"));
+    assertEquals(expectedViewTemplates, testPageType.getRenderTemplateForRenderMode("view"));
     verifyDefault();
   }
 
@@ -130,8 +127,7 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     expect(webUtilsMock.getInheritedTemplatedPath(eq(localTemplateDocRef))).andReturn(
         expectedEditTemplates);
     replayDefault();
-    assertEquals(expectedEditTemplates, testPageType.getRenderTemplateForRenderMode(
-        "edit"));
+    assertEquals(expectedEditTemplates, testPageType.getRenderTemplateForRenderMode("edit"));
     verifyDefault();
   }
 

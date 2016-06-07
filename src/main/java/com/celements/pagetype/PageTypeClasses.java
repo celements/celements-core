@@ -45,16 +45,15 @@ public class PageTypeClasses extends AbstractClassCollection {
   @Deprecated
   public static final String PAGE_TYPE_PROPERTIES_CLASS_DOC = "PageTypeProperties";
   @Deprecated
-  public static final String PAGE_TYPE_PROPERTIES_CLASS = 
-    PAGE_TYPE_PROPERTIES_CLASS_SPACE + "." + PAGE_TYPE_PROPERTIES_CLASS_DOC;
+  public static final String PAGE_TYPE_PROPERTIES_CLASS = PAGE_TYPE_PROPERTIES_CLASS_SPACE + "."
+      + PAGE_TYPE_PROPERTIES_CLASS_DOC;
 
   @Deprecated
   public static final String PAGE_TYPE_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String PAGE_TYPE_CLASS_DOC = "PageType";
   @Deprecated
-  public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "."
-      + PAGE_TYPE_CLASS_DOC;
+  public static final String PAGE_TYPE_CLASS = PAGE_TYPE_CLASS_SPACE + "." + PAGE_TYPE_CLASS_DOC;
   @Deprecated
   public static final String PAGE_TYPE_FIELD = "page_type";
 
@@ -65,7 +64,8 @@ public class PageTypeClasses extends AbstractClassCollection {
   private IWebUtilsService webUtilsService;
 
   /**
-   * @deprecated instead use getPageTypePropertiesClassRef(WikiReference) in IPageTypeClassConfig
+   * @deprecated instead use getPageTypePropertiesClassRef(WikiReference) in
+   *             IPageTypeClassConfig
    */
   @Deprecated
   public DocumentReference getPageTypePropertiesClassRef(String wikiName) {
@@ -97,19 +97,17 @@ public class PageTypeClasses extends AbstractClassCollection {
     return "celPageTypeClasses";
   }
 
-  private BaseClass getPageTypePropertiesClass()
-      throws XWikiException {
+  private BaseClass getPageTypePropertiesClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
-    DocumentReference pageTypePropertiesClassRef = 
-        pageTypeClassConfig.getPageTypePropertiesClassRef(webUtilsService.getWikiRef());
+    DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig.getPageTypePropertiesClassRef(
+        webUtilsService.getWikiRef());
     try {
       doc = xwiki.getDocument(pageTypePropertiesClassRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get [" + pageTypePropertiesClassRef + "] class document",
-          exp);
+      LOGGER.error("Failed to get [" + pageTypePropertiesClassRef + "] class document", exp);
       doc = new XWikiDocument(pageTypePropertiesClassRef);
       needsUpdate = true;
     }
@@ -118,30 +116,25 @@ public class PageTypeClasses extends AbstractClassCollection {
     bclass.setXClassReference(pageTypePropertiesClassRef);
     needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_TYPE_NAME,
         "Type Pretty Name", 30);
-    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_CATEGORY,
-        "Category", 30);
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_CATEGORY, "Category", 30);
     needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_PAGE_EDIT,
         "Type Edit Template", 30);
     needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_PAGE_VIEW,
         "Type View Template", 30);
-    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_VISIBLE,
-        "Visible", "yesno");
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_VISIBLE, "Visible",
+        "yesno");
     needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_SHOW_FRAME,
         "Show Frame", "yesno");
-    needsUpdate |= bclass.addBooleanField(
-        IPageTypeClassConfig.PAGETYPE_PROP_LOAD_RICHTEXT, "Load Richtext Editor",
-        "yesno");
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_LOAD_RICHTEXT,
+        "Load Richtext Editor", "yesno");
     needsUpdate |= bclass.addNumberField(IPageTypeClassConfig.PAGETYPE_PROP_RTE_WIDTH,
-        "Richtext Editor Width", 30,
-        "integer");
+        "Richtext Editor Width", 30, "integer");
     needsUpdate |= bclass.addNumberField(IPageTypeClassConfig.PAGETYPE_PROP_RTE_HEIGHT,
-        "Richtext Editor Height", 30,
-        "integer");
+        "Richtext Editor Height", 30, "integer");
     needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_HASPAGETITLE,
         "Has Page Title", "yesno");
-    needsUpdate |= bclass.addBooleanField(
-        IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT, "Is Unconnected Parent",
-        "yesno");
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT,
+        "Is Unconnected Parent", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;

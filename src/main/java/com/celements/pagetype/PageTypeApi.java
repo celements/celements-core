@@ -30,68 +30,74 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * @deprecated since 2.21.0 instead use com.celements.pagetype.IPageTypeConfig
- *             you can get IPageTypeConfig objects over PageTypeScriptService
- *             or PageTypeService.
+ * @deprecated since 2.21.0 instead use com.celements.pagetype.IPageTypeConfig you can get
+ *             IPageTypeConfig objects over PageTypeScriptService or PageTypeService.
  */
 @Deprecated
 public class PageTypeApi implements IPageType {
+
   private XWikiContext context;
   private XWiki xwiki;
   private XWikiDocument doc;
-  
-  public PageTypeApi(String fullName, XWikiContext context
-      ) throws XWikiException{
+
+  public PageTypeApi(String fullName, XWikiContext context) throws XWikiException {
     this.context = context;
     xwiki = context.getWiki();
     doc = xwiki.getDocument(fullName, context);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getTemplateDocument()
    */
   public Document getTemplateDocument() throws XWikiException {
-    return getPageTypeObjForCurrentDoc().getTemplateDocument(
-        context).newDocument(context);
+    return getPageTypeObjForCurrentDoc().getTemplateDocument(context).newDocument(context);
   }
 
   private PageType getPageTypeObjForCurrentDoc() {
     return PageTypeCommand.getInstance().getPageTypeObj(doc, context);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getPageType()
    */
   public String getPageType() {
     return PageTypeCommand.getInstance().getPageType(doc, context);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getPageTypeObject()
    */
   public com.xpn.xwiki.api.Object getPageTypeObject() {
-    BaseObject pageTypeObject = PageTypeCommand.getInstance().getPageTypeObject(
-        doc, context);
+    BaseObject pageTypeObject = PageTypeCommand.getInstance().getPageTypeObject(doc, context);
     if (pageTypeObject != null) {
       return pageTypeObject.newObjectApi(pageTypeObject, context);
     } else {
       return null;
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#showFrame()
    */
   public boolean showFrame() throws XWikiException {
     return getPageTypeObjForCurrentDoc().showFrame(context);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getPageTypeProperties()
    */
-  public com.xpn.xwiki.api.Object getPageTypeProperties() throws XWikiException{
-    BaseObject pageTypePropObj = getPageTypeObjForCurrentDoc().getPageTypeProperties(
-        context);
+  public com.xpn.xwiki.api.Object getPageTypeProperties() throws XWikiException {
+    BaseObject pageTypePropObj = getPageTypeObjForCurrentDoc().getPageTypeProperties(context);
     if (pageTypePropObj != null) {
       return pageTypePropObj.newObjectApi(pageTypePropObj, context);
     } else {
@@ -99,10 +105,12 @@ public class PageTypeApi implements IPageType {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.celements.web.plugin.IPageType#getRenderTemplate(java.lang.String)
    */
-  public String getRenderTemplate(String renderMode) throws XWikiException{
+  public String getRenderTemplate(String renderMode) throws XWikiException {
     return getPageTypeObjForCurrentDoc().getRenderTemplate(renderMode, context);
   }
 

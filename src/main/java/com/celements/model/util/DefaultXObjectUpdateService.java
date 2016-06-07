@@ -56,8 +56,8 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
     for (String field : fields) {
       String className = extractClassName(field);
       if (!ret.containsKey(className)) {
-        BaseObject obj = modelAccess.getOrCreateXObject(doc, webUtilsService
-            .resolveDocumentReference(className));
+        BaseObject obj = modelAccess.getOrCreateXObject(doc,
+            webUtilsService.resolveDocumentReference(className));
         ret.put(className, obj);
       }
     }

@@ -1,5 +1,6 @@
 package com.celements.nextfreedoc;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -19,21 +20,23 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
-public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
+public class NextFreeDocServiceTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
   private NextFreeDocService nextFreeDocService;
-  
+
   private QueryManager queryManagerMock;
   private QueryExecutor queryExecutorMock;
+  private XWikiStoreInterface storeMock;
 
   @Before
   public void setUp_NextFreeDocNameCommandTest() throws Exception {
@@ -43,6 +46,8 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     queryManagerMock = createMockAndAddToDefault(QueryManager.class);
     nextFreeDocService.injectQueryManager(queryManagerMock);
     queryExecutorMock = createMockAndAddToDefault(QueryExecutor.class);
+    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
   }
 
   @Test
@@ -51,25 +56,24 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
         context.getDatabase()));
     String title = "asdf";
     nextFreeDocService.injectNum(spaceRef, title, 5);
-    
+
     DocumentReference docRef1 = new DocumentReference(title + 5, spaceRef);
-    expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).once();
-    
+    expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).atLeastOnce();
+
     DocumentReference docRef2 = new DocumentReference(title + 6, spaceRef);
-    expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()
-        ).once();
-    
+    expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()).once();
+
     DocumentReference docRef3 = new DocumentReference(title + 7, spaceRef);
-    expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).once();
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(docMock).once();
-    expect(docMock.getLock(same(context))).andReturn(null);
-    
+    expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).atLeastOnce();
+    XWikiDocument doc3 = new XWikiDocument(docRef3);
+    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
+    expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+
     replayDefault();
     DocumentReference ret = nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
     verifyDefault();
-    
+
     assertEquals(docRef3, ret);
   }
 
@@ -77,13 +81,13 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
   public void testGetNextTitledPageDocRef_nullSpace() throws Exception {
     SpaceReference spaceRef = null;
     String title = "asdf";
-    
+
     replayDefault();
     try {
       nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
@@ -93,13 +97,13 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference(
         context.getDatabase()));
     String title = "";
-    
+
     replayDefault();
     try {
       nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
@@ -109,59 +113,55 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference(
         context.getDatabase()));
     nextFreeDocService.injectNum(spaceRef, INextFreeDocRole.UNTITLED_NAME, 5);
-    
-    DocumentReference docRef1 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 5, 
-        spaceRef);
+
+    DocumentReference docRef1 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 5, spaceRef);
     expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).once();
-    
-    DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, 
-        spaceRef);
+
+    DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()
-        ).once();
-    
-    DocumentReference docRef3 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 7, 
-        spaceRef);
+    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()).once();
+
+    DocumentReference docRef3 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 7, spaceRef);
     expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).once();
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(docMock).once();
-    expect(docMock.getLock(same(context))).andReturn(null);
-    
+    XWikiDocument doc3 = new XWikiDocument(docRef3);
+    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
+    expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+
     replayDefault();
     DocumentReference ret = nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
     verifyDefault();
-    
+
     assertEquals(docRef3, ret);
   }
 
   @Test
   public void testGetNextUntitledPageDocRef_nullSpace() throws Exception {
     SpaceReference spaceRef = null;
-    
+
     replayDefault();
     try {
       nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
       fail();
     } catch (IllegalArgumentException exp) {
-      //expected
+      // expected
     }
     verifyDefault();
   }
-  
+
   @Test
   public void testGetHighestNum_fromCache() {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("myWiki"));
     String name = "asdf";
     DocumentReference baseDocRef = new DocumentReference(name, spaceRef);
     nextFreeDocService.injectNum(spaceRef, name, 5);
-    
+
     replayDefault();
     long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
-    
+
     assertEquals(5, ret);
   }
-  
+
   @Test
   public void testGetHighestNum() throws Exception {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("myWiki"));
@@ -170,13 +170,13 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     Query query = new DefaultQuery("statement", null, queryExecutorMock);
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andReturn(query).once();
-    expect(queryExecutorMock.execute(same(query))).andReturn(Arrays.<Object>asList(
-        name + "NoDigit", name + 5, name + 4)).once();
-    
+    expect(queryExecutorMock.execute(same(query))).andReturn(Arrays.<Object>asList(name + "NoDigit",
+        name + 5, name + 4)).once();
+
     replayDefault();
     long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
-    
+
     assertEquals(6, ret);
     assertEquals(0, query.getOffset());
     assertEquals(8, query.getLimit());
@@ -185,7 +185,7 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(spaceRef.getName(), query.getNamedParameters().get("space"));
     assertEquals(name + "%", query.getNamedParameters().get("name"));
   }
-  
+
   @Test
   public void testGetHighestNum_emptyResult() throws Exception {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("myWiki"));
@@ -195,11 +195,11 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andReturn(query).once();
     expect(queryExecutorMock.execute(same(query))).andReturn(Collections.emptyList()).once();
-    
+
     replayDefault();
     long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
-    
+
     assertEquals(1, ret);
     assertEquals(0, query.getOffset());
     assertEquals(8, query.getLimit());
@@ -208,7 +208,7 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(spaceRef.getName(), query.getNamedParameters().get("space"));
     assertEquals(name + "%", query.getNamedParameters().get("name"));
   }
-  
+
   @Test
   public void testGetHighestNum_QueryException_createQuery() throws Exception {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("myWiki"));
@@ -216,14 +216,14 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     DocumentReference baseDocRef = new DocumentReference(name, spaceRef);
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andThrow(new QueryException("", null, null)).once();
-    
+
     replayDefault();
     long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
-    
+
     assertEquals(1, ret);
   }
-  
+
   @Test
   public void testGetHighestNum_QueryException_execute() throws Exception {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("myWiki"));
@@ -232,13 +232,13 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     Query query = new DefaultQuery("statement", null, queryExecutorMock);
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andReturn(query).once();
-    expect(queryExecutorMock.execute(same(query))).andThrow(new QueryException("", query, 
+    expect(queryExecutorMock.execute(same(query))).andThrow(new QueryException("", query,
         null)).once();
-    
+
     replayDefault();
     long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
-    
+
     assertEquals(1, ret);
     assertEquals(0, query.getOffset());
     assertEquals(8, query.getLimit());
@@ -247,7 +247,7 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(spaceRef.getName(), query.getNamedParameters().get("space"));
     assertEquals(name + "%", query.getNamedParameters().get("name"));
   }
-  
+
   @Test
   public void testGetHighestNum_multiQuery() throws Exception {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference("myWiki"));
@@ -267,13 +267,13 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     Query query3 = new DefaultQuery("statement", null, queryExecutorMock);
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andReturn(query3).once();
-    expect(queryExecutorMock.execute(same(query3))).andReturn(Arrays.<Object>asList(
-        name + "5")).once();
-    
+    expect(queryExecutorMock.execute(same(query3))).andReturn(Arrays.<Object>asList(name
+        + "5")).once();
+
     replayDefault();
     long ret = nextFreeDocService.getHighestNum(baseDocRef);
     verifyDefault();
-    
+
     assertEquals(6, ret);
     assertEquals(0, query1.getOffset());
     assertEquals(8, query1.getLimit());
@@ -294,26 +294,24 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(spaceRef.getName(), query3.getNamedParameters().get("space"));
     assertEquals(name + "%", query3.getNamedParameters().get("name"));
   }
-  
+
   @Test
   public void testGetNumFromName() {
     String prefix = "asdf";
-    List<Object> results = Arrays.<Object>asList(prefix + "NoDigit", prefix + "1234", 
-        prefix + "6");
-    
-    assertEquals(new Long(1235), nextFreeDocService.extractNumFromResults(prefix, 
-        results));
+    List<Object> results = Arrays.<Object>asList(prefix + "NoDigit", prefix + "1234", prefix + "6");
+
+    assertEquals(new Long(1235), nextFreeDocService.extractNumFromResults(prefix, results));
   }
-  
+
   @Test
   public void testGetNumFromName_noDigit() {
     String prefix = "asdf";
-    List<Object> results = Arrays.<Object>asList(prefix + "NoDigit", prefix 
-        + "StillNoDigit", "notStartingWithPrefix");
+    List<Object> results = Arrays.<Object>asList(prefix + "NoDigit", prefix + "StillNoDigit",
+        "notStartingWithPrefix");
 
     assertNull(nextFreeDocService.extractNumFromResults(prefix, results));
   }
-  
+
   @Test
   public void testGetNumFromName_emptyList() {
     String prefix = "asdf";
@@ -321,11 +319,11 @@ public class NextFreeDocServiceTest extends AbstractBridgedComponentTestCase {
 
     assertNull(nextFreeDocService.extractNumFromResults(prefix, results));
   }
-  
+
   @Test
   public void testGetHighestNumHQL() {
     assertEquals("SELECT doc.name FROM XWikiDocument doc WHERE doc.space=:space "
-        + "AND doc.name LIKE :name ORDER BY LENGTH(doc.name) DESC, doc.name DESC", 
+        + "AND doc.name LIKE :name ORDER BY LENGTH(doc.name) DESC, doc.name DESC",
         nextFreeDocService.getHighestNumHQL());
   }
 

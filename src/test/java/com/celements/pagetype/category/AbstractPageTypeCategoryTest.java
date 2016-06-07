@@ -9,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.pagetype.category.AbstractPageTypeCategory;
-
 
 public class AbstractPageTypeCategoryTest extends AbstractComponentTest {
 
@@ -85,7 +83,7 @@ public class AbstractPageTypeCategoryTest extends AbstractComponentTest {
         return injectDeprecatedNames;
       }
     }
-    
+
   }
 
 }

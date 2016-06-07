@@ -53,25 +53,24 @@ public class CSSEngineTest extends AbstractBridgedComponentTestCase {
     BaseObject cssObj1 = new BaseObject();
     baseCSSList.add(cssObj1);
 
-    List<CSS> cssList = cssEngine.includeCSS("", "", baseCSSList , context);
+    List<CSS> cssList = cssEngine.includeCSS("", "", baseCSSList, context);
 
-    assertFalse("includeCSS must not add null objects to the css list.",
-        cssListContains(cssList, null));
-    assertTrue("includeCSS must add cssObj to the css list.",
-        cssListContains(cssList, cssObj));
-    assertTrue("includeCSS must not add cssObj1 to the css list.",
-        cssListContains(cssList, cssObj1));
+    assertFalse("includeCSS must not add null objects to the css list.", cssListContains(cssList,
+        null));
+    assertTrue("includeCSS must add cssObj to the css list.", cssListContains(cssList, cssObj));
+    assertTrue("includeCSS must not add cssObj1 to the css list.", cssListContains(cssList,
+        cssObj1));
   }
 
-  //*****************************************************************
-  //*                  H E L P E R  - M E T H O D S                 *
-  //*****************************************************************/
+  // *****************************************************************
+  // * H E L P E R - M E T H O D S *
+  // *****************************************************************/
 
   private boolean cssListContains(List<CSS> cssList, BaseObject containsObj) {
     boolean found = false;
     for (CSS cssObj : cssList) {
       if (cssObj instanceof CSSBaseObject) {
-        BaseObject foundObj = ((CSSBaseObject)cssObj).getObject();
+        BaseObject foundObj = ((CSSBaseObject) cssObj).getObject();
         if (containsObj == foundObj) {
           found = true;
         }

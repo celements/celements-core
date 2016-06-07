@@ -30,10 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * 
- * @author fabian
- * since 2.51.0
- *
+ * @author fabian since 2.51.0
  */
 @Component
 public class CaptchaService implements ICaptchaServiceRole {
@@ -44,26 +41,26 @@ public class CaptchaService implements ICaptchaServiceRole {
   Execution execution;
 
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
-  @Override 
+  @Override
   public boolean checkCaptcha() {
     String answer = getContext().getRequest().get("captcha_answer");
-    if((answer != null) && (answer.length() > 0)) {
-        try {
-          _LOGGER.info("Checking answer for user id '" 
-              + getCaptchaVerifier().getUserId(getContext().getRequest()) + "'");
-          String anwserCacheKey = "captcha_" + getCaptchaType() + "_anwserCache";
-          if (!getContext().containsKey(anwserCacheKey)) {
-            Boolean isAnswerCorrect = getCaptchaVerifier().isAnswerCorrect(getContext(
-                ).getRequest().get("captcha_id"), answer);
-            getContext().put(anwserCacheKey, isAnswerCorrect);
-          }
-          return (Boolean) getContext().get(anwserCacheKey);
-        } catch (Exception e) {
-          _LOGGER.error("Exception while attempting to verify captcha", e);
+    if ((answer != null) && (answer.length() > 0)) {
+      try {
+        _LOGGER.info("Checking answer for user id '" + getCaptchaVerifier().getUserId(
+            getContext().getRequest()) + "'");
+        String anwserCacheKey = "captcha_" + getCaptchaType() + "_anwserCache";
+        if (!getContext().containsKey(anwserCacheKey)) {
+          Boolean isAnswerCorrect = getCaptchaVerifier().isAnswerCorrect(
+              getContext().getRequest().get("captcha_id"), answer);
+          getContext().put(anwserCacheKey, isAnswerCorrect);
         }
+        return (Boolean) getContext().get(anwserCacheKey);
+      } catch (Exception e) {
+        _LOGGER.error("Exception while attempting to verify captcha", e);
+      }
     }
     return false;
   }
@@ -76,12 +73,12 @@ public class CaptchaService implements ICaptchaServiceRole {
     return getContext().getRequest().get("captcha_type");
   }
 
-  @Override 
+  @Override
   public String getCaptchaId() {
     return getCaptchaId("image");
   }
 
-  @Override 
+  @Override
   public String getCaptchaId(String captchaType) {
     CaptchaVerifier cv = Utils.getComponent(CaptchaVerifier.class, captchaType);
     try {

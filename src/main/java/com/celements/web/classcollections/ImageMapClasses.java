@@ -31,11 +31,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.imageMap.classes")
 public class ImageMapClasses extends AbstractClassCollection {
-  
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(ImageMapClasses.class);
 
-  public ImageMapClasses() { }
-  
+  public ImageMapClasses() {
+  }
+
   @Override
   protected Log getLogger() {
     return LOGGER;
@@ -46,12 +47,12 @@ public class ImageMapClasses extends AbstractClassCollection {
     getImageMapConfigClass();
     getImageMapClass();
   }
-  
+
   private BaseClass getImageMapConfigClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "ImageMapConfigClass");
+    DocumentReference classRef = new DocumentReference(getContext().getDatabase(), "Classes",
+        "ImageMapConfigClass");
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
@@ -60,28 +61,28 @@ public class ImageMapClasses extends AbstractClassCollection {
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
     needsUpdate |= bclass.addTextField("lang", "Language", 30);
     needsUpdate |= bclass.addTextAreaField("map", "Map Code", 80, 15);
-    
-    if(!"internal".equals(bclass.getCustomMapping())){
+
+    if (!"internal".equals(bclass.getCustomMapping())) {
       needsUpdate = true;
       bclass.setCustomMapping("internal");
     }
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
-  
+
   protected BaseClass getImageMapClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = new DocumentReference(getContext().getDatabase(),
-        "Classes", "ImageMapClass");
-    
+    DocumentReference classRef = new DocumentReference(getContext().getDatabase(), "Classes",
+        "ImageMapClass");
+
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
@@ -89,11 +90,11 @@ public class ImageMapClasses extends AbstractClassCollection {
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
-    
+
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("map_id", "Map Identifier", 30);
-    
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }

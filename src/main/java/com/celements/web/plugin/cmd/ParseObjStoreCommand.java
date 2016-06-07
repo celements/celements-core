@@ -30,32 +30,33 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 
 public class ParseObjStoreCommand {
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ParseObjStoreCommand.class);
+
+  private static Log mLogger = LogFactory.getFactory().getInstance(ParseObjStoreCommand.class);
 
   /**
-   * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as
-   * a Map.
-   * @param options The String saved in the store object
-   * @return Map containing all the 
+   * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as a
+   * Map.
+   * 
+   * @param options
+   *          The String saved in the store object
+   * @return Map containing all the
    */
   public Map<String, String> getObjStoreOptionsMap(String options, XWikiContext context) {
     String optHash = getHash(options);
-    Map<String, String> optMap = (Map<String, String>)context.get(optHash);
-    if(optMap == null) {
+    Map<String, String> optMap = (Map<String, String>) context.get(optHash);
+    if (optMap == null) {
       optMap = new HashMap<String, String>();
-      if(options != null) {
-        for(String line : options.split("\n")) {
+      if (options != null) {
+        for (String line : options.split("\n")) {
           line = line.trim();
-          if(line.length() > 0) {
+          if (line.length() > 0) {
             int radioSep = line.indexOf(":");
             int radioFirstIndexSep = line.indexOf(";");
             int radioLastIndexSep = line.lastIndexOf(";");
-            if((radioSep >= 0) && (radioFirstIndexSep >= 0) 
-                && (radioSep < radioFirstIndexSep)) {
-              String key = line.substring(0, radioSep+1);
-              key = key + line.substring(radioLastIndexSep+1);
-              String value = line.substring(radioSep+1, radioFirstIndexSep);
+            if ((radioSep >= 0) && (radioFirstIndexSep >= 0) && (radioSep < radioFirstIndexSep)) {
+              String key = line.substring(0, radioSep + 1);
+              key = key + line.substring(radioLastIndexSep + 1);
+              String value = line.substring(radioSep + 1, radioFirstIndexSep);
               optMap.put(key, value);
             } else {
               optMap.put(line, line);
@@ -67,10 +68,10 @@ public class ParseObjStoreCommand {
     }
     return optMap;
   }
-  
+
   String getHash(String text) {
     String hash = "";
-    if(text == null) {
+    if (text == null) {
       text = "";
     }
     try {
@@ -81,5 +82,5 @@ public class ParseObjStoreCommand {
       mLogger.error("SHA-1 algorithm not available", e);
     }
     return hash;
-  } 
+  }
 }
