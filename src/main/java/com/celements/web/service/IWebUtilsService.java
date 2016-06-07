@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -143,11 +144,33 @@ public interface IWebUtilsService {
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef);
 
+  /**
+   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
+   * requested generic type
+   *
+   * @param name
+   *          to be resolved
+   * @param token
+   *          for the reference type
+   * @return a resolved reference
+   */
   public <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token);
 
+  /**
+   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
+   * requested generic type
+   *
+   * @param name
+   *          to be resolved
+   * @param token
+   *          for the reference type
+   * @param baseRef
+   *          a reference used as base for resolving
+   * @return a resolved reference
+   */
   public <T extends EntityReference> T resolveReference(@NotNull String name,
-      @NotNull Class<T> token, @Nullable WikiReference wikiRef);
+      @NotNull Class<T> token, @Nullable EntityReference baseRef);
 
   public boolean isAdminUser();
 

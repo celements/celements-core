@@ -78,6 +78,7 @@ import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.xpn.xwiki.XWikiContext;
@@ -476,7 +477,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
     WikiReference wikiRef = null;
-    if (StringUtils.isNotBlank(wikiName)) {
+    if (!Strings.isNullOrEmpty(wikiName)) {
       wikiRef = new WikiReference(wikiName);
     }
     return MoreObjects.firstNonNull(wikiRef, defaultWikiRef);
@@ -506,7 +507,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public EntityReference resolveRelativeEntityReference(String name, EntityType type) {
     EntityReference ref = relativeRefResolver.resolve(name, type);
-    LOGGER.debug("resolveRelativeEntityReference: for [" + name + "] got reference [" + ref + "]");
+    LOGGER.debug("resolveRelativeEntityReference: for '{}' got ref '{}'", name, ref);
     return ref;
   }
 
@@ -517,15 +518,18 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public <T extends EntityReference> T resolveReference(String name, Class<T> token,
-      WikiReference wikiRef) {
+      EntityReference baseRef) {
+    baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
     try {
       EntityReference ref;
       if (ENTITY_TYPE_MAP.get(token).ordinal() > EntityType.WIKI.ordinal()) {
-        ref = refResolver.resolve(name, ENTITY_TYPE_MAP.get(token), getWikiRef(wikiRef));
+        ref = refResolver.resolve(name, ENTITY_TYPE_MAP.get(token), baseRef);
       } else {
-        ref = resolveWikiReference(name, getWikiRef(wikiRef));
+        ref = resolveWikiReference(name, getWikiRef(baseRef));
       }
-      return token.getConstructor(EntityReference.class).newInstance(ref);
+      T ret = token.getConstructor(EntityReference.class).newInstance(ref);
+      LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
+      return ret;
     } catch (ReflectiveOperationException | SecurityException | IllegalArgumentException
         | NullPointerException exc) {
       throw new IllegalArgumentException("Unsupported entity class: " + token, exc);
