@@ -24,6 +24,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
@@ -129,6 +132,8 @@ public interface IWebUtilsService {
 
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
 
+  public WikiReference resolveWikiReference(String wikiName);
+
   public AttachmentReference resolveAttachmentReference(String fullName);
 
   public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef);
@@ -137,6 +142,12 @@ public interface IWebUtilsService {
 
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef);
+
+  public <T extends EntityReference> T resolveReference(@NotNull String name,
+      @NotNull Class<T> token);
+
+  public <T extends EntityReference> T resolveReference(@NotNull String name,
+      @NotNull Class<T> token, @Nullable WikiReference wikiRef);
 
   public boolean isAdminUser();
 
