@@ -21,14 +21,15 @@ package com.celements.pagetype.xobject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.pagetype.PageTypeReference;
@@ -42,49 +43,59 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
   @Requirement
   private IWebUtilsService webUtilsService;
 
-  GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
+  final GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
 
-  Map<WikiReference, List<PageTypeReference>> pageTypeRefCache;
+  final ConcurrentMap<WikiReference, List<PageTypeReference>> pageTypeRefCache = new ConcurrentHashMap<>();
 
   @Requirement
-  Execution execution;
+  private Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
   }
 
   private XObjectPageTypeConfig getXObjectPTConfigForFN(String pageTypeFN) {
-    return new XObjectPageTypeConfig(pageTypeFN);
+    DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(pageTypeFN);
+    return new XObjectPageTypeConfig(pageTypeDocRef);
   }
 
-  public void invalidateCacheForWiki(WikiReference wikiRef) {
+  @Override
+  public synchronized void invalidateCacheForWiki(WikiReference wikiRef) {
     if (webUtilsService.getCentralWikiRef().equals(wikiRef)) {
-      pageTypeRefCache = null;
+      pageTypeRefCache.clear();
     } else if (pageTypeRefCache != null) {
       pageTypeRefCache.remove(wikiRef);
     }
   }
 
-  Map<WikiReference, List<PageTypeReference>> getPageTypeRefCache() {
-    if (pageTypeRefCache == null) {
-      pageTypeRefCache = new HashMap<WikiReference, List<PageTypeReference>>();
-    }
+  ConcurrentMap<WikiReference, List<PageTypeReference>> getPageTypeRefCache() {
     return pageTypeRefCache;
   }
 
   @Override
   public List<PageTypeReference> getPageTypesRefsForWiki(WikiReference wikiRef) {
-    if (!getPageTypeRefCache().containsKey(wikiRef)) {
-      List<PageTypeReference> pageTypeList = new ArrayList<PageTypeReference>();
+    List<PageTypeReference> pageTypeList = getPageTypeRefCache().get(wikiRef);
+    if (pageTypeList == null) {
+      pageTypeList = putPageTypeRefsForWikiToCache(wikiRef);
+    }
+    return pageTypeList;
+  }
+
+  private synchronized List<PageTypeReference> putPageTypeRefsForWikiToCache(
+      WikiReference wikiRef) {
+    List<PageTypeReference> pageTypeList = getPageTypeRefCache().get(wikiRef);
+    if (pageTypeList == null) {
+      List<PageTypeReference> newPageTypeList = new ArrayList<PageTypeReference>();
       Set<String> pageTypeSet = getPageTypeCmd.getAllXObjectPageTypes(getContext());
       for (String pageTypeFN : pageTypeSet) {
         XObjectPageTypeConfig xObjPT = getXObjectPTConfigForFN(pageTypeFN);
-        pageTypeList.add(new PageTypeReference(xObjPT.getName(),
+        newPageTypeList.add(new PageTypeReference(xObjPT.getName(),
             "com.celements.XObjectPageTypeProvider", xObjPT.getCategories()));
       }
-      getPageTypeRefCache().put(wikiRef, Collections.unmodifiableList(pageTypeList));
+      pageTypeList = Collections.unmodifiableList(newPageTypeList);
+      getPageTypeRefCache().putIfAbsent(wikiRef, pageTypeList);
     }
-    return getPageTypeRefCache().get(wikiRef);
+    return pageTypeList;
   }
 
 }
