@@ -21,7 +21,6 @@ package com.celements.web.service;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -297,7 +296,7 @@ public class CelementsWebScriptService implements ScriptService {
     }
     int exp = (int) (Math.log(bytes) / Math.log(unit));
     String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-    NumberFormat decimalFormat = DecimalFormat.getInstance(locale);
+    NumberFormat decimalFormat = NumberFormat.getInstance(locale);
     decimalFormat.setMaximumFractionDigits(1);
     decimalFormat.setMinimumFractionDigits(1);
     return String.format("%s %sB", decimalFormat.format(bytes / Math.pow(unit, exp)), pre);
@@ -559,7 +558,7 @@ public class CelementsWebScriptService implements ScriptService {
 
   /**
    * permanentlyEmptyTrash delete all documents after waitDays and minWaitDays
-   * 
+   *
    * @return
    */
   public Integer permanentlyEmptyTrash(int waitDays) {
@@ -626,7 +625,7 @@ public class CelementsWebScriptService implements ScriptService {
   /**
    * getLastStartupTimeStamp to solve browser caching issues with files on disk e.g.
    * tinymce
-   * 
+   *
    * @return
    */
   public String getLastStartupTimeStamp() {
@@ -727,7 +726,7 @@ public class CelementsWebScriptService implements ScriptService {
   /**
    * Cache should maintain itself. Thus this flushMenuItemCache should not be called
    * anymore.
-   * 
+   *
    * @deprecated
    */
   @Deprecated
@@ -736,7 +735,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void checkClasses() {
-    classesComp.checkAllClassCollections();
+    classesComp.checkClasses();
   }
 
   public boolean isClassCollectionActivated(String name) {
@@ -1005,7 +1004,7 @@ public class CelementsWebScriptService implements ScriptService {
    * TODO Move after Refactoring to WebUtilScriptService
    */
   public boolean isHighDate(Date date) {
-    if ((date != null) && date.compareTo(IWebUtilsService.DATE_HIGH) >= 0) {
+    if ((date != null) && (date.compareTo(IWebUtilsService.DATE_HIGH) >= 0)) {
       return true;
     }
     return false;
