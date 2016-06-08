@@ -43,7 +43,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
   @Requirement
   private IWebUtilsService webUtilsService;
 
-  final GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
+  GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
 
   final ConcurrentMap<WikiReference, List<PageTypeReference>> pageTypeRefCache = new ConcurrentHashMap<>();
 
@@ -74,7 +74,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
 
   @Override
   public List<PageTypeReference> getPageTypesRefsForWiki(WikiReference wikiRef) {
-    List<PageTypeReference> pageTypeList = getPageTypeRefCache().get(wikiRef);
+    List<PageTypeReference> pageTypeList = pageTypeRefCache.get(wikiRef);
     if (pageTypeList == null) {
       pageTypeList = putPageTypeRefsForWikiToCache(wikiRef);
     }
@@ -83,7 +83,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
 
   private synchronized List<PageTypeReference> putPageTypeRefsForWikiToCache(
       WikiReference wikiRef) {
-    List<PageTypeReference> pageTypeList = getPageTypeRefCache().get(wikiRef);
+    List<PageTypeReference> pageTypeList = pageTypeRefCache.get(wikiRef);
     if (pageTypeList == null) {
       List<PageTypeReference> newPageTypeList = new ArrayList<PageTypeReference>();
       Set<String> pageTypeSet = getPageTypeCmd.getAllXObjectPageTypes(getContext());
@@ -93,7 +93,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
             "com.celements.XObjectPageTypeProvider", xObjPT.getCategories()));
       }
       pageTypeList = Collections.unmodifiableList(newPageTypeList);
-      getPageTypeRefCache().putIfAbsent(wikiRef, pageTypeList);
+      pageTypeRefCache.putIfAbsent(wikiRef, pageTypeList);
     }
     return pageTypeList;
   }

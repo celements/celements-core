@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype.xobject;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -34,7 +35,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.GetPageTypesCommand;
 import com.xpn.xwiki.XWiki;
@@ -42,7 +43,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
+public class XObjectPageTypeCacheTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -72,7 +73,7 @@ public class XObjectPageTypeCacheTest extends AbstractBridgedComponentTestCase {
     assertNotNull(xObjPageTypeCache.getPageTypeRefCache());
     replayDefault();
     xObjPageTypeCache.invalidateCacheForWiki(new WikiReference("celements2web"));
-    assertNull(xObjPageTypeCache.pageTypeRefCache);
+    assertTrue(xObjPageTypeCache.pageTypeRefCache.isEmpty());
     verifyDefault();
   }
 
