@@ -21,19 +21,15 @@ package com.celements.common.classes;
 
 import org.xwiki.component.annotation.ComponentRole;
 
-import com.xpn.xwiki.XWikiException;
+import com.celements.model.access.exception.DocumentAccessException;
 
-/**
- * {@link Deprecated} instead use {@link IClassCreatorRole}
- */
-@Deprecated
 @ComponentRole
-public interface IClassCollectionRole {
+public interface IClassCreatorRole {
 
-  public void runUpdate() throws XWikiException;
-
-  public String getConfigName();
+  public String getName();
 
   public boolean isActivated();
+
+  public void createClasses() throws DocumentAccessException;
 
 }

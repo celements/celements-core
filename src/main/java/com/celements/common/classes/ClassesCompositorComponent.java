@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
+import com.celements.model.access.exception.DocumentAccessException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -34,6 +35,9 @@ import com.xpn.xwiki.XWikiException;
 public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassesCompositorComponent.class);
+
+  @Requirement
+  private Map<String, IClassCreatorRole> classCreatorMap;
 
   @Requirement
   private Map<String, IClassCollectionRole> classCollectionMap;
@@ -49,11 +53,24 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   }
 
   @Override
-  public void checkAllClassCollections() {
-    LOGGER.info("start checkAllClassCollections for wiki '{}'", getContext().getDatabase());
+  public void checkClasses() {
+    LOGGER.info("start checkClasses for wiki '{}'", getContext().getDatabase());
+    for (IClassCreatorRole classCreator : classCreatorMap.values()) {
+      try {
+        classCreator.createClasses();
+      } catch (DocumentAccessException dae) {
+        LOGGER.error("Exception creating classes for creator '{}'", classCreator.getName(), dae);
+      }
+    }
     checkClassCollections();
     checkOldClassCollections();
-    LOGGER.debug("finish checkAllClassCollections for wiki '{}'", getContext().getDatabase());
+    LOGGER.debug("finish checkClasses for wiki '{}'", getContext().getDatabase());
+  }
+
+  @Override
+  @Deprecated
+  public void checkAllClassCollections() {
+    checkClasses();
   }
 
   @Deprecated
@@ -68,6 +85,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
     }
   }
 
+  @Deprecated
   void checkClassCollections() {
     for (IClassCollectionRole classCollection : classCollectionMap.values()) {
       try {
@@ -81,6 +99,14 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public boolean isActivated(String name) {
+    if (classCreatorMap.containsKey(name)) {
+      return classCreatorMap.get(name).isActivated();
+    } else {
+      return isActivatedOld(name);
+    }
+  }
+
+  private boolean isActivatedOld(String name) {
     // TODO build map in initialize with key name and value hint to avoid loop here
     for (IClassCollectionRole classCollection : classCollectionMap.values()) {
       if (classCollection.getConfigName().equals(name)) {

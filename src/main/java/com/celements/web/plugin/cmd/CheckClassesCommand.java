@@ -52,7 +52,7 @@ public class CheckClassesCommand {
     IClassesCompositorComponent compComponent = Utils.getComponent(
         IClassesCompositorComponent.class);
     if (compComponent != null) {
-      compComponent.checkAllClassCollections();
+      compComponent.checkClasses();
     }
   }
 

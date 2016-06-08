@@ -43,9 +43,11 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  * Extend CelementsClassCollection and make the implementor a named component. Celements
  * then will call your initClasses method on system start once or if it is explicitly
  * asked for.
- * 
+ *
  * @author fabian pichler since 2.18.0
+ * @deprecated instead use {@link AbstractClassCreator}
  */
+@Deprecated
 public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   @Requirement
@@ -79,8 +81,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
     try {
       return modelAccess.getOrCreateDocument(classRef);
     } catch (DocumentLoadException docLoadExp) {
-      getLogger().error("Failed getting classDoc for classRef '" + classRef + "'",
-          docLoadExp);
+      getLogger().error("Failed getting classDoc for classRef '" + classRef + "'", docLoadExp);
       return new XWikiDocument(classRef);
     }
   }

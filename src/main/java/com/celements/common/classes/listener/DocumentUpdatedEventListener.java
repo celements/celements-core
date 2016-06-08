@@ -52,15 +52,18 @@ public class DocumentUpdatedEventListener implements EventListener {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public List<Event> getEvents() {
     LOGGER.info("getEvents: registering for document update events.");
     return Arrays.<Event>asList(new DocumentUpdatedEvent());
   }
 
+  @Override
   public String getName() {
     return "celements.classes.DocumentUpdatedEventListener";
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     if (source instanceof XWikiDocument) {
       XWikiDocument document = (XWikiDocument) source;
@@ -70,7 +73,7 @@ public class DocumentUpdatedEventListener implements EventListener {
       if (document.getDocumentReference().equals(xwikiPrefDoc)) {
         LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
             + "Collections.");
-        classesCompositor.checkAllClassCollections();
+        classesCompositor.checkClasses();
       } else {
         LOGGER.trace("changes on [" + xwikiPrefDoc + "] saved. NOT checking all Class "
             + "Collections.");
