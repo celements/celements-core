@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.python.google.common.base.Objects;
+import org.xwiki.model.reference.EntityReference;
 
 public class XObjectFieldValue<T> extends XObjectField<T> {
 
@@ -19,12 +20,21 @@ public class XObjectFieldValue<T> extends XObjectField<T> {
 
   public XObjectFieldValue(@NotNull XObjectField<T> field,
       @NotNull Map<XObjectField<?>, ?> fieldMap) {
-    super(field.getClassRef(), field.getName(), field.getToken());
-    this.value = field.getToken().cast(fieldMap.get(field));
+    this(field, field.resolveFromXOjectValue(fieldMap.get(field)));
   }
 
   public T getValue() {
     return value;
+  }
+
+  public Object serializeToXObjectValue() {
+    Object ret = getValue();
+    if (EntityReference.class.isAssignableFrom(getToken())) {
+      ret = getWebUtils().serializeRef((EntityReference) getValue());
+    } else {
+      ret = getValue();
+    }
+    return ret;
   }
 
   @Override
@@ -43,6 +53,12 @@ public class XObjectFieldValue<T> extends XObjectField<T> {
       }
     }
     return false;
+  }
+
+  @Override
+  public XObjectFieldValue<T> clone() {
+    return new XObjectFieldValue<>(new XObjectField<>(getClassRef(), getName(), getToken()),
+        getValue());
   }
 
   @Override

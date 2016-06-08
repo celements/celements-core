@@ -31,41 +31,58 @@ public class XObjectFieldValueTest extends AbstractComponentTest {
 
   @Test
   public void test_equals() throws Exception {
-    String val = "val";
     String name = "name";
+    String val = "val";
     XObjectFieldValue<String> field = new XObjectFieldValue<>(new XObjectField<>(classRef, name,
         String.class), val);
     assertTrue(field.equals(new XObjectFieldValue<String>(new XObjectField<String>(classRef, name,
+        String.class), val)));
+    assertFalse(field.equals(new XObjectFieldValue<String>(new XObjectField<String>(classRef, name,
         String.class), "otherVal")));
-    assertTrue(field.equals(new XObjectField<>(classRef, name, String.class)));
-    assertTrue(field.equals(new XObjectField<Date>(classRef, name, Date.class)));
-    assertFalse(field.equals(new XObjectField<>(classRef, "name2", String.class)));
-    DocumentReference classRefOther = new DocumentReference(classRef);
-    classRefOther.setName("other");
-    assertFalse(field.equals(new XObjectField<>(classRefOther, name, String.class)));
+    assertFalse(field.equals(new XObjectFieldValue<String>(new XObjectField<String>(classRef,
+        "name2", String.class), "otherVal")));
+    assertFalse(field.equals(new XObjectField<>(classRef, name, String.class)));
     assertFalse(field.equals(null));
   }
 
   @Test
   public void test_hashCode() throws Exception {
     String name = "name";
-    XObjectField<String> field = new XObjectField<>(classRef, name, String.class);
+    String val = "val";
+    XObjectFieldValue<String> field = new XObjectFieldValue<>(new XObjectField<>(classRef, name,
+        String.class), val);
     assertTrue(field.hashCode() == new XObjectFieldValue<String>(new XObjectField<String>(classRef,
+        name, String.class), val).hashCode());
+    assertFalse(field.hashCode() == new XObjectFieldValue<String>(new XObjectField<String>(classRef,
         name, String.class), "otherVal").hashCode());
-    assertTrue(field.hashCode() == new XObjectField<>(classRef, name, String.class).hashCode());
-    assertTrue(field.hashCode() == new XObjectField<Date>(classRef, name, Date.class).hashCode());
-    assertFalse(field.hashCode() == new XObjectField<>(classRef, "name2", String.class).hashCode());
-    DocumentReference classRefOther = new DocumentReference(classRef);
-    classRefOther.setName("other");
-    assertFalse(field.hashCode() == new XObjectField<>(classRefOther, name, String.class)
-        .hashCode());
+    assertFalse(field.hashCode() == new XObjectFieldValue<String>(new XObjectField<String>(classRef,
+        "name2", String.class), val).hashCode());
+    assertFalse(field.hashCode() == new XObjectField<>(classRef, name, String.class).hashCode());
+  }
+
+  @Test
+  public void test_serializeToXObjectValue_date() {
+    String name = "name";
+    Date val = new Date();
+    XObjectFieldValue<Date> field = new XObjectFieldValue<>(new XObjectField<>(classRef, name,
+        Date.class), val);
+    assertEquals(val, field.serializeToXObjectValue());
+  }
+
+  @Test
+  public void test_serializeToXObjectValue_ref() {
+    String name = "name";
+    DocumentReference val = classRef;
+    XObjectFieldValue<DocumentReference> field = new XObjectFieldValue<>(new XObjectField<>(
+        classRef, name, DocumentReference.class), val);
+    assertEquals(XObjectField.getWebUtils().serializeRef(val), field.serializeToXObjectValue());
   }
 
   @Test
   public void test_toString() throws Exception {
     XObjectField<String> field = new XObjectFieldValue<String>(new XObjectField<String>(classRef,
         "name", String.class), "val");
-    assertEquals("class.any.name", field.toString());
+    assertEquals("class.any.name: val", field.toString());
   }
 
 }

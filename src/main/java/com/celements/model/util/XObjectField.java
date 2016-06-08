@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.web.service.IWebUtilsService;
@@ -31,8 +32,8 @@ public class XObjectField<T> {
   public XObjectField(@Nullable String wiki, @NotNull String classSpace, @NotNull String className,
       @NotNull String name, @NotNull Class<T> token) {
     this(new DocumentReference(Objects.requireNonNull(Strings.emptyToNull(className)),
-        new SpaceReference(Objects.requireNonNull(Strings.emptyToNull(classSpace)), getWebUtils()
-            .resolveWikiReference(wiki))), name, token);
+        new SpaceReference(Objects.requireNonNull(Strings.emptyToNull(classSpace)),
+            getWebUtils().resolveWikiReference(wiki))), name, token);
   }
 
   public XObjectField(@NotNull String classSpace, @NotNull String className, @NotNull String name,
@@ -48,8 +49,24 @@ public class XObjectField<T> {
     return name;
   }
 
-  public Class<T> getToken() {
+  protected Class<T> getToken() {
     return token;
+  }
+
+  @SuppressWarnings("unchecked")
+  public T resolveFromXOjectValue(Object obj) {
+    try {
+      T ret;
+      if (EntityReference.class.isAssignableFrom(getToken())) {
+        ret = (T) getWebUtils().resolveReference(obj.toString(),
+            (Class<? extends EntityReference>) getToken());
+      } else {
+        ret = getToken().cast(obj);
+      }
+      return ret;
+    } catch (ClassCastException ex) {
+      throw new IllegalArgumentException("XObjectField ill defined: " + this.toString(), ex);
+    }
   }
 
   @Override
@@ -61,10 +78,15 @@ public class XObjectField<T> {
   public boolean equals(Object obj) {
     if (obj instanceof XObjectField) {
       XObjectField<?> other = (XObjectField<?>) obj;
-      return new EqualsBuilder().append(getClassRef(), other.getClassRef()).append(getName(), other
-          .getName()).isEquals();
+      return new EqualsBuilder().append(getClassRef(), other.getClassRef()).append(getName(),
+          other.getName()).isEquals();
     }
     return false;
+  }
+
+  @Override
+  public XObjectField<T> clone() {
+    return new XObjectField<>(getClassRef(), getName(), getToken());
   }
 
   @Override

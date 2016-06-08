@@ -73,8 +73,26 @@ public class XObjectFieldTest extends AbstractComponentTest {
     assertFalse(field.hashCode() == new XObjectField<>(classRef, "name2", String.class).hashCode());
     DocumentReference classRefOther = new DocumentReference(classRef);
     classRefOther.setName("other");
-    assertFalse(field.hashCode() == new XObjectField<>(classRefOther, name, String.class)
-        .hashCode());
+    assertFalse(field.hashCode() == new XObjectField<>(classRefOther, name,
+        String.class).hashCode());
+  }
+
+  @Test
+  public void test_resolveFromXOjectValue_date() {
+    String name = "name";
+    Date val = new Date();
+    XObjectField<Date> field = new XObjectField<>(classRef, name, Date.class);
+    assertEquals(val, field.resolveFromXOjectValue(val));
+  }
+
+  @Test
+  public void test_resolveFromXOjectValue_ref() {
+    String name = "name";
+    DocumentReference val = classRef;
+    XObjectField<DocumentReference> field = new XObjectField<>(classRef, name,
+        DocumentReference.class);
+    assertEquals(classRef, field.resolveFromXOjectValue(XObjectField.getWebUtils().serializeRef(
+        val)));
   }
 
   @Test
