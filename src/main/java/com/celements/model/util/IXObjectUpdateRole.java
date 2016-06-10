@@ -35,7 +35,7 @@ public interface IXObjectUpdateRole {
    * @throws ClassDocumentLoadException
    *           if encountered invalid class name
    */
-  public boolean update(XWikiDocument doc, Set<XObjectFieldValue<?>> fieldValues)
+  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues)
       throws ClassDocumentLoadException;
 
 }

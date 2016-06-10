@@ -13,6 +13,7 @@ import org.xwiki.component.annotation.Requirement;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Objects;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -86,18 +87,18 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   }
 
   @Override
-  public boolean update(XWikiDocument doc, Set<XObjectFieldValue<?>> fieldValues)
+  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues)
       throws ClassDocumentLoadException {
     boolean hasChanged = false;
-    for (XObjectFieldValue<?> field : fieldValues) {
-      Object oldVal = modelAccess.getProperty(doc, field);
-      if (!ObjectUtils.equals(oldVal, field.getValue())) {
-        modelAccess.setProperty(doc, field);
+    for (ClassFieldValue<?> fieldValue : fieldValues) {
+      Object oldVal = modelAccess.getProperty(doc, fieldValue.getField());
+      if (!Objects.equal(oldVal, fieldValue.getValue())) {
+        modelAccess.setProperty(doc, fieldValue);
         hasChanged = true;
-        LOGGER.trace("update: '" + field + "' has changed from '" + oldVal + "'");
+        LOGGER.trace("update: '{}' has changed from '{}'", fieldValue.getField(), oldVal);
       }
     }
-    LOGGER.info("update: for doc " + doc + "' hasChanged '" + hasChanged + "'");
+    LOGGER.info("update: for doc '{}' hasChanged '{}'", doc, hasChanged);
     return hasChanged;
   }
 
