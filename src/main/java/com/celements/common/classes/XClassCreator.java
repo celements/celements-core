@@ -22,24 +22,23 @@ package com.celements.common.classes;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAccessException;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.Utils;
 
-/**
- * Can be implemented to create custom {@link BaseClass} definitions CelementsClassCollection and
- * make the implementor a named component.
- * Celements then will call your initClasses method on system start once or if it
- * is explicitly asked for.
- *
- * @author Marc Sladek
- */
-public abstract class AbstractClassCreator implements IClassCreatorRole {
+public class XClassCreator implements XClassCreatorRole {
+
+  private static Logger LOGGER = LoggerFactory.getLogger(XClassCreator.class);
 
   @Requirement
   protected IModelAccessFacade modelAccess;
@@ -51,27 +50,25 @@ public abstract class AbstractClassCreator implements IClassCreatorRole {
   protected ConfigurationSource configSrc;
 
   @Override
-  public void createClasses() throws DocumentAccessException {
-    if (isActivated()) {
-      getLogger().debug("{} - define classes for database '{}'", getName(), webUtils.getWikiRef());
-      for (ClassDefinition classDef : getClassDefinitions()) {
-        createClassDefinition(classDef);
-        getLogger().debug("{} - defined class '{}'", getName(), classDef.getClassRef());
+  public void createXClasses() throws DocumentAccessException {
+    LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
+    for (ClassDefinition classDef : Utils.getComponentList(ClassDefinition.class)) {
+      if (!isBlacklisted(classDef)) {
+        createXClass(classDef);
+        LOGGER.debug("created class '{}'", classDef.getName());
+      } else {
+        LOGGER.info("skipping blacklisted class '{}'", classDef.getName());
       }
-    } else {
-      getLogger().info("{} - skipping not activated class definition", getName());
     }
   }
 
-  @Override
-  public boolean isActivated() {
-    String key = "celements.classcollections";
-    return configSrc.containsKey(key) && configSrc.<List<?>>getProperty(key).contains(getName());
+  private boolean isBlacklisted(ClassDefinition classDef) {
+    String key = "celements.classdefinition.blacklist";
+    return configSrc.containsKey(key) && configSrc.<List<?>>getProperty(key).contains(
+        classDef.getName());
   }
 
-  abstract protected List<ClassDefinition> getClassDefinitions();
-
-  private void createClassDefinition(ClassDefinition classDef) throws DocumentAccessException {
+  private void createXClass(ClassDefinition classDef) throws DocumentAccessException {
     XWikiDocument classDoc = modelAccess.getOrCreateDocument(classDef.getClassRef());
     BaseClass bClass = classDoc.getXClass();
     boolean needsUpdate = classDoc.isNew();
@@ -79,12 +76,17 @@ public abstract class AbstractClassCreator implements IClassCreatorRole {
       bClass.setCustomMapping("internal");
       needsUpdate = true;
     }
-    needsUpdate |= classDef.defineProperties(bClass);
+    for (ClassField<?> field : classDef.getFields()) {
+      if (bClass.get(field.getName()) == null) {
+        PropertyInterface xField = field.getXField();
+        xField.setObject(bClass);
+        bClass.addField(field.getName(), xField);
+        needsUpdate = true;
+      }
+    }
     if (needsUpdate) {
       modelAccess.saveDocument(classDoc);
     }
   }
-
-  protected abstract Logger getLogger();
 
 }

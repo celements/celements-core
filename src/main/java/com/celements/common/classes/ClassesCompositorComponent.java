@@ -37,7 +37,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassesCompositorComponent.class);
 
   @Requirement
-  private Map<String, IClassCreatorRole> classCreatorMap;
+  private XClassCreatorRole classCreator;
 
   @Requirement
   private Map<String, IClassCollectionRole> classCollectionMap;
@@ -55,12 +55,10 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   @Override
   public void checkClasses() {
     LOGGER.info("start checkClasses for wiki '{}'", getContext().getDatabase());
-    for (IClassCreatorRole classCreator : classCreatorMap.values()) {
-      try {
-        classCreator.createClasses();
-      } catch (DocumentAccessException dae) {
-        LOGGER.error("Exception creating classes for creator '{}'", classCreator.getName(), dae);
-      }
+    try {
+      classCreator.createXClasses();
+    } catch (DocumentAccessException dae) {
+      LOGGER.error("Exception creating classes", dae);
     }
     checkClassCollections();
     checkOldClassCollections();
@@ -99,14 +97,6 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public boolean isActivated(String name) {
-    if (classCreatorMap.containsKey(name)) {
-      return classCreatorMap.get(name).isActivated();
-    } else {
-      return isActivatedOld(name);
-    }
-  }
-
-  private boolean isActivatedOld(String name) {
     // TODO build map in initialize with key name and value hint to avoid loop here
     for (IClassCollectionRole classCollection : classCollectionMap.values()) {
       if (classCollection.getConfigName().equals(name)) {
