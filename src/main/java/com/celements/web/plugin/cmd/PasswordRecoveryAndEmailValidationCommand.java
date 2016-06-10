@@ -26,9 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -46,7 +46,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
 
   private static final String CEL_PASSWORD_RECOVERY_SUBJECT_KEY = "cel_password_recovery_default_subject";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger LOGGER = LoggerFactory.getLogger(
       PasswordRecoveryAndEmailValidationCommand.class);
 
   static final String CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY = "cel_register_acount_activation_mail_subject";
