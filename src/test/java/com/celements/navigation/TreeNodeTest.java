@@ -19,6 +19,7 @@
  */
 package com.celements.navigation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -27,10 +28,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWikiContext;
 
-public class TreeNodeTest extends AbstractBridgedComponentTestCase {
+public class TreeNodeTest extends AbstractComponentTest {
 
   private DocumentReference docRef;
   private XWikiContext context;
