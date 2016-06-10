@@ -161,14 +161,18 @@ public class TreeNode {
     }
     // object must be Test at this point
     TreeNode node = (TreeNode) obj;
-    return docRef.equals(node.docRef) && (position == node.position);
+    if (docRef.equals(node.docRef)) {
+      return (((position == null) && (node.position == null)) || ((position != null)
+          && position.equals(node.position)));
+    }
+    return false;
   }
 
   @Override
   public int hashCode() {
     int hash = 7;
-    hash = 31 * hash + (position == null ? 0 : position.hashCode());
-    hash = 31 * hash + (docRef == null ? 0 : docRef.hashCode());
+    hash = (31 * hash) + (position == null ? 0 : position.hashCode());
+    hash = (31 * hash) + (docRef == null ? 0 : docRef.hashCode());
     return hash;
   }
 

@@ -88,6 +88,16 @@ public class TreeNodeTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testEquals_position_notSameInteger() {
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", new Integer(1));
+    treeNode.setPosition(new Integer(1));
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
+    verifyDefault();
+  }
+
+  @Test
   public void testEquals_null() {
     replayDefault();
     assertFalse(treeNode.equals(null));
