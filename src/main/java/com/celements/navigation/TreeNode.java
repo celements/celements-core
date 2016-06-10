@@ -156,7 +156,7 @@ public class TreeNode {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || (obj.getClass() != this.getClass())) {
+    if (!(obj instanceof TreeNode)) { // null check included
       return false;
     }
     // object must be Test at this point

@@ -88,6 +88,15 @@ public class TreeNodeTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testEquals_not_getClass() {
+    TreeNode treeNodeTest = new TestTreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", 1);
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
+    verifyDefault();
+  }
+
+  @Test
   public void testEquals_position_notSameInteger() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
         "myPage"), "", new Integer(1));
@@ -203,4 +212,11 @@ public class TreeNodeTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  private class TestTreeNode extends TreeNode {
+
+    public TestTreeNode(DocumentReference docRef, String parent, Integer position) {
+      super(docRef, parent, position);
+    }
+
+  }
 }
