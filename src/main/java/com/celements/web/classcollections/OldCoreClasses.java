@@ -34,62 +34,50 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.oldCoreClasses")
 public class OldCoreClasses extends AbstractClassCollection {
 
-
   private static Log LOGGER = LogFactory.getFactory().getInstance(OldCoreClasses.class);
 
   @Deprecated
-  public static final String PHOTO_ALBUM_CLASS_DOC =
-      IOldCoreClassConfig.PHOTO_ALBUM_CLASS_DOC;
+  public static final String PHOTO_ALBUM_CLASS_DOC = IOldCoreClassConfig.PHOTO_ALBUM_CLASS_DOC;
   @Deprecated
-  public static final String PHOTO_ALBUM_CLASS_SPACE =
-      IOldCoreClassConfig.PHOTO_ALBUM_CLASS_SPACE;
+  public static final String PHOTO_ALBUM_CLASS_SPACE = IOldCoreClassConfig.PHOTO_ALBUM_CLASS_SPACE;
   @Deprecated
   public static final String PHOTO_ALBUM_CLASS = PHOTO_ALBUM_CLASS_SPACE + "."
       + PHOTO_ALBUM_CLASS_DOC;
   @Deprecated
-  public static final String PHOTO_ALBUM_GALLERY_LAYOUT =
-      IOldCoreClassConfig.PHOTO_ALBUM_GALLERY_LAYOUT;
+  public static final String PHOTO_ALBUM_GALLERY_LAYOUT = IOldCoreClassConfig.PHOTO_ALBUM_GALLERY_LAYOUT;
 
   @Deprecated
-  public static final String XWIKI_USERS_CLASS_DOC =
-      IOldCoreClassConfig.XWIKI_USERS_CLASS_DOC;
+  public static final String XWIKI_USERS_CLASS_DOC = IOldCoreClassConfig.XWIKI_USERS_CLASS_DOC;
   @Deprecated
-  public static final String XWIKI_USERS_CLASS_SPACE =
-      IOldCoreClassConfig.XWIKI_USERS_CLASS_SPACE;
+  public static final String XWIKI_USERS_CLASS_SPACE = IOldCoreClassConfig.XWIKI_USERS_CLASS_SPACE;
   @Deprecated
   public static final String XWIKI_USERS_CLASS = XWIKI_USERS_CLASS_SPACE + "."
       + XWIKI_USERS_CLASS_DOC;
 
   @Deprecated
-  public static final String XWIKI_PREFERENCES_CLASS_DOC =
-      IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC;
+  public static final String XWIKI_PREFERENCES_CLASS_DOC = IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_DOC;
   @Deprecated
-  public static final String XWIKI_PREFERENCES_CLASS_SPACE =
-      IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_SPACE;
+  public static final String XWIKI_PREFERENCES_CLASS_SPACE = IOldCoreClassConfig.XWIKI_PREFERENCES_CLASS_SPACE;
   @Deprecated
   public static final String XWIKI_PREFERENCES_CLASS = XWIKI_PREFERENCES_CLASS_SPACE + "."
-        + XWIKI_PREFERENCES_CLASS_DOC;
+      + XWIKI_PREFERENCES_CLASS_DOC;
   @Deprecated
-  public static final String XWIKI_PREFERENCES_CELLOGIN_PROPERTY =
-      IOldCoreClassConfig.XWIKI_PREFERENCES_CELLOGIN_PROPERTY;
+  public static final String XWIKI_PREFERENCES_CELLOGIN_PROPERTY = IOldCoreClassConfig.XWIKI_PREFERENCES_CELLOGIN_PROPERTY;
 
   @Deprecated
   public static final String IMPORT_CLASS_DOC = IOldCoreClassConfig.IMPORT_CLASS_DOC;
   @Deprecated
   public static final String IMPORT_CLASS_SPACE = IOldCoreClassConfig.IMPORT_CLASS_SPACE;
   @Deprecated
-  public static final String IMPORT_CLASS = IMPORT_CLASS_SPACE + "."
-        + IMPORT_CLASS_DOC;
+  public static final String IMPORT_CLASS = IMPORT_CLASS_SPACE + "." + IMPORT_CLASS_DOC;
 
   @Deprecated
-  public static final String FILEBASE_TAG_CLASS_DOC =
-      IOldCoreClassConfig.FILEBASE_TAG_CLASS_DOC;
+  public static final String FILEBASE_TAG_CLASS_DOC = IOldCoreClassConfig.FILEBASE_TAG_CLASS_DOC;
   @Deprecated
-  public static final String FILEBASE_TAG_CLASS_SPACE =
-      IOldCoreClassConfig.FILEBASE_TAG_CLASS_SPACE;
+  public static final String FILEBASE_TAG_CLASS_SPACE = IOldCoreClassConfig.FILEBASE_TAG_CLASS_SPACE;
   @Deprecated
   public static final String FILEBASE_TAG_CLASS = FILEBASE_TAG_CLASS_SPACE + "."
-        + FILEBASE_TAG_CLASS_DOC;
+      + FILEBASE_TAG_CLASS_DOC;
 
   @Deprecated
   public static final String RTE_CONFIG_TYPE_CLASS_DOC = "RTEConfigTypeClass";
@@ -97,25 +85,21 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String RTE_CONFIG_TYPE_CLASS_SPACE = "Classes";
   @Deprecated
   public static final String RTE_CONFIG_TYPE_CLASS = RTE_CONFIG_TYPE_CLASS_SPACE + "."
-        + RTE_CONFIG_TYPE_CLASS_DOC;
+      + RTE_CONFIG_TYPE_CLASS_DOC;
 
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC =
-      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_DOC = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_DOC;
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE =
-      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE;
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS_SPACE;
   @Deprecated
-  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS =
-      RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
+  public static final String RTE_CONFIG_TYPE_PRPOP_CLASS = RTEConfigClasses.RTE_CONFIG_TYPE_PRPOP_CLASS;
 
   @Deprecated
   public static final String KEY_VALUE_CLASS_DOC = "KeyValueClass";
   @Deprecated
   public static final String KEY_VALUE_CLASS_SPACE = "Classes";
   @Deprecated
-  public static final String KEY_VALUE_CLASS = KEY_VALUE_CLASS_SPACE + "."
-        + KEY_VALUE_CLASS_DOC;
+  public static final String KEY_VALUE_CLASS = KEY_VALUE_CLASS_SPACE + "." + KEY_VALUE_CLASS_DOC;
 
   @Deprecated
   public static final String TOKEN_CLASS_DOC = "TokenClass";
@@ -138,15 +122,14 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String PANEL_CONFIG_CLASS_SPACE = "Class";
   @Deprecated
   public static final String PANEL_CONFIG_CLASS = PANEL_CONFIG_CLASS_SPACE + "."
-        + PANEL_CONFIG_CLASS_DOC;
+      + PANEL_CONFIG_CLASS_DOC;
 
   @Deprecated
   public static final String FORM_MAIL_CLASS_DOC = "FormMailClass";
   @Deprecated
   public static final String FORM_MAIL_CLASS_SPACE = "Celements2";
   @Deprecated
-  public static final String FORM_MAIL_CLASS = FORM_MAIL_CLASS_SPACE + "."
-        + FORM_MAIL_CLASS_DOC;
+  public static final String FORM_MAIL_CLASS = FORM_MAIL_CLASS_SPACE + "." + FORM_MAIL_CLASS_DOC;
 
   @Deprecated
   public static final String FORM_ACTION_CLASS_DOC = "FormActionClass";
@@ -154,7 +137,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String FORM_ACTION_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String FORM_ACTION_CLASS = FORM_ACTION_CLASS_SPACE + "."
-        + FORM_ACTION_CLASS_DOC;
+      + FORM_ACTION_CLASS_DOC;
 
   @Deprecated
   public static final String FORM_CONFIG_CLASS_DOC = "FormConfigClass";
@@ -162,7 +145,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String FORM_CONFIG_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String FORM_CONFIG_CLASS = FORM_CONFIG_CLASS_SPACE + "."
-        + FORM_CONFIG_CLASS_DOC;
+      + FORM_CONFIG_CLASS_DOC;
 
   @Deprecated
   public static final String ACTION_TYPE_CLASS_DOC = "ActionTypeClass";
@@ -170,7 +153,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String ACTION_TYPE_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String ACTION_TYPE_CLASS = ACTION_TYPE_CLASS_SPACE + "."
-        + ACTION_TYPE_CLASS_DOC;
+      + ACTION_TYPE_CLASS_DOC;
 
   @Deprecated
   public static final String ACTION_TYPE_PROP_CLASS_DOC = "ActionTypeProperties";
@@ -178,7 +161,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String ACTION_TYPE_PROP_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String ACTION_TYPE_PROP_CLASS = ACTION_TYPE_PROP_CLASS_SPACE + "."
-        + ACTION_TYPE_PROP_CLASS_DOC;
+      + ACTION_TYPE_PROP_CLASS_DOC;
 
   @Deprecated
   public static final String FORM_STORAGE_CLASS_DOC = "FormStorageClass";
@@ -186,7 +169,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String FORM_STORAGE_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String FORM_STORAGE_CLASS = FORM_STORAGE_CLASS_SPACE + "."
-        + FORM_STORAGE_CLASS_DOC;
+      + FORM_STORAGE_CLASS_DOC;
 
   @Deprecated
   public static final String RECEIVER_EMAIL_CLASS_DOC = "ReceiverEMail";
@@ -194,37 +177,36 @@ public class OldCoreClasses extends AbstractClassCollection {
   public static final String RECEIVER_EMAIL_CLASS_SPACE = "Celements2";
   @Deprecated
   public static final String RECEIVER_EMAIL_CLASS = RECEIVER_EMAIL_CLASS_SPACE + "."
-        + RECEIVER_EMAIL_CLASS_DOC;
+      + RECEIVER_EMAIL_CLASS_DOC;
 
   @Deprecated
   public static final String USER_CSS_CLASS_DOC = "UserCSS";
   @Deprecated
   public static final String USER_CSS_CLASS_SPACE = "Skins";
   @Deprecated
-  public static final String USER_CSS_CLASS = USER_CSS_CLASS_SPACE + "."
-        + USER_CSS_CLASS_DOC;
+  public static final String USER_CSS_CLASS = USER_CSS_CLASS_SPACE + "." + USER_CSS_CLASS_DOC;
 
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC = "ExternalFiles";
   @Deprecated
   public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE = "JavaScript";
   @Deprecated
-  public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS =
-      JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE + "."
-          + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
+  public static final String JAVA_SCRIPTS_EXTERNAL_FILES_CLASS = JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE
+      + "." + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC;
 
   @Override
   protected Log getLogger() {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "oldCoreClasses";
   }
 
   @Override
   protected void initClasses() throws XWikiException {
-    //old core xwiki
+    // old core xwiki
     getContext().getWiki().getPrefsClass(getContext());
     getContext().getWiki().getUserClass(getContext());
     getContext().getWiki().getTagClass(getContext());
@@ -304,20 +286,17 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addTextAreaField("cmi_link", "CMItem Link (velocity code)", 80,
-        20);
+    needsUpdate |= bclass.addTextAreaField("cmi_link", "CMItem Link (velocity code)", 80, 20);
     needsUpdate |= bclass.addTextField("cmi_text", "CMItem Link Name", 30);
     needsUpdate |= bclass.addTextField("cmi_icon", "optional CMItem icon", 30);
-    needsUpdate |= bclass
-        .addTextField("cmi_shortcut", "optional shortcut definition", 30);
+    needsUpdate |= bclass.addTextField("cmi_shortcut", "optional shortcut definition", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getPanelConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, PANEL_CONFIG_CLASS_SPACE,
-        PANEL_CONFIG_CLASS_DOC);
+    return new DocumentReference(wikiName, PANEL_CONFIG_CLASS_SPACE, PANEL_CONFIG_CLASS_DOC);
   }
 
   private BaseClass getPanelConfigClass() throws XWikiException {
@@ -335,10 +314,9 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addStaticListField("config_name", "Panel Config Type", 1,
-        false, "leftPanels|rightPanels", "select");
-    needsUpdate |= bclass.addBooleanField("show_panels", "Display the panel column",
-        "yesno");
+    needsUpdate |= bclass.addStaticListField("config_name", "Panel Config Type", 1, false,
+        "leftPanels|rightPanels", "select");
+    needsUpdate |= bclass.addBooleanField("show_panels", "Display the panel column", "yesno");
     needsUpdate |= bclass.addTextField("panels", "Panels displayed", 60);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -366,16 +344,16 @@ public class OldCoreClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("cel_centralfilebase", "Central Filebase", 30);
-    needsUpdate |= bclass.addStaticListField("celements_version",
-        "Celements Version Mode", 1, false, "---|celements2|celements3", "select");
+    needsUpdate |= bclass.addStaticListField("celements_version", "Celements Version Mode", 1,
+        false, "---|celements2|celements3", "select");
     needsUpdate |= bclass.addTextField("cel_edittabs_config", "Tab Config", 30);
     needsUpdate |= bclass.addTextField(XWIKI_PREFERENCES_CELLOGIN_PROPERTY,
         "login data fields for usercredntials", 30);
     needsUpdate |= bclass.addTextField("admin_language", "Admin Language", 30);
     // plugins property works only for the main wiki.
     // needsUpdate |= bclass.addTextField("plugins" , "Additional Plugins", 30);
-    needsUpdate |= bclass.addTextField("activated_classcollections",
-        "Activated Class Collections", 30);
+    needsUpdate |= bclass.addTextField("activated_classcollections", "Activated Class Collections",
+        30);
     needsUpdate |= bclass.addTextField("celGoogleAnalyticsAccount",
         "Google Analytics Account Number", 30);
 
@@ -383,26 +361,22 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
     needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
     needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
-    needsUpdate |= bclass.addTextField("smtp_server_username",
-        "Server username (optional)", 30);
-    needsUpdate |= bclass.addTextField("smtp_server_password",
-        "Server password (optional)", 30);
-    needsUpdate |= bclass.addTextAreaField("javamail_extra_props",
-        "Additional JavaMail properties", 60, 6);
-    needsUpdate |= bclass.addBooleanField("use_navigation_images",
-        "Use Images for Navigation", "yesno");
-    needsUpdate |= bclass.addBooleanField("publishdate_active",
-        "Activate Publication Date", "yesno");
-    needsUpdate |= bclass.addBooleanField("extract_active", "Activate Document Extracts",
+    needsUpdate |= bclass.addTextField("smtp_server_username", "Server username (optional)", 30);
+    needsUpdate |= bclass.addTextField("smtp_server_password", "Server password (optional)", 30);
+    needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties",
+        60, 6);
+    needsUpdate |= bclass.addBooleanField("use_navigation_images", "Use Images for Navigation",
         "yesno");
+    needsUpdate |= bclass.addBooleanField("publishdate_active", "Activate Publication Date",
+        "yesno");
+    needsUpdate |= bclass.addBooleanField("extract_active", "Activate Document Extracts", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getXWikiUsersClassRef(String wikiName) {
-    return new DocumentReference(wikiName, XWIKI_USERS_CLASS_SPACE,
-        XWIKI_USERS_CLASS_DOC);
+    return new DocumentReference(wikiName, XWIKI_USERS_CLASS_SPACE, XWIKI_USERS_CLASS_DOC);
   }
 
   private BaseClass getXWikiUsersClass() throws XWikiException {
@@ -422,21 +396,18 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change",
-        "yesno");
-    needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language",
-        4);
+    needsUpdate |= bclass.addBooleanField("force_pwd_change", "force_pwd_change", "yesno");
+    needsUpdate |= bclass.addTextField("admin_language", "User Edit-Interface Language", 4);
 
-    LOGGER.debug("checking XWikiUsers Class for " + getContext().getDatabase()
-        + " update needed: " + needsUpdate);
+    LOGGER.debug("checking XWikiUsers Class for " + getContext().getDatabase() + " update needed: "
+        + needsUpdate);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getFormMailClassRef(String wikiName) {
-    return new DocumentReference(wikiName, FORM_MAIL_CLASS_SPACE,
-        FORM_MAIL_CLASS_DOC);
+    return new DocumentReference(wikiName, FORM_MAIL_CLASS_SPACE, FORM_MAIL_CLASS_DOC);
   }
 
   private BaseClass getFormMailClass() throws XWikiException {
@@ -464,8 +435,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getPhotoAlbumClassRef(String wikiName) {
-    return new DocumentReference(wikiName, PHOTO_ALBUM_CLASS_SPACE,
-        PHOTO_ALBUM_CLASS_DOC);
+    return new DocumentReference(wikiName, PHOTO_ALBUM_CLASS_SPACE, PHOTO_ALBUM_CLASS_DOC);
   }
 
   private BaseClass getPhotoAlbumClass() throws XWikiException {
@@ -493,19 +463,19 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addBooleanField("hasOverview", "hasOverview", "yesno");
     needsUpdate |= bclass.addStaticListField("theme", "theme",
         "grey|black|red|green|blue|gold|orange");
-    needsUpdate |= bclass.addTextField(PHOTO_ALBUM_GALLERY_LAYOUT,
-        "image gallery slideshow layout", 30);
+    needsUpdate |= bclass.addTextField(PHOTO_ALBUM_GALLERY_LAYOUT, "image gallery slideshow layout",
+        30);
     needsUpdate |= bclass.addNumberField("initialdelay", "initialdelay", 30, "long");
     needsUpdate |= bclass.addNumberField("frequency", "frequency", 30, "long");
     needsUpdate |= bclass.addBooleanField("thumbDescription", "Thumbnail Description", "yesno");
+    needsUpdate |= addBooleanField(bclass, "showDescription", "is description shown", "yesno", 1);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getFilebaseTagClassRef(String wikiName) {
-    return new DocumentReference(wikiName, FILEBASE_TAG_CLASS_SPACE,
-        FILEBASE_TAG_CLASS_DOC);
+    return new DocumentReference(wikiName, FILEBASE_TAG_CLASS_SPACE, FILEBASE_TAG_CLASS_DOC);
   }
 
   private BaseClass getFilebaseTagClass() throws XWikiException {
@@ -530,8 +500,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getImportClassRef(String wikiName) {
-    return new DocumentReference(wikiName, IMPORT_CLASS_SPACE,
-        IMPORT_CLASS_DOC);
+    return new DocumentReference(wikiName, IMPORT_CLASS_SPACE, IMPORT_CLASS_DOC);
   }
 
   private BaseClass getImportClass() throws XWikiException {
@@ -551,8 +520,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("filebaseTagDocName", "filebaseTagDocName", 30);
     needsUpdate |= bclass.addTextField("preimport_link", "preimport_link", 30);
-    needsUpdate |= bclass.addTextField("allowed_file_extentions",
-        "allowed_file_extentions", 30);
+    needsUpdate |= bclass.addTextField("allowed_file_extentions", "allowed_file_extentions", 30);
     needsUpdate |= bclass.addTextAreaField("js_preimport_function",
         "js_preimport_function (optional)", 80, 15);
     needsUpdate |= bclass.addTextField("encoding", "encoding (optional)", 30);
@@ -562,8 +530,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getUserCssClassRef(String wikiName) {
-    return new DocumentReference(wikiName, USER_CSS_CLASS_SPACE,
-        USER_CSS_CLASS_DOC);
+    return new DocumentReference(wikiName, USER_CSS_CLASS_SPACE, USER_CSS_CLASS_DOC);
   }
 
   private BaseClass getUserCSSClass() throws XWikiException {
@@ -593,8 +560,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getFormActionClassRef(String wikiName) {
-    return new DocumentReference(wikiName, FORM_ACTION_CLASS_SPACE,
-        FORM_ACTION_CLASS_DOC);
+    return new DocumentReference(wikiName, FORM_ACTION_CLASS_SPACE, FORM_ACTION_CLASS_DOC);
   }
 
   private BaseClass getFormActionClass() throws XWikiException {
@@ -613,16 +579,14 @@ public class OldCoreClasses extends AbstractClassCollection {
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
     needsUpdate |= bclass.addTextField("doc_fullName", "doc_fullName", 30);
-    needsUpdate |= bclass.addTextAreaField("completeRuleSnippet",
-        "is Form complete Rule", 80, 15);
+    needsUpdate |= bclass.addTextAreaField("completeRuleSnippet", "is Form complete Rule", 80, 15);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   public DocumentReference getFormConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, FORM_CONFIG_CLASS_SPACE,
-        FORM_CONFIG_CLASS_DOC);
+    return new DocumentReference(wikiName, FORM_CONFIG_CLASS_SPACE, FORM_CONFIG_CLASS_DOC);
   }
 
   private BaseClass getFormConfigClass() throws XWikiException {
@@ -650,8 +614,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getActionTypeClassRef(String wikiName) {
-    return new DocumentReference(wikiName, ACTION_TYPE_CLASS_SPACE,
-        ACTION_TYPE_CLASS_DOC);
+    return new DocumentReference(wikiName, ACTION_TYPE_CLASS_SPACE, ACTION_TYPE_CLASS_DOC);
   }
 
   private BaseClass getActionTypeClass() throws XWikiException {
@@ -683,8 +646,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   private BaseClass getActionTypePropertiesClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = getActionTypePropertiesClassRef(
-        getContext().getDatabase());
+    DocumentReference classRef = getActionTypePropertiesClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
@@ -709,8 +671,7 @@ public class OldCoreClasses extends AbstractClassCollection {
    */
   @Deprecated
   public DocumentReference getFromStorageClassRef(String wikiName) {
-    return new DocumentReference(wikiName, FORM_STORAGE_CLASS_SPACE,
-        FORM_STORAGE_CLASS_DOC);
+    return new DocumentReference(wikiName, FORM_STORAGE_CLASS_SPACE, FORM_STORAGE_CLASS_DOC);
   }
 
   private BaseClass getFormStorageClass() throws XWikiException {
@@ -738,8 +699,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getReceiverEmailClassRef(String wikiName) {
-    return new DocumentReference(wikiName, RECEIVER_EMAIL_CLASS_SPACE,
-        RECEIVER_EMAIL_CLASS_DOC);
+    return new DocumentReference(wikiName, RECEIVER_EMAIL_CLASS_SPACE, RECEIVER_EMAIL_CLASS_DOC);
   }
 
   private BaseClass getReceiverEMailClass() throws XWikiException {
@@ -764,22 +724,19 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getJavaScriptExternalFilesClassRef(String wikiName) {
-    return new DocumentReference(wikiName,
-        JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE, JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC);
+    return new DocumentReference(wikiName, JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_SPACE,
+        JAVA_SCRIPTS_EXTERNAL_FILES_CLASS_DOC);
   }
 
-  private BaseClass getJavaScriptExternalFilesClass()
-      throws XWikiException {
+  private BaseClass getJavaScriptExternalFilesClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference classRef = getJavaScriptExternalFilesClassRef(
-        getContext().getDatabase());
+    DocumentReference classRef = getJavaScriptExternalFilesClassRef(getContext().getDatabase());
 
     try {
       doc = getContext().getWiki().getDocument(classRef, getContext());
     } catch (XWikiException exp) {
-      LOGGER.error("Failed to get " + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS
-          + " class document. ", exp);
+      LOGGER.error("Failed to get " + JAVA_SCRIPTS_EXTERNAL_FILES_CLASS + " class document. ", exp);
       doc = new XWikiDocument(classRef);
       needsUpdate = true;
     }
@@ -793,8 +750,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getRTEConfigTypeClassRef(String wikiName) {
-    return new DocumentReference(wikiName, RTE_CONFIG_TYPE_CLASS_SPACE,
-        RTE_CONFIG_TYPE_CLASS_DOC);
+    return new DocumentReference(wikiName, RTE_CONFIG_TYPE_CLASS_SPACE, RTE_CONFIG_TYPE_CLASS_DOC);
   }
 
   private BaseClass getRTEConfigTypeClass() throws XWikiException {
@@ -864,8 +820,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getTokenClassRef(String wikiName) {
-    return new DocumentReference(wikiName, TOKEN_CLASS_SPACE,
-        TOKEN_CLASS_DOC);
+    return new DocumentReference(wikiName, TOKEN_CLASS_SPACE, TOKEN_CLASS_DOC);
   }
 
   private BaseClass getTokenClass() throws XWikiException {
@@ -896,8 +851,7 @@ public class OldCoreClasses extends AbstractClassCollection {
   }
 
   public DocumentReference getOverlayConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, OVERLAY_CONFIG_CLASS_SPACE,
-        OVERLAY_CONFIG_CLASS_DOC);
+    return new DocumentReference(wikiName, OVERLAY_CONFIG_CLASS_SPACE, OVERLAY_CONFIG_CLASS_DOC);
   }
 
   private BaseClass getOverlayConfigClass() throws XWikiException {
@@ -915,14 +869,13 @@ public class OldCoreClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(classRef);
-    needsUpdate |= bclass.addBooleanField("loadAdminMenuBar", "Load admin menu bar",
+    needsUpdate |= bclass.addBooleanField("loadAdminMenuBar", "Load admin menu bar", "yesno");
+    needsUpdate |= bclass.addBooleanField("showOverlayLanguageBar", "Show overlay language bar",
         "yesno");
-    needsUpdate |= bclass.addBooleanField("showOverlayLanguageBar",
-        "Show overlay language bar", "yesno");
-    needsUpdate |= bclass.addBooleanField("showCloseOverlayButton",
-        "Show close overlay button", "yesno");
-    needsUpdate |= bclass.addTextField("documentToLoadInOverlay",
-        "Document to load in overlay", 30);
+    needsUpdate |= bclass.addBooleanField("showCloseOverlayButton", "Show close overlay button",
+        "yesno");
+    needsUpdate |= bclass.addTextField("documentToLoadInOverlay", "Document to load in overlay",
+        30);
     needsUpdate |= bclass.addTextAreaField("overlayCSS", "Overlay CSS", 80, 3);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
