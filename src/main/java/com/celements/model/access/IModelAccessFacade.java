@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -17,8 +18,8 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
-import com.celements.model.util.XObjectField;
-import com.celements.model.util.XObjectFieldValue;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -315,17 +316,21 @@ public interface IModelAccessFacade {
    */
   public Object getProperty(BaseObject obj, String name);
 
-  public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull XObjectField<T> field)
+  public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull ClassField<T> field)
       throws DocumentLoadException, DocumentNotExistsException;
 
-  public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull XObjectField<T> field);
+  public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
 
   public boolean setProperty(BaseObject obj, String name, Object value);
 
   public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
-      @NotNull XObjectFieldValue<T> field) throws DocumentLoadException, DocumentNotExistsException;
+      @NotNull ClassField<T> field, @Nullable T value) throws DocumentLoadException,
+          DocumentNotExistsException;
 
-  public <T> boolean setProperty(@NotNull XWikiDocument doc, @NotNull XObjectFieldValue<T> field)
+  public <T> boolean setProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field,
+      @Nullable T value) throws ClassDocumentLoadException;
+
+  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue)
       throws ClassDocumentLoadException;
 
   /**
