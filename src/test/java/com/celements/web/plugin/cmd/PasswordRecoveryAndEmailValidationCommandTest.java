@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -30,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.TestMessageTool;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
@@ -44,8 +45,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class PasswordRecoveryAndEmailValidationCommandTest extends
-    AbstractBridgedComponentTestCase {
+public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
