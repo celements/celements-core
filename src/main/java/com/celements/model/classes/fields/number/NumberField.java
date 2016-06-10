@@ -4,11 +4,11 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.classes.fields.AbstractCelObjectField;
+import com.celements.model.classes.fields.AbstractClassField;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
-public abstract class NumberField<T extends Number> extends AbstractCelObjectField<T> {
+public abstract class NumberField<T extends Number> extends AbstractClassField<T> {
 
   public enum NumberType {
     INTEGER, LONG, FLOAT, DOUBLE;

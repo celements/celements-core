@@ -12,12 +12,12 @@ import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.web.Utils;
 
-public abstract class AbstractCelObjectField<T> implements CelObjectField<T> {
+public abstract class AbstractClassField<T> implements ClassField<T> {
 
   private final DocumentReference classRef;
   private final String name;
 
-  public AbstractCelObjectField(@NotNull DocumentReference classRef, @NotNull String name) {
+  public AbstractClassField(@NotNull DocumentReference classRef, @NotNull String name) {
     this.classRef = Objects.requireNonNull(classRef);
     this.name = Objects.requireNonNull(Strings.emptyToNull(name));
   }
@@ -39,8 +39,8 @@ public abstract class AbstractCelObjectField<T> implements CelObjectField<T> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof AbstractCelObjectField) {
-      AbstractCelObjectField<?> other = (AbstractCelObjectField<?>) obj;
+    if (obj instanceof AbstractClassField) {
+      AbstractClassField<?> other = (AbstractClassField<?>) obj;
       return new EqualsBuilder().append(getClassRef(), other.getClassRef()).append(getName(),
           other.getName()).isEquals();
     }
@@ -59,21 +59,6 @@ public abstract class AbstractCelObjectField<T> implements CelObjectField<T> {
 
   protected static IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public T resolveFromXFieldValue(Object obj) {
-    try {
-      return (T) obj;
-    } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("Field ill defined: " + this, ex);
-    }
-  }
-
-  @Override
-  public Object serializeToXFieldValue(T value) {
-    return value;
   }
 
 }

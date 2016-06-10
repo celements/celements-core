@@ -7,7 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 
-public class StringField extends AbstractCelObjectField<String> {
+public class StringField extends AbstractClassField<String> {
 
   private String prettyName;
   private Integer size;

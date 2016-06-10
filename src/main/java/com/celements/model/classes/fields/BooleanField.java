@@ -7,7 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 
-public class BooleanField extends AbstractCelObjectField<Boolean> {
+public class BooleanField extends AbstractClassField<Boolean> {
 
   private String prettyName;
   private String displayType;

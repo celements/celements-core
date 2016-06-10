@@ -5,12 +5,13 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.model.classes.fields.AbstractCelObjectField;
+import com.celements.model.classes.fields.AbstractClassField;
+import com.celements.model.classes.fields.CustomClassField;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
 public abstract class EntityReferenceField<T extends EntityReference> extends
-    AbstractCelObjectField<T> {
+    AbstractClassField<T> implements CustomClassField<T> {
 
   private String prettyName;
   private Integer size;
@@ -80,12 +81,12 @@ public abstract class EntityReferenceField<T extends EntityReference> extends
   }
 
   @Override
-  public T resolveFromXFieldValue(Object obj) {
+  public T resolve(Object obj) {
     return getWebUtils().resolveReference(obj.toString(), getEntityClass());
   }
 
   @Override
-  public Object serializeToXFieldValue(T value) {
+  public Object serialize(T value) {
     return getWebUtils().serializeRef(value);
   }
 

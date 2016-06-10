@@ -5,10 +5,10 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.classes.fields.CelObjectField;
+import com.celements.model.classes.fields.ClassField;
 
 @ComponentRole
-public interface CelClassDefinition {
+public interface ClassDefinition {
 
   public String getName();
 
@@ -16,6 +16,6 @@ public interface CelClassDefinition {
 
   public boolean isInternalMapping();
 
-  public abstract List<CelObjectField<?>> getFields();
+  public abstract List<ClassField<?>> getFields();
 
 }

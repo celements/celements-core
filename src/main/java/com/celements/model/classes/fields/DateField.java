@@ -9,7 +9,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.DateClass;
 
-public class DateField extends AbstractCelObjectField<Date> {
+public class DateField extends AbstractClassField<Date> {
 
   private String prettyName;
   private Integer size;
