@@ -26,13 +26,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.token.NewCelementsTokenForUserCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -44,10 +51,12 @@ import com.xpn.xwiki.web.Utils;
 
 public class PasswordRecoveryAndEmailValidationCommand {
 
-  private static final String CEL_PASSWORD_RECOVERY_SUBJECT_KEY = "cel_password_recovery_default_subject";
-
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static Logger LOGGER = LoggerFactory.getLogger(
       PasswordRecoveryAndEmailValidationCommand.class);
+
+  public static final String CEL_PASSWORD_RECOVERY_FAILED = "cel_password_recovery_failed";
+
+  public static final String CEL_PASSWORD_RECOVERY_SUBJECT_KEY = "cel_password_recovery_default_subject";
 
   static final String CEL_ACOUNT_ACTIVATION_MAIL_SUBJECT_KEY = "cel_register_acount_activation_mail_subject";
 
@@ -67,52 +76,50 @@ public class PasswordRecoveryAndEmailValidationCommand {
     }
     List<String> params = new ArrayList<String>();
     params.add(email);
-    return getContext().getMessageTool().get("cel_password_recovery_failed", params);
+    return getContext().getMessageTool().get(CEL_PASSWORD_RECOVERY_FAILED, params);
   }
 
   // Allow recovery exclusively for email input
   public String recoverPassword(String account, String input) {
     List<String> params = new ArrayList<String>();
     params.add(input);
-    String resultMsgKey = "cel_password_recovery_failed";
+    String resultMsgKey = CEL_PASSWORD_RECOVERY_FAILED;
     if ((account != null) && (!"".equals(account.trim()))) {
-      account = completeAccountFN(account);
-      DocumentReference accountDocRef = getWebUtilsService().resolveDocumentReference(account);
-      XWikiDocument userDoc = null;
-      BaseObject userObj = null;
-      if (getContext().getWiki().exists(accountDocRef, getContext())) {
-        try {
-          userDoc = getContext().getWiki().getDocument(accountDocRef, getContext());
-        } catch (XWikiException e) {
-          LOGGER.error("Exception getting document '" + account + "'", e);
-        }
-        userObj = userDoc.getXObject(getUserClassRef(accountDocRef.getWikiReference().getName()));
-      }
-      if ((userDoc != null) && (userObj != null)) {
-        String sendResult = null;
-        try {
+      DocumentReference accountDocRef = completeAccountDocRef(account);
+      try {
+        XWikiDocument userDoc = getModelAccess().getDocument(accountDocRef);
+        BaseObject userObj = userDoc.getXObject(getUserClassRef(
+            accountDocRef.getWikiReference().getName()));
+        if (userObj != null) {
+          String sendResult = null;
           sendResult = setForcePwdAndSendMail(account, userObj, userDoc);
-        } catch (XWikiException e) {
-          LOGGER.error("Exception setting ForcePwd or sending mail for user '" + account + "'", e);
+          if (sendResult != null) {
+            resultMsgKey = sendResult;
+          }
         }
-        if (sendResult != null) {
-          resultMsgKey = sendResult;
-        }
+      } catch (DocumentLoadException | DocumentNotExistsException exp) {
+        LOGGER.error("Exception getting document '{}'", account, exp);
+      } catch (XWikiException | DocumentSaveException exp) {
+        LOGGER.error("Exception setting ForcePwd or sending mail for user '{}'", account, exp);
       }
     }
     LOGGER.debug("recover result msg: '" + resultMsgKey + "' param: '" + params.get(0) + "'");
-    return getContext().getMessageTool().get(resultMsgKey, params);
+    return getWebUtilsService().getAdminMessageTool().get(resultMsgKey, params);
   }
 
-  private String completeAccountFN(String account) {
-    if (!account.contains(".")) {
-      account = "XWiki." + account;
+  private DocumentReference completeAccountDocRef(String accountName) {
+    DocumentReference accountDocRef;
+    if (accountName.startsWith("XWiki.")) {
+      accountDocRef = getWebUtilsService().resolveDocumentReference(accountName);
+    } else {
+      accountDocRef = new DocumentReference(getContext().getDatabase(), "XWiki", accountName);
     }
-    return account;
+    return accountDocRef;
   }
 
   private String setForcePwdAndSendMail(String account, BaseObject userObj, XWikiDocument userDoc)
-      throws XWikiException {
+      throws XWikiException, DocumentSaveException, DocumentLoadException,
+      DocumentNotExistsException {
     String result = null;
     if (userObj.getIntValue("active") == 0) {
       sendNewValidation(account);
@@ -139,16 +146,17 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   private String setUserFieldsForPasswordRecovery(XWikiDocument userDoc, BaseObject userObj)
-      throws XWikiException {
+      throws XWikiException, DocumentSaveException {
     userObj.set("force_pwd_change", 1, getContext());
     String validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
     userObj.set("validkey", validkey, getContext());
-    getContext().getWiki().saveDocument(userDoc,
-        "Password Recovery - set validkey and force_pwd_change", true, getContext());
+    getModelAccess().saveDocument(userDoc, "Password Recovery - set validkey and force_pwd_change",
+        true);
     return validkey;
   }
 
-  private int sendRecoveryMail(String email, String lang, String defLang) throws XWikiException {
+  private int sendRecoveryMail(String email, String lang, String defLang) throws XWikiException,
+      DocumentLoadException, DocumentNotExistsException {
     String sender = new CelMailConfiguration().getDefaultAdminSenderAddress();
     String subject = getPasswordRecoverySubject(lang, defLang);
     String textContent = getPasswordRecoveryMailContent("PasswordRecoverMailTextContent", lang,
@@ -163,7 +171,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   private String getPasswordRecoveryMailContent(String template, String lang, String defLang)
-      throws XWikiException {
+      throws XWikiException, DocumentLoadException, DocumentNotExistsException {
     String mailContent = null;
     String newContent = "";
     XWikiDocument doc = getRTEDocWithCelementswebFallback(new DocumentReference(
@@ -182,7 +190,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return mailContent;
   }
 
-  private String getPasswordRecoverySubject(String lang, String defLang) throws XWikiException {
+  private String getPasswordRecoverySubject(String lang, String defLang)
+      throws DocumentLoadException, DocumentNotExistsException {
     String subject = "";
     XWikiDocument doc = getRTEDocWithCelementswebFallback(new DocumentReference(
         getContext().getDatabase(), "Tools", "PasswordRecoverMailTextContent"));
@@ -208,24 +217,34 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   private XWikiDocument getRTEDocWithCelementswebFallback(DocumentReference templateDocRef)
-      throws XWikiException {
+      throws DocumentLoadException, DocumentNotExistsException {
     XWikiDocument doc = null;
     DocumentReference templateCentralDocRef = new DocumentReference("celements2web",
         templateDocRef.getLastSpaceReference().getName(), templateDocRef.getName());
     if (!getDefaultEmptyDocStrategy().isEmptyDocumentTranslated(templateDocRef)) {
-      doc = getContext().getWiki().getDocument(templateDocRef, getContext());
+      doc = getModelAccess().getDocument(templateDocRef);
     } else if (!getDefaultEmptyDocStrategy().isEmptyDocumentTranslated(templateCentralDocRef)) {
-      doc = getContext().getWiki().getDocument(templateCentralDocRef, getContext());
+      doc = getModelAccess().getDocument(templateCentralDocRef);
     }
     return doc;
   }
 
+  /**
+   * @deprecated since 2.79 instead use sendNewValidationToAccountEmail(String, String,
+   *             DocumentReference)
+   */
+  @Deprecated
   public boolean sendNewValidation(String login, String possibleFields) throws XWikiException {
     String user = new UserNameForUserDataCommand().getUsernameForUserData(login, possibleFields,
         getContext());
     return sendNewValidation(user);
   }
 
+  /**
+   * @deprecated since 2.79 instead use sendNewValidationToAccountEmail(String, String,
+   *             DocumentReference)
+   */
+  @Deprecated
   public void sendNewValidation(String login, String possibleFields,
       DocumentReference activationMailDocRef) throws XWikiException {
     String user = new UserNameForUserDataCommand().getUsernameForUserData(login, possibleFields,
@@ -233,44 +252,100 @@ public class PasswordRecoveryAndEmailValidationCommand {
     sendNewValidation(user, activationMailDocRef);
   }
 
+  /**
+   * @deprecated since 2.79 instead use sendNewValidationToAccountEmail(String)
+   */
+  @Deprecated
   public boolean sendNewValidation(String accountName) throws XWikiException {
     return sendNewValidation(accountName, (DocumentReference) null);
   }
 
+  /**
+   * @deprecated since 2.79 instead use sendNewValidationToAccountEmail(String, DocumentReference)
+   */
+  @Deprecated
   public boolean sendNewValidation(String accountName, DocumentReference activationMailDocRef)
       throws XWikiException {
-    accountName = completeAccountFN(accountName);
-    DocumentReference accountDocRef = getWebUtilsService().resolveDocumentReference(accountName);
-    String validkey = getNewValidationTokenForUser(accountDocRef);
-
-    XWikiDocument doc = getContext().getWiki().getDocument(accountDocRef, getContext());
-    BaseObject obj = doc.getXObject(getUserClassRef(accountDocRef.getWikiReference().getName()));
-    String oldLanguage = getContext().getLanguage();
-    String newAdminLanguage = obj.getStringValue("admin_language");
-    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    Object oldAdminLanguage = vcontext.get("admin_language");
-    if ((newAdminLanguage != null) && !"".equals(newAdminLanguage)) {
-      getContext().setLanguage(newAdminLanguage);
-      vcontext.put("admin_language", newAdminLanguage);
-      vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
-    }
-    if (activationMailDocRef == null) {
-      activationMailDocRef = getDefaultAccountActivationMailDocRef();
-    } else if (!getContext().getWiki().exists(activationMailDocRef, getContext())) {
-      LOGGER.warn("Failed to get activation mail [" + activationMailDocRef
-          + "] now using default.");
-      activationMailDocRef = getDefaultAccountActivationMailDocRef();
-    }
-    boolean sentSuccessful = false;
     try {
-      sentSuccessful = sendValidationMessage(obj.getStringValue("email"), validkey,
-          activationMailDocRef, newAdminLanguage, getWebUtilsService().getDefaultAdminLanguage());
-    } finally {
-      getContext().setLanguage(oldLanguage);
-      vcontext.put("admin_language", oldAdminLanguage);
-      vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
+      return sendNewValidationToAccountEmail(accountName, activationMailDocRef);
+    } catch (SendValidationFailedException exp) {
+      if (exp.getCause() instanceof XWikiException) {
+        throw (XWikiException) exp.getCause();
+      } else {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+            XWikiException.ERROR_XWIKI_UNKNOWN, "sendNewValiation failed.", exp);
+      }
     }
-    return sentSuccessful;
+  }
+
+  public boolean sendNewValidationToAccountEmail(String login, String possibleFields)
+      throws SendValidationFailedException {
+    try {
+      String user = new UserNameForUserDataCommand().getUsernameForUserData(login, possibleFields,
+          getContext());
+      return sendNewValidationToAccountEmail(user);
+    } catch (XWikiException exp) {
+      throw new SendValidationFailedException("sending new validation to accountName '" + login
+          + "' failed", exp);
+    }
+  }
+
+  public void sendNewValidationToAccountEmail(String login, String possibleFields,
+      DocumentReference activationMailDocRef) throws SendValidationFailedException {
+    String user;
+    try {
+      user = new UserNameForUserDataCommand().getUsernameForUserData(login, possibleFields,
+          getContext());
+      sendNewValidationToAccountEmail(user, activationMailDocRef);
+    } catch (XWikiException exp) {
+      throw new SendValidationFailedException("sending new validation to accountName '" + login
+          + "' failed", exp);
+    }
+  }
+
+  public boolean sendNewValidationToAccountEmail(String accountName)
+      throws SendValidationFailedException {
+    return sendNewValidationToAccountEmail(accountName, (DocumentReference) null);
+  }
+
+  public boolean sendNewValidationToAccountEmail(String accountName,
+      DocumentReference activationMailDocRef) throws SendValidationFailedException {
+    try {
+      DocumentReference accountDocRef = completeAccountDocRef(accountName);
+      String validkey = getNewValidationTokenForUser(accountDocRef);
+
+      XWikiDocument doc = getModelAccess().getDocument(accountDocRef);
+      BaseObject obj = doc.getXObject(getUserClassRef(accountDocRef.getWikiReference().getName()));
+      String oldLanguage = getContext().getLanguage();
+      String newAdminLanguage = obj.getStringValue("admin_language");
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      Object oldAdminLanguage = vcontext.get("admin_language");
+      if ((newAdminLanguage != null) && !"".equals(newAdminLanguage)) {
+        getContext().setLanguage(newAdminLanguage);
+        vcontext.put("admin_language", newAdminLanguage);
+        vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
+      }
+      if (activationMailDocRef == null) {
+        activationMailDocRef = getDefaultAccountActivationMailDocRef();
+      } else if (!getModelAccess().exists(activationMailDocRef)) {
+        LOGGER.warn("Failed to get activation mail [" + activationMailDocRef
+            + "] now using default.");
+        activationMailDocRef = getDefaultAccountActivationMailDocRef();
+      }
+      boolean sentSuccessful = false;
+      try {
+        sentSuccessful = sendValidationMessage(obj.getStringValue("email"), validkey,
+            activationMailDocRef, newAdminLanguage, getWebUtilsService().getDefaultAdminLanguage());
+      } finally {
+        getContext().setLanguage(oldLanguage);
+        vcontext.put("admin_language", oldAdminLanguage);
+        vcontext.put("adminMsg", getWebUtilsService().getAdminMessageTool());
+      }
+      return sentSuccessful;
+    } catch (XWikiException | DocumentLoadException | DocumentNotExistsException exp) {
+      throw new SendValidationFailedException("sending new validation to accountName '"
+          + accountName + "' failed", exp);
+    }
   }
 
   private DocumentReference getDefaultAccountActivationMailDocRef() {
@@ -278,10 +353,6 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   /**
-   * @param accountName
-   * @param context
-   * @return
-   * @throws XWikiException
    * @Deprecated since 2.14.0 instead use getNewValidationTokenForUser(DocumentReference)
    */
   @Deprecated
@@ -290,18 +361,43 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return getNewValidationTokenForUser(getWebUtilsService().resolveDocumentReference(accountName));
   }
 
+  /**
+   * @deprecated since 2.79 instead use createNewValidationTokenForUser(DocumentReference)
+   */
+  @Deprecated
   public String getNewValidationTokenForUser(DocumentReference accountDocRef)
       throws XWikiException {
-    String validkey = null;
-    if (getContext().getWiki().exists(accountDocRef, getContext())) {
-      validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(getContext());
-      XWikiDocument doc1 = getContext().getWiki().getDocument(accountDocRef, getContext());
+    try {
+      return createNewValidationTokenForUser(accountDocRef);
+    } catch (CreatingValidationTokenFailedException exp) {
+      if (exp.getCause() instanceof XWikiException) {
+        throw (XWikiException) exp.getCause();
+      } else {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+            XWikiException.ERROR_XWIKI_UNKNOWN, "sendNewValiation failed.", exp);
+      }
+    }
+  }
+
+  public String createNewValidationTokenForUser(@NotNull DocumentReference accountDocRef)
+      throws CreatingValidationTokenFailedException {
+    try {
+      XWikiDocument doc1 = getModelAccess().getDocument(accountDocRef);
       BaseObject obj1 = doc1.getXObject(getUserClassRef(
           accountDocRef.getWikiReference().getName()));
+      final String validkey = new NewCelementsTokenForUserCommand().getUniqueValidationKey(
+          getContext());
       obj1.set("validkey", validkey, getContext());
-      getContext().getWiki().saveDocument(doc1, getContext());
+      getModelAccess().saveDocument(doc1, "creating new validkey");
+      return validkey;
+    } catch (XWikiException | DocumentSaveException | DocumentLoadException exp) {
+      throw new CreatingValidationTokenFailedException("Failed to create a new validkey for user "
+          + accountDocRef.getName(), exp);
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.info("creating validkey failed, because user document does not exist for '"
+          + accountDocRef.getName() + "'");
     }
-    return validkey;
+    return null;
   }
 
   private DocumentReference getUserClassRef(String dbName) {
@@ -309,11 +405,6 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   /**
-   * @param to
-   * @param validkey
-   * @param contentDocName
-   * @param context
-   * @throws XWikiException
    * @Deprecated since 2.14.0 instead use sendValidationMessage(String, String,
    *             DocumentReference)
    */
@@ -325,10 +416,6 @@ public class PasswordRecoveryAndEmailValidationCommand {
   }
 
   /**
-   * @param to
-   * @param validkey
-   * @param contentDocRef
-   * @throws XWikiException
    * @Deprecated since 2.34.0 instead use sendValidationMessage(String, String,
    *             DocumentReference, String)
    */
@@ -344,24 +431,49 @@ public class PasswordRecoveryAndEmailValidationCommand {
     sendValidationMessage(to, validkey, contentDocRef, lang, null);
   }
 
+  /**
+   * @deprecated since 2.79 instead use sendValidationMessageToEmailAdr(String, String,
+   *             DocumentReference,
+   *             String, String)
+   */
+  @Deprecated
   public boolean sendValidationMessage(String to, String validkey, DocumentReference contentDocRef,
       String lang, String defLang) throws XWikiException {
-    String sender = "";
-    String subject = "";
-    String content = "";
-    XWikiDocument contentDoc = null;
-    DocumentReference contentCentralDocRef = new DocumentReference("celements2web",
-        contentDocRef.getLastSpaceReference().getName(), contentDocRef.getName());
-    if (getContext().getWiki().exists(contentDocRef, getContext())) {
-      contentDoc = getContext().getWiki().getDocument(contentDocRef, getContext());
-    } else if (getContext().getWiki().exists(contentCentralDocRef, getContext())) {
-      contentDoc = getContext().getWiki().getDocument(contentCentralDocRef, getContext());
+    try {
+      return sendValidationMessageToEmailAdr(to, validkey, contentDocRef, lang, defLang);
+    } catch (SendValidationFailedException exp) {
+      if (exp.getCause() instanceof XWikiException) {
+        throw (XWikiException) exp.getCause();
+      } else {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+            XWikiException.ERROR_XWIKI_UNKNOWN, "sendNewValiation failed.", exp);
+      }
     }
-    sender = getFromEmailAdr(sender, contentDoc);
-    setValidationInfoInContext(to, validkey);
-    content = getValidationEmailContent(contentDoc, lang, defLang);
-    subject = getValidationEmailSubject(contentDoc, lang, defLang);
-    return sendMail(sender, null, to, null, null, subject, content, "", null, null) == 0;
+  }
+
+  public boolean sendValidationMessageToEmailAdr(@NotNull String to, @NotNull String validkey,
+      @NotNull DocumentReference contentDocRef, @Nullable String lang, @Nullable String defLang)
+      throws SendValidationFailedException {
+    try {
+      String sender = "";
+      String subject = "";
+      String content = "";
+      XWikiDocument contentDoc = null;
+      DocumentReference contentCentralDocRef = new DocumentReference("celements2web",
+          contentDocRef.getLastSpaceReference().getName(), contentDocRef.getName());
+      if (getModelAccess().exists(contentDocRef)) {
+        contentDoc = getModelAccess().getDocument(contentDocRef);
+      } else if (getModelAccess().exists(contentCentralDocRef)) {
+        contentDoc = getModelAccess().getDocument(contentCentralDocRef);
+      }
+      sender = getFromEmailAdr(sender, contentDoc);
+      setValidationInfoInContext(to, validkey);
+      content = getValidationEmailContent(contentDoc, lang, defLang);
+      subject = getValidationEmailSubject(contentDoc, lang, defLang);
+      return sendMail(sender, null, to, null, null, subject, content, "", null, null) == 0;
+    } catch (XWikiException | DocumentLoadException | DocumentNotExistsException exp) {
+      throw new SendValidationFailedException("send validation message to " + to + " failed.", exp);
+    }
   }
 
   public String getValidationEmailSubject(XWikiDocument contentDoc, String lang, String defLang)
@@ -385,8 +497,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return subject;
   }
 
-  public String getValidationEmailContent(XWikiDocument contentDoc, String lang, String defLang)
-      throws XWikiException {
+  public String getValidationEmailContent(@Nullable XWikiDocument contentDoc, @Nullable String lang,
+      @Nullable String defLang) throws XWikiException {
     String content = "";
     if (contentDoc != null) {
       content = contentDoc.getTranslatedDocument(lang, getContext()).getRenderedContent(
@@ -403,7 +515,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return new DocumentReference(getContext().getDatabase(), "Mails", "AccountActivationMail");
   }
 
-  public String getFromEmailAdr(String sender, XWikiDocument contentDoc) {
+  public String getFromEmailAdr(@NotNull String sender, @Nullable XWikiDocument contentDoc) {
     if (contentDoc != null) {
       DocumentReference mailSenderClassRef = new DocumentReference(getContext().getDatabase(),
           "Celements2", "FormMailClass");
@@ -418,7 +530,8 @@ public class PasswordRecoveryAndEmailValidationCommand {
     return sender;
   }
 
-  void setValidationInfoInContext(String to, String validkey) throws XWikiException {
+  void setValidationInfoInContext(@NotNull String to, @NotNull String validkey)
+      throws XWikiException {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     vcontext.put("email", to);
     vcontext.put("validkey", validkey);
@@ -444,7 +557,7 @@ public class PasswordRecoveryAndEmailValidationCommand {
   int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
       String htmlContent, String textContent, List<Attachment> attachments,
       Map<String, String> others) {
-    CelSendMail sender = getCelSendMail();
+    IMailObjectRole sender = getCelSendMail();
     sender.setFrom(from);
     sender.setReplyTo(replyTo);
     sender.setTo(to);
@@ -462,11 +575,11 @@ public class PasswordRecoveryAndEmailValidationCommand {
     this.injectedCelSendMail = celSendMail;
   }
 
-  CelSendMail getCelSendMail() {
+  IMailObjectRole getCelSendMail() {
     if (injectedCelSendMail != null) {
       return injectedCelSendMail;
     }
-    return new CelSendMail();
+    return Utils.getComponent(IMailObjectRole.class);
   }
 
   private XWikiContext getContext() {
@@ -483,6 +596,10 @@ public class PasswordRecoveryAndEmailValidationCommand {
 
   private IDefaultEmptyDocStrategyRole getDefaultEmptyDocStrategy() {
     return Utils.getComponent(IDefaultEmptyDocStrategyRole.class);
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
 }
