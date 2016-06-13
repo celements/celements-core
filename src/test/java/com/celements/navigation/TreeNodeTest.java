@@ -19,6 +19,7 @@
  */
 package com.celements.navigation;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -27,10 +28,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWikiContext;
 
-public class TreeNodeTest extends AbstractBridgedComponentTestCase {
+public class TreeNodeTest extends AbstractComponentTest {
 
   private DocumentReference docRef;
   private XWikiContext context;
@@ -81,6 +82,25 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
   public void testEquals() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
         "myPage"), "", 1);
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
+    verifyDefault();
+  }
+
+  @Test
+  public void testEquals_not_getClass() {
+    TreeNode treeNodeTest = new TestTreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", 1);
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
+    verifyDefault();
+  }
+
+  @Test
+  public void testEquals_position_notSameInteger() {
+    TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", new Integer(1));
+    treeNode.setPosition(new Integer(1));
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
@@ -192,4 +212,11 @@ public class TreeNodeTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
+  private class TestTreeNode extends TreeNode {
+
+    public TestTreeNode(DocumentReference docRef, String parent, Integer position) {
+      super(docRef, parent, position);
+    }
+
+  }
 }
