@@ -556,13 +556,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     return resolvePropertyValue(field, getProperty(doc, field.getClassRef(), field.getName()));
   }
 
-  @SuppressWarnings("unchecked")
   private <T> T resolvePropertyValue(ClassField<T> field, Object value) {
     try {
       if (field instanceof CustomClassField) {
         return ((CustomClassField<T>) field).resolve(value);
       } else {
-        return (T) value;
+        return field.getType().cast(value);
       }
     } catch (ClassCastException ex) {
       throw new IllegalArgumentException("Field ill defined: " + field, ex);

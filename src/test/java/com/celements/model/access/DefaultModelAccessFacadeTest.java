@@ -25,8 +25,10 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
-import com.celements.model.util.XObjectField;
-import com.celements.model.util.XObjectFieldValue;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.DateField;
+import com.celements.model.classes.fields.StringField;
+import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
@@ -800,8 +802,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_XObjectField() throws Exception {
-    XObjectField<String> field = new XObjectField<>(classRef, "name", String.class);
+  public void testGetProperty_ClassField() throws Exception {
+    ClassField<String> field = new StringField(classRef, "name");
     String val = "val";
     addObj(classRef, field.getName(), val);
 
@@ -813,8 +815,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_XObjectField_illegalField() throws Exception {
-    XObjectField<Date> field = new XObjectField<>(classRef, "name", Date.class);
+  public void testGetProperty_ClassField_illegalField() throws Exception {
+    ClassField<Date> field = new DateField(classRef, "name");
     addObj(classRef, field.getName(), "val");
 
     replayDefault();
@@ -831,8 +833,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_XObjectField_docRef() throws Exception {
-    XObjectField<String> field = new XObjectField<>(classRef, "name", String.class);
+  public void testGetProperty_ClassField_docRef() throws Exception {
+    ClassField<String> field = new StringField(classRef, "name");
     String val = "val";
     addObj(classRef, field.getName(), val);
 
@@ -916,16 +918,16 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_XObjectField() throws Exception {
+  public void testSetProperty_ClassField() throws Exception {
     String val = "val";
-    XObjectFieldValue<String> field = new XObjectFieldValue<>(new XObjectField<>(classRef, "name",
-        String.class), val);
+    ClassField<String> field = new StringField(classRef, "name");
+    ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
     BaseObject obj = addObj(classRef, field.getName(), "");
 
     expectPropertyClass(classRef, field.getName(), new StringClass());
 
     replayDefault();
-    modelAccess.setProperty(doc, field);
+    modelAccess.setProperty(doc, fieldValue);
     verifyDefault();
 
     assertEquals(1, obj.getFieldList().size());
@@ -933,16 +935,16 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_XObjectField_illegalField() throws Exception {
-    XObjectFieldValue<Date> field = new XObjectFieldValue<>(new XObjectField<>(classRef, "name",
-        Date.class), new Date());
+  public void testSetProperty_ClassField_illegalField() throws Exception {
+    ClassField<Date> field = new DateField(classRef, "name");
+    ClassFieldValue<Date> fieldValue = new ClassFieldValue<>(field, new Date());
     BaseClass bClass = expectNewBaseObject(classRef);
 
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
     replayDefault();
     try {
-      modelAccess.setProperty(doc, field);
+      modelAccess.setProperty(doc, fieldValue);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
       assertTrue(iae.getMessage().contains("class.any.name"));
@@ -953,15 +955,15 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_XObjectField_newObj() throws Exception {
+  public void testSetProperty_ClassField_newObj() throws Exception {
     String val = "val";
-    XObjectFieldValue<String> field = new XObjectFieldValue<>(new XObjectField<>(classRef, "name",
-        String.class), val);
+    ClassField<String> field = new StringField(classRef, "name");
+    ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
     replayDefault();
-    modelAccess.setProperty(doc, field);
+    modelAccess.setProperty(doc, fieldValue);
     verifyDefault();
 
     BaseObject obj = doc.getXObject(classRef);
