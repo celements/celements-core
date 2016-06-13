@@ -37,7 +37,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassesCompositorComponent.class);
 
   @Requirement
-  private XClassCreatorRole classCreator;
+  private XClassCreator classCreator;
 
   @Requirement
   private Map<String, IClassCollectionRole> classCollectionMap;

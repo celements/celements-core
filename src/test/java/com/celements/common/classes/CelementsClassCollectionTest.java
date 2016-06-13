@@ -103,10 +103,12 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
     boolean initClassExecuted = false;
 
+    @Override
     public void initClasses(XWikiContext context) throws XWikiException {
       initClassExecuted = true;
     }
 
+    @Override
     public String getConfigName() {
       return "testcol";
     }

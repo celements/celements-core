@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * {@link Deprecated} instead use {@link XClassCreatorRole}
+ * {@link Deprecated} instead use {@link XClassCreator}
  */
 @Deprecated
 @ComponentRole
