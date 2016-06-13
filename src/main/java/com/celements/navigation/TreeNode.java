@@ -30,6 +30,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -149,11 +150,7 @@ public class TreeNode {
     }
     // object must be Test at this point
     TreeNode node = (TreeNode) obj;
-    if (docRef.equals(node.docRef)) {
-      return (((position == null) && (node.position == null)) || ((position != null)
-          && position.equals(node.position)));
-    }
-    return false;
+    return Objects.equal(docRef, node.docRef) && Objects.equal(position, node.position);
   }
 
   @Override
