@@ -19,6 +19,8 @@
  */
 package com.celements.navigation;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -28,6 +30,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Preconditions;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -41,35 +44,30 @@ public class TreeNode {
 
   private IPartNameGetStrategy partNameGetStrategy;
 
-  private DocumentReference docRef;
-
-  private String databaseName;
+  private final DocumentReference docRef;
 
   @Deprecated
-  public TreeNode(String fullName, String parent, Integer position, String databaseName) {
-    this.databaseName = databaseName;
-    setFullName(fullName);
+  public TreeNode(@NotNull String fullName, String parent, Integer position,
+      @NotNull String databaseName) {
+    this(new DocumentReference(databaseName, fullName.split("\\.")[0], fullName.split("\\.")[1]),
+        parent, position);
+  }
+
+  public TreeNode(@NotNull DocumentReference docRef, String parent, Integer position) {
+    Preconditions.checkNotNull(docRef, "document reference for TreeNode may not be null.");
+    this.docRef = docRef;
     setParent(parent);
     setPosition(position);
   }
 
-  public TreeNode(DocumentReference docRef, String parent, Integer position) {
-    setDocumentReference(docRef);
-    setParent(parent);
-    setPosition(position);
-  }
-
-  public TreeNode(DocumentReference docRef, DocumentReference parentRef, Integer position) {
-    setDocumentReference(docRef);
-    setParent(getWebUtilsService().getRefLocalSerializer().serialize(parentRef));
-    setPosition(position);
-  }
-
-  public TreeNode(DocumentReference docRef, SpaceReference parentRef, String partName,
+  public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef,
       Integer position) {
-    setDocumentReference(docRef);
-    setParent("");
-    setPosition(position);
+    this(docRef, getWebUtilsService().getRefLocalSerializer().serialize(parentRef), position);
+  }
+
+  public TreeNode(@NotNull DocumentReference docRef, SpaceReference parentRef, String partName,
+      Integer position) {
+    this(docRef, "", position);
     if (!StringUtils.isEmpty(partName)) {
       setPartName(partName);
     }
@@ -82,16 +80,6 @@ public class TreeNode {
   @Deprecated
   public String getFullName() {
     return docRef.getLastSpaceReference().getName() + "." + docRef.getName();
-  }
-
-  void setDocumentReference(DocumentReference docRef) {
-    this.docRef = docRef;
-  }
-
-  @Deprecated
-  void setFullName(String fullName) {
-    setDocumentReference(new DocumentReference(databaseName, fullName.split("\\.")[0],
-        fullName.split("\\.")[1]));
   }
 
   public EntityReference getParentRef() {
@@ -190,7 +178,7 @@ public class TreeNode {
     return Utils.getComponent(Execution.class).getContext();
   }
 
-  private IWebUtilsService getWebUtilsService() {
+  private static IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
