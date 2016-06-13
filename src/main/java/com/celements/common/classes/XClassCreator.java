@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
@@ -36,6 +37,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
+@Component
 public class XClassCreator implements XClassCreatorRole {
 
   private static Logger LOGGER = LoggerFactory.getLogger(XClassCreator.class);
