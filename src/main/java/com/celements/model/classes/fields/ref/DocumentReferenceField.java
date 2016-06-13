@@ -10,9 +10,8 @@ public class DocumentReferenceField extends EntityReferenceField<DocumentReferen
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public Class<DocumentReference> getEntityClass() {
+  public Class<DocumentReference> getType() {
     return DocumentReference.class;
   }
 

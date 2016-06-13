@@ -10,10 +10,6 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 
 public abstract class NumberField<T extends Number> extends AbstractClassField<T> {
 
-  public enum NumberType {
-    INTEGER, LONG, FLOAT, DOUBLE;
-  }
-
   private String prettyName;
   private Integer size;
   private String validationRegExp;
@@ -22,9 +18,6 @@ public abstract class NumberField<T extends Number> extends AbstractClassField<T
   public NumberField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
   }
-
-  @NotNull
-  public abstract NumberType getNumberType();
 
   public String getPrettyName() {
     return prettyName;
@@ -66,7 +59,7 @@ public abstract class NumberField<T extends Number> extends AbstractClassField<T
   public PropertyInterface getXField() {
     NumberClass element = new NumberClass();
     element.setName(getName());
-    element.setNumberType(getNumberType().name().toLowerCase());
+    element.setNumberType(getType().getSimpleName().toLowerCase());
     if (prettyName != null) {
       element.setPrettyName(prettyName);
     }

@@ -18,6 +18,11 @@ public class StringField extends AbstractClassField<String> {
     super(classRef, name);
   }
 
+  @Override
+  public Class<String> getType() {
+    return String.class;
+  }
+
   public String getPrettyName() {
     return prettyName;
   }

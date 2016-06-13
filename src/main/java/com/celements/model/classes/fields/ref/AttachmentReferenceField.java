@@ -11,9 +11,8 @@ public class AttachmentReferenceField extends EntityReferenceField<AttachmentRef
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public Class<AttachmentReference> getEntityClass() {
+  public Class<AttachmentReference> getType() {
     return AttachmentReference.class;
   }
 

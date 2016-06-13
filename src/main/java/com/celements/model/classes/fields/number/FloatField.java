@@ -10,10 +10,9 @@ public class FloatField extends NumberField<Float> {
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public NumberType getNumberType() {
-    return NumberType.FLOAT;
+  public Class<Float> getType() {
+    return Float.class;
   }
 
 }

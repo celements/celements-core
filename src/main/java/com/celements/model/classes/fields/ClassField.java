@@ -15,6 +15,9 @@ public interface ClassField<T> {
   public String getName();
 
   @NotNull
+  public Class<T> getType();
+
+  @NotNull
   public PropertyInterface getXField();
 
   @NotNull

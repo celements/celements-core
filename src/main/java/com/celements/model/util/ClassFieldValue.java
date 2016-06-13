@@ -1,10 +1,9 @@
 package com.celements.model.util;
 
+import java.util.Objects;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Preconditions;
@@ -29,15 +28,14 @@ public class ClassFieldValue<T> {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder().append(field.hashCode()).append(getValue()).hashCode();
+    return Objects.hash(field, value);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ClassFieldValue) {
       ClassFieldValue<?> other = (ClassFieldValue<?>) obj;
-      return new EqualsBuilder().append(this.field, other.field).append(this.value,
-          other.value).isEquals();
+      return Objects.equals(this.field, other.field) && Objects.equals(this.value, other.value);
     }
     return false;
   }

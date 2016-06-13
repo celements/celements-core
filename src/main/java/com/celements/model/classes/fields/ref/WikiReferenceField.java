@@ -11,9 +11,8 @@ public class WikiReferenceField extends EntityReferenceField<WikiReference> {
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public Class<WikiReference> getEntityClass() {
+  public Class<WikiReference> getType() {
     return WikiReference.class;
   }
 

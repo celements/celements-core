@@ -10,8 +10,8 @@ import com.celements.model.classes.fields.CustomClassField;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
-public abstract class EntityReferenceField<T extends EntityReference> extends
-    AbstractClassField<T> implements CustomClassField<T> {
+public abstract class EntityReferenceField<T extends EntityReference> extends AbstractClassField<T>
+    implements CustomClassField<T> {
 
   private String prettyName;
   private Integer size;
@@ -21,9 +21,6 @@ public abstract class EntityReferenceField<T extends EntityReference> extends
   public EntityReferenceField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
   }
-
-  @NotNull
-  public abstract Class<T> getEntityClass();
 
   public String getPrettyName() {
     return prettyName;
@@ -82,7 +79,7 @@ public abstract class EntityReferenceField<T extends EntityReference> extends
 
   @Override
   public T resolve(Object obj) {
-    return getWebUtils().resolveReference(obj.toString(), getEntityClass());
+    return getWebUtils().resolveReference(obj.toString(), getType());
   }
 
   @Override

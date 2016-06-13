@@ -11,9 +11,8 @@ public class SpaceReferenceField extends EntityReferenceField<SpaceReference> {
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public Class<SpaceReference> getEntityClass() {
+  public Class<SpaceReference> getType() {
     return SpaceReference.class;
   }
 

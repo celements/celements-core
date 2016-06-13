@@ -10,10 +10,9 @@ public class LongField extends NumberField<Long> {
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public NumberType getNumberType() {
-    return NumberType.LONG;
+  public Class<Long> getType() {
+    return Long.class;
   }
 
 }

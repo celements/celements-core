@@ -4,8 +4,6 @@ import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.service.IWebUtilsService;
@@ -34,15 +32,14 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder().append(getClassRef()).append(getName()).hashCode();
+    return Objects.hash(classRef, name);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AbstractClassField) {
       AbstractClassField<?> other = (AbstractClassField<?>) obj;
-      return new EqualsBuilder().append(getClassRef(), other.getClassRef()).append(getName(),
-          other.getName()).isEquals();
+      return Objects.equals(this.classRef, other.classRef) && Objects.equals(this.name, other.name);
     }
     return false;
   }

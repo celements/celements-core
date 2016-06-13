@@ -10,10 +10,9 @@ public class IntField extends NumberField<Integer> {
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public NumberType getNumberType() {
-    return NumberType.INTEGER;
+  public Class<Integer> getType() {
+    return Integer.class;
   }
 
 }

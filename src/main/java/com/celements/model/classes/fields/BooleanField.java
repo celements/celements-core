@@ -19,6 +19,11 @@ public class BooleanField extends AbstractClassField<Boolean> {
     super(classRef, name);
   }
 
+  @Override
+  public Class<Boolean> getType() {
+    return Boolean.class;
+  }
+
   public String getPrettyName() {
     return prettyName;
   }

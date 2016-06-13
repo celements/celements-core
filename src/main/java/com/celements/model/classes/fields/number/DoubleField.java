@@ -10,10 +10,9 @@ public class DoubleField extends NumberField<Double> {
     super(classRef, name);
   }
 
-  @NotNull
   @Override
-  public NumberType getNumberType() {
-    return NumberType.DOUBLE;
+  public Class<Double> getType() {
+    return Double.class;
   }
 
 }

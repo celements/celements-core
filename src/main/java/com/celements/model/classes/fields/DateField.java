@@ -22,6 +22,11 @@ public class DateField extends AbstractClassField<Date> {
     super(classRef, name);
   }
 
+  @Override
+  public Class<Date> getType() {
+    return Date.class;
+  }
+
   public String getPrettyName() {
     return prettyName;
   }
