@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -40,12 +42,16 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
 
+  private static Logger LOGGER = LoggerFactory.getLogger(XObjectPageTypeCache.class);
+
   @Requirement
   private IWebUtilsService webUtilsService;
 
-  GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
+  private final GetPageTypesCommand getPageTypeCmd = new GetPageTypesCommand();
 
-  final ConcurrentMap<WikiReference, List<PageTypeReference>> pageTypeRefCache = new ConcurrentHashMap<>();
+  GetPageTypesCommand injectedTest_getPageTypeCmd;
+
+  private final ConcurrentMap<WikiReference, List<PageTypeReference>> pageTypeRefCache = new ConcurrentHashMap<>();
 
   @Requirement
   private Execution execution;
@@ -62,13 +68,19 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
   @Override
   public synchronized void invalidateCacheForWiki(WikiReference wikiRef) {
     if (webUtilsService.getCentralWikiRef().equals(wikiRef)) {
+      LOGGER.info("invalidate XObjectPageTypeCache for wiki '{}'", wikiRef);
       pageTypeRefCache.clear();
     } else if (pageTypeRefCache != null) {
+      LOGGER.info("invalidate complete XObjectPageTypeCache.");
       pageTypeRefCache.remove(wikiRef);
     }
   }
 
+  /**
+   * FOR TESTS ONLY!!!
+   */
   ConcurrentMap<WikiReference, List<PageTypeReference>> getPageTypeRefCache() {
+    LOGGER.warn("getPageTypeRefCache called!");
     return pageTypeRefCache;
   }
 
@@ -85,17 +97,27 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
       WikiReference wikiRef) {
     List<PageTypeReference> pageTypeList = pageTypeRefCache.get(wikiRef);
     if (pageTypeList == null) {
+      LOGGER.info("compute XObjectPageTypeCache for wiki '{}'", wikiRef);
       List<PageTypeReference> newPageTypeList = new ArrayList<PageTypeReference>();
-      Set<String> pageTypeSet = getPageTypeCmd.getAllXObjectPageTypes(getContext());
+      Set<String> pageTypeSet = getGetPageTypeCmd().getAllXObjectPageTypes(getContext());
       for (String pageTypeFN : pageTypeSet) {
         XObjectPageTypeConfig xObjPT = getXObjectPTConfigForFN(pageTypeFN);
         newPageTypeList.add(new PageTypeReference(xObjPT.getName(),
             "com.celements.XObjectPageTypeProvider", xObjPT.getCategories()));
       }
       pageTypeList = Collections.unmodifiableList(newPageTypeList);
+      LOGGER.info("computed XObjectPageTypeCache for wiki '{}' list '{}'", wikiRef, pageTypeList);
       pageTypeRefCache.putIfAbsent(wikiRef, pageTypeList);
     }
     return pageTypeList;
+  }
+
+  private GetPageTypesCommand getGetPageTypeCmd() {
+    if (injectedTest_getPageTypeCmd != null) {
+      LOGGER.warn("injectedTest_getPageTypeCmd found!");
+      return injectedTest_getPageTypeCmd;
+    }
+    return getPageTypeCmd;
   }
 
 }

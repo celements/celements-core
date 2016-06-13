@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,7 +48,6 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
   private XWiki xwiki;
   private GetPageTypesCommand getPageTypeCmdMock;
   private XObjectPageTypeCache xObjPageTypeCache;
-  private GetPageTypesCommand backupGetPageTypeCmd;
   private WikiReference wikiRef;
 
   @Before
@@ -58,14 +56,8 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
     xwiki = getWikiMock();
     xObjPageTypeCache = (XObjectPageTypeCache) Utils.getComponent(IXObjectPageTypeCacheRole.class);
     getPageTypeCmdMock = createMockAndAddToDefault(GetPageTypesCommand.class);
-    backupGetPageTypeCmd = xObjPageTypeCache.getPageTypeCmd;
-    xObjPageTypeCache.getPageTypeCmd = getPageTypeCmdMock;
+    xObjPageTypeCache.injectedTest_getPageTypeCmd = getPageTypeCmdMock;
     wikiRef = new WikiReference(context.getDatabase());
-  }
-
-  @After
-  public void tearDown_XObjectPageTypeCacheTest() {
-    xObjPageTypeCache.getPageTypeCmd = backupGetPageTypeCmd;
   }
 
   @Test
@@ -73,7 +65,7 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
     assertNotNull(xObjPageTypeCache.getPageTypeRefCache());
     replayDefault();
     xObjPageTypeCache.invalidateCacheForWiki(new WikiReference("celements2web"));
-    assertTrue(xObjPageTypeCache.pageTypeRefCache.isEmpty());
+    assertTrue(xObjPageTypeCache.getPageTypeRefCache().isEmpty());
     verifyDefault();
   }
 
@@ -86,7 +78,7 @@ public class XObjectPageTypeCacheTest extends AbstractComponentTest {
     assertTrue(pageTypeRefCache.containsKey(wikiRef));
     replayDefault();
     xObjPageTypeCache.invalidateCacheForWiki(wikiRef);
-    assertNotNull(xObjPageTypeCache.pageTypeRefCache);
+    assertNotNull(xObjPageTypeCache.getPageTypeRefCache());
     assertFalse(pageTypeRefCache.containsKey(wikiRef));
     verifyDefault();
   }
