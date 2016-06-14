@@ -5,15 +5,22 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.classes.TestClassDefinition;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -21,17 +28,31 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTestCase {
+public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
 
-  private DefaultXObjectUpdateService xObjUpdateService;
+  private IXObjectUpdateRole xObjUpdateService;
   private XWikiDocument doc;
   private DocumentReference classRef;
 
+  private IModelAccessFacade modelAccessMock;
+
+  @Override
   @Before
-  public void setUp_DefaultXObjectUpdateServiceTest() throws Exception {
-    xObjUpdateService = (DefaultXObjectUpdateService) Utils.getComponent(IXObjectUpdateRole.class);
+  public void setUp() throws Exception {
+    super.setUp();
+    init(false);
     doc = new XWikiDocument(new DocumentReference("xwikidb", "space", "doc"));
     classRef = new DocumentReference("xwikidb", "class", "any");
+  }
+
+  private void init(boolean withModelAccessMock) throws ComponentRepositoryException {
+    if (withModelAccessMock) {
+      modelAccessMock = registerComponentMock(IModelAccessFacade.class);
+    }
+    ComponentDescriptor<IXObjectUpdateRole> descr = Utils.getComponentManager().getComponentDescriptor(
+        IXObjectUpdateRole.class, "default");
+    Utils.getComponentManager().registerComponent(descr);
+    xObjUpdateService = Utils.getComponent(IXObjectUpdateRole.class);
   }
 
   @Test
@@ -108,8 +129,9 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     fieldMap.put("invalidString", "asdf");
     Throwable cause = new XWikiException();
 
-    expect(getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")), same(
-        getContext()))).andThrow(cause).once();
+    expect(
+        getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")),
+            same(getContext()))).andThrow(cause).once();
 
     replayDefault();
     try {
@@ -122,6 +144,36 @@ public class DefaultXObjectUpdateServiceTest extends AbstractBridgedComponentTes
     verifyDefault();
 
     assertNull(doc.getXObject(classRef));
+  }
+
+  @Test
+  public void test_update_empty() throws Exception {
+    Set<ClassFieldValue<?>> fieldValues = new HashSet<>();
+
+    replayDefault();
+    assertFalse(xObjUpdateService.update(doc, fieldValues));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_update() throws Exception {
+    init(true);
+    ClassFieldValue<String> fieldVal1 = new ClassFieldValue<>(TestClassDefinition.FIELD_MY_STRING,
+        "val");
+    ClassFieldValue<Boolean> fieldVal2 = new ClassFieldValue<>(TestClassDefinition.FIELD_MY_BOOL,
+        true);
+    ClassFieldValue<Integer> fieldVal3 = new ClassFieldValue<>(TestClassDefinition.FIELD_MY_INT, 1);
+
+    expect(modelAccessMock.getProperty(same(doc), eq(fieldVal1.getField()))).andReturn(null).once();
+    expect(modelAccessMock.setProperty(same(doc), eq(fieldVal1))).andReturn(true).once();
+    expect(modelAccessMock.getProperty(same(doc), eq(fieldVal2.getField()))).andReturn(false).once();
+    expect(modelAccessMock.setProperty(same(doc), eq(fieldVal2))).andReturn(true).once();
+    expect(modelAccessMock.getProperty(same(doc), eq(fieldVal3.getField()))).andReturn(1).once();
+
+    replayDefault();
+    assertTrue(xObjUpdateService.update(doc, ImmutableSet.<ClassFieldValue<?>>of(fieldVal1,
+        fieldVal2, fieldVal3)));
+    verifyDefault();
   }
 
   private IWebUtilsService getWebUtils() {
