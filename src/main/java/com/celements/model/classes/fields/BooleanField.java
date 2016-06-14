@@ -4,16 +4,13 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class BooleanField extends AbstractClassField<Boolean> {
 
-  private String prettyName;
   private String displayType;
   private Integer defaultValue;
-  private String validationRegExp;
-  private String validationMessage;
 
   public BooleanField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
@@ -22,15 +19,6 @@ public class BooleanField extends AbstractClassField<Boolean> {
   @Override
   public Class<Boolean> getType() {
     return Boolean.class;
-  }
-
-  public String getPrettyName() {
-    return prettyName;
-  }
-
-  public BooleanField setPrettyName(String prettyName) {
-    this.prettyName = prettyName;
-    return this;
   }
 
   public String getDisplayType() {
@@ -51,42 +39,14 @@ public class BooleanField extends AbstractClassField<Boolean> {
     return this;
   }
 
-  public String getValidationRegExp() {
-    return validationRegExp;
-  }
-
-  public BooleanField setValidationRegExp(String validationRegExp) {
-    this.validationRegExp = validationRegExp;
-    return this;
-  }
-
-  public String getValidationMessage() {
-    return validationMessage;
-  }
-
-  public BooleanField setValidationMessage(String validationMessage) {
-    this.validationMessage = validationMessage;
-    return this;
-  }
-
   @Override
-  public PropertyInterface getXField() {
+  protected PropertyClass getPropertyClass() {
     BooleanClass element = new BooleanClass();
-    element.setName(getName());
-    if (prettyName != null) {
-      element.setPrettyName(prettyName);
-    }
     if (displayType != null) {
       element.setDisplayType(displayType);
     }
     if (defaultValue != null) {
       element.setDefaultValue(defaultValue);
-    }
-    if (validationRegExp != null) {
-      element.setValidationRegExp(validationRegExp);
-    }
-    if (validationMessage != null) {
-      element.setValidationMessage(validationMessage);
     }
     return element;
   }

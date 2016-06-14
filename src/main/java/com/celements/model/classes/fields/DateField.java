@@ -6,17 +6,14 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class DateField extends AbstractClassField<Date> {
 
-  private String prettyName;
   private Integer size;
   private Integer emptyIsToday;
   private String dateFormat;
-  private String validationRegExp;
-  private String validationMessage;
 
   public DateField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
@@ -25,15 +22,6 @@ public class DateField extends AbstractClassField<Date> {
   @Override
   public Class<Date> getType() {
     return Date.class;
-  }
-
-  public String getPrettyName() {
-    return prettyName;
-  }
-
-  public DateField setPrettyName(String prettyName) {
-    this.prettyName = prettyName;
-    return this;
   }
 
   public Integer getSize() {
@@ -63,31 +51,9 @@ public class DateField extends AbstractClassField<Date> {
     return this;
   }
 
-  public String getValidationRegExp() {
-    return validationRegExp;
-  }
-
-  public DateField setValidationRegExp(String validationRegExp) {
-    this.validationRegExp = validationRegExp;
-    return this;
-  }
-
-  public String getValidationMessage() {
-    return validationMessage;
-  }
-
-  public DateField setValidationMessage(String validationMessage) {
-    this.validationMessage = validationMessage;
-    return this;
-  }
-
   @Override
-  public PropertyInterface getXField() {
+  protected PropertyClass getPropertyClass() {
     DateClass element = new DateClass();
-    element.setName(getName());
-    if (prettyName != null) {
-      element.setPrettyName(prettyName);
-    }
     if (size != null) {
       element.setSize(size);
     }
@@ -96,12 +62,6 @@ public class DateField extends AbstractClassField<Date> {
     }
     if (dateFormat != null) {
       element.setDateFormat(dateFormat);
-    }
-    if (validationRegExp != null) {
-      element.setValidationRegExp(validationRegExp);
-    }
-    if (validationMessage != null) {
-      element.setValidationMessage(validationMessage);
     }
     return element;
   }

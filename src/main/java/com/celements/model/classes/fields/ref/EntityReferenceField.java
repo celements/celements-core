@@ -7,28 +7,16 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
 public abstract class EntityReferenceField<T extends EntityReference> extends AbstractClassField<T>
     implements CustomClassField<T> {
 
-  private String prettyName;
   private Integer size;
-  private String validationRegExp;
-  private String validationMessage;
 
   public EntityReferenceField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
-  }
-
-  public String getPrettyName() {
-    return prettyName;
-  }
-
-  public EntityReferenceField<T> setPrettyName(String prettyName) {
-    this.prettyName = prettyName;
-    return this;
   }
 
   public Integer getSize() {
@@ -40,51 +28,23 @@ public abstract class EntityReferenceField<T extends EntityReference> extends Ab
     return this;
   }
 
-  public String getValidationRegExp() {
-    return validationRegExp;
-  }
-
-  public EntityReferenceField<T> setValidationRegExp(String validationRegExp) {
-    this.validationRegExp = validationRegExp;
-    return this;
-  }
-
-  public String getValidationMessage() {
-    return validationMessage;
-  }
-
-  public EntityReferenceField<T> setValidationMessage(String validationMessage) {
-    this.validationMessage = validationMessage;
-    return this;
-  }
-
   @Override
-  public PropertyInterface getXField() {
-    NumberClass element = new NumberClass();
-    element.setName(getName());
-    if (prettyName != null) {
-      element.setPrettyName(prettyName);
-    }
+  protected PropertyClass getPropertyClass() {
+    StringClass element = new StringClass();
     if (size != null) {
       element.setSize(size);
-    }
-    if (validationRegExp != null) {
-      element.setValidationRegExp(validationRegExp);
-    }
-    if (validationMessage != null) {
-      element.setValidationMessage(validationMessage);
     }
     return element;
   }
 
   @Override
-  public T resolve(Object obj) {
-    return getWebUtils().resolveReference(obj.toString(), getType());
+  public Object serialize(T value) {
+    return getWebUtils().serializeRef(value);
   }
 
   @Override
-  public Object serialize(T value) {
-    return getWebUtils().serializeRef(value);
+  public T resolve(Object obj) {
+    return getWebUtils().resolveReference(obj.toString(), getType());
   }
 
 }

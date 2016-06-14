@@ -5,9 +5,9 @@ import javax.annotation.Nullable;
 public interface CustomClassField<T> extends ClassField<T> {
 
   @Nullable
-  public T resolve(@Nullable Object obj);
+  public Object serialize(@Nullable T value);
 
   @Nullable
-  public Object serialize(@Nullable T value);
+  public T resolve(@Nullable Object obj);
 
 }

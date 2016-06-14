@@ -8,12 +8,18 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
   private final DocumentReference classRef;
   private final String name;
+
+  private String prettyName;
+  private String validationRegExp;
+  private String validationMessage;
 
   public AbstractClassField(@NotNull DocumentReference classRef, @NotNull String name) {
     this.classRef = Objects.requireNonNull(classRef);
@@ -29,6 +35,51 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   public String getName() {
     return name;
   }
+
+  public String getPrettyName() {
+    return prettyName;
+  }
+
+  public AbstractClassField<T> setPrettyName(String prettyName) {
+    this.prettyName = prettyName;
+    return this;
+  }
+
+  public String getValidationRegExp() {
+    return validationRegExp;
+  }
+
+  public AbstractClassField<T> setValidationRegExp(String validationRegExp) {
+    this.validationRegExp = validationRegExp;
+    return this;
+  }
+
+  public String getValidationMessage() {
+    return validationMessage;
+  }
+
+  public AbstractClassField<T> setValidationMessage(String validationMessage) {
+    this.validationMessage = validationMessage;
+    return this;
+  }
+
+  @Override
+  public PropertyInterface getXField() {
+    PropertyClass element = getPropertyClass();
+    element.setName(getName());
+    if (prettyName != null) {
+      element.setPrettyName(prettyName);
+    }
+    if (validationRegExp != null) {
+      element.setValidationRegExp(validationRegExp);
+    }
+    if (validationMessage != null) {
+      element.setValidationMessage(validationMessage);
+    }
+    return element;
+  }
+
+  protected abstract PropertyClass getPropertyClass();
 
   @Override
   public int hashCode() {
