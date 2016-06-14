@@ -1,4 +1,4 @@
-package com.celements.model.util;
+package com.celements.model.classes.fields;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
@@ -24,7 +24,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_constructor_constr_null_classRef() throws Exception {
+  public void test_constr_null_classRef() throws Exception {
     try {
       new TestClassField(null, "name");
       fail("expecting NullPointerException");
@@ -34,7 +34,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_constructor_constr_null_name() throws Exception {
+  public void test_constr_null_name() throws Exception {
     try {
       new TestClassField(classRef, null);
       fail("expecting NullPointerException");
@@ -44,7 +44,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_constructor_constr_getters() throws Exception {
+  public void test_getters() throws Exception {
     String name = "name";
     TestClassField field = new TestClassField(classRef, name);
     assertEquals(classRef, field.getClassRef());
