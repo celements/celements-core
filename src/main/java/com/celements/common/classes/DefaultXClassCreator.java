@@ -45,6 +45,8 @@ public class DefaultXClassCreator implements XClassCreator {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DefaultXClassCreator.class);
 
+  static final String BLACKLIST_KEY = "celements.classdefinition.blacklist";
+
   @Requirement
   protected IModelAccessFacade modelAccess;
 
@@ -68,15 +70,14 @@ public class DefaultXClassCreator implements XClassCreator {
   }
 
   private boolean isBlacklisted(ClassDefinition classDef) {
-    String key = "celements.classdefinition.blacklist";
-    return configSrc.containsKey(key) && configSrc.<List<?>>getProperty(key).contains(
-        classDef.getName());
+    return configSrc.containsKey(BLACKLIST_KEY)
+        && configSrc.<List<?>>getProperty(BLACKLIST_KEY).contains(classDef.getName());
   }
 
   private void createXClass(ClassDefinition classDef) throws DocumentAccessException {
+    boolean needsUpdate = !modelAccess.exists(classDef.getClassRef());
     XWikiDocument classDoc = modelAccess.getOrCreateDocument(classDef.getClassRef());
     BaseClass bClass = classDoc.getXClass();
-    boolean needsUpdate = classDoc.isNew();
     if (classDef.isInternalMapping() && !bClass.hasInternalCustomMapping()) {
       bClass.setCustomMapping("internal");
       needsUpdate = true;

@@ -19,6 +19,7 @@
  */
 package com.celements.common.classes;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -27,12 +28,12 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCase {
+public class CelementsClassCollectionTest extends AbstractComponentTest {
 
   private TestClassCollection testClassColl;
   private XWikiContext context;
@@ -70,10 +71,8 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testRunUpdate_activated_Param() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
-        "").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn(
-        "mycol,testcol").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn("mycol,testcol").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
@@ -82,10 +81,8 @@ public class CelementsClassCollectionTest extends AbstractBridgedComponentTestCa
 
   @Test
   public void testRunUpdate_deactivated_Param() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
-        "").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn(
-        "othercol,andcol").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn("").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn("othercol,andcol").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
