@@ -19,6 +19,9 @@
  */
 package com.celements.navigation;
 
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,22 +33,22 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 public class TreeNode {
 
-  private String parent;
+  private final String parent;
 
   private Integer position;
 
+  private final DocumentReference docRef;
+
   private String partName;
 
-  private IPartNameGetStrategy partNameGetStrategy;
-
-  private final DocumentReference docRef;
+  private PartNameGetter partNameGetter;
 
   @Deprecated
   public TreeNode(@NotNull String fullName, String parent, Integer position,
@@ -54,11 +57,11 @@ public class TreeNode {
         parent, position);
   }
 
-  public TreeNode(@NotNull DocumentReference docRef, String parent, Integer position) {
-    Preconditions.checkNotNull(docRef, "document reference for TreeNode may not be null.");
-    this.docRef = docRef;
-    setParent(parent);
-    setPosition(position);
+  public TreeNode(@NotNull DocumentReference docRef, @Nullable String parent, Integer position) {
+    Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
+    this.docRef = new DocumentReference(docRef);
+    this.parent = MoreObjects.firstNonNull(parent, "");
+    this.position = MoreObjects.firstNonNull(position, new Integer(0));
   }
 
   public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef,
@@ -96,28 +99,15 @@ public class TreeNode {
     return parent;
   }
 
-  void setParent(String parent) {
-    if (parent == null) {
-      parent = "";
-    }
-    this.parent = parent;
-  }
-
   public Integer getPosition() {
-    if (position == null) {
-      position = 0;
-    }
     return position;
-  }
-
-  void setPosition(Integer position) {
-    this.position = position;
   }
 
   public String getPartName(XWikiContext context) {
     if (partName == null) {
-      if (partNameGetStrategy != null) {
-        partName = partNameGetStrategy.getPartName(getFullName(), context);
+      PartNameGetter theStrategy = getPartNameGetStrategy();
+      if (theStrategy != null) {
+        partName = theStrategy.getPartName(getDocumentReference());
       } else {
         partName = "";
       }
@@ -125,15 +115,27 @@ public class TreeNode {
     return partName;
   }
 
-  public void setPartName(String partName) {
+  public synchronized void setPartName(String partName) {
     if (partName == null) {
       partName = "";
     }
     this.partName = partName;
   }
 
-  public void setPartNameGetStrategy(IPartNameGetStrategy strategy) {
-    this.partNameGetStrategy = strategy;
+  private synchronized PartNameGetter getPartNameGetStrategy() {
+    return partNameGetter;
+  }
+
+  public synchronized void setPartNameGetter(PartNameGetter strategy) {
+    partNameGetter = strategy;
+  }
+
+  /**
+   * @deprecated since 1.140 instead use setPartNameGetter(PartNameGetter)
+   */
+  @Deprecated
+  public synchronized void setPartNameGetStrategy(IPartNameGetStrategy strategy) {
+    partNameGetter = new PartNameGetterWrapper(strategy);
   }
 
   public DocumentReference getDocumentReference() {
@@ -150,7 +152,7 @@ public class TreeNode {
     }
     // object must be Test at this point
     TreeNode node = (TreeNode) obj;
-    return Objects.equal(docRef, node.docRef) && Objects.equal(position, node.position);
+    return Objects.equals(docRef, node.docRef) && Objects.equals(position, node.position);
   }
 
   @Override
@@ -177,6 +179,28 @@ public class TreeNode {
 
   private static IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  @Deprecated
+  private class PartNameGetterWrapper implements PartNameGetter {
+
+    private IPartNameGetStrategy strategy;
+
+    public PartNameGetterWrapper(IPartNameGetStrategy strategy) {
+      this.strategy = strategy;
+    }
+
+    @Override
+    public String getPartName(DocumentReference docRef) {
+      return strategy.getPartName(docRef.getLastSpaceReference().getName() + "." + docRef.getName(),
+          getContext());
+    }
+
+    private XWikiContext getContext() {
+      return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+          "xwikicontext");
+    }
+
   }
 
 }

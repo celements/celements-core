@@ -100,9 +100,10 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void testEquals_position_notSameInteger() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
         "myPage"), "", new Integer(1));
-    treeNode.setPosition(new Integer(1));
+    TreeNode treeNodeTest2 = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", new Integer(1));
     replayDefault();
-    assertTrue(treeNode.equals(treeNodeTest));
+    assertTrue(treeNodeTest2.equals(treeNodeTest));
     verifyDefault();
   }
 
@@ -126,9 +127,10 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void testHash_null_position() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
         "myPage"), "", null);
-    treeNode.setPosition(null);
+    TreeNode treeNodeTest2 = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
+        "myPage"), "", null);
     replayDefault();
-    assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
+    assertEquals(treeNodeTest.hashCode(), treeNodeTest2.hashCode());
     verifyDefault();
   }
 
@@ -196,9 +198,9 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void testEquals_parentDocRefConstructor() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
         "myPage"), new DocumentReference(context.getDatabase(), "myParentPage", "MySpace"), 1);
-    treeNode.setParent("MySpace.myParentPage");
+    TreeNode treeNode2 = new TreeNode(docRef, "MySpace.myParentPage", 1);
     replayDefault();
-    assertTrue(treeNode.equals(treeNodeTest));
+    assertTrue(treeNode2.equals(treeNodeTest));
     verifyDefault();
   }
 
@@ -206,9 +208,9 @@ public class TreeNodeTest extends AbstractComponentTest {
   public void testHash_parentDocRefConstructor() {
     TreeNode treeNodeTest = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace",
         "myPage"), new DocumentReference(context.getDatabase(), "myParentPage", "MySpace"), 1);
-    treeNode.setParent("MySpace.myParentPage");
+    TreeNode treeNode2 = new TreeNode(docRef, "MySpace.myParentPage", 1);
     replayDefault();
-    assertEquals(treeNodeTest.hashCode(), treeNode.hashCode());
+    assertEquals(treeNodeTest.hashCode(), treeNode2.hashCode());
     verifyDefault();
   }
 

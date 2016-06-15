@@ -21,6 +21,10 @@ package com.celements.navigation;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * @deprecated since 1.140 instead please use PartNameGetter
+ */
+@Deprecated
 public interface IPartNameGetStrategy {
 
   public String getPartName(String fullName, XWikiContext context);
