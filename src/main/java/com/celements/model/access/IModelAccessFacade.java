@@ -18,6 +18,7 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -316,16 +317,22 @@ public interface IModelAccessFacade {
    */
   public Object getProperty(BaseObject obj, String name);
 
+  @Nullable
   public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull ClassField<T> field)
       throws DocumentLoadException, DocumentNotExistsException;
 
+  @Nullable
   public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
+
+  @NotNull
+  public List<ClassFieldValue<?>> getProperties(@NotNull XWikiDocument doc,
+      @NotNull ClassDefinition classDef);
 
   public boolean setProperty(BaseObject obj, String name, Object value);
 
   public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
       @NotNull ClassField<T> field, @Nullable T value) throws DocumentLoadException,
-          DocumentNotExistsException;
+      DocumentNotExistsException;
 
   public <T> boolean setProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field,
       @Nullable T value) throws ClassDocumentLoadException;

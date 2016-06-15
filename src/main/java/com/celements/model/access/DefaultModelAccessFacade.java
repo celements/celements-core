@@ -27,6 +27,7 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
 import com.celements.model.util.ClassFieldValue;
@@ -389,8 +390,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
-          throw new NoAccessRightsException(obj.getDocumentReference(), getContext().getXWikiUser(),
-              EAccessLevel.VIEW);
+          throw new NoAccessRightsException(obj.getDocumentReference(),
+              getContext().getXWikiUser(), EAccessLevel.VIEW);
         }
       } catch (IllegalStateException exp) {
         LOGGER.warn("getApiObject failed for '{}'", obj, exp);
@@ -569,6 +570,21 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public List<ClassFieldValue<?>> getProperties(XWikiDocument doc, ClassDefinition classDef) {
+    List<ClassFieldValue<?>> ret = new ArrayList<>();
+    for (ClassField<?> field : classDef.getFields()) {
+      ret.add(new ClassFieldValue<Object>(castField(field), getProperty(doc, field)));
+    }
+    return ret;
+  }
+
+  // unchecked suppression is ok because every wildcard extends Object
+  @SuppressWarnings("unchecked")
+  private ClassField<Object> castField(ClassField<?> field) {
+    return (ClassField<Object>) field;
+  }
+
+  @Override
   public boolean setProperty(BaseObject obj, String name, Object value) {
     boolean hasChange = !Objects.equal(value, getProperty(obj, name));
     if (hasChange) {
@@ -625,8 +641,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         return attach;
       }
     }
-    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]", filename,
-        document, document.getDocumentReference());
+    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
+        filename, document, document.getDocumentReference());
     // FIXME empty or null filename leads to exception:
     // java.lang.IllegalArgumentException: An Entity Reference name cannot be null or
     // empty

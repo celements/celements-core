@@ -25,6 +25,8 @@ import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.DateField;
 import com.celements.model.classes.fields.StringField;
@@ -71,8 +73,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getDocument() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -85,8 +86,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_getDocument_failed() throws Exception {
     Throwable cause = new XWikiException();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andThrow(
         cause).once();
     replayDefault();
@@ -129,10 +129,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     modelAccess.webUtilsService = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference().getLastSpaceReference()))).andReturn(
+        "de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -148,10 +147,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     modelAccess.webUtilsService = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference().getLastSpaceReference()))).andReturn(
+        "de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
         Collections.<String>emptyList());
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
@@ -172,10 +170,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
     modelAccess.webUtilsService = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(webUtilsMock.getDefaultLanguage(eq(doc.getDocumentReference().getLastSpaceReference()))).andReturn(
+        "de").anyTimes();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
         Arrays.asList("en", "fr"));
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
@@ -186,8 +183,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     theTdoc.setLanguage("en");
     theTdoc.setNew(false);
     theTdoc.setSyntax(Syntax.XWIKI_1_0);
-    expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))).andReturn(
-        theTdoc).once();
+    expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))).andReturn(theTdoc).once();
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "en");
     verifyDefault();
@@ -247,8 +243,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_createDocument_alreadyExists() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     replayDefault();
     try {
       modelAccess.createDocument(doc.getDocumentReference());
@@ -271,8 +266,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getOrCreateDocument_get() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -286,8 +280,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_getOrCreateDocument_get_failed() throws Exception {
     Throwable cause = new XWikiException();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andThrow(
         cause).once();
     replayDefault();
@@ -343,8 +336,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_exists_true() {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     replayDefault();
     boolean ret = modelAccess.exists(doc.getDocumentReference());
     verifyDefault();
@@ -568,8 +560,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getXObjects_docRef() throws Exception {
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     replayDefault();
@@ -731,7 +722,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_String() throws Exception {
+  public void test_getProperty_String() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     String val = "val";
@@ -745,7 +736,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_String_emptyString() throws Exception {
+  public void test_getProperty_String_emptyString() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     String val = "";
@@ -759,7 +750,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_Number() throws Exception {
+  public void test_getProperty_Number() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     int val = 5;
@@ -773,7 +764,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_Date() throws Exception {
+  public void test_getProperty_Date() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     Date val = new Date();
@@ -787,7 +778,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_Date_Timestamp() throws Exception {
+  public void test_getProperty_Date_Timestamp() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     Date date = new Date();
@@ -802,7 +793,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_ClassField() throws Exception {
+  public void test_getProperty_ClassField() throws Exception {
     ClassField<String> field = new StringField(classRef, "name");
     String val = "val";
     addObj(classRef, field.getName(), val);
@@ -815,7 +806,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_ClassField_illegalField() throws Exception {
+  public void test_getProperty_ClassField_illegalField() throws Exception {
     ClassField<Date> field = new DateField(classRef, "name");
     addObj(classRef, field.getName(), "val");
 
@@ -833,13 +824,12 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_ClassField_docRef() throws Exception {
+  public void test_getProperty_ClassField_docRef() throws Exception {
     ClassField<String> field = new StringField(classRef, "name");
     String val = "val";
     addObj(classRef, field.getName(), val);
 
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
 
@@ -851,7 +841,29 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_String() throws Exception {
+  public void test_getProperties() {
+    ClassDefinition classDef = Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME);
+    String val = "value";
+    addObj(classDef.getClassRef(), TestClassDefinition.FIELD_MY_STRING.getName(), val);
+
+    replayDefault();
+    List<ClassFieldValue<?>> ret = modelAccess.getProperties(doc, classDef);
+    verifyDefault();
+
+    assertEquals(classDef.getFields().size(), ret.size());
+    for (int i = 0; i < ret.size(); i++) {
+      ClassField<?> field = classDef.getFields().get(i);
+      assertEquals(field, ret.get(i).getField());
+      if (field.equals(TestClassDefinition.FIELD_MY_STRING)) {
+        assertEquals(val, ret.get(i).getValue());
+      } else {
+        assertNull(ret.get(i).getValue());
+      }
+    }
+  }
+
+  @Test
+  public void test_setProperty_String() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -868,7 +880,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_Number() throws Exception {
+  public void test_setProperty_Number() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -885,7 +897,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_Date() throws Exception {
+  public void test_setProperty_Date() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -902,7 +914,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_List() throws Exception {
+  public void test_setProperty_List() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -918,7 +930,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_ClassField() throws Exception {
+  public void test_setProperty_ClassField() throws Exception {
     String val = "val";
     ClassField<String> field = new StringField(classRef, "name");
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
@@ -935,7 +947,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_ClassField_illegalField() throws Exception {
+  public void test_setProperty_ClassField_illegalField() throws Exception {
     ClassField<Date> field = new DateField(classRef, "name");
     ClassFieldValue<Date> fieldValue = new ClassFieldValue<>(field, new Date());
     BaseClass bClass = expectNewBaseObject(classRef);
@@ -955,7 +967,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_ClassField_newObj() throws Exception {
+  public void test_setProperty_ClassField_newObj() throws Exception {
     String val = "val";
     ClassField<String> field = new StringField(classRef, "name");
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
@@ -969,6 +981,25 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     BaseObject obj = doc.getXObject(classRef);
     assertEquals(1, obj.getFieldList().size());
     assertEquals(val, obj.getStringValue(field.getName()));
+  }
+
+  @Test
+  public void test_setProperty_getProperty_customField() throws Exception {
+    ClassField<DocumentReference> field = TestClassDefinition.FIELD_MY_DOCREF;
+    DocumentReference toStoreRef = new DocumentReference("myDB", "mySpace", "myDoc");
+
+    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    expectPropertyClass(bClass, field.getName(), new StringClass());
+
+    replayDefault();
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, toStoreRef));
+    DocumentReference ret = modelAccess.getProperty(doc, field);
+    verifyDefault();
+
+    assertEquals(toStoreRef, ret);
+    String objValue = modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
+        field.getName());
+    assertEquals(modelAccess.webUtilsService.serializeRef(toStoreRef), objValue);
   }
 
   @Test
@@ -1007,8 +1038,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void test_getApiDocument_hasAccess() throws Exception {
     XWikiRightService mockRightSrv = createMockAndAddToDefault(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(mockRightSrv).anyTimes();
-    expect(mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq("db:space.doc"),
-        same(getContext()))).andReturn(true).atLeastOnce();
+    expect(
+        mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq("db:space.doc"),
+            same(getContext()))).andReturn(true).atLeastOnce();
     replayDefault();
     Document apiDoc = modelAccess.getApiDocument(doc);
     assertNotNull("Expected Attachment api object - not null", apiDoc);
@@ -1019,8 +1051,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void test_getApiDocument_noAccess() throws Exception {
     XWikiRightService mockRightSrv = createMockAndAddToDefault(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(mockRightSrv).anyTimes();
-    expect(mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq("db:space.doc"),
-        same(getContext()))).andReturn(false).atLeastOnce();
+    expect(
+        mockRightSrv.hasAccessLevel(eq("view"), eq(getContext().getUser()), eq("db:space.doc"),
+            same(getContext()))).andReturn(false).atLeastOnce();
     replayDefault();
     try {
       modelAccess.getApiDocument(doc);
