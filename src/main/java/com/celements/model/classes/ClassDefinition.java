@@ -10,12 +10,24 @@ import com.celements.model.classes.fields.ClassField;
 @ComponentRole
 public interface ClassDefinition {
 
+  /**
+   * @return the name of the component and class definition, used for blacklisting
+   */
   public String getName();
 
+  /**
+   * @return the document reference on which the class is defined
+   */
   public DocumentReference getClassRef();
 
+  /**
+   * @return true if the class is mapped internally (hibernate mapping)
+   */
   public boolean isInternalMapping();
 
+  /**
+   * @return a list of all fields defining this class
+   */
   public abstract List<ClassField<?>> getFields();
 
 }
