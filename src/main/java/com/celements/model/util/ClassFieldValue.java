@@ -1,5 +1,6 @@
 package com.celements.model.util;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
@@ -19,7 +20,11 @@ public class ClassFieldValue<T> {
   }
 
   public ClassField<T> getField() {
-    return this.field;
+    return field;
+  }
+
+  public boolean isField(ClassField<?> otherField) {
+    return field.equals(otherField);
   }
 
   public T getValue() {
@@ -47,6 +52,18 @@ public class ClassFieldValue<T> {
 
   public String toString(boolean local) {
     return field.toString(local) + ": " + value;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> ClassFieldValue<T> select(ClassField<T> toSelect,
+      Collection<ClassFieldValue<?>> in) {
+    ClassFieldValue<T> ret = null;
+    for (ClassFieldValue<?> fieldVal : in) {
+      if (toSelect.equals(fieldVal.field)) {
+        ret = (ClassFieldValue<T>) fieldVal;
+      }
+    }
+    return ret;
   }
 
 }
