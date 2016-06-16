@@ -37,7 +37,6 @@ import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.web.Utils;
 
 @Singleton
 @Component
@@ -45,7 +44,7 @@ public class DefaultXClassCreator implements XClassCreator {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DefaultXClassCreator.class);
 
-  static final String BLACKLIST_KEY = "celements.classdefinition.blacklist";
+  public static final String BLACKLIST_KEY = "celements.classdefinition.blacklist";
 
   @Requirement
   protected IModelAccessFacade modelAccess;
@@ -56,10 +55,13 @@ public class DefaultXClassCreator implements XClassCreator {
   @Requirement
   protected ConfigurationSource configSrc;
 
+  @Requirement
+  private List<ClassDefinition> classDefinitions;
+
   @Override
   public void createXClasses() throws DocumentAccessException {
     LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
-    for (ClassDefinition classDef : Utils.getComponentList(ClassDefinition.class)) {
+    for (ClassDefinition classDef : classDefinitions) {
       if (!isBlacklisted(classDef)) {
         createXClass(classDef);
         LOGGER.debug("created class '{}'", classDef.getName());
@@ -70,8 +72,8 @@ public class DefaultXClassCreator implements XClassCreator {
   }
 
   private boolean isBlacklisted(ClassDefinition classDef) {
-    return configSrc.containsKey(BLACKLIST_KEY)
-        && configSrc.<List<?>>getProperty(BLACKLIST_KEY).contains(classDef.getName());
+    return configSrc.containsKey(BLACKLIST_KEY) && configSrc.<List<String>>getProperty(
+        BLACKLIST_KEY).contains(classDef.getName());
   }
 
   private void createXClass(ClassDefinition classDef) throws DocumentAccessException {
