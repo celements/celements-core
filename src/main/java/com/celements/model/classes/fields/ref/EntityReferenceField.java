@@ -39,12 +39,20 @@ public abstract class EntityReferenceField<T extends EntityReference> extends Ab
 
   @Override
   public Object serialize(T value) {
-    return getWebUtils().serializeRef(value);
+    Object ret = null;
+    if (value != null) {
+      ret = getWebUtils().serializeRef(value);
+    }
+    return ret;
   }
 
   @Override
   public T resolve(Object obj) {
-    return getWebUtils().resolveReference(obj.toString(), getType());
+    T ret = null;
+    if (obj != null) {
+      ret = getWebUtils().resolveReference(obj.toString(), getType());
+    }
+    return ret;
   }
 
 }

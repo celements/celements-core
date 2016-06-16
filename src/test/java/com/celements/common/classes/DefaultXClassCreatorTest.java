@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.configuration.ConfigurationSource;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -50,14 +49,10 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    classDef = new TestClassDefinition();
-    DefaultComponentDescriptor<ClassDefinition> descr = new DefaultComponentDescriptor<>();
-    descr.setRole(ClassDefinition.class);
-    descr.setRoleHint(classDef.getName());
-    Utils.getComponentManager().registerComponent(descr, classDef);
     registerComponentMock(IModelAccessFacade.class);
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
+    classDef = Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME);
   }
 
   @Test

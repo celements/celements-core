@@ -9,7 +9,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.classes.fields.number.IntField;
 import com.celements.model.classes.fields.number.NumberField;
-import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 
 public class NumberFieldTest extends AbstractComponentTest {
 
@@ -32,8 +32,8 @@ public class NumberFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_getXField() throws Exception {
-    assertTrue(field.getXField() instanceof StringClass);
-    StringClass xField = (StringClass) field.getXField();
+    assertTrue(field.getXField() instanceof NumberClass);
+    NumberClass xField = (NumberClass) field.getXField();
     assertEquals(size, (Integer) xField.getSize());
   }
 
