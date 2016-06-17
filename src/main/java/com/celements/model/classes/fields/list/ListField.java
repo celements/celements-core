@@ -17,7 +17,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public abstract class ListField extends AbstractClassField<List<String>> implements
     CustomClassField<List<String>> {
 
-  private boolean multiSelect;
+  private Boolean multiSelect;
   private Integer size;
   private String displayType;
   private Boolean picker;
@@ -49,7 +49,7 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
     }
   }
 
-  public boolean getMultiSelect() {
+  public Boolean getMultiSelect() {
     return multiSelect;
   }
 
@@ -101,7 +101,9 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
   @Override
   protected PropertyClass getPropertyClass() {
     ListClass element = getListClass();
-    element.setMultiSelect(multiSelect);
+    if (multiSelect != null) {
+      element.setMultiSelect(multiSelect);
+    }
     if (size != null) {
       element.setSize(size);
     }
@@ -111,7 +113,6 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
     if (picker != null) {
       element.setPicker(picker);
     }
-    element.setSeparator(getSeparator());
     element.setSeparators(getSeparator());
     return element;
   }
