@@ -24,20 +24,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.validation.constraints.NotNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.navigation.TreeNode;
-import com.celements.web.plugin.CelementsWebPlugin;
+import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 public class GetMappedMenuItemsForParentCommand {
 
-  public static final String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
+  public final static String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(CelementsWebPlugin.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(
+      GetMappedMenuItemsForParentCommand.class);
 
   private boolean _isActive;
 
@@ -64,26 +71,40 @@ public class GetMappedMenuItemsForParentCommand {
       List<TreeNode> menu = new ArrayList<TreeNode>();
       try {
         List<Object[]> results = context.getWiki().getStore().search(getHQL(), 0, 0, context);
-        mLogger.info("getMenuItems: found " + results.size() + " menus with parentKey "
-            + parentKey);
+        LOGGER.info("getMenuItems: found " + results.size() + " menus with parentKey " + parentKey);
         for (Object[] nodeData : results) {
-          TreeNode treeNode = new TreeNode(new DocumentReference(context.getDatabase(),
-              nodeData[1].toString(), nodeData[0].toString().split("\\.")[1]),
-              nodeData[2].toString(), (Integer) nodeData[3]);
-          treeNode.setPartName(nodeData[4].toString());
+          DocumentReference docRef = new DocumentReference(context.getDatabase(),
+              nodeData[1].toString(), nodeData[0].toString().split("\\.")[1]);
+          String partName = MoreObjects.firstNonNull(nodeData[4], "").toString();
+          String parentFN = MoreObjects.firstNonNull(nodeData[2], "").toString();
+          TreeNode treeNode = new TreeNode(docRef, resolveParentRef(parentFN),
+              (Integer) nodeData[3], partName);
           menu.add(treeNode);
         }
       } catch (XWikiException e) {
-        mLogger.error("getMenuItems ", e);
+        LOGGER.error("getMenuItems ", e);
       }
       context.setDatabase(saveDatabase);
       return menu;
     } else {
       if (is_isActive()) {
-        mLogger.warn("getMenuItems: parentKey is emtpy");
+        LOGGER.warn("getMenuItems: parentKey is emtpy");
       }
       return Collections.emptyList();
     }
+  }
+
+  private EntityReference resolveParentRef(@NotNull String parentFN) {
+    EntityType entityType = (parentFN.contains(".")) ? EntityType.DOCUMENT : EntityType.SPACE;
+    EntityReference parentRef = null;
+    if (parentFN.isEmpty()) {
+      parentRef = getWebUtils().resolveEntityReference(parentFN, entityType);
+    }
+    return parentRef;
+  }
+
+  private IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   String getHQL() {

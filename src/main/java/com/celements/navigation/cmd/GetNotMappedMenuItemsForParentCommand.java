@@ -26,22 +26,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
-import com.celements.navigation.IPartNameGetStrategy;
 import com.celements.navigation.TreeNode;
+import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class GetNotMappedMenuItemsForParentCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(
+  private final static Logger LOGGER = LoggerFactory.getLogger(
       GetNotMappedMenuItemsForParentCommand.class);
 
   private final Map<String, Map<String, List<TreeNode>>> menuItems;
@@ -99,6 +102,7 @@ public class GetNotMappedMenuItemsForParentCommand {
     if (!menuItems.containsKey(wikiName)) {
       LOGGER.debug("loadMenuForWiki: loading for wikiName [{}].", wikiName);
       Map<String, List<TreeNode>> wikiMenuItemsMap = new HashMap<String, List<TreeNode>>();
+      final MenuItemObjectPartNameGetter strategy = new MenuItemObjectPartNameGetter();
       queryCount = queryCount + 1;
       List<TreeNode> menu = null;
       try {
@@ -114,7 +118,8 @@ public class GetNotMappedMenuItemsForParentCommand {
           docCount++;
           LOGGER.debug("got item from db: {}", docData[0].toString());
           oldParentKey = parentKey;
-          parentKey = getParentKey(wikiName, docData[2].toString(), docData[1].toString());
+          String parentFN = MoreObjects.firstNonNull(docData[2], "").toString();
+          parentKey = getParentKey(wikiName, parentFN, docData[1].toString());
           if (!oldParentKey.equals(parentKey) || (menu == null)) {
             if (menu != null) {
               LOGGER.debug("put menu in cache for parent [{}]", oldParentKey);
@@ -123,32 +128,16 @@ public class GetNotMappedMenuItemsForParentCommand {
             menu = getMenuCacheForParent(wikiMenuItemsMap, parentKey);
           }
           LOGGER.debug("put item [{}] in cache [{}]: ", docData[0].toString(), parentKey);
-          if ((wikiName == null) || (docData[1].toString() == null) || (docData[0].toString().split(
-              "\\.")[1] == null) || "".equals(wikiName) || "".equals(docData[1].toString())
-              || "".equals(docData[0].toString().split("\\.")[1])) {
+          if ((wikiName == null) || (docData[1] == null) || (docData[0].toString().split(
+              "\\.").length < 2) || wikiName.isEmpty() || docData[1].toString().isEmpty()
+              || ("".equals(docData[0].toString().split("\\.")[1]))) {
             LOGGER.warn("loadMenuForWiki: skip [{}] because of null value!! " + "'{}', '{}', '{}'",
-                docData[0].toString(), wikiName, docData[1].toString(), docData[0].toString().split(
-                    "\\.")[1]);
+                docData[0].toString(), wikiName, docData[1], docData[0].toString().split("\\.")[1]);
           } else {
-            TreeNode treeNode = new TreeNode(new DocumentReference(wikiName, docData[1].toString(),
-                docData[0].toString().split("\\.")[1]), docData[2].toString(),
-                (Integer) docData[3]);
-            treeNode.setPartNameGetStrategy(new IPartNameGetStrategy() {
-
-              @Override
-              public String getPartName(String fullName, XWikiContext context) {
-                try {
-                  XWikiDocument itemdoc = context.getWiki().getDocument(fullName, context);
-                  BaseObject cobj = itemdoc.getObject("Celements2.MenuItem");
-                  if (cobj != null) {
-                    return cobj.getStringValue("part_name");
-                  }
-                } catch (XWikiException exp) {
-                  LOGGER.error("getPartName failed for '{}'.", fullName, exp);
-                }
-                return "";
-              }
-            });
+            DocumentReference docRef = new DocumentReference(wikiName, docData[1].toString(),
+                docData[0].toString().split("\\.")[1]);
+            TreeNode treeNode = new TreeNode(docRef, resolveParentRef(parentFN),
+                (Integer) docData[3], strategy);
             menu.add(treeNode);
           }
         }
@@ -169,6 +158,19 @@ public class GetNotMappedMenuItemsForParentCommand {
       }
     }
     return internalGetMenuItemsForWiki(wikiName);
+  }
+
+  private IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private EntityReference resolveParentRef(@NotNull String parentFN) {
+    EntityType entityType = (parentFN.contains(".")) ? EntityType.DOCUMENT : EntityType.SPACE;
+    EntityReference parentRef = null;
+    if (parentFN.isEmpty()) {
+      parentRef = getWebUtils().resolveEntityReference(parentFN, entityType);
+    }
+    return parentRef;
   }
 
   List<Object[]> getFromDBForParentKey(String wikiName) throws XWikiException {

@@ -71,6 +71,7 @@ public class NavigationTest extends AbstractComponentTest {
   private PageLayoutCommand mockLayoutCmd;
   private XWikiRightService mockRightService;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
@@ -1081,7 +1082,7 @@ public class NavigationTest extends AbstractComponentTest {
         getContext().getDatabase()));
     DocumentReference homeDocRef = new DocumentReference(getContext().getDatabase(), spaceName,
         "Home");
-    List<TreeNode> mainNodeList = Arrays.asList(new TreeNode(homeDocRef, "", 1));
+    List<TreeNode> mainNodeList = Arrays.asList(new TreeNode(homeDocRef, null, 1));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))).andReturn(
         mainNodeList);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1141,7 +1142,7 @@ public class NavigationTest extends AbstractComponentTest {
     expectLastCall().anyTimes();
     DocumentReference subNodeRef = new DocumentReference(getContext().getDatabase(), spaceName,
         "SubNodeDoc");
-    List<TreeNode> nodeList = Arrays.asList(new TreeNode(subNodeRef, "", 1));
+    List<TreeNode> nodeList = Arrays.asList(new TreeNode(subNodeRef, null, 1));
     expect(tNServiceMock.getSubNodesForParent(eq(parentRef), same(navFilterMock))).andReturn(
         nodeList);
     replayDefault();
@@ -1279,11 +1280,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> expectedMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1311,11 +1312,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1345,11 +1346,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1379,11 +1380,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1413,11 +1414,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1446,11 +1447,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
@@ -1480,11 +1481,11 @@ public class NavigationTest extends AbstractComponentTest {
     DocumentReference docRef3 = new DocumentReference(wikiName, spaceName, "myPage3");
     DocumentReference docRef4 = new DocumentReference(wikiName, spaceName, "myPage4");
     DocumentReference docRef5 = new DocumentReference(wikiName, spaceName, "myPage5");
-    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, "", 1);
-    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, "", 2);
-    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, "", 3);
-    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, "", 4);
-    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, "", 5);
+    TreeNode treeNode1 = new TreeNode(docRef1, mySpaceRef, 1);
+    TreeNode treeNode2 = new TreeNode(docRef2, mySpaceRef, 2);
+    TreeNode treeNode3 = new TreeNode(docRef3, mySpaceRef, 3);
+    TreeNode treeNode4 = new TreeNode(docRef4, mySpaceRef, 4);
+    TreeNode treeNode5 = new TreeNode(docRef5, mySpaceRef, 5);
     List<TreeNode> allMenuItemsList = Arrays.asList(treeNode1, treeNode2, treeNode3, treeNode4,
         treeNode5);
     expect(tNServiceMock.getSubNodesForParent(eq(""), eq(spaceName), same(
