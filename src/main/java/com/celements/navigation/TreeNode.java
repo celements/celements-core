@@ -44,7 +44,7 @@ public class TreeNode {
 
   private final DocumentReference docRef;
 
-  private String partName;
+  private volatile String partName;
 
   private PartNameGetter partNameGetter;
 
@@ -62,7 +62,8 @@ public class TreeNode {
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
   }
 
-  public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef, Integer position) {
+  public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef,
+      Integer position) {
     this(docRef, getWebUtilsService().getRefLocalSerializer().serialize(parentRef), position);
   }
 
@@ -87,8 +88,8 @@ public class TreeNode {
     if ("".equals(parent)) {
       return docRef.getLastSpaceReference();
     } else {
-      return getWebUtilsService().resolveDocumentReference(parent,
-          getWebUtilsService().getWikiRef(docRef));
+      return getWebUtilsService().resolveDocumentReference(parent, getWebUtilsService().getWikiRef(
+          docRef));
     }
   }
 
@@ -105,16 +106,23 @@ public class TreeNode {
     return getPartName();
   }
 
+  // this method should be thread safe, the method 'setPartNameInternal()' is synchronized and only
+  // changes the reference of the volatile field 'partName'
   public String getPartName() {
     if (partName == null) {
-      PartNameGetter theStrategy = getPartNameGetStrategy();
-      if (theStrategy != null) {
-        partName = theStrategy.getPartName(getDocumentReference());
-      } else {
-        partName = "";
-      }
+      setPartNameInternal();
     }
     return partName;
+  }
+
+  private synchronized void setPartNameInternal() {
+    if (partName == null) {
+      String partName = "";
+      if (partNameGetter != null) {
+        partName = partNameGetter.getPartName(getDocumentReference());
+      }
+      setPartName(partName);
+    }
   }
 
   public synchronized void setPartName(String partName) {
@@ -122,10 +130,6 @@ public class TreeNode {
       partName = "";
     }
     this.partName = partName;
-  }
-
-  private synchronized PartNameGetter getPartNameGetStrategy() {
-    return partNameGetter;
   }
 
   public synchronized void setPartNameGetter(PartNameGetter strategy) {
@@ -136,8 +140,8 @@ public class TreeNode {
    * @deprecated since 1.140 instead use setPartNameGetter(PartNameGetter)
    */
   @Deprecated
-  public synchronized void setPartNameGetStrategy(IPartNameGetStrategy strategy) {
-    partNameGetter = new PartNameGetterWrapper(strategy);
+  public void setPartNameGetStrategy(IPartNameGetStrategy strategy) {
+    setPartNameGetter(new PartNameGetterWrapper(strategy));
   }
 
   public DocumentReference getDocumentReference() {
