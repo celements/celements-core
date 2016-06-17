@@ -42,15 +42,11 @@ public class EnumListField<T extends Enum<T>> extends ListField<T> {
 
   @Override
   protected List<T> resolveList(List<?> list) {
-    List<T> ret = null;
-    if (list != null) {
-      ret = new ArrayList<>();
-      for (Object elem : (Collection<?>) list) {
-        ret.add(Enum.valueOf(enumType, elem.toString()));
-      }
-      ret = Collections.unmodifiableList(ret);
+    List<T> ret = new ArrayList<>();
+    for (Object elem : (Collection<?>) list) {
+      ret.add(Enum.valueOf(enumType, elem.toString()));
     }
-    return ret;
+    return Collections.unmodifiableList(ret);
   }
 
   @Override

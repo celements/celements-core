@@ -83,4 +83,27 @@ public class EnumListFieldTest extends AbstractComponentTest {
         field.getClassRef()).getListValue(field.getName()));
   }
 
+  @Test
+  public void test_resolve_serialize_null() throws Exception {
+    IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
+    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    field.setMultiSelect(true);
+
+    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
+
+    replayDefault();
+    List<TestEnum> ret1 = modelAccess.getProperty(doc, field);
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
+    List<TestEnum> ret2 = modelAccess.getProperty(doc, field);
+    verifyDefault();
+
+    assertNotNull(ret1);
+    assertTrue(ret1.isEmpty());
+    assertNotNull(ret2);
+    assertTrue(ret2.isEmpty());
+    assertTrue(modelAccess.getXObject(doc, field.getClassRef()).getListValue(
+        field.getName()).isEmpty());
+  }
+
 }

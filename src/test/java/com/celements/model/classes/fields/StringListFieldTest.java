@@ -106,4 +106,28 @@ public class StringListFieldTest extends AbstractComponentTest {
         field.getName()));
   }
 
+  @Test
+  public void test_resolve_serialize_null() throws Exception {
+    IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
+    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    field.setMultiSelect(true);
+    field.setValues(Arrays.asList("A", "B", "C", "D"));
+
+    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
+
+    replayDefault();
+    List<String> ret1 = modelAccess.getProperty(doc, field);
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
+    List<String> ret2 = modelAccess.getProperty(doc, field);
+    verifyDefault();
+
+    assertNotNull(ret1);
+    assertTrue(ret1.isEmpty());
+    assertNotNull(ret2);
+    assertTrue(ret2.isEmpty());
+    assertTrue(modelAccess.getXObject(doc, field.getClassRef()).getListValue(
+        field.getName()).isEmpty());
+  }
+
 }

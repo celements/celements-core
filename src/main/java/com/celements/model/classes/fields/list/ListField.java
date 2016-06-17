@@ -1,8 +1,8 @@
 package com.celements.model.classes.fields.list;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -34,17 +34,19 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   @Override
   public List<T> resolve(Object obj) {
-    List<?> list = null;
+    List<?> list;
     if (obj instanceof String) {
       list = Splitter.on(getSeparator()).splitToList((String) obj);
-    } else {
+    } else if (obj != null) {
       list = getType().cast(obj);
+    } else {
+      list = new ArrayList<>();
     }
     return resolveList(list);
   }
 
-  @Nullable
-  protected abstract List<T> resolveList(@Nullable List<?> list);
+  @NotNull
+  protected abstract List<T> resolveList(@NotNull List<?> list);
 
   public Boolean getMultiSelect() {
     return multiSelect;
