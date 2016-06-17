@@ -7,7 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
-public class DBListField extends ListField {
+public class DBListField extends StringListField {
 
   private String sql;
 

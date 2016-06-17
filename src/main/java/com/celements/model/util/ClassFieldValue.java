@@ -55,12 +55,12 @@ public class ClassFieldValue<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> ClassFieldValue<T> select(ClassField<T> toSelect,
-      Collection<ClassFieldValue<?>> in) {
-    ClassFieldValue<T> ret = null;
+  public static <T> T select(ClassField<T> toSelect, Collection<ClassFieldValue<?>> in) {
+    T ret = null;
     for (ClassFieldValue<?> fieldVal : in) {
       if (toSelect.equals(fieldVal.field)) {
-        ret = (ClassFieldValue<T>) fieldVal;
+        ret = ((ClassFieldValue<T>) fieldVal).getValue();
+        break;
       }
     }
     return ret;

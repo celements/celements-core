@@ -564,7 +564,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       } else {
         return field.getType().cast(value);
       }
-    } catch (ClassCastException ex) {
+    } catch (ClassCastException | IllegalArgumentException ex) {
       throw new IllegalArgumentException("Field '" + field + "' ill defined, expecting type '"
           + field.getType() + "' but got '" + value.getClass() + "'", ex);
     }
@@ -629,8 +629,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       } else {
         return value;
       }
-    } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("Field ill defined: " + field, ex);
+    } catch (ClassCastException | IllegalArgumentException ex) {
+      throw new IllegalArgumentException("Field '" + field + "' ill defined", ex);
     }
   }
 

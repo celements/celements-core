@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.python.google.common.base.Joiner;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.classes.fields.AbstractClassField;
@@ -14,8 +13,8 @@ import com.google.common.base.Splitter;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public abstract class ListField extends AbstractClassField<List<String>> implements
-    CustomClassField<List<String>> {
+public abstract class ListField<T> extends AbstractClassField<List<T>> implements
+    CustomClassField<List<T>> {
 
   private Boolean multiSelect;
   private Integer size;
@@ -29,31 +28,29 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
 
   @Override
   @SuppressWarnings("unchecked")
-  public Class<List<String>> getType() {
-    return (Class<List<String>>) (Object) List.class;
+  public Class<List<T>> getType() {
+    return (Class<List<T>>) (Object) List.class;
   }
 
   @Override
-  @Nullable
-  public Object serialize(@Nullable List<String> value) {
-    return Joiner.on(getSeparator()).join(value);
-  }
-
-  @Override
-  @Nullable
-  public List<String> resolve(@Nullable Object obj) {
+  public List<T> resolve(Object obj) {
+    List<?> list = null;
     if (obj instanceof String) {
-      return Splitter.on(getSeparator()).splitToList((String) obj);
+      list = Splitter.on(getSeparator()).splitToList((String) obj);
     } else {
-      return getType().cast(obj);
+      list = getType().cast(obj);
     }
+    return resolveList(list);
   }
+
+  @Nullable
+  protected abstract List<T> resolveList(@Nullable List<?> list);
 
   public Boolean getMultiSelect() {
     return multiSelect;
   }
 
-  public ListField setMultiSelect(Boolean multiSelect) {
+  public ListField<T> setMultiSelect(Boolean multiSelect) {
     this.multiSelect = multiSelect;
     return this;
   }
@@ -62,7 +59,7 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
     return size;
   }
 
-  public ListField setSize(Integer size) {
+  public ListField<T> setSize(Integer size) {
     this.size = size;
     return this;
   }
@@ -71,7 +68,7 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
     return displayType;
   }
 
-  public ListField setDisplayType(String displayType) {
+  public ListField<T> setDisplayType(String displayType) {
     this.displayType = displayType;
     return this;
   }
@@ -80,7 +77,7 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
     return picker;
   }
 
-  public ListField setPicker(Boolean picker) {
+  public ListField<T> setPicker(Boolean picker) {
     this.picker = picker;
     return this;
   }
@@ -93,7 +90,7 @@ public abstract class ListField extends AbstractClassField<List<String>> impleme
     }
   }
 
-  public ListField setSeparator(String separator) {
+  public ListField<T> setSeparator(String separator) {
     this.separator = separator;
     return this;
   }

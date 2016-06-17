@@ -30,7 +30,6 @@ import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.DateField;
 import com.celements.model.classes.fields.StringField;
-import com.celements.model.classes.fields.list.StaticListField;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
@@ -43,7 +42,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -1014,46 +1012,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     String objValue = modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
         field.getName());
     assertEquals(modelAccess.webUtilsService.serializeRef(toStoreRef), objValue);
-  }
-
-  @Test
-  public void test_setProperty_getProperty_List() throws Exception {
-    String value = "B";
-    StaticListField field = new StaticListField(classRef, "myField");
-    field.setMultiSelect(false);
-    field.setValues(Arrays.asList("A", "B", "C", "D"));
-
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
-    expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
-
-    replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, Arrays.asList("B")));
-    List<String> ret = modelAccess.getProperty(doc, field);
-    verifyDefault();
-
-    assertEquals(Arrays.asList("B"), ret);
-    assertEquals(value, modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
-        field.getName()));
-  }
-
-  @Test
-  public void test_setProperty_getProperty_List_multiselect() throws Exception {
-    List<String> value = Arrays.asList("B", "D");
-    StaticListField field = new StaticListField(classRef, "myField");
-    field.setMultiSelect(true);
-    field.setValues(Arrays.asList("A", "B", "C", "D"));
-
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
-    expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
-
-    replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<String> ret = modelAccess.getProperty(doc, field);
-    verifyDefault();
-
-    assertEquals(value, ret);
-    assertEquals(value, modelAccess.getXObject(doc, field.getClassRef()).getListValue(
-        field.getName()));
   }
 
   @Test

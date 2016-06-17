@@ -10,7 +10,7 @@ import com.google.common.base.Joiner;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
-public class StaticListField extends ListField {
+public class StaticListField extends StringListField {
 
   private List<String> values;
 
