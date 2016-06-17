@@ -390,8 +390,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
-          throw new NoAccessRightsException(obj.getDocumentReference(),
-              getContext().getXWikiUser(), EAccessLevel.VIEW);
+          throw new NoAccessRightsException(obj.getDocumentReference(), getContext().getXWikiUser(),
+              EAccessLevel.VIEW);
         }
       } catch (IllegalStateException exp) {
         LOGGER.warn("getApiObject failed for '{}'", obj, exp);
@@ -565,7 +565,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         return field.getType().cast(value);
       }
     } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("Field ill defined: " + field, ex);
+      throw new IllegalArgumentException("Field '" + field + "' ill defined, expecting type '"
+          + field.getType() + "' but got '" + value.getClass() + "'", ex);
     }
   }
 
@@ -589,7 +590,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     boolean hasChange = !Objects.equal(value, getProperty(obj, name));
     if (hasChange) {
       if (value instanceof Collection) {
-        value = Joiner.on('|').join((Iterable<?>) value);
+        value = Joiner.on('|').join((Collection<?>) value);
       }
       obj.set(name, value, getContext());
     }
@@ -641,8 +642,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         return attach;
       }
     }
-    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
-        filename, document, document.getDocumentReference());
+    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]", filename,
+        document, document.getDocumentReference());
     // FIXME empty or null filename leads to exception:
     // java.lang.IllegalArgumentException: An Entity Reference name cannot be null or
     // empty

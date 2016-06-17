@@ -10,20 +10,19 @@ import com.google.common.base.Joiner;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
-public abstract class StaticListField<T> extends ListField<T> {
+public class StaticListField extends ListField {
 
   private List<String> values;
 
-  public StaticListField(@NotNull DocumentReference classRef, @NotNull String name,
-      boolean multiSelect) {
-    super(classRef, name, multiSelect);
+  public StaticListField(@NotNull DocumentReference classRef, @NotNull String name) {
+    super(classRef, name);
   }
 
   public List<String> getValues() {
     return values;
   }
 
-  public StaticListField<T> setValues(@NotNull List<String> values) {
+  public StaticListField setValues(@NotNull List<String> values) {
     this.values = values;
     return this;
   }

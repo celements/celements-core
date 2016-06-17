@@ -7,20 +7,19 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
-public abstract class DBListField<T> extends ListField<T> {
+public class DBListField extends ListField {
 
   private String sql;
 
-  public DBListField(@NotNull DocumentReference classRef, @NotNull String name,
-      boolean multiSelect) {
-    super(classRef, name, multiSelect);
+  public DBListField(@NotNull DocumentReference classRef, @NotNull String name) {
+    super(classRef, name);
   }
 
   public String getSql() {
     return sql;
   }
 
-  public DBListField<T> setSql(String sql) {
+  public DBListField setSql(String sql) {
     this.sql = sql;
     return this;
   }
