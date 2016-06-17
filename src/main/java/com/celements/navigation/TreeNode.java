@@ -26,11 +26,9 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.MoreObjects;
@@ -64,8 +62,7 @@ public class TreeNode {
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
   }
 
-  public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef,
-      Integer position) {
+  public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef, Integer position) {
     this(docRef, getWebUtilsService().getRefLocalSerializer().serialize(parentRef), position);
   }
 
@@ -83,7 +80,7 @@ public class TreeNode {
    */
   @Deprecated
   public String getFullName() {
-    return docRef.getLastSpaceReference().getName() + "." + docRef.getName();
+    return getWebUtilsService().serializeRef(docRef, true);
   }
 
   public EntityReference getParentRef() {
@@ -91,7 +88,7 @@ public class TreeNode {
       return docRef.getLastSpaceReference();
     } else {
       return getWebUtilsService().resolveDocumentReference(parent,
-          (WikiReference) docRef.getLastSpaceReference().getParent());
+          getWebUtilsService().getWikiRef(docRef));
     }
   }
 
@@ -103,7 +100,12 @@ public class TreeNode {
     return position;
   }
 
+  @Deprecated
   public String getPartName(XWikiContext context) {
+    return getPartName();
+  }
+
+  public String getPartName() {
     if (partName == null) {
       PartNameGetter theStrategy = getPartNameGetStrategy();
       if (theStrategy != null) {
@@ -146,35 +148,27 @@ public class TreeNode {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
+    } else if (obj instanceof TreeNode) { // null check included
+      TreeNode node = (TreeNode) obj;
+      return Objects.equals(docRef, node.docRef) && Objects.equals(position, node.position);
     }
-    if (!(obj instanceof TreeNode)) { // null check included
-      return false;
-    }
-    // object must be Test at this point
-    TreeNode node = (TreeNode) obj;
-    return Objects.equals(docRef, node.docRef) && Objects.equals(position, node.position);
+    return false;
   }
 
   @Override
   public int hashCode() {
-    int hash = 7;
-    hash = (31 * hash) + (position == null ? 0 : position.hashCode());
-    hash = (31 * hash) + (docRef == null ? 0 : docRef.hashCode());
-    return hash;
+    return Objects.hash(docRef, position);
   }
 
   @Override
   public String toString() {
     return "[ docRef = [" + docRef + "], parent = [" + parent + "], position = [" + position
-        + "], partName = [" + getPartName(getContext()) + "] ]";
+        + "], partName = [" + getPartName() + "] ]";
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext) getExecutionContext().getProperty("xwikicontext");
-  }
-
-  private ExecutionContext getExecutionContext() {
-    return Utils.getComponent(Execution.class).getContext();
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   private static IWebUtilsService getWebUtilsService() {
@@ -194,11 +188,6 @@ public class TreeNode {
     public String getPartName(DocumentReference docRef) {
       return strategy.getPartName(docRef.getLastSpaceReference().getName() + "." + docRef.getName(),
           getContext());
-    }
-
-    private XWikiContext getContext() {
-      return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-          "xwikicontext");
     }
 
   }
