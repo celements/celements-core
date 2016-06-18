@@ -107,7 +107,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
       }
       pageTypeList = Collections.unmodifiableList(newPageTypeList);
       LOGGER.info("computed XObjectPageTypeCache for wiki '{}' list '{}'", wikiRef, pageTypeList);
-      pageTypeRefCache.putIfAbsent(wikiRef, pageTypeList);
+      pageTypeRefCache.put(wikiRef, pageTypeList);
     }
     return pageTypeList;
   }
