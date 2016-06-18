@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -57,7 +59,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class Navigation implements INavigation {
 
-  public static final int DEFAULT_MAX_LEVEL = 100;
+  @Deprecated
+  public static final int DEFAULT_MAX_LEVEL = NavigationConfig.DEFAULT_MAX_LEVEL;
 
   /**
    * @deprecated since 2.18.0 instead use NavigationClasses.NAVIGATION_CONFIG_CLASS_DOC
@@ -77,9 +80,8 @@ public class Navigation implements INavigation {
 
   private INavigationBuilder navBuilder;
 
-  public static final String LIST_LAYOUT_TYPE = "list";
-
-  private static final String _PAGE_MENU_DATA_TYPE = "pageMenu";
+  @Deprecated
+  public static final String LIST_LAYOUT_TYPE = NavigationConfig.LIST_LAYOUT_TYPE;
 
   public static final String MENU_TYPE_MENUITEM = "menuitem";
 
@@ -138,10 +140,10 @@ public class Navigation implements INavigation {
     this.menuNameCmd = new MultilingualMenuNameCommand();
     this.uniqueName = navUniqueId;
     this.navigationEnabled = true;
-    this.fromHierarchyLevel = 1;
+    this.fromHierarchyLevel = NavigationConfig.DEFAULT_MIN_LEVEL;
     this.toHierarchyLevel = DEFAULT_MAX_LEVEL;
     this.menuPart = "";
-    this.dataType = _PAGE_MENU_DATA_TYPE;
+    this.dataType = NavigationConfig.PAGE_MENU_DATA_TYPE;
     this._showAll = false;
     this._hasLink = true;
     try {
@@ -286,7 +288,7 @@ public class Navigation implements INavigation {
     if (navInclude == null) {
       if (navigationEnabled) {
         StringBuilder outStream = new StringBuilder();
-        if (_PAGE_MENU_DATA_TYPE.equals(dataType)) {
+        if (NavigationConfig.PAGE_MENU_DATA_TYPE.equals(dataType)) {
           try {
             addNavigationForParent(outStream, parentRef, getNumLevels());
           } catch (XWikiException e) {
@@ -603,7 +605,7 @@ public class Navigation implements INavigation {
     if (isLastItem) {
       cssClass += " last";
     }
-    if ((numItem % 2) == 0) {
+    if ((numItem & 1) == 0) {
       cssClass += " cel_nav_even";
     } else {
       cssClass += " cel_nav_odd";
@@ -784,6 +786,7 @@ public class Navigation implements INavigation {
   }
 
   @Override
+  @Deprecated
   public void loadConfigFromObject(BaseObject prefObj) {
     if (prefObj != null) {
       configName = prefObj.getStringValue("menu_element_name");
@@ -819,6 +822,28 @@ public class Navigation implements INavigation {
       // setMenuTypeByTypeName(prefObj.getStringValue("menu_type"));
     } else {
       navigationEnabled = false;
+    }
+  }
+
+  @Override
+  public void loadConfig(@NotNull NavigationConfig config) {
+    navigationEnabled = config.isEnabled();
+    if (navigationEnabled) {
+      configName = config.getConfigName();
+      fromHierarchyLevel = config.getFromHierarchyLevel();
+      toHierarchyLevel = config.getToHierarchyLevel();
+      showInactiveToLevel = config.getShowInactiveToLevel();
+      menuPart = config.getMenuPart();
+      nodeSpaceRef = config.getNodeSpaceRef();
+      dataType = config.getDataType();
+      try {
+        setLayoutType(config.getLayoutType());
+      } catch (UnknownLayoutTypeException exp) {
+        LOGGER.error("loadConfigFromObject failed on setLayoutType.", exp);
+      }
+      nrOfItemsPerPage = config.getNrOfItemsPerPage();
+      presentationType = config.getPresentationType();
+      cmCssClass = config.getCssClass();
     }
   }
 
