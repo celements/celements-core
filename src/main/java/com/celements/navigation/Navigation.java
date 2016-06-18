@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
@@ -83,7 +83,7 @@ public class Navigation implements INavigation {
 
   public static final String MENU_TYPE_MENUITEM = "menuitem";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(Navigation.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(Navigation.class);
 
   private static final String _NAVIGATION_COUNTER_KEY = NavigationApi.class.getCanonicalName()
       + "_NavigationCounter";
@@ -147,7 +147,7 @@ public class Navigation implements INavigation {
     try {
       setLayoutType(LIST_LAYOUT_TYPE);
     } catch (UnknownLayoutTypeException exp) {
-      LOGGER.fatal("Native List Layout Type not available!", exp);
+      LOGGER.error("Native List Layout Type not available!", exp);
       throw new IllegalStateException("Native List Layout Type not available!", exp);
     }
     this.nodeSpaceRef = null;
@@ -209,7 +209,7 @@ public class Navigation implements INavigation {
 
   /**
    * setFromHierarchyLevel
-   * 
+   *
    * @param fromHierarchyLevel
    *          starting (including) at Hierarchy Level 1 = mainMenu , 0 = spaceMenu
    *          (including all first mainMenuItems of all Spaces)
@@ -223,7 +223,7 @@ public class Navigation implements INavigation {
 
   /**
    * setToHierarchyLevel
-   * 
+   *
    * @param toHierarchyLevel
    *          ending (including) with Hierarchy Level
    */
@@ -242,6 +242,7 @@ public class Navigation implements INavigation {
    *          (default: $doc.web)
    * @deprecated since 2.24.0 instead use setNodeSpace
    */
+  @Override
   @Deprecated
   public void setMenuSpace(String menuSpace) {
     if ((menuSpace != null) && (!"".equals(menuSpace))) {
@@ -259,6 +260,7 @@ public class Navigation implements INavigation {
   /**
    * @deprecated since 2.24.0 use includeNavigation() instead.
    */
+  @Override
   @Deprecated
   public String includeNavigation(XWikiContext context) {
     return includeNavigation();
@@ -305,6 +307,7 @@ public class Navigation implements INavigation {
   /**
    * @deprecated since 2.24.0 instead use getNodeSpaceRef()
    */
+  @Override
   @Deprecated
   public String getMenuSpace(XWikiContext context) {
     return getWebUtilsService().getRefLocalSerializer().serialize(getNodeSpaceRef());
@@ -369,7 +372,7 @@ public class Navigation implements INavigation {
   }
 
   private int getNumLevels() {
-    return toHierarchyLevel - fromHierarchyLevel + 1;
+    return (toHierarchyLevel - fromHierarchyLevel) + 1;
   }
 
   void addNavigationForParent(StringBuilder outStream, EntityReference parentRef, int numMoreLevels)
@@ -453,12 +456,12 @@ public class Navigation implements INavigation {
   }
 
   private int getCurrentLevel(int numMoreLevels) {
-    return getNumLevels() - numMoreLevels + 1;
+    return (getNumLevels() - numMoreLevels) + 1;
   }
 
   /**
    * menuPart is only valid for the first level of a menu block.
-   * 
+   *
    * @param currentLevel
    * @return
    */
@@ -600,7 +603,7 @@ public class Navigation implements INavigation {
     if (isLastItem) {
       cssClass += " last";
     }
-    if (numItem % 2 == 0) {
+    if ((numItem % 2) == 0) {
       cssClass += " cel_nav_even";
     } else {
       cssClass += " cel_nav_odd";
@@ -692,7 +695,7 @@ public class Navigation implements INavigation {
   }
 
   static String newNavIdForContext(XWikiContext context) {
-    Long navCounter = (Long) getNavCounterFromContext(context) + 1;
+    Long navCounter = getNavCounterFromContext(context) + 1;
     context.put(_NAVIGATION_COUNTER_KEY, navCounter);
     return "N" + navCounter;
   }
@@ -731,8 +734,8 @@ public class Navigation implements INavigation {
     BaseObject prevMenuItem = null;
     try {
       prevMenuItem = WebUtils.getInstance().getPrevMenuItem(fullName, context);
-    } catch (XWikiException e) {
-      LOGGER.error(e, e);
+    } catch (XWikiException exp) {
+      LOGGER.error("getPrevMenuItemFullName failed.", exp);
     }
     if (prevMenuItem != null) {
       return prevMenuItem.getName();
@@ -746,8 +749,8 @@ public class Navigation implements INavigation {
     BaseObject nextMenuItem = null;
     try {
       nextMenuItem = WebUtils.getInstance().getNextMenuItem(fullName, context);
-    } catch (XWikiException e) {
-      LOGGER.error(e, e);
+    } catch (XWikiException exp) {
+      LOGGER.error("getNextMenuItemFullName failed.", exp);
     }
     if (nextMenuItem != null) {
       return nextMenuItem.getName();
@@ -775,8 +778,8 @@ public class Navigation implements INavigation {
       BaseObject prefObj = utils.getConfigDocByInheritance(doc, NAVIGATION_CONFIG_CLASS,
           context).getObject(NAVIGATION_CONFIG_CLASS, "menu_element_name", configName, false);
       loadConfigFromObject(prefObj);
-    } catch (XWikiException e) {
-      LOGGER.error(e, e);
+    } catch (XWikiException exp) {
+      LOGGER.error("loadConfigByName failed.", exp);
     }
   }
 
@@ -800,7 +803,7 @@ public class Navigation implements INavigation {
         try {
           setLayoutType(prefObj.getStringValue("layout_type"));
         } catch (UnknownLayoutTypeException exp) {
-          LOGGER.error(exp, exp);
+          LOGGER.error("loadConfigFromObject failed on setLayoutType.", exp);
         }
       }
       int itemsPerPage = prefObj.getIntValue(INavigationClassConfig.ITEMS_PER_PAGE);
