@@ -70,6 +70,7 @@ public final class TreeNode {
     return (parentRef == null);
   }
 
+  @NotNull
   public EntityReference getParentRef() {
     if (isEmptyParentRef()) {
       return new SpaceReference(getDocumentReference().getLastSpaceReference().clone());
@@ -78,14 +79,17 @@ public final class TreeNode {
     }
   }
 
+  @NotNull
   public Integer getPosition() {
     return position;
   }
 
+  @NotNull
   public String getPartName() {
     return partName;
   }
 
+  @NotNull
   public DocumentReference getDocumentReference() {
     return docRef;
   }
@@ -107,6 +111,7 @@ public final class TreeNode {
   }
 
   @Override
+  @NotNull
   public String toString() {
     return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(
         ", parentRef=").append(parentRef).append(", position=").append(position).append(
