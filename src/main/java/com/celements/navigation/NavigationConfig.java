@@ -37,20 +37,20 @@ public final class NavigationConfig {
   private final String cmCssClass;
 
   public NavigationConfig() {
-    this(false, null, null, null, null, null, null, null, null, null, null);
+    this(false, null, null, null, null, null, null, null, null, null, null, null);
   }
 
   public NavigationConfig(@Nullable String configName, @Nullable Integer fromHierarchyLevel,
       @Nullable Integer toHierarchyLevel, @Nullable Integer showInactiveToLevel,
-      @Nullable String menuPart, @Nullable SpaceReference nodeSpaceRef, @Nullable String layoutType,
-      @Nullable Integer nrOfItemsPerPage, @Nullable String presentationTypeHint,
-      @Nullable String cmCssClass) {
+      @Nullable String menuPart, @Nullable String dataType, @Nullable SpaceReference nodeSpaceRef,
+      @Nullable String layoutType, @Nullable Integer nrOfItemsPerPage,
+      @Nullable String presentationTypeHint, @Nullable String cmCssClass) {
     this(true, configName, fromHierarchyLevel, toHierarchyLevel, showInactiveToLevel, menuPart,
-        nodeSpaceRef, layoutType, nrOfItemsPerPage, presentationTypeHint, cmCssClass);
+        dataType, nodeSpaceRef, layoutType, nrOfItemsPerPage, presentationTypeHint, cmCssClass);
   }
 
   private NavigationConfig(boolean enabled, String configName, Integer fromHierarchyLevel,
-      Integer toHierarchyLevel, Integer showInactiveToLevel, String menuPart,
+      Integer toHierarchyLevel, Integer showInactiveToLevel, String menuPart, String dataType,
       SpaceReference nodeSpaceRef, String layoutType, Integer nrOfItemsPerPage,
       String presentationTypeHint, String cmCssClass) {
     this.enabled = enabled;
@@ -61,7 +61,7 @@ public final class NavigationConfig {
     this.showInactiveToLevel = MoreObjects.firstNonNull(showInactiveToLevel, DEFAULT_MIN_LEVEL - 1);
     this.menuPart = Strings.nullToEmpty(menuPart);
     this.nodeSpaceRef = nodeSpaceRef;
-    this.dataType = PAGE_MENU_DATA_TYPE;
+    this.dataType = MoreObjects.firstNonNull(Strings.emptyToNull(dataType), PAGE_MENU_DATA_TYPE);
     this.layoutType = MoreObjects.firstNonNull(layoutType, LIST_LAYOUT_TYPE);
     this.nrOfItemsPerPage = Math.max(MoreObjects.firstNonNull(nrOfItemsPerPage, 1), 1);
     this.presentationTypeHint = MoreObjects.firstNonNull(Strings.emptyToNull(presentationTypeHint),
