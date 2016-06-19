@@ -33,6 +33,7 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
 
   @Requirement
   private INavigationClassConfig navClassConfig;
+
   @Requirement
   private IModelAccessFacade modelAccess;
 
