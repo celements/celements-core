@@ -835,6 +835,7 @@ public class NavigationTest extends AbstractComponentTest {
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().once();
     String spaceName = "MySpace";
+    navConfigObj.setStringValue("menu_space", spaceName);
     EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
         getContext().getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))).andReturn(
