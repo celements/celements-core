@@ -898,7 +898,8 @@ public class NavigationTest extends AbstractComponentTest {
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
-    navConfigObj.setStringValue(NavigationClasses.PRESENTATION_TYPE_FIELD, "testPresentationType");
+    navConfigObj.setStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD,
+        "testPresentationType");
     IPresentationTypeRole componentInstance = createMockAndAddToDefault(
         IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
