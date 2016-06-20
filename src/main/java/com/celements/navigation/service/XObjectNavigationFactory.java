@@ -33,6 +33,7 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
 
   @Requirement
   private INavigationClassConfig navClassConfig;
+
   @Requirement
   private IModelAccessFacade modelAccess;
 
@@ -59,7 +60,7 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
     return nav;
   }
 
-  private NavigationConfig loadConfigFromObject(BaseObject prefObj) {
+  NavigationConfig loadConfigFromObject(BaseObject prefObj) {
     if (prefObj != null) {
       String configName = prefObj.getStringValue("menu_element_name");
       LOGGER.debug("loadConfigFromObject: configName [" + configName + "] from doc ["

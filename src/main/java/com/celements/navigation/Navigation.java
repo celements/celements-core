@@ -839,7 +839,7 @@ public class Navigation implements INavigation {
       try {
         setLayoutType(config.getLayoutType());
       } catch (UnknownLayoutTypeException exp) {
-        LOGGER.error("loadConfigFromObject failed on setLayoutType.", exp);
+        LOGGER.error("loadConfig failed on setLayoutType.", exp);
       }
       nrOfItemsPerPage = config.getNrOfItemsPerPage();
       presentationType = config.getPresentationType();
