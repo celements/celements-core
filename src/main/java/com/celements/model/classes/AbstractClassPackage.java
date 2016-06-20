@@ -5,7 +5,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
-public abstract class AbstractClassDefinitionPackage implements ClassDefinitionPackage {
+public abstract class AbstractClassPackage implements ClassPackage {
 
   @Requirement
   protected ConfigurationSource configSrc;

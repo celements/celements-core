@@ -7,7 +7,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
 @Component(TestClassDefinitionPackage.NAME)
-public class TestClassDefinitionPackage extends AbstractClassDefinitionPackage {
+public class TestClassDefinitionPackage extends AbstractClassPackage {
 
   public static final String NAME = "Test";
 

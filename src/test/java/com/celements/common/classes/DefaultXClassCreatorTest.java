@@ -35,7 +35,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
-import com.celements.model.classes.ClassDefinitionPackage;
+import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.TestClassDefinitionPackage;
 import com.celements.model.classes.TestClassDefinitionRole;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.web.Utils;
 public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   private XClassCreator creator;
-  private ClassDefinitionPackage classPackage;
+  private ClassPackage classPackage;
   private ClassDefinition classDef;
 
   @Override
@@ -57,7 +57,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     registerComponentMock(IModelAccessFacade.class);
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
-    classPackage = Utils.getComponent(ClassDefinitionPackage.class,
+    classPackage = Utils.getComponent(ClassPackage.class,
         TestClassDefinitionPackage.NAME);
     classDef = Utils.getComponent(TestClassDefinitionRole.class, TestClassDefinition.NAME);
   }
@@ -65,7 +65,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Test
   public void test_createXClasses_notActive() throws Exception {
     expect(getMock(ConfigurationSource.class).getProperty(
-        ClassDefinitionPackage.CFG_SRC_KEY)).andReturn(Collections.emptyList()).anyTimes();
+        ClassPackage.CFG_SRC_KEY)).andReturn(Collections.emptyList()).anyTimes();
 
     replayDefault();
     creator.createXClasses();
@@ -75,7 +75,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Test
   public void test_createXClasses_blacklisted() throws Exception {
     expect(getMock(ConfigurationSource.class).getProperty(
-        ClassDefinitionPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
+        ClassPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
             classPackage.getName())).anyTimes();
     expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
         Arrays.asList(classDef.getName())).anyTimes();
@@ -90,7 +90,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     XWikiDocument doc = new XWikiDocument(classDef.getClassRef());
 
     expect(getMock(ConfigurationSource.class).getProperty(
-        ClassDefinitionPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
+        ClassPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
             classPackage.getName())).anyTimes();
     expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
         null).anyTimes();

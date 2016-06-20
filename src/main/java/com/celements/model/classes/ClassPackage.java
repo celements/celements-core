@@ -5,7 +5,7 @@ import java.util.List;
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface ClassDefinitionPackage {
+public interface ClassPackage {
 
   public static final String CFG_SRC_KEY = "celements.classdefinition.active";
 

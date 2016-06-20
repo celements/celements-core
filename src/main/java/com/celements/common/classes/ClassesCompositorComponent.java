@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 
-import com.celements.model.classes.ClassDefinitionPackage;
+import com.celements.model.classes.ClassPackage;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
@@ -101,7 +101,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
       }
     }
     try {
-      return Utils.getComponentManager().lookup(ClassDefinitionPackage.class, name).isActivated();
+      return Utils.getComponentManager().lookup(ClassPackage.class, name).isActivated();
     } catch (ComponentLookupException exc) {
       LOGGER.debug("ClassDefinitionPackage '{}' doesn't exist", name);
       return false;

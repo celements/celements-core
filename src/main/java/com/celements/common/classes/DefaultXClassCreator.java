@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Requirement;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
-import com.celements.model.classes.ClassDefinitionPackage;
+import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,12 +50,12 @@ public class DefaultXClassCreator implements XClassCreator {
   protected IWebUtilsService webUtils;
 
   @Requirement
-  private List<ClassDefinitionPackage> classPackages;
+  private List<ClassPackage> classPackages;
 
   @Override
   public void createXClasses() {
     LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
-    for (ClassDefinitionPackage classPackage : classPackages) {
+    for (ClassPackage classPackage : classPackages) {
       if (classPackage.isActivated()) {
         createXClasses(classPackage);
       } else {
@@ -65,7 +65,7 @@ public class DefaultXClassCreator implements XClassCreator {
   }
 
   @Override
-  public void createXClasses(ClassDefinitionPackage classPackage) {
+  public void createXClasses(ClassPackage classPackage) {
     LOGGER.debug("creating package '{}'", classPackage.getName());
     for (ClassDefinition classDef : classPackage.getClassDefinitions()) {
       if (!classDef.isBlacklisted()) {
