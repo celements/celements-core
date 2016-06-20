@@ -18,6 +18,7 @@ public final class NavigationConfig {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(NavigationConfig.class);
 
+  public static final int UNLIMITED_ITEMS_PER_PAGE = -1;
   public static final int DEFAULT_MIN_LEVEL = 1;
   public static final int DEFAULT_MAX_LEVEL = 100;
   public static final String PAGE_MENU_DATA_TYPE = "pageMenu";
@@ -65,7 +66,8 @@ public final class NavigationConfig {
     this.nodeSpaceRef = nodeSpaceRef;
     this.dataType = MoreObjects.firstNonNull(Strings.emptyToNull(dataType), PAGE_MENU_DATA_TYPE);
     this.layoutType = MoreObjects.firstNonNull(layoutType, LIST_LAYOUT_TYPE);
-    this.nrOfItemsPerPage = Math.max(MoreObjects.firstNonNull(nrOfItemsPerPage, 1), 1);
+    this.nrOfItemsPerPage = Math.max(MoreObjects.firstNonNull(nrOfItemsPerPage,
+        UNLIMITED_ITEMS_PER_PAGE), UNLIMITED_ITEMS_PER_PAGE);
     this.presentationTypeHint = MoreObjects.firstNonNull(Strings.emptyToNull(presentationTypeHint),
         "default");
     this.cmCssClass = Strings.nullToEmpty(cmCssClass);
@@ -113,7 +115,11 @@ public final class NavigationConfig {
   }
 
   public int getNrOfItemsPerPage() {
-    return nrOfItemsPerPage;
+    if (nrOfItemsPerPage > 0) {
+      return nrOfItemsPerPage;
+    } else {
+      return UNLIMITED_ITEMS_PER_PAGE;
+    }
   }
 
   @Nullable
