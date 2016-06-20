@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.DocumentAccessException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.web.service.IWebUtilsService;
@@ -59,7 +58,7 @@ public class DefaultXClassCreator implements XClassCreator {
   private List<ClassDefinition> classDefinitions;
 
   @Override
-  public void createXClasses() throws DocumentAccessException {
+  public void createXClasses() {
     LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
     for (ClassDefinition classDef : classDefinitions) {
       if (!isBlacklisted(classDef)) {
@@ -76,7 +75,7 @@ public class DefaultXClassCreator implements XClassCreator {
         BLACKLIST_KEY).contains(classDef.getName());
   }
 
-  private void createXClass(ClassDefinition classDef) throws DocumentAccessException {
+  private void createXClass(ClassDefinition classDef) {
     boolean needsUpdate = !modelAccess.exists(classDef.getClassRef());
     XWikiDocument classDoc = modelAccess.getOrCreateDocument(classDef.getClassRef());
     BaseClass bClass = classDoc.getXClass();

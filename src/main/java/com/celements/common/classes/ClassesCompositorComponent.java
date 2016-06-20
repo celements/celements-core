@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
-import com.celements.model.access.exception.DocumentAccessException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -55,11 +54,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   @Override
   public void checkClasses() {
     LOGGER.info("start checkClasses for wiki '{}'", getContext().getDatabase());
-    try {
-      classCreator.createXClasses();
-    } catch (DocumentAccessException dae) {
-      LOGGER.error("Exception creating classes", dae);
-    }
+    classCreator.createXClasses();
     checkClassCollections();
     checkOldClassCollections();
     LOGGER.debug("finish checkClasses for wiki '{}'", getContext().getDatabase());

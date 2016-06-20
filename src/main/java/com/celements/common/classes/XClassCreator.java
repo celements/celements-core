@@ -21,7 +21,6 @@ package com.celements.common.classes;
 
 import org.xwiki.component.annotation.ComponentRole;
 
-import com.celements.model.access.exception.DocumentAccessException;
 import com.celements.model.classes.ClassDefinition;
 
 @ComponentRole
@@ -29,11 +28,7 @@ public interface XClassCreator {
 
   /**
    * loads all {@link ClassDefinition} and creates XClasses from them if they don't exist yet
-   *
-   * @throws DocumentAccessException
-   *           if unable to load/save defined documents
    */
-
-  public void createXClasses() throws DocumentAccessException;
+  public void createXClasses();
 
 }
