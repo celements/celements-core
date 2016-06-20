@@ -11,12 +11,8 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
-import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
-import com.celements.model.access.exception.DocumentDeleteException;
-import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
@@ -30,33 +26,29 @@ import com.xpn.xwiki.objects.BaseObject;
 @ComponentRole
 public interface IModelAccessFacade {
 
-  public XWikiDocument getDocument(DocumentReference docRef) throws DocumentLoadException,
-      DocumentNotExistsException;
+  public XWikiDocument getDocument(DocumentReference docRef) throws DocumentNotExistsException;
 
   public XWikiDocument getDocument(DocumentReference docRef, String lang)
-      throws DocumentLoadException, DocumentNotExistsException, TranslationNotExistsException;
+      throws DocumentNotExistsException, TranslationNotExistsException;
 
-  public XWikiDocument createDocument(DocumentReference docRef) throws DocumentLoadException,
-      DocumentAlreadyExistsException;
+  public XWikiDocument createDocument(DocumentReference docRef)
+      throws DocumentAlreadyExistsException;
 
-  public XWikiDocument getOrCreateDocument(DocumentReference docRef) throws DocumentLoadException;
+  public XWikiDocument getOrCreateDocument(DocumentReference docRef);
 
   public boolean exists(DocumentReference docRef);
 
-  public void saveDocument(XWikiDocument doc) throws DocumentSaveException;
+  public void saveDocument(XWikiDocument doc);
 
-  public void saveDocument(XWikiDocument doc, String comment) throws DocumentSaveException;
+  public void saveDocument(XWikiDocument doc, String comment);
 
-  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
-      throws DocumentSaveException;
+  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit);
 
-  public void deleteDocument(DocumentReference docRef, boolean totrash)
-      throws DocumentLoadException, DocumentDeleteException;
+  public void deleteDocument(DocumentReference docRef, boolean totrash);
 
-  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException;
+  public void deleteDocument(XWikiDocument doc, boolean totrash);
 
-  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
-      throws DocumentDeleteException;
+  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash);
 
   /**
    * @param docRef
@@ -64,13 +56,11 @@ public interface IModelAccessFacade {
    * @param classRef
    *          type of xobject to get (may not be null)
    * @return the xobject or null
-   * @throws DocumentLoadException
-   *           if unable to load the document
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef)
-      throws DocumentLoadException, DocumentNotExistsException;
+      throws DocumentNotExistsException;
 
   /**
    * @param docRef
@@ -82,13 +72,11 @@ public interface IModelAccessFacade {
    * @param value
    *          for field specific xobject filtering
    * @return the xobject or null
-   * @throws DocumentLoadException
-   *           if unable to load the document
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef, String key,
-      Object value) throws DocumentLoadException, DocumentNotExistsException;
+      Object value) throws DocumentNotExistsException;
 
   /**
    * @param doc
@@ -119,13 +107,11 @@ public interface IModelAccessFacade {
    * @param classRef
    *          type of xobjects to get (may not be null)
    * @return an unmodifiable list of xobjects (without null values) or empty list
-   * @throws DocumentLoadException
-   *           if unable to load the document
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef)
-      throws DocumentLoadException, DocumentNotExistsException;
+      throws DocumentNotExistsException;
 
   /**
    * @param docRef
@@ -137,13 +123,11 @@ public interface IModelAccessFacade {
    * @param value
    *          for field specific xobjects filtering
    * @return an unmodifiable list of xobjects (without null values) or empty list
-   * @throws DocumentLoadException
-   *           if unable to load the document
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
-      String key, Object value) throws DocumentLoadException, DocumentNotExistsException;
+      String key, Object value) throws DocumentNotExistsException;
 
   /**
    * @param docRef
@@ -155,13 +139,11 @@ public interface IModelAccessFacade {
    * @param values
    *          for field specific xobjects filtering
    * @return an unmodifiable list of xobjects (without null values) or empty list
-   * @throws DocumentLoadException
-   *           if unable to load the document
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
-      String key, Collection<?> values) throws DocumentLoadException, DocumentNotExistsException;
+      String key, Collection<?> values) throws DocumentNotExistsException;
 
   /**
    * @param doc
@@ -218,11 +200,8 @@ public interface IModelAccessFacade {
    * @param value
    *          for field specific xobject filtering
    * @return newly created xobject with set key - value
-   * @throws ClassDocumentLoadException
-   *           if unable to load class document
    */
-  public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef)
-      throws ClassDocumentLoadException;
+  public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
    * @param doc
@@ -230,11 +209,8 @@ public interface IModelAccessFacade {
    * @param classRef
    *          type of xobjects to create (may not be null)
    * @return already existing or newly created xobject
-   * @throws ClassDocumentLoadException
-   *           if unable to load class document
    */
-  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef)
-      throws ClassDocumentLoadException;
+  public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
    * @param doc
@@ -242,11 +218,9 @@ public interface IModelAccessFacade {
    * @param classRef
    *          type of xobjects to create (may not be null)
    * @return already existing or newly created xobject
-   * @throws ClassDocumentLoadException
-   *           if unable to load class document
    */
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef, String key,
-      Object value) throws ClassDocumentLoadException;
+      Object value);
 
   /**
    * @param doc
@@ -304,7 +278,7 @@ public interface IModelAccessFacade {
       Collection<?> values);
 
   public Object getProperty(DocumentReference docRef, DocumentReference classRef, String name)
-      throws DocumentLoadException, DocumentNotExistsException;
+      throws DocumentNotExistsException;
 
   public Object getProperty(XWikiDocument doc, DocumentReference classRef, String name);
 

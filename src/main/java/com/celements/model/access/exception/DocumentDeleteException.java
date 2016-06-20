@@ -2,7 +2,7 @@ package com.celements.model.access.exception;
 
 import org.xwiki.model.reference.DocumentReference;
 
-public class DocumentDeleteException extends DocumentAccessException {
+public class DocumentDeleteException extends DocumentAccessRuntimeException {
 
   private static final long serialVersionUID = -2592241907630457229L;
 
