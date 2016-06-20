@@ -74,8 +74,7 @@ public interface IWebUtilsService {
    */
   public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
 
-  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
-      boolean includeDoc);
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef, boolean includeDoc);
 
   public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section)
       throws XWikiException;
@@ -141,8 +140,7 @@ public interface IWebUtilsService {
 
   public EntityReference resolveEntityReference(String name, EntityType type);
 
-  public EntityReference resolveEntityReference(String name, EntityType type,
-      WikiReference wikiRef);
+  public EntityReference resolveEntityReference(String name, EntityType type, WikiReference wikiRef);
 
   /**
    * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
@@ -154,6 +152,7 @@ public interface IWebUtilsService {
    *          for the reference type
    * @return a resolved reference
    */
+  @NotNull
   public <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token);
 
@@ -169,6 +168,7 @@ public interface IWebUtilsService {
    *          a reference used as base for resolving
    * @return a resolved reference
    */
+  @NotNull
   public <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token, @Nullable EntityReference baseRef);
 
@@ -214,8 +214,7 @@ public interface IWebUtilsService {
       Comparator<XWikiAttachment> comparator);
 
   /**
-   * @deprecated instead use
-   *             {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean)}
+   * @deprecated instead use {@link #getAttachmentListSorted(XWikiDocument, Comparator, boolean)}
    */
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,

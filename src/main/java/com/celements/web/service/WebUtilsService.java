@@ -53,8 +53,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -62,6 +60,7 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
@@ -79,8 +78,6 @@ import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -100,19 +97,6 @@ public class WebUtilsService implements IWebUtilsService {
   private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
 
   private static Logger LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
-
-  private static final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
-
-  static {
-    Map<Class<? extends EntityReference>, EntityType> map = new HashMap<>();
-    map.put(WikiReference.class, EntityType.WIKI);
-    map.put(SpaceReference.class, EntityType.SPACE);
-    map.put(DocumentReference.class, EntityType.DOCUMENT);
-    map.put(AttachmentReference.class, EntityType.ATTACHMENT);
-    map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
-    map.put(ObjectReference.class, EntityType.OBJECT);
-    ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
-  }
 
   @Requirement
   ComponentManager componentManager;
@@ -501,7 +485,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef) {
-    return resolveReference(name, ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
+    return resolveReference(name, ModelUtils.ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
   }
 
   @Override
@@ -520,20 +504,18 @@ public class WebUtilsService implements IWebUtilsService {
   public <T extends EntityReference> T resolveReference(String name, Class<T> token,
       EntityReference baseRef) {
     baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
-    try {
-      EntityReference ref;
-      if (ENTITY_TYPE_MAP.get(token).ordinal() > EntityType.WIKI.ordinal()) {
-        ref = refResolver.resolve(name, ENTITY_TYPE_MAP.get(token), baseRef);
-      } else {
-        ref = resolveWikiReference(name, getWikiRef(baseRef));
-      }
-      T ret = token.getConstructor(EntityReference.class).newInstance(ref);
-      LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
-      return ret;
-    } catch (ReflectiveOperationException | SecurityException | IllegalArgumentException
-        | NullPointerException exc) {
-      throw new IllegalArgumentException("Unsupported entity class: " + token, exc);
+    EntityReference reference;
+    EntityType type = ModelUtils.ENTITY_TYPE_MAP.get(token);
+    if (type == null) {
+      throw new IllegalArgumentException("Unsupported entity class: " + token);
+    } else if (type == EntityType.WIKI) {
+      reference = resolveWikiReference(name, getWikiRef(baseRef));
+    } else {
+      reference = refResolver.resolve(name, type, baseRef);
     }
+    T ret = ModelUtils.cloneReference(reference, token);
+    LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
+    return ret;
   }
 
   @Override
@@ -831,7 +813,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc, boolean bWithObjects,
       boolean bWithRendering, boolean bWithAttachmentContent, boolean bWithVersions)
-          throws XWikiException {
+      throws XWikiException {
     Map<String, String> docData = new LinkedHashMap<String, String>();
     DocumentReference docRef = xwikiDoc.getDocumentReference();
     docData.put("web", docRef.getLastSpaceReference().getName());
@@ -879,7 +861,7 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
     docData.put("menuName", menuNameCmd.getMultilingualMenuName(serializer_default.serialize(
         xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
-        // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
+    // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
     /**
      * TODO add Attachments for (XWikiAttachment attach : xwikiDoc.getAttachmentList()) {
@@ -1214,8 +1196,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   /**
-   * @deprecated instead use
-   *             {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
+   * @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
    */
   @Deprecated
   @Override
