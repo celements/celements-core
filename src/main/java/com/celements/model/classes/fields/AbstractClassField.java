@@ -13,6 +13,9 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Subclasses are expected be thread safe
+ */
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
   private final DocumentReference classRef;
