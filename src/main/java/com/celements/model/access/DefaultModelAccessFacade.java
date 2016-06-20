@@ -540,7 +540,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public <T> T getProperty(DocumentReference docRef, ClassField<T> field)
-      throws DocumentLoadException, DocumentNotExistsException {
+      throws DocumentNotExistsException {
     return resolvePropertyValue(field, getProperty(docRef, field.getClassRef(), field.getName()));
   }
 
@@ -591,15 +591,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public <T> XWikiDocument setProperty(DocumentReference docRef, ClassField<T> field, T value)
-      throws DocumentLoadException, DocumentNotExistsException {
+      throws DocumentNotExistsException {
     XWikiDocument doc = getDocument(docRef);
     setProperty(doc, field, value);
     return doc;
   }
 
   @Override
-  public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value)
-      throws ClassDocumentLoadException {
+  public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value) {
     try {
       return setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(),
           serializePropertyValue(field, value));
@@ -609,8 +608,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue)
-      throws ClassDocumentLoadException {
+  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue) {
     return setProperty(doc, fieldValue.getField(), fieldValue.getValue());
   }
 

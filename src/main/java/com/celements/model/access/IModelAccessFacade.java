@@ -293,7 +293,7 @@ public interface IModelAccessFacade {
 
   @Nullable
   public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull ClassField<T> field)
-      throws DocumentLoadException, DocumentNotExistsException;
+      throws DocumentNotExistsException;
 
   @Nullable
   public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
@@ -305,14 +305,12 @@ public interface IModelAccessFacade {
   public boolean setProperty(BaseObject obj, String name, Object value);
 
   public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
-      @NotNull ClassField<T> field, @Nullable T value) throws DocumentLoadException,
-      DocumentNotExistsException;
+      @NotNull ClassField<T> field, @Nullable T value) throws DocumentNotExistsException;
 
   public <T> boolean setProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field,
-      @Nullable T value) throws ClassDocumentLoadException;
+      @Nullable T value);
 
-  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue)
-      throws ClassDocumentLoadException;
+  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue);
 
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use
