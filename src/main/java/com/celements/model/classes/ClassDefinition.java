@@ -10,6 +10,8 @@ import com.celements.model.classes.fields.ClassField;
 @ComponentRole
 public interface ClassDefinition {
 
+  public static final String CFG_SRC_KEY = "celements.classdefinition.blacklist";
+
   /**
    * @return the name of the component and class definition, used for blacklisting
    */
@@ -19,6 +21,11 @@ public interface ClassDefinition {
    * @return the document reference on which the class is defined
    */
   public DocumentReference getClassRef();
+
+  /**
+   * @return true if the class definition is blacklisted
+   */
+  public boolean isBlacklisted();
 
   /**
    * @return true if the class is mapped internally (hibernate mapping)

@@ -22,13 +22,30 @@ package com.celements.common.classes;
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassDefinitionPackage;
 
 @ComponentRole
 public interface XClassCreator {
 
   /**
-   * loads all {@link ClassDefinition} and creates XClasses from them if they don't exist yet
+   * creates XClasses from all {@link ClassDefinitionPackage}s if activated, class definition isn't
+   * blacklisted and XClasses don't exist yet
    */
   public void createXClasses();
+
+  /**
+   * creates XClasses from provided classPackage if class definition isn't blacklisted and XClasses
+   * don't exist
+   *
+   * @param classPackage
+   */
+  public void createXClasses(ClassDefinitionPackage classPackage);
+
+  /**
+   * creates XClass from provided classDefinition if doesn't exist yet
+   *
+   * @param classDefinition
+   */
+  public void createXClass(ClassDefinition classDefinition);
 
 }

@@ -16,9 +16,10 @@ import com.celements.model.classes.fields.ref.DocumentReferenceField;
 
 @Singleton
 @Component(TestClassDefinition.NAME)
-public class TestClassDefinition implements ClassDefinition {
+public class TestClassDefinition extends AbstractClassDefinition implements
+    TestClassDefinitionRole {
 
-  public static final String NAME = "TestClass";
+  public static final String NAME = "Test.TestClass";
 
   public static final DocumentReference CLASS_REF = new DocumentReference("db", "classes", "test");
 

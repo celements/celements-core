@@ -27,10 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.configuration.ConfigurationSource;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassDefinitionPackage;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,8 +43,6 @@ public class DefaultXClassCreator implements XClassCreator {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DefaultXClassCreator.class);
 
-  public static final String BLACKLIST_KEY = "celements.classdefinition.blacklist";
-
   @Requirement
   protected IModelAccessFacade modelAccess;
 
@@ -52,30 +50,35 @@ public class DefaultXClassCreator implements XClassCreator {
   protected IWebUtilsService webUtils;
 
   @Requirement
-  protected ConfigurationSource configSrc;
-
-  @Requirement
-  private List<ClassDefinition> classDefinitions;
+  private List<ClassDefinitionPackage> classPackages;
 
   @Override
   public void createXClasses() {
     LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
-    for (ClassDefinition classDef : classDefinitions) {
-      if (!isBlacklisted(classDef)) {
+    for (ClassDefinitionPackage classPackage : classPackages) {
+      if (classPackage.isActivated()) {
+        createXClasses(classPackage);
+      } else {
+        LOGGER.info("skipping package '{}'", classPackage.getName());
+      }
+    }
+  }
+
+  @Override
+  public void createXClasses(ClassDefinitionPackage classPackage) {
+    LOGGER.debug("creating package '{}'", classPackage.getName());
+    for (ClassDefinition classDef : classPackage.getClassDefinitions()) {
+      if (!classDef.isBlacklisted()) {
         createXClass(classDef);
-        LOGGER.debug("created class '{}'", classDef.getName());
       } else {
         LOGGER.info("skipping blacklisted class '{}'", classDef.getName());
       }
     }
   }
 
-  private boolean isBlacklisted(ClassDefinition classDef) {
-    return configSrc.containsKey(BLACKLIST_KEY) && configSrc.<List<String>>getProperty(
-        BLACKLIST_KEY).contains(classDef.getName());
-  }
-
-  private void createXClass(ClassDefinition classDef) {
+  @Override
+  public void createXClass(ClassDefinition classDef) {
+    LOGGER.debug("creating class '{}'", classDef.getName());
     boolean created = !modelAccess.exists(classDef.getClassRef());
     boolean needsSave = created;
     XWikiDocument classDoc = modelAccess.getOrCreateDocument(classDef.getClassRef());

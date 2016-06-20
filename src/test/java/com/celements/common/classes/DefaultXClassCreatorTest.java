@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -34,7 +35,10 @@ import org.xwiki.configuration.ConfigurationSource;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassDefinitionPackage;
 import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.TestClassDefinitionPackage;
+import com.celements.model.classes.TestClassDefinitionRole;
 import com.celements.model.classes.fields.ClassField;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -43,6 +47,7 @@ import com.xpn.xwiki.web.Utils;
 public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   private XClassCreator creator;
+  private ClassDefinitionPackage classPackage;
   private ClassDefinition classDef;
 
   @Override
@@ -52,20 +57,49 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     registerComponentMock(IModelAccessFacade.class);
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
-    classDef = Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME);
+    classPackage = Utils.getComponent(ClassDefinitionPackage.class,
+        TestClassDefinitionPackage.NAME);
+    classDef = Utils.getComponent(TestClassDefinitionRole.class, TestClassDefinition.NAME);
+  }
+
+  @Test
+  public void test_createXClasses_notActive() throws Exception {
+    expect(getMock(ConfigurationSource.class).getProperty(
+        ClassDefinitionPackage.CFG_SRC_KEY)).andReturn(Collections.emptyList()).anyTimes();
+
+    replayDefault();
+    creator.createXClasses();
+    verifyDefault();
+  }
+
+  @Test
+  public void test_createXClasses_blacklisted() throws Exception {
+    expect(getMock(ConfigurationSource.class).getProperty(
+        ClassDefinitionPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
+            classPackage.getName())).anyTimes();
+    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
+        Arrays.asList(classDef.getName())).anyTimes();
+
+    replayDefault();
+    creator.createXClasses();
+    verifyDefault();
   }
 
   @Test
   public void test_createXClasses() throws Exception {
     XWikiDocument doc = new XWikiDocument(classDef.getClassRef());
 
-    expect(getMock(ConfigurationSource.class).containsKey(DefaultXClassCreator.BLACKLIST_KEY)).andReturn(
-        false).anyTimes();
+    expect(getMock(ConfigurationSource.class).getProperty(
+        ClassDefinitionPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
+            classPackage.getName())).anyTimes();
+    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
+        null).anyTimes();
+
     expect(getMock(IModelAccessFacade.class).exists(classDef.getClassRef())).andReturn(true).times(
         2);
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(classDef.getClassRef()))).andReturn(
-        doc).times(2);
-    getMock(IModelAccessFacade.class).saveDocument(same(doc));
+    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(
+        classDef.getClassRef()))).andReturn(doc).times(2);
+    getMock(IModelAccessFacade.class).saveDocument(same(doc), eq("updated XClass"));
     expectLastCall().once();
 
     replayDefault();
@@ -83,18 +117,6 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
       assertNotNull(xField);
       assertEquals(field.getName(), xField.getName());
     }
-  }
-
-  @Test
-  public void test_createXClasses_blacklisted() throws Exception {
-    expect(getMock(ConfigurationSource.class).containsKey(DefaultXClassCreator.BLACKLIST_KEY)).andReturn(
-        true).once();
-    expect(getMock(ConfigurationSource.class).getProperty(DefaultXClassCreator.BLACKLIST_KEY)).andReturn(
-        Arrays.asList(classDef.getName())).once();
-
-    replayDefault();
-    creator.createXClasses();
-    verifyDefault();
   }
 
 }
