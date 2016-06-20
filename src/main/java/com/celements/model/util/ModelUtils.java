@@ -17,7 +17,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
-public class ModelUtils {
+public final class ModelUtils {
 
   public static final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
 
@@ -30,6 +30,9 @@ public class ModelUtils {
     map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
     map.put(ObjectReference.class, EntityType.OBJECT);
     ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
+  }
+
+  private ModelUtils() {
   }
 
   /**
