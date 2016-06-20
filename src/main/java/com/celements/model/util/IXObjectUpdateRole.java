@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
 
-import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @ComponentRole
@@ -18,13 +17,10 @@ public interface IXObjectUpdateRole {
    * @param fieldMap
    *          key is of format "{ClassFullName}.{FieldName}"
    * @return true if doc has changed
-   * @throws ClassDocumentLoadException
-   *           if encountered invalid class name
    * @deprecated instead use {@link #update(XWikiDocument, Set)}
    */
   @Deprecated
-  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap)
-      throws ClassDocumentLoadException;
+  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap);
 
   /**
    * updates the document from the field map given
@@ -32,10 +28,7 @@ public interface IXObjectUpdateRole {
    * @param doc
    * @param fieldValues
    * @return true if doc has changed
-   * @throws ClassDocumentLoadException
-   *           if encountered invalid class name
    */
-  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues)
-      throws ClassDocumentLoadException;
+  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues);
 
 }

@@ -129,9 +129,8 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
     fieldMap.put("invalidString", "asdf");
     Throwable cause = new XWikiException();
 
-    expect(
-        getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")),
-            same(getContext()))).andThrow(cause).once();
+    expect(getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")), same(
+        getContext()))).andThrow(cause).once();
 
     replayDefault();
     try {
@@ -166,7 +165,8 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
 
     expect(modelAccessMock.getProperty(same(doc), eq(fieldVal1.getField()))).andReturn(null).once();
     expect(modelAccessMock.setProperty(same(doc), eq(fieldVal1))).andReturn(true).once();
-    expect(modelAccessMock.getProperty(same(doc), eq(fieldVal2.getField()))).andReturn(false).once();
+    expect(modelAccessMock.getProperty(same(doc), eq(fieldVal2.getField()))).andReturn(
+        false).once();
     expect(modelAccessMock.setProperty(same(doc), eq(fieldVal2))).andReturn(true).once();
     expect(modelAccessMock.getProperty(same(doc), eq(fieldVal3.getField()))).andReturn(1).once();
 

@@ -11,7 +11,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Objects;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -30,8 +29,7 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
 
   @Override
   @Deprecated
-  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap)
-      throws ClassDocumentLoadException {
+  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap) {
     boolean hasChanged = false;
     Map<String, BaseObject> objMap = getObjectMap(doc, fieldMap.keySet());
     for (String field : fieldMap.keySet()) {
@@ -51,8 +49,7 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
     return hasChanged;
   }
 
-  private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields)
-      throws ClassDocumentLoadException {
+  private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields) {
     Map<String, BaseObject> ret = new HashMap<>();
     for (String field : fields) {
       String className = extractClassName(field);
@@ -87,8 +84,7 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   }
 
   @Override
-  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues)
-      throws ClassDocumentLoadException {
+  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues) {
     boolean hasChanged = false;
     for (ClassFieldValue<?> fieldValue : fieldValues) {
       Object oldVal = modelAccess.getProperty(doc, fieldValue.getField());
