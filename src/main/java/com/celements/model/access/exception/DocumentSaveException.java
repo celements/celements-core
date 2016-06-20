@@ -2,7 +2,7 @@ package com.celements.model.access.exception;
 
 import org.xwiki.model.reference.DocumentReference;
 
-public class DocumentSaveException extends DocumentAccessException {
+public class DocumentSaveException extends DocumentAccessRuntimeException {
 
   private static final long serialVersionUID = -2592241907630457229L;
 
