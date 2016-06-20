@@ -37,7 +37,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.TestClassDefinitionPackage;
+import com.celements.model.classes.TestClassPackage;
 import com.celements.model.classes.TestClassDefinitionRole;
 import com.celements.model.classes.fields.ClassField;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -58,7 +58,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
     classPackage = Utils.getComponent(ClassPackage.class,
-        TestClassDefinitionPackage.NAME);
+        TestClassPackage.NAME);
     classDef = Utils.getComponent(TestClassDefinitionRole.class, TestClassDefinition.NAME);
   }
 

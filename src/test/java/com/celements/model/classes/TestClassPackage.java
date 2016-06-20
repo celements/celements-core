@@ -6,13 +6,13 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
-@Component(TestClassDefinitionPackage.NAME)
-public class TestClassDefinitionPackage extends AbstractClassPackage {
+@Component(TestClassPackage.NAME)
+public class TestClassPackage extends AbstractClassPackage {
 
   public static final String NAME = "Test";
 
   @Requirement
-  private List<TestClassDefinitionRole> testClassDefs;
+  private List<TestClassDefinitionRole> classDefs;
 
   @Override
   public String getName() {
@@ -21,7 +21,7 @@ public class TestClassDefinitionPackage extends AbstractClassPackage {
 
   @Override
   public List<? extends ClassDefinition> getClassDefinitions() {
-    return new ArrayList<>(testClassDefs);
+    return new ArrayList<>(classDefs);
   }
 
 }
