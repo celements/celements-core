@@ -26,8 +26,8 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.model.util.ModelUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -50,8 +50,8 @@ public final class TreeNode {
   public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @Nullable String partName) {
     Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
-    this.docRef = new DocumentReference(docRef.clone());
-    this.parentRef = (parentRef != null) ? parentRef.clone() : null;
+    this.docRef = ModelUtils.cloneReference(docRef, DocumentReference.class);
+    this.parentRef = (parentRef != null) ? ModelUtils.cloneReference(parentRef) : null;
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
     this.partName = Strings.nullToEmpty(partName);
   }
@@ -72,11 +72,13 @@ public final class TreeNode {
 
   @NotNull
   public EntityReference getParentRef() {
+    EntityReference ref;
     if (isEmptyParentRef()) {
-      return new SpaceReference(getDocumentReference().getLastSpaceReference().clone());
+      ref = getDocumentReference().getLastSpaceReference();
     } else {
-      return parentRef.clone();
+      ref = parentRef;
     }
+    return ModelUtils.cloneReference(ref);
   }
 
   @NotNull
@@ -113,9 +115,9 @@ public final class TreeNode {
   @Override
   @NotNull
   public String toString() {
-    return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(
-        ", parentRef=").append(parentRef).append(", position=").append(position).append(
-            ", partName=").append(partName).append("]").toString();
+    return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(", parentRef=").append(
+        parentRef).append(", position=").append(position).append(", partName=").append(partName).append(
+            "]").toString();
   }
 
 }
