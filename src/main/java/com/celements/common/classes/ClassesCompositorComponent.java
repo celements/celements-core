@@ -19,16 +19,19 @@
  */
 package com.celements.common.classes;
 
-import java.util.Map;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 
+import com.celements.model.classes.ClassDefinitionPackage;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class ClassesCompositorComponent implements IClassesCompositorComponent {
@@ -39,10 +42,10 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   private XClassCreator classCreator;
 
   @Requirement
-  private Map<String, IClassCollectionRole> classCollectionMap;
+  private List<IClassCollectionRole> classCollections;
 
   @Requirement
-  private Map<String, ICelementsClassCollection> classCollectionMap_old;
+  private List<ICelementsClassCollection> classCollectionsOld;
 
   @Requirement
   private Execution execution;
@@ -68,7 +71,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Deprecated
   void checkOldClassCollections() {
-    for (ICelementsClassCollection classCollection : classCollectionMap_old.values()) {
+    for (ICelementsClassCollection classCollection : classCollectionsOld) {
       try {
         classCollection.runUpdate(getContext());
       } catch (XWikiException xwe) {
@@ -80,7 +83,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Deprecated
   void checkClassCollections() {
-    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
+    for (IClassCollectionRole classCollection : classCollections) {
       try {
         classCollection.runUpdate();
       } catch (XWikiException xwe) {
@@ -92,13 +95,17 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public boolean isActivated(String name) {
-    // TODO build map in initialize with key name and value hint to avoid loop here
-    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
+    for (IClassCollectionRole classCollection : classCollections) {
       if (classCollection.getConfigName().equals(name)) {
         return classCollection.isActivated();
       }
     }
-    return false;
+    try {
+      return Utils.getComponentManager().lookup(ClassDefinitionPackage.class, name).isActivated();
+    } catch (ComponentLookupException exc) {
+      LOGGER.debug("ClassDefinitionPackage '{}' doesn't exist", name);
+      return false;
+    }
   }
 
 }
