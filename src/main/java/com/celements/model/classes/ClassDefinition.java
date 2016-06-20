@@ -28,6 +28,6 @@ public interface ClassDefinition {
   /**
    * @return a list of all fields defining this class
    */
-  public abstract List<ClassField<?>> getFields();
+  public List<ClassField<?>> getFields();
 
 }
