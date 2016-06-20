@@ -32,16 +32,22 @@ public class ModelUtils {
     ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
   }
 
+  /**
+   * @param reference
+   *          the reference to be cloned
+   * @return a cloned instance of the reference
+   */
+  @NotNull
   public static EntityReference cloneReference(@NotNull EntityReference reference) {
     return cloneReference(reference, ENTITY_TYPE_MAP.inverse().get(reference.getType()));
   }
 
   /**
    * @param reference
-   *          the reference to be copied
+   *          the reference to be cloned
    * @param token
    *          type of the reference
-   * @return a copied instance of the reference
+   * @return a cloned instance of the reference
    */
   @NotNull
   public static <T extends EntityReference> T cloneReference(@NotNull EntityReference reference,
