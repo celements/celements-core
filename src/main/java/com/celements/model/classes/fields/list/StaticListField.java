@@ -1,5 +1,7 @@
 package com.celements.model.classes.fields.list;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -12,7 +14,7 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 
 public class StaticListField extends StringListField {
 
-  private List<String> values;
+  private volatile List<String> values;
 
   public StaticListField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
@@ -23,7 +25,7 @@ public class StaticListField extends StringListField {
   }
 
   public StaticListField setValues(@NotNull List<String> values) {
-    this.values = values;
+    this.values = Collections.unmodifiableList(new ArrayList<>(values));
     return this;
   }
 

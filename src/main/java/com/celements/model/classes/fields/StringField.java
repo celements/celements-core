@@ -9,7 +9,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 
 public class StringField extends AbstractClassField<String> {
 
-  private Integer size;
+  private volatile Integer size;
 
   public StringField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);

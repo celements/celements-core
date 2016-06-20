@@ -13,7 +13,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 public abstract class EntityReferenceField<T extends EntityReference> extends AbstractClassField<T>
     implements CustomClassField<T> {
 
-  private Integer size;
+  private volatile Integer size;
 
   public EntityReferenceField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);

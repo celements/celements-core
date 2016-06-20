@@ -9,8 +9,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class BooleanField extends AbstractClassField<Boolean> {
 
-  private String displayType;
-  private Integer defaultValue;
+  private volatile String displayType;
+  private volatile Integer defaultValue;
 
   public BooleanField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);

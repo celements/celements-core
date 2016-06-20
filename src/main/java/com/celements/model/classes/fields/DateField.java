@@ -11,9 +11,9 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class DateField extends AbstractClassField<Date> {
 
-  private Integer size;
-  private Integer emptyIsToday;
-  private String dateFormat;
+  private volatile Integer size;
+  private volatile Integer emptyIsToday;
+  private volatile String dateFormat;
 
   public DateField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);

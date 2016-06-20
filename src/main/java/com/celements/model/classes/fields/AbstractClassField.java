@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.util.ModelUtils;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -17,18 +18,19 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   private final DocumentReference classRef;
   private final String name;
 
-  private String prettyName;
-  private String validationRegExp;
-  private String validationMessage;
+  private volatile String prettyName;
+  private volatile String validationRegExp;
+  private volatile String validationMessage;
 
   public AbstractClassField(@NotNull DocumentReference classRef, @NotNull String name) {
-    this.classRef = Objects.requireNonNull(classRef);
+    Objects.requireNonNull(classRef);
+    this.classRef = ModelUtils.cloneReference(classRef, DocumentReference.class);
     this.name = Objects.requireNonNull(Strings.emptyToNull(name));
   }
 
   @Override
   public DocumentReference getClassRef() {
-    return new DocumentReference(classRef);
+    return ModelUtils.cloneReference(classRef, DocumentReference.class);
   }
 
   @Override
@@ -102,7 +104,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public String toString(boolean local) {
-    return getWebUtils().serializeRef(getClassRef(), local) + "." + getName();
+    return getWebUtils().serializeRef(classRef, local) + "." + name;
   }
 
   protected static IWebUtilsService getWebUtils() {

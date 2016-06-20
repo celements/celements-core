@@ -16,11 +16,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public abstract class ListField<T> extends AbstractClassField<List<T>> implements
     CustomClassField<List<T>> {
 
-  private Boolean multiSelect;
-  private Integer size;
-  private String displayType;
-  private Boolean picker;
-  private String separator;
+  private volatile Boolean multiSelect;
+  private volatile Integer size;
+  private volatile String displayType;
+  private volatile Boolean picker;
+  private volatile String separator;
 
   public ListField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);

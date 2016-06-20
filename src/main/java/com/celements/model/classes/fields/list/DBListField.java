@@ -9,7 +9,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 public class DBListField extends StringListField {
 
-  private String sql;
+  private volatile String sql;
 
   public DBListField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);

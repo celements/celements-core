@@ -10,7 +10,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public abstract class NumberField<T extends Number> extends AbstractClassField<T> {
 
-  private Integer size;
+  private volatile Integer size;
 
   public NumberField(@NotNull DocumentReference classRef, @NotNull String name) {
     super(classRef, name);
