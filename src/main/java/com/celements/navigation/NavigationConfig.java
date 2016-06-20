@@ -49,6 +49,8 @@ public final class NavigationConfig {
         dataType, nodeSpaceRef, layoutType, nrOfItemsPerPage, presentationTypeHint, cmCssClass);
   }
 
+  // TODO extend with "@NotNull NavigationConfig defaultConfig" parameter to
+  // TODO allow to overlay multiple NavigationConfigs
   private NavigationConfig(boolean enabled, String configName, Integer fromHierarchyLevel,
       Integer toHierarchyLevel, Integer showInactiveToLevel, String menuPart, String dataType,
       SpaceReference nodeSpaceRef, String layoutType, Integer nrOfItemsPerPage,
