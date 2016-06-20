@@ -53,8 +53,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -62,6 +60,7 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
@@ -79,8 +78,6 @@ import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -100,19 +97,6 @@ public class WebUtilsService implements IWebUtilsService {
   private static final WikiReference CENTRAL_WIKI_REF = new WikiReference("celements2web");
 
   private static Logger LOGGER = LoggerFactory.getLogger(WebUtilsService.class);
-
-  private static final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
-
-  static {
-    Map<Class<? extends EntityReference>, EntityType> map = new HashMap<>();
-    map.put(WikiReference.class, EntityType.WIKI);
-    map.put(SpaceReference.class, EntityType.SPACE);
-    map.put(DocumentReference.class, EntityType.DOCUMENT);
-    map.put(AttachmentReference.class, EntityType.ATTACHMENT);
-    map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
-    map.put(ObjectReference.class, EntityType.OBJECT);
-    ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
-  }
 
   @Requirement
   ComponentManager componentManager;
@@ -190,8 +174,7 @@ public class WebUtilsService implements IWebUtilsService {
    */
   @Override
   @Deprecated
-  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
-      boolean includeDoc) {
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef, boolean includeDoc) {
     return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
   }
 
@@ -270,8 +253,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   private String renderText(String velocityText) {
-    return getContext().getWiki().getRenderingEngine().renderText("{pre}" + velocityText + "{/pre}",
-        getContext().getDoc(), getContext());
+    return getContext().getWiki().getRenderingEngine().renderText(
+        "{pre}" + velocityText + "{/pre}", getContext().getDoc(), getContext());
   }
 
   private boolean isEmptyRTEString(String rteContent) {
@@ -281,8 +264,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<String> getAllowedLanguages() {
     if ((getContext() != null) && (getContext().getDoc() != null)) {
-      return getAllowedLanguages(
-          getContext().getDoc().getDocumentReference().getLastSpaceReference().getName());
+      return getAllowedLanguages(getContext().getDoc().getDocumentReference().getLastSpaceReference().getName());
     }
     return Collections.emptyList();
   }
@@ -295,8 +277,8 @@ public class WebUtilsService implements IWebUtilsService {
     languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
-      LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space [" + spaceName
-          + "]");
+      LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space ["
+          + spaceName + "]");
       return languages;
     }
     LOGGER.warn("Deprecated usage of Preferences field 'language'." + " Instead use 'languages'.");
@@ -317,8 +299,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public XWikiMessageTool getMessageTool(String adminLanguage) {
     if (adminLanguage != null) {
-      if ((getContext().getLanguage() != null) && getContext().getLanguage().equals(
-          adminLanguage)) {
+      if ((getContext().getLanguage() != null) && getContext().getLanguage().equals(adminLanguage)) {
         return getContext().getMessageTool();
       } else {
         Locale locale = new Locale(adminLanguage);
@@ -499,9 +480,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public EntityReference resolveEntityReference(String name, EntityType type,
-      WikiReference wikiRef) {
-    return resolveReference(name, ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
+  public EntityReference resolveEntityReference(String name, EntityType type, WikiReference wikiRef) {
+    return resolveReference(name, ModelUtils.ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
   }
 
   @Override
@@ -520,30 +500,27 @@ public class WebUtilsService implements IWebUtilsService {
   public <T extends EntityReference> T resolveReference(String name, Class<T> token,
       EntityReference baseRef) {
     baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
-    try {
-      EntityReference ref;
-      if (ENTITY_TYPE_MAP.get(token).ordinal() > EntityType.WIKI.ordinal()) {
-        ref = refResolver.resolve(name, ENTITY_TYPE_MAP.get(token), baseRef);
-      } else {
-        ref = resolveWikiReference(name, getWikiRef(baseRef));
-      }
-      T ret = token.getConstructor(EntityReference.class).newInstance(ref);
-      LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
-      return ret;
-    } catch (ReflectiveOperationException | SecurityException | IllegalArgumentException
-        | NullPointerException exc) {
-      throw new IllegalArgumentException("Unsupported entity class: " + token, exc);
+    EntityReference reference;
+    EntityType type = ModelUtils.ENTITY_TYPE_MAP.get(token);
+    if (type == null) {
+      throw new IllegalArgumentException("Unsupported entity class: " + token);
+    } else if (type == EntityType.WIKI) {
+      reference = resolveWikiReference(name, getWikiRef(baseRef));
+    } else {
+      reference = refResolver.resolve(name, type, baseRef);
     }
+    T ret = ModelUtils.cloneReference(reference, token);
+    LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
+    return ret;
   }
 
   @Override
   public boolean isAdminUser() {
     try {
       if ((getContext().getXWikiUser() != null)
-          && (getContext().getWiki().getRightService() != null)
-          && (getContext().getDoc() != null)) {
-        return (getContext().getWiki().getRightService().hasAdminRights(getContext())
-            || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup", getContext()));
+          && (getContext().getWiki().getRightService() != null) && (getContext().getDoc() != null)) {
+        return (getContext().getWiki().getRightService().hasAdminRights(getContext()) || getContext().getXWikiUser().isUserInGroup(
+            "XWiki.XWikiAdminGroup", getContext()));
       } else {
         return false;
       }
@@ -565,11 +542,11 @@ public class WebUtilsService implements IWebUtilsService {
     String user = getContext().getUser();
     LOGGER.trace("isLayoutEditor: user [" + user + "] db [" + getContext().getDatabase() + "].");
     try {
-      boolean isLayoutEditor = isAdvancedAdmin() || getContext().getXWikiUser().isUserInGroup(
-          "XWiki.LayoutEditorsGroup", getContext());
-      LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user [" + user.startsWith(
-          "xwiki:") + "] returning [" + isLayoutEditor + "] db [" + getContext().getDatabase()
-          + "].");
+      boolean isLayoutEditor = isAdvancedAdmin()
+          || getContext().getXWikiUser().isUserInGroup("XWiki.LayoutEditorsGroup", getContext());
+      LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user ["
+          + user.startsWith("xwiki:") + "] returning [" + isLayoutEditor + "] db ["
+          + getContext().getDatabase() + "].");
       return isLayoutEditor;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
@@ -585,12 +562,12 @@ public class WebUtilsService implements IWebUtilsService {
       XWikiDocument userDoc = getContext().getWiki().getDocument(resolveDocumentReference(user),
           getContext());
       BaseObject userObj = userDoc.getXObject(resolveDocumentReference("XWiki.XWikiUsers"));
-      boolean isAdvancedAdmin = isAdminUser() && (user.startsWith("xwiki:") || ((userObj != null)
-          && "Advanced".equals(userObj.getStringValue("usertype"))));
-      LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user [" + user.startsWith(
-          "xwiki:") + "] usertype [" + ((userObj != null) ? userObj.getStringValue("usertype")
-              : "null") + "] returning [" + isAdvancedAdmin + "] db [" + getContext().getDatabase()
-          + "].");
+      boolean isAdvancedAdmin = isAdminUser()
+          && (user.startsWith("xwiki:") || ((userObj != null) && "Advanced".equals(userObj.getStringValue("usertype"))));
+      LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user ["
+          + user.startsWith("xwiki:") + "] usertype ["
+          + ((userObj != null) ? userObj.getStringValue("usertype") : "null") + "] returning ["
+          + isAdvancedAdmin + "] db [" + getContext().getDatabase() + "].");
       return isAdvancedAdmin;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
@@ -768,8 +745,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
-    if ((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName),
-        getContext())) {
+    if ((tagName != null)
+        && getContext().getWiki().exists(resolveDocumentReference(tagName), getContext())) {
       XWikiDocument filterDoc = null;
       try {
         filterDoc = getContext().getWiki().getDocument(resolveDocumentReference(tagName),
@@ -831,7 +808,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc, boolean bWithObjects,
       boolean bWithRendering, boolean bWithAttachmentContent, boolean bWithVersions)
-          throws XWikiException {
+      throws XWikiException {
     Map<String, String> docData = new LinkedHashMap<String, String>();
     DocumentReference docRef = xwikiDoc.getDocumentReference();
     docData.put("web", docRef.getLastSpaceReference().getName());
@@ -853,7 +830,8 @@ public class WebUtilsService implements IWebUtilsService {
     for (DocumentReference parentDocRef : documentParentsList) {
       String parentDocFN = serializer_default.serialize(parentDocRef);
       parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN,
-          getContext().getLanguage(), getContext()) + ",";
+          getContext().getLanguage(), getContext())
+          + ",";
       parentsListStr += parentDocFN + ",";
     }
     docData.put("parentslist", parentsListStr.replaceAll(",*$", ""));
@@ -877,9 +855,10 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("comment", xwikiDoc.getComment());
     docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
-    docData.put("menuName", menuNameCmd.getMultilingualMenuName(serializer_default.serialize(
-        xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
-        // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
+    docData.put("menuName", menuNameCmd.getMultilingualMenuName(
+        serializer_default.serialize(xwikiDoc.getDocumentReference()), getContext().getLanguage(),
+        getContext()));
+    // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
     /**
      * TODO add Attachments for (XWikiAttachment attach : xwikiDoc.getAttachmentList()) {
@@ -917,8 +896,8 @@ public class WebUtilsService implements IWebUtilsService {
 
     if (bWithRendering) {
       try {
-        docData.put("renderedcontent", replaceInternalWithExternalLinks(xwikiDoc.getRenderedContent(
-            getContext()), host));
+        docData.put("renderedcontent", replaceInternalWithExternalLinks(
+            xwikiDoc.getRenderedContent(getContext()), host));
       } catch (XWikiException exp) {
         LOGGER.error("Exception with rendering content: ", exp);
       }
@@ -1181,8 +1160,7 @@ public class WebUtilsService implements IWebUtilsService {
       String templatePath = getRefDefaultSerializer().serialize(localTemplateRef);
       if (!getContext().getWiki().exists(localTemplateRef, getContext())) {
         if (!"celements2web".equals(localTemplateRef.getLastSpaceReference().getParent().getName())
-            && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef),
-                getContext())) {
+            && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef), getContext())) {
           templatePath = "celements2web:" + templatePath;
         } else {
           templatePath = ":" + templatePath.replaceAll("celements2web:", "");
@@ -1214,8 +1192,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   /**
-   * @deprecated instead use
-   *             {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
+   * @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
    */
   @Deprecated
   @Override
@@ -1243,8 +1220,8 @@ public class WebUtilsService implements IWebUtilsService {
       String pathName = (String) entry.getKey();
       if (renderTemplatePath.startsWith(":" + pathName)) {
         String newRenderTemplatePath = renderTemplatePath.replaceAll("^:(" + pathName + "\\.)?",
-            "/templates/" + ((String) entry.getValue()) + "/") + getTemplatePathLangSuffix(lang)
-            + ".vm";
+            "/templates/" + ((String) entry.getValue()) + "/")
+            + getTemplatePathLangSuffix(lang) + ".vm";
         LOGGER.debug("getTemplatePathOnDisk: for [" + renderTemplatePath + "] and lang [" + lang
             + "] returning [" + newRenderTemplatePath + "].");
         return newRenderTemplatePath;
