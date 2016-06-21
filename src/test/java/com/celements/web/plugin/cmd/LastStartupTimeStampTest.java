@@ -27,13 +27,18 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LastStartupTimeStampTest {
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.web.service.LastStartupTimeStamp;
+import com.celements.web.service.LastStartupTimeStampRole;
+import com.xpn.xwiki.web.Utils;
+
+public class LastStartupTimeStampTest extends AbstractComponentTest {
 
   private LastStartupTimeStamp lastStartupTS;
 
   @Before
-  public void setUp() throws Exception {
-    lastStartupTS = new LastStartupTimeStamp();
+  public void setUp_LastStartupTimeStampTest() throws Exception {
+    lastStartupTS = (LastStartupTimeStamp) Utils.getComponent(LastStartupTimeStampRole.class);
   }
 
   @Test

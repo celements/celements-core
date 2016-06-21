@@ -130,3 +130,4 @@ com.celements.configuration.CelementsDefaultConfigurationSource
 com.celements.configuration.CelementsAllConfigurationSource
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
+com.celements.web.service.LastStartupTimeStamp

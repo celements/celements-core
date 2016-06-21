@@ -27,6 +27,7 @@ import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.web.service.LastStartupTimeStampRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -65,7 +66,7 @@ public class AttachmentURLCommand {
         XWikiDocument doc = context.getWiki().getDocument(getPageFullName(link), context);
         XWikiAttachment att = getAttachmentService().getAttachmentNameEqual(doc, attName);
         url = doc.getAttachmentURL(attName, action, context);
-        url += "?version=" + new LastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
+        url += "?version=" + getLastStartupTimeStamp().getLastChangedTimeStamp(att.getDate());
       } catch (XWikiException exp) {
         LOGGER.error("Error getting attachment URL for doc " + getPageFullName(link) + " and file "
             + attName, exp);
@@ -78,12 +79,16 @@ public class AttachmentURLCommand {
       String path = link.trim().substring(1);
       url = context.getWiki().getSkinFile(path, true, context).replace("/skin/", "/" + action
           + "/");
-      url += "?version=" + new LastStartupTimeStamp().getFileModificationDate(path, context);
+      url += "?version=" + getLastStartupTimeStamp().getFileModificationDate(path);
     }
     if (url.startsWith("?")) {
       url = context.getDoc().getURL("view", context) + url;
     }
     return url;
+  }
+
+  private LastStartupTimeStampRole getLastStartupTimeStamp() {
+    return Utils.getComponent(LastStartupTimeStampRole.class);
   }
 
   public String getAttachmentName(String link) {
