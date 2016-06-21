@@ -1,13 +1,13 @@
 package com.celements.navigation.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.context.Execution;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
 import com.xpn.xwiki.XWiki;
@@ -15,22 +15,19 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
-public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
+public class TreeNodeCacheTest extends AbstractComponentTest {
 
   private XWikiContext context;
-  private XWiki wiki;
   private XWikiStoreInterface mockStore;
   private TreeNodeCache treeNodeCache;
 
   @Before
   public void setUp_TreeNodeCacheTest() throws Exception {
     context = getContext();
-    wiki = createMock(XWiki.class);
-    context.setWiki(wiki);
+    XWiki wiki = getWikiMock();
     mockStore = createMock(XWikiStoreInterface.class);
     expect(wiki.getStore()).andReturn(mockStore).anyTimes();
-    treeNodeCache = new TreeNodeCache();
-    treeNodeCache.execution = Utils.getComponent(Execution.class);
+    treeNodeCache = (TreeNodeCache) Utils.getComponent(ITreeNodeCache.class);
   }
 
   @Test
@@ -85,34 +82,25 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testQueryCount() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMockAndAddToDefault(
         GetNotMappedMenuItemsForParentCommand.class);
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     expect(testGetMenuItemCommand.queryCount()).andReturn(15);
-    replayAll(testGetMenuItemCommand);
+    replayDefault();
     assertEquals(15, treeNodeCache.queryCount());
-    verifyAll(testGetMenuItemCommand);
+    verifyDefault();
   }
 
   @Test
   public void testFlushMenuItemCache() {
-    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMock(
+    GetNotMappedMenuItemsForParentCommand testGetMenuItemCommand = createMockAndAddToDefault(
         GetNotMappedMenuItemsForParentCommand.class);
     treeNodeCache.inject_GetNotMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     testGetMenuItemCommand.flushMenuItemCache(same(context));
     expectLastCall().once();
-    replayAll(testGetMenuItemCommand);
+    replayDefault();
     treeNodeCache.flushMenuItemCache();
-    verifyAll(testGetMenuItemCommand);
+    verifyDefault();
   }
 
-  private void replayAll(Object... mocks) {
-    replay(mockStore, wiki);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(mockStore, wiki);
-    verify(mocks);
-  }
 }
