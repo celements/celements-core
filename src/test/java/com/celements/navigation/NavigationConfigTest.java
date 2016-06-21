@@ -289,7 +289,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertEquals("", navConfig.getCssClass());
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
-    assertEquals(1, navConfig.getNrOfItemsPerPage());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
   }
 
   @Test
