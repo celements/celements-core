@@ -59,12 +59,9 @@ public final class ModelUtils {
       reference = reference.clone();
       T ret;
       if (token != EntityReference.class) {
-        ret = token.getConstructor(EntityReference.class).newInstance(reference.clone());
+        ret = token.getConstructor(EntityReference.class).newInstance(reference);
       } else {
-        // T == EntityReference
-        @SuppressWarnings("unchecked")
-        T castedReference = (T) reference;
-        ret = castedReference;
+        ret = token.cast(reference);
       }
       return ret;
     } catch (ReflectiveOperationException | SecurityException exc) {
