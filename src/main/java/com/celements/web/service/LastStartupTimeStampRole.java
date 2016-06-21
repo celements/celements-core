@@ -14,7 +14,8 @@ public interface LastStartupTimeStampRole {
    *
    * @return changedDate formated as yyyyMMddHHmmss
    */
-  public String getLastChangedTimeStamp(Date changedDate);
+  @NotNull
+  public String getLastChangedTimeStamp(@NotNull Date changedDate);
 
   /**
    * getLastStartupTimeStamp

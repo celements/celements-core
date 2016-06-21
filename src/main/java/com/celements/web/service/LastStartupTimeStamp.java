@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -49,6 +50,7 @@ public class LastStartupTimeStamp implements LastStartupTimeStampRole {
   }
 
   @Override
+  @NotNull
   public String getLastStartupTimeStamp() {
     return lastStartUpTimeStamp;
   }
@@ -59,12 +61,14 @@ public class LastStartupTimeStamp implements LastStartupTimeStampRole {
   }
 
   @Override
-  public String getLastChangedTimeStamp(Date lastChangeDate) {
+  @NotNull
+  public String getLastChangedTimeStamp(@NotNull Date lastChangeDate) {
     return new SimpleDateFormat("yyyyMMddHHmmss").format(lastChangeDate);
   }
 
   @Override
-  public String getFileModificationDate(String path) {
+  @NotNull
+  public String getFileModificationDate(@NotNull String path) {
     return getLastChangedTimeStamp(getContext().getWiki().getResourceLastModificationDate(
         FileAction.RESOURCES_DIRECTORY + FileAction.DELIMITER + path));
   }
