@@ -473,7 +473,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   @Deprecated
   public void enableMappedMenuItems(XWikiContext context) {
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
-    cmd.set_isActive(true);
+    cmd.setIsActive(true);
     context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, cmd);
   }
 

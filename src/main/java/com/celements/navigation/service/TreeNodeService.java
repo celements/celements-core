@@ -514,7 +514,7 @@ public class TreeNodeService implements ITreeNodeService {
   @Override
   public void enableMappedMenuItems() {
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
-    cmd.set_isActive(true);
+    cmd.setIsActive(true);
     getContext().put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY, cmd);
   }
 

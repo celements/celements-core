@@ -35,16 +35,16 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMappedMenuItemsForParentCmd() {
-    assertFalse(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
+    assertFalse(treeNodeCache.getMappedMenuItemsForParentCmd().isActive());
   }
 
   @Test
   public void testGetMappedMenuItemsForParentCmd_injected() {
     GetMappedMenuItemsForParentCommand testGetMenuItemCommand = new GetMappedMenuItemsForParentCommand();
-    testGetMenuItemCommand.set_isActive(true);
+    testGetMenuItemCommand.setIsActive(true);
     treeNodeCache.inject_GetMappedMenuItemsForParentCmd(testGetMenuItemCommand);
     assertEquals(testGetMenuItemCommand, treeNodeCache.getMappedMenuItemsForParentCmd());
-    assertTrue(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
+    assertTrue(treeNodeCache.getMappedMenuItemsForParentCmd().isActive());
   }
 
   @Test
@@ -72,15 +72,15 @@ public class TreeNodeCacheTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetMappedMenuItemsForParentCmd_injectedByContext() {
     GetMappedMenuItemsForParentCommand testGetMenuItemCommand = new GetMappedMenuItemsForParentCommand();
-    testGetMenuItemCommand.set_isActive(true);
+    testGetMenuItemCommand.setIsActive(true);
     context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY,
         testGetMenuItemCommand);
-    assertTrue(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
+    assertTrue(treeNodeCache.getMappedMenuItemsForParentCmd().isActive());
 
-    testGetMenuItemCommand.set_isActive(false);
+    testGetMenuItemCommand.setIsActive(false);
     context.put(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY,
         testGetMenuItemCommand);
-    assertFalse(treeNodeCache.getMappedMenuItemsForParentCmd().is_isActive());
+    assertFalse(treeNodeCache.getMappedMenuItemsForParentCmd().isActive());
   }
 
   @Test
