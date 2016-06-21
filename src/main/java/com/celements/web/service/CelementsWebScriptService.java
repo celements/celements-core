@@ -94,7 +94,7 @@ public class CelementsWebScriptService implements ScriptService {
 
   private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(CelementsWebScriptService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebScriptService.class);
 
   @Requirement
   QueryManager queryManager;
@@ -212,18 +212,18 @@ public class CelementsWebScriptService implements ScriptService {
   public String getCurrentPageURL(String queryString) {
     String ret;
     if (isAppScriptRequest()) {
-      _LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
+      LOGGER.debug("getCurrentPageURL: AppScript for query '" + queryString + "'");
       ret = getAppScriptURL(getScriptNameFromURL(), queryString);
     } else {
-      _LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
+      LOGGER.debug("getCurrentPageURL: query '" + queryString + "'");
       ret = Util.escapeURL("?" + queryString);
     }
-    _LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
+    LOGGER.debug("getCurrentPageURL: ret '" + ret + "' for query '" + queryString + "'");
     return ret;
   }
 
   public String convertToPlainText(String htmlContent) {
-    _LOGGER.trace("convertToPlainText called on celementsweb script service for [" + htmlContent
+    LOGGER.trace("convertToPlainText called on celementsweb script service for [" + htmlContent
         + "].");
     return new PlainTextCommand().convertToPlainText(htmlContent);
   }
@@ -240,7 +240,7 @@ public class CelementsWebScriptService implements ScriptService {
         return new DeleteMenuItemCommand().deleteMenuItem(docRef);
       }
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to check 'edit' access rights for user [" + getContext().getUser()
+      LOGGER.error("Failed to check 'edit' access rights for user [" + getContext().getUser()
           + "] on document [" + docFN + "]");
     }
     return false;
@@ -316,10 +316,10 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public Document createDocument(DocumentReference newDocRef, String pageType) {
-    _LOGGER.trace("create new document for [" + newDocRef + "] and pageType [" + pageType + "].");
+    LOGGER.trace("create new document for [" + newDocRef + "] and pageType [" + pageType + "].");
     XWikiDocument theNewDoc = new CreateDocumentCommand().createDocument(newDocRef, pageType);
     if (theNewDoc != null) {
-      _LOGGER.debug("created new document for [" + newDocRef + "] and pageType [" + pageType + "].");
+      LOGGER.debug("created new document for [" + newDocRef + "] and pageType [" + pageType + "].");
       return theNewDoc.newDocument(getContext());
     }
     return null;
@@ -392,13 +392,13 @@ public class CelementsWebScriptService implements ScriptService {
       String renderMode, boolean preserveVelocityContext) {
     try {
       if (preserveVelocityContext) {
-        return getCelementsRenderCmd().renderCelementsDocumentPreserveVelocityContext(
-            elementDocRef, lang, renderMode);
+        return getCelementsRenderCmd().renderCelementsDocumentPreserveVelocityContext(elementDocRef,
+            lang, renderMode);
       } else {
         return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang, renderMode);
       }
     } catch (XWikiException exp) {
-      _LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
+      LOGGER.error("renderCelementsDocument: Failed to render " + elementDocRef, exp);
     }
     return "";
   }
@@ -410,7 +410,7 @@ public class CelementsWebScriptService implements ScriptService {
   public String renderCelementsDocument(Document renderDoc, String renderMode) {
     // we must not get here for !getService().isAppScriptRequest()
     if ("view".equals(getContext().getAction()) && renderDoc.isNew()) {
-      _LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
+      LOGGER.info("renderCelementsDocument: Failed to get xwiki document for"
           + renderDoc.getFullName() + " no rendering applied.");
       return "";
     } else {
@@ -420,30 +420,30 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String renderDocument(DocumentReference docRef) {
-    _LOGGER.trace("renderDocument: docRef [" + docRef + "].");
+    LOGGER.trace("renderDocument: docRef [" + docRef + "].");
     return new RenderCommand().renderDocument(docRef);
   }
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef) {
-    _LOGGER.trace("renderDocument: docRef [" + docRef + "] and includeDocRef [" + includeDocRef
+    LOGGER.trace("renderDocument: docRef [" + docRef + "] and includeDocRef [" + includeDocRef
         + "].");
     return new RenderCommand().renderDocument(docRef, includeDocRef);
   }
 
   public String renderDocument(DocumentReference docRef, String lang) {
-    _LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
+    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "].");
     return new RenderCommand().renderDocument(docRef, lang);
   }
 
   public String renderDocument(DocumentReference docRef, DocumentReference includeDocRef,
       String lang) {
-    _LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "] and includeDocRef ["
+    LOGGER.trace("renderDocument: lang [" + lang + "] docRef [" + docRef + "] and includeDocRef ["
         + includeDocRef + "].");
     return new RenderCommand().renderDocument(docRef, includeDocRef, lang);
   }
 
   public String renderDocument(Document renderDoc) {
-    _LOGGER.trace("renderDocument: renderDocLang [" + renderDoc.getLanguage() + "] renderDoc ["
+    LOGGER.trace("renderDocument: renderDocLang [" + renderDoc.getLanguage() + "] renderDoc ["
         + renderDoc.getDocumentReference() + "].");
     return new RenderCommand().renderDocument(renderDoc.getDocumentReference(),
         renderDoc.getLanguage());
@@ -456,13 +456,14 @@ public class CelementsWebScriptService implements ScriptService {
       renderCommand.initRenderingEngine(rendererNameList);
       return renderCommand.renderDocument(docRef, lang);
     } catch (XWikiException exp) {
-      _LOGGER.error("renderCelementsDocument: Failed to render [" + docRef + "] lang [" + lang
+      LOGGER.error("renderCelementsDocument: Failed to render [" + docRef + "] lang [" + lang
           + "].", exp);
     }
     return "";
   }
 
-  public String renderDocument(Document renderDoc, boolean removePre, List<String> rendererNameList) {
+  public String renderDocument(Document renderDoc, boolean removePre,
+      List<String> rendererNameList) {
     return renderDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(), removePre,
         rendererNameList);
   }
@@ -483,7 +484,7 @@ public class CelementsWebScriptService implements ScriptService {
     try {
       return webUtilsService.renderInheritableDocument(docRef, lang);
     } catch (XWikiException exp) {
-      _LOGGER.error("renderInheritableDocument: Failed to render inheritable [" + docRef
+      LOGGER.error("renderInheritableDocument: Failed to render inheritable [" + docRef
           + "] in lang [" + lang + "].");
     }
     return "";
@@ -492,7 +493,8 @@ public class CelementsWebScriptService implements ScriptService {
   public boolean useNewButtons() {
     int wikiConfig = getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
         "celements.usenewbuttons", 0, getContext());
-    return getContext().getWiki().getSpacePreferenceAsInt("useNewButtons", wikiConfig, getContext()) == 1;
+    return getContext().getWiki().getSpacePreferenceAsInt("useNewButtons", wikiConfig,
+        getContext()) == 1;
   }
 
   public String getDefaultAdminLanguage() {
@@ -522,10 +524,11 @@ public class CelementsWebScriptService implements ScriptService {
   public List<String> getDeletedDocuments(String orderby, boolean hideOverwritten) {
     List<String> resultList = Collections.emptyList();
     try {
-      Query query = queryManager.createQuery(getDeletedDocsHql(orderby, hideOverwritten), Query.HQL);
+      Query query = queryManager.createQuery(getDeletedDocsHql(orderby, hideOverwritten),
+          Query.HQL);
       resultList = query.execute();
     } catch (QueryException queryExp) {
-      _LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
+      LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
     }
     return resultList;
   }
@@ -582,13 +585,13 @@ public class CelementsWebScriptService implements ScriptService {
             }
           }
         } catch (XWikiException exp) {
-          _LOGGER.error("Failed to delete document [" + fullName + "] in wiki ["
+          LOGGER.error("Failed to delete document [" + fullName + "] in wiki ["
               + getContext().getDatabase() + "].", exp);
         }
       }
       return countDeleted;
     } else {
-      _LOGGER.error("deleting document trash needs admin rights.");
+      LOGGER.error("deleting document trash needs admin rights.");
     }
     return null;
   }
@@ -599,7 +602,7 @@ public class CelementsWebScriptService implements ScriptService {
       Query query = queryManager.createQuery(getDeletedAttachmentsHql(), Query.HQL);
       resultList = query.execute();
     } catch (QueryException queryExp) {
-      _LOGGER.error("Failed to parse or execute deletedAttachments hql query.", queryExp);
+      LOGGER.error("Failed to parse or execute deletedAttachments hql query.", queryExp);
     }
     return resultList;
   }
@@ -649,7 +652,8 @@ public class CelementsWebScriptService implements ScriptService {
     }
   }
 
-  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName, String key) {
+  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName,
+      String key) {
     BaseCollection skinConfigBaseColl = new SkinConfigObjCommand().getSkinConfigFieldInheritor(
         fallbackClassName).getObject(key);
     if ((skinConfigBaseColl != null) && (skinConfigBaseColl instanceof BaseObject)) {
@@ -671,28 +675,30 @@ public class CelementsWebScriptService implements ScriptService {
     // FIXME not all tag documents have a page type: who cares? deprecated? migration?
     // DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
     // "Celements2.PageType");
-    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference("Classes.FilebaseTag");
+    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference(
+        "Classes.FilebaseTag");
     String tagValue = fileDocFullName + "/" + fileName;
     try {
       XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
       if (/*
-       * (tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) !=
-       * null) &&
-       */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
+           * (tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) !=
+           * null) &&
+           */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
         BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
         obj.setStringValue("attachment", tagValue);
         getContext().getWiki().saveDocument(tagDoc, getContext());
         return true;
       }
     } catch (XWikiException xwe) {
-      _LOGGER.error("Could not get tag Document", xwe);
+      LOGGER.error("Could not get tag Document", xwe);
     }
     return false;
   }
 
   public boolean getUserAdminShowLoginName() {
     boolean showLoginName = (getContext().getWiki().getXWikiPreferenceAsInt(
-        "celUserAdminShowLoginName", "celements.administration.showloginname", 0, getContext()) != 0);
+        "celUserAdminShowLoginName", "celements.administration.showloginname", 0,
+        getContext()) != 0);
     return (webUtilsService.isAdvancedAdmin() || showLoginName);
   }
 
@@ -730,7 +736,7 @@ public class CelementsWebScriptService implements ScriptService {
     try {
       classesComp.checkClasses();
     } catch (XClassCreateException exc) {
-      _LOGGER.error("failed to create classes", exc);
+      LOGGER.error("failed to create classes", exc);
     }
   }
 
@@ -784,16 +790,17 @@ public class CelementsWebScriptService implements ScriptService {
    */
   @Deprecated
   public String clearFileName(String fileName) {
-    return ((FileBaseScriptService) Utils.getComponent(ScriptService.class, "filebase")).clearFileName(fileName);
+    return ((FileBaseScriptService) Utils.getComponent(ScriptService.class,
+        "filebase")).clearFileName(fileName);
   }
 
   public boolean isTranslationAvailable(Document doc, String language) {
     try {
       return doc.getTranslationList().contains(language);
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].", exp);
-      return (language.equals(getWebUtilsService().getDefaultLanguage()) && getContext().getWiki().exists(
-          doc.getDocumentReference(), getContext()));
+      LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].", exp);
+      return (language.equals(getWebUtilsService().getDefaultLanguage())
+          && getContext().getWiki().exists(doc.getDocumentReference(), getContext()));
     }
   }
 
@@ -814,7 +821,7 @@ public class CelementsWebScriptService implements ScriptService {
     if (hasAdminRights()) {
       return new ResetProgrammingRightsCommand().resetCelements2webRigths(getContext());
     } else {
-      _LOGGER.warn("user [" + getContext().getUser()
+      LOGGER.warn("user [" + getContext().getUser()
           + "] tried to reset programming rights, but has no admin rights.");
     }
     return false;
@@ -845,7 +852,7 @@ public class CelementsWebScriptService implements ScriptService {
         return appClassObj.getStringValue("appversion");
       }
     } catch (XWikiException exp) {
-      _LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
+      LOGGER.warn("Failed to get celementsWeb Application scripts version.", exp);
     }
     return "N/A";
   }
@@ -858,8 +865,8 @@ public class CelementsWebScriptService implements ScriptService {
       String propertyName) throws XWikiException {
     String sql = ", BaseObject as obj, IntegerProperty as art_id";
     sql += " where obj.name=doc.fullName";
-    sql += " and obj.className='"
-        + getWebUtilsService().getRefLocalSerializer().serialize(classRef) + "'";
+    sql += " and obj.className='" + getWebUtilsService().getRefLocalSerializer().serialize(classRef)
+        + "'";
     sql += " and doc.space='" + spaceRef.getName() + "' and obj.id = art_id.id.id";
     sql += " and art_id.id.name='" + propertyName + "' order by art_id.value desc";
     int nextId = 1;
@@ -938,7 +945,7 @@ public class CelementsWebScriptService implements ScriptService {
       }
       return rteTemplateListExternal;
     } catch (XWikiException exp) {
-      _LOGGER.error("getRTETemplateList failed.", exp);
+      LOGGER.error("getRTETemplateList failed.", exp);
     }
     return Collections.emptyList();
   }
@@ -948,13 +955,13 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void setGlobalContextValue(String key, Object value) {
-    _LOGGER.debug("setGlobalContextValue: key '{}', value '{}'", key, value);
+    LOGGER.debug("setGlobalContextValue: key '{}', value '{}'", key, value);
     execution.getContext().setProperty(CEL_GLOBALVAL_PREFIX + key, value);
   }
 
   public Object getGlobalContextValue(String key) {
     Object value = execution.getContext().getProperty(CEL_GLOBALVAL_PREFIX + key);
-    _LOGGER.debug("getGlobalContextValue: key '{}', value '{}'", key, value);
+    LOGGER.debug("getGlobalContextValue: key '{}', value '{}'", key, value);
     return value;
   }
 
@@ -1026,7 +1033,7 @@ public class CelementsWebScriptService implements ScriptService {
         this.versionMap.put(systemComponentName, properties.getProperty(VERSION_FILE_PROPERTY));
       } catch (MalformedURLException | XWikiException exp) {
         // Failed to retrieve the version, log a warning and default to "Unknown"
-        _LOGGER.warn("Failed to retrieve XWiki's version from [" + versionFile + "], using the ["
+        LOGGER.warn("Failed to retrieve XWiki's version from [" + versionFile + "], using the ["
             + VERSION_FILE_PROPERTY + "] property.", exp);
         return "Unknown version";
       }
