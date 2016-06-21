@@ -116,10 +116,13 @@ public class GetNotMappedMenuItemsForParentCommand {
         start = System.currentTimeMillis();
         for (Object[] docData : results) {
           docCount++;
-          LOGGER.debug("got item from db: {}", docData[0].toString());
           oldParentKey = parentKey;
+          // doc.fullName, doc.space, doc.parent, pos.value
+          String fullName = MoreObjects.firstNonNull(docData[0], "").toString();
+          String spaceName = MoreObjects.firstNonNull(docData[1], "").toString();
           String parentFN = MoreObjects.firstNonNull(docData[2], "").toString();
-          parentKey = getParentKey(wikiName, parentFN, docData[1].toString());
+          LOGGER.debug("got item from db: {}", fullName);
+          parentKey = getParentKey(wikiName, parentFN, spaceName);
           if (!oldParentKey.equals(parentKey) || (menu == null)) {
             if (menu != null) {
               LOGGER.debug("put menu in cache for parent [{}]", oldParentKey);
@@ -127,15 +130,14 @@ public class GetNotMappedMenuItemsForParentCommand {
             }
             menu = getMenuCacheForParent(wikiMenuItemsMap, parentKey);
           }
-          LOGGER.debug("put item [{}] in cache [{}]: ", docData[0].toString(), parentKey);
-          if ((wikiName == null) || (docData[1] == null) || (docData[0].toString().split(
-              "\\.").length < 2) || wikiName.isEmpty() || docData[1].toString().isEmpty()
-              || ("".equals(docData[0].toString().split("\\.")[1]))) {
+          LOGGER.debug("put item [{}] in cache [{}]: ", fullName, parentKey);
+          if ((wikiName == null) || (fullName.split("\\.").length < 2) || wikiName.isEmpty()
+              || spaceName.isEmpty() || ("".equals(fullName.split("\\.")[1]))) {
             LOGGER.warn("loadMenuForWiki: skip [{}] because of null value!! " + "'{}', '{}', '{}'",
-                docData[0].toString(), wikiName, docData[1], docData[0].toString().split("\\.")[1]);
+                fullName, wikiName, spaceName, fullName.split("\\.")[1]);
           } else {
-            DocumentReference docRef = new DocumentReference(wikiName, docData[1].toString(),
-                docData[0].toString().split("\\.")[1]);
+            DocumentReference docRef = new DocumentReference(wikiName, spaceName, fullName.split(
+                "\\.")[1]);
             TreeNode treeNode = new TreeNode(docRef, resolveParentRef(parentFN),
                 (Integer) docData[3], strategy);
             menu.add(treeNode);
@@ -160,17 +162,17 @@ public class GetNotMappedMenuItemsForParentCommand {
     return internalGetMenuItemsForWiki(wikiName);
   }
 
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
+  private EntityReference resolveParentRef(@NotNull String parentFN) {
+    return (parentFN.isEmpty()) ? null
+        : getWebUtils().resolveEntityReference(parentFN, getEntityType(parentFN));
   }
 
-  private EntityReference resolveParentRef(@NotNull String parentFN) {
-    EntityType entityType = (parentFN.contains(".")) ? EntityType.DOCUMENT : EntityType.SPACE;
-    EntityReference parentRef = null;
-    if (parentFN.isEmpty()) {
-      parentRef = getWebUtils().resolveEntityReference(parentFN, entityType);
-    }
-    return parentRef;
+  private EntityType getEntityType(String parentFN) {
+    return (parentFN.contains(".")) ? EntityType.DOCUMENT : EntityType.SPACE;
+  }
+
+  private IWebUtilsService getWebUtils() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   List<Object[]> getFromDBForParentKey(String wikiName) throws XWikiException {
