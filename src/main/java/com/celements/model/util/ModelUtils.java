@@ -17,7 +17,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
-public class ModelUtils {
+public final class ModelUtils {
 
   public static final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
 
@@ -32,16 +32,25 @@ public class ModelUtils {
     ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
   }
 
+  private ModelUtils() {
+  }
+
+  /**
+   * @param reference
+   *          the reference to be cloned
+   * @return a cloned instance of the reference
+   */
+  @NotNull
   public static EntityReference cloneReference(@NotNull EntityReference reference) {
     return cloneReference(reference, ENTITY_TYPE_MAP.inverse().get(reference.getType()));
   }
 
   /**
    * @param reference
-   *          the reference to be copied
+   *          the reference to be cloned
    * @param token
    *          type of the reference
-   * @return a copied instance of the reference
+   * @return a cloned instance of the reference
    */
   @NotNull
   public static <T extends EntityReference> T cloneReference(@NotNull EntityReference reference,
@@ -50,12 +59,9 @@ public class ModelUtils {
       reference = reference.clone();
       T ret;
       if (token != EntityReference.class) {
-        ret = token.getConstructor(EntityReference.class).newInstance(reference.clone());
+        ret = token.getConstructor(EntityReference.class).newInstance(reference);
       } else {
-        // T == EntityReference
-        @SuppressWarnings("unchecked")
-        T castedReference = (T) reference;
-        ret = castedReference;
+        ret = token.cast(reference);
       }
       return ret;
     } catch (ReflectiveOperationException | SecurityException exc) {

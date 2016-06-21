@@ -174,7 +174,8 @@ public class WebUtilsService implements IWebUtilsService {
    */
   @Override
   @Deprecated
-  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef, boolean includeDoc) {
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
+      boolean includeDoc) {
     return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
   }
 
@@ -253,8 +254,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   private String renderText(String velocityText) {
-    return getContext().getWiki().getRenderingEngine().renderText(
-        "{pre}" + velocityText + "{/pre}", getContext().getDoc(), getContext());
+    return getContext().getWiki().getRenderingEngine().renderText("{pre}" + velocityText + "{/pre}",
+        getContext().getDoc(), getContext());
   }
 
   private boolean isEmptyRTEString(String rteContent) {
@@ -264,7 +265,8 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<String> getAllowedLanguages() {
     if ((getContext() != null) && (getContext().getDoc() != null)) {
-      return getAllowedLanguages(getContext().getDoc().getDocumentReference().getLastSpaceReference().getName());
+      return getAllowedLanguages(
+          getContext().getDoc().getDocumentReference().getLastSpaceReference().getName());
     }
     return Collections.emptyList();
   }
@@ -277,8 +279,8 @@ public class WebUtilsService implements IWebUtilsService {
     languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
     languages.remove("");
     if (languages.size() > 0) {
-      LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space ["
-          + spaceName + "]");
+      LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space [" + spaceName
+          + "]");
       return languages;
     }
     LOGGER.warn("Deprecated usage of Preferences field 'language'." + " Instead use 'languages'.");
@@ -299,7 +301,8 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public XWikiMessageTool getMessageTool(String adminLanguage) {
     if (adminLanguage != null) {
-      if ((getContext().getLanguage() != null) && getContext().getLanguage().equals(adminLanguage)) {
+      if ((getContext().getLanguage() != null) && getContext().getLanguage().equals(
+          adminLanguage)) {
         return getContext().getMessageTool();
       } else {
         Locale locale = new Locale(adminLanguage);
@@ -480,7 +483,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
-  public EntityReference resolveEntityReference(String name, EntityType type, WikiReference wikiRef) {
+  public EntityReference resolveEntityReference(String name, EntityType type,
+      WikiReference wikiRef) {
     return resolveReference(name, ModelUtils.ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
   }
 
@@ -518,9 +522,10 @@ public class WebUtilsService implements IWebUtilsService {
   public boolean isAdminUser() {
     try {
       if ((getContext().getXWikiUser() != null)
-          && (getContext().getWiki().getRightService() != null) && (getContext().getDoc() != null)) {
-        return (getContext().getWiki().getRightService().hasAdminRights(getContext()) || getContext().getXWikiUser().isUserInGroup(
-            "XWiki.XWikiAdminGroup", getContext()));
+          && (getContext().getWiki().getRightService() != null)
+          && (getContext().getDoc() != null)) {
+        return (getContext().getWiki().getRightService().hasAdminRights(getContext())
+            || getContext().getXWikiUser().isUserInGroup("XWiki.XWikiAdminGroup", getContext()));
       } else {
         return false;
       }
@@ -542,11 +547,11 @@ public class WebUtilsService implements IWebUtilsService {
     String user = getContext().getUser();
     LOGGER.trace("isLayoutEditor: user [" + user + "] db [" + getContext().getDatabase() + "].");
     try {
-      boolean isLayoutEditor = isAdvancedAdmin()
-          || getContext().getXWikiUser().isUserInGroup("XWiki.LayoutEditorsGroup", getContext());
-      LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user ["
-          + user.startsWith("xwiki:") + "] returning [" + isLayoutEditor + "] db ["
-          + getContext().getDatabase() + "].");
+      boolean isLayoutEditor = isAdvancedAdmin() || getContext().getXWikiUser().isUserInGroup(
+          "XWiki.LayoutEditorsGroup", getContext());
+      LOGGER.debug("isLayoutEditor: admin [" + isAdminUser() + "] global user [" + user.startsWith(
+          "xwiki:") + "] returning [" + isLayoutEditor + "] db [" + getContext().getDatabase()
+          + "].");
       return isLayoutEditor;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
@@ -562,12 +567,12 @@ public class WebUtilsService implements IWebUtilsService {
       XWikiDocument userDoc = getContext().getWiki().getDocument(resolveDocumentReference(user),
           getContext());
       BaseObject userObj = userDoc.getXObject(resolveDocumentReference("XWiki.XWikiUsers"));
-      boolean isAdvancedAdmin = isAdminUser()
-          && (user.startsWith("xwiki:") || ((userObj != null) && "Advanced".equals(userObj.getStringValue("usertype"))));
-      LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user ["
-          + user.startsWith("xwiki:") + "] usertype ["
-          + ((userObj != null) ? userObj.getStringValue("usertype") : "null") + "] returning ["
-          + isAdvancedAdmin + "] db [" + getContext().getDatabase() + "].");
+      boolean isAdvancedAdmin = isAdminUser() && (user.startsWith("xwiki:") || ((userObj != null)
+          && "Advanced".equals(userObj.getStringValue("usertype"))));
+      LOGGER.debug("isAdvancedAdmin: admin [" + isAdminUser() + "] global user [" + user.startsWith(
+          "xwiki:") + "] usertype [" + ((userObj != null) ? userObj.getStringValue("usertype")
+              : "null") + "] returning [" + isAdvancedAdmin + "] db [" + getContext().getDatabase()
+          + "].");
       return isAdvancedAdmin;
     } catch (XWikiException exp) {
       LOGGER.error("Failed to get user document for [" + user + "].", exp);
@@ -745,8 +750,8 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
-    if ((tagName != null)
-        && getContext().getWiki().exists(resolveDocumentReference(tagName), getContext())) {
+    if ((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName),
+        getContext())) {
       XWikiDocument filterDoc = null;
       try {
         filterDoc = getContext().getWiki().getDocument(resolveDocumentReference(tagName),
@@ -830,8 +835,7 @@ public class WebUtilsService implements IWebUtilsService {
     for (DocumentReference parentDocRef : documentParentsList) {
       String parentDocFN = serializer_default.serialize(parentDocRef);
       parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN,
-          getContext().getLanguage(), getContext())
-          + ",";
+          getContext().getLanguage(), getContext()) + ",";
       parentsListStr += parentDocFN + ",";
     }
     docData.put("parentslist", parentsListStr.replaceAll(",*$", ""));
@@ -855,9 +859,8 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("comment", xwikiDoc.getComment());
     docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
-    docData.put("menuName", menuNameCmd.getMultilingualMenuName(
-        serializer_default.serialize(xwikiDoc.getDocumentReference()), getContext().getLanguage(),
-        getContext()));
+    docData.put("menuName", menuNameCmd.getMultilingualMenuName(serializer_default.serialize(
+        xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
     // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
     /**
@@ -896,8 +899,8 @@ public class WebUtilsService implements IWebUtilsService {
 
     if (bWithRendering) {
       try {
-        docData.put("renderedcontent", replaceInternalWithExternalLinks(
-            xwikiDoc.getRenderedContent(getContext()), host));
+        docData.put("renderedcontent", replaceInternalWithExternalLinks(xwikiDoc.getRenderedContent(
+            getContext()), host));
       } catch (XWikiException exp) {
         LOGGER.error("Exception with rendering content: ", exp);
       }
@@ -1160,7 +1163,8 @@ public class WebUtilsService implements IWebUtilsService {
       String templatePath = getRefDefaultSerializer().serialize(localTemplateRef);
       if (!getContext().getWiki().exists(localTemplateRef, getContext())) {
         if (!"celements2web".equals(localTemplateRef.getLastSpaceReference().getParent().getName())
-            && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef), getContext())) {
+            && getContext().getWiki().exists(getCentralTemplateRef(localTemplateRef),
+                getContext())) {
           templatePath = "celements2web:" + templatePath;
         } else {
           templatePath = ":" + templatePath.replaceAll("celements2web:", "");
@@ -1220,8 +1224,8 @@ public class WebUtilsService implements IWebUtilsService {
       String pathName = (String) entry.getKey();
       if (renderTemplatePath.startsWith(":" + pathName)) {
         String newRenderTemplatePath = renderTemplatePath.replaceAll("^:(" + pathName + "\\.)?",
-            "/templates/" + ((String) entry.getValue()) + "/")
-            + getTemplatePathLangSuffix(lang) + ".vm";
+            "/templates/" + ((String) entry.getValue()) + "/") + getTemplatePathLangSuffix(lang)
+            + ".vm";
         LOGGER.debug("getTemplatePathOnDisk: for [" + renderTemplatePath + "] and lang [" + lang
             + "] returning [" + newRenderTemplatePath + "].");
         return newRenderTemplatePath;

@@ -17,35 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.web.plugin.cmd;
+package com.celements.web.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
+
 import com.celements.web.FileAction;
 import com.xpn.xwiki.XWikiContext;
 
-public class LastStartupTimeStamp {
+@Singleton
+@Component
+public class LastStartupTimeStamp implements LastStartupTimeStampRole {
 
-  private static String lastStartUpTimeStamp;
+  private volatile String lastStartUpTimeStamp;
 
+  @Requirement
+  private Execution execution;
+
+  private XWikiContext getContext() {
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  public LastStartupTimeStamp() {
+    this.lastStartUpTimeStamp = getLastChangedTimeStamp(new Date());
+  }
+
+  @Override
+  @NotNull
   public String getLastStartupTimeStamp() {
-    if (lastStartUpTimeStamp == null) {
-      lastStartUpTimeStamp = getLastChangedTimeStamp(new Date());
-    }
     return lastStartUpTimeStamp;
   }
 
-  public void resetLastStartupTimeStamp() {
-    lastStartUpTimeStamp = null;
+  @Override
+  public synchronized void resetLastStartupTimeStamp() {
+    lastStartUpTimeStamp = getLastChangedTimeStamp(new Date());
   }
 
-  public String getLastChangedTimeStamp(Date lastChangeDate) {
+  @Override
+  @NotNull
+  public String getLastChangedTimeStamp(@NotNull Date lastChangeDate) {
     return new SimpleDateFormat("yyyyMMddHHmmss").format(lastChangeDate);
   }
 
-  public String getFileModificationDate(String path, XWikiContext context) {
-    return getLastChangedTimeStamp(context.getWiki().getResourceLastModificationDate(
+  @Override
+  @NotNull
+  public String getFileModificationDate(@NotNull String path) {
+    return getLastChangedTimeStamp(getContext().getWiki().getResourceLastModificationDate(
         FileAction.RESOURCES_DIRECTORY + FileAction.DELIMITER + path));
   }
 
