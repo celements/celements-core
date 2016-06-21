@@ -45,10 +45,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testNavigationConfig() throws Exception {
-    replayDefault();
     NavigationConfig navConfig = new NavigationConfig();
-    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
-    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
     assertFalse(navConfig.isEnabled());
     assertEquals("toHieararchyLevel default must equal DEFAULT_MAX_LEVEL",
         NavigationConfig.DEFAULT_MAX_LEVEL, navConfig.getToHierarchyLevel());
@@ -65,7 +62,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
-    verifyDefault();
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -85,6 +84,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -103,6 +105,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -123,6 +128,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -142,6 +150,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -163,6 +174,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -184,6 +198,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -204,6 +221,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -224,6 +244,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -249,6 +272,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertEquals("", navConfig.getMenuPart());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -269,6 +295,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertEquals("", navConfig.getCssClass());
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -290,6 +319,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -312,6 +343,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
   @Test
@@ -339,6 +372,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertNull(navConfig.getNodeSpaceRef());
     assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
     assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
   }
 
   @Test
@@ -356,6 +390,12 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertTrue("showInactiveToLevel must be greater equlas zero",
         navConfig.getShowInactiveToLevel() >= 0);
     assertEquals("", navConfig.getMenuPart());
+    assertNull(navConfig.getNodeSpaceRef());
+    assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
+    assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
   }
 
 }
