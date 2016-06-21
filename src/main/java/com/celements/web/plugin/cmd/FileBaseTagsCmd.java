@@ -74,6 +74,7 @@ public class FileBaseTagsCmd {
       XWikiContext context) {
     XWikiDocument tagDoc = null;
     try {
+      // FIXME CELDEV-271: change to modelAccess
       tagDoc = context.getWiki().getDocument(getTagFullName(tagName, context), context);
       if (!existsTagWithName(tagName, context)) {
         if (createIfNotExists) {
