@@ -60,10 +60,11 @@ public final class NavigationConfig {
     this.toHierarchyLevel = MoreObjects.firstNonNull(toHierarchyLevel, DEFAULT_MAX_LEVEL);
     this.showInactiveToLevel = MoreObjects.firstNonNull(showInactiveToLevel, DEFAULT_MIN_LEVEL - 1);
     this.menuPart = Strings.nullToEmpty(menuPart);
-    this.nodeSpaceRef = nodeSpaceRef;
+    this.nodeSpaceRef = (nodeSpaceRef != null) ? new SpaceReference(nodeSpaceRef.clone()) : null;
     this.dataType = MoreObjects.firstNonNull(Strings.emptyToNull(dataType), PAGE_MENU_DATA_TYPE);
     this.layoutType = MoreObjects.firstNonNull(layoutType, LIST_LAYOUT_TYPE);
     this.nrOfItemsPerPage = Math.max(MoreObjects.firstNonNull(nrOfItemsPerPage, 1), 1);
+    // TODO if unset nrOfItemsPerPage must be NULL instead!!!
     this.presentationTypeHint = MoreObjects.firstNonNull(Strings.emptyToNull(presentationTypeHint),
         "default");
     this.cmCssClass = Strings.nullToEmpty(cmCssClass);
@@ -97,7 +98,7 @@ public final class NavigationConfig {
 
   @Nullable
   public SpaceReference getNodeSpaceRef() {
-    return nodeSpaceRef;
+    return (nodeSpaceRef == null) ? null : new SpaceReference(nodeSpaceRef.clone());
   }
 
   @NotNull
