@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.fields.ClassField;
@@ -53,7 +54,7 @@ public class DefaultXClassCreator implements XClassCreator {
   private List<ClassPackage> classPackages;
 
   @Override
-  public void createXClasses() {
+  public void createXClasses() throws XClassCreateException {
     LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
     for (ClassPackage classPackage : classPackages) {
       if (classPackage.isActivated()) {
@@ -65,7 +66,7 @@ public class DefaultXClassCreator implements XClassCreator {
   }
 
   @Override
-  public void createXClasses(ClassPackage classPackage) {
+  public void createXClasses(ClassPackage classPackage) throws XClassCreateException {
     LOGGER.debug("creating package '{}'", classPackage.getName());
     for (ClassDefinition classDef : classPackage.getClassDefinitions()) {
       if (!classDef.isBlacklisted()) {
@@ -77,7 +78,7 @@ public class DefaultXClassCreator implements XClassCreator {
   }
 
   @Override
-  public void createXClass(ClassDefinition classDef) {
+  public void createXClass(ClassDefinition classDef) throws XClassCreateException {
     LOGGER.debug("creating class '{}'", classDef.getName());
     boolean created = !modelAccess.exists(classDef.getClassRef());
     boolean needsSave = created;
@@ -96,7 +97,11 @@ public class DefaultXClassCreator implements XClassCreator {
       }
     }
     if (needsSave) {
-      modelAccess.saveDocument(classDoc, (created ? "created" : "updated") + " XClass");
+      try {
+        modelAccess.saveDocument(classDoc, (created ? "created" : "updated") + " XClass");
+      } catch (DocumentSaveException exc) {
+        throw new XClassCreateException(exc);
+      }
     }
   }
 

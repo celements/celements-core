@@ -11,6 +11,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
+import com.celements.common.classes.XClassCreateException;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 
@@ -43,7 +44,7 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void testOnEvent() {
+  public void testOnEvent() throws XClassCreateException {
     String database = "db";
     Event event = new WikiCreatedEvent(database);
 

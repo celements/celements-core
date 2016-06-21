@@ -55,7 +55,7 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   }
 
   @Override
-  public void checkClasses() {
+  public void checkClasses() throws XClassCreateException {
     LOGGER.info("start checkClasses for wiki '{}'", getContext().getDatabase());
     classCreator.createXClasses();
     checkClassCollections();
@@ -66,7 +66,11 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   @Override
   @Deprecated
   public void checkAllClassCollections() {
-    checkClasses();
+    try {
+      checkClasses();
+    } catch (XClassCreateException exc) {
+      LOGGER.error("failed to create classes", exc);
+    }
   }
 
   @Deprecated

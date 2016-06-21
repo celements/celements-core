@@ -33,6 +33,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.celements.common.classes.IClassesCompositorComponent;
+import com.celements.common.classes.XClassCreateException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -71,9 +72,12 @@ public class DocumentUpdatedEventListener implements EventListener {
           document.getDocumentReference().getLastSpaceReference().getParent().getName(), "XWiki",
           "XWikiPreferences");
       if (document.getDocumentReference().equals(xwikiPrefDoc)) {
-        LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class "
-            + "Collections.");
-        classesCompositor.checkClasses();
+        LOGGER.info("changes on [" + xwikiPrefDoc + "] saved. Checking all Class " + "Collections.");
+        try {
+          classesCompositor.checkClasses();
+        } catch (XClassCreateException exc) {
+          LOGGER.error("failed to create classes", exc);
+        }
       } else {
         LOGGER.trace("changes on [" + xwikiPrefDoc + "] saved. NOT checking all Class "
             + "Collections.");

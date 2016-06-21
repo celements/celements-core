@@ -49,6 +49,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.classes.IClassesCompositorComponent;
+import com.celements.common.classes.XClassCreateException;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
@@ -318,8 +319,7 @@ public class CelementsWebScriptService implements ScriptService {
     _LOGGER.trace("create new document for [" + newDocRef + "] and pageType [" + pageType + "].");
     XWikiDocument theNewDoc = new CreateDocumentCommand().createDocument(newDocRef, pageType);
     if (theNewDoc != null) {
-      _LOGGER.debug("created new document for [" + newDocRef + "] and pageType [" + pageType
-          + "].");
+      _LOGGER.debug("created new document for [" + newDocRef + "] and pageType [" + pageType + "].");
       return theNewDoc.newDocument(getContext());
     }
     return null;
@@ -392,8 +392,8 @@ public class CelementsWebScriptService implements ScriptService {
       String renderMode, boolean preserveVelocityContext) {
     try {
       if (preserveVelocityContext) {
-        return getCelementsRenderCmd().renderCelementsDocumentPreserveVelocityContext(elementDocRef,
-            lang, renderMode);
+        return getCelementsRenderCmd().renderCelementsDocumentPreserveVelocityContext(
+            elementDocRef, lang, renderMode);
       } else {
         return getCelementsRenderCmd().renderCelementsDocument(elementDocRef, lang, renderMode);
       }
@@ -462,8 +462,7 @@ public class CelementsWebScriptService implements ScriptService {
     return "";
   }
 
-  public String renderDocument(Document renderDoc, boolean removePre,
-      List<String> rendererNameList) {
+  public String renderDocument(Document renderDoc, boolean removePre, List<String> rendererNameList) {
     return renderDocument(renderDoc.getDocumentReference(), renderDoc.getLanguage(), removePre,
         rendererNameList);
   }
@@ -493,8 +492,7 @@ public class CelementsWebScriptService implements ScriptService {
   public boolean useNewButtons() {
     int wikiConfig = getContext().getWiki().getXWikiPreferenceAsInt("useNewButtons",
         "celements.usenewbuttons", 0, getContext());
-    return getContext().getWiki().getSpacePreferenceAsInt("useNewButtons", wikiConfig,
-        getContext()) == 1;
+    return getContext().getWiki().getSpacePreferenceAsInt("useNewButtons", wikiConfig, getContext()) == 1;
   }
 
   public String getDefaultAdminLanguage() {
@@ -524,8 +522,7 @@ public class CelementsWebScriptService implements ScriptService {
   public List<String> getDeletedDocuments(String orderby, boolean hideOverwritten) {
     List<String> resultList = Collections.emptyList();
     try {
-      Query query = queryManager.createQuery(getDeletedDocsHql(orderby, hideOverwritten),
-          Query.HQL);
+      Query query = queryManager.createQuery(getDeletedDocsHql(orderby, hideOverwritten), Query.HQL);
       resultList = query.execute();
     } catch (QueryException queryExp) {
       _LOGGER.error("Failed to parse or execute deletedDocs hql query.", queryExp);
@@ -612,8 +609,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link EditorSupportScriptService #validateRequest()}
+   * @deprecated since 2.59 instead use {@link EditorSupportScriptService #validateRequest()}
    * @return empty map means the validation has been successful. Otherwise validation
    *         messages are returned for invalid fields.
    */
@@ -637,8 +633,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 2.59 instead use
-   *             {@link LegacySkinScriptService #getSkinConfigObj()}
+   * @deprecated since 2.59 instead use {@link LegacySkinScriptService #getSkinConfigObj()}
    */
   @Deprecated
   public com.xpn.xwiki.api.Object getSkinConfigObj() {
@@ -654,8 +649,7 @@ public class CelementsWebScriptService implements ScriptService {
     }
   }
 
-  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName,
-      String key) {
+  public com.xpn.xwiki.api.Object getSkinConfigFieldInheritor(String fallbackClassName, String key) {
     BaseCollection skinConfigBaseColl = new SkinConfigObjCommand().getSkinConfigFieldInheritor(
         fallbackClassName).getObject(key);
     if ((skinConfigBaseColl != null) && (skinConfigBaseColl instanceof BaseObject)) {
@@ -677,15 +671,14 @@ public class CelementsWebScriptService implements ScriptService {
     // FIXME not all tag documents have a page type: who cares? deprecated? migration?
     // DocumentReference pageTypeDocRef = webUtilsService.resolveDocumentReference(
     // "Celements2.PageType");
-    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference(
-        "Classes.FilebaseTag");
+    DocumentReference tagClassDocRef = webUtilsService.resolveDocumentReference("Classes.FilebaseTag");
     String tagValue = fileDocFullName + "/" + fileName;
     try {
       XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
       if (/*
-           * (tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) !=
-           * null) &&
-           */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
+       * (tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) !=
+       * null) &&
+       */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
         BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
         obj.setStringValue("attachment", tagValue);
         getContext().getWiki().saveDocument(tagDoc, getContext());
@@ -699,8 +692,7 @@ public class CelementsWebScriptService implements ScriptService {
 
   public boolean getUserAdminShowLoginName() {
     boolean showLoginName = (getContext().getWiki().getXWikiPreferenceAsInt(
-        "celUserAdminShowLoginName", "celements.administration.showloginname", 0,
-        getContext()) != 0);
+        "celUserAdminShowLoginName", "celements.administration.showloginname", 0, getContext()) != 0);
     return (webUtilsService.isAdvancedAdmin() || showLoginName);
   }
 
@@ -735,7 +727,11 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void checkClasses() {
-    classesComp.checkClasses();
+    try {
+      classesComp.checkClasses();
+    } catch (XClassCreateException exc) {
+      _LOGGER.error("failed to create classes", exc);
+    }
   }
 
   public boolean isClassCollectionActivated(String name) {
@@ -788,8 +784,7 @@ public class CelementsWebScriptService implements ScriptService {
    */
   @Deprecated
   public String clearFileName(String fileName) {
-    return ((FileBaseScriptService) Utils.getComponent(ScriptService.class,
-        "filebase")).clearFileName(fileName);
+    return ((FileBaseScriptService) Utils.getComponent(ScriptService.class, "filebase")).clearFileName(fileName);
   }
 
   public boolean isTranslationAvailable(Document doc, String language) {
@@ -797,8 +792,8 @@ public class CelementsWebScriptService implements ScriptService {
       return doc.getTranslationList().contains(language);
     } catch (XWikiException exp) {
       _LOGGER.error("Failed to get TranslationList for [" + doc.getFullName() + "].", exp);
-      return (language.equals(getWebUtilsService().getDefaultLanguage())
-          && getContext().getWiki().exists(doc.getDocumentReference(), getContext()));
+      return (language.equals(getWebUtilsService().getDefaultLanguage()) && getContext().getWiki().exists(
+          doc.getDocumentReference(), getContext()));
     }
   }
 
@@ -863,8 +858,8 @@ public class CelementsWebScriptService implements ScriptService {
       String propertyName) throws XWikiException {
     String sql = ", BaseObject as obj, IntegerProperty as art_id";
     sql += " where obj.name=doc.fullName";
-    sql += " and obj.className='" + getWebUtilsService().getRefLocalSerializer().serialize(classRef)
-        + "'";
+    sql += " and obj.className='"
+        + getWebUtilsService().getRefLocalSerializer().serialize(classRef) + "'";
     sql += " and doc.space='" + spaceRef.getName() + "' and obj.id = art_id.id.id";
     sql += " and art_id.id.name='" + propertyName + "' order by art_id.value desc";
     int nextId = 1;
