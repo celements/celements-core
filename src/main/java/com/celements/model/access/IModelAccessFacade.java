@@ -12,7 +12,9 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
@@ -38,17 +40,20 @@ public interface IModelAccessFacade {
 
   public boolean exists(DocumentReference docRef);
 
-  public void saveDocument(XWikiDocument doc);
+  public void saveDocument(XWikiDocument doc) throws DocumentSaveException;
 
-  public void saveDocument(XWikiDocument doc, String comment);
+  public void saveDocument(XWikiDocument doc, String comment) throws DocumentSaveException;
 
-  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit);
+  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
+      throws DocumentSaveException;
 
-  public void deleteDocument(DocumentReference docRef, boolean totrash);
+  public void deleteDocument(DocumentReference docRef, boolean totrash)
+      throws DocumentDeleteException;
 
-  public void deleteDocument(XWikiDocument doc, boolean totrash);
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException;
 
-  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash);
+  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
+      throws DocumentDeleteException;
 
   /**
    * @param docRef

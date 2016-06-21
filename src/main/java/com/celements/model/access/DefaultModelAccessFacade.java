@@ -21,6 +21,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.access.exception.DocumentAccessRuntimeException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
@@ -211,19 +212,20 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void saveDocument(XWikiDocument doc) {
+  public void saveDocument(XWikiDocument doc) throws DocumentSaveException {
     checkNotNull(doc);
     saveDocument(doc, "", false);
   }
 
   @Override
-  public void saveDocument(XWikiDocument doc, String comment) {
+  public void saveDocument(XWikiDocument doc, String comment) throws DocumentSaveException {
     checkNotNull(doc);
     saveDocument(doc, comment, false);
   }
 
   @Override
-  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit) {
+  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
+      throws DocumentSaveException {
     checkNotNull(doc);
     try {
       String username = getContext().getUser();
@@ -238,16 +240,19 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void deleteDocument(DocumentReference docRef, boolean totrash) {
+  public void deleteDocument(DocumentReference docRef, boolean totrash)
+      throws DocumentDeleteException {
     try {
       deleteDocument(getDocument(docRef), totrash);
     } catch (DocumentNotExistsException exc) {
       LOGGER.debug("doc trying to delete does not exist '{}'", docRef, exc);
+    } catch (DocumentAccessRuntimeException exc) {
+      throw new DocumentDeleteException(docRef, exc);
     }
   }
 
   @Override
-  public void deleteDocument(XWikiDocument doc, boolean totrash) {
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException {
     checkNotNull(doc);
     List<XWikiDocument> toDelDocs = new ArrayList<>();
     try {
@@ -267,7 +272,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash) {
+  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
+      throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
       getContext().setDatabase(webUtilsService.getWikiRef(doc).getName());
@@ -384,8 +390,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
-          throw new NoAccessRightsException(obj.getDocumentReference(), getContext().getXWikiUser(),
-              EAccessLevel.VIEW);
+          throw new NoAccessRightsException(obj.getDocumentReference(),
+              getContext().getXWikiUser(), EAccessLevel.VIEW);
         }
       } catch (IllegalStateException exp) {
         LOGGER.warn("getApiObject failed for '{}'", obj, exp);
@@ -632,8 +638,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         return attach;
       }
     }
-    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]", filename,
-        document, document.getDocumentReference());
+    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
+        filename, document, document.getDocumentReference());
     // FIXME empty or null filename leads to exception:
     // java.lang.IllegalArgumentException: An Entity Reference name cannot be null or
     // empty
