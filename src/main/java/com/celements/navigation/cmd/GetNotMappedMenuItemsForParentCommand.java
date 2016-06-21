@@ -19,6 +19,8 @@
  */
 package com.celements.navigation.cmd;
 
+import static com.celements.navigation.cmd.MenuItemsUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,17 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.validation.constraints.NotNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 
 import com.celements.navigation.TreeNode;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -160,19 +157,6 @@ public class GetNotMappedMenuItemsForParentCommand {
       }
     }
     return internalGetMenuItemsForWiki(wikiName);
-  }
-
-  private EntityReference resolveParentRef(@NotNull String parentFN) {
-    return (parentFN.isEmpty()) ? null
-        : getWebUtils().resolveEntityReference(parentFN, getEntityType(parentFN));
-  }
-
-  private EntityType getEntityType(String parentFN) {
-    return (parentFN.contains(".")) ? EntityType.DOCUMENT : EntityType.SPACE;
-  }
-
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
   }
 
   List<Object[]> getFromDBForParentKey(String wikiName) throws XWikiException {

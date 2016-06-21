@@ -19,6 +19,8 @@
  */
 package com.celements.navigation.cmd;
 
+import static com.celements.navigation.cmd.MenuItemsUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,12 +31,9 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 
 import com.celements.navigation.TreeNode;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -70,8 +69,11 @@ public class GetMappedMenuItemsForParentCommand {
     return getTreeNodesForParentKey(parentKey);
   }
 
-  public List<TreeNode> getTreeNodesForParentKey(String parentKey) {
-    if (isActive() && !"".equals(parentKey)) {
+  /**
+   * TODO not yet implemented correctly
+   */
+  public List<TreeNode> getTreeNodesForParentKey(@NotNull String parentKey) {
+    if (isActive() && !parentKey.isEmpty()) {
       if (parentKey.trim().endsWith(".")) {
         parentKey = " ";
       }
@@ -109,30 +111,11 @@ public class GetMappedMenuItemsForParentCommand {
     }
   }
 
-  private EntityReference resolveParentRef(@NotNull String parentFN) {
-    return (parentFN.isEmpty()) ? null
-        : getWebUtils().resolveEntityReference(parentFN, getEntityType(parentFN));
-  }
-
-  private EntityType getEntityType(String parentFN) {
-    return (parentFN.contains(".")) ? EntityType.DOCUMENT : EntityType.SPACE;
-  }
-
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
-  }
-
   String getHQL() {
-    String hql = "select doc.fullName, doc.space, doc.parent,";
-    hql += " menuitem.menu_position, menuitem.part_name";
-    hql += " from XWikiDocument doc, BaseObject as obj,";
-    hql += " Classes.MenuItemClass as menuitem";
-    hql += " where doc.parent=?";
-    hql += " and doc.translation='0'";
-    hql += " and obj.name=doc.fullName";
-    hql += " and obj.id=menuitem.id";
-    hql += " order by menuitem.menu_position";
-    return hql;
+    return "select doc.fullName, doc.space, doc.parent, menuitem.menu_position, menuitem.part_name"
+        + " from XWikiDocument doc, BaseObject as obj, Classes.MenuItemClass as menuitem"
+        + " where doc.parent=? and doc.translation='0' and obj.name=doc.fullName"
+        + " and obj.id=menuitem.id order by menuitem.menu_position";
   }
 
 }
