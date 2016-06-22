@@ -35,11 +35,7 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(InternalRightsFilter.class);
 
-  private String menuPart;
-
-  public InternalRightsFilter() {
-    menuPart = "";
-  }
+  private String menuPart = "";
 
   @Override
   public String getMenuPart() {
