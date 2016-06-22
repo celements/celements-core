@@ -33,12 +33,15 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponentTest {
 
@@ -77,26 +80,26 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   @Test
   public void testGetHQL() {
     String hql = notMappedItemsCmd.getHQL();
-    assertTrue("missing doc name restriction [" + hql + "].", hql.matches(
-        ".*[where |and ]obj.name=doc.fullName .*"));
-    assertTrue("missing classname restriction [" + hql + "].", hql.matches(
-        ".*[where |and ]obj.className='Celements2.MenuItem' .*"));
-    assertTrue("missing object-property join restriction [" + hql + "].", hql.matches(
-        ".*[where |and ]obj.id = pos.id.id .*"));
-    assertTrue("missing property name restriction [" + hql + "].", hql.matches(
-        ".*[where |and ]and pos.id.name = 'menu_position' .*"));
-    assertTrue("missing translation restriction [" + hql + "].", hql.matches(
-        ".*[where |and ]doc.translation = 0 .*"));
-    assertTrue("expecting no trash restriction [" + hql + "].", hql.matches(
-        ".*[where |and ]and doc.space <> 'Trash' .*"));
+    assertTrue("missing doc name restriction [" + hql + "].",
+        hql.matches(".*[where |and ]obj.name=doc.fullName .*"));
+    assertTrue("missing classname restriction [" + hql + "].",
+        hql.matches(".*[where |and ]obj.className='Celements2.MenuItem' .*"));
+    assertTrue("missing object-property join restriction [" + hql + "].",
+        hql.matches(".*[where |and ]obj.id = pos.id.id .*"));
+    assertTrue("missing property name restriction [" + hql + "].",
+        hql.matches(".*[where |and ]and pos.id.name = 'menu_position' .*"));
+    assertTrue("missing translation restriction [" + hql + "].",
+        hql.matches(".*[where |and ]doc.translation = 0 .*"));
+    assertTrue("expecting no trash restriction [" + hql + "].",
+        hql.matches(".*[where |and ]and doc.space <> 'Trash' .*"));
     assertTrue("missing order by [" + hql + "].", hql.matches(".* order by doc.parent, pos.value"));
   }
 
   @Test
   public void testGetTreeNodesForParentKey_miss() throws XWikiException {
     context.setDatabase("mydatabase");
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "",
-        1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace",
+        "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     DocumentReference myDoc1Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
@@ -104,17 +107,15 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc1Ref, null, 1), new TreeNode(
         myDoc2Ref, null, 2));
     expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc1Ref)).atLeastOnce();
+    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(myDoc1Ref)).atLeastOnce();
     expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
+    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(myDoc2Ref)).atLeastOnce();
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey("mydatabase:MySpace.");
     assertEquals(expectedList.size(), resultTNlist.size());
     for (int i = 0; i < expectedList.size(); i++) {
-      assertEquals(expectedList.get(i).getDocumentReference(), resultTNlist.get(
-          i).getDocumentReference());
+      assertEquals(expectedList.get(i).getDocumentReference(),
+          resultTNlist.get(i).getDocumentReference());
       assertEquals(expectedList.get(i).getParentRef(), resultTNlist.get(i).getParentRef());
       assertEquals(expectedList.get(i).getPosition(), resultTNlist.get(i).getPosition());
       assertEquals(expectedList.get(i).getPartName(), resultTNlist.get(i).getPartName());
@@ -125,27 +126,22 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   @Test
   public void testGetTreeNodesForParentKey_differentParents_miss() throws XWikiException {
     context.setDatabase("mydatabase");
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "",
-        1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "MySpace.MyDoc1",
-            2).toArray());
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace",
+        "", 1).toArray(),
+        Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "MySpace.MyDoc1", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     DocumentReference myDoc1Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
     DocumentReference myDoc2Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc2");
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc2Ref, myDoc1Ref, 2));
-    expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc1Ref)).atLeastOnce();
     expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
+    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(myDoc2Ref)).atLeastOnce();
     replayDefault();
-    List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(
-        "mydatabase:MySpace.MyDoc1");
+    List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey("mydatabase:MySpace.MyDoc1");
     assertEquals(expectedList.size(), resultTNlist.size());
     for (int i = 0; i < expectedList.size(); i++) {
-      assertEquals(expectedList.get(i).getDocumentReference(), resultTNlist.get(
-          i).getDocumentReference());
+      assertEquals(expectedList.get(i).getDocumentReference(),
+          resultTNlist.get(i).getDocumentReference());
       assertEquals(expectedList.get(i).getParentRef(), resultTNlist.get(i).getParentRef());
       assertEquals(expectedList.get(i).getPosition(), resultTNlist.get(i).getPosition());
       assertEquals(expectedList.get(i).getPartName(), resultTNlist.get(i).getPartName());
@@ -161,7 +157,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), null, 1), new TreeNode(new DocumentReference(
-            context.getDatabase(), "MySpace", "MyDoc2"), null, 2));
+        context.getDatabase(), "MySpace", "MyDoc2"), null, 2));
     mySpaceMap.put(searchParentKey, expectedList);
     notMappedItemsCmd.injectMapForTests(cacheKey, mySpaceMap);
     replayDefault();
@@ -173,21 +169,12 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   @Test
   public void testGetTreeNodesForParentKey_miss_empty() throws XWikiException {
     context.setDatabase("mydatabase");
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "",
-        1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace",
+        "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
-    DocumentReference myDoc1Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc1");
-    DocumentReference myDoc2Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc2");
-    expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc1Ref)).atLeastOnce();
-    expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
     replayDefault();
-    List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(
-        "mydatabase:MySpace2.");
+    List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey("mydatabase:MySpace2.");
     assertEquals(Collections.emptyList(), resultTNlist);
     verifyDefault();
   }
@@ -200,7 +187,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
     mySpaceMap.put("mydatabase:MySpace.", Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), null, 1), new TreeNode(new DocumentReference(
-            context.getDatabase(), "MySpace", "MyDoc2"), null, 2)));
+        context.getDatabase(), "MySpace", "MyDoc2"), null, 2)));
     notMappedItemsCmd.injectMapForTests(cacheKey, mySpaceMap);
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(searchParentKey);
@@ -213,28 +200,36 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   public void testGetTreeNodesForParentKey_differentDbs() throws Exception {
     context.setDatabase("myTestWiki");
     String searchParentKey = "mydatabase:MySpace.";
+    String expectedPartName = "mainPart";
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference("mydatabase",
-        "MySpace", "MyDoc1"), null, 1), new TreeNode(new DocumentReference("mydatabase", "MySpace",
-            "MyDoc2"), null, 2));
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "",
-        1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+        "MySpace", "MyDoc1"), null, 1, expectedPartName), new TreeNode(new DocumentReference(
+        "mydatabase", "MySpace", "MyDoc2"), null, 2, expectedPartName));
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace",
+        "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     DocumentReference myDoc1Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc1");
+    XWikiDocument doc1 = new XWikiDocument(myDoc1Ref);
+    BaseObject menuItem1 = new BaseObject();
+    menuItem1.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
+    menuItem1.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
+    doc1.addXObject(menuItem1);
     DocumentReference myDoc2Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc2");
     expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc1Ref)).atLeastOnce();
+    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(doc1).atLeastOnce();
+    XWikiDocument doc2 = new XWikiDocument(myDoc2Ref);
+    BaseObject menuItem2 = new BaseObject();
+    menuItem2.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
+    menuItem2.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
+    doc2.addXObject(menuItem2);
     expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
+    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(doc2).atLeastOnce();
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey(searchParentKey);
     for (int index = 0; index < resultTNlist.size(); index++) {
       TreeNode testNode = resultTNlist.get(index);
       TreeNode expectedNode = expectedList.get(index);
-      assertEquals("expected [" + expectedNode.getDocumentReference() + "] but found ["
-          + testNode.getDocumentReference() + "].", expectedNode, testNode);
+      assertTreeNoteEquals(expectedNode, testNode);
     }
     assertEquals(expectedList, resultTNlist);
     verifyDefault();
@@ -248,15 +243,24 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     DocumentReference myDoc1Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc1");
     DocumentReference myDoc2Ref = new DocumentReference("mydatabase", "MySpace", "MyDoc2");
     expect(xwiki.exists(eq(myDoc1Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc1Ref)).atLeastOnce();
+    XWikiDocument doc1 = new XWikiDocument(myDoc1Ref);
+    String expectedPartName = "mainPart";
+    BaseObject menuItem1 = new BaseObject();
+    menuItem1.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
+    menuItem1.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
+    doc1.addXObject(menuItem1);
+    expect(xwiki.getDocument(eq(myDoc1Ref), same(context))).andReturn(doc1).atLeastOnce();
     expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
-    List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc1Ref, null, 1), new TreeNode(
-        myDoc2Ref, null, 2));
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "",
-        1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    XWikiDocument doc2 = new XWikiDocument(myDoc2Ref);
+    BaseObject menuItem2 = new BaseObject();
+    menuItem2.setXClassReference(getNavClassConfig().getMenuItemClassRef("mydatabase"));
+    menuItem2.setStringValue(INavigationClassConfig.PART_NAME_FIELD, expectedPartName);
+    doc2.addXObject(menuItem2);
+    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(doc2).atLeastOnce();
+    List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc1Ref, null, 1, expectedPartName),
+        new TreeNode(myDoc2Ref, null, 2, expectedPartName));
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace",
+        "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     replayDefault();
@@ -265,8 +269,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     for (int index = 0; index < resultTNlist.size(); index++) {
       TreeNode testNode = resultTNlist.get(index);
       TreeNode expectedNode = expectedList.get(index);
-      assertEquals("expected [" + expectedNode.getDocumentReference() + "] but found ["
-          + testNode.getDocumentReference() + "].", expectedNode, testNode);
+      assertTreeNoteEquals(expectedNode, testNode);
     }
     assertEquals(expectedList, resultTNlist);
     verifyDefault();
@@ -311,25 +314,45 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   }
 
   @Test
-  public void testGetTreeNodesForParentKey_miss_IllegalArgumentExp_emptySpace()
+  @Deprecated
+  public void testGetTreeNodesForParentKey_miss_IllegalArgumentExp_emptySpace_deprecated()
       throws XWikiException {
     context.setDatabase("mydatabase");
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList(".MyDoc1", "", "", 1).toArray(),
-        Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    List<Object[]> resultList = Arrays.asList(
+        Arrays.<Object>asList(".MyDoc1", "", "", 1).toArray(), Arrays.<Object>asList(
+            "MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
-    DocumentReference myDoc2Ref = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc2");
-    expect(xwiki.exists(eq(myDoc2Ref), same(context))).andReturn(true).atLeastOnce();
-    expect(xwiki.getDocument(eq(myDoc2Ref), same(context))).andReturn(new XWikiDocument(
-        myDoc2Ref)).atLeastOnce();
-    List<TreeNode> expectedList = Arrays.asList(new TreeNode(myDoc2Ref, null, 2));
+    List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
+        context.getDatabase(), "MySpace", "MyDoc2"), null, 2));
     replayDefault();
     List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey("mydatabase:MySpace.",
         context);
     assertEquals(expectedList.size(), resultTNlist.size());
     for (int i = 0; i < expectedList.size(); i++) {
-      assertEquals(expectedList.get(i).getDocumentReference(), resultTNlist.get(
-          i).getDocumentReference());
+      assertEquals(expectedList.get(i).getDocumentReference(),
+          resultTNlist.get(i).getDocumentReference());
+    }
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetTreeNodesForParentKey_miss_IllegalArgumentExp_emptySpace()
+      throws XWikiException {
+    context.setDatabase("mydatabase");
+    List<Object[]> resultList = Arrays.asList(
+        Arrays.<Object>asList(".MyDoc1", "", "", 1).toArray(), Arrays.<Object>asList(
+            "MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
+        resultList).atLeastOnce();
+    List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
+        context.getDatabase(), "MySpace", "MyDoc2"), null, 2));
+    replayDefault();
+    List<TreeNode> resultTNlist = notMappedItemsCmd.getTreeNodesForParentKey("mydatabase:MySpace.");
+    assertEquals(expectedList.size(), resultTNlist.size());
+    for (int i = 0; i < expectedList.size(); i++) {
+      assertEquals(expectedList.get(i).getDocumentReference(),
+          resultTNlist.get(i).getDocumentReference());
     }
     verifyDefault();
   }
@@ -337,8 +360,9 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   @Test
   public void testExecuteSearch_fixDbForSearch() throws Exception {
     context.setDatabase("myTestWiki");
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList(".MyDoc1", "", "", 1).toArray(),
-        Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    List<Object[]> resultList = Arrays.asList(
+        Arrays.<Object>asList(".MyDoc1", "", "", 1).toArray(), Arrays.<Object>asList(
+            "MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     replayDefault();
@@ -351,8 +375,8 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
   @Test
   public void testGetFromDBForParentKey_preserve_db() throws Exception {
     context.setDatabase("myTestWiki");
-    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace", "",
-        1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
+    List<Object[]> resultList = Arrays.asList(Arrays.<Object>asList("MySpace.MyDoc1", "MySpace",
+        "", 1).toArray(), Arrays.<Object>asList("MySpace.MyDoc2", "MySpace", "", 2).toArray());
     expect(mockStore.<Object[]>search(isA(String.class), eq(0), eq(0), same(context))).andReturn(
         resultList).atLeastOnce();
     replayDefault();
@@ -360,6 +384,23 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     assertEquals("expect database being preserved.", "myTestWiki", context.getDatabase());
     assertEquals(resultList, result);
     verifyDefault();
+  }
+
+  private INavigationClassConfig getNavClassConfig() {
+    return Utils.getComponent(INavigationClassConfig.class);
+  }
+
+  private void assertTreeNoteEquals(TreeNode expectedNode, TreeNode testNode) {
+    assertEquals("wrong parentRef for [" + expectedNode.getDocumentReference().getName() + "]",
+        expectedNode.getParentRef(), testNode.getParentRef());
+    assertEquals("wrong documentReference for [" + expectedNode.getDocumentReference().getName()
+        + "]", expectedNode.getDocumentReference(), testNode.getDocumentReference());
+    assertEquals("wrong position for [" + expectedNode.getDocumentReference().getName() + "]",
+        expectedNode.getPosition(), testNode.getPosition());
+    assertEquals("wrong partName for [" + expectedNode.getDocumentReference().getName() + "]",
+        expectedNode.getPartName(), testNode.getPartName());
+    assertEquals("expected [" + expectedNode.getDocumentReference() + "] but found ["
+        + testNode.getDocumentReference() + "].", expectedNode, testNode);
   }
 
 }

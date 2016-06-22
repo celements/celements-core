@@ -33,7 +33,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 /**
- * Immutable TreeNode
+ * Immutable TreeNode with optional lazy getter for PartName
+ * needed as performance improvement for legacy NotMappedMenuItems
  *
  * @author Fabian Pichler, Marc Sladek
  */
@@ -45,25 +46,33 @@ public final class TreeNode {
 
   private final DocumentReference docRef;
 
-  private final String partName;
+  private volatile String partName;
+
+  private final PartNameGetter partNameStrategy;
 
   public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @Nullable String partName) {
-    Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
-    this.docRef = ModelUtils.cloneReference(docRef, DocumentReference.class);
-    this.parentRef = (parentRef != null) ? ModelUtils.cloneReference(parentRef) : null;
-    this.position = MoreObjects.firstNonNull(position, new Integer(0));
-    this.partName = Strings.nullToEmpty(partName);
+    this(docRef, parentRef, position, partName, null);
   }
 
   public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @NotNull PartNameGetter strategy) {
-    this(docRef, parentRef, position, strategy.getPartName(docRef));
+    this(docRef, parentRef, position, null, strategy);
   }
 
   public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position) {
     this(docRef, parentRef, position, (String) null);
+  }
+
+  private TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
+      @Nullable Integer position, @Nullable String partName, @Nullable PartNameGetter strategy) {
+    Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
+    this.docRef = ModelUtils.cloneReference(docRef, DocumentReference.class);
+    this.parentRef = (parentRef != null) ? ModelUtils.cloneReference(parentRef) : null;
+    this.position = MoreObjects.firstNonNull(position, new Integer(0));
+    this.partName = (strategy == null) ? Strings.nullToEmpty(partName) : partName;
+    this.partNameStrategy = strategy;
   }
 
   public boolean isEmptyParentRef() {
@@ -88,6 +97,13 @@ public final class TreeNode {
 
   @NotNull
   public String getPartName() {
+    if ((partName == null) && (partNameStrategy != null)) {
+      synchronized (this) {
+        if (partName == null) {
+          this.partName = Strings.nullToEmpty(partNameStrategy.getPartName(docRef));
+        }
+      }
+    }
     return partName;
   }
 
@@ -117,7 +133,7 @@ public final class TreeNode {
   public String toString() {
     return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(", parentRef=").append(
         parentRef).append(", position=").append(position).append(", partName=").append(partName).append(
-            "]").toString();
+        "]").toString();
   }
 
 }

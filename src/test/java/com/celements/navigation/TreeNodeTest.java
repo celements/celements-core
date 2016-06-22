@@ -20,6 +20,7 @@
 package com.celements.navigation;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -62,6 +63,48 @@ public class TreeNodeTest extends AbstractComponentTest {
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
     assertEquals("", treeNodeTest.getPartName());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_ConstructorParentSpaceRef_strategy() {
+    PartNameGetter partNameGetterMock = createMockAndAddToDefault(PartNameGetter.class);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
+    TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
+        context.getDatabase())), 1, partNameGetterMock);
+    expect(partNameGetterMock.getPartName(eq(docRef2))).andReturn("mainPart").once();
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
+    assertEquals("expecting a call to getPartName", "mainPart", treeNodeTest.getPartName());
+    assertEquals("expecting only one call to getPartName", "mainPart", treeNodeTest.getPartName());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_ConstructorParentSpaceRef_strategy_null() {
+    PartNameGetter partNameGetterMock = createMockAndAddToDefault(PartNameGetter.class);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
+    TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
+        context.getDatabase())), 1, partNameGetterMock);
+    expect(partNameGetterMock.getPartName(eq(docRef2))).andReturn((String) null).once();
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
+    assertEquals("expecting a call to getPartName", "", treeNodeTest.getPartName());
+    assertEquals("expecting only one call to getPartName", "", treeNodeTest.getPartName());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_ConstructorParentSpaceRef_strategy_lazy() {
+    PartNameGetter partNameGetterMock = createMockAndAddToDefault(PartNameGetter.class);
+    DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
+    TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
+        context.getDatabase())), 1, partNameGetterMock);
+    expect(partNameGetterMock.getPartName(eq(docRef2))).andThrow(
+        new RuntimeException("partNameGetter must be called lazily for"
+            + " NotMappedMenuItems for performance reasons.")).anyTimes();
+    replayDefault();
+    assertTrue(treeNode.equals(treeNodeTest));
     verifyDefault();
   }
 
