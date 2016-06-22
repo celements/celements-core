@@ -69,7 +69,6 @@ import com.celements.web.plugin.cmd.DocHeaderTitleCommand;
 import com.celements.web.plugin.cmd.DocMetaTagsCmd;
 import com.celements.web.plugin.cmd.FormObjStorageCommand;
 import com.celements.web.plugin.cmd.ImageMapCommand;
-import com.celements.web.plugin.cmd.LastStartupTimeStamp;
 import com.celements.web.plugin.cmd.ParseObjStoreCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
@@ -131,6 +130,9 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   ILastChangedRole lastChangedSrv;
+
+  @Requirement
+  LastStartupTimeStampRole lastStartupTimeStamp;
 
   @Requirement
   Execution execution;
@@ -628,7 +630,7 @@ public class CelementsWebScriptService implements ScriptService {
    * @return
    */
   public String getLastStartupTimeStamp() {
-    return new LastStartupTimeStamp().getLastStartupTimeStamp();
+    return lastStartupTimeStamp.getLastStartupTimeStamp();
   }
 
   public Map<String, String> getDocMetaTags(String language, String defaultLanguage) {
@@ -930,7 +932,7 @@ public class CelementsWebScriptService implements ScriptService {
 
   public boolean resetLastStartupTimeStamp() {
     if (hasProgrammingRights()) {
-      new LastStartupTimeStamp().resetLastStartupTimeStamp();
+      lastStartupTimeStamp.resetLastStartupTimeStamp();
       return true;
     }
     return false;

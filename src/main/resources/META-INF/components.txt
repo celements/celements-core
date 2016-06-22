@@ -131,3 +131,4 @@ com.celements.configuration.CelementsAllConfigurationSource
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
 com.celements.common.classes.DefaultXClassCreator
+com.celements.web.service.LastStartupTimeStamp
