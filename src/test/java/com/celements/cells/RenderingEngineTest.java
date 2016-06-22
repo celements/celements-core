@@ -19,6 +19,7 @@
  */
 package com.celements.cells;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -31,13 +32,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
+public class RenderingEngineTest extends AbstractComponentTest {
 
   private RenderingEngine renderingEngine;
   private XWikiContext context;
@@ -56,7 +57,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testRenderCell_notRender() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     renderStrategyMock.startRendering();
     expectLastCall().once();
     renderStrategyMock.endRendering();
@@ -70,7 +71,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testRenderCell_isRendering() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     renderStrategyMock.startRendering();
     expectLastCall().once();
     renderStrategyMock.endRendering();
@@ -174,7 +175,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_RenderCell_notRender() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "Cell2");
-    TreeNode menuItem = new TreeNode(docRef, "", 0);
+    TreeNode menuItem = new TreeNode(docRef, null, 0);
     expect(renderStrategyMock.isRenderCell(same(menuItem))).andReturn(false).once();
     replayAll();
     renderingEngine.internal_renderCell(menuItem, true, false);
@@ -186,7 +187,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
     boolean isLastItem = false;
     boolean isFirstItem = true;
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "Cell2");
-    TreeNode menuItem = new TreeNode(docRef, "", 0);
+    TreeNode menuItem = new TreeNode(docRef, null, 0);
     expect(renderStrategyMock.isRenderCell(same(menuItem))).andReturn(true).once();
     renderStrategyMock.startRenderCell(eq(menuItem), eq(isFirstItem), eq(isLastItem));
     expectLastCall().once();
@@ -201,7 +202,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_renderSubCells_notRenderSubCells() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "Cell2");
-    TreeNode node = new TreeNode(docRef, "", 1);
+    TreeNode node = new TreeNode(docRef, null, 1);
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(false).once();
     replayAll();
     renderingEngine.internal_renderSubCells(node);
@@ -211,7 +212,7 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_renderSubCells_isRendering_noSubcells() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySkin", "Cell2");
-    TreeNode node = new TreeNode(docRef, "", 1);
+    TreeNode node = new TreeNode(docRef, null, 1);
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(true).once();
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart(eq(node))).andReturn(menuPart);
@@ -229,23 +230,23 @@ public class RenderingEngineTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testInternal_renderSubCells_isRendering_withSubcells() {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "MyLayout", "Cell2");
-    TreeNode cellNode = new TreeNode(cellRef, "", 1);
+    TreeNode cellNode = new TreeNode(cellRef, null, 1);
     expect(renderStrategyMock.isRenderSubCells(eq(cellRef))).andReturn(true).once();
     String menuSpace = "MyCellSpace";
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart(eq(cellNode))).andReturn(menuPart).once();
     List<TreeNode> subCellList = new ArrayList<TreeNode>();
     TreeNode subCell1 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell1"), "", 1);
+        "subCell1"), null, 1);
     subCellList.add(subCell1);
     TreeNode subCell2 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell2"), "", 2);
+        "subCell2"), null, 2);
     subCellList.add(subCell2);
     TreeNode subCell3 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell3"), "", 3);
+        "subCell3"), null, 3);
     subCellList.add(subCell3);
     TreeNode subCell4 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
-        "subCell4"), "", 4);
+        "subCell4"), null, 4);
     subCellList.add(subCell4);
     expect(mockTreeNodeService.getSubNodesForParent(eq(cellRef), eq(menuPart))).andReturn(
         subCellList);

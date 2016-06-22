@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * TreeNodeCache must be a singleton to ensure efficient caching
- * 
+ *
  * @author Fabian Pichler
  */
 @Component
@@ -40,10 +40,10 @@ public class TreeNodeCache implements ITreeNodeCache {
 
   private GetMappedMenuItemsForParentCommand injected_GetMappedMenuItemCommand;
 
-  private GetNotMappedMenuItemsForParentCommand notMappedMenuItemCommand;
+  private volatile GetNotMappedMenuItemsForParentCommand notMappedMenuItemCommand;
 
   @Requirement
-  Execution execution;
+  private Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -51,9 +51,10 @@ public class TreeNodeCache implements ITreeNodeCache {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.utils.IWebUtils#queryCount()
    */
+  @Override
   public int queryCount() {
     return getNotMappedMenuItemsForParentCmd().queryCount();
   }
@@ -63,6 +64,7 @@ public class TreeNodeCache implements ITreeNodeCache {
     notMappedMenuItemCommand = testGetMenuItemCommand;
   }
 
+  @Override
   synchronized public GetNotMappedMenuItemsForParentCommand getNotMappedMenuItemsForParentCmd() {
     if (notMappedMenuItemCommand == null) {
       notMappedMenuItemCommand = new GetNotMappedMenuItemsForParentCommand();
@@ -72,9 +74,10 @@ public class TreeNodeCache implements ITreeNodeCache {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.utils.IWebUtils#flushMenuItemCache(com.xpn.xwiki.XWikiContext)
    */
+  @Override
   public void flushMenuItemCache() {
     getNotMappedMenuItemsForParentCmd().flushMenuItemCache(getContext());
   }
@@ -84,19 +87,20 @@ public class TreeNodeCache implements ITreeNodeCache {
     injected_GetMappedMenuItemCommand = testGetMenuItemCommand;
   }
 
+  @Override
   public GetMappedMenuItemsForParentCommand getMappedMenuItemsForParentCmd() {
     if (injected_GetMappedMenuItemCommand != null) {
       return injected_GetMappedMenuItemCommand;
     }
     XWikiContext context = getContext();
-    if (context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null
-        && context.get(
-            GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) instanceof GetMappedMenuItemsForParentCommand) {
+    if ((context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null)
+        && (context.get(
+            GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) instanceof GetMappedMenuItemsForParentCommand)) {
       return (GetMappedMenuItemsForParentCommand) context.get(
           GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY);
     }
     GetMappedMenuItemsForParentCommand cmd = new GetMappedMenuItemsForParentCommand();
-    cmd.set_isActive(false);
+    cmd.setIsActive(false);
     return cmd;
   }
 

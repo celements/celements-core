@@ -27,10 +27,12 @@ public class ExternalUsageFilter implements INavFilter<com.xpn.xwiki.api.Object>
 
   private InternalRightsFilter rightsFilter;
 
+  @Override
   public com.xpn.xwiki.api.Object convertObject(BaseObject baseObj, XWikiContext context) {
     return baseObj.newObjectApi(baseObj, context);
   }
 
+  @Override
   public String getMenuPart() {
     return getRightsFilter().getMenuPart();
   }
@@ -46,14 +48,21 @@ public class ExternalUsageFilter implements INavFilter<com.xpn.xwiki.api.Object>
     this.rightsFilter = rightsFilter;
   }
 
+  /**
+   * @Deprecated instead use includeTreeNode(TreeNode, context)
+   */
+  @Override
+  @Deprecated
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context) {
     return getRightsFilter().includeMenuItem(baseObj, context);
   }
 
+  @Override
   public void setMenuPart(String menuPart) {
     getRightsFilter().setMenuPart(menuPart);
   }
 
+  @Override
   public boolean includeTreeNode(TreeNode node, XWikiContext context) {
     return getRightsFilter().includeTreeNode(node, context);
   }
