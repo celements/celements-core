@@ -14,7 +14,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Subclasses are expected be thread safe
+ * Subclasses are expected to be thread safe
  */
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
