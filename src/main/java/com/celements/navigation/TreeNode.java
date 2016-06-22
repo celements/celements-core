@@ -46,6 +46,11 @@ public final class TreeNode {
 
   private final DocumentReference docRef;
 
+  /**
+   * The partName is only once set to a non-null value. This can be directly in the constructor or
+   * if a PartNameGetter strategy is provided and NO partName then the strategy is lazily evaluated
+   * on the first getPartName call.
+   */
   private volatile String partName;
 
   private final PartNameGetter partNameStrategy;
@@ -131,9 +136,9 @@ public final class TreeNode {
   @Override
   @NotNull
   public String toString() {
-    return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(", parentRef=").append(
-        parentRef).append(", position=").append(position).append(", partName=").append(partName).append(
-        "]").toString();
+    return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(
+        ", parentRef=").append(parentRef).append(", position=").append(position).append(
+            ", partName=").append(partName).append("]").toString();
   }
 
 }
