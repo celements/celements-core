@@ -27,7 +27,6 @@ import com.celements.navigation.TreeNode;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
@@ -42,16 +41,15 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
     return menuPart;
   }
 
+  /**
+   * @Deprecated instead use includeTreeNode(TreeNode, context)
+   */
   @Override
+  @Deprecated
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context) {
-    try {
-      return context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-          baseObj.getName(), context) && ("".equals(getMenuPart()) || getMenuPart().equals(
-              baseObj.getStringValue("part_name")));
-    } catch (XWikiException exp) {
-      LOGGER.error("includeMenuItem failed", exp);
-      return false;
-    }
+    return getRightsAccess().hasAccessLevel(baseObj.getDocumentReference(), EAccessLevel.VIEW,
+        context.getXWikiUser()) && (getMenuPart().isEmpty() || getMenuPart().equals(
+            baseObj.getStringValue("part_name")));
   }
 
   @Override
