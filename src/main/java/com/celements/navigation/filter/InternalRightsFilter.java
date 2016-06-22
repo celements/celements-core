@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.filter;
 
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +60,7 @@ public class InternalRightsFilter implements INavFilter<BaseObject> {
 
   @Override
   public void setMenuPart(String menuPart) {
-    if (menuPart == null) {
-      menuPart = "";
-    }
-    this.menuPart = menuPart;
+    this.menuPart = Strings.nullToEmpty(menuPart);
   }
 
   @Override
