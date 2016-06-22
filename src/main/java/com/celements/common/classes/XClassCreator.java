@@ -30,10 +30,8 @@ public interface XClassCreator {
   /**
    * creates XClasses from all {@link ClassPackage}s if activated, class definition isn't
    * blacklisted and XClasses don't exist yet
-   * 
-   * @throws XClassCreateException
    */
-  public void createXClasses() throws XClassCreateException;
+  public void createXClasses();
 
   /**
    * creates XClasses from provided classPackage if class definition isn't blacklisted and XClasses

@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 public class DefaultXClassCreator implements XClassCreator {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DefaultXClassCreator.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultXClassCreator.class);
 
   @Requirement
   protected IModelAccessFacade modelAccess;
@@ -54,11 +54,15 @@ public class DefaultXClassCreator implements XClassCreator {
   private List<ClassPackage> classPackages;
 
   @Override
-  public void createXClasses() throws XClassCreateException {
+  public void createXClasses() {
     LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
     for (ClassPackage classPackage : classPackages) {
       if (classPackage.isActivated()) {
-        createXClasses(classPackage);
+        try {
+          createXClasses(classPackage);
+        } catch (XClassCreateException exc) {
+          LOGGER.error("failed to create classes for package '{}'", classPackage.getName(), exc);
+        }
       } else {
         LOGGER.info("skipping package '{}'", classPackage.getName());
       }

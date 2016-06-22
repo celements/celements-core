@@ -735,11 +735,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public void checkClasses() {
-    try {
-      classesComp.checkClasses();
-    } catch (XClassCreateException exc) {
-      LOGGER.error("failed to create classes", exc);
-    }
+    classesComp.checkClasses();
   }
 
   public boolean isClassCollectionActivated(String name) {

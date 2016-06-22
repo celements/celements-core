@@ -34,7 +34,6 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.classes.IClassesCompositorComponent;
-import com.celements.common.classes.XClassCreateException;
 import com.xpn.xwiki.XWikiContext;
 
 @Component(WikiCreatedEventListener.NAME)
@@ -80,8 +79,6 @@ public class WikiCreatedEventListener implements EventListener {
         LOGGER.info("checking all class collections for db '{}'", database);
         getContext().setDatabase(database);
         classesCompositor.checkClasses();
-      } catch (XClassCreateException exc) {
-        LOGGER.error("failed to create classes", exc);
       } finally {
         getContext().setDatabase(dbBackup);
       }

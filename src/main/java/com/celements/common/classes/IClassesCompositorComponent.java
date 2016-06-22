@@ -10,10 +10,8 @@ public interface IClassesCompositorComponent {
   /**
    * loads all {@link ClassDefinition} and {@link IClassCollectionRole} (deprecated) and creates
    * XClasses from them if they don't exist yet
-   *
-   * @throws XClassCreateException
    */
-  public void checkClasses() throws XClassCreateException;
+  public void checkClasses();
 
   /**
    * @deprecated instead use {@link #checkClasses()}
