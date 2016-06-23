@@ -19,84 +19,103 @@
  */
 package com.celements.navigation.cmd;
 
+import static com.celements.navigation.cmd.MenuItemsUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.validation.constraints.NotNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.TreeNode;
-import com.celements.web.plugin.CelementsWebPlugin;
+import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 public class GetMappedMenuItemsForParentCommand {
 
-  public static final String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
+  public final static String CELEMENTS_MAPPED_MENU_ITEMS_KEY = "com.celements.web.utils.GetMappedMenuItemsForParendCmd";
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(CelementsWebPlugin.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(
+      GetMappedMenuItemsForParentCommand.class);
 
-  private boolean _isActive;
+  private boolean isActive;
 
-  public void set_isActive(boolean _isActive) {
-    this._isActive = _isActive;
+  private XWikiContext getContext() {
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
   }
 
-  public boolean is_isActive() {
-    return _isActive;
+  public void setIsActive(boolean isActive) {
+    this.isActive = isActive;
   }
 
+  public boolean isActive() {
+    return isActive;
+  }
+
+  /**
+   * @deprecated since 1.140 instead use getTreeNodesForParentKey(String)
+   */
+  @Deprecated
   public List<TreeNode> getTreeNodesForParentKey(String parentKey, XWikiContext context) {
-    if (is_isActive() && !"".equals(parentKey)) {
+    return getTreeNodesForParentKey(parentKey);
+  }
+
+  /**
+   * TODO not yet implemented correctly
+   */
+  public List<TreeNode> getTreeNodesForParentKey(@NotNull String parentKey) {
+    if (isActive() && !parentKey.isEmpty()) {
       if (parentKey.trim().endsWith(".")) {
         parentKey = " ";
       }
       if (parentKey.indexOf(':') < 0) {
-        parentKey = context.getDatabase() + ":" + parentKey;
+        parentKey = getContext().getDatabase() + ":" + parentKey;
       }
       List<Object> parameterList = new Vector<Object>();
       parameterList.add(parentKey.split(":")[1]);
-      String saveDatabase = context.getDatabase();
-      context.setDatabase(parentKey.split(":")[0]);
+      String saveDatabase = getContext().getDatabase();
+      getContext().setDatabase(parentKey.split(":")[0]);
       List<TreeNode> menu = new ArrayList<TreeNode>();
       try {
-        List<Object[]> results = context.getWiki().getStore().search(getHQL(), 0, 0, context);
-        mLogger.info("getMenuItems: found " + results.size() + " menus with parentKey "
-            + parentKey);
+        List<Object[]> results = getContext().getWiki().getStore().search(getHQL(), 0, 0,
+            getContext());
+        LOGGER.info("getMenuItems: found " + results.size() + " menus with parentKey " + parentKey);
         for (Object[] nodeData : results) {
-          TreeNode treeNode = new TreeNode(new DocumentReference(context.getDatabase(),
-              nodeData[1].toString(), nodeData[0].toString().split("\\.")[1]),
-              nodeData[2].toString(), (Integer) nodeData[3]);
-          treeNode.setPartName(nodeData[4].toString());
+          DocumentReference docRef = new DocumentReference(getContext().getDatabase(),
+              nodeData[1].toString(), nodeData[0].toString().split("\\.")[1]);
+          String partName = MoreObjects.firstNonNull(nodeData[4], "").toString();
+          String parentFN = MoreObjects.firstNonNull(nodeData[2], "").toString();
+          TreeNode treeNode = new TreeNode(docRef, resolveParentRef(parentFN),
+              (Integer) nodeData[3], partName);
           menu.add(treeNode);
         }
       } catch (XWikiException e) {
-        mLogger.error("getMenuItems ", e);
+        LOGGER.error("getMenuItems ", e);
       }
-      context.setDatabase(saveDatabase);
+      getContext().setDatabase(saveDatabase);
       return menu;
     } else {
-      if (is_isActive()) {
-        mLogger.warn("getMenuItems: parentKey is emtpy");
+      if (isActive()) {
+        LOGGER.warn("getMenuItems: parentKey is emtpy");
       }
       return Collections.emptyList();
     }
   }
 
   String getHQL() {
-    String hql = "select doc.fullName, doc.space, doc.parent,";
-    hql += " menuitem.menu_position, menuitem.part_name";
-    hql += " from XWikiDocument doc, BaseObject as obj,";
-    hql += " Classes.MenuItemClass as menuitem";
-    hql += " where doc.parent=?";
-    hql += " and doc.translation='0'";
-    hql += " and obj.name=doc.fullName";
-    hql += " and obj.id=menuitem.id";
-    hql += " order by menuitem.menu_position";
-    return hql;
+    return "select doc.fullName, doc.space, doc.parent, menuitem.menu_position, menuitem.part_name"
+        + " from XWikiDocument doc, BaseObject as obj, Classes.MenuItemClass as menuitem"
+        + " where doc.parent=? and doc.translation='0' and obj.name=doc.fullName"
+        + " and obj.id=menuitem.id order by menuitem.menu_position";
   }
 
 }

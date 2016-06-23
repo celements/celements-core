@@ -181,9 +181,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
     List<TreeNode> childrenList = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "myChild"), "mySpace.MyEmptyDoc", 0), new TreeNode(
-            new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
-            "mySpace.MyEmptyDoc", 1));
+        context.getDatabase(), "mySpace", "myChild"), emptyDocRef, 0), new TreeNode(
+            new DocumentReference(context.getDatabase(), "mySpace", "myChild2"), emptyDocRef, 1));
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
         childrenList).once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(), "mySpace",
@@ -206,18 +205,17 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
         "MyEmptyDoc");
     createEmptyDoc(emptyDocRef);
     List<TreeNode> childrenList = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "myChild"), "mySpace.MyEmptyDoc", 0), new TreeNode(
-            new DocumentReference(context.getDatabase(), "mySpace", "myChild2"),
-            "mySpace.MyEmptyDoc", 1));
+        context.getDatabase(), "mySpace", "myChild"), emptyDocRef, 0), new TreeNode(
+            new DocumentReference(context.getDatabase(), "mySpace", "myChild2"), emptyDocRef, 1));
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
         childrenList).once();
     DocumentReference childDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChild");
     createEmptyDoc(childDocRef);
     List<TreeNode> childrenList2 = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "myChildChild"), "mySpace.MyEmptyDoc", 0), new TreeNode(
-            new DocumentReference(context.getDatabase(), "mySpace", "myChildChild2"),
-            "mySpace.MyEmptyDoc", 1));
+        context.getDatabase(), "mySpace", "myChildChild"), emptyDocRef, 0), new TreeNode(
+            new DocumentReference(context.getDatabase(), "mySpace", "myChildChild2"), emptyDocRef,
+            1));
     expect(treeNodeService.getSubNodesForParent(eq(childDocRef), eq(""))).andReturn(
         childrenList2).once();
     DocumentReference expectedChildDocRef = new DocumentReference(context.getDatabase(), "mySpace",
@@ -247,8 +245,8 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference child2DocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChild2");
     createEmptyDoc(child2DocRef);
-    List<TreeNode> childrenList = Arrays.asList(new TreeNode(childDocRef, "mySpace.MyEmptyDoc", 0),
-        new TreeNode(child2DocRef, "mySpace.MyEmptyDoc", 1));
+    List<TreeNode> childrenList = Arrays.asList(new TreeNode(childDocRef, emptyDocRef, 0),
+        new TreeNode(child2DocRef, emptyDocRef, 1));
     // if called more than once the recursion detection is very likely broken!
     expect(treeNodeService.getSubNodesForParent(eq(emptyDocRef), eq(""))).andReturn(
         childrenList).once();
@@ -258,12 +256,12 @@ public class EmptyCheckCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference childChild2DocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myChildChild2");
     createEmptyDoc(childChild2DocRef);
-    List<TreeNode> childrenList2 = Arrays.asList(new TreeNode(childChildDocRef,
-        "mySpace.MyEmptyDoc", 0), new TreeNode(childChild2DocRef, "mySpace.MyEmptyDoc", 1));
+    List<TreeNode> childrenList2 = Arrays.asList(new TreeNode(childChildDocRef, emptyDocRef, 0),
+        new TreeNode(childChild2DocRef, emptyDocRef, 1));
     expect(treeNodeService.getSubNodesForParent(eq(childDocRef), eq(""))).andReturn(
         childrenList2).once();
     List<TreeNode> childrenList3 = Arrays.asList(new TreeNode(new DocumentReference(
-        context.getDatabase(), "mySpace", "MyEmptyDoc"), "mySpace.MyEmptyDoc", 0));
+        context.getDatabase(), "mySpace", "MyEmptyDoc"), emptyDocRef, 0));
     expect(treeNodeService.getSubNodesForParent(eq(childChildDocRef), eq(""))).andReturn(
         childrenList3).once();
     expect(treeNodeService.getSubNodesForParent(eq(child2DocRef), eq(""))).andReturn(

@@ -19,6 +19,7 @@
  */
 package com.celements.cells;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -30,7 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
@@ -40,7 +41,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
+public class CellRenderStrategyTest extends AbstractComponentTest {
 
   private CellRenderStrategy renderer;
   private ICellWriter outWriterMock;
@@ -113,7 +114,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
   public void testIsRenderCell() {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     assertFalse(renderer.isRenderCell(null));
-    assertTrue(renderer.isRenderCell(new TreeNode(docRef, "", 0)));
+    assertTrue(renderer.isRenderCell(new TreeNode(docRef, null, 0)));
   }
 
   @Test
@@ -164,7 +165,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject cellObj = new BaseObject();
     String cssClasses = "classes two";
@@ -190,7 +191,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject cellObj = new BaseObject();
     String idname = "myDivId";
@@ -214,7 +215,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject cellObj = new BaseObject();
     String cssClasses = "classes two";
@@ -239,7 +240,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject cellObj = new BaseObject();
     String cssClasses = "classes two";
@@ -265,7 +266,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference("layoutDb", "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     DocumentReference cellClassRef = new DocumentReference("layoutDb",
         CellsClasses.CELEMENTS_CELL_CLASS_SPACE, CellsClasses.CELEMENTS_CELL_CLASS_NAME);
@@ -291,7 +292,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
     DocumentReference docRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
     boolean isLastItem = true;
     boolean isFirstItem = false;
-    TreeNode node = new TreeNode(docRef, "", 0);
+    TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject cellObj = new BaseObject();
     String cssClasses = "classes two";
@@ -315,7 +316,7 @@ public class CellRenderStrategyTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testRenderEmptyChildren() throws XWikiException {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
-    TreeNode cellNode = new TreeNode(cellRef, "", 0);
+    TreeNode cellNode = new TreeNode(cellRef, null, 0);
     String cellContentExpected = "Cell test content Skin.MasterCell";
     expect(mockctRendererCmd.renderCelementsCell(eq(cellRef))).andReturn(
         cellContentExpected).once();

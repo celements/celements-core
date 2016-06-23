@@ -76,26 +76,26 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCoveredQuotient() {
-    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(5, 5));
-    assertEquals(3, ((WebUtils) celUtils).coveredQuotient(2, 5));
-    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(8, 4));
-    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(8, 2));
-    assertEquals(1, ((WebUtils) celUtils).coveredQuotient(8, 7));
-    assertEquals(0, ((WebUtils) celUtils).coveredQuotient(8, 0));
+    assertEquals(1, celUtils.coveredQuotient(5, 5));
+    assertEquals(3, celUtils.coveredQuotient(2, 5));
+    assertEquals(1, celUtils.coveredQuotient(8, 4));
+    assertEquals(1, celUtils.coveredQuotient(8, 2));
+    assertEquals(1, celUtils.coveredQuotient(8, 7));
+    assertEquals(0, celUtils.coveredQuotient(8, 0));
   }
 
   @Test
   public void testPrepareMaxCoverSet() {
     ArrayList<String> threeElems = new ArrayList<String>(Arrays.asList(new String[] { "1", "lj",
         "lizh" }));
-    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(0, threeElems).size());
-    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(1, threeElems).size());
-    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(2, threeElems).size());
-    assertEquals(3, ((WebUtils) celUtils).prepareMaxCoverSet(3, threeElems).size());
-    assertEquals(6, ((WebUtils) celUtils).prepareMaxCoverSet(4, threeElems).size());
-    assertEquals(6, ((WebUtils) celUtils).prepareMaxCoverSet(5, threeElems).size());
-    assertEquals(6, ((WebUtils) celUtils).prepareMaxCoverSet(6, threeElems).size());
-    assertEquals(9, ((WebUtils) celUtils).prepareMaxCoverSet(7, threeElems).size());
+    assertEquals(3, celUtils.prepareMaxCoverSet(0, threeElems).size());
+    assertEquals(3, celUtils.prepareMaxCoverSet(1, threeElems).size());
+    assertEquals(3, celUtils.prepareMaxCoverSet(2, threeElems).size());
+    assertEquals(3, celUtils.prepareMaxCoverSet(3, threeElems).size());
+    assertEquals(6, celUtils.prepareMaxCoverSet(4, threeElems).size());
+    assertEquals(6, celUtils.prepareMaxCoverSet(5, threeElems).size());
+    assertEquals(6, celUtils.prepareMaxCoverSet(6, threeElems).size());
+    assertEquals(9, celUtils.prepareMaxCoverSet(7, threeElems).size());
   }
 
   @Test
@@ -272,20 +272,20 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetMajorVersion_nullDoc() {
-    assertEquals("1", ((WebUtils) celUtils).getMajorVersion(null));
+    assertEquals("1", celUtils.getMajorVersion(null));
   }
 
   @Test
   public void testGetMajorVersion_noVersionSet() {
     XWikiDocument doc = new XWikiDocument();
-    assertEquals("1", ((WebUtils) celUtils).getMajorVersion(doc));
+    assertEquals("1", celUtils.getMajorVersion(doc));
   }
 
   @Test
   public void testGetMajorVersion() {
     XWikiDocument doc = new XWikiDocument();
     doc.setVersion("28.82");
-    assertEquals("28", ((WebUtils) celUtils).getMajorVersion(doc));
+    assertEquals("28", celUtils.getMajorVersion(doc));
   }
 
   @Test
@@ -307,13 +307,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
     expect(getWikiMock().getDocument(eq(prevDoc.getDocumentReference()), same(
         getContext()))).andReturn(prevDoc).once();
-    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), "Celements2.MenuItem", 0);
+    TreeNode tnPrev = new TreeNode(prevDoc.getDocumentReference(), null, 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getPrevMenuItem(doc.getDocumentReference())).andReturn(
         tnPrev).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(mItemFullName, getContext());
+    BaseObject prevMenuItem = celUtils.getPrevMenuItem(mItemFullName, getContext());
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem1, prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
@@ -340,7 +340,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(mockTreeNodeService.getPrevMenuItem(eq(prevDoc.getDocumentReference()))).andReturn(
         null).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getPrevMenuItem(prevFullName, getContext());
+    BaseObject prevMenuItem = celUtils.getPrevMenuItem(prevFullName, getContext());
     assertNull(prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
@@ -364,13 +364,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     doc.setObject("Celements2.MenuItem", 0, menuItemItemDoc);
     expect(getWikiMock().getDocument(eq(nextDoc.getDocumentReference()), same(
         getContext()))).andReturn(nextDoc).once();
-    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
+    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), null, 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))).andReturn(
         tnPrev).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName, getContext());
+    BaseObject prevMenuItem = celUtils.getNextMenuItem(mItemFullName, getContext());
     assertEquals("MySpace.Doc1 MenuItem expected.", menuItem2, prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }
@@ -395,13 +395,13 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     nextDoc.setObject("Celements2.MenuItem", 0, menuItem2);
     expect(getWikiMock().getDocument(eq(nextDoc.getDocumentReference()), same(
         getContext()))).andReturn(nextDoc).once();
-    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), "Celements2.MenuItem", 0);
+    TreeNode tnPrev = new TreeNode(nextDoc.getDocumentReference(), null, 0);
     ITreeNodeService mockTreeNodeService = createMock(ITreeNodeService.class);
     celUtils.injectTreeNodeService(mockTreeNodeService);
     expect(mockTreeNodeService.getNextMenuItem(eq(doc.getDocumentReference()))).andReturn(
         tnPrev).once();
     replayDefault(mockTreeNodeService);
-    BaseObject nextMenuItem = ((WebUtils) celUtils).getNextMenuItem(mItemFullName, getContext());
+    BaseObject nextMenuItem = celUtils.getNextMenuItem(mItemFullName, getContext());
     assertEquals("MySpace.Doc2 MenuItem expected.", menuItem2, nextMenuItem);
     verifyDefault(mockTreeNodeService);
   }
@@ -428,7 +428,7 @@ public class WebUtilsTest extends AbstractBridgedComponentTestCase {
     expect(mockTreeNodeService.getNextMenuItem(eq(nextDoc.getDocumentReference()))).andReturn(
         null).once();
     replayDefault(mockTreeNodeService);
-    BaseObject prevMenuItem = ((WebUtils) celUtils).getNextMenuItem(nextFullName, getContext());
+    BaseObject prevMenuItem = celUtils.getNextMenuItem(nextFullName, getContext());
     assertNull(prevMenuItem);
     verifyDefault(mockTreeNodeService);
   }

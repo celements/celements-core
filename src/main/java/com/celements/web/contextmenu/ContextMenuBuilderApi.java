@@ -36,7 +36,7 @@ public class ContextMenuBuilderApi extends com.xpn.xwiki.api.Api {
   public List<ContextMenuItemApi> getCMItemsForClassAndId(String className, String elemId) {
     List<ContextMenuItemApi> cmiList = new ArrayList<ContextMenuItemApi>();
     for (ContextMenuItem cmiObj : cmiBuilder.getCMItemsForClassAndId(className, elemId, context)) {
-      cmiList.add(ContextMenuItemApi.getAPIObject(cmiObj, context));
+      cmiList.add(new ContextMenuItemApi(cmiObj, context));
     }
     return cmiList;
   }

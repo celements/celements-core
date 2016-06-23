@@ -56,6 +56,7 @@ import com.celements.rteConfig.RTEConfigScriptService;
 import com.celements.sajson.Builder;
 import com.celements.validation.ValidationType;
 import com.celements.web.contextmenu.ContextMenuBuilderApi;
+import com.celements.web.contextmenu.ContextMenuItem;
 import com.celements.web.contextmenu.ContextMenuItemApi;
 import com.celements.web.css.CSS;
 import com.celements.web.plugin.CelementsWebPlugin;
@@ -193,7 +194,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public ContextMenuItemApi getWrapper(com.xpn.xwiki.api.Object menuItem, String elemId) {
-    return new ContextMenuItemApi(menuItem, elemId, context);
+    return new ContextMenuItemApi(new ContextMenuItem(menuItem.getXWikiObject(), elemId), context);
   }
 
   /**
@@ -685,7 +686,7 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * Returns a list of all parent for a specified doc
-   * 
+   *
    * @param fullName
    * @param includeDoc
    * @return List of all parents, starting at the specified doc (bottom up)
@@ -715,7 +716,7 @@ public class CelementsWebPluginApi extends Api {
    * provides a pageTypeApi for the celements document <code>fullname</code>. e.g.
    * getPageType(fullName).getPageType() provides the PageType name given by the
    * pageType-object on the fullname.
-   * 
+   *
    * @param fullName
    *          of the celements document
    * @return
@@ -1024,6 +1025,7 @@ public class CelementsWebPluginApi extends Api {
    * @deprecated since 2.59 instead use
    *             {@link WebUtilsScriptService #getJSONContent(Document)}
    */
+  @Deprecated
   public String getJSONContent(Document contentDoc) {
     return getWebUtilsScriptService().getJSONContent(contentDoc);
   }
@@ -1032,6 +1034,7 @@ public class CelementsWebPluginApi extends Api {
    * @deprecated since 2.63 instead use
    *             {@link WebUtilsScriptService #getJSONContent(DocumentReference)}
    */
+  @Deprecated
   public String getJSONContent(DocumentReference docRef) {
     if (hasAccessLevel("view", context.getUser(), true,
         getWebUtilsService().getRefLocalSerializer().serialize(docRef))) {
@@ -1604,7 +1607,7 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * renderCelementsDocument
-   * 
+   *
    * @param elementFullName
    * @return
    * @deprecated since 2.11.2 use
@@ -1868,7 +1871,7 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * API to check rights on a document for a given user or group
-   * 
+   *
    * @deprecated since 2.59 instead use
    *             {@link AuthenticationScriptService #hasAccessLevel(String, String, boolean, String)}
    * @param level

@@ -19,123 +19,100 @@
  */
 package com.celements.navigation;
 
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringUtils;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
-import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.Objects;
+import com.celements.model.util.ModelUtils;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
+import com.google.common.base.Strings;
 
-public class TreeNode {
+/**
+ * Immutable TreeNode with optional lazy getter for PartName
+ * needed as performance improvement for legacy NotMappedMenuItems
+ *
+ * @author Fabian Pichler, Marc Sladek
+ */
+public final class TreeNode {
 
-  private String parent;
+  private final EntityReference parentRef;
 
-  private Integer position;
-
-  private String partName;
-
-  private IPartNameGetStrategy partNameGetStrategy;
+  private final Integer position;
 
   private final DocumentReference docRef;
 
-  @Deprecated
-  public TreeNode(@NotNull String fullName, String parent, Integer position,
-      @NotNull String databaseName) {
-    this(new DocumentReference(databaseName, fullName.split("\\.")[0], fullName.split("\\.")[1]),
-        parent, position);
-  }
-
-  public TreeNode(@NotNull DocumentReference docRef, String parent, Integer position) {
-    Preconditions.checkNotNull(docRef, "document reference for TreeNode may not be null.");
-    this.docRef = docRef;
-    setParent(parent);
-    setPosition(position);
-  }
-
-  public TreeNode(@NotNull DocumentReference docRef, DocumentReference parentRef,
-      Integer position) {
-    this(docRef, getWebUtilsService().getRefLocalSerializer().serialize(parentRef), position);
-  }
-
-  public TreeNode(@NotNull DocumentReference docRef, SpaceReference parentRef, String partName,
-      Integer position) {
-    this(docRef, "", position);
-    if (!StringUtils.isEmpty(partName)) {
-      setPartName(partName);
-    }
-  }
-
   /**
-   * @return fullName
-   * @deprecated since 2.14.0 use getDocumentReference instead
+   * The partName is only once set to a non-null value. This can be directly in the constructor or
+   * if a PartNameGetter strategy is provided and NO partName then the strategy is lazily evaluated
+   * on the first getPartName call.
    */
-  @Deprecated
-  public String getFullName() {
-    return docRef.getLastSpaceReference().getName() + "." + docRef.getName();
+  private volatile String partName;
+
+  private final PartNameGetter partNameStrategy;
+
+  public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
+      @Nullable Integer position, @Nullable String partName) {
+    this(docRef, parentRef, position, partName, null);
   }
 
+  public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
+      @Nullable Integer position, @NotNull PartNameGetter strategy) {
+    this(docRef, parentRef, position, null, strategy);
+  }
+
+  public TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
+      @Nullable Integer position) {
+    this(docRef, parentRef, position, (String) null);
+  }
+
+  private TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
+      @Nullable Integer position, @Nullable String partName, @Nullable PartNameGetter strategy) {
+    Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
+    this.docRef = ModelUtils.cloneReference(docRef, DocumentReference.class);
+    this.parentRef = (parentRef != null) ? ModelUtils.cloneReference(parentRef) : null;
+    this.position = MoreObjects.firstNonNull(position, new Integer(0));
+    this.partName = (strategy == null) ? Strings.nullToEmpty(partName) : partName;
+    this.partNameStrategy = strategy;
+  }
+
+  public boolean isEmptyParentRef() {
+    return (parentRef == null);
+  }
+
+  @NotNull
   public EntityReference getParentRef() {
-    if ("".equals(parent)) {
-      return docRef.getLastSpaceReference();
+    EntityReference ref;
+    if (isEmptyParentRef()) {
+      ref = getDocumentReference().getLastSpaceReference();
     } else {
-      return getWebUtilsService().resolveDocumentReference(parent,
-          (WikiReference) docRef.getLastSpaceReference().getParent());
+      ref = parentRef;
     }
+    return ModelUtils.cloneReference(ref);
   }
 
-  public String getParent() {
-    return parent;
-  }
-
-  void setParent(String parent) {
-    if (parent == null) {
-      parent = "";
-    }
-    this.parent = parent;
-  }
-
+  @NotNull
   public Integer getPosition() {
-    if (position == null) {
-      position = 0;
-    }
     return position;
   }
 
-  void setPosition(Integer position) {
-    this.position = position;
-  }
-
-  public String getPartName(XWikiContext context) {
-    if (partName == null) {
-      if (partNameGetStrategy != null) {
-        partName = partNameGetStrategy.getPartName(getFullName(), context);
-      } else {
-        partName = "";
+  @NotNull
+  public String getPartName() {
+    if ((partName == null) && (partNameStrategy != null)) {
+      synchronized (this) {
+        if (partName == null) {
+          this.partName = Strings.nullToEmpty(partNameStrategy.getPartName(docRef));
+        }
       }
     }
     return partName;
   }
 
-  public void setPartName(String partName) {
-    if (partName == null) {
-      partName = "";
-    }
-    this.partName = partName;
-  }
-
-  public void setPartNameGetStrategy(IPartNameGetStrategy strategy) {
-    this.partNameGetStrategy = strategy;
-  }
-
+  @NotNull
   public DocumentReference getDocumentReference() {
     return docRef;
   }
@@ -144,39 +121,24 @@ public class TreeNode {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
+    } else if (obj instanceof TreeNode) { // null check included
+      TreeNode node = (TreeNode) obj;
+      return Objects.equals(docRef, node.docRef) && Objects.equals(position, node.position);
     }
-    if (!(obj instanceof TreeNode)) { // null check included
-      return false;
-    }
-    // object must be Test at this point
-    TreeNode node = (TreeNode) obj;
-    return Objects.equal(docRef, node.docRef) && Objects.equal(position, node.position);
+    return false;
   }
 
   @Override
   public int hashCode() {
-    int hash = 7;
-    hash = (31 * hash) + (position == null ? 0 : position.hashCode());
-    hash = (31 * hash) + (docRef == null ? 0 : docRef.hashCode());
-    return hash;
+    return Objects.hash(docRef, position);
   }
 
   @Override
+  @NotNull
   public String toString() {
-    return "[ docRef = [" + docRef + "], parent = [" + parent + "], position = [" + position
-        + "], partName = [" + getPartName(getContext()) + "] ]";
-  }
-
-  private XWikiContext getContext() {
-    return (XWikiContext) getExecutionContext().getProperty("xwikicontext");
-  }
-
-  private ExecutionContext getExecutionContext() {
-    return Utils.getComponent(Execution.class).getContext();
-  }
-
-  private static IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
+    return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(
+        ", parentRef=").append(parentRef).append(", position=").append(position).append(
+            ", partName=").append(partName).append("]").toString();
   }
 
 }
