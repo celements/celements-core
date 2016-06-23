@@ -785,6 +785,10 @@ public class Navigation implements INavigation {
     }
   }
 
+  /**
+   * @deprecated since 1.141 instead use XObjectNavigationFactory
+   *             createNavigation(DocumentReference)
+   */
   @Override
   @Deprecated
   public void loadConfigFromObject(BaseObject prefObj) {
