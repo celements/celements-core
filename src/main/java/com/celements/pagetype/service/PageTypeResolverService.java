@@ -28,9 +28,12 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -51,16 +54,33 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   IPageTypeClassConfig pageTypeClassCfg;
 
   @Requirement
+  IModelAccessFacade modelAccess;
+
+  @Requirement
   Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public PageTypeReference getPageTypeRefForCurrentDoc() {
-    return getPageTypeRefForDocWithDefault(getContext().getDoc());
+    XWikiDocument doc = getContext().getDoc();
+    if ((getContext().getRequest() != null) && ("inline".equals(getContext().getAction()))) {
+      String templName = getContext().getRequest().get("template");
+      if (!Strings.isNullOrEmpty(templName)) {
+        try {
+          DocumentReference docRef = webUtilsService.resolveDocumentReference(templName);
+          doc = modelAccess.getDocument(docRef);
+        } catch (DocumentNotExistsException exp) {
+          LOGGER.warn("Exception while getting template doc '{}", templName, exp);
+        }
+      }
+    }
+    return getPageTypeRefForDocWithDefault(doc);
   }
 
+  @Override
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc) {
     if (doc != null) {
       PageTypeReference pageTypeRef = getPageTypeRefForDoc(doc);
@@ -72,6 +92,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     return null;
   }
 
+  @Override
   public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc,
       PageTypeReference defaultPTRef) {
     PageTypeReference pageTypeRef = getPageTypeRefForDoc(doc);
@@ -83,6 +104,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     return pageTypeRef;
   }
 
+  @Override
   public PageTypeReference getPageTypeRefForDocWithDefault(DocumentReference docRef) {
     try {
       XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
@@ -93,6 +115,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     return getDefaultPageTypeRefForDoc(docRef);
   }
 
+  @Override
   public PageTypeReference getDefaultPageTypeRefForDoc(DocumentReference docRef) {
     FieldInheritor inheritor = new InheritorFactory().getConfigFieldInheritor(
         pageTypeClassCfg.getPageTypeClassRef(docRef.getWikiReference()), docRef);
@@ -105,6 +128,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     return pageTypeService.getPageTypeRefByConfigName("RichText");
   }
 
+  @Override
   public PageTypeReference getPageTypeRefForDoc(XWikiDocument checkDoc) {
     BaseObject pageTypeObj = getPageTypeObject(checkDoc);
     if (pageTypeObj != null) {
@@ -114,6 +138,7 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
     return null;
   }
 
+  @Override
   public BaseObject getPageTypeObject(XWikiDocument checkDoc) {
     if (checkDoc != null) {
       if (checkDoc.isNew() && (webUtilsService.getWikiTemplateDocRef() != null)) {
