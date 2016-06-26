@@ -23,42 +23,88 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class FileBaseTagsCmd {
 
-  private final static Logger Logger = LoggerFactory.getLogger(FileBaseTagsCmd.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(FileBaseTagsCmd.class);
 
-  public static final String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
-  private ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);
+  public final static String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
+  private final ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);
+  private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
+  private final INavigationClassConfig navClassConfig = Utils.getComponent(
+      INavigationClassConfig.class);
+  private final Execution execution = Utils.getComponent(Execution.class);
 
+  private XWikiContext getContext() {
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  }
+
+  /**
+   * @deprecated since 1.141 instead use getAllFileBaseTags()
+   */
+  @Deprecated
   public List<TreeNode> getAllFileBaseTags(XWikiContext context) {
-    return treeNodeSrv.getSubNodesForParent("", getTagSpaceName(context),
-        new InternalRightsFilter());
+    return getAllFileBaseTags();
   }
 
+  public List<TreeNode> getAllFileBaseTags() {
+    return treeNodeSrv.getSubNodesForParent(getTagSpaceRef(), new InternalRightsFilter());
+  }
+
+  /**
+   * @deprecated since 1.141 instead use getTagSpaceRef()
+   */
+  @Deprecated
   public String getTagSpaceName(XWikiContext context) {
-    String centralFileBaseName = getCentralFileBaseFullName(context) + ".";
-    return centralFileBaseName.substring(0, centralFileBaseName.indexOf('.'));
+    return getTagSpaceRef().getName();
   }
 
+  public SpaceReference getTagSpaceRef() {
+    String centralFileBaseName = getCentralFileBaseFullName() + ".";
+    String spaceName = centralFileBaseName.substring(0, centralFileBaseName.indexOf('.'));
+    return new SpaceReference(spaceName, new WikiReference(getContext().getDatabase()));
+  }
+
+  /**
+   * @deprecated since 1.141 instead use getCentralFileBaseFullName()
+   */
+  @Deprecated
   public String getCentralFileBaseFullName(XWikiContext context) {
-    return context.getWiki().getSpacePreference("cel_centralfilebase", "", context);
+    return getCentralFileBaseFullName();
   }
 
+  public String getCentralFileBaseFullName() {
+    return getContext().getWiki().getSpacePreference("cel_centralfilebase", "", getContext());
+  }
+
+  /**
+   * @deprecated since 1.141 instead use existsTagWithName(String)
+   */
+  @Deprecated
   public boolean existsTagWithName(String tagName, XWikiContext context) {
-    if (context.getWiki().exists(getTagFullName(tagName, context), context)) {
-      DocumentReference tagDocRef = getTagDocRef(tagName, context);
-      for (TreeNode node : getAllFileBaseTags(context)) {
+    return existsTagWithName(tagName);
+  }
+
+  public boolean existsTagWithName(String tagName) {
+    if (modelAccess.exists(getTagDocRef(tagName))) {
+      DocumentReference tagDocRef = getTagDocRef(tagName);
+      for (TreeNode node : getAllFileBaseTags()) {
         if (tagDocRef.equals(node.getDocumentReference())) {
           return true;
         }
@@ -68,40 +114,63 @@ public class FileBaseTagsCmd {
   }
 
   /**
-   * @deprecated instead use getTagDocRef
+   * @deprecated since 1.140 instead use getTagDocRef(String)
    */
   @Deprecated
   public String getTagFullName(String tagName, XWikiContext context) {
     return getTagSpaceName(context) + "." + tagName;
   }
 
+  /**
+   * @deprecated since 1.141 instead use getTagDocRef(String)
+   */
+  @Deprecated
   public DocumentReference getTagDocRef(String tagName, XWikiContext context) {
-    return new DocumentReference(context.getDatabase(), getTagSpaceName(context), tagName);
+    return getTagDocRef(tagName);
   }
 
+  public DocumentReference getTagDocRef(String tagName) {
+    return new DocumentReference(getContext().getDatabase(), getTagSpaceRef().getName(), tagName);
+  }
+
+  /**
+   * @deprecated since 1.141 instead use getOrCreateTagDocument(String, boolean)
+   */
+  @Deprecated
   public XWikiDocument getTagDocument(String tagName, boolean createIfNotExists,
       XWikiContext context) {
-    XWikiDocument tagDoc = null;
     try {
-      // FIXME CELDEV-271: change to modelAccess
-      tagDoc = context.getWiki().getDocument(getTagFullName(tagName, context), context);
-      if (!existsTagWithName(tagName, context)) {
-        if (createIfNotExists) {
-          BaseObject menuItemObj = tagDoc.newObject("Celements2.MenuItem", context);
-          menuItemObj.setIntValue("menu_position", getAllFileBaseTags(context).size());
-          menuItemObj.setStringValue("menu_parent", "");
-          menuItemObj.setStringValue("part_name", "");
-          context.getWiki().saveDocument(tagDoc, "Added by Navigation", context);
-        }
-      }
-    } catch (XWikiException exp) {
-      Logger.error("Failed to get tag document [" + getTagFullName(tagName, context) + "].", exp);
+      return getOrCreateTagDocument(tagName, createIfNotExists);
+    } catch (FailedToCreateTagException exp) {
+      LOGGER.warn("deprecated getTagDocument usage.", exp);
     }
-    return tagDoc;
+    return null;
   }
 
-  void inject_treeNodeSrv(ITreeNodeService mockTreeNodeSrv) {
-    this.treeNodeSrv = mockTreeNodeSrv;
+  public XWikiDocument getOrCreateTagDocument(String tagName, boolean createIfNotExists)
+      throws FailedToCreateTagException {
+    XWikiDocument tagDoc = null;
+    try {
+      if (!existsTagWithName(tagName) && createIfNotExists) {
+        tagDoc = modelAccess.getOrCreateDocument(getTagDocRef(tagName));
+        BaseObject menuItemObj = modelAccess.getOrCreateXObject(tagDoc,
+            navClassConfig.getMenuItemClassRef());
+        menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD,
+            getAllFileBaseTags().size());
+        menuItemObj.setStringValue("menu_parent", "");
+        menuItemObj.setStringValue(INavigationClassConfig.PART_NAME_FIELD, "");
+        modelAccess.saveDocument(tagDoc, "Added by Navigation");
+      }
+    } catch (DocumentSaveException exp) {
+      LOGGER.error("Failed to save document [{}].", getTagDocRef(tagName), exp);
+    }
+    try {
+      return modelAccess.getDocument(getTagDocRef(tagName));
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.info("Failed to get tag document [{}].", getTagDocRef(tagName), exp);
+      throw new FailedToCreateTagException("Failed to get tag document [" + getTagDocRef(tagName)
+          + "].", exp);
+    }
   }
 
 }
