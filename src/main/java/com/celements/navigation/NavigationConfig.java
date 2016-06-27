@@ -1,6 +1,7 @@
 package com.celements.navigation;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.python.google.common.base.Strings;
@@ -14,6 +15,7 @@ import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.web.Utils;
 
+@Immutable
 public final class NavigationConfig {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(NavigationConfig.class);
