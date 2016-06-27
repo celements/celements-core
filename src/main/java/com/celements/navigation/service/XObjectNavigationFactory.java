@@ -1,9 +1,13 @@
 package com.celements.navigation.service;
 
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -21,6 +25,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("xobject")
+@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+@Singleton
 public final class XObjectNavigationFactory implements NavigationFactory<DocumentReference> {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(XObjectNavigationFactory.class);
