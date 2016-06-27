@@ -22,6 +22,7 @@ package com.celements.navigation;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -38,6 +39,7 @@ import com.google.common.base.Strings;
  *
  * @author Fabian Pichler, Marc Sladek
  */
+@Immutable
 public final class TreeNode {
 
   private final EntityReference parentRef;
