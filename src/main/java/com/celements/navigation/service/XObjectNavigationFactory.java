@@ -50,22 +50,50 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
   }
 
   @Override
+  @NotNull
   public INavigation createNavigation() {
     return createNavigation(getContext().getDoc().getDocumentReference());
   }
 
   @Override
-  public INavigation createNavigation(DocumentReference configReference) {
+  @NotNull
+  public INavigation createNavigation(@NotNull DocumentReference configReference) {
     final INavigation nav = Navigation.createNavigation(getContext());
+    nav.loadConfig(getNavigationConfig(configReference));
+    return nav;
+  }
+
+  @Override
+  @NotNull
+  public NavigationConfig getNavigationConfig() {
+    return getNavigationConfig(getContext().getDoc().getDocumentReference());
+  }
+
+  @Override
+  @NotNull
+  public NavigationConfig getNavigationConfig(@NotNull DocumentReference configReference) {
+    return loadConfigFromObject(getConfiBaseObj(configReference));
+  }
+
+  @Override
+  public boolean hasNavigationConfig() {
+    return hasNavigationConfig(getContext().getDoc().getDocumentReference());
+  }
+
+  @Override
+  public boolean hasNavigationConfig(@NotNull DocumentReference configReference) {
+    return (getConfiBaseObj(configReference) != null);
+  }
+
+  private BaseObject getConfiBaseObj(@NotNull DocumentReference configReference) {
+    BaseObject prefObj = null;
     try {
-      BaseObject prefObj = modelAccess.getXObject(configReference,
-          navClassConfig.getNavigationConfigClassRef(configReference.getWikiReference()));
-      nav.loadConfig(loadConfigFromObject(prefObj));
-      return nav;
+      prefObj = modelAccess.getXObject(configReference, navClassConfig.getNavigationConfigClassRef(
+          configReference.getWikiReference()));
     } catch (DocumentLoadException | DocumentNotExistsException exp) {
       LOGGER.info("failed to load navigation from '{}'", configReference, exp);
     }
-    return nav;
+    return prefObj;
   }
 
   @NotNull
