@@ -1,6 +1,8 @@
 package com.celements.navigation.service;
 
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +68,8 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
     return nav;
   }
 
-  NavigationConfig loadConfigFromObject(BaseObject prefObj) {
+  @NotNull
+  NavigationConfig loadConfigFromObject(@Nullable BaseObject prefObj) {
     if (prefObj != null) {
       String configName = prefObj.getStringValue("menu_element_name");
       LOGGER.debug("loadConfigFromObject: configName [" + configName + "] from doc ["

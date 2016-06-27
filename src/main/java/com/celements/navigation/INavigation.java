@@ -21,6 +21,8 @@ package com.celements.navigation;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -95,7 +97,7 @@ public interface INavigation {
 
   public boolean isNavigationEnabled();
 
-  public void loadConfig(NavigationConfig config);
+  public void loadConfig(@NotNull NavigationConfig config);
 
   /**
    * @Deprecated since 1.140 instead use XObjectNavigationFactory
