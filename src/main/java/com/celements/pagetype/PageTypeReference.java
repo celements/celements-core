@@ -22,18 +22,21 @@ package com.celements.pagetype;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
  * PageTypeReference is used to represent one pagetype 'id'. Instances of this class may
  * be used by scripts (non privileged code). Thus be carefull to NOT expose any internal
  * classes.
  */
+@Immutable
 public class PageTypeReference {
 
-  private String configName;
+  private final String configName;
 
-  private String providerHint;
+  private final String providerHint;
 
-  private List<String> categories;
+  private final List<String> categories;
 
   public PageTypeReference(String configName, String providerHint, List<String> categories) {
     this.configName = configName;
