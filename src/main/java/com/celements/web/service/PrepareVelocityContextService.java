@@ -39,7 +39,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 /**
  * TODO implement VelocityContextInitializer role --> maybe XWiki overwrites later some
  * vcontext variables ($language, $doc, $tdoc)
- * 
+ *
  * @author fabian
  */
 
@@ -215,6 +215,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
         if (pageTypeRef != null) {
           vcontext.put("page_type", pageTypeRef.getConfigName());
         }
+      } else {
+        _LOGGER.debug("initCelementsVelocity: page_type [{}] already available in context",
+            vcontext.get("page_type"));
       }
       if (!vcontext.containsKey("user")) {
         vcontext.put("user", getContext().getUser());
@@ -458,7 +461,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * then use the user default language and barring that use the browser's
    * "Accept-Language" header sent in HTTP request. If none is defined use the default
    * language.
-   * 
+   *
    * @return the language to use introduced in 2.18.0 because of a bug in xwiki 2.7.2 it
    *         is fixed in unstable-xwiki4 YET celements allows default_language and
    *         language change between spaces. XWiki does not!
@@ -607,7 +610,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * looking for a language parameter. If the language value is "default" use the default
    * language from the XWiki preferences settings. Otherwise set a cookie to remember the
    * language in use.
-   * 
+   *
    * @return
    */
   private String getLanguageInRequestParam() {
@@ -650,7 +653,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    * method filters out some bugs in different browsers or containers, like returning '*'
    * as a language (Jetty) or using '_' as a language--country delimiter (some versions of
    * Opera).
-   * 
+   *
    * @param request
    *          The client request.
    * @return A list of language codes, in the client preference order; might be empty if
@@ -703,8 +706,9 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
   }
 
   boolean isTdocLanguageWrong(Document vTdocBefore) {
-    if (vTdocBefore == null)
+    if (vTdocBefore == null) {
       return true;
+    }
     String vTdocLang = vTdocBefore.getLanguage();
     if ("".equals(vTdocLang)) {
       vTdocLang = vTdocBefore.getDefaultLanguage();
