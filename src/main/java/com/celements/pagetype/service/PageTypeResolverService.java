@@ -72,6 +72,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
         try {
           DocumentReference docRef = webUtilsService.resolveDocumentReference(templName);
           doc = modelAccess.getDocument(docRef);
+          LOGGER.debug("getPageTypeRefForCurrentDoc: creating new document, getting page type from "
+              + "template {}", docRef);
         } catch (DocumentNotExistsException exp) {
           LOGGER.warn("Exception while getting template doc '{}", templName, exp);
         }
