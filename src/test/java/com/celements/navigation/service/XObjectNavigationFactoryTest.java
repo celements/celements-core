@@ -217,6 +217,28 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void testGetNavigationConfig_docRef() throws Exception {
+    DocumentReference cellConfigDocRef = new DocumentReference(getContext().getDatabase(),
+        "MySpace", "MyDoc");
+    XWikiDocument collConfigDoc = new XWikiDocument(cellConfigDocRef);
+    BaseObject navConfigObj = new BaseObject();
+    navConfigObj.setDocumentReference(cellConfigDocRef);
+    navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
+        getContext().getDatabase()));
+    collConfigDoc.addXObject(navConfigObj);
+    expect(xwiki.exists(cellConfigDocRef, getContext())).andReturn(true);
+    expect(xwiki.getDocument(cellConfigDocRef, getContext())).andReturn(collConfigDoc).once();
+    String spaceName = "MySpace";
+    navConfigObj.setStringValue("menu_space", spaceName);
+    EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        getContext().getDatabase()));
+    replayDefault();
+    NavigationConfig navConfig = xobjNavFactory.getNavigationConfig(cellConfigDocRef);
+    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef());
+    verifyDefault();
+  }
+
   private INavigationClassConfig getNavClasses() {
     return Utils.getComponent(INavigationClassConfig.class);
   }
