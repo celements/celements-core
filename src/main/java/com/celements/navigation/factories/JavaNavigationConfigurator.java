@@ -1,4 +1,4 @@
-package com.celements.navigation.service;
+package com.celements.navigation.factories;
 
 import org.xwiki.component.annotation.ComponentRole;
 

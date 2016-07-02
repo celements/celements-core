@@ -1,4 +1,4 @@
-package com.celements.navigation.service;
+package com.celements.navigation.factories;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
@@ -11,6 +11,9 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.NavigationConfig;
+import com.celements.navigation.factories.JavaNavigationConfigurator;
+import com.celements.navigation.factories.JavaNavigationFactory;
+import com.celements.navigation.factories.NavigationFactory;
 import com.xpn.xwiki.web.Utils;
 
 public class JavaNavigationFactoryTest extends AbstractComponentTest {
