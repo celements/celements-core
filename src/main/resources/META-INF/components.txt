@@ -135,3 +135,4 @@ com.celements.pagetype.xobject.XObjectPageTypeUtils
 com.celements.navigation.factories.XObjectNavigationFactory
 com.celements.navigation.factories.JavaNavigationFactory
 com.celements.navigation.factories.PageTypeNavigationFactory
+com.celements.navigation.factories.DefaultNavigationFactory
