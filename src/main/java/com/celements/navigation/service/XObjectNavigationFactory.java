@@ -17,9 +17,7 @@ import org.xwiki.model.reference.SpaceReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.navigation.INavigation;
 import com.celements.navigation.INavigationClassConfig;
-import com.celements.navigation.Navigation;
 import com.celements.navigation.NavigationConfig;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
@@ -29,7 +27,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("xobject")
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
 @Singleton
-public final class XObjectNavigationFactory implements NavigationFactory<DocumentReference> {
+public final class XObjectNavigationFactory extends AbstractNavigationFactory<DocumentReference> {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(XObjectNavigationFactory.class);
 
@@ -45,47 +43,27 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
   @Requirement
   private IModelAccessFacade modelAccess;
 
-  private XWikiContext getContext() {
+  XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   @Override
-  @NotNull
-  public INavigation createNavigation() {
-    return createNavigation(getContext().getDoc().getDocumentReference());
-  }
-
-  @Override
-  @NotNull
-  public INavigation createNavigation(@NotNull DocumentReference configReference) {
-    final INavigation nav = Navigation.createNavigation(getContext());
-    nav.loadConfig(getNavigationConfig(configReference));
-    return nav;
-  }
-
-  @Override
-  @NotNull
-  public NavigationConfig getNavigationConfig() {
-    return getNavigationConfig(getContext().getDoc().getDocumentReference());
+  protected DocumentReference getDefaultConfigReference() {
+    return getContext().getDoc().getDocumentReference();
   }
 
   @Override
   @NotNull
   public NavigationConfig getNavigationConfig(@NotNull DocumentReference configReference) {
-    return loadConfigFromObject(getConfiBaseObj(configReference));
-  }
-
-  @Override
-  public boolean hasNavigationConfig() {
-    return hasNavigationConfig(getContext().getDoc().getDocumentReference());
+    return loadConfigFromObject(getConfigBaseObj(configReference));
   }
 
   @Override
   public boolean hasNavigationConfig(@NotNull DocumentReference configReference) {
-    return (getConfiBaseObj(configReference) != null);
+    return (getConfigBaseObj(configReference) != null);
   }
 
-  private BaseObject getConfiBaseObj(@NotNull DocumentReference configReference) {
+  private BaseObject getConfigBaseObj(@NotNull DocumentReference configReference) {
     BaseObject prefObj = null;
     try {
       prefObj = modelAccess.getXObject(configReference, navClassConfig.getNavigationConfigClassRef(
