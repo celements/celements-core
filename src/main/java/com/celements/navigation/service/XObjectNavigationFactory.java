@@ -121,7 +121,7 @@ public final class XObjectNavigationFactory implements NavigationFactory<Documen
           showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType, itemsPerPage,
           presentationTypeHint, cmCssClass);
     } else {
-      return new NavigationConfig();
+      return NavigationConfig.DEFAULTS;
     }
   }
 

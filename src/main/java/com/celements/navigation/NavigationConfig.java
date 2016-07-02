@@ -20,6 +20,8 @@ public final class NavigationConfig {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(NavigationConfig.class);
 
+  public static final NavigationConfig DEFAULTS = new NavigationConfig();
+
   public static final int UNLIMITED_ITEMS_PER_PAGE = -1;
   public static final int DEFAULT_MIN_LEVEL = 1;
   public static final int DEFAULT_MAX_LEVEL = 100;
@@ -144,7 +146,7 @@ public final class NavigationConfig {
           newShowInactiveToLevel, newMenuPart, newDataType, newNodeSpaceRef, newLayoutType,
           newNrOfItemsPerPage, newPresentationTypeHint, newCmCssClass);
     } else {
-      return new NavigationConfig();
+      return DEFAULTS;
     }
   }
 

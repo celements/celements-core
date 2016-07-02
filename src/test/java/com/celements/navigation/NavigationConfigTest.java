@@ -959,4 +959,14 @@ public class NavigationConfigTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void testOverlayValues_defaults() throws Exception {
+    NavigationConfig navConfig2 = new NavigationConfig();
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(NavigationConfig.DEFAULTS);
+    assertFalse(navConfig.isEnabled());
+    assertSame(navConfig, NavigationConfig.DEFAULTS);
+    verifyDefault();
+  }
+
 }
