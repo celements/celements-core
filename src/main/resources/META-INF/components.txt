@@ -132,3 +132,4 @@ com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
 com.celements.web.service.LastStartupTimeStamp
 com.celements.navigation.service.XObjectNavigationFactory
+com.celements.navigation.service.JavaNavigationFactory
