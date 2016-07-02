@@ -44,8 +44,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testNavigationConfig() throws Exception {
-    NavigationConfig navConfig = new NavigationConfig();
+  public void testNavigationConfig_DEFAULTS() throws Exception {
+    NavigationConfig navConfig = NavigationConfig.DEFAULTS;
     assertFalse(navConfig.isEnabled());
     assertEquals("toHieararchyLevel default must equal DEFAULT_MAX_LEVEL",
         NavigationConfig.DEFAULT_MAX_LEVEL, navConfig.getToHierarchyLevel());
@@ -961,7 +961,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_defaults() throws Exception {
-    NavigationConfig navConfig2 = new NavigationConfig();
+    NavigationConfig navConfig2 = NavigationConfig.DEFAULTS;
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(NavigationConfig.DEFAULTS);
     assertFalse(navConfig.isEnabled());
