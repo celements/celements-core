@@ -50,6 +50,7 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
   }
 
   @Override
+  @NotNull
   protected DocumentReference getDefaultConfigReference() {
     return getContext().getDoc().getDocumentReference();
   }

@@ -8,6 +8,7 @@ import com.celements.navigation.NavigationConfig;
 
 public abstract class AbstractNavigationFactory<T> implements NavigationFactory<T> {
 
+  @NotNull
   abstract protected T getDefaultConfigReference();
 
   @Override
