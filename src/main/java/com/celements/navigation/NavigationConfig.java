@@ -65,7 +65,7 @@ public final class NavigationConfig {
     }
   }
 
-  public NavigationConfig() {
+  private NavigationConfig() {
     this(false, null, null, null, null, null, null, null, null, null, null, null);
   }
 
