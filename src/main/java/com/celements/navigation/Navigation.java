@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -692,21 +693,30 @@ public class Navigation implements INavigation {
     return docURL;
   }
 
+  /**
+   * @deprecated since 1.141 instead use createNavigation()
+   */
+  @Deprecated
   public static INavigation createNavigation(XWikiContext context) {
-    return new Navigation(Navigation.newNavIdForContext(context));
+    return new Navigation(Navigation.newNavIdForContext());
   }
 
-  static String newNavIdForContext(XWikiContext context) {
-    Long navCounter = getNavCounterFromContext(context) + 1;
-    context.put(_NAVIGATION_COUNTER_KEY, navCounter);
+  public static INavigation createNavigation() {
+    return new Navigation(Navigation.newNavIdForContext());
+  }
+
+  static String newNavIdForContext() {
+    ExecutionContext executionContext = Utils.getComponent(Execution.class).getContext();
+    Long navCounter = getNavCounterFromContext(executionContext) + 1;
+    executionContext.setProperty(_NAVIGATION_COUNTER_KEY, navCounter);
     return "N" + navCounter;
   }
 
-  private static Long getNavCounterFromContext(XWikiContext context) {
-    if (!context.containsKey(_NAVIGATION_COUNTER_KEY)) {
+  private static Long getNavCounterFromContext(ExecutionContext executionContext) {
+    if (executionContext.getProperty(_NAVIGATION_COUNTER_KEY) == null) {
       return new Long(0);
     }
-    java.lang.Object navCounterObj = context.get(_NAVIGATION_COUNTER_KEY);
+    java.lang.Object navCounterObj = executionContext.getProperty(_NAVIGATION_COUNTER_KEY);
     if (navCounterObj instanceof Long) {
       return (Long) navCounterObj + 1;
     } else {
