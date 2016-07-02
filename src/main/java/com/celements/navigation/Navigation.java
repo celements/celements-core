@@ -694,7 +694,7 @@ public class Navigation implements INavigation {
   }
 
   /**
-   * @deprecated since 1.141 instead use createNavigation()
+   * @deprecated since 1.142 instead use createNavigation()
    */
   @Deprecated
   public static INavigation createNavigation(XWikiContext context) {
@@ -796,7 +796,7 @@ public class Navigation implements INavigation {
   }
 
   /**
-   * @deprecated since 1.141 instead use XObjectNavigationFactory
+   * @deprecated since 1.142 instead use XObjectNavigationFactory
    *             createNavigation(DocumentReference)
    */
   @Override
