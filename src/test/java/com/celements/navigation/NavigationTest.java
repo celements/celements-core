@@ -261,7 +261,9 @@ public class NavigationTest extends AbstractComponentTest {
     ptObj.setXClassReference(new PageTypeClasses().getPageTypeClassRef(getContext().getDatabase()));
     ptObj.setStringValue(PageTypeClasses.PAGE_TYPE_FIELD, "TestPageType");
     currentDoc.addXObject(ptObj);
-    expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(currentDoc);
+    expect(getWikiMock().exists(eq(currentDocRef), same(getContext()))).andReturn(true);
+    expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(
+        currentDoc).times(3);
     String testPageType = "TestPageType";
     expect(ptServiceMock.getPageTypeRefByConfigName(testPageType)).andReturn(new PageTypeReference(
         testPageType, "myTestProvider", Collections.<String>emptyList()));

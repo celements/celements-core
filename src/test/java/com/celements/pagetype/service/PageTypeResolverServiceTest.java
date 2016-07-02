@@ -177,6 +177,7 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
   @Test
   public void testGetPageTypeRefForDocWithDefault_docRef() throws Exception {
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     doc.setNew(false);
     BaseObject pageTypeObj = new BaseObject();
@@ -196,6 +197,7 @@ public class PageTypeResolverServiceTest extends AbstractBridgedComponentTestCas
 
   @Test
   public void testGetPageTypeRefForDocWithDefault_docRef_Exception() throws Exception {
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
     expect(request.get(eq("template"))).andReturn(null).anyTimes();
     expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException());
