@@ -350,10 +350,11 @@ public class NavigationConfigTest extends AbstractComponentTest {
   @Test
   public void testGetPresentationType() throws Exception {
     presentationTypeHint = "myTestPresentationType";
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint))).andReturn(
-        componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint))).andReturn(componentInstance);
     replayDefault();
     NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
         toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
@@ -396,6 +397,566 @@ public class NavigationConfigTest extends AbstractComponentTest {
     assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
     assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
     assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
+  }
+
+  @Test
+  public void testOverlayValues_configName() throws Exception {
+    configName = "configName1";
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("configName must equal to first parameter", configName, navConfig.getConfigName());
+    // navConfig2 values for other fields must remain
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_fromHierarchyLevel() throws Exception {
+    fromHierarchyLevel = 15;
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("fromHieararchyLevel must equal to first parameter", fromHierarchyLevel,
+        (Integer) navConfig.getFromHierarchyLevel());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_toHierarchyLevel() throws Exception {
+    toHierarchyLevel = 70;
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("toHieararchyLevel must equal to first parameter", toHierarchyLevel,
+        (Integer) navConfig.getToHierarchyLevel());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_showInactiveToLevel() throws Exception {
+    showInactiveToLevel = 30;
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("showInactiveToLevel must equal to first parameter", showInactiveToLevel,
+        (Integer) navConfig.getShowInactiveToLevel());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_menuPart() throws Exception {
+    menuPart = "menuPart1";
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("menuPart must equal to first parameter", menuPart, navConfig.getMenuPart());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_dataType() throws Exception {
+    dataType = "dataType1";
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("dataType must equal to first parameter", dataType, navConfig.getDataType());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_nodeSpaceRef() throws Exception {
+    nodeSpaceRef = new SpaceReference("NavConfigSpace1", new WikiReference(
+        getContext().getDatabase()));
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("nodeSpaceRef must equal to first parameter", nodeSpaceRef,
+        navConfig.getNodeSpaceRef());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_layoutType() throws Exception {
+    layoutType = "layoutType1";
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("layoutType must equal to first parameter", layoutType, navConfig.getLayoutType());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_itemsPerPage() throws Exception {
+    itemsPerPage = 20;
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("itemsPerPage must equal to first parameter", itemsPerPage,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_presentationTypeHint() throws Exception {
+    presentationTypeHint = "navConfigPresTypeHint1";
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertEquals("cmCssClass must equal to second parameter", cmCssClass2, navConfig.getCssClass());
+    verifyDefault();
+  }
+
+  @Test
+  public void testOverlayValues_cmCssClass() throws Exception {
+    cmCssClass = "cm_cssTestClass1";
+    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
+        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
+        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName2 = "configName2";
+    Integer fromHierarchyLevel2 = 22;
+    Integer toHierarchyLevel2 = 60;
+    Integer showInactiveToLevel2 = 55;
+    String menuPart2 = "menuPart2";
+    String dataType2 = "dataType2";
+    SpaceReference nodeSpaceRef2 = new SpaceReference("NavConfigSpace2", new WikiReference(
+        getContext().getDatabase()));
+    String layoutType2 = "navConfig2LayoutType";
+    Integer itemsPerPage2 = 50;
+    String presentationTypeHint2 = "navConfigPresTypeHint2";
+    String cmCssClass2 = "cm_cssTestClass2";
+    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
+        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
+        itemsPerPage2, presentationTypeHint2, cmCssClass2);
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        presentationTypeHint2))).andReturn(componentInstance);
+    replayDefault();
+    NavigationConfig navConfig = navConfig2.overlay(navConfig1);
+    assertTrue(navConfig.isEnabled());
+    assertEquals("cmCssClass must equal to first parameter", cmCssClass, navConfig.getCssClass());
+    // navConfig2 values for other fields must remain
+    assertEquals("configName must equal to second parameter", configName2,
+        navConfig.getConfigName());
+    assertEquals("fromHieararchyLevel must equal to second parameter", fromHierarchyLevel2,
+        (Integer) navConfig.getFromHierarchyLevel());
+    assertEquals("toHieararchyLevel must equal to second parameter", toHierarchyLevel2,
+        (Integer) navConfig.getToHierarchyLevel());
+    assertEquals("showInactiveToLevel must equal to second parameter", showInactiveToLevel2,
+        (Integer) navConfig.getShowInactiveToLevel());
+    assertEquals("menuPart must equal to second parameter", menuPart2, navConfig.getMenuPart());
+    assertEquals("nodeSpaceRef must equal to second parameter", nodeSpaceRef2,
+        navConfig.getNodeSpaceRef());
+    assertEquals("dataType must equal to second parameter", dataType2, navConfig.getDataType());
+    assertEquals("layoutType must equal to second parameter", layoutType2,
+        navConfig.getLayoutType());
+    assertEquals("itemsPerPage must equal to second parameter", itemsPerPage2,
+        (Integer) navConfig.getNrOfItemsPerPage());
+    assertSame(componentInstance, navConfig.getPresentationType());
+    verifyDefault();
   }
 
 }
