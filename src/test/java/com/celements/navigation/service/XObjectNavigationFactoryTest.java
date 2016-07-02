@@ -31,7 +31,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
   public void setUp_XObjectNavigationFactoryTest() throws Exception {
     xwiki = getWikiMock();
     xobjNavFactory = (XObjectNavigationFactory) Utils.getComponent(NavigationFactory.class,
-        "xobject");
+        XObjectNavigationFactory.XOBJECT_NAV_FACTORY_HINT);
   }
 
   @Test

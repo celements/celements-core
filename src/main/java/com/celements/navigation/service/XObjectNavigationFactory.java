@@ -24,10 +24,12 @@ import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("xobject")
+@Component(XObjectNavigationFactory.XOBJECT_NAV_FACTORY_HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
 @Singleton
 public final class XObjectNavigationFactory extends AbstractNavigationFactory<DocumentReference> {
+
+  public static final String XOBJECT_NAV_FACTORY_HINT = "xobject";
 
   private final static Logger LOGGER = LoggerFactory.getLogger(XObjectNavigationFactory.class);
 
