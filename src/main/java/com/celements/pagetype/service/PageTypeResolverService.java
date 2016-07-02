@@ -35,7 +35,6 @@ import com.celements.pagetype.PageTypeReference;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -72,6 +71,8 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
         try {
           DocumentReference docRef = webUtilsService.resolveDocumentReference(templName);
           doc = modelAccess.getDocument(docRef);
+          LOGGER.debug("getPageTypeRefForCurrentDoc: creating new document, getting page type from "
+              + "template {}", docRef);
         } catch (DocumentNotExistsException exp) {
           LOGGER.warn("Exception while getting template doc '{}", templName, exp);
         }
@@ -107,9 +108,9 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
   @Override
   public PageTypeReference getPageTypeRefForDocWithDefault(DocumentReference docRef) {
     try {
-      XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+      XWikiDocument doc = modelAccess.getDocument(docRef);
       return getPageTypeRefForDocWithDefault(doc);
-    } catch (XWikiException exp) {
+    } catch (DocumentNotExistsException exp) {
       LOGGER.error("Failed to get XWikiDocument for [" + docRef + "].", exp);
     }
     return getDefaultPageTypeRefForDoc(docRef);
