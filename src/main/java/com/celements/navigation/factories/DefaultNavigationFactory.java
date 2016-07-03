@@ -26,7 +26,7 @@ public class DefaultNavigationFactory extends AbstractNavigationFactory<Document
   NavigationFactory<DocumentReference> pageTypeNavFactory;
 
   @Requirement(JavaNavigationFactory.JAVA_NAV_FACTORY_HINT)
-  NavigationFactory<String> javaNavFactory;
+  NavigationFactory<PageTypeReference> javaNavFactory;
 
   @Requirement
   IPageTypeResolverRole pageTypeResolver;
@@ -44,21 +44,21 @@ public class DefaultNavigationFactory extends AbstractNavigationFactory<Document
     return getContext().getDoc().getDocumentReference();
   }
 
-  private String getJavaConfigReference(DocumentReference configReference) {
+  private PageTypeReference getJavaConfigReference(DocumentReference configReference) {
     PageTypeReference pageTypeRef;
     if (getDefaultConfigReference().equals(configReference)) {
       pageTypeRef = pageTypeResolver.getPageTypeRefForCurrentDoc();
     } else {
       pageTypeRef = pageTypeResolver.getPageTypeRefForDocWithDefault(configReference);
     }
-    return pageTypeRef.getConfigName();
+    return pageTypeRef;
   }
 
   @Override
   @NotNull
   public NavigationConfig getNavigationConfig(DocumentReference configReference) {
     NavigationConfig theNavConfig = NavigationConfig.DEFAULTS;
-    String javaConfigReference = getJavaConfigReference(configReference);
+    PageTypeReference javaConfigReference = getJavaConfigReference(configReference);
     if (javaNavFactory.hasNavigationConfig(javaConfigReference)) {
       theNavConfig = theNavConfig.overlay(javaNavFactory.getNavigationConfig(javaConfigReference));
     }
@@ -73,7 +73,7 @@ public class DefaultNavigationFactory extends AbstractNavigationFactory<Document
 
   @Override
   public boolean hasNavigationConfig(DocumentReference configReference) {
-    String javaConfigReference = getJavaConfigReference(configReference);
+    PageTypeReference javaConfigReference = getJavaConfigReference(configReference);
     return (javaNavFactory.hasNavigationConfig(javaConfigReference)
         || pageTypeNavFactory.hasNavigationConfig(configReference)
         || xobjNavFactory.hasNavigationConfig(configReference));
