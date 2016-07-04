@@ -34,7 +34,7 @@ public class DefaultNavigationFactory extends AbstractNavigationFactory<Document
   @Requirement
   private Execution execution;
 
-  XWikiContext getContext() {
+  private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
