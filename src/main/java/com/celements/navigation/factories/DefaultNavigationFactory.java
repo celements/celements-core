@@ -1,9 +1,12 @@
 package com.celements.navigation.factories;
 
+import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -14,6 +17,8 @@ import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.xpn.xwiki.XWikiContext;
 
 @Component
+@InstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)
+@Singleton
 public class DefaultNavigationFactory extends AbstractNavigationFactory<DocumentReference> {
 
   @Requirement
