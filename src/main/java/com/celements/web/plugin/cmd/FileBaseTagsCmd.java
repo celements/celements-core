@@ -21,28 +21,29 @@ package com.celements.web.plugin.cmd;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
-import com.celements.web.utils.IWebUtils;
-import com.celements.web.utils.WebUtils;
+import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class FileBaseTagsCmd {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(FileBaseTagsCmd.class);
+  private final static Logger Logger = LoggerFactory.getLogger(FileBaseTagsCmd.class);
 
   public static final String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
-  private IWebUtils celUtils = WebUtils.getInstance();
+  private ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);
 
   public List<TreeNode> getAllFileBaseTags(XWikiContext context) {
-    return celUtils.getSubNodesForParent("", getTagSpaceName(context), new InternalRightsFilter(),
-        context);
+    return treeNodeSrv.getSubNodesForParent("", getTagSpaceName(context),
+        new InternalRightsFilter());
   }
 
   public String getTagSpaceName(XWikiContext context) {
@@ -56,9 +57,9 @@ public class FileBaseTagsCmd {
 
   public boolean existsTagWithName(String tagName, XWikiContext context) {
     if (context.getWiki().exists(getTagFullName(tagName, context), context)) {
-      String tagFullName = getTagFullName(tagName, context);
+      DocumentReference tagDocRef = getTagDocRef(tagName, context);
       for (TreeNode node : getAllFileBaseTags(context)) {
-        if (tagFullName.equals(node.getFullName())) {
+        if (tagDocRef.equals(node.getDocumentReference())) {
           return true;
         }
       }
@@ -66,8 +67,16 @@ public class FileBaseTagsCmd {
     return false;
   }
 
+  /**
+   * @deprecated instead use getTagDocRef
+   */
+  @Deprecated
   public String getTagFullName(String tagName, XWikiContext context) {
     return getTagSpaceName(context) + "." + tagName;
+  }
+
+  public DocumentReference getTagDocRef(String tagName, XWikiContext context) {
+    return new DocumentReference(context.getDatabase(), getTagSpaceName(context), tagName);
   }
 
   public XWikiDocument getTagDocument(String tagName, boolean createIfNotExists,
@@ -83,17 +92,16 @@ public class FileBaseTagsCmd {
           menuItemObj.setStringValue("menu_parent", "");
           menuItemObj.setStringValue("part_name", "");
           context.getWiki().saveDocument(tagDoc, "Added by Navigation", context);
-          celUtils.flushMenuItemCache(context);
         }
       }
     } catch (XWikiException exp) {
-      mLogger.error("Failed to get tag document [" + getTagFullName(tagName, context) + "].", exp);
+      Logger.error("Failed to get tag document [" + getTagFullName(tagName, context) + "].", exp);
     }
     return tagDoc;
   }
 
-  void inject_celUtils(IWebUtils mockUtils) {
-    this.celUtils = mockUtils;
+  void inject_treeNodeSrv(ITreeNodeService mockTreeNodeSrv) {
+    this.treeNodeSrv = mockTreeNodeSrv;
   }
 
 }

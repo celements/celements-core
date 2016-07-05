@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.filter;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -26,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -34,7 +35,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
+public class InternalRightsFilterTest extends AbstractComponentTest {
 
   private InternalRightsFilter filter;
   private XWikiContext context;
@@ -45,9 +46,8 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   public void setUp_InternalRightsFilterTest() throws Exception {
     filter = new InternalRightsFilter();
     context = getContext();
-    wiki = createMock(XWiki.class);
-    context.setWiki(wiki);
-    rightsService = createMock(XWikiRightService.class);
+    wiki = getWikiMock();
+    rightsService = createMockAndAddToDefault(XWikiRightService.class);
     expect(wiki.getRightService()).andReturn(rightsService);
   }
 
@@ -80,137 +80,144 @@ public class InternalRightsFilterTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  @Deprecated
   public void testIncludeMenuItem_noViewRights() throws Exception {
     String docFullName = "MySpace.MyDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     BaseObject baseObj = new BaseObject();
-    baseObj.setName(docFullName);
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(false);
-    replay(wiki, rightsService);
+    baseObj.setDocumentReference(docRef);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(false);
+    replayDefault();
     assertFalse(filter.includeMenuItem(baseObj, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
+  @Deprecated
   public void testIncludeMenuItem_hasViewRights_noMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     BaseObject baseObj = new BaseObject();
-    baseObj.setName(docFullName);
+    baseObj.setDocumentReference(docRef);
     filter.setMenuPart("");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(true);
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(true);
+    replayDefault();
     assertTrue(filter.includeMenuItem(baseObj, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
+  @Deprecated
   public void testIncludeMenuItem_hasViewRights_wrongMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     BaseObject baseObj = new BaseObject();
-    baseObj.setName(docFullName);
+    baseObj.setDocumentReference(docRef);
     baseObj.setStringValue("part_name", "anotherPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(true);
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(true);
+    replayDefault();
     assertFalse(filter.includeMenuItem(baseObj, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
+  @Deprecated
   public void testIncludeMenuItem_hasViewRights_matchingMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     BaseObject baseObj = new BaseObject();
-    baseObj.setName(docFullName);
+    baseObj.setDocumentReference(docRef);
     baseObj.setStringValue("part_name", "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(true);
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(true);
+    replayDefault();
     assertTrue(filter.includeMenuItem(baseObj, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
+  @Deprecated
   public void testIncludeMenuItem_Exception() throws Exception {
     String docFullName = "MySpace.MyDoc";
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc");
     BaseObject baseObj = new BaseObject();
-    baseObj.setName(docFullName);
+    baseObj.setDocumentReference(docRef);
     baseObj.setStringValue("part_name", "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andThrow(new XWikiException());
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andThrow(new XWikiException());
+    replayDefault();
     assertFalse(filter.includeMenuItem(baseObj, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
   public void testIncludeTreeNode_noViewRights() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
-        (String) null, 0);
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(false);
-    replay(wiki, rightsService);
+        null, 0);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(false);
+    replayDefault();
     assertFalse(filter.includeTreeNode(node, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
   public void testIncludeTreeNode_hasViewRights_noMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
-        (String) null, 0);
+        null, 0);
     filter.setMenuPart("");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(true);
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(true);
+    replayDefault();
     assertTrue(filter.includeTreeNode(node, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
   public void testIncludeTreeNode_hasViewRights_wrongMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
-        "", 0);
-    node.setPartName("anotherPart");
+        null, 0, "anotherPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(true);
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(true);
+    replayDefault();
     assertFalse(filter.includeTreeNode(node, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
   public void testIncludeTreeNode_hasViewRights_matchingMenuPart() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
-        "", 0);
-    node.setPartName("mainPart");
+        null, 0, "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andReturn(true);
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andReturn(true);
+    replayDefault();
     assertTrue(filter.includeTreeNode(node, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
   @Test
   public void testIncludeTreeNode_Exception() throws Exception {
     String docFullName = "MySpace.MyDoc";
     TreeNode node = new TreeNode(new DocumentReference(context.getDatabase(), "MySpace", "MyDoc"),
-        "", 0);
-    node.setPartName("mainPart");
+        null, 0, "mainPart");
     filter.setMenuPart("mainPart");
-    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(docFullName), same(
-        context))).andThrow(new XWikiException());
-    replay(wiki, rightsService);
+    expect(rightsService.hasAccessLevel(eq("view"), eq(context.getUser()), eq(context.getDatabase()
+        + ":" + docFullName), same(context))).andThrow(new XWikiException());
+    replayDefault();
     assertFalse(filter.includeTreeNode(node, context));
-    verify(wiki, rightsService);
+    verifyDefault();
   }
 
 }

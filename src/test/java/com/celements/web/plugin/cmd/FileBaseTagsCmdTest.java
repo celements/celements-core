@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,20 +30,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.INavFilter;
-import com.celements.web.utils.IWebUtils;
+import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
+public class FileBaseTagsCmdTest extends AbstractComponentTest {
 
   private FileBaseTagsCmd fileBaseTagCmd;
   private XWikiContext context;
   private XWiki xwiki;
-  private IWebUtils mockUtils;
+  private ITreeNodeService mockTreeNodeSrv;
 
   @Before
   public void setUp_FileBaseTagsCmdTest() throws Exception {
@@ -50,8 +51,8 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
     fileBaseTagCmd = new FileBaseTagsCmd();
-    mockUtils = createMock(IWebUtils.class);
-    fileBaseTagCmd.inject_celUtils(mockUtils);
+    mockTreeNodeSrv = createMock(ITreeNodeService.class);
+    fileBaseTagCmd.inject_treeNodeSrv(mockTreeNodeSrv);
   }
 
   @Test
@@ -59,9 +60,9 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
     String celFileBaseName = "Content_attachments.FileBaseDoc";
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName);
-    replay(xwiki, mockUtils);
+    replay(xwiki, mockTreeNodeSrv);
     assertEquals("Content_attachments", fileBaseTagCmd.getTagSpaceName(context));
-    verify(xwiki, mockUtils);
+    verify(xwiki, mockTreeNodeSrv);
   }
 
   @Test
@@ -69,9 +70,9 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
     String celFileBaseName = "Content_attachments";
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName);
-    replay(xwiki, mockUtils);
+    replay(xwiki, mockTreeNodeSrv);
     assertEquals("Content_attachments", fileBaseTagCmd.getTagSpaceName(context));
-    verify(xwiki, mockUtils);
+    verify(xwiki, mockTreeNodeSrv);
   }
 
   @SuppressWarnings("unchecked")
@@ -82,13 +83,13 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
         celFileBaseName).anyTimes();
     String tagDocFN = celFileBaseName + ".tag0";
     expect(xwiki.exists(eq(tagDocFN), same(context))).andReturn(true);
-    expect(mockUtils.getSubNodesForParent(eq(""), eq(celFileBaseName), isA(INavFilter.class), same(
-        context))).andReturn(Collections.emptyList());
+    expect(mockTreeNodeSrv.getSubNodesForParent(eq(""), eq(celFileBaseName), isA(
+        INavFilter.class))).andReturn(Collections.emptyList());
     expect(xwiki.getDocument(eq(tagDocFN), same(context))).andReturn(new XWikiDocument()).once();
-    replay(xwiki, mockUtils);
+    replay(xwiki, mockTreeNodeSrv);
     assertNotNull("docAlready exists: expecting existing doc", fileBaseTagCmd.getTagDocument("tag0",
         false, context));
-    verify(xwiki, mockUtils);
+    verify(xwiki, mockTreeNodeSrv);
   }
 
   @SuppressWarnings("unchecked")
@@ -99,15 +100,15 @@ public class FileBaseTagsCmdTest extends AbstractBridgedComponentTestCase {
         celFileBaseName).anyTimes();
     String tagDocFN = celFileBaseName + ".tag0";
     expect(xwiki.exists(eq(tagDocFN), same(context))).andReturn(true);
-    expect(mockUtils.getSubNodesForParent(eq(""), eq(celFileBaseName), isA(INavFilter.class), same(
-        context))).andReturn(Arrays.asList(new TreeNode(new DocumentReference(context.getDatabase(),
-            celFileBaseName, "tag0"), "", 0)));
+    expect(mockTreeNodeSrv.getSubNodesForParent(eq(""), eq(celFileBaseName), isA(
+        INavFilter.class))).andReturn(Arrays.asList(new TreeNode(new DocumentReference(
+            context.getDatabase(), celFileBaseName, "tag0"), null, 0)));
     XWikiDocument existingTagDoc = new XWikiDocument();
     expect(xwiki.getDocument(eq(tagDocFN), same(context))).andReturn(existingTagDoc).once();
-    replay(xwiki, mockUtils);
+    replay(xwiki, mockTreeNodeSrv);
     assertSame("docAlready exists: expecting existing doc", existingTagDoc,
         fileBaseTagCmd.getTagDocument("tag0", false, context));
-    verify(xwiki, mockUtils);
+    verify(xwiki, mockTreeNodeSrv);
   }
 
 }

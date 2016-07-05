@@ -27,8 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
@@ -45,10 +43,17 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
   private String _CEL_XOBJ_GETALLPAGETYPES_COUNTER = "celXObjectGetAllPageTypesCounter";
   private String _CEL_XOBJ_GETALLPAGETYPES_TOTALTIME = "celXObjectGetAllPageTypesTotelTime";
 
+  /**
+   * @deprecated since 1.142 instead use XObjectPageTypeUtilsRole.getDocRefForPageType()
+   */
+  @Deprecated
   public static final String DEFAULT_PAGE_TYPES_SPACE = "PageTypes";
 
   @Requirement
   IXObjectPageTypeCacheRole xobjectPageTypeCache;
+
+  @Requirement
+  XObjectPageTypeUtilsRole xobjectPageTypeUtils;
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -60,12 +65,12 @@ public class XObjectPageTypeProvider implements IPageTypeProviderRole {
     return execution.getContext();
   }
 
+  @Override
   public IPageTypeConfig getPageTypeByReference(PageTypeReference pageTypeRef) {
-    DocumentReference pageTypeDocRef = new DocumentReference(pageTypeRef.getConfigName(),
-        new SpaceReference(DEFAULT_PAGE_TYPES_SPACE, webUtilsService.getWikiRef()));
-    return new XObjectPageTypeConfig(pageTypeDocRef);
+    return new XObjectPageTypeConfig(xobjectPageTypeUtils.getDocRefForPageType(pageTypeRef));
   }
 
+  @Override
   public List<PageTypeReference> getPageTypes() {
     Integer count = 0;
     if (getExecContext().getProperty(_CEL_XOBJ_GETALLPAGETYPES_COUNTER) != null) {

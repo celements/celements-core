@@ -33,6 +33,7 @@ import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.GetMappedMenuItemsForParentCommand;
 import com.celements.navigation.cmd.GetNotMappedMenuItemsForParentCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -66,11 +67,13 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     mockTreeNodeCache = createMockAndAddToDefault(ITreeNodeCache.class);
     treeNodeService.treeNodeCache = mockTreeNodeCache;
     treeNodeService.execution = Utils.getComponent(Execution.class);
-    mockGetNotMenuItemCommand = createMockAndAddToDefault(GetNotMappedMenuItemsForParentCommand.class);
+    mockGetNotMenuItemCommand = createMockAndAddToDefault(
+        GetNotMappedMenuItemsForParentCommand.class);
     expect(mockTreeNodeCache.getNotMappedMenuItemsForParentCmd()).andReturn(
         mockGetNotMenuItemCommand).anyTimes();
     mockGetMenuItemCommand = createMockAndAddToDefault(GetMappedMenuItemsForParentCommand.class);
-    expect(mockTreeNodeCache.getMappedMenuItemsForParentCmd()).andReturn(mockGetMenuItemCommand).anyTimes();
+    expect(mockTreeNodeCache.getMappedMenuItemsForParentCmd()).andReturn(
+        mockGetMenuItemCommand).anyTimes();
     backupNodeProviders = treeNodeService.nodeProviders;
     treeNodeService.nodeProviders = new HashMap<String, ITreeNodeProvider>(backupNodeProviders);
   }
@@ -95,9 +98,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         mockTreeNodeList);
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
         Collections.<TreeNode>emptyList());
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(spaceName + "."
-            + docName), same(context))).andReturn(true);
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(wikiName + ":"
+        + spaceName + "." + docName), same(context))).andReturn(true);
     replayDefault();
     List<TreeNode> resultList = treeNodeService.getSubNodesForParent(spaceRef, "");
     assertEquals(1, resultList.size());
@@ -119,9 +121,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> emptyList = Collections.emptyList();
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
         emptyList);
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(spaceName + "."
-            + docName), same(context))).andReturn(true);
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), eq(wikiName + ":"
+        + spaceName + "." + docName), same(context))).andReturn(true);
     replayDefault();
     List<TreeNode> resultList = treeNodeService.getSubNodesForParent("", spaceName, "");
     assertEquals(1, resultList.size());
@@ -144,7 +145,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     TreeNode menuItem5 = createTreeNode(spaceName, "myDoc5", spaceName, docName, 5);
     List<TreeNode> mappedList = Arrays.asList(menuItem1, menuItem5), notMappedList = Arrays.asList(
         menuItem2, menuItem3), expectedList = Arrays.asList(menuItem1, menuItem2, menuItem3,
-        menuItem5);
+            menuItem5);
 
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
         mappedList).once();
@@ -190,7 +191,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         mappedList).once();
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
         notMappedList).once();
-    expect(nodeProviderMock.getTreeNodesForParent(eq(parentKey))).andReturn(nodeProviderList).once();
+    expect(nodeProviderMock.getTreeNodesForParent(eq(parentKey))).andReturn(
+        nodeProviderList).once();
 
     replayDefault();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
@@ -309,7 +311,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     List<TreeNode> mappedList = Collections.emptyList();
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
         mappedList).once();
-    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(null).once();
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
+        null).once();
     replayDefault();
     List<TreeNode> menuItemsMerged = treeNodeService.fetchNodesForParentKey(docRef);
     assertNotNull("expecting not null.", menuItemsMerged);
@@ -319,8 +322,14 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   private TreeNode createTreeNode(String docSpace, String docName, String parentDocSpace,
       String parentDocName, int pos) {
-    return new TreeNode(new DocumentReference(context.getDatabase(), docSpace, docName),
-        parentDocSpace + "." + parentDocName, pos);
+    EntityReference parentRef;
+    if (Strings.isNullOrEmpty(parentDocName)) {
+      parentRef = new SpaceReference(parentDocSpace, new WikiReference(context.getDatabase()));
+    } else {
+      parentRef = new DocumentReference(context.getDatabase(), parentDocSpace, parentDocName);
+    }
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), docSpace, docName);
+    return new TreeNode(docRef, parentRef, pos);
   }
 
   @Test
@@ -328,9 +337,9 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     String wikiName = getContext().getDatabase();
     String spaceName = "mySpace";
     String docName = "myDoc";
-    EntityReference wikiEntRef = new EntityReference(wikiName, EntityType.WIKI), spaceEntRef = new EntityReference(
-        spaceName, EntityType.SPACE, wikiEntRef), docEntRef = new EntityReference(docName,
-        EntityType.DOCUMENT, spaceEntRef);
+    EntityReference wikiEntRef = new EntityReference(wikiName, EntityType.WIKI),
+        spaceEntRef = new EntityReference(spaceName, EntityType.SPACE, wikiEntRef),
+        docEntRef = new EntityReference(docName, EntityType.DOCUMENT, spaceEntRef);
 
     assertEquals(docEntRef, treeNodeService.resolveEntityReference(wikiName + ":" + spaceName + "."
         + docName));
@@ -350,28 +359,26 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockPageLayoutCmd.getPageLayoutForCurrentDoc()).andReturn(layoutRef);
     DocumentReference mainCellRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "MainCell");
-    List<TreeNode> myLayoutMenuItems = Arrays.asList(new TreeNode(mainCellRef, "", 1));
+    List<TreeNode> myLayoutMenuItems = Arrays.asList(new TreeNode(mainCellRef, null, 1));
     DocumentReference navConfigDocRef1 = new DocumentReference(context.getDatabase(), "MyLayout",
         "NavigationCell1");
     DocumentReference navConfigDocRef2 = new DocumentReference(context.getDatabase(), "MyLayout",
         "NavigationCell2");
+    SpaceReference layoutSpaceRef = new SpaceReference("MyLayout", new WikiReference("xwikidb"));
     List<TreeNode> myLayoutSubMenuItems = Arrays.asList(new TreeNode(navConfigDocRef1,
-        "xwikidb:MyLayout.", 1), new TreeNode(navConfigDocRef2, "xwikidb:MyLayout.", 2));
+        layoutSpaceRef, 1), new TreeNode(navConfigDocRef2, layoutSpaceRef, 2));
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:MyLayout."))).andReturn(
         myLayoutMenuItems);
-    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:MyLayout.MainCell"))).andReturn(
-        myLayoutSubMenuItems);
-    expect(
-        mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:MyLayout.NavigationCell1"))).andReturn(
-        Collections.<TreeNode>emptyList());
-    expect(
-        mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:MyLayout.NavigationCell2"))).andReturn(
-        Collections.<TreeNode>emptyList());
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class), same(context))).andReturn(
-        Collections.<TreeNode>emptyList()).anyTimes();
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(
+        "xwikidb:MyLayout.MainCell"))).andReturn(myLayoutSubMenuItems);
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(
+        "xwikidb:MyLayout.NavigationCell1"))).andReturn(Collections.<TreeNode>emptyList());
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(
+        "xwikidb:MyLayout.NavigationCell2"))).andReturn(Collections.<TreeNode>emptyList());
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class), same(
+        context))).andReturn(Collections.<TreeNode>emptyList()).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     BaseObject navConfigObj1 = new BaseObject();
     DocumentReference navigationConfigClassRef = getNavClassConfig().getNavigationConfigClassRef(
         context.getDatabase());
@@ -399,7 +406,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))).andReturn(
@@ -416,7 +424,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     navObjects.add(createNavObj(3, webPrefDoc));
     webPrefDoc.setXObjects(getNavClassConfig().getNavigationConfigClassRef(context.getDatabase()),
         navObjects);
-    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin").atLeastOnce();
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     replayDefault();
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
     verifyDefault();
@@ -430,7 +439,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))).andReturn(
@@ -445,7 +455,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     // a null pointer in the object list
     webPrefDoc.setXObject(2, createNavObj(8, webPrefDoc));
     webPrefDoc.setXObject(3, createNavObj(3, webPrefDoc));
-    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin").atLeastOnce();
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     replayDefault();
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
     verifyDefault();
@@ -459,7 +470,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))).andReturn(
@@ -472,11 +484,13 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
-    expect(wiki.getDocument(eq(xwikiPrefDocRef), eq(context))).andReturn(xwikiPrefDoc).atLeastOnce();
+    expect(wiki.getDocument(eq(xwikiPrefDocRef), eq(context))).andReturn(
+        xwikiPrefDoc).atLeastOnce();
     DocumentReference skinDocRef = new DocumentReference(context.getDatabase(), "Skins", "MySkin");
     XWikiDocument skinDoc = new XWikiDocument(skinDocRef);
     expect(wiki.getDocument(eq(skinDocRef), eq(context))).andReturn(skinDoc).atLeastOnce();
-    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin").atLeastOnce();
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     replayDefault();
     int maxLevel = treeNodeService.getMaxConfiguredNavigationLevel();
     verifyDefault();
@@ -490,7 +504,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     context.setDoc(doc);
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))).andReturn(
@@ -500,7 +515,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         "WebPreferences");
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
     expect(wiki.getDocument(eq(webPrefDocRef), eq(context))).andReturn(webPrefDoc).atLeastOnce();
-    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin").atLeastOnce();
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn(
+        "Skins.MySkin").atLeastOnce();
     Vector<BaseObject> navObjects = new Vector<BaseObject>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
@@ -520,7 +536,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     inheritorFact.injectPageLayoutCmd(mockPageLayoutCmd);
     treeNodeService.pageLayoutCmd = mockPageLayoutCmd;
     treeNodeService.injectInheritorFactory(inheritorFact);
-    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDocument");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace",
+        "MyDocument");
     XWikiDocument doc = new XWikiDocument(docRef);
     String layoutSpaceName = "MyLayout";
     expect(mockPageLayoutCmd.getPageLayoutForDoc(eq(doc.getFullName()), same(context))).andReturn(
@@ -535,7 +552,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     layoutConfigObj.setXClassReference(getCellsClasses().getPageLayoutPropertiesClassRef(
         context.getDatabase()));
     layoutWebHomeDoc.addXObject(layoutConfigObj);
-    expect(wiki.getDocument(eq(layoutWebHomeRef), same(context))).andReturn(layoutWebHomeDoc).atLeastOnce();
+    expect(wiki.getDocument(eq(layoutWebHomeRef), same(context))).andReturn(
+        layoutWebHomeDoc).atLeastOnce();
     context.setDoc(doc);
 
     DocumentReference webPrefDocRef = new DocumentReference(context.getDatabase(), "MySpace",
@@ -545,26 +563,27 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
         "XWikiPreferences");
     XWikiDocument xwikiPrefDoc = new XWikiDocument(xwikiPrefDocRef);
-    expect(wiki.getDocument(eq(xwikiPrefDocRef), eq(context))).andReturn(xwikiPrefDoc).atLeastOnce();
+    expect(wiki.getDocument(eq(xwikiPrefDocRef), eq(context))).andReturn(
+        xwikiPrefDoc).atLeastOnce();
     DocumentReference skinDocRef = new DocumentReference(context.getDatabase(), "Skins", "MySkin");
     XWikiDocument skinDoc = new XWikiDocument(skinDocRef);
     expect(wiki.getDocument(eq(skinDocRef), eq(context))).andReturn(skinDoc).atLeastOnce();
-    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn("Skins.MySkin").atLeastOnce();
+    expect(wiki.getSpacePreference(eq("skin"), same(context))).andReturn(
+        "Skins.MySkin").atLeastOnce();
 
     DocumentReference navConfigDocRef = new DocumentReference(context.getDatabase(), "MyLayout",
         "NavigationCell");
-    List<TreeNode> myLayoutMenuItems = Arrays.asList(new TreeNode(navConfigDocRef,
-        "xwikidb:MyLayout.", 1));
+    SpaceReference layoutSpaceRef = new SpaceReference("MyLayout", new WikiReference("xwikidb"));
+    List<TreeNode> myLayoutMenuItems = Arrays.asList(new TreeNode(navConfigDocRef, layoutSpaceRef,
+        1));
     expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:MyLayout."))).andReturn(
         myLayoutMenuItems);
-    expect(
-        mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq("xwikidb:MyLayout.NavigationCell"))).andReturn(
-        Collections.<TreeNode>emptyList());
-    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class), same(context))).andReturn(
-        Collections.<TreeNode>emptyList()).anyTimes();
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(
+        "xwikidb:MyLayout.NavigationCell"))).andReturn(Collections.<TreeNode>emptyList());
+    expect(mockGetMenuItemCommand.getTreeNodesForParentKey(isA(String.class), same(
+        context))).andReturn(Collections.<TreeNode>emptyList()).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     BaseObject navConfigObj = new BaseObject();
     DocumentReference navigationConfigClassRef = getNavClassConfig().getNavigationConfigClassRef(
         context.getDatabase());
@@ -589,18 +608,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     XWikiDocument myDoc = new XWikiDocument(docRef);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(myDoc).anyTimes();
 
-    String parentFN = "";
-    TreeNode tnItem = new TreeNode(docRef, parentFN, 1);
+    TreeNode tnItem = new TreeNode(docRef, null, 1);
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnItem);
 
-    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(nodes).once();
+    expect(mockGetNotMenuItemCommand.getTreeNodesForParentKey(eq(parentKey))).andReturn(
+        nodes).once();
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
         new ArrayList<TreeNode>()).once();
 
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     replayDefault();
     assertEquals(0, treeNodeService.getMenuItemPos(docRef, menuPart));
     verifyDefault();
@@ -619,10 +637,12 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         new EntityReference(space, EntityType.SPACE, new EntityReference(db, EntityType.WIKI)));
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-        "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace", "DocNext");
-    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev), docNext = new XWikiDocument(
-        docRefNext);
-    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(), menuItemNext = new BaseObject();
+            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+                "DocNext");
+    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
+        docNext = new XWikiDocument(docRefNext);
+    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
+        menuItemNext = new BaseObject();
 
     doc.setParentReference(entRefCel);
     docPrev.setParentReference(entRefCel);
@@ -646,10 +666,10 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(wiki.getDocument(eq(docRefPrev), same(context))).andReturn(docPrev).anyTimes();
     expect(wiki.getDocument(eq(docRefNext), same(context))).andReturn(docNext).anyTimes();
 
-    String parentFN = space + "." + celDocName;
-    TreeNode tnPrev = new TreeNode(docRefPrev, parentFN, 0);
-    TreeNode tnItem = new TreeNode(mItemDocRef, parentFN, 1);
-    TreeNode tnNext = new TreeNode(docRefNext, parentFN, 2);
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), space, celDocName);
+    TreeNode tnPrev = new TreeNode(docRefPrev, parentRef, 0);
+    TreeNode tnItem = new TreeNode(mItemDocRef, parentRef, 1);
+    TreeNode tnNext = new TreeNode(docRefNext, parentRef, 2);
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev);
     nodes.add(tnItem);
@@ -660,9 +680,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
         new ArrayList<TreeNode>()).times(2);
 
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     replayDefault();
     TreeNode prevMenuItem = treeNodeService.getSiblingMenuItem(mItemDocRef, true);
     assertEquals("MySpace.DocPrev TreeNode expected.", tnPrev, prevMenuItem);
@@ -715,10 +734,10 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(wiki.getDocument(eq(docRefPrev), same(context))).andReturn(docPrev).anyTimes();
     expect(wiki.getDocument(eq(docRefNext), same(context))).andReturn(docNext).anyTimes();
 
-    String parentFN = space + "." + celDocName;
-    TreeNode tnPrev = new TreeNode(docRefPrev, parentFN, 0);
-    TreeNode tnItem = new TreeNode(mItemDocRef, parentFN, 1);
-    TreeNode tnNext = new TreeNode(docRefNext, parentFN, 2);
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), space, celDocName);
+    TreeNode tnPrev = new TreeNode(docRefPrev, parentRef, 0);
+    TreeNode tnItem = new TreeNode(mItemDocRef, parentRef, 1);
+    TreeNode tnNext = new TreeNode(docRefNext, parentRef, 2);
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev);
     nodes.add(tnItem);
@@ -729,9 +748,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
         new ArrayList<TreeNode>()).times(2);
 
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     replayDefault();
     TreeNode prevMenuItem = treeNodeService.getSiblingMenuItem(mItemDocRef, false);
     assertEquals("MySpace.DocNext TreeNode expected.", tnNext, prevMenuItem);
@@ -748,10 +766,12 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-        "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace", "DocNext");
-    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev), docNext = new XWikiDocument(
-        docRefNext);
-    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(), menuItemNext = new BaseObject();
+            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+                "DocNext");
+    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
+        docNext = new XWikiDocument(docRefNext);
+    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
+        menuItemNext = new BaseObject();
 
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
@@ -771,10 +791,9 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(wiki.getDocument(eq(docRefPrev), same(context))).andReturn(docPrev).anyTimes();
     expect(wiki.getDocument(eq(docRefNext), same(context))).andReturn(docNext).anyTimes();
 
-    String parentFN = "";
-    TreeNode tnPrev = new TreeNode(docRefPrev, parentFN, 0);
-    TreeNode tnItem = new TreeNode(mItemDocRef, parentFN, 1);
-    TreeNode tnNext = new TreeNode(docRefNext, parentFN, 2);
+    TreeNode tnPrev = new TreeNode(docRefPrev, null, 0);
+    TreeNode tnItem = new TreeNode(mItemDocRef, null, 1);
+    TreeNode tnNext = new TreeNode(docRefNext, null, 2);
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev);
     nodes.add(tnItem);
@@ -785,9 +804,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
         new ArrayList<TreeNode>()).times(2);
 
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     replayDefault();
     TreeNode prevMenuItem = treeNodeService.getSiblingMenuItem(mItemDocRef, true);
     assertEquals("MySpace.DocPrev TreeNode expected.", tnPrev, prevMenuItem);
@@ -804,10 +822,12 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-        "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace", "DocNext");
-    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev), docNext = new XWikiDocument(
-        docRefNext);
-    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(), menuItemNext = new BaseObject();
+            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+                "DocNext");
+    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
+        docNext = new XWikiDocument(docRefNext);
+    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
+        menuItemNext = new BaseObject();
 
     menuItemItemDoc.setDocumentReference(mItemDocRef);
     menuItemPrev.setDocumentReference(docRefPrev);
@@ -827,10 +847,9 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(wiki.getDocument(eq(docRefPrev), same(context))).andReturn(docPrev).anyTimes();
     expect(wiki.getDocument(eq(docRefNext), same(context))).andReturn(docNext).anyTimes();
 
-    String parentFN = "";
-    TreeNode tnPrev = new TreeNode(docRefPrev, parentFN, 0);
-    TreeNode tnItem = new TreeNode(mItemDocRef, parentFN, 1);
-    TreeNode tnNext = new TreeNode(docRefNext, parentFN, 2);
+    TreeNode tnPrev = new TreeNode(docRefPrev, null, 0);
+    TreeNode tnItem = new TreeNode(mItemDocRef, null, 1);
+    TreeNode tnNext = new TreeNode(docRefNext, null, 2);
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev);
     nodes.add(tnItem);
@@ -841,9 +860,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
         new ArrayList<TreeNode>()).times(2);
 
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     replayDefault();
     TreeNode prevMenuItem = treeNodeService.getSiblingMenuItem(mItemDocRef, false);
     assertEquals("MySpace.DocNext TreeNode expected.", tnNext, prevMenuItem);
@@ -856,6 +874,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     String space = "Celements2";
     String celDocName = "MenuItem";
     String fullName = db + ":" + space + "." + celDocName;
+    DocumentReference parentRef = new DocumentReference(db, space, celDocName);
 
     context.setDatabase(db);
 
@@ -863,10 +882,12 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         new EntityReference(space, EntityType.SPACE, new EntityReference(db, EntityType.WIKI)));
     DocumentReference mItemDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "myMenuItemDoc"), docRefPrev = new DocumentReference(context.getDatabase(), "mySpace",
-        "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace", "DocNext");
-    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev), docNext = new XWikiDocument(
-        docRefNext);
-    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(), menuItemNext = new BaseObject();
+            "DocPrev"), docRefNext = new DocumentReference(context.getDatabase(), "mySpace",
+                "DocNext");
+    XWikiDocument doc = new XWikiDocument(mItemDocRef), docPrev = new XWikiDocument(docRefPrev),
+        docNext = new XWikiDocument(docRefNext);
+    BaseObject menuItemItemDoc = new BaseObject(), menuItemPrev = new BaseObject(),
+        menuItemNext = new BaseObject();
 
     doc.setParentReference(entRefCel);
     docPrev.setParentReference(entRefCel);
@@ -890,8 +911,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(wiki.getDocument(eq(docRefPrev), same(context))).andReturn(docPrev).anyTimes();
     expect(wiki.getDocument(eq(docRefNext), same(context))).andReturn(docNext).anyTimes();
 
-    TreeNode tnPrev = new TreeNode(docRefPrev, fullName, 0), tnItem = new TreeNode(mItemDocRef,
-        fullName, 1);
+    TreeNode tnPrev = new TreeNode(docRefPrev, parentRef, 0), tnItem = new TreeNode(mItemDocRef,
+        parentRef, 1);
     List<TreeNode> nodes = new ArrayList<TreeNode>();
     nodes.add(tnPrev);
     nodes.add(tnItem);
@@ -901,9 +922,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(fullName), same(context))).andReturn(
         new ArrayList<TreeNode>()).times(2);
 
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class),
-            same(context))).andReturn(true).anyTimes();
+    expect(mockRightService.hasAccessLevel(eq("view"), isA(String.class), isA(String.class), same(
+        context))).andReturn(true).anyTimes();
     replayDefault();
     TreeNode prevMenuItem = treeNodeService.getSiblingMenuItem(mItemDocRef, false);
     assertEquals("null expected.", null, prevMenuItem);
@@ -931,9 +951,12 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
   @Test
   public void testEnableMappedMenuItems() {
     treeNodeService.enableMappedMenuItems();
-    assertTrue(context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
-    assertTrue(context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
-    assertTrue(((GetMappedMenuItemsForParentCommand) context.get(GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).is_isActive());
+    assertTrue(context.get(
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
+    assertTrue(context.get(
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY) != null);
+    assertTrue(((GetMappedMenuItemsForParentCommand) context.get(
+        GetMappedMenuItemsForParentCommand.CELEMENTS_MAPPED_MENU_ITEMS_KEY)).isActive());
   }
 
   @Test
@@ -960,7 +983,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(wikiName, spaceName, docName);
     SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
     int pos = 2;
-    TreeNode expectedTreeNode = new TreeNode(docRef, spaceRef, "", pos);
+    TreeNode expectedTreeNode = new TreeNode(docRef, spaceRef, pos, "");
     XWikiDocument navDoc1 = createNavDoc(expectedTreeNode);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(navDoc1).anyTimes();
     replayDefault();
@@ -978,14 +1001,14 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(wikiName, spaceName, docName);
     SpaceReference spaceRef = new SpaceReference(spaceName, new WikiReference(wikiName));
     int pos = 2;
-    TreeNode expectedTreeNode = new TreeNode(docRef, spaceRef, "mainNav", pos);
+    TreeNode expectedTreeNode = new TreeNode(docRef, spaceRef, pos, "mainNav");
     XWikiDocument navDoc1 = createNavDoc(expectedTreeNode);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(navDoc1).anyTimes();
     replayDefault();
     TreeNode treeNodeTest = treeNodeService.getTreeNodeForDocRef(docRef);
     assertEquals(expectedTreeNode, treeNodeTest);
     assertEquals(spaceRef, treeNodeTest.getParentRef());
-    assertEquals("mainNav", treeNodeTest.getPartName(getContext()));
+    assertEquals("mainNav", treeNodeTest.getPartName());
     verifyDefault();
   }
 
@@ -1046,9 +1069,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
         expectedTreeNodes);
     expect(mockGetMenuItemCommand.getTreeNodesForParentKey(eq(parentKey), same(context))).andReturn(
         Collections.<TreeNode>emptyList());
-    expect(
-        mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), isA(String.class),
-            same(context))).andReturn(true).atLeastOnce();
+    expect(mockRightService.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), isA(String.class),
+        same(context))).andReturn(true).atLeastOnce();
     replayDefault();
     assertEquals(expectedTreeNodes, treeNodeService.getSiblingTreeNodes(moveDocRef));
     verifyDefault();
@@ -1149,17 +1171,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testStoreOrder() throws Exception {
-    String parentFN = "mySpace.name";
     String spaceName = "mySpace";
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), spaceName, "name");
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName, "Doc1");
     Integer oldPos1 = 3;
-    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName, "Doc2");
     Integer oldPos2 = 2;
-    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName, "Doc3");
     Integer oldPos3 = 1;
-    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
     XWikiDocument navDoc1 = createNavDoc(treeNode1);
     expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
@@ -1196,17 +1218,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testStoreOrder_minorEdits() throws Exception {
-    String parentFN = "mySpace.name";
     String spaceName = "mySpace";
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), spaceName, "name");
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName, "Doc1");
     Integer oldPos1 = 3;
-    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName, "Doc2");
     Integer oldPos2 = 2;
-    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName, "Doc3");
     Integer oldPos3 = 1;
-    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
     XWikiDocument navDoc1 = createNavDoc(treeNode1);
     expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
@@ -1243,17 +1265,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testStoreOrder_nullObjects() throws Exception {
-    String parentFN = "mySpace.name";
     String spaceName = "mySpace";
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), spaceName, "name");
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName, "Doc1");
     Integer oldPos1 = 3;
-    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName, "Doc2");
     Integer oldPos2 = 2;
-    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName, "Doc3");
     Integer oldPos3 = 5;
-    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
     XWikiDocument navDoc1 = createNavDoc(treeNode1);
     expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
@@ -1283,17 +1305,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testStoreOrder_rightOrder() throws Exception {
-    String parentFN = "mySpace.name";
     String spaceName = "mySpace";
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), spaceName, "name");
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName, "Doc1");
     Integer oldPos1 = 0;
-    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName, "Doc2");
     Integer oldPos2 = 1;
-    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName, "Doc3");
     Integer oldPos3 = 2;
-    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
     XWikiDocument navDoc1 = createNavDoc(treeNode1);
     expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
@@ -1321,17 +1343,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testStoreOrder_exception_onGetDoc() throws Exception {
-    String parentFN = "mySpace.name";
     String spaceName = "mySpace";
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), spaceName, "name");
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName, "Doc1");
     Integer oldPos1 = 3;
-    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName, "Doc2");
     Integer oldPos2 = 2;
-    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName, "Doc3");
     Integer oldPos3 = 5;
-    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
     XWikiDocument navDoc1 = createNavDoc(treeNode1);
     expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1).once();
@@ -1360,17 +1382,17 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   @Test
   public void testStoreOrder_exception_onSaveDoc() throws Exception {
-    String parentFN = "mySpace.name";
     String spaceName = "mySpace";
+    DocumentReference parentRef = new DocumentReference(context.getDatabase(), spaceName, "name");
     DocumentReference docRef1 = new DocumentReference(context.getDatabase(), spaceName, "Doc1");
     Integer oldPos1 = 3;
-    TreeNode treeNode1 = new TreeNode(docRef1, parentFN, oldPos1);
+    TreeNode treeNode1 = new TreeNode(docRef1, parentRef, oldPos1);
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), spaceName, "Doc2");
     Integer oldPos2 = 2;
-    TreeNode treeNode2 = new TreeNode(docRef2, parentFN, oldPos2);
+    TreeNode treeNode2 = new TreeNode(docRef2, parentRef, oldPos2);
     DocumentReference docRef3 = new DocumentReference(context.getDatabase(), spaceName, "Doc3");
     Integer oldPos3 = 1;
-    TreeNode treeNode3 = new TreeNode(docRef3, parentFN, oldPos3);
+    TreeNode treeNode3 = new TreeNode(docRef3, parentRef, oldPos3);
     List<TreeNode> newTreeNodes = Arrays.asList(treeNode1, treeNode2, treeNode3);
     XWikiDocument navDoc1 = createNavDoc(treeNode1);
     expect(wiki.getDocument(eq(docRef1), same(context))).andReturn(navDoc1);
@@ -1527,7 +1549,7 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
     BaseObject menuItemObj = new BaseObject();
     menuItemObj.setXClassReference(getNavClassConfig().getMenuItemClassRef(context.getDatabase()));
     menuItemObj.setIntValue(INavigationClassConfig.MENU_POSITION_FIELD, treeNode1.getPosition());
-    String partName = treeNode1.getPartName(getContext());
+    String partName = treeNode1.getPartName();
     if ("".equals(partName)) {
       partName = null;
     }
@@ -1538,7 +1560,8 @@ public class TreeNodeServiceTest extends AbstractComponentTest {
 
   private BaseObject createNavObj(int toLevel, XWikiDocument doc) {
     BaseObject navObj = new BaseObject();
-    navObj.setXClassReference(getNavClassConfig().getNavigationConfigClassRef(context.getDatabase()));
+    navObj.setXClassReference(getNavClassConfig().getNavigationConfigClassRef(
+        context.getDatabase()));
     navObj.setStringValue("menu_element_name", "mainMenu");
     navObj.setIntValue("to_hierarchy_level", toLevel);
     navObj.setDocumentReference(doc.getDocumentReference());

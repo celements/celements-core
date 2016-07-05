@@ -19,6 +19,9 @@
  */
 package com.celements.pagetype.service;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -35,7 +38,7 @@ public interface IPageTypeResolverRole {
    * getPageTypeObject returns the page-type object attached to the given checkDoc. If the
    * checkDoc isNew and thus has no objects it falls back to the wikiTemplateDoc in case
    * one is defined in the request.
-   * 
+   *
    * @param checkDocRef
    * @return page-type object or null if non is present
    */
@@ -44,7 +47,7 @@ public interface IPageTypeResolverRole {
   /**
    * getPageTypeRefForDoc gets the PageTypeRef defined by the PageType-xobject attached to
    * the given document. It returns null if no valid PageType-xobject is found.
-   * 
+   *
    * @param checkDoc
    * @return
    */
@@ -53,7 +56,7 @@ public interface IPageTypeResolverRole {
   /**
    * getDefaultPageTypeRefForDoc returns the PageTypeReference which is defined as default
    * PageType in the current location (docRef).
-   * 
+   *
    * @param docRef
    * @return
    */
@@ -63,27 +66,29 @@ public interface IPageTypeResolverRole {
    * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the given
    * document reference. If no explicit page-type is defined it returns the default
    * PageTypeReference defined for the given document location.
-   * 
+   *
    * @param docRef
    * @return
    */
-  public PageTypeReference getPageTypeRefForDocWithDefault(DocumentReference docRef);
+  @Nullable
+  public PageTypeReference getPageTypeRefForDocWithDefault(@NotNull DocumentReference docRef);
 
   /**
    * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the given
    * document. If no explicit page-type is defined it returns the default
    * PageTypeReference defined for the given document location.
-   * 
+   *
    * @param doc
    * @return
    */
-  public PageTypeReference getPageTypeRefForDocWithDefault(XWikiDocument doc);
+  @Nullable
+  public PageTypeReference getPageTypeRefForDocWithDefault(@Nullable XWikiDocument doc);
 
   /**
    * getPageTypeRefForDocWithDefault returns the PageTypeReference defined for the given
    * document. If no explicit page-type is defined it returns the default
    * PageTypeReference given by the caller.
-   * 
+   *
    * @param doc
    * @param defaultPTRef
    * @return

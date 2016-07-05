@@ -19,70 +19,70 @@
  */
 package com.celements.navigation.filter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.navigation.TreeNode;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class InternalRightsFilter implements INavFilter<BaseObject> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(InternalRightsFilter.class);
-  private String menuPart;
+  private final static Logger LOGGER = LoggerFactory.getLogger(InternalRightsFilter.class);
 
-  public InternalRightsFilter() {
-    menuPart = "";
-  }
+  private String menuPart = "";
 
+  @Override
   public String getMenuPart() {
     return menuPart;
   }
 
+  /**
+   * @Deprecated instead use includeTreeNode(TreeNode, context)
+   */
+  @Override
+  @Deprecated
   public boolean includeMenuItem(BaseObject baseObj, XWikiContext context) {
-    try {
-      return context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-          baseObj.getName(), context) && ("".equals(getMenuPart()) || getMenuPart().equals(
-              baseObj.getStringValue("part_name")));
-    } catch (XWikiException e) {
-      LOGGER.error(e);
-      return false;
-    }
+    return getRightsAccess().hasAccessLevel(baseObj.getDocumentReference(), EAccessLevel.VIEW,
+        context.getXWikiUser()) && (getMenuPart().isEmpty() || getMenuPart().equals(
+            baseObj.getStringValue("part_name")));
   }
 
+  @Override
   public void setMenuPart(String menuPart) {
-    if (menuPart == null) {
-      menuPart = "";
-    }
-    this.menuPart = menuPart;
+    this.menuPart = Strings.nullToEmpty(menuPart);
   }
 
+  @Override
   public BaseObject convertObject(BaseObject baseObj, XWikiContext context) {
     return baseObj;
   }
 
   /**
    * includeTreeNode
-   * 
+   *
    * @param node
    *          MUST NOT be null
    * @param context
    */
+  @Override
   public boolean includeTreeNode(TreeNode node, XWikiContext context) {
-    LOGGER.debug("includeTreeNode: for [" + node.getFullName() + "]");
-    try {
-      return context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-          node.getFullName(), context) && checkMenuPart(node, context);
-    } catch (XWikiException exp) {
-      LOGGER.error(exp);
-      return false;
-    }
+    LOGGER.debug("includeTreeNode: for [" + node.getDocumentReference() + "]");
+    return getRightsAccess().hasAccessLevel(node.getDocumentReference(), EAccessLevel.VIEW,
+        context.getXWikiUser()) && checkMenuPart(node, context);
   }
 
   private boolean checkMenuPart(TreeNode node, XWikiContext context) {
-    return ("".equals(getMenuPart()) || ("".equals(node.getParent()) && getMenuPart().equals(
-        node.getPartName(context))));
+    return (getMenuPart().isEmpty() || (node.isEmptyParentRef() && getMenuPart().equals(
+        node.getPartName())));
+  }
+
+  private IRightsAccessFacadeRole getRightsAccess() {
+    return Utils.getComponent(IRightsAccessFacadeRole.class);
   }
 
 }
