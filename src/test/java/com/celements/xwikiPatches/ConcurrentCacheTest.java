@@ -4,8 +4,10 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.easymock.IAnswer;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -45,6 +48,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -107,9 +112,20 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expect(sessionMock.beginTransaction()).andReturn(transactionMock).once();
     expect(sessionMock.close()).andReturn(null).once();
     XWikiDocument myDoc = new XWikiDocument(testDocRef);
-    // TODO mock load method??
     sessionMock.load(isA(XWikiDocument.class), eq(new Long(myDoc.getId())));
-    expectLastCall().once();
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+
+      @Override
+      public Object answer() throws Throwable {
+        XWikiDocument theDoc = (XWikiDocument) getCurrentArguments()[0];
+        theDoc.setContent("test Content");
+        theDoc.setTitle("the test Title");
+        theDoc.setAuthor("XWiki.testAuthor");
+        theDoc.setCreationDate(new java.sql.Date(new Date().getTime() - 5000L));
+        theDoc.setContentUpdateDate(new java.sql.Date(new Date().getTime() - 2000L));
+        return this;
+      }
+    }).once();
     String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
     Query query = new TestQuery(loadAttachmentHql, new QueryList() {
 
@@ -166,11 +182,25 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         row[0] = INavigationClassConfig.MENU_NAME_FIELD;
         row[1] = "com.xpn.xwiki.objects.StringProperty";
         propList.add(row);
+        // TODO add missing properties
         return propList;
       }
 
     });
     expect(sessionMock.createQuery(eq(loadPropHql))).andReturn(queryProp);
+    sessionMock.load(isA(PropertyInterface.class), isA(Serializable.class));
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+
+      @Override
+      public Object answer() throws Throwable {
+        PropertyInterface property = (PropertyInterface) getCurrentArguments()[0];
+        if (property instanceof StringProperty) {
+          // TODO check for name and set values
+        }
+        // TODO set Property???
+        return this;
+      }
+    }).once();
 
     // TODO
     replayDefault();
