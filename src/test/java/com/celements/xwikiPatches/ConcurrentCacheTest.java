@@ -12,7 +12,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -27,7 +30,6 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
 import org.hibernate.impl.AbstractQueryImpl;
 import org.junit.Before;
@@ -35,7 +37,6 @@ import org.junit.Test;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.QueryExecutor;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigationClassConfig;
@@ -48,8 +49,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -65,11 +66,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private XWikiConfig configMock;
   private DocumentReference testDocRef;
   private SessionFactory sessionFactoryMock;
-  private Configuration hibConfigMock;
-  private QueryExecutor hibQueryExecMock;
   private IPageTypeClassConfig pageTypeClassConfig;
   private INavigationClassConfig navClassConfig;
   private IWebUtilsService webUtilsService;
+  private ConcurrentMap<DocumentReference, List<BaseObject>> baseObjMap = new ConcurrentHashMap<>();
 
   @Before
   public void setUp_ConcurrentCatchTest() throws Exception {
@@ -78,9 +78,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
     getContext().setDatabase(wikiName);
     sessionFactoryMock = createMockAndAddToDefault(SessionFactory.class);
-    hibConfigMock = createMockAndAddToDefault(Configuration.class);
     Utils.getComponent(HibernateSessionFactory.class).setSessionFactory(sessionFactoryMock);
-    hibQueryExecMock = registerComponentMock(QueryExecutor.class, "hql");
     testDocRef = new DocumentReference(wikiName, "TestSpace", "TestDoc");
     configMock = createMockAndAddToDefault(XWikiConfig.class);
     expect(getWikiMock().getConfig()).andReturn(configMock).anyTimes();
@@ -98,6 +96,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         "0").anyTimes();
     expect(getWikiMock().getXClass(isA(DocumentReference.class), isA(
         XWikiContext.class))).andStubDelegateTo(new TestXWiki());
+    createBaseObjects();
   }
 
   @Test
@@ -105,11 +104,13 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     Session sessionMock = createMockAndAddToDefault(Session.class);
     expect(sessionFactoryMock.openSession()).andReturn(sessionMock).once();
     sessionMock.setFlushMode(eq(FlushMode.COMMIT));
-    expectLastCall().once().atLeastOnce();
+    expectLastCall().atLeastOnce();
     sessionMock.setFlushMode(eq(FlushMode.MANUAL));
-    expectLastCall().once().atLeastOnce();
+    expectLastCall().atLeastOnce();
     Transaction transactionMock = createMockAndAddToDefault(Transaction.class);
     expect(sessionMock.beginTransaction()).andReturn(transactionMock).once();
+    transactionMock.rollback();
+    expectLastCall().once();
     expect(sessionMock.close()).andReturn(null).once();
     XWikiDocument myDoc = new XWikiDocument(testDocRef);
     sessionMock.load(isA(XWikiDocument.class), eq(new Long(myDoc.getId())));
@@ -127,39 +128,35 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       }
     }).once();
     String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
-    Query query = new TestQuery(loadAttachmentHql, new QueryList() {
+    Query query = new TestQuery<XWikiAttachment>(loadAttachmentHql,
+        new QueryList<XWikiAttachment>() {
 
-      @Override
-      public List list(String string, Map<String, Object> params) throws HibernateException {
-        List<XWikiAttachment> attList = new ArrayList<>();
-        return attList;
-      }
+          @Override
+          public List<XWikiAttachment> list(String string, Map<String, Object> params)
+              throws HibernateException {
+            List<XWikiAttachment> attList = new ArrayList<>();
+            return attList;
+          }
 
-    });
+        });
     expect(sessionMock.createQuery(eq(loadAttachmentHql))).andReturn(query);
+
     String loadBaseObjectHql = "from BaseObject as bobject where bobject.name = :name order by "
         + "bobject.number";
-    Query queryObj = new TestQuery(loadBaseObjectHql, new QueryList() {
+    Query queryObj = new TestQuery<BaseObject>(loadBaseObjectHql, new QueryList<BaseObject>() {
 
       @Override
-      public List list(String string, Map<String, Object> params) throws HibernateException {
+      public List<BaseObject> list(String string, Map<String, Object> params)
+          throws HibernateException {
         DocumentReference theDocRef = webUtilsService.resolveDocumentReference((String) params.get(
             "name"));
-        BaseObject bObj1 = createBaseObject(0, navClassConfig.getMenuNameClassRef(wikiName));
-        bObj1.setDocumentReference(theDocRef);
-        // addStringField(bObj1, INavigationClassConfig.MENU_NAME_LANG_FIELD, "de");
-        // addStringField(bObj1, INavigationClassConfig.MENU_NAME_FIELD, "Hause");
-        BaseObject bObj2 = createBaseObject(1, navClassConfig.getMenuNameClassRef(wikiName));
-        bObj2.setDocumentReference(theDocRef);
-        // addStringField(bObj2, INavigationClassConfig.MENU_NAME_LANG_FIELD, "en");
-        // addStringField(bObj2, INavigationClassConfig.MENU_NAME_FIELD, "Home");
-        BaseObject bObj3 = createBaseObject(0, navClassConfig.getMenuItemClassRef(wikiRef));
-        bObj3.setDocumentReference(theDocRef);
-        // addIntField(bObj3, INavigationClassConfig.MENU_POSITION_FIELD, 1);
-        BaseObject bObj4 = createBaseObject(0, pageTypeClassConfig.getPageTypeClassRef(wikiRef));
-        bObj4.setDocumentReference(theDocRef);
-        // addStringField(bObj4, IPageTypeClassConfig.PAGE_TYPE_FIELD, "Performance");
-        List<BaseObject> attList = Arrays.asList(bObj1, bObj2, bObj3, bObj4);
+        List<BaseObject> attList = new ArrayList<>();
+        for (BaseObject templBaseObject : baseObjMap.get(theDocRef)) {
+          BaseObject bObj = createBaseObject(templBaseObject.getNumber(),
+              templBaseObject.getXClassReference());
+          bObj.setDocumentReference(theDocRef);
+          attList.add(bObj);
+        }
         return attList;
       }
 
@@ -167,42 +164,51 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expect(sessionMock.createQuery(eq(loadBaseObjectHql))).andReturn(queryObj);
     String loadPropHql = "select prop.name, prop.classType from BaseProperty as prop where "
         + "prop.id.id = :id";
-    Query queryProp = new TestQuery(loadPropHql, new QueryList() {
+    Query queryProp = new TestQuery<String[]>(loadPropHql, new QueryList<String[]>() {
 
       @Override
-      public List list(String string, Map<String, Object> params) throws HibernateException {
+      public List<String[]> list(String string, Map<String, Object> params)
+          throws HibernateException {
         Integer objId = (Integer) params.get("id");
-        // query.setInteger("id", object.getId());
         List<String[]> propList = new ArrayList<>();
-        String[] row = new String[2];
-        row[0] = INavigationClassConfig.MENU_NAME_LANG_FIELD;
-        row[1] = "com.xpn.xwiki.objects.StringProperty";
-        propList.add(row);
-        row = new String[2];
-        row[0] = INavigationClassConfig.MENU_NAME_FIELD;
-        row[1] = "com.xpn.xwiki.objects.StringProperty";
-        propList.add(row);
-        // TODO add missing properties
+        for (BaseObject templBaseObject : baseObjMap.get(testDocRef)) {
+          if (objId.equals(templBaseObject.getId())) {
+            for (Object theObj : templBaseObject.getFieldList()) {
+              PropertyInterface theField = (PropertyInterface) theObj;
+              String[] row = new String[2];
+              row[0] = theField.getName();
+              row[1] = theField.getClass().getCanonicalName();
+              propList.add(row);
+            }
+          }
+        }
         return propList;
       }
 
     });
-    expect(sessionMock.createQuery(eq(loadPropHql))).andReturn(queryProp);
+    expect(sessionMock.createQuery(eq(loadPropHql))).andReturn(queryProp).atLeastOnce();
     sessionMock.load(isA(PropertyInterface.class), isA(Serializable.class));
     expectLastCall().andAnswer(new IAnswer<Object>() {
 
       @Override
       public Object answer() throws Throwable {
-        PropertyInterface property = (PropertyInterface) getCurrentArguments()[0];
-        if (property instanceof StringProperty) {
-          // TODO check for name and set values
+        BaseProperty property = (BaseProperty) getCurrentArguments()[0];
+        Integer objId = property.getObject().getId();
+        for (BaseObject templBaseObject : baseObjMap.get(testDocRef)) {
+          if (objId.equals(templBaseObject.getId())) {
+            for (Object theObj : templBaseObject.getFieldList()) {
+              BaseProperty theField = (BaseProperty) theObj;
+              if (theField.getName().equals(property.getName()) && theField.getClass().equals(
+                  property.getClass())) {
+                property.setValue(theField.getValue());
+              }
+            }
+          }
         }
-        // TODO set Property???
         return this;
       }
-    }).once();
+    }).atLeastOnce();
 
-    // TODO
     replayDefault();
     initStore();
     LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand();
@@ -211,8 +217,29 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  public void createBaseObjects() {
+    DocumentReference testDocRefClone = new DocumentReference(testDocRef.clone());
+    BaseObject bObj1 = createBaseObject(0, navClassConfig.getMenuNameClassRef(wikiName));
+    bObj1.setDocumentReference(testDocRefClone);
+    addStringField(bObj1, INavigationClassConfig.MENU_NAME_LANG_FIELD, "de");
+    addStringField(bObj1, INavigationClassConfig.MENU_NAME_FIELD, "Hause");
+    BaseObject bObj2 = createBaseObject(1, navClassConfig.getMenuNameClassRef(wikiName));
+    bObj2.setDocumentReference(testDocRefClone);
+    addStringField(bObj2, INavigationClassConfig.MENU_NAME_LANG_FIELD, "en");
+    addStringField(bObj2, INavigationClassConfig.MENU_NAME_FIELD, "Home");
+    BaseObject bObj3 = createBaseObject(0, navClassConfig.getMenuItemClassRef(wikiRef));
+    bObj3.setDocumentReference(testDocRefClone);
+    addIntField(bObj3, INavigationClassConfig.MENU_POSITION_FIELD, 1);
+    BaseObject bObj4 = createBaseObject(0, pageTypeClassConfig.getPageTypeClassRef(wikiRef));
+    bObj4.setDocumentReference(testDocRefClone);
+    addStringField(bObj4, IPageTypeClassConfig.PAGE_TYPE_FIELD, "Performance");
+    List<BaseObject> attList = new Vector<>(Arrays.asList(bObj1, bObj2, bObj3, bObj4));
+    baseObjMap.put(testDocRefClone, attList);
+  }
+
   @Test
   public void test_multiThreaded() throws Exception {
+    fail("not yet implemented");
     replayDefault();
     initStore();
     int cores = Runtime.getRuntime().availableProcessors();
@@ -262,8 +289,12 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       XWikiDocument myDoc = new XWikiDocument(testDocRef);
       XWikiDocument loadedXWikiDoc = theCacheStore.loadXWikiDoc(myDoc, getContext());
       assertNotNull(loadedXWikiDoc);
-      // TODO check objects
-      return false;
+      boolean testResult = true;
+      for (BaseObject theTestObj : baseObjMap.get(testDocRef)) {
+        Map<DocumentReference, List<BaseObject>> loadedObjs = loadedXWikiDoc.getXObjects();
+        testResult &= loadedObjs.get(theTestObj.getXClassReference()).contains(theTestObj);
+      }
+      return testResult;
     }
 
   }
@@ -278,28 +309,24 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   private final BaseObject createBaseObject(int num, DocumentReference classRef) {
     BaseObject bObj = new BaseObject();
-    bObj.setXClassReference(classRef);
+    bObj.setXClassReference(new DocumentReference(classRef.clone()));
     bObj.setNumber(num);
     return bObj;
   }
 
-  private interface QueryList {
+  private interface QueryList<T> {
 
-    public List list(String string, Map<String, Object> params) throws HibernateException;
+    public List<T> list(String string, Map<String, Object> params) throws HibernateException;
 
   }
 
-  private class TestQuery extends AbstractQueryImpl {
+  private class TestQuery<T> extends AbstractQueryImpl {
 
     private Query theQueryMock;
-    private QueryList listStub;
+    private QueryList<T> listStub;
     private Map<String, Object> params;
 
-    public TestQuery(String queryStr) {
-      this(queryStr, null);
-    }
-
-    public TestQuery(String queryStr, QueryList listStub) {
+    public TestQuery(String queryStr, QueryList<T> listStub) {
       super(queryStr, FlushMode.AUTO, null, null);
       this.listStub = listStub;
       this.params = new HashMap<String, Object>();
@@ -323,7 +350,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     }
 
     @Override
-    public List list() throws HibernateException {
+    public List<T> list() throws HibernateException {
       if (listStub != null) {
         return listStub.list(getQueryString(), params);
       }
