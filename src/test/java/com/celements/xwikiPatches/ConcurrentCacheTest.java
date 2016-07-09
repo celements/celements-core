@@ -17,8 +17,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.easymock.IAnswer;
@@ -34,7 +34,12 @@ import org.hibernate.classic.Session;
 import org.hibernate.impl.AbstractQueryImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -55,21 +60,25 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
 import com.xpn.xwiki.web.Utils;
 
 public class ConcurrentCacheTest extends AbstractComponentTest {
 
-  private XWikiCacheStore theCacheStore;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentCacheTest.class);
+
+  private volatile XWikiCacheStore theCacheStore;
+  private volatile ConcurrentMap<DocumentReference, List<BaseObject>> baseObjMap = new ConcurrentHashMap<>();
+  private volatile DocumentReference testDocRef;
+
   private final String wikiName = "testWiki";
   private final WikiReference wikiRef = new WikiReference(wikiName);
   private String testFullName = "TestSpace.TestDoc";
   private XWikiConfig configMock;
-  private DocumentReference testDocRef;
   private SessionFactory sessionFactoryMock;
   private IPageTypeClassConfig pageTypeClassConfig;
   private INavigationClassConfig navClassConfig;
   private IWebUtilsService webUtilsService;
-  private ConcurrentMap<DocumentReference, List<BaseObject>> baseObjMap = new ConcurrentHashMap<>();
 
   @Before
   public void setUp_ConcurrentCatchTest() throws Exception {
@@ -100,7 +109,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_singleThreaded() throws Exception {
+  public void test_singleThreaded_sync() throws Exception {
     Session sessionMock = createMockAndAddToDefault(Session.class);
     expect(sessionFactoryMock.openSession()).andReturn(sessionMock).once();
     sessionMock.setFlushMode(eq(FlushMode.COMMIT));
@@ -113,34 +122,75 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expectLastCall().once();
     expect(sessionMock.close()).andReturn(null).once();
     XWikiDocument myDoc = new XWikiDocument(testDocRef);
-    sessionMock.load(isA(XWikiDocument.class), eq(new Long(myDoc.getId())));
-    expectLastCall().andAnswer(new IAnswer<Object>() {
+    expectXWikiDocLoad(sessionMock, myDoc);
+    expectLoadEmptyAttachmentList(sessionMock);
+    expectBaseObjectLoad(sessionMock);
+    replayDefault();
+    initStore();
+    LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand();
+    Boolean result = testLoadCommand.call();
+    assertTrue(result);
+    verifyDefault();
+  }
 
-      @Override
-      public Object answer() throws Throwable {
-        XWikiDocument theDoc = (XWikiDocument) getCurrentArguments()[0];
-        theDoc.setContent("test Content");
-        theDoc.setTitle("the test Title");
-        theDoc.setAuthor("XWiki.testAuthor");
-        theDoc.setCreationDate(new java.sql.Date(new Date().getTime() - 5000L));
-        theDoc.setContentUpdateDate(new java.sql.Date(new Date().getTime() - 2000L));
-        return this;
-      }
-    }).once();
-    String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
-    Query query = new TestQuery<XWikiAttachment>(loadAttachmentHql,
-        new QueryList<XWikiAttachment>() {
+  @Test
+  public void test_singleThreaded_async() throws Exception {
+    Session sessionMock = createMockAndAddToDefault(Session.class);
+    expect(sessionFactoryMock.openSession()).andReturn(sessionMock).once();
+    sessionMock.setFlushMode(eq(FlushMode.COMMIT));
+    expectLastCall().atLeastOnce();
+    sessionMock.setFlushMode(eq(FlushMode.MANUAL));
+    expectLastCall().atLeastOnce();
+    Transaction transactionMock = createMockAndAddToDefault(Transaction.class);
+    expect(sessionMock.beginTransaction()).andReturn(transactionMock).once();
+    transactionMock.rollback();
+    expectLastCall().once();
+    expect(sessionMock.close()).andReturn(null).once();
+    XWikiDocument myDoc = new XWikiDocument(testDocRef);
+    expectXWikiDocLoad(sessionMock, myDoc);
+    expectLoadEmptyAttachmentList(sessionMock);
+    expectBaseObjectLoad(sessionMock);
+    replayDefault();
+    initStore();
+    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(1);
+    Future<Boolean> testFuture = theExecutor.submit((Callable<Boolean>) new LoadXWikiDocCommand());
+    theExecutor.shutdown();
+    while (!theExecutor.isTerminated()) {
+      Thread.sleep(500L);
+    }
+    Boolean result = testFuture.get();
+    assertTrue(result);
+    verifyDefault();
+  }
 
-          @Override
-          public List<XWikiAttachment> list(String string, Map<String, Object> params)
-              throws HibernateException {
-            List<XWikiAttachment> attList = new ArrayList<>();
-            return attList;
-          }
+  @Test
+  public void test_multiThreaded() throws Exception {
+    replayDefault();
+    initStore();
+    int cores = Runtime.getRuntime().availableProcessors();
+    assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
+    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
+    ArrayList<Future<Boolean>> futureList = new ArrayList<>(100);
+    for (int i = 1; i < 100; i++) {
+      Future<Boolean> testFuture = theExecutor.schedule(
+          (Callable<Boolean>) new LoadXWikiDocCommand(), 90, TimeUnit.MILLISECONDS);
+      futureList.add(testFuture);
+    }
+    theExecutor.scheduleAtFixedRate(new ResetCacheEntryCommand(), 100, 100, TimeUnit.MILLISECONDS);
+    try {
+      theExecutor.awaitTermination(10, TimeUnit.SECONDS);
+    } catch (InterruptedException exp) {
+      LOGGER.error("Interrupted executor", exp);
+    }
+    for (Future<Boolean> testFuture : futureList) {
+      assertTrue(testFuture.isDone());
+      assertTrue(testFuture.get());
+    }
+    theExecutor.shutdown();
+    verifyDefault();
+  }
 
-        });
-    expect(sessionMock.createQuery(eq(loadAttachmentHql))).andReturn(query);
-
+  private void expectBaseObjectLoad(Session sessionMock) {
     String loadBaseObjectHql = "from BaseObject as bobject where bobject.name = :name order by "
         + "bobject.number";
     Query queryObj = new TestQuery<BaseObject>(loadBaseObjectHql, new QueryList<BaseObject>() {
@@ -162,6 +212,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
     });
     expect(sessionMock.createQuery(eq(loadBaseObjectHql))).andReturn(queryObj);
+    expectPropertiesLoad(sessionMock);
+  }
+
+  private void expectPropertiesLoad(Session sessionMock) {
     String loadPropHql = "select prop.name, prop.classType from BaseProperty as prop where "
         + "prop.id.id = :id";
     Query queryProp = new TestQuery<String[]>(loadPropHql, new QueryList<String[]>() {
@@ -208,16 +262,44 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         return this;
       }
     }).atLeastOnce();
-
-    replayDefault();
-    initStore();
-    LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand();
-    Boolean result = testLoadCommand.call();
-    assertTrue(result);
-    verifyDefault();
   }
 
-  public void createBaseObjects() {
+  private void expectLoadEmptyAttachmentList(Session sessionMock) {
+    String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
+    Query query = new TestQuery<XWikiAttachment>(loadAttachmentHql,
+        new QueryList<XWikiAttachment>() {
+
+          @Override
+          public List<XWikiAttachment> list(String string, Map<String, Object> params)
+              throws HibernateException {
+            List<XWikiAttachment> attList = new ArrayList<>();
+            return attList;
+          }
+
+        });
+    expect(sessionMock.createQuery(eq(loadAttachmentHql))).andReturn(query).anyTimes();
+  }
+
+  private void expectXWikiDocLoad(Session sessionMock, XWikiDocument myDoc) {
+    sessionMock.load(isA(XWikiDocument.class), eq(new Long(myDoc.getId())));
+    expectLastCall().andAnswer(new IAnswer<Object>() {
+
+      @Override
+      public Object answer() throws Throwable {
+        XWikiDocument theDoc = (XWikiDocument) getCurrentArguments()[0];
+        if (testDocRef.equals(theDoc)) {
+          theDoc.setContent("test Content");
+          theDoc.setTitle("the test Title");
+          theDoc.setAuthor("XWiki.testAuthor");
+          theDoc.setCreationDate(new java.sql.Date(new Date().getTime() - 5000L));
+          theDoc.setContentUpdateDate(new java.sql.Date(new Date().getTime() - 2000L));
+        }
+        return this;
+      }
+    }).anyTimes();
+  }
+
+  private void createBaseObjects() {
     DocumentReference testDocRefClone = new DocumentReference(testDocRef.clone());
     BaseObject bObj1 = createBaseObject(0, navClassConfig.getMenuNameClassRef(wikiName));
     bObj1.setDocumentReference(testDocRefClone);
@@ -237,35 +319,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     baseObjMap.put(testDocRefClone, attList);
   }
 
-  @Test
-  public void test_multiThreaded() throws Exception {
-    fail("not yet implemented");
-    replayDefault();
-    initStore();
-    int cores = Runtime.getRuntime().availableProcessors();
-    assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    ArrayList<ScheduledFuture<Boolean>> futureList = new ArrayList<>(100);
-    for (int i = 1; i < 100; i++) {
-      ScheduledFuture<Boolean> testFuture = theExecutor.schedule(new LoadXWikiDocCommand(), 90,
-          TimeUnit.MILLISECONDS);
-      futureList.add(testFuture);
-    }
-    theExecutor.scheduleAtFixedRate(new ResetCacheEntryCommand(), 100, 100, TimeUnit.MILLISECONDS);
-    try {
-      theExecutor.awaitTermination(10, TimeUnit.SECONDS);
-    } catch (InterruptedException exp) {
-      exp.printStackTrace();
-    }
-    for (ScheduledFuture<Boolean> testFuture : futureList) {
-      assertTrue(testFuture.isDone());
-      assertTrue(testFuture.get());
-    }
-    theExecutor.shutdown();
-    verifyDefault();
-  }
-
-  void initStore() throws XWikiException {
+  private void initStore() throws XWikiException {
     XWikiStoreInterface store = Utils.getComponent(XWikiStoreInterface.class);
     theCacheStore = new XWikiCacheStore(store, getContext());
   }
@@ -282,19 +336,57 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   }
 
-  private class LoadXWikiDocCommand implements Callable<Boolean> {
+  private class LoadXWikiDocCommand extends AbstractXWikiRunnable implements Callable<Boolean> {
+
+    private XWikiDocument loadedXWikiDoc;
+    private boolean hasNewContext;
+
+    private ExecutionContext getExecutionContext() {
+      return Utils.getComponent(Execution.class).getContext();
+    }
 
     @Override
     public Boolean call() throws Exception {
-      XWikiDocument myDoc = new XWikiDocument(testDocRef);
-      XWikiDocument loadedXWikiDoc = theCacheStore.loadXWikiDoc(myDoc, getContext());
-      assertNotNull(loadedXWikiDoc);
-      boolean testResult = true;
-      for (BaseObject theTestObj : baseObjMap.get(testDocRef)) {
-        Map<DocumentReference, List<BaseObject>> loadedObjs = loadedXWikiDoc.getXObjects();
-        testResult &= loadedObjs.get(theTestObj.getXClassReference()).contains(theTestObj);
+      try {
+        hasNewContext = (getExecutionContext() == null);
+        if (hasNewContext) {
+          initExecutionContext();
+        }
+      } catch (ExecutionContextException e) {
+        LOGGER.error("Failed to initialize execution context", e);
+        return false;
+      }
+
+      try {
+        runInternal();
+        return testLoadedDocument();
+      } finally {
+        if (hasNewContext) {
+          // cleanup execution context
+          cleanupExecutionContext();
+        }
+      }
+    }
+
+    private boolean testLoadedDocument() {
+      boolean testResult = loadedXWikiDoc != null;
+      if (testResult) {
+        for (BaseObject theTestObj : baseObjMap.get(testDocRef)) {
+          Map<DocumentReference, List<BaseObject>> loadedObjs = loadedXWikiDoc.getXObjects();
+          testResult &= loadedObjs.get(theTestObj.getXClassReference()).contains(theTestObj);
+        }
       }
       return testResult;
+    }
+
+    @Override
+    public void runInternal() {
+      XWikiDocument myDoc = new XWikiDocument(testDocRef);
+      try {
+        loadedXWikiDoc = theCacheStore.loadXWikiDoc(myDoc, getContext());
+      } catch (XWikiException exp) {
+        throw new IllegalStateException(exp);
+      }
     }
 
   }
