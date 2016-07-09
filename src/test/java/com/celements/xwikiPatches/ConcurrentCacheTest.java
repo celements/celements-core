@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.easymock.IAnswer;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -84,6 +85,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private INavigationClassConfig navClassConfig;
   private IWebUtilsService webUtilsService;
 
+  @SuppressWarnings("deprecation")
   @Before
   public void setUp_ConcurrentCatchTest() throws Exception {
     pageTypeClassConfig = Utils.getComponent(IPageTypeClassConfig.class);
@@ -165,6 +167,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       Thread.sleep(500L);
     }
     List<Object> result = testFuture.get();
+    @SuppressWarnings("unchecked")
     List<String> messages = (List<String>) result.get(1);
     assertTrue(Arrays.deepToString(messages.toArray()), (Boolean) result.get(0));
     verifyDefault();
@@ -215,11 +218,20 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     while (!theExecutor.isTerminated()) {
       Thread.sleep(500L);
     }
+    int successfulRuns = 0;
+    List<String> failMessgs = new ArrayList<>();
     for (Future<List<Object>> testFuture : futureList) {
       List<Object> result = testFuture.get();
-      List<String> messages = (List<String>) result.get(1);
-      assertTrue(Arrays.deepToString(messages.toArray()), (Boolean) result.get(0));
+      if ((Boolean) result.get(0)) {
+        successfulRuns += 1;
+      } else {
+        @SuppressWarnings("unchecked")
+        List<String> messages = (List<String>) result.get(1);
+        failMessgs.addAll(messages);
+      }
     }
+    assertEquals("Found failing runs: " + Arrays.deepToString(failMessgs.toArray()),
+        futureList.size(), successfulRuns);
     verifyDefault();
   }
 
@@ -384,28 +396,33 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
     @Override
     public List<Object> call() throws Exception {
+      boolean result = false;
       try {
-        hasNewContext = (getExecutionContext() == null);
-        if (hasNewContext) {
-          initExecutionContext();
-          getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, defaultMocks);
-          getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY,
-              defaultContext.clone());
+        try {
+          hasNewContext = (getExecutionContext() == null);
+          if (hasNewContext) {
+            initExecutionContext();
+            getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, defaultMocks);
+            getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY,
+                defaultContext.clone());
+          }
+          try {
+            runInternal();
+            result = testLoadedDocument();
+          } finally {
+            if (hasNewContext) {
+              // cleanup execution context
+              cleanupExecutionContext();
+            }
+          }
+        } catch (ExecutionContextException e) {
+          LOGGER.error("Failed to initialize execution context", e);
         }
-      } catch (ExecutionContextException e) {
-        LOGGER.error("Failed to initialize execution context", e);
-        return Arrays.asList(false, messages);
+      } catch (Throwable exp) {
+        // anything could happen in the test and we want to catch all failures
+        messages.add("Exception: " + exp.getMessage() + "\\n" + ExceptionUtils.getStackTrace(exp));
       }
-
-      try {
-        runInternal();
-        return Arrays.asList(testLoadedDocument(), messages);
-      } finally {
-        if (hasNewContext) {
-          // cleanup execution context
-          cleanupExecutionContext();
-        }
-      }
+      return Arrays.asList(result, messages);
     }
 
     private boolean testLoadedDocument() {
@@ -469,6 +486,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       replay(theQueryMock);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Iterator iterate() throws HibernateException {
       return theQueryMock.iterate();
@@ -484,6 +502,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       return theQueryMock.scroll(scrollMode);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<T> list() throws HibernateException {
       if (listStub != null) {
@@ -520,6 +539,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       return theQueryMock.setLockMode(alias, lockMode);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     protected Map getLockModes() {
       throw new UnsupportedOperationException("getLockModes not supported");
