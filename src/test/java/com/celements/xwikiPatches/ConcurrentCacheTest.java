@@ -133,8 +133,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand();
-    Boolean result = testLoadCommand.call();
-    assertTrue(result);
+    List<Object> result = testLoadCommand.call();
+    assertTrue((Boolean) result.get(0));
     verifyDefault();
   }
 
@@ -158,19 +158,21 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(1);
-    Future<Boolean> testFuture = theExecutor.submit((Callable<Boolean>) new LoadXWikiDocCommand());
+    Future<List<Object>> testFuture = theExecutor.submit(
+        (Callable<List<Object>>) new LoadXWikiDocCommand());
     theExecutor.shutdown();
     while (!theExecutor.isTerminated()) {
       Thread.sleep(500L);
     }
-    Boolean result = testFuture.get();
-    assertTrue(result);
+    List<Object> result = testFuture.get();
+    List<String> messages = (List<String>) result.get(1);
+    assertTrue(Arrays.deepToString(messages.toArray()), (Boolean) result.get(0));
     verifyDefault();
   }
 
   @Test
   public void test_multiThreaded() throws Exception {
-    int executeTimes = 10;
+    int executeTimes = 50000;
     Session sessionMock = createMockAndAddToDefault(Session.class);
     expect(sessionFactoryMock.openSession()).andReturn(sessionMock).anyTimes();
     sessionMock.setFlushMode(eq(FlushMode.COMMIT));
@@ -191,22 +193,32 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    List<Future<Boolean>> futureList = new ArrayList<>(100);
+    theExecutor.scheduleAtFixedRate(new ResetCacheEntryCommand(), 50, 20, TimeUnit.MILLISECONDS);
+    List<Future<List<Object>>> futureList = new ArrayList<>(3 * executeTimes);
     for (int i = 1; i <= executeTimes; i++) {
-      Future<Boolean> testFuture = theExecutor.schedule(
-          (Callable<Boolean>) new LoadXWikiDocCommand(), i * 100, TimeUnit.MILLISECONDS);
+      Future<List<Object>> testFuture = theExecutor.schedule(
+          (Callable<List<Object>>) new LoadXWikiDocCommand(), 10, TimeUnit.MILLISECONDS);
       futureList.add(testFuture);
     }
-    // theExecutor.scheduleAtFixedRate(new ResetCacheEntryCommand(), 100, 100,
-    // TimeUnit.MILLISECONDS);
+    for (int i = 1; i <= executeTimes; i++) {
+      Future<List<Object>> testFuture = theExecutor.schedule(
+          (Callable<List<Object>>) new LoadXWikiDocCommand(), 100, TimeUnit.MILLISECONDS);
+      futureList.add(testFuture);
+    }
+    for (int i = 1; i <= executeTimes; i++) {
+      Future<List<Object>> testFuture = theExecutor.schedule(
+          (Callable<List<Object>>) new LoadXWikiDocCommand(), 200, TimeUnit.MILLISECONDS);
+      futureList.add(testFuture);
+    }
     theExecutor.awaitTermination(60, TimeUnit.SECONDS);
     theExecutor.shutdown();
     while (!theExecutor.isTerminated()) {
       Thread.sleep(500L);
     }
-    for (Future<Boolean> testFuture : futureList) {
-      assertTrue(testFuture.isDone());
-      assertTrue(testFuture.get());
+    for (Future<List<Object>> testFuture : futureList) {
+      List<Object> result = testFuture.get();
+      List<String> messages = (List<String>) result.get(1);
+      assertTrue(Arrays.deepToString(messages.toArray()), (Boolean) result.get(0));
     }
     verifyDefault();
   }
@@ -359,17 +371,19 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   }
 
-  private class LoadXWikiDocCommand extends AbstractXWikiRunnable implements Callable<Boolean> {
+  private class LoadXWikiDocCommand extends AbstractXWikiRunnable implements
+      Callable<List<Object>> {
 
     private XWikiDocument loadedXWikiDoc;
     private boolean hasNewContext;
+    private final List<String> messages = new Vector<String>();
 
     private ExecutionContext getExecutionContext() {
       return Utils.getComponent(Execution.class).getContext();
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public List<Object> call() throws Exception {
       try {
         hasNewContext = (getExecutionContext() == null);
         if (hasNewContext) {
@@ -380,14 +394,12 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         }
       } catch (ExecutionContextException e) {
         LOGGER.error("Failed to initialize execution context", e);
-        return false;
+        return Arrays.asList(false, messages);
       }
-
-      getContext().getWiki().hasDynamicCustomMappings();
 
       try {
         runInternal();
-        return testLoadedDocument();
+        return Arrays.asList(testLoadedDocument(), messages);
       } finally {
         if (hasNewContext) {
           // cleanup execution context
@@ -401,7 +413,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       if (testResult) {
         for (BaseObject theTestObj : baseObjMap.get(testDocRef)) {
           Map<DocumentReference, List<BaseObject>> loadedObjs = loadedXWikiDoc.getXObjects();
-          testResult &= loadedObjs.get(theTestObj.getXClassReference()).contains(theTestObj);
+          if (!loadedObjs.get(theTestObj.getXClassReference()).contains(theTestObj)) {
+            messages.add("Object missing " + theTestObj);
+            testResult = false;
+          }
         }
       }
       return testResult;
