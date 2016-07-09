@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,6 +72,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private volatile XWikiCacheStore theCacheStore;
   private volatile ConcurrentMap<DocumentReference, List<BaseObject>> baseObjMap = new ConcurrentHashMap<>();
   private volatile DocumentReference testDocRef;
+  private static volatile Collection<Object> defaultMocks;
+  private static volatile XWikiContext defaultContext;
 
   private final String wikiName = "testWiki";
   private final WikiReference wikiRef = new WikiReference(wikiName);
@@ -98,7 +102,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         null).anyTimes();
     CacheFactory cacheFactory = Utils.getComponent(CacheFactory.class, "jbosscache");
     expect(getWikiMock().getCacheFactory()).andReturn(cacheFactory).anyTimes();
-    expect(getWikiMock().getPlugin(eq("monitor"), same(getContext()))).andReturn(null).anyTimes();
+    expect(getWikiMock().getPlugin(eq("monitor"), isA(XWikiContext.class))).andReturn(
+        null).anyTimes();
     expect(getWikiMock().hasDynamicCustomMappings()).andReturn(false).anyTimes();
     expect(getWikiMock().isVirtualMode()).andReturn(false).anyTimes();
     expect(getWikiMock().Param(eq("xwiki.store.hibernate.useclasstables.read"), eq("1"))).andReturn(
@@ -126,7 +131,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expectLoadEmptyAttachmentList(sessionMock);
     expectBaseObjectLoad(sessionMock);
     replayDefault();
-    initStore();
+    initStorePrepareMultiThreadMocks();
     LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand();
     Boolean result = testLoadCommand.call();
     assertTrue(result);
@@ -151,7 +156,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expectLoadEmptyAttachmentList(sessionMock);
     expectBaseObjectLoad(sessionMock);
     replayDefault();
-    initStore();
+    initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(1);
     Future<Boolean> testFuture = theExecutor.submit((Callable<Boolean>) new LoadXWikiDocCommand());
     theExecutor.shutdown();
@@ -165,28 +170,44 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   @Test
   public void test_multiThreaded() throws Exception {
+    int executeTimes = 10;
+    Session sessionMock = createMockAndAddToDefault(Session.class);
+    expect(sessionFactoryMock.openSession()).andReturn(sessionMock).anyTimes();
+    sessionMock.setFlushMode(eq(FlushMode.COMMIT));
+    expectLastCall().atLeastOnce();
+    sessionMock.setFlushMode(eq(FlushMode.MANUAL));
+    expectLastCall().atLeastOnce();
+    Transaction transactionMock = createMockAndAddToDefault(Transaction.class);
+    expect(sessionMock.beginTransaction()).andReturn(transactionMock).anyTimes();
+    transactionMock.rollback();
+    expectLastCall().anyTimes();
+    expect(sessionMock.close()).andReturn(null).anyTimes();
+    XWikiDocument myDoc = new XWikiDocument(testDocRef);
+    expectXWikiDocLoad(sessionMock, myDoc);
+    expectLoadEmptyAttachmentList(sessionMock);
+    expectBaseObjectLoad(sessionMock);
     replayDefault();
-    initStore();
+    initStorePrepareMultiThreadMocks();
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    ArrayList<Future<Boolean>> futureList = new ArrayList<>(100);
-    for (int i = 1; i < 100; i++) {
+    List<Future<Boolean>> futureList = new ArrayList<>(100);
+    for (int i = 1; i <= executeTimes; i++) {
       Future<Boolean> testFuture = theExecutor.schedule(
-          (Callable<Boolean>) new LoadXWikiDocCommand(), 90, TimeUnit.MILLISECONDS);
+          (Callable<Boolean>) new LoadXWikiDocCommand(), i * 100, TimeUnit.MILLISECONDS);
       futureList.add(testFuture);
     }
-    theExecutor.scheduleAtFixedRate(new ResetCacheEntryCommand(), 100, 100, TimeUnit.MILLISECONDS);
-    try {
-      theExecutor.awaitTermination(10, TimeUnit.SECONDS);
-    } catch (InterruptedException exp) {
-      LOGGER.error("Interrupted executor", exp);
+    // theExecutor.scheduleAtFixedRate(new ResetCacheEntryCommand(), 100, 100,
+    // TimeUnit.MILLISECONDS);
+    theExecutor.awaitTermination(60, TimeUnit.SECONDS);
+    theExecutor.shutdown();
+    while (!theExecutor.isTerminated()) {
+      Thread.sleep(500L);
     }
     for (Future<Boolean> testFuture : futureList) {
       assertTrue(testFuture.isDone());
       assertTrue(testFuture.get());
     }
-    theExecutor.shutdown();
     verifyDefault();
   }
 
@@ -211,7 +232,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       }
 
     });
-    expect(sessionMock.createQuery(eq(loadBaseObjectHql))).andReturn(queryObj);
+    expect(sessionMock.createQuery(eq(loadBaseObjectHql))).andReturn(queryObj).anyTimes();
     expectPropertiesLoad(sessionMock);
   }
 
@@ -319,9 +340,11 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     baseObjMap.put(testDocRefClone, attList);
   }
 
-  private void initStore() throws XWikiException {
+  private void initStorePrepareMultiThreadMocks() throws XWikiException {
     XWikiStoreInterface store = Utils.getComponent(XWikiStoreInterface.class);
-    theCacheStore = new XWikiCacheStore(store, getContext());
+    defaultContext = (XWikiContext) getContext().clone();
+    theCacheStore = new XWikiCacheStore(store, defaultContext);
+    defaultMocks = Collections.unmodifiableCollection(getDefaultMocks());
   }
 
   private class ResetCacheEntryCommand implements Runnable {
@@ -351,11 +374,16 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         hasNewContext = (getExecutionContext() == null);
         if (hasNewContext) {
           initExecutionContext();
+          getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, defaultMocks);
+          getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY,
+              defaultContext.clone());
         }
       } catch (ExecutionContextException e) {
         LOGGER.error("Failed to initialize execution context", e);
         return false;
       }
+
+      getContext().getWiki().hasDynamicCustomMappings();
 
       try {
         runInternal();
