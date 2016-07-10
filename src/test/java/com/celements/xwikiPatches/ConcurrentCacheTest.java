@@ -177,18 +177,17 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   @Test
   public void test_multiRuns_singleThreaded() throws Exception {
-    executeMultiRunsTest(1);
+    executeMultiRunsTest(1, 50000);
   }
 
   @Test
   public void test_multiThreaded() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    executeMultiRunsTest(cores);
+    executeMultiRunsTest(cores, 100000);
   }
 
-  private void executeMultiRunsTest(int cores) throws Exception {
-    int executeTimes = 100000;
+  private void executeMultiRunsTest(int cores, int executeRuns) throws Exception {
     Session sessionMock = createMockAndAddToDefault(Session.class);
     expect(sessionFactoryMock.openSession()).andReturn(sessionMock).anyTimes();
     sessionMock.setFlushMode(eq(FlushMode.COMMIT));
@@ -207,25 +206,26 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    CountDownLatch startSignal = new CountDownLatch(cores);
-    CountDownLatch doneSignal = new CountDownLatch(executeTimes);
-    List<Future<List<Object>>> futureList = new ArrayList<>(executeTimes);
-    futureList.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand(null,
-        doneSignal)));
-    for (int i = 1; i < executeTimes; i++) {
-      Future<List<Object>> testFuture = theExecutor.schedule(
-          (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal, doneSignal), 100,
-          TimeUnit.MILLISECONDS);
-      futureList.add(testFuture);
+    List<Future<List<Object>>> futureList = new ArrayList<>(executeRuns * (cores + 1));
+    for (int i = 1; i < executeRuns; i++) {
+      futureList.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand()));
+      CountDownLatch doneSignal = new CountDownLatch(cores);
+      CountDownLatch startSignal = new CountDownLatch(cores);
+      for (int j = 1; j <= cores; j++) {
+        Future<List<Object>> testFuture = theExecutor.schedule(
+            (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal, doneSignal), 100,
+            TimeUnit.MILLISECONDS);
+        futureList.add(testFuture);
+      }
+      doneSignal.await();
+      theExecutor.submit(new ResetCacheEntryCommand());
     }
-    doneSignal.await();
-    theExecutor.submit(new ResetCacheEntryCommand());
     CountDownLatch startSignal2 = new CountDownLatch(cores);
-    CountDownLatch doneSignal2 = new CountDownLatch(executeTimes);
-    List<Future<List<Object>>> futureList2 = new ArrayList<>(executeTimes);
+    CountDownLatch doneSignal2 = new CountDownLatch(executeRuns);
+    List<Future<List<Object>>> futureList2 = new ArrayList<>(executeRuns);
     futureList2.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand(null,
         doneSignal2)));
-    for (int i = 1; i < executeTimes; i++) {
+    for (int i = 1; i < executeRuns; i++) {
       Future<List<Object>> testFuture = theExecutor.schedule(
           (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal2, doneSignal2), 500,
           TimeUnit.MILLISECONDS);
@@ -234,11 +234,11 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     doneSignal2.await();
     theExecutor.submit(new ResetCacheEntryCommand());
     CountDownLatch startSignal3 = new CountDownLatch(cores);
-    CountDownLatch doneSignal3 = new CountDownLatch(executeTimes);
-    List<Future<List<Object>>> futureList3 = new ArrayList<>(executeTimes);
+    CountDownLatch doneSignal3 = new CountDownLatch(executeRuns);
+    List<Future<List<Object>>> futureList3 = new ArrayList<>(executeRuns);
     futureList3.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand(null,
         doneSignal3)));
-    for (int i = 1; i < executeTimes; i++) {
+    for (int i = 1; i < executeRuns; i++) {
       Future<List<Object>> testFuture = theExecutor.schedule(
           (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal3, doneSignal3), 1000,
           TimeUnit.MILLISECONDS);
