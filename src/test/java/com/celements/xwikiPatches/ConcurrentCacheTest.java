@@ -151,15 +151,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    try {
-      assertSuccessFullRuns(testScenario1(cores, executeRuns, theExecutor));
-    } finally {
-      theExecutor.shutdown();
-    }
-    while (!theExecutor.isTerminated()) {
-      Thread.sleep(500L);
-    }
+    assertSuccessFullRuns(testScenario1(cores, executeRuns));
     verifyDefault();
   }
 
@@ -170,15 +162,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    try {
-      assertSuccessFullRuns(testScenario2(cores, executeRuns, theExecutor));
-    } finally {
-      theExecutor.shutdown();
-    }
-    while (!theExecutor.isTerminated()) {
-      Thread.sleep(500L);
-    }
+    assertSuccessFullRuns(testScenario2(cores, executeRuns));
     verifyDefault();
   }
 
@@ -190,15 +174,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    try {
-      assertSuccessFullRuns(testScenario1(cores, executeRuns, theExecutor));
-    } finally {
-      theExecutor.shutdown();
-    }
-    while (!theExecutor.isTerminated()) {
-      Thread.sleep(500L);
-    }
+    assertSuccessFullRuns(testScenario1(cores, executeRuns));
     verifyDefault();
   }
 
@@ -210,15 +186,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    try {
-      assertSuccessFullRuns(testScenario2(cores, executeRuns, theExecutor));
-    } finally {
-      theExecutor.shutdown();
-    }
-    while (!theExecutor.isTerminated()) {
-      Thread.sleep(500L);
-    }
+    assertSuccessFullRuns(testScenario2(cores, executeRuns));
     verifyDefault();
   }
 
@@ -240,57 +208,83 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expectBaseObjectLoad(sessionMock);
   }
 
-  private List<Future<LoadDocCheckResult>> testScenario2(int cores, int executeRuns,
-      ScheduledExecutorService theExecutor) throws InterruptedException, ExecutionException {
-    CountDownLatch startSignal = new CountDownLatch(cores);
-    CountDownLatch doneSignal = new CountDownLatch(executeRuns);
-    List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(executeRuns);
-    Future<?> resetCacheCmd = theExecutor.submit(new ResetCacheEntryCommand());
-    while (!resetCacheCmd.isDone()) {
-      Thread.sleep(100);
+  /**
+   * Scenario 1
+   * 1. for executeRuns do
+   * 1.1 first and every 100 run
+   * 1.1.1 reset cache entry
+   * 1.1.2 load document in cache
+   * 1.2 load document 3*cores in parallels for core threads
+   */
+  private List<Future<LoadDocCheckResult>> testScenario1(int cores, int executeRuns)
+      throws Exception {
+    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
+    try {
+      final int numTimesFromCache = cores * 3;
+      List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(executeRuns
+          * numTimesFromCache);
+      for (int i = 0; i < executeRuns; i++) {
+        CountDownLatch doneSignal = new CountDownLatch(numTimesFromCache);
+        CountDownLatch startSignal = new CountDownLatch(cores);
+        List<LoadXWikiDocCommand> loadTasks = new ArrayList<>(numTimesFromCache);
+        for (int j = 1; j <= numTimesFromCache; j++) {
+          loadTasks.add(new LoadXWikiDocCommand(startSignal, doneSignal, true));
+        }
+        if ((i % 100) == 0) {
+          // LOGGER.error("reset cache after {} runs", futureList.size());
+          Future<?> resetCacheCmd = theExecutor.submit(new ResetCacheEntryCommand());
+          while (!resetCacheCmd.isDone()) {
+            Thread.sleep(10);
+          }
+          CountDownLatch doneLoadingSignal = new CountDownLatch(1);
+          Future<LoadDocCheckResult> loadDocToCache = theExecutor.submit(
+              (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(null, doneLoadingSignal,
+                  false));
+          futureList.add(loadDocToCache);
+          doneLoadingSignal.await();
+        }
+        futureList.addAll(theExecutor.invokeAll(loadTasks));
+        doneSignal.await();
+      }
+      return futureList;
+    } finally {
+      theExecutor.shutdown();
     }
-    Future<LoadDocCheckResult> loadDocToCache = theExecutor.submit(
-        (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(null, doneSignal, false));
-    futureList.add(loadDocToCache);
-    while (!loadDocToCache.isDone()) {
-      Thread.sleep(100);
-    }
-    for (int i = 1; i < executeRuns; i++) {
-      Future<LoadDocCheckResult> testFuture = theExecutor.submit(
-          (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(startSignal, doneSignal, true));
-      futureList.add(testFuture);
-    }
-    doneSignal.await();
-    return futureList;
   }
 
-  private List<Future<LoadDocCheckResult>> testScenario1(int cores, int executeRuns,
-      ScheduledExecutorService theExecutor) throws InterruptedException, ExecutionException {
-    List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(executeRuns * cores * 3);
-    for (int i = 0; i < executeRuns; i++) {
-      if ((i % 10000) == 0) {
-        LOGGER.error("reset cache after {} runs", futureList.size());
-        Future<?> resetCacheCmd = theExecutor.submit(new ResetCacheEntryCommand());
-        while (!resetCacheCmd.isDone()) {
-          Thread.sleep(100);
-        }
-        Future<LoadDocCheckResult> loadDocToCache = theExecutor.submit(
-            (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(false));
-        futureList.add(loadDocToCache);
-        while (!loadDocToCache.isDone()) {
-          Thread.sleep(100);
-        }
-      }
-      CountDownLatch doneSignal = new CountDownLatch(cores * 3);
+  /**
+   * Scenario 2
+   * 1. reset cache
+   * 2. Load document once into cache
+   * 3. read executeRuns times from cache in parallel for cores threads
+   */
+  private List<Future<LoadDocCheckResult>> testScenario2(int cores, int executeRuns)
+      throws Exception {
+    ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
+    try {
       CountDownLatch startSignal = new CountDownLatch(cores);
-      for (int j = 1; j <= (cores * 3); j++) {
+      CountDownLatch doneSignal = new CountDownLatch(executeRuns);
+      List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(executeRuns);
+      Future<?> resetCacheCmd = theExecutor.submit(new ResetCacheEntryCommand());
+      while (!resetCacheCmd.isDone()) {
+        Thread.sleep(100);
+      }
+      Future<LoadDocCheckResult> loadDocToCache = theExecutor.submit(
+          (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(null, doneSignal, false));
+      futureList.add(loadDocToCache);
+      while (!loadDocToCache.isDone()) {
+        Thread.sleep(100);
+      }
+      for (int i = 1; i < executeRuns; i++) {
         Future<LoadDocCheckResult> testFuture = theExecutor.submit(
             (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(startSignal, doneSignal, true));
         futureList.add(testFuture);
       }
       doneSignal.await();
+      return futureList;
+    } finally {
+      theExecutor.shutdown();
     }
-    return futureList;
   }
 
   private void assertSuccessFullRuns(List<Future<LoadDocCheckResult>> futureList)
