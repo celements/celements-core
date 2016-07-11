@@ -136,8 +136,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand();
-    List<Object> result = testLoadCommand.call();
-    assertTrue((Boolean) result.get(0));
+    LoadDocCheckResult result = testLoadCommand.call();
+    assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
     verifyDefault();
   }
 
@@ -161,16 +161,14 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(1);
-    Future<List<Object>> testFuture = theExecutor.submit(
-        (Callable<List<Object>>) new LoadXWikiDocCommand());
+    Future<LoadDocCheckResult> testFuture = theExecutor.submit(
+        (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand());
     theExecutor.shutdown();
     while (!theExecutor.isTerminated()) {
       Thread.sleep(500L);
     }
-    List<Object> result = testFuture.get();
-    @SuppressWarnings("unchecked")
-    List<String> messages = (List<String>) result.get(1);
-    assertTrue(Arrays.deepToString(messages.toArray()), (Boolean) result.get(0));
+    LoadDocCheckResult result = testFuture.get();
+    assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
     verifyDefault();
   }
 
@@ -183,7 +181,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   public void test_multiThreaded() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    executeMultiRunsTest(cores, 300000);
+    executeMultiRunsTest(cores, 100000);
   }
 
   private void executeMultiRunsTest(int cores, int executeRuns) throws Exception {
@@ -205,20 +203,21 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    List<Future<List<Object>>> futureList = new ArrayList<>(executeRuns * cores);
-    for (int i = 1; i < (executeRuns / 3); i++) {
+    List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(executeRuns * cores * 3);
+    for (int i = 1; i < (executeRuns); i++) {
       if ((i % 1000) == 0) {
         LOGGER.error("reset cache after {} runs", futureList.size());
         theExecutor.submit(new ResetCacheEntryCommand());
         Thread.sleep(100);
-        futureList.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand()));
+        futureList.add(theExecutor.submit(
+            (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand()));
         Thread.sleep(100);
       }
       CountDownLatch doneSignal = new CountDownLatch(cores * 3);
       CountDownLatch startSignal = new CountDownLatch(cores);
       for (int j = 1; j <= (cores * 3); j++) {
-        Future<List<Object>> testFuture = theExecutor.submit(
-            (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal, doneSignal));
+        Future<LoadDocCheckResult> testFuture = theExecutor.submit(
+            (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(startSignal, doneSignal));
         futureList.add(testFuture);
       }
       doneSignal.await();
@@ -226,12 +225,12 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     theExecutor.submit(new ResetCacheEntryCommand());
     CountDownLatch startSignal2 = new CountDownLatch(cores);
     CountDownLatch doneSignal2 = new CountDownLatch(executeRuns);
-    List<Future<List<Object>>> futureList2 = new ArrayList<>(executeRuns);
-    futureList2.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand(null,
+    List<Future<LoadDocCheckResult>> futureList2 = new ArrayList<>(executeRuns);
+    futureList2.add(theExecutor.submit((Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(null,
         doneSignal2)));
     for (int i = 1; i < executeRuns; i++) {
-      Future<List<Object>> testFuture = theExecutor.submit(
-          (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal2, doneSignal2));
+      Future<LoadDocCheckResult> testFuture = theExecutor.submit(
+          (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(startSignal2, doneSignal2));
       futureList2.add(testFuture);
     }
     doneSignal2.await();
@@ -244,17 +243,16 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  void assertSuccessFullRuns(List<Future<List<Object>>> futureList) throws InterruptedException,
-      ExecutionException {
+  void assertSuccessFullRuns(List<Future<LoadDocCheckResult>> futureList)
+      throws InterruptedException, ExecutionException {
     int successfulRuns = 0;
     List<String> failMessgs = new ArrayList<>();
-    for (Future<List<Object>> testFuture : futureList) {
-      List<Object> result = testFuture.get();
-      if ((Boolean) result.get(0)) {
+    for (Future<LoadDocCheckResult> testFuture : futureList) {
+      LoadDocCheckResult result = testFuture.get();
+      if (result.isSuccessfull()) {
         successfulRuns += 1;
       } else {
-        @SuppressWarnings("unchecked")
-        List<String> messages = (List<String>) result.get(1);
+        List<String> messages = result.getMessages();
         failMessgs.addAll(messages);
       }
     }
@@ -410,14 +408,32 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   }
 
+  private class LoadDocCheckResult {
+
+    private final List<String> messages = new Vector<String>();
+
+    public void addMessage(String message) {
+      messages.add(message);
+    }
+
+    public boolean isSuccessfull() {
+      return (messages.size() == 0);
+    }
+
+    public List<String> getMessages() {
+      return messages;
+    }
+
+  }
+
   private class LoadXWikiDocCommand extends AbstractXWikiRunnable implements
-      Callable<List<Object>> {
+      Callable<LoadDocCheckResult> {
 
     private XWikiDocument loadedXWikiDoc;
     private boolean hasNewContext;
-    private final List<String> messages = new Vector<String>();
     private final CountDownLatch startSignal;
     private final CountDownLatch doneSignal;
+    private final LoadDocCheckResult result = new LoadDocCheckResult();
     private boolean startDone = false;
 
     public LoadXWikiDocCommand() {
@@ -435,8 +451,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     }
 
     @Override
-    public List<Object> call() throws Exception {
-      boolean result = false;
+    public LoadDocCheckResult call() throws Exception {
       try {
         try {
           hasNewContext = (getExecutionContext() == null);
@@ -448,7 +463,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
           }
           try {
             runInternal();
-            result = testLoadedDocument();
+            testLoadedDocument();
           } finally {
             if (hasNewContext) {
               // cleanup execution context
@@ -460,7 +475,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         }
       } catch (Throwable exp) {
         // anything could happen in the test and we want to catch all failures
-        messages.add("Exception: " + exp.getMessage() + "\\n" + ExceptionUtils.getStackTrace(exp));
+        result.addMessage("Exception: " + exp.getMessage() + "\\n" + ExceptionUtils.getStackTrace(
+            exp));
       } finally {
         if ((startSignal != null) && !startDone) {
           startSignal.countDown();
@@ -469,21 +485,43 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
           doneSignal.countDown();
         }
       }
-      return Arrays.asList(result, messages);
+      return result;
     }
 
-    private boolean testLoadedDocument() {
-      boolean testResult = loadedXWikiDoc != null;
-      if (testResult) {
+    private void testLoadedDocument() {
+      if (loadedXWikiDoc != null) {
+        if (loadedXWikiDoc.isNew()) {
+          result.addMessage("unexpected: isNew is true");
+        }
+        if (!loadedXWikiDoc.isMostRecent()) {
+          result.addMessage("unexpected: isMostRecent is false");
+        }
         for (BaseObject theTestObj : baseObjMap.get(testDocRef)) {
           Map<DocumentReference, List<BaseObject>> loadedObjs = loadedXWikiDoc.getXObjects();
-          if (!loadedObjs.get(theTestObj.getXClassReference()).contains(theTestObj)) {
-            messages.add("Object missing " + theTestObj);
-            testResult = false;
+          final List<BaseObject> xclassObjs = loadedObjs.get(theTestObj.getXClassReference());
+          if (!xclassObjs.contains(theTestObj)) {
+            result.addMessage("Object missing " + theTestObj);
+          } else {
+            BaseObject theLoadedObj = xclassObjs.get(xclassObjs.indexOf(theTestObj));
+            if (theLoadedObj == theTestObj) {
+              result.addMessage("Object is same " + theTestObj);
+            } else {
+              for (String theFieldName : theTestObj.getPropertyNames()) {
+                BaseProperty theField = (BaseProperty) theLoadedObj.getField(theFieldName);
+                BaseProperty theTestField = (BaseProperty) theTestObj.getField(theFieldName);
+                if (theField == theTestField) {
+                  result.addMessage("Field is same " + theField);
+                } else if (!theTestField.getValue().equals(theField.getValue())) {
+                  result.addMessage("Field value missmatch expected: " + theField
+                      + "\\n but found: " + theField.getValue());
+                }
+              }
+            }
           }
         }
+      } else {
+        result.addMessage("Loaded document reference is null.");
       }
-      return testResult;
     }
 
     @Override
