@@ -204,7 +204,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
     List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(executeRuns * cores * 3);
-    for (int i = 1; i < (executeRuns); i++) {
+    for (int i = 1; i < executeRuns; i++) {
       if ((i % 1000) == 0) {
         LOGGER.error("reset cache after {} runs", futureList.size());
         theExecutor.submit(new ResetCacheEntryCommand());
