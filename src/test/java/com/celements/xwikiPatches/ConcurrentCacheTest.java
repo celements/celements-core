@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.easymock.IAnswer;
@@ -76,6 +77,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private volatile DocumentReference testDocRef;
   private static volatile Collection<Object> defaultMocks;
   private static volatile XWikiContext defaultContext;
+  private final static AtomicBoolean fastFail = new AtomicBoolean();
 
   private final String wikiName = "testWiki";
   private final WikiReference wikiRef = new WikiReference(wikiName);
@@ -137,7 +139,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand());
     theExecutor.shutdown();
     while (!theExecutor.isTerminated()) {
-      theExecutor.awaitTermination(1000, TimeUnit.SECONDS);
+      theExecutor.awaitTermination(1, TimeUnit.SECONDS);
     }
     LoadDocCheckResult result = testFuture.get();
     assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
@@ -198,28 +200,43 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
    * http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/package-summary.html#
    * MemoryVisibility
    */
-  private List<Future<LoadDocCheckResult>> testScenario1(int cores, int executeRuns)
+  private List<Future<LoadDocCheckResult>> testScenario1(int cores, int maxLoadTasks)
       throws Exception {
+    fastFail.set(false);
     final int numTimesFromCache = cores * 3;
+    final int oneRunRepeats = 200;
+    int count = (maxLoadTasks / (oneRunRepeats * numTimesFromCache)) + 1;
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
+    List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(count * (numTimesFromCache + 1)
+        * oneRunRepeats);
     try {
-      List<Callable<LoadDocCheckResult>> loadTasks = new ArrayList<>(executeRuns
-          * (numTimesFromCache + 1));
-      for (int i = 0; i < executeRuns; i++) {
-        loadTasks.add(new ResetCacheEntryCommand());
-        for (int j = 1; j <= numTimesFromCache; j++) {
-          loadTasks.add(new LoadXWikiDocCommand());
+      do {
+        count--;
+        List<Callable<LoadDocCheckResult>> loadTasks = new ArrayList<>(oneRunRepeats
+            * numTimesFromCache);
+        for (int i = 0; i < oneRunRepeats; i++) {
+          loadTasks.add(new ResetCacheEntryCommand());
+          for (int j = 1; j <= numTimesFromCache; j++) {
+            loadTasks.add(new LoadXWikiDocCommand());
+          }
         }
-      }
-      List<Future<LoadDocCheckResult>> futureList = new ArrayList<>(loadTasks.size());
-      futureList.addAll(theExecutor.invokeAll(loadTasks));
-      return futureList;
+        futureList.addAll(theExecutor.invokeAll(loadTasks));
+        final Future<LoadDocCheckResult> lastFuture = futureList.get(futureList.size()
+            - oneRunRepeats);
+        while (!lastFuture.isDone() && !fastFail.get()) {
+          Thread.sleep(50);
+        }
+      } while (!fastFail.get() && (count > 0));
     } finally {
       theExecutor.shutdown();
       while (!theExecutor.isTerminated()) {
-        theExecutor.awaitTermination(1000, TimeUnit.SECONDS);
+        if (fastFail.get()) {
+          theExecutor.shutdownNow();
+        }
+        theExecutor.awaitTermination(500, TimeUnit.MILLISECONDS);
       }
     }
+    return futureList;
   }
 
   private void assertSuccessFullRuns(List<Future<LoadDocCheckResult>> futureList)
@@ -397,6 +414,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
     public void addMessage(String message) {
       messages.add(message);
+      fastFail.set(true);
     }
 
     public boolean isSuccessfull() {
@@ -427,8 +445,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
           hasNewContext = (getExecutionContext() == null);
           if (hasNewContext) {
             initExecutionContext();
-            getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, new ArrayList<Object>(
-                defaultMocks));
+            getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, defaultMocks);
             getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY,
                 defaultContext.clone());
           }
