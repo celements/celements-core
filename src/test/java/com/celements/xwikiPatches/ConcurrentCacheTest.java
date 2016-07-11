@@ -90,7 +90,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   @SuppressWarnings("deprecation")
   @Before
-  public void setUp_ConcurrentCatchTest() throws Exception {
+  public void setUp_ConcurrentCacheTest() throws Exception {
     pageTypeClassConfig = Utils.getComponent(IPageTypeClassConfig.class);
     navClassConfig = Utils.getComponent(INavigationClassConfig.class);
     webUtilsService = Utils.getComponent(IWebUtilsService.class);
