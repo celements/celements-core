@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.easymock.IAnswer;
@@ -184,7 +183,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   public void test_multiThreaded() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    executeMultiRunsTest(cores, 100000);
+    executeMultiRunsTest(cores, 300000);
   }
 
   private void executeMultiRunsTest(int cores, int executeRuns) throws Exception {
@@ -206,52 +205,42 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(cores);
-    List<Future<List<Object>>> futureList = new ArrayList<>(executeRuns * (cores + 1));
-    for (int i = 1; i < executeRuns; i++) {
-      futureList.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand()));
-      CountDownLatch doneSignal = new CountDownLatch(cores);
+    List<Future<List<Object>>> futureList = new ArrayList<>(executeRuns * cores);
+    for (int i = 1; i < (executeRuns / 3); i++) {
+      if ((i % 1000) == 0) {
+        LOGGER.error("reset cache after {} runs", futureList.size());
+        theExecutor.submit(new ResetCacheEntryCommand());
+        Thread.sleep(100);
+        futureList.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand()));
+        Thread.sleep(100);
+      }
+      CountDownLatch doneSignal = new CountDownLatch(cores * 3);
       CountDownLatch startSignal = new CountDownLatch(cores);
-      for (int j = 1; j <= cores; j++) {
-        Future<List<Object>> testFuture = theExecutor.schedule(
-            (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal, doneSignal), 100,
-            TimeUnit.MILLISECONDS);
+      for (int j = 1; j <= (cores * 3); j++) {
+        Future<List<Object>> testFuture = theExecutor.submit(
+            (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal, doneSignal));
         futureList.add(testFuture);
       }
       doneSignal.await();
-      theExecutor.submit(new ResetCacheEntryCommand());
     }
+    theExecutor.submit(new ResetCacheEntryCommand());
     CountDownLatch startSignal2 = new CountDownLatch(cores);
     CountDownLatch doneSignal2 = new CountDownLatch(executeRuns);
     List<Future<List<Object>>> futureList2 = new ArrayList<>(executeRuns);
     futureList2.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand(null,
         doneSignal2)));
     for (int i = 1; i < executeRuns; i++) {
-      Future<List<Object>> testFuture = theExecutor.schedule(
-          (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal2, doneSignal2), 500,
-          TimeUnit.MILLISECONDS);
+      Future<List<Object>> testFuture = theExecutor.submit(
+          (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal2, doneSignal2));
       futureList2.add(testFuture);
     }
     doneSignal2.await();
-    theExecutor.submit(new ResetCacheEntryCommand());
-    CountDownLatch startSignal3 = new CountDownLatch(cores);
-    CountDownLatch doneSignal3 = new CountDownLatch(executeRuns);
-    List<Future<List<Object>>> futureList3 = new ArrayList<>(executeRuns);
-    futureList3.add(theExecutor.submit((Callable<List<Object>>) new LoadXWikiDocCommand(null,
-        doneSignal3)));
-    for (int i = 1; i < executeRuns; i++) {
-      Future<List<Object>> testFuture = theExecutor.schedule(
-          (Callable<List<Object>>) new LoadXWikiDocCommand(startSignal3, doneSignal3), 1000,
-          TimeUnit.MILLISECONDS);
-      futureList3.add(testFuture);
-    }
-    doneSignal3.await();
     theExecutor.shutdown();
     while (!theExecutor.isTerminated()) {
       Thread.sleep(500L);
     }
     assertSuccessFullRuns(futureList);
     assertSuccessFullRuns(futureList2);
-    assertSuccessFullRuns(futureList3);
     verifyDefault();
   }
 
