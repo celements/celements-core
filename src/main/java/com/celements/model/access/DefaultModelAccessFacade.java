@@ -86,15 +86,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     String defaultLanguage = webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference());
     String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
     if (!lang.equals(docDefLang) && (!"".equals(docDefLang) || !lang.equals(defaultLanguage))) {
-      try {
-        if (translatedDocument.getTranslationList(getContext()).contains(lang)) {
-          translatedDocument = translatedDocument.getTranslatedDocument(lang, getContext());
-        } else {
-          throw new TranslationNotExistsException(docRef, lang);
-        }
-      } catch (XWikiException xwe) {
-        throw new DocumentLoadException(docRef, xwe);
-      }
+      translatedDocument = getTranslation(docRef, lang);
     }
     // We need to clone this document first, since a cached storage would return the same
     // object for the
@@ -200,11 +192,20 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public boolean exists(DocumentReference docRef) {
-    boolean exists = false;
-    if (docRef != null) {
-      exists = getContext().getWiki().exists(docRef, getContext());
+    return exists(docRef, null);
+  }
+
+  @Override
+  public boolean exists(DocumentReference docRef, String lang) {
+    String database = getContext().getDatabase();
+    try {
+      getContext().setDatabase(docRef.getWikiReference().getName());
+      return getContext().getWiki().getStore().exists(newDoc(docRef, lang), getContext());
+    } catch (XWikiException xwe) {
+      throw new DocumentLoadException(docRef, xwe);
+    } finally {
+      getContext().setDatabase(database);
     }
-    return exists;
   }
 
   @Override
@@ -283,6 +284,56 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     } finally {
       getContext().setDatabase(dbBefore);
     }
+  }
+
+  @Override
+  public XWikiDocument getTranslation(DocumentReference docRef, String lang)
+      throws TranslationNotExistsException {
+    checkNotNull(docRef);
+    XWikiDocument ret = null;
+    String database = getContext().getDatabase();
+    try {
+      getContext().setDatabase(docRef.getWikiReference().getName());
+      XWikiDocument doc = getContext().getWiki().getStore().loadXWikiDoc(newDoc(docRef, lang),
+          getContext());
+      if (doc.isNew()) {
+        throw new TranslationNotExistsException(docRef, lang);
+      }
+      ret = doc;
+    } catch (XWikiException xwe) {
+      throw new DocumentLoadException(docRef, xwe);
+    } finally {
+      getContext().setDatabase(database);
+    }
+    return ret;
+  }
+
+  @Override
+  public Map<String, XWikiDocument> getTranslations(DocumentReference docRef) {
+    Map<String, XWikiDocument> transMap = new HashMap<>();
+    String database = getContext().getDatabase();
+    try {
+      getContext().setDatabase(docRef.getWikiReference().getName());
+      for (String lang : getContext().getWiki().getStore().getTranslationList(newDoc(docRef, null),
+          getContext())) {
+        try {
+          transMap.put(lang, getTranslation(docRef, lang));
+        } catch (TranslationNotExistsException exc) {
+          LOGGER.error("failed to load existing translation '{}' for doc '{}'", lang, docRef, exc);
+        }
+      }
+    } catch (XWikiException xwe) {
+      throw new DocumentLoadException(docRef, xwe);
+    } finally {
+      getContext().setDatabase(database);
+    }
+    return transMap;
+  }
+
+  private XWikiDocument newDoc(DocumentReference docRef, String lang) {
+    XWikiDocument doc = new XWikiDocument(docRef);
+    doc.setLanguage(lang);
+    return doc;
   }
 
   @Override
@@ -386,8 +437,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
-          throw new NoAccessRightsException(obj.getDocumentReference(),
-              getContext().getXWikiUser(), EAccessLevel.VIEW);
+          throw new NoAccessRightsException(obj.getDocumentReference(), getContext().getXWikiUser(),
+              EAccessLevel.VIEW);
         }
       } catch (IllegalStateException exp) {
         LOGGER.warn("getApiObject failed for '{}'", obj, exp);
@@ -556,8 +607,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         return attach;
       }
     }
-    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]",
-        filename, document, document.getDocumentReference());
+    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]", filename,
+        document, document.getDocumentReference());
     // FIXME empty or null filename leads to exception:
     // java.lang.IllegalArgumentException: An Entity Reference name cannot be null or
     // empty

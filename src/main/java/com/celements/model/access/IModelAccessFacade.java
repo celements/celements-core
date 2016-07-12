@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -32,7 +35,9 @@ public interface IModelAccessFacade {
 
   public XWikiDocument getOrCreateDocument(DocumentReference docRef);
 
-  public boolean exists(DocumentReference docRef);
+  public boolean exists(@NotNull DocumentReference docRef);
+
+  public boolean exists(@NotNull DocumentReference docRef, @Nullable String lang);
 
   public void saveDocument(XWikiDocument doc) throws DocumentSaveException;
 
@@ -48,6 +53,13 @@ public interface IModelAccessFacade {
 
   public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
       throws DocumentDeleteException;
+
+  @NotNull
+  public XWikiDocument getTranslation(@NotNull DocumentReference docRef, @Nullable String lang)
+      throws TranslationNotExistsException;
+
+  @NotNull
+  public Map<String, XWikiDocument> getTranslations(@NotNull DocumentReference docRef);
 
   /**
    * @param docRef
