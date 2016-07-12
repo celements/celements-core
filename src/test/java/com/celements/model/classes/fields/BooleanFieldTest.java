@@ -20,13 +20,12 @@ public class BooleanFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new BooleanField(new DocumentReference("wiki", "class", "any"), "name");
-    field.setDisplayType(displayType);
-    field.setDefaultValue(defaultValue);
+    field = new BooleanField.Builder(new DocumentReference("wiki", "class", "any"),
+        "name").displayType(displayType).defaultValue(defaultValue).build();
   }
 
   @Test
-  public void test_getters_setters() throws Exception {
+  public void test_getters() throws Exception {
     assertEquals(displayType, field.getDisplayType());
     assertEquals(defaultValue, field.getDefaultValue());
   }

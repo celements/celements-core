@@ -19,12 +19,12 @@ public class StringFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new StringField(new DocumentReference("wiki", "class", "any"), "name");
-    field.setSize(size);
+    field = new StringField.Builder(new DocumentReference("wiki", "class", "any"), "name").size(
+        size).build();
   }
 
   @Test
-  public void test_getters_setters() throws Exception {
+  public void test_getters() throws Exception {
     assertEquals(size, field.getSize());
   }
 

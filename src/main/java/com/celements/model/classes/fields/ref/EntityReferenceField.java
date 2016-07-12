@@ -1,5 +1,7 @@
 package com.celements.model.classes.fields.ref;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -10,22 +12,35 @@ import com.celements.model.classes.fields.CustomClassField;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+@Immutable
 public abstract class EntityReferenceField<T extends EntityReference> extends AbstractClassField<T>
     implements CustomClassField<T> {
 
-  private volatile Integer size;
+  private final Integer size;
 
-  public EntityReferenceField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  public abstract static class Builder<B extends Builder<B, T>, T extends EntityReference> extends
+      AbstractClassField.Builder<B, T> {
+
+    private Integer size;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      super(classRef, name);
+    }
+
+    public B size(@Nullable Integer val) {
+      size = val;
+      return getThis();
+    }
+
+  }
+
+  protected EntityReferenceField(@NotNull Builder<?, T> builder) {
+    super(builder);
+    this.size = builder.size;
   }
 
   public Integer getSize() {
     return size;
-  }
-
-  public EntityReferenceField<T> setSize(Integer size) {
-    this.size = size;
-    return this;
   }
 
   @Override

@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 public class ClassFieldTest extends AbstractComponentTest {
@@ -24,16 +23,14 @@ public class ClassFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new TestClassField(classRef, name);
-    field.setPrettyName(prettyName);
-    field.setValidationRegExp(validationRegExp);
-    field.setValidationMessage(validationMessage);
+    field = new TestClassField.Builder(classRef, name).size(5).prettyName(
+        prettyName).validationRegExp(validationRegExp).validationMessage(validationMessage).build();
   }
 
   @Test
   public void test_constr_null_classRef() throws Exception {
     try {
-      new TestClassField(null, field.getName());
+      new TestClassField.Builder(null, field.getName()).build();
       fail("expecting NullPointerException");
     } catch (NullPointerException npe) {
       // expected
@@ -43,7 +40,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   @Test
   public void test_constr_null_name() throws Exception {
     try {
-      new TestClassField(field.getClassRef(), null);
+      new TestClassField.Builder(field.getClassRef(), null).build();
       fail("expecting NullPointerException");
     } catch (NullPointerException npe) {
       // expected
@@ -73,50 +70,39 @@ public class ClassFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_equals() throws Exception {
-    assertTrue(field.equals(new TestClassField(field.getClassRef(), field.getName())));
-    assertTrue(field.equals(new StringField(field.getClassRef(), field.getName())));
-    assertTrue(field.equals(new TestClassField(field.getClassRef(), field.getName()).setPrettyName(
-        "asdf").setValidationRegExp("asdf").setValidationMessage("asdf")));
-    assertFalse(field.equals(new TestClassField(field.getClassRef(), "name2")));
+    assertTrue(field.equals(new TestClassField.Builder(field.getClassRef(),
+        field.getName()).build()));
+    assertTrue(field.equals(new StringField.Builder(field.getClassRef(), field.getName()).build()));
+    assertTrue(field.equals(new TestClassField.Builder(field.getClassRef(),
+        field.getName()).prettyName("asdf").validationRegExp("asdf").validationMessage(
+            "asdf").build()));
+    assertFalse(field.equals(new TestClassField.Builder(field.getClassRef(), "name2").build()));
     DocumentReference classRefOther = new DocumentReference(field.getClassRef());
     classRefOther.setName("other");
-    assertFalse(field.equals(new TestClassField(classRefOther, field.getName())));
+    assertFalse(field.equals(new TestClassField.Builder(classRefOther, field.getName()).build()));
     assertFalse(field.equals(null));
   }
 
   @Test
   public void test_hashCode() throws Exception {
-    assertTrue(field.hashCode() == new TestClassField(field.getClassRef(), field.getName()).hashCode());
-    assertTrue(field.hashCode() == new StringField(field.getClassRef(), field.getName()).hashCode());
-    assertTrue(field.hashCode() == new TestClassField(field.getClassRef(), field.getName()).setPrettyName(
-        "asdf").setValidationRegExp("asdf").setValidationMessage("asdf").hashCode());
-    assertFalse(field.hashCode() == new TestClassField(field.getClassRef(), "name2").hashCode());
+    assertTrue(field.hashCode() == new TestClassField.Builder(field.getClassRef(),
+        field.getName()).build().hashCode());
+    assertTrue(field.hashCode() == new StringField.Builder(field.getClassRef(),
+        field.getName()).build().hashCode());
+    assertTrue(field.hashCode() == new TestClassField.Builder(field.getClassRef(),
+        field.getName()).prettyName("asdf").validationRegExp("asdf").validationMessage(
+            "asdf").build().hashCode());
+    assertFalse(field.hashCode() == new TestClassField.Builder(field.getClassRef(),
+        "name2").build().hashCode());
     DocumentReference classRefOther = new DocumentReference(field.getClassRef());
     classRefOther.setName("other");
-    assertFalse(field.hashCode() == new TestClassField(classRefOther, field.getName()).hashCode());
+    assertFalse(field.hashCode() == new TestClassField.Builder(classRefOther,
+        field.getName()).build().hashCode());
   }
 
   @Test
   public void test_toString() throws Exception {
     assertEquals("class.any.name", field.toString());
-  }
-
-  private class TestClassField extends AbstractClassField<TestClassField> {
-
-    public TestClassField(DocumentReference classRef, String name) {
-      super(classRef, name);
-    }
-
-    @Override
-    public Class<TestClassField> getType() {
-      return TestClassField.class;
-    }
-
-    @Override
-    protected PropertyClass getPropertyClass() {
-      return new StringClass();
-    }
-
   }
 
 }

@@ -10,11 +10,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 @Immutable
-public class StringField extends AbstractClassField<String> {
+public class TestClassField extends AbstractClassField<TestClassField> {
 
   private final Integer size;
 
-  public static class Builder extends AbstractClassField.Builder<Builder, String> {
+  public static class Builder extends AbstractClassField.Builder<Builder, TestClassField> {
 
     private Integer size;
 
@@ -29,24 +29,19 @@ public class StringField extends AbstractClassField<String> {
 
     public Builder size(@Nullable Integer val) {
       size = val;
-      return getThis();
+      return this;
     }
 
     @Override
-    public StringField build() {
-      return new StringField(getThis());
+    public TestClassField build() {
+      return new TestClassField(this);
     }
 
   }
 
-  protected StringField(@NotNull Builder builder) {
+  protected TestClassField(@NotNull Builder builder) {
     super(builder);
     this.size = builder.size;
-  }
-
-  @Override
-  public Class<String> getType() {
-    return String.class;
   }
 
   public Integer getSize() {
@@ -54,12 +49,13 @@ public class StringField extends AbstractClassField<String> {
   }
 
   @Override
+  public Class<TestClassField> getType() {
+    return TestClassField.class;
+  }
+
+  @Override
   protected PropertyClass getPropertyClass() {
-    StringClass element = new StringClass();
-    if (size != null) {
-      element.setSize(size);
-    }
-    return element;
+    return new StringClass();
   }
 
 }

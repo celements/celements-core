@@ -1,5 +1,7 @@
 package com.celements.model.classes.fields;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -7,13 +9,46 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
+@Immutable
 public class BooleanField extends AbstractClassField<Boolean> {
 
-  private volatile String displayType;
-  private volatile Integer defaultValue;
+  private final String displayType;
+  private final Integer defaultValue;
 
-  public BooleanField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  public static class Builder extends AbstractClassField.Builder<Builder, Boolean> {
+
+    private String displayType;
+    private Integer defaultValue;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      super(classRef, name);
+    }
+
+    @Override
+    public Builder getThis() {
+      return this;
+    }
+
+    public Builder displayType(@Nullable String val) {
+      displayType = val;
+      return getThis();
+    }
+
+    public Builder defaultValue(@Nullable Integer val) {
+      defaultValue = val;
+      return getThis();
+    }
+
+    @Override
+    public BooleanField build() {
+      return new BooleanField(getThis());
+    }
+  }
+
+  protected BooleanField(@NotNull Builder builder) {
+    super(builder);
+    this.displayType = builder.displayType;
+    this.defaultValue = builder.defaultValue;
   }
 
   @Override
@@ -25,18 +60,8 @@ public class BooleanField extends AbstractClassField<Boolean> {
     return displayType;
   }
 
-  public BooleanField setDisplayType(String displayType) {
-    this.displayType = displayType;
-    return this;
-  }
-
   public Integer getDefaultValue() {
     return defaultValue;
-  }
-
-  public BooleanField setDefaultValue(int defaultValue) {
-    this.defaultValue = defaultValue;
-    return this;
   }
 
   @Override

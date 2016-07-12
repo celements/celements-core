@@ -2,16 +2,16 @@ package com.celements.model.classes.fields.list;
 
 import java.util.List;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
-
-import org.xwiki.model.reference.DocumentReference;
 
 import com.google.common.base.Joiner;
 
+@Immutable
 public abstract class StringListField extends ListField<String> {
 
-  public StringListField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  protected StringListField(@NotNull Builder<?, String> builder) {
+    super(builder);
   }
 
   @Override

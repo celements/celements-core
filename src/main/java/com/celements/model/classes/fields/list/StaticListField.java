@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -12,21 +13,44 @@ import com.google.common.base.Joiner;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
+@Immutable
 public class StaticListField extends StringListField {
 
-  private volatile List<String> values;
+  private final List<String> values;
 
-  public StaticListField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  public static class Builder extends ListField.Builder<Builder, String> {
+
+    private List<String> values;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      super(classRef, name);
+      values = new ArrayList<>();
+    }
+
+    @Override
+    public Builder getThis() {
+      return this;
+    }
+
+    public Builder values(@NotNull List<String> val) {
+      values = val;
+      return this;
+    }
+
+    @Override
+    public StaticListField build() {
+      return new StaticListField(this);
+    }
+
+  }
+
+  protected StaticListField(@NotNull Builder builder) {
+    super(builder);
+    this.values = Collections.unmodifiableList(new ArrayList<>(builder.values));
   }
 
   public List<String> getValues() {
     return values;
-  }
-
-  public StaticListField setValues(@NotNull List<String> values) {
-    this.values = Collections.unmodifiableList(new ArrayList<>(values));
-    return this;
   }
 
   @Override

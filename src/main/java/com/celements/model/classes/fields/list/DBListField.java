@@ -1,5 +1,7 @@
 package com.celements.model.classes.fields.list;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -7,21 +9,43 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
+@Immutable
 public class DBListField extends StringListField {
 
-  private volatile String sql;
+  private final String sql;
 
-  public DBListField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  public static class Builder extends ListField.Builder<Builder, String> {
+
+    private String sql;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      super(classRef, name);
+    }
+
+    @Override
+    public Builder getThis() {
+      return this;
+    }
+
+    public Builder sql(@Nullable String val) {
+      sql = val;
+      return getThis();
+    }
+
+    @Override
+    public DBListField build() {
+      return new DBListField(getThis());
+    }
+
+  }
+
+  protected DBListField(@NotNull Builder builder) {
+    super(builder);
+    this.sql = builder.sql;
   }
 
   public String getSql() {
     return sql;
-  }
-
-  public DBListField setSql(String sql) {
-    this.sql = sql;
-    return this;
   }
 
   @Override

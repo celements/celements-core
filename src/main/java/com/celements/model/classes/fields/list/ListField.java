@@ -3,27 +3,77 @@ package com.celements.model.classes.fields.list;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
+import org.python.google.common.base.Objects;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
+@Immutable
 public abstract class ListField<T> extends AbstractClassField<List<T>> implements
     CustomClassField<List<T>> {
 
-  private volatile Boolean multiSelect;
-  private volatile Integer size;
-  private volatile String displayType;
-  private volatile Boolean picker;
-  private volatile String separator;
+  private final Boolean multiSelect;
+  private final Integer size;
+  private final String displayType;
+  private final Boolean picker;
+  private final String separator;
 
-  public ListField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  public abstract static class Builder<B extends Builder<B, T>, T> extends
+      AbstractClassField.Builder<B, List<T>> {
+
+    private Boolean multiSelect;
+    private Integer size;
+    private String displayType;
+    private Boolean picker;
+    private String separator;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      super(classRef, name);
+    }
+
+    public B multiSelect(@Nullable Boolean val) {
+      multiSelect = val;
+      return getThis();
+    }
+
+    public B size(@Nullable Integer val) {
+      size = val;
+      return getThis();
+    }
+
+    public B displayType(@Nullable String val) {
+      displayType = val;
+      return getThis();
+    }
+
+    public B picker(@Nullable Boolean val) {
+      picker = val;
+      return getThis();
+    }
+
+    public B separator(@Nullable String val) {
+      separator = val;
+      return getThis();
+    }
+
+  }
+
+  protected ListField(@NotNull Builder<?, T> builder) {
+    super(builder);
+    this.multiSelect = builder.multiSelect;
+    this.size = builder.size;
+    this.displayType = builder.displayType;
+    this.picker = builder.picker;
+    this.separator = Objects.firstNonNull(Strings.emptyToNull(builder.separator), "|");
   }
 
   @Override
@@ -52,49 +102,20 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
     return multiSelect;
   }
 
-  public ListField<T> setMultiSelect(Boolean multiSelect) {
-    this.multiSelect = multiSelect;
-    return this;
-  }
-
   public Integer getSize() {
     return size;
-  }
-
-  public ListField<T> setSize(Integer size) {
-    this.size = size;
-    return this;
   }
 
   public String getDisplayType() {
     return displayType;
   }
 
-  public ListField<T> setDisplayType(String displayType) {
-    this.displayType = displayType;
-    return this;
-  }
-
   public Boolean getPicker() {
     return picker;
   }
 
-  public ListField<T> setPicker(Boolean picker) {
-    this.picker = picker;
-    return this;
-  }
-
   public String getSeparator() {
-    if (separator != null) {
-      return separator;
-    } else {
-      return "|";
-    }
-  }
-
-  public ListField<T> setSeparator(String separator) {
-    this.separator = separator;
-    return this;
+    return separator;
   }
 
   @Override

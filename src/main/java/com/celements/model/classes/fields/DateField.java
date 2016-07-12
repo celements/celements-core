@@ -2,6 +2,8 @@ package com.celements.model.classes.fields;
 
 import java.util.Date;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -9,14 +11,54 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
+@Immutable
 public class DateField extends AbstractClassField<Date> {
 
-  private volatile Integer size;
-  private volatile Integer emptyIsToday;
-  private volatile String dateFormat;
+  private final Integer size;
+  private final Integer emptyIsToday;
+  private final String dateFormat;
 
-  public DateField(@NotNull DocumentReference classRef, @NotNull String name) {
-    super(classRef, name);
+  public static class Builder extends AbstractClassField.Builder<Builder, Date> {
+
+    private Integer size;
+    private Integer emptyIsToday;
+    private String dateFormat;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      super(classRef, name);
+    }
+
+    @Override
+    public Builder getThis() {
+      return this;
+    }
+
+    public Builder size(@Nullable Integer val) {
+      size = val;
+      return getThis();
+    }
+
+    public Builder emptyIsToday(@Nullable Integer val) {
+      emptyIsToday = val;
+      return getThis();
+    }
+
+    public Builder dateFormat(@Nullable String val) {
+      dateFormat = val;
+      return getThis();
+    }
+
+    @Override
+    public DateField build() {
+      return new DateField(getThis());
+    }
+  }
+
+  protected DateField(@NotNull Builder builder) {
+    super(builder);
+    this.size = builder.size;
+    this.emptyIsToday = builder.emptyIsToday;
+    this.dateFormat = builder.dateFormat;
   }
 
   @Override
@@ -28,27 +70,12 @@ public class DateField extends AbstractClassField<Date> {
     return size;
   }
 
-  public DateField setSize(Integer size) {
-    this.size = size;
-    return this;
-  }
-
   public Integer getEmptyIsToday() {
     return emptyIsToday;
   }
 
-  public DateField setEmptyIsToday(Integer emptyIsToday) {
-    this.emptyIsToday = emptyIsToday;
-    return this;
-  }
-
   public String getDateFormat() {
     return dateFormat;
-  }
-
-  public DateField setDateFormat(String dateFormat) {
-    this.dateFormat = dateFormat;
-    return this;
   }
 
   @Override

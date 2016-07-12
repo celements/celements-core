@@ -2,6 +2,8 @@ package com.celements.model.classes.fields;
 
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -14,21 +16,58 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Subclasses are expected to be thread safe
+ * Subclasses are expected to be immutable
  */
+@Immutable
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
   private final DocumentReference classRef;
   private final String name;
+  private final String prettyName;
+  private final String validationRegExp;
+  private final String validationMessage;
 
-  private volatile String prettyName;
-  private volatile String validationRegExp;
-  private volatile String validationMessage;
+  public abstract static class Builder<B extends Builder<B, T>, T> {
 
-  public AbstractClassField(@NotNull DocumentReference classRef, @NotNull String name) {
-    Objects.requireNonNull(classRef);
-    this.classRef = ModelUtils.cloneReference(classRef, DocumentReference.class);
-    this.name = Objects.requireNonNull(Strings.emptyToNull(name));
+    private final DocumentReference classRef;
+    private final String name;
+    private String prettyName;
+    private String validationRegExp;
+    private String validationMessage;
+
+    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
+      Objects.requireNonNull(classRef);
+      this.classRef = ModelUtils.cloneReference(classRef, DocumentReference.class);
+      this.name = Objects.requireNonNull(Strings.emptyToNull(name));
+    }
+
+    public abstract B getThis();
+
+    public B prettyName(@Nullable String val) {
+      prettyName = val;
+      return getThis();
+    }
+
+    public B validationRegExp(@Nullable String val) {
+      validationRegExp = val;
+      return getThis();
+    }
+
+    public B validationMessage(@Nullable String val) {
+      validationMessage = val;
+      return getThis();
+    }
+
+    public abstract AbstractClassField<T> build();
+
+  }
+
+  protected AbstractClassField(@NotNull Builder<?, T> builder) {
+    this.classRef = builder.classRef;
+    this.name = builder.name;
+    this.prettyName = builder.prettyName;
+    this.validationRegExp = builder.validationRegExp;
+    this.validationMessage = builder.validationMessage;
   }
 
   @Override
@@ -45,27 +84,12 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
     return prettyName;
   }
 
-  public AbstractClassField<T> setPrettyName(String prettyName) {
-    this.prettyName = prettyName;
-    return this;
-  }
-
   public String getValidationRegExp() {
     return validationRegExp;
   }
 
-  public AbstractClassField<T> setValidationRegExp(String validationRegExp) {
-    this.validationRegExp = validationRegExp;
-    return this;
-  }
-
   public String getValidationMessage() {
     return validationMessage;
-  }
-
-  public AbstractClassField<T> setValidationMessage(String validationMessage) {
-    this.validationMessage = validationMessage;
-    return this;
   }
 
   @Override

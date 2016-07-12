@@ -22,7 +22,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class StringListFieldTest extends AbstractComponentTest {
 
-  private StaticListField field;
+  private StaticListField.Builder fieldBuilder;
 
   private boolean multiSelect = true;
   private Integer size = 5;
@@ -34,26 +34,26 @@ public class StringListFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new StaticListField(new DocumentReference("wiki", "class", "any"), "name");
-    field.setMultiSelect(multiSelect);
-    field.setSize(size);
-    field.setDisplayType(displayType);
-    field.setPicker(picker);
-    field.setSeparator(separator);
+    fieldBuilder = new StaticListField.Builder(new DocumentReference("wiki", "class", "any"),
+        "name").multiSelect(multiSelect).size(size).displayType(displayType).picker(
+            picker).separator(separator);
   }
 
   @Test
-  public void test_getters_setters() throws Exception {
+  public void test_getters() throws Exception {
+    StaticListField field = fieldBuilder.build();
     assertEquals(multiSelect, field.getMultiSelect());
     assertEquals(size, field.getSize());
     assertEquals(displayType, field.getDisplayType());
     assertEquals(picker, field.getPicker());
     assertEquals(separator, field.getSeparator());
-    assertEquals("|", new StaticListField(field.getClassRef(), field.getName()).getSeparator());
+    assertEquals("|", new StaticListField.Builder(field.getClassRef(),
+        field.getName()).build().getSeparator());
   }
 
   @Test
   public void test_getXField() throws Exception {
+    StaticListField field = fieldBuilder.build();
     assertTrue(field.getXField() instanceof ListClass);
     ListClass xField = (ListClass) field.getXField();
     assertEquals(multiSelect, xField.isMultiSelect());
@@ -66,32 +66,31 @@ public class StringListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize() throws Exception {
+    StaticListField field = fieldBuilder.values(Arrays.asList("A", "B", "C", "D")).build();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(field.getClassRef());
-    String value = "B";
-    field.setMultiSelect(false);
-    field.setValues(Arrays.asList("A", "B", "C", "D"));
+    List<String> value = Arrays.asList("B");
 
     BaseClass bClass = expectNewBaseObject(field.getClassRef());
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, Arrays.asList(value)));
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
     List<String> ret = modelAccess.getProperty(doc, field);
     verifyDefault();
 
-    assertEquals(Arrays.asList(value), ret);
-    assertEquals(value, modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
+    assertEquals(value, ret);
+    assertEquals(value, modelAccess.getXObject(doc, field.getClassRef()).getListValue(
         field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
+    StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
+        "D")).build();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(field.getClassRef());
     List<String> value = Arrays.asList("B", "D");
-    field.setMultiSelect(true);
-    field.setValues(Arrays.asList("A", "B", "C", "D"));
 
     BaseClass bClass = expectNewBaseObject(field.getClassRef());
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
@@ -108,10 +107,10 @@ public class StringListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
+    StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
+        "D")).build();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(field.getClassRef());
-    field.setMultiSelect(true);
-    field.setValues(Arrays.asList("A", "B", "C", "D"));
 
     BaseClass bClass = expectNewBaseObject(field.getClassRef());
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());

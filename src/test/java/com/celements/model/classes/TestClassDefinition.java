@@ -50,27 +50,19 @@ public class TestClassDefinition extends AbstractClassDefinition implements
   }
 
   private static ClassField<String> getFieldMyString() {
-    StringField ret = new StringField(CLASS_REF, "myString");
-    ret.setSize(30);
-    return ret;
+    return new StringField.Builder(CLASS_REF, "myString").size(30).build();
   }
 
   private static ClassField<Integer> getFieldMyInt() {
-    IntField ret = new IntField(CLASS_REF, "myInt");
-    ret.setSize(30);
-    return ret;
+    return new IntField.Builder(CLASS_REF, "myInt").size(30).build();
   }
 
   private static ClassField<Boolean> getFieldMyBool() {
-    BooleanField ret = new BooleanField(CLASS_REF, "myBool");
-    ret.setDisplayType("asdf");
-    return ret;
+    return new BooleanField.Builder(CLASS_REF, "myBool").displayType("asdf").build();
   }
 
   private static ClassField<DocumentReference> getFieldMyDocRef() {
-    DocumentReferenceField ret = new DocumentReferenceField(CLASS_REF, "myDocRef");
-    ret.setSize(30);
-    return ret;
+    return new DocumentReferenceField.Builder(CLASS_REF, "myDocRef").size(30).build();
   }
 
 }

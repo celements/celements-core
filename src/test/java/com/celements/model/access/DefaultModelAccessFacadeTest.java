@@ -805,7 +805,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_ClassField() throws Exception {
-    ClassField<String> field = new StringField(classRef, "name");
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
     String val = "val";
     addObj(classRef, field.getName(), val);
 
@@ -818,7 +818,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_ClassField_illegalField() throws Exception {
-    ClassField<Date> field = new DateField(classRef, "name");
+    ClassField<Date> field = new DateField.Builder(classRef, "name").build();
     addObj(classRef, field.getName(), "val");
 
     replayDefault();
@@ -836,7 +836,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_ClassField_docRef() throws Exception {
-    ClassField<String> field = new StringField(classRef, "name");
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
     String val = "val";
     addObj(classRef, field.getName(), val);
 
@@ -944,7 +944,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_setProperty_ClassField() throws Exception {
     String val = "val";
-    ClassField<String> field = new StringField(classRef, "name");
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
     BaseObject obj = addObj(classRef, field.getName(), "");
 
@@ -960,7 +960,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_ClassField_illegalField() throws Exception {
-    ClassField<Date> field = new DateField(classRef, "name");
+    ClassField<Date> field = new DateField.Builder(classRef, "name").build();
     ClassFieldValue<Date> fieldValue = new ClassFieldValue<>(field, new Date());
     BaseClass bClass = expectNewBaseObject(classRef);
 
@@ -981,7 +981,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_setProperty_ClassField_newObj() throws Exception {
     String val = "val";
-    ClassField<String> field = new StringField(classRef, "name");
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), new StringClass());

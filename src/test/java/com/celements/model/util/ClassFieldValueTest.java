@@ -18,7 +18,7 @@ public class ClassFieldValueTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new StringField(new DocumentReference("wiki", "class", "any"), "name");
+    field = new StringField.Builder(new DocumentReference("wiki", "class", "any"), "name").build();
     val = "val";
   }
 
@@ -50,8 +50,8 @@ public class ClassFieldValueTest extends AbstractComponentTest {
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
     assertTrue(fieldValue.equals(new ClassFieldValue<String>(field, val)));
     assertFalse(fieldValue.equals(new ClassFieldValue<String>(field, "otherVal")));
-    assertFalse(fieldValue.equals(new ClassFieldValue<String>(new StringField(field.getClassRef(),
-        "name2"), val)));
+    assertFalse(fieldValue.equals(new ClassFieldValue<String>(new StringField.Builder(
+        field.getClassRef(), "name2").build(), val)));
     assertFalse(fieldValue.equals(field));
     assertFalse(fieldValue.equals(null));
   }
@@ -61,8 +61,8 @@ public class ClassFieldValueTest extends AbstractComponentTest {
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
     assertTrue(fieldValue.hashCode() == new ClassFieldValue<String>(field, val).hashCode());
     assertFalse(fieldValue.hashCode() == new ClassFieldValue<String>(field, "otherVal").hashCode());
-    assertFalse(fieldValue.hashCode() == new ClassFieldValue<String>(new StringField(
-        field.getClassRef(), "name2"), val).hashCode());
+    assertFalse(fieldValue.hashCode() == new ClassFieldValue<String>(new StringField.Builder(
+        field.getClassRef(), "name2").build(), val).hashCode());
     assertFalse(fieldValue.hashCode() == field.hashCode());
   }
 
