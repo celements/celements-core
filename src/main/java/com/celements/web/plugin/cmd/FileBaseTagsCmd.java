@@ -24,6 +24,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -35,6 +37,7 @@ import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -47,8 +50,8 @@ public class FileBaseTagsCmd {
   public final static String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
   private final ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-  private final INavigationClassConfig navClassConfig = Utils.getComponent(
-      INavigationClassConfig.class);
+  private final INavigationClassConfig navClassConfig = Utils.getComponent(INavigationClassConfig.class);
+  private final ModelConfiguration modelConfig = Utils.getComponent(ModelConfiguration.class);
   private final Execution execution = Utils.getComponent(Execution.class);
 
   private XWikiContext getContext() {
@@ -78,6 +81,9 @@ public class FileBaseTagsCmd {
   public SpaceReference getTagSpaceRef() {
     String centralFileBaseName = getCentralFileBaseFullName() + ".";
     String spaceName = centralFileBaseName.substring(0, centralFileBaseName.indexOf('.'));
+    if (Strings.isNullOrEmpty(spaceName)) {
+      spaceName = modelConfig.getDefaultReferenceValue(EntityType.SPACE) + "_attachments";
+    }
     return new SpaceReference(spaceName, new WikiReference(getContext().getDatabase()));
   }
 
