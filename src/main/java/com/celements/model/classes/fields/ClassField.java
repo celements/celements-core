@@ -1,11 +1,13 @@
 package com.celements.model.classes.fields;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.objects.PropertyInterface;
 
+@Immutable
 public interface ClassField<T> {
 
   @NotNull
