@@ -23,7 +23,6 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
@@ -126,15 +125,15 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     modelAccess.webUtilsService = webUtilsMock;
     expect(webUtilsMock.getDefaultLanguage(eq(
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        doc).once();
+    Capture<XWikiDocument> captExists = expectExists(true);
+    Capture<XWikiDocument> captLoad = expectLoad(doc);
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "de");
     verifyDefault();
     assertEquals(doc, theDoc);
     assertNotSame("must be cloned for cache safety", doc, theDoc);
+    assertCapture(captExists, doc.getDocumentReference(), "de");
+    assertCapture(captLoad, doc.getDocumentReference(), "de");
   }
 
   @Test
@@ -145,23 +144,16 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     modelAccess.webUtilsService = webUtilsMock;
     expect(webUtilsMock.getDefaultLanguage(eq(
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        doc).once();
-    XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
-    theTdoc.setDefaultLanguage("de");
-    theTdoc.setLanguage("en");
-    Capture<XWikiDocument> captLoad = expectLoad(theTdoc);
+    Capture<XWikiDocument> captExists = expectExists(false);
     replayDefault();
     try {
       modelAccess.getDocument(doc.getDocumentReference(), "en");
-      fail("expecting TranslationNotExistsException");
-    } catch (TranslationNotExistsException exc) {
+      fail("expecting DocumentNotExistsException");
+    } catch (DocumentNotExistsException exc) {
       // expected
     }
     verifyDefault();
-    assertCapture(captLoad, doc.getDocumentReference(), "en");
+    assertCapture(captExists, doc.getDocumentReference(), "en");
   }
 
   @Test
@@ -172,10 +164,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     modelAccess.webUtilsService = webUtilsMock;
     expect(webUtilsMock.getDefaultLanguage(eq(
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        true).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        doc).once();
+    Capture<XWikiDocument> captExists = expectExists(true);
     XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
     theTdoc.setDefaultLanguage("de");
     theTdoc.setLanguage("en");
@@ -187,6 +176,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     verifyDefault();
     assertEquals(theTdoc, theDoc);
     assertNotSame("must be cloned for cache safety", theTdoc, theDoc);
+    assertCapture(captExists, doc.getDocumentReference(), "en");
     assertCapture(captLoad, doc.getDocumentReference(), "en");
   }
 
