@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   private XWikiDocument doc;
   private DocumentReference classRef;
   private DocumentReference classRef2;
-  private XWikiStoreInterface xwikiStoreMock;
+  private XWikiStoreInterface storeMock;
 
   @Before
   public void setUp_DefaultModelAccessFacadeTest() {
@@ -55,10 +54,10 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
     doc.setSyntax(Syntax.XWIKI_1_0);
     doc.setMetaDataDirty(false);
-    xwikiStoreMock = createMockAndAddToDefault(XWikiStoreInterface.class);
-    doc.setStore(xwikiStoreMock);
+    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
+    doc.setStore(storeMock);
     doc.setNew(false);
-    expect(getWikiMock().getStore()).andReturn(xwikiStoreMock).anyTimes();
+    expect(getWikiMock().getStore()).andReturn(storeMock).anyTimes();
     classRef = new DocumentReference("db", "class", "any");
     classRef2 = new DocumentReference("db", "class", "other");
     // important for unstable-2.0 set database because class references are checked for db
@@ -148,10 +147,12 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         true).once();
-    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
-        Collections.<String>emptyList());
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
+    XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
+    theTdoc.setDefaultLanguage("de");
+    theTdoc.setLanguage("en");
+    Capture<XWikiDocument> captLoad = expectLoad(theTdoc);
     replayDefault();
     try {
       modelAccess.getDocument(doc.getDocumentReference(), "en");
@@ -160,6 +161,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       // expected
     }
     verifyDefault();
+    assertCapture(captLoad, doc.getDocumentReference(), "en");
   }
 
   @Test
@@ -172,26 +174,20 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         true).once();
-    expect(xwikiStoreMock.getTranslationList(same(doc), same(getContext()))).andReturn(
-        Arrays.asList("en", "fr"));
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
-    Capture<XWikiDocument> tdocCapture = new Capture<>();
     XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
     theTdoc.setDefaultLanguage("de");
     theTdoc.setLanguage("en");
     theTdoc.setNew(false);
     theTdoc.setSyntax(Syntax.XWIKI_1_0);
-    expect(xwikiStoreMock.loadXWikiDoc(capture(tdocCapture), same(getContext()))).andReturn(
-        theTdoc).once();
+    Capture<XWikiDocument> captLoad = expectLoad(theTdoc);
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "en");
     verifyDefault();
     assertEquals(theTdoc, theDoc);
     assertNotSame("must be cloned for cache safety", theTdoc, theDoc);
-    XWikiDocument loadedTdoc = tdocCapture.getValue();
-    assertEquals(doc.getDocumentReference(), loadedTdoc.getDocumentReference());
-    assertEquals("en", loadedTdoc.getLanguage());
+    assertCapture(captLoad, doc.getDocumentReference(), "en");
   }
 
   @Test
@@ -338,7 +334,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_exists_true() {
+  public void test_exists_true() throws Exception {
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         true).once();
     replayDefault();
@@ -348,7 +344,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_exists_false() {
+  public void test_exists_false() throws Exception {
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         false).once();
     replayDefault();
@@ -358,9 +354,49 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_exists_null() {
+  public void test_exists_null() throws Exception {
     replayDefault();
     boolean ret = modelAccess.exists(null);
+    verifyDefault();
+    assertFalse(ret);
+  }
+
+  @Test
+  public void test_exists_lang_true() throws Exception {
+    String lang = "en";
+    Capture<XWikiDocument> capt = expectExists(true);
+    replayDefault();
+    boolean ret = modelAccess.exists(doc.getDocumentReference(), lang);
+    verifyDefault();
+    assertTrue(ret);
+    assertCapture(capt, doc.getDocumentReference(), lang);
+  }
+
+  @Test
+  public void test_exists_lang_false() throws Exception {
+    String lang = "en";
+    Capture<XWikiDocument> capt = expectExists(false);
+    replayDefault();
+    boolean ret = modelAccess.exists(doc.getDocumentReference(), lang);
+    verifyDefault();
+    assertFalse(ret);
+    assertCapture(capt, doc.getDocumentReference(), lang);
+  }
+
+  @Test
+  public void test_exists_lang_none() throws Exception {
+    Capture<XWikiDocument> capt = expectExists(false);
+    replayDefault();
+    boolean ret = modelAccess.exists(doc.getDocumentReference(), null);
+    verifyDefault();
+    assertFalse(ret);
+    assertCapture(capt, doc.getDocumentReference(), "");
+  }
+
+  @Test
+  public void test_exists_lang_null() throws Exception {
+    replayDefault();
+    boolean ret = modelAccess.exists(null, null);
     verifyDefault();
     assertFalse(ret);
   }
@@ -932,6 +968,24 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       // expected
     }
     verifyDefault();
+  }
+
+  private Capture<XWikiDocument> expectExists(boolean result) throws XWikiException {
+    Capture<XWikiDocument> capt = new Capture<>();
+    expect(storeMock.exists(capture(capt), same(getContext()))).andReturn(result).once();
+    return capt;
+  }
+
+  private Capture<XWikiDocument> expectLoad(XWikiDocument result) throws XWikiException {
+    Capture<XWikiDocument> capt = new Capture<>();
+    expect(storeMock.loadXWikiDoc(capture(capt), same(getContext()))).andReturn(result).once();
+    return capt;
+  }
+
+  private void assertCapture(Capture<XWikiDocument> capt, DocumentReference docRef, String lang) {
+    assertNotNull(capt.getValue());
+    assertEquals(docRef, capt.getValue().getDocumentReference());
+    assertEquals(lang, capt.getValue().getLanguage());
   }
 
 }

@@ -66,27 +66,24 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public XWikiDocument getDocument(DocumentReference docRef) throws DocumentNotExistsException {
-    checkNotNull(docRef);
-    if (exists(docRef)) {
-      return getDocumentInternal(docRef);
-    } else {
-      throw new DocumentNotExistsException(docRef);
+    try {
+      return getDocument(docRef, null);
+    } catch (TranslationNotExistsException exc) {
+      throw new RuntimeException("Default translation must exist", exc);
     }
   }
 
-  /**
-   * TODO unit test
-   */
   @Override
   public XWikiDocument getDocument(DocumentReference docRef, String lang)
       throws DocumentNotExistsException, TranslationNotExistsException {
-    checkNotNull(docRef);
-    checkState(!Strings.isNullOrEmpty(lang));
-    XWikiDocument translatedDocument = getDocumentForReadOnly(docRef);
-    String defaultLanguage = webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference());
-    String docDefLang = Strings.nullToEmpty(translatedDocument.getDefaultLanguage());
-    if (!lang.equals(docDefLang) && (!"".equals(docDefLang) || !lang.equals(defaultLanguage))) {
-      translatedDocument = getTranslation(docRef, lang);
+    XWikiDocument doc = getDocumentForReadOnly(docRef);
+    lang = Strings.nullToEmpty(lang);
+    if (!lang.isEmpty()) {
+      String defaultLanguage = webUtilsService.getDefaultLanguage(docRef.getLastSpaceReference());
+      String docDefLang = Strings.nullToEmpty(doc.getDefaultLanguage());
+      if (!lang.equals(docDefLang) && (!docDefLang.isEmpty() || !lang.equals(defaultLanguage))) {
+        doc = getTranslation(docRef, lang);
+      }
     }
     // We need to clone this document first, since a cached storage would return the same
     // object for the
@@ -94,7 +91,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     // worse, if an error
     // occurs during the save, the cached object will not reflect the actual document at
     // all.
-    return translatedDocument.clone();
+    return doc.clone();
   }
 
   @Override
@@ -190,17 +187,31 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
   }
 
+  /*
+   * TODO delegate to {@link #exists(DocumentReference, String)}
+   * this is not yet possible because many tests do not mock this component and are therefore
+   * implementation dependent. changing this method to use the store directly breaks all these
+   * tests, we therefore first need a proper ModelAccess stub in celements.test
+   */
   @Override
   public boolean exists(DocumentReference docRef) {
-    return exists(docRef, null);
+    boolean exists = false;
+    if (docRef != null) {
+      exists = getContext().getWiki().exists(docRef, getContext());
+    }
+    return exists;
   }
 
   @Override
   public boolean exists(DocumentReference docRef, String lang) {
+    boolean ret = false;
     String database = getContext().getDatabase();
     try {
-      getContext().setDatabase(docRef.getWikiReference().getName());
-      return getContext().getWiki().getStore().exists(newDoc(docRef, lang), getContext());
+      if (docRef != null) {
+        getContext().setDatabase(docRef.getWikiReference().getName());
+        ret = getContext().getWiki().getStore().exists(newDoc(docRef, lang), getContext());
+      }
+      return ret;
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     } finally {
