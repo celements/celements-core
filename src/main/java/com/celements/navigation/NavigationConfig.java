@@ -32,7 +32,7 @@ public final class NavigationConfig {
   public static class Builder {
 
     // Required parameters
-    private final boolean enabled;
+    private boolean enabled;
 
     // Optional parameters - initialized to Optional
     private Optional<String> configName = Optional.absent();
@@ -47,8 +47,13 @@ public final class NavigationConfig {
     private Optional<String> presentationTypeHint = Optional.absent();
     private Optional<String> cmCssClass = Optional.absent();
 
-    public Builder(boolean enabled) {
-      this.enabled = enabled;
+    public Builder() {
+      enabled = true;
+    }
+
+    public Builder disable() {
+      enabled = false;
+      return this;
     }
 
     public Builder configName(@Nullable String val) {
@@ -129,7 +134,7 @@ public final class NavigationConfig {
   private final Optional<String> cmCssClass;
 
   private NavigationConfig() {
-    this(new Builder(false));
+    this(new Builder().disable());
   }
 
   private NavigationConfig(@NotNull Builder builder) {
@@ -156,7 +161,7 @@ public final class NavigationConfig {
   final public NavigationConfig overlay(@NotNull NavigationConfig newConf) {
     boolean newEnabled = enabled || newConf.enabled;
     if (newEnabled) {
-      Builder b = new Builder(true);
+      Builder b = new Builder();
       b.configName = newConf.configName.or(configName);
       b.fromHierarchyLevel = newConf.fromHierarchyLevel.or(fromHierarchyLevel);
       b.toHierarchyLevel = newConf.toHierarchyLevel.or(toHierarchyLevel);

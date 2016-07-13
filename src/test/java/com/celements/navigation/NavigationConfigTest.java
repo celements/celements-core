@@ -21,7 +21,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Before
   public void setUp_NavigationConfigTest() throws Exception {
-    navBuilder = new NavigationConfig.Builder(true);
+    navBuilder = new NavigationConfig.Builder();
   }
 
   @Test
@@ -112,7 +112,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testIsEnabled_false() {
-    NavigationConfig navConfig = new NavigationConfig.Builder(false).build();
+    NavigationConfig navConfig = navBuilder.disable().build();
     assertFalse(navConfig.isEnabled());
     // defaults for other fields must remain
     assertEquals("", navConfig.getConfigName());
@@ -381,7 +381,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -431,7 +431,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -482,7 +482,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -533,7 +533,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -584,7 +584,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -635,7 +635,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -687,7 +687,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -738,7 +738,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -788,7 +788,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -839,7 +839,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
@@ -890,7 +890,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+    NavigationConfig navConfig2 = new NavigationConfig.Builder().configName(configName2).fromHierarchyLevel(
         fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
         showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
         layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
