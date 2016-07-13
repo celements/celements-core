@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -12,7 +15,6 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.celements.model.access.exception.TranslationNotExistsException;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -22,32 +24,46 @@ import com.xpn.xwiki.objects.BaseObject;
 @ComponentRole
 public interface IModelAccessFacade {
 
-  public XWikiDocument getDocument(DocumentReference docRef) throws DocumentNotExistsException;
+  @NotNull
+  public XWikiDocument getDocument(@NotNull DocumentReference docRef)
+      throws DocumentNotExistsException;
 
-  public XWikiDocument getDocument(DocumentReference docRef, String lang)
-      throws DocumentNotExistsException, TranslationNotExistsException;
+  @NotNull
+  public XWikiDocument getDocument(@NotNull DocumentReference docRef, @Nullable String lang)
+      throws DocumentNotExistsException;
 
-  public XWikiDocument createDocument(DocumentReference docRef)
+  @NotNull
+  public XWikiDocument createDocument(@NotNull DocumentReference docRef)
       throws DocumentAlreadyExistsException;
 
-  public XWikiDocument getOrCreateDocument(DocumentReference docRef);
+  @NotNull
+  public XWikiDocument getOrCreateDocument(@NotNull DocumentReference docRef);
 
-  public boolean exists(DocumentReference docRef);
+  public boolean exists(@NotNull DocumentReference docRef);
 
-  public void saveDocument(XWikiDocument doc) throws DocumentSaveException;
+  public boolean exists(@NotNull DocumentReference docRef, @Nullable String lang);
 
-  public void saveDocument(XWikiDocument doc, String comment) throws DocumentSaveException;
+  public void saveDocument(@NotNull XWikiDocument doc) throws DocumentSaveException;
 
-  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
+  public void saveDocument(@NotNull XWikiDocument doc, @Nullable String comment)
       throws DocumentSaveException;
 
-  public void deleteDocument(DocumentReference docRef, boolean totrash)
+  public void saveDocument(@NotNull XWikiDocument doc, @Nullable String comment,
+      boolean isMinorEdit) throws DocumentSaveException;
+
+  public void deleteDocument(@NotNull DocumentReference docRef, boolean totrash)
       throws DocumentDeleteException;
 
-  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException;
-
-  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
+  public void deleteDocument(@NotNull XWikiDocument doc, boolean totrash)
       throws DocumentDeleteException;
+
+  public void deleteDocumentWithoutTranslations(@NotNull XWikiDocument doc, boolean totrash)
+      throws DocumentDeleteException;
+
+  @NotNull
+  public Map<String, XWikiDocument> getTranslations(@NotNull DocumentReference docRef);
+
+  public boolean isTranslation(@NotNull XWikiDocument doc);
 
   /**
    * @param docRef
