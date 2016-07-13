@@ -488,6 +488,17 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_isTranslation() throws Exception {
+    assertFalse(modelAccess.isTranslation(doc));
+  }
+
+  @Test
+  public void test_isTranslation_false() throws Exception {
+    doc.setTranslation(1);
+    assertTrue(modelAccess.isTranslation(doc));
+  }
+
+  @Test
   public void test_getXObjects_nullDoc() {
     try {
       modelAccess.getXObjects((XWikiDocument) null, null);
@@ -576,6 +587,19 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getXObjects_isTranslation() throws Exception {
+    doc.setTranslation(1);
+    replayDefault();
+    try {
+      modelAccess.getXObjects(doc, classRef);
+      fail("expecting IllegalStateException");
+    } catch (IllegalStateException ise) {
+      // expected
+    }
+    verifyDefault();
+  }
+
+  @Test
   public void test_getXObjects_undmodifiable() throws Exception {
     addObj(classRef, null, null);
     List<BaseObject> ret = modelAccess.getXObjects(doc, classRef);
@@ -622,6 +646,19 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     } catch (UnsupportedOperationException exc) {
       // expected
     }
+  }
+
+  @Test
+  public void test_getXObjects_map_isTranslation() throws Exception {
+    doc.setTranslation(1);
+    replayDefault();
+    try {
+      modelAccess.getXObjects(doc);
+      fail("expecting IllegalStateException");
+    } catch (IllegalStateException ise) {
+      // expected
+    }
+    verifyDefault();
   }
 
   @Test
