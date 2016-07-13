@@ -45,7 +45,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -351,14 +350,12 @@ public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference templRef = new DocumentReference(db, "Templates", "MyTempl");
     XWikiDocument templDoc = new XWikiDocument(templRef);
     expect(xwiki.getDocument(eq(templRef), same(context))).andReturn(templDoc);
-    XWikiStoreInterface store = createMockAndAddToDefault(XWikiStoreInterface.class);
     // //TODO is there a better method to match the parameter? -> eq and same do not work
     // // since loadXWikiDoc create a new XWikiDocument
     // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
     // same(context))).andReturn(defaultDoc);
     // expect(store.loadXWikiDoc(isA(XWikiDocument.class),
     // same(context))).andReturn(specificDoc);
-    expect(xwiki.getStore()).andReturn(store).anyTimes();
     replayDefault();
     Set<XWikiDocument> changedDocs = docFormCmd.updateDocFromMap("Full.Name", data, context);
     verifyDefault();
