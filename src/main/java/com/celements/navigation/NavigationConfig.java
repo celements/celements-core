@@ -12,7 +12,8 @@ import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
@@ -28,123 +29,146 @@ public final class NavigationConfig {
   public static final String PAGE_MENU_DATA_TYPE = "pageMenu";
   public static final String LIST_LAYOUT_TYPE = "list";
 
-  private final boolean enabled;
-  private final ConfigValues origValues;
-  private final ConfigValues ownValues;
+  public static class Builder {
 
-  private class ConfigValues {
+    // Required parameters
+    private final boolean enabled;
 
-    private final String configName;
-    private final Integer fromHierarchyLevel;
-    private final Integer toHierarchyLevel;
-    private final Integer showInactiveToLevel;
-    private final String menuPart;
-    private final SpaceReference nodeSpaceRef;
-    private final String dataType;
-    private final String layoutType;
-    private final Integer nrOfItemsPerPage;
-    private final String presentationTypeHint;
-    private final String cmCssClass;
+    // Optional parameters - initialized to Optional
+    private Optional<String> configName = Optional.absent();
+    private Optional<Integer> fromHierarchyLevel = Optional.absent();
+    private Optional<Integer> toHierarchyLevel = Optional.absent();
+    private Optional<Integer> showInactiveToLevel = Optional.absent();
+    private Optional<String> menuPart = Optional.absent();
+    private Optional<SpaceReference> nodeSpaceRef = Optional.absent();
+    private Optional<String> dataType = Optional.absent();
+    private Optional<String> layoutType = Optional.absent();
+    private Optional<Integer> nrOfItemsPerPage = Optional.absent();
+    private Optional<String> presentationTypeHint = Optional.absent();
+    private Optional<String> cmCssClass = Optional.absent();
 
-    private ConfigValues(@Nullable String configName, @Nullable Integer fromHierarchyLevel,
-        @Nullable Integer toHierarchyLevel, @Nullable Integer showInactiveToLevel,
-        @Nullable String menuPart, @Nullable String dataType, @Nullable SpaceReference nodeSpaceRef,
-        @Nullable String layoutType, @Nullable Integer nrOfItemsPerPage,
-        @Nullable String presentationTypeHint, @Nullable String cmCssClass) {
-      this.configName = configName;
-      this.fromHierarchyLevel = fromHierarchyLevel;
-      this.toHierarchyLevel = toHierarchyLevel;
-      this.showInactiveToLevel = showInactiveToLevel;
-      this.menuPart = menuPart;
-      this.nodeSpaceRef = nodeSpaceRef;
-      this.dataType = dataType;
-      this.layoutType = layoutType;
-      this.nrOfItemsPerPage = nrOfItemsPerPage;
-      this.presentationTypeHint = presentationTypeHint;
-      this.cmCssClass = cmCssClass;
+    public Builder(boolean enabled) {
+      this.enabled = enabled;
     }
+
+    public Builder configName(@Nullable String val) {
+      configName = Optional.fromNullable(Strings.emptyToNull(val));
+      return this;
+    }
+
+    public Builder fromHierarchyLevel(int val) {
+      fromHierarchyLevel = Optional.of(val);
+      return this;
+    }
+
+    public Builder toHierarchyLevel(int val) {
+      toHierarchyLevel = Optional.of(val);
+      return this;
+    }
+
+    public Builder showInactiveToLevel(int val) {
+      showInactiveToLevel = Optional.of(val);
+      return this;
+    }
+
+    public Builder menuPart(@Nullable String val) {
+      menuPart = Optional.fromNullable(Strings.emptyToNull(val));
+      return this;
+    }
+
+    public Builder nodeSpaceRef(@NotNull SpaceReference val) {
+      Preconditions.checkNotNull(val);
+      nodeSpaceRef = Optional.of(new SpaceReference(val.clone()));
+      return this;
+    }
+
+    public Builder dataType(@Nullable String val) {
+      dataType = Optional.fromNullable(Strings.emptyToNull(val));
+      return this;
+    }
+
+    public Builder layoutType(@Nullable String val) {
+      layoutType = Optional.fromNullable(Strings.emptyToNull(val));
+      return this;
+    }
+
+    public Builder nrOfItemsPerPage(int val) {
+      if ((val == UNLIMITED_ITEMS_PER_PAGE) || (val > 0)) {
+        nrOfItemsPerPage = Optional.of(val);
+      }
+      return this;
+    }
+
+    public Builder presentationTypeHint(@Nullable String val) {
+      presentationTypeHint = Optional.fromNullable(Strings.emptyToNull(val));
+      return this;
+    }
+
+    public Builder cmCssClass(@Nullable String val) {
+      cmCssClass = Optional.fromNullable(Strings.emptyToNull(val));
+      return this;
+    }
+
+    public NavigationConfig build() {
+      return new NavigationConfig(this);
+    }
+
   }
+
+  private final boolean enabled;
+  private final Optional<String> configName;
+  private final Optional<Integer> fromHierarchyLevel;
+  private final Optional<Integer> toHierarchyLevel;
+  private final Optional<Integer> showInactiveToLevel;
+  private final Optional<String> menuPart;
+  private final Optional<SpaceReference> nodeSpaceRef;
+  private final Optional<String> dataType;
+  private final Optional<String> layoutType;
+  private final Optional<Integer> nrOfItemsPerPage;
+  private final Optional<String> presentationTypeHint;
+  private final Optional<String> cmCssClass;
 
   private NavigationConfig() {
-    this(false, null, null, null, null, null, null, null, null, null, null, null);
+    this(new Builder(false));
   }
 
-  public NavigationConfig(@Nullable String configName, @Nullable Integer fromHierarchyLevel,
-      @Nullable Integer toHierarchyLevel, @Nullable Integer showInactiveToLevel,
-      @Nullable String menuPart, @Nullable String dataType, @Nullable SpaceReference nodeSpaceRef,
-      @Nullable String layoutType, @Nullable Integer nrOfItemsPerPage,
-      @Nullable String presentationTypeHint, @Nullable String cmCssClass) {
-    this(true, configName, fromHierarchyLevel, toHierarchyLevel, showInactiveToLevel, menuPart,
-        dataType, nodeSpaceRef, layoutType, nrOfItemsPerPage, presentationTypeHint, cmCssClass);
-  }
-
-  private NavigationConfig(boolean enabled, String configName, Integer fromHierarchyLevel,
-      Integer toHierarchyLevel, Integer showInactiveToLevel, String menuPart, String dataType,
-      SpaceReference nodeSpaceRef, String layoutType, Integer nrOfItemsPerPage,
-      String presentationTypeHint, String cmCssClass) {
-    this.enabled = enabled;
-    SpaceReference theNodeSpaceRef = (nodeSpaceRef != null) ? new SpaceReference(
-        nodeSpaceRef.clone()) : null;
-    this.origValues = new ConfigValues(Strings.emptyToNull(configName), fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, Strings.emptyToNull(menuPart), Strings.emptyToNull(
-            dataType), theNodeSpaceRef, Strings.emptyToNull(layoutType), nrOfItemsPerPage,
-        Strings.emptyToNull(presentationTypeHint), Strings.emptyToNull(cmCssClass));
-    String theConfigName = Strings.nullToEmpty(origValues.configName);
-    int theFromHierarchyLevel = Math.max(MoreObjects.firstNonNull(origValues.fromHierarchyLevel,
-        DEFAULT_MIN_LEVEL), DEFAULT_MIN_LEVEL);
-    Integer theToHierarchyLevel = MoreObjects.firstNonNull(origValues.toHierarchyLevel,
-        DEFAULT_MAX_LEVEL);
-    Integer theShowInactiveToLevel = MoreObjects.firstNonNull(origValues.showInactiveToLevel,
-        DEFAULT_MIN_LEVEL - 1);
-    String theMenuPart = Strings.nullToEmpty(origValues.menuPart);
-    String theDataType = MoreObjects.firstNonNull(origValues.dataType, PAGE_MENU_DATA_TYPE);
-    String theLayoutType = MoreObjects.firstNonNull(origValues.layoutType, LIST_LAYOUT_TYPE);
-    int theNrOfItemsPerPage = Math.max(MoreObjects.firstNonNull(origValues.nrOfItemsPerPage,
-        UNLIMITED_ITEMS_PER_PAGE), UNLIMITED_ITEMS_PER_PAGE);
-    String thePresentationTypeHint = MoreObjects.firstNonNull(origValues.presentationTypeHint,
-        "default");
-    String theCmCssClass = Strings.nullToEmpty(origValues.cmCssClass);
-    this.ownValues = new ConfigValues(theConfigName, theFromHierarchyLevel, theToHierarchyLevel,
-        theShowInactiveToLevel, theMenuPart, theDataType, origValues.nodeSpaceRef, theLayoutType,
-        theNrOfItemsPerPage, thePresentationTypeHint, theCmCssClass);
+  private NavigationConfig(@NotNull Builder builder) {
+    this.enabled = builder.enabled;
+    this.configName = builder.configName;
+    this.fromHierarchyLevel = builder.fromHierarchyLevel;
+    this.toHierarchyLevel = builder.toHierarchyLevel;
+    this.showInactiveToLevel = builder.showInactiveToLevel;
+    this.menuPart = builder.menuPart;
+    this.nodeSpaceRef = builder.nodeSpaceRef;
+    this.dataType = builder.dataType;
+    this.layoutType = builder.layoutType;
+    this.nrOfItemsPerPage = builder.nrOfItemsPerPage;
+    this.presentationTypeHint = builder.presentationTypeHint;
+    this.cmCssClass = builder.cmCssClass;
   }
 
   @Nullable
   final private <T> T firstNotNullOrNull(@Nullable T firstObj, @Nullable T secondObj) {
-    if (firstObj != null) {
-      return firstObj;
-    } else {
-      return secondObj;
-    }
+    return Optional.fromNullable(firstObj).or(Optional.fromNullable(secondObj)).orNull();
   }
 
   @NotNull
   final public NavigationConfig overlay(@NotNull NavigationConfig newConf) {
     boolean newEnabled = enabled || newConf.enabled;
     if (newEnabled) {
-      String newConfigName = firstNotNullOrNull(newConf.origValues.configName,
-          origValues.configName);
-      Integer newFromHierarchyLevel = firstNotNullOrNull(newConf.origValues.fromHierarchyLevel,
-          origValues.fromHierarchyLevel);
-      Integer newToHierarchyLevel = firstNotNullOrNull(newConf.origValues.toHierarchyLevel,
-          origValues.toHierarchyLevel);
-      Integer newShowInactiveToLevel = firstNotNullOrNull(newConf.origValues.showInactiveToLevel,
-          origValues.showInactiveToLevel);
-      String newMenuPart = firstNotNullOrNull(newConf.origValues.menuPart, origValues.menuPart);
-      String newDataType = firstNotNullOrNull(newConf.origValues.dataType, origValues.dataType);
-      SpaceReference newNodeSpaceRef = firstNotNullOrNull(newConf.origValues.nodeSpaceRef,
-          origValues.nodeSpaceRef);
-      String newLayoutType = firstNotNullOrNull(newConf.origValues.layoutType,
-          origValues.layoutType);
-      Integer newNrOfItemsPerPage = firstNotNullOrNull(newConf.origValues.nrOfItemsPerPage,
-          origValues.nrOfItemsPerPage);
-      String newPresentationTypeHint = firstNotNullOrNull(newConf.origValues.presentationTypeHint,
-          origValues.presentationTypeHint);
-      String newCmCssClass = firstNotNullOrNull(newConf.origValues.cmCssClass,
-          origValues.cmCssClass);
-      return new NavigationConfig(true, newConfigName, newFromHierarchyLevel, newToHierarchyLevel,
-          newShowInactiveToLevel, newMenuPart, newDataType, newNodeSpaceRef, newLayoutType,
-          newNrOfItemsPerPage, newPresentationTypeHint, newCmCssClass);
+      Builder b = new Builder(true);
+      b.configName = newConf.configName.or(configName);
+      b.fromHierarchyLevel = newConf.fromHierarchyLevel.or(fromHierarchyLevel);
+      b.toHierarchyLevel = newConf.toHierarchyLevel.or(toHierarchyLevel);
+      b.showInactiveToLevel = newConf.showInactiveToLevel.or(showInactiveToLevel);
+      b.menuPart = newConf.menuPart.or(menuPart);
+      b.dataType = newConf.dataType.or(dataType);
+      b.nodeSpaceRef = newConf.nodeSpaceRef.or(nodeSpaceRef);
+      b.layoutType = newConf.layoutType.or(layoutType);
+      b.nrOfItemsPerPage = newConf.nrOfItemsPerPage.or(nrOfItemsPerPage);
+      b.presentationTypeHint = newConf.presentationTypeHint.or(presentationTypeHint);
+      b.cmCssClass = newConf.cmCssClass.or(cmCssClass);
+      return b.build();
     } else {
       return DEFAULTS;
     }
@@ -156,66 +180,65 @@ public final class NavigationConfig {
 
   @NotNull
   public String getConfigName() {
-    return ownValues.configName;
+    return configName.or("");
   }
 
   public int getFromHierarchyLevel() {
-    return ownValues.fromHierarchyLevel;
+    return Math.max(fromHierarchyLevel.or(DEFAULT_MIN_LEVEL), DEFAULT_MIN_LEVEL);
   }
 
   public int getToHierarchyLevel() {
-    return ownValues.toHierarchyLevel;
+    return toHierarchyLevel.or(DEFAULT_MAX_LEVEL);
   }
 
   public int getShowInactiveToLevel() {
-    return ownValues.showInactiveToLevel;
+    return showInactiveToLevel.or(DEFAULT_MIN_LEVEL - 1);
   }
 
   @NotNull
   public String getMenuPart() {
-    return ownValues.menuPart;
+    return menuPart.or("");
   }
 
   @Nullable
   public SpaceReference getNodeSpaceRef() {
-    return (ownValues.nodeSpaceRef == null) ? null
-        : new SpaceReference(ownValues.nodeSpaceRef.clone());
+    if (nodeSpaceRef.isPresent()) {
+      return new SpaceReference(nodeSpaceRef.get().clone());
+    }
+    return null;
   }
 
   @NotNull
   public String getDataType() {
-    return ownValues.dataType;
+    return dataType.or(PAGE_MENU_DATA_TYPE);
   }
 
   @NotNull
   public String getLayoutType() {
-    return ownValues.layoutType;
+    return layoutType.or(LIST_LAYOUT_TYPE);
   }
 
   public int getNrOfItemsPerPage() {
-    if (ownValues.nrOfItemsPerPage > 0) {
-      return ownValues.nrOfItemsPerPage;
-    } else {
-      return UNLIMITED_ITEMS_PER_PAGE;
-    }
+    return Math.max(nrOfItemsPerPage.or(UNLIMITED_ITEMS_PER_PAGE), UNLIMITED_ITEMS_PER_PAGE);
   }
 
   @Nullable
   public IPresentationTypeRole getPresentationType() {
+    String thePresentationTypeHint = presentationTypeHint.or("default");
     try {
-      LOGGER.info("setPresentationType to [" + ownValues.presentationTypeHint + "].");
+      LOGGER.info("setPresentationType to [" + thePresentationTypeHint + "].");
       return Utils.getComponent(IWebUtilsService.class).lookup(IPresentationTypeRole.class,
-          ownValues.presentationTypeHint);
+          thePresentationTypeHint);
     } catch (ComponentLookupException failedToLoadException) {
       LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
-          + ownValues.presentationTypeHint + "].", failedToLoadException);
+          + thePresentationTypeHint + "].", failedToLoadException);
     }
     return null;
   }
 
   @NotNull
   public String getCssClass() {
-    return ownValues.cmCssClass;
+    return cmCssClass.or("");
   }
 
 }

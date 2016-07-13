@@ -10,37 +10,18 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.navigation.NavigationConfig.Builder;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.web.Utils;
 
 public class NavigationConfigTest extends AbstractComponentTest {
 
-  private String configName;
-  private Integer fromHierarchyLevel;
-  private Integer toHierarchyLevel;
-  private Integer showInactiveToLevel;
-  private String menuPart;
-  private String dataType;
-  private SpaceReference nodeSpaceRef;
-  private Integer itemsPerPage;
-  private String presentationTypeHint;
-  private String cmCssClass;
-  private String layoutType;
+  private Builder navBuilder;
 
   @Before
   public void setUp_NavigationConfigTest() throws Exception {
-    configName = null;
-    fromHierarchyLevel = null;
-    toHierarchyLevel = null;
-    showInactiveToLevel = null;
-    menuPart = null;
-    dataType = null;
-    nodeSpaceRef = null;
-    itemsPerPage = null;
-    presentationTypeHint = null;
-    cmCssClass = null;
-    layoutType = null;
+    navBuilder = new NavigationConfig.Builder(true);
   }
 
   @Test
@@ -69,9 +50,7 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetConfigName_default() {
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("", navConfig.getConfigName());
     // defaults for other fields must remain
     assertTrue(navConfig.isEnabled());
@@ -90,32 +69,10 @@ public class NavigationConfigTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetConfigName_empty() {
-    String configName = "";
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
-    assertEquals("", navConfig.getConfigName());
-    // defaults for other fields must remain
-    assertTrue(navConfig.isEnabled());
-    assertTrue("toHieararchyLevel must be greater zero", navConfig.getToHierarchyLevel() > 0);
-    assertTrue("fromHieararchyLevel must be greater zero", navConfig.getFromHierarchyLevel() > 0);
-    assertEquals("", navConfig.getMenuPart());
-    assertEquals("", navConfig.getCssClass());
-    assertNull(navConfig.getNodeSpaceRef());
-    assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
-    assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
-    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
-    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
-    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
-  }
-
-  @Test
   public void testGetConfigName() {
     String configName = "mainMenu";
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    navBuilder.configName(configName);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals(configName, navConfig.getConfigName());
     // defaults for other fields must remain
     assertTrue(navConfig.isEnabled());
@@ -134,10 +91,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testIsEnabled() {
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+  public void testIsEnabled_true() {
+    NavigationConfig navConfig = navBuilder.build();
     assertTrue(navConfig.isEnabled());
     // defaults for other fields must remain
     assertEquals("", navConfig.getConfigName());
@@ -156,11 +111,30 @@ public class NavigationConfigTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testIsEnabled_false() {
+    NavigationConfig navConfig = new NavigationConfig.Builder(false).build();
+    assertFalse(navConfig.isEnabled());
+    // defaults for other fields must remain
+    assertEquals("", navConfig.getConfigName());
+    assertTrue("toHieararchyLevel must be greater zero", navConfig.getToHierarchyLevel() > 0);
+    assertTrue("fromHieararchyLevel must be greater zero", navConfig.getFromHierarchyLevel() > 0);
+    assertTrue("showInactiveToLevel must be greater equlas zero",
+        navConfig.getShowInactiveToLevel() >= 0);
+    assertEquals("", navConfig.getMenuPart());
+    assertEquals("", navConfig.getCssClass());
+    assertNull(navConfig.getNodeSpaceRef());
+    assertEquals(NavigationConfig.PAGE_MENU_DATA_TYPE, navConfig.getDataType());
+    assertEquals(NavigationConfig.LIST_LAYOUT_TYPE, navConfig.getLayoutType());
+    assertEquals(NavigationConfig.UNLIMITED_ITEMS_PER_PAGE, navConfig.getNrOfItemsPerPage());
+    assertNotNull(Utils.getComponent(IPresentationTypeRole.class));
+    assertSame(Utils.getComponent(IPresentationTypeRole.class), navConfig.getPresentationType());
+  }
+
+  @Test
   public void testGetFromHierarchyLevel() {
-    fromHierarchyLevel = 10;
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer fromHierarchyLevel = 10;
+    navBuilder.fromHierarchyLevel(fromHierarchyLevel);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("fromHieararchyLevel must equals to parameter", fromHierarchyLevel,
         (Integer) navConfig.getFromHierarchyLevel());
     // defaults for other fields must remain
@@ -181,10 +155,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetToHierarchyLevel() {
-    toHierarchyLevel = 11;
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer toHierarchyLevel = 11;
+    navBuilder.toHierarchyLevel(toHierarchyLevel);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("toHieararchyLevel must equals to parameter", toHierarchyLevel,
         (Integer) navConfig.getToHierarchyLevel());
     // defaults for other fields must remain
@@ -205,10 +178,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetShowInactiveToLevel() {
-    showInactiveToLevel = 10;
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer showInactiveToLevel = 10;
+    navBuilder.showInactiveToLevel(showInactiveToLevel);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("showInactiveToLevel must equals to parameter", showInactiveToLevel,
         (Integer) navConfig.getShowInactiveToLevel());
     // defaults for other fields must remain
@@ -228,10 +200,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetMenuPart() {
-    menuPart = "mainMenu";
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String menuPart = "mainMenu";
+    navBuilder.menuPart(menuPart);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("menuPart must equals to parameter", menuPart, navConfig.getMenuPart());
     // defaults for other fields must remain
     assertTrue(navConfig.isEnabled());
@@ -252,10 +223,10 @@ public class NavigationConfigTest extends AbstractComponentTest {
   @Test
   public void testGetNodeSpaceRef() {
     String spaceName = "MySpace";
-    nodeSpaceRef = new SpaceReference(spaceName, new WikiReference(getContext().getDatabase()));
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    SpaceReference nodeSpaceRef = new SpaceReference(spaceName, new WikiReference(
+        getContext().getDatabase()));
+    navBuilder.nodeSpaceRef(nodeSpaceRef);
+    NavigationConfig navConfig = navBuilder.build();
     SpaceReference firstReturnNodeSpace = navConfig.getNodeSpaceRef();
     assertEquals("expected equals nodeSpaceRef", nodeSpaceRef, firstReturnNodeSpace);
     assertNotSame("expected defensive copy of nodeSpaceRef", nodeSpaceRef, firstReturnNodeSpace);
@@ -280,9 +251,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
   @Test
   public void testGetDataType() {
     String dataType = "testType";
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    navBuilder.dataType(dataType);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals(dataType, navConfig.getDataType());
     // defaults for other fields must remain
     assertTrue(navConfig.isEnabled());
@@ -303,9 +273,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
   @Test
   public void testGetLayoutType() {
     String layoutType = "testLayoutType";
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    navBuilder.layoutType(layoutType);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals(layoutType, navConfig.getLayoutType());
     // defaults for other fields must remain
     assertTrue(navConfig.isEnabled());
@@ -325,10 +294,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetNrOfItemsPerPage() {
-    itemsPerPage = 10;
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer itemsPerPage = 10;
+    navBuilder.nrOfItemsPerPage(itemsPerPage);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("itemsPerPage must equals to parameter", itemsPerPage,
         (Integer) navConfig.getNrOfItemsPerPage());
     // defaults for other fields must remain
@@ -349,16 +317,14 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetPresentationType() throws Exception {
-    presentationTypeHint = "myTestPresentationType";
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    String presentationTypeHint = "myTestPresentationType";
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint))).andReturn(
+        componentInstance);
     replayDefault();
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    navBuilder.presentationTypeHint(presentationTypeHint);
+    NavigationConfig navConfig = navBuilder.build();
     assertSame(componentInstance, navConfig.getPresentationType());
     verifyDefault();
     // defaults for other fields must remain
@@ -378,10 +344,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testGetCssClass() {
-    cmCssClass = "cm_cssTestClass";
-    NavigationConfig navConfig = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String cmCssClass = "cm_cssTestClass";
+    navBuilder.cmCssClass(cmCssClass);
+    NavigationConfig navConfig = navBuilder.build();
     assertEquals("cmCssClass must equals to parameter", cmCssClass, navConfig.getCssClass());
     // defaults for other fields must remain
     assertTrue(navConfig.isEnabled());
@@ -401,10 +366,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_configName() throws Exception {
-    configName = "configName1";
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String configName = "configName1";
+    navBuilder.configName(configName);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -417,14 +381,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -451,10 +416,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_fromHierarchyLevel() throws Exception {
-    fromHierarchyLevel = 15;
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer fromHierarchyLevel = 15;
+    navBuilder.fromHierarchyLevel(fromHierarchyLevel);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -467,14 +431,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -502,10 +467,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_toHierarchyLevel() throws Exception {
-    toHierarchyLevel = 70;
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer toHierarchyLevel = 70;
+    navBuilder.toHierarchyLevel(toHierarchyLevel);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -518,14 +482,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -553,10 +518,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_showInactiveToLevel() throws Exception {
-    showInactiveToLevel = 30;
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer showInactiveToLevel = 30;
+    navBuilder.showInactiveToLevel(showInactiveToLevel);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -569,14 +533,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -604,10 +569,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_menuPart() throws Exception {
-    menuPart = "menuPart1";
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String menuPart = "menuPart1";
+    navBuilder.menuPart(menuPart);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -620,14 +584,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -655,10 +620,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_dataType() throws Exception {
-    dataType = "dataType1";
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String dataType = "dataType1";
+    navBuilder.dataType(dataType);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -671,14 +635,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -706,11 +671,10 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_nodeSpaceRef() throws Exception {
-    nodeSpaceRef = new SpaceReference("NavConfigSpace1", new WikiReference(
+    SpaceReference nodeSpaceRef = new SpaceReference("NavConfigSpace1", new WikiReference(
         getContext().getDatabase()));
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    navBuilder.nodeSpaceRef(nodeSpaceRef);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -723,14 +687,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -758,10 +723,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_layoutType() throws Exception {
-    layoutType = "layoutType1";
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String layoutType = "layoutType1";
+    navBuilder.layoutType(layoutType);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -774,14 +738,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -808,10 +773,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_itemsPerPage() throws Exception {
-    itemsPerPage = 20;
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    Integer itemsPerPage = 20;
+    navBuilder.nrOfItemsPerPage(itemsPerPage);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -824,14 +788,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -859,10 +824,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_presentationTypeHint() throws Exception {
-    presentationTypeHint = "navConfigPresTypeHint1";
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String presentationTypeHint = "navConfigPresTypeHint1";
+    navBuilder.presentationTypeHint(presentationTypeHint);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -875,14 +839,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
@@ -910,10 +875,9 @@ public class NavigationConfigTest extends AbstractComponentTest {
 
   @Test
   public void testOverlayValues_cmCssClass() throws Exception {
-    cmCssClass = "cm_cssTestClass1";
-    NavigationConfig navConfig1 = new NavigationConfig(configName, fromHierarchyLevel,
-        toHierarchyLevel, showInactiveToLevel, menuPart, dataType, nodeSpaceRef, layoutType,
-        itemsPerPage, presentationTypeHint, cmCssClass);
+    String cmCssClass = "cm_cssTestClass1";
+    navBuilder.cmCssClass(cmCssClass);
+    NavigationConfig navConfig1 = navBuilder.build();
     String configName2 = "configName2";
     Integer fromHierarchyLevel2 = 22;
     Integer toHierarchyLevel2 = 60;
@@ -926,14 +890,15 @@ public class NavigationConfigTest extends AbstractComponentTest {
     Integer itemsPerPage2 = 50;
     String presentationTypeHint2 = "navConfigPresTypeHint2";
     String cmCssClass2 = "cm_cssTestClass2";
-    NavigationConfig navConfig2 = new NavigationConfig(configName2, fromHierarchyLevel2,
-        toHierarchyLevel2, showInactiveToLevel2, menuPart2, dataType2, nodeSpaceRef2, layoutType2,
-        itemsPerPage2, presentationTypeHint2, cmCssClass2);
-    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
-        IPresentationTypeRole.class);
+    NavigationConfig navConfig2 = new NavigationConfig.Builder(true).configName(configName2).fromHierarchyLevel(
+        fromHierarchyLevel2).toHierarchyLevel(toHierarchyLevel2).showInactiveToLevel(
+        showInactiveToLevel2).menuPart(menuPart2).dataType(dataType2).nodeSpaceRef(nodeSpaceRef2).layoutType(
+        layoutType2).nrOfItemsPerPage(itemsPerPage2).presentationTypeHint(presentationTypeHint2).cmCssClass(
+        cmCssClass2).build();
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
-    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
-        presentationTypeHint2))).andReturn(componentInstance);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(presentationTypeHint2))).andReturn(
+        componentInstance);
     replayDefault();
     NavigationConfig navConfig = navConfig2.overlay(navConfig1);
     assertTrue(navConfig.isEnabled());
