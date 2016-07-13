@@ -196,7 +196,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     try {
       if (docRef != null) {
         getContext().setDatabase(docRef.getWikiReference().getName());
-        ret = getContext().getWiki().getStore().exists(newDoc(docRef, lang), getContext());
+        ret = getContext().getWiki().getStore().exists(newDummyDoc(docRef, lang), getContext());
       }
       return ret;
     } catch (XWikiException xwe) {
@@ -292,7 +292,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     String database = getContext().getDatabase();
     try {
       getContext().setDatabase(docRef.getWikiReference().getName());
-      XWikiDocument doc = getContext().getWiki().getStore().loadXWikiDoc(newDoc(docRef, lang),
+      XWikiDocument doc = getContext().getWiki().getStore().loadXWikiDoc(newDummyDoc(docRef, lang),
           getContext());
       if (doc.isNew()) {
         throw new TranslationNotExistsException(docRef, lang);
@@ -312,8 +312,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     String database = getContext().getDatabase();
     try {
       getContext().setDatabase(docRef.getWikiReference().getName());
-      for (String lang : getContext().getWiki().getStore().getTranslationList(newDoc(docRef, null),
-          getContext())) {
+      for (String lang : getContext().getWiki().getStore().getTranslationList(newDummyDoc(docRef,
+          null), getContext())) {
         try {
           transMap.put(lang, getTranslation(docRef, lang));
         } catch (TranslationNotExistsException exc) {
@@ -328,15 +328,17 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     return transMap;
   }
 
-  // We need to clone this document first, since a cached storage would return the same object for
-  // the following requests, so concurrent request might get a partially modified object, or worse,
-  // if an error occurs during the save, the cached object will not reflect the actual document at
-  // all.
+  /**
+   * We need to clone this document first, since a cached storage would return the same object for
+   * the following requests, so concurrent request might get a partially modified object, or worse,
+   * if an error occurs during the save, the cached object will not reflect the actual document at
+   * all.
+   */
   private XWikiDocument cloneDoc(XWikiDocument doc) {
     return doc.clone();
   }
 
-  private XWikiDocument newDoc(DocumentReference docRef, String lang) {
+  private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setLanguage(lang);
     return doc;
