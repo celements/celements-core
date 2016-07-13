@@ -7,7 +7,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 @Immutable
-public class AttachmentReferenceField extends EntityReferenceField<AttachmentReference> {
+public final class AttachmentReferenceField extends EntityReferenceField<AttachmentReference> {
 
   public static class Builder extends EntityReferenceField.Builder<Builder, AttachmentReference> {
 

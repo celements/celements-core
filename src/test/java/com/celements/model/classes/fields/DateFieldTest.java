@@ -1,6 +1,7 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,11 @@ public class DateFieldTest extends AbstractComponentTest {
     super.setUp();
     field = new DateField.Builder(new DocumentReference("wiki", "class", "any"), "name").size(
         size).emptyIsToday(emptyIsToday).dateFormat(dateFormat).build();
+  }
+
+  @Test
+  public void test_immutability() {
+    assertImmutable(DateField.class);
   }
 
   @Test

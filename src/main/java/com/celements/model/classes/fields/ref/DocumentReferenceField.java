@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 
 @Immutable
-public class DocumentReferenceField extends EntityReferenceField<DocumentReference> {
+public final class DocumentReferenceField extends EntityReferenceField<DocumentReference> {
 
   public static class Builder extends EntityReferenceField.Builder<Builder, DocumentReference> {
 

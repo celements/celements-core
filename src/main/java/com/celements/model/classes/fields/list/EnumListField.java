@@ -16,7 +16,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 @Immutable
-public class EnumListField<E extends Enum<E>> extends ListField<E> {
+public final class EnumListField<E extends Enum<E>> extends ListField<E> {
 
   private final Class<E> enumType;
 

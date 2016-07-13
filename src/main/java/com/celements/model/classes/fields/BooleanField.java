@@ -10,7 +10,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 @Immutable
-public class BooleanField extends AbstractClassField<Boolean> {
+public final class BooleanField extends AbstractClassField<Boolean> {
 
   private final String displayType;
   private final Integer defaultValue;

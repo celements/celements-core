@@ -2,6 +2,7 @@ package com.celements.model.classes.fields;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.classes.fields.list.DBListField;
 import com.celements.model.classes.fields.list.StaticListField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -37,6 +39,12 @@ public class StringListFieldTest extends AbstractComponentTest {
     fieldBuilder = new StaticListField.Builder(new DocumentReference("wiki", "class", "any"),
         "name").multiSelect(multiSelect).size(size).displayType(displayType).picker(
             picker).separator(separator);
+  }
+
+  @Test
+  public void test_immutability() {
+    assertImmutable(StaticListField.class);
+    assertImmutable(DBListField.class);
   }
 
   @Test

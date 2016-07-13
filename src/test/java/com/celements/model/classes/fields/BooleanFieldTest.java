@@ -1,6 +1,7 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,11 @@ public class BooleanFieldTest extends AbstractComponentTest {
     super.setUp();
     field = new BooleanField.Builder(new DocumentReference("wiki", "class", "any"),
         "name").displayType(displayType).defaultValue(defaultValue).build();
+  }
+
+  @Test
+  public void test_immutability() {
+    assertImmutable(BooleanField.class);
   }
 
   @Test

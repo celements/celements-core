@@ -7,7 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 @Immutable
-public class WikiReferenceField extends EntityReferenceField<WikiReference> {
+public final class WikiReferenceField extends EntityReferenceField<WikiReference> {
 
   public static class Builder extends EntityReferenceField.Builder<Builder, WikiReference> {
 

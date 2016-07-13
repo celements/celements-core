@@ -14,7 +14,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 @Immutable
-public class StaticListField extends StringListField {
+public final class StaticListField extends StringListField {
 
   private final List<String> values;
 

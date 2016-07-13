@@ -10,7 +10,7 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 @Immutable
-public class DBListField extends StringListField {
+public final class DBListField extends StringListField {
 
   private final String sql;
 

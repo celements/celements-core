@@ -2,12 +2,10 @@ package com.celements.model.classes.fields.list;
 
 import java.util.List;
 
-import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Joiner;
 
-@Immutable
 public abstract class StringListField extends ListField<String> {
 
   protected StringListField(@NotNull Builder<?, String> builder) {

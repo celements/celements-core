@@ -12,7 +12,7 @@ import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 @Immutable
-public class DateField extends AbstractClassField<Date> {
+public final class DateField extends AbstractClassField<Date> {
 
   private final Integer size;
   private final Integer emptyIsToday;

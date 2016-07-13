@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 
 @Immutable
-public class FloatField extends NumberField<Float> {
+public final class FloatField extends NumberField<Float> {
 
   public static class Builder extends NumberField.Builder<Builder, Float> {
 

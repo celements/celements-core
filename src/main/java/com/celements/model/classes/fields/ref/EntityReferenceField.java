@@ -1,7 +1,6 @@
 package com.celements.model.classes.fields.ref;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -12,7 +11,6 @@ import com.celements.model.classes.fields.CustomClassField;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
-@Immutable
 public abstract class EntityReferenceField<T extends EntityReference> extends AbstractClassField<T>
     implements CustomClassField<T> {
 

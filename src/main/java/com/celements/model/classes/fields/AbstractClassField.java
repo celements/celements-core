@@ -3,7 +3,6 @@ package com.celements.model.classes.fields;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -18,7 +17,6 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Subclasses are expected to be immutable
  */
-@Immutable
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
   private final DocumentReference classRef;

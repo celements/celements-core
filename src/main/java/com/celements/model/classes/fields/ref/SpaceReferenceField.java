@@ -7,7 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 @Immutable
-public class SpaceReferenceField extends EntityReferenceField<SpaceReference> {
+public final class SpaceReferenceField extends EntityReferenceField<SpaceReference> {
 
   public static class Builder extends EntityReferenceField.Builder<Builder, SpaceReference> {
 

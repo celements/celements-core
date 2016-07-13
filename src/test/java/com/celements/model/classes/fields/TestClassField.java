@@ -10,7 +10,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 @Immutable
-public class TestClassField extends AbstractClassField<TestClassField> {
+public final class TestClassField extends AbstractClassField<TestClassField> {
 
   private final Integer size;
 

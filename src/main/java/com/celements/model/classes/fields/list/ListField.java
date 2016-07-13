@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.python.google.common.base.Objects;
@@ -17,7 +16,6 @@ import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-@Immutable
 public abstract class ListField<T> extends AbstractClassField<List<T>> implements
     CustomClassField<List<T>> {
 

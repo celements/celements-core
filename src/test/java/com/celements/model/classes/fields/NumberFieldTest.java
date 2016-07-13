@@ -1,13 +1,17 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.fields.number.DoubleField;
+import com.celements.model.classes.fields.number.FloatField;
 import com.celements.model.classes.fields.number.IntField;
+import com.celements.model.classes.fields.number.LongField;
 import com.celements.model.classes.fields.number.NumberField;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
@@ -23,6 +27,14 @@ public class NumberFieldTest extends AbstractComponentTest {
     super.setUp();
     field = new IntField.Builder(new DocumentReference("wiki", "class", "any"), "name").size(
         size).build();
+  }
+
+  @Test
+  public void test_immutability() {
+    assertImmutable(DoubleField.class);
+    assertImmutable(FloatField.class);
+    assertImmutable(LongField.class);
+    assertImmutable(IntField.class);
   }
 
   @Test

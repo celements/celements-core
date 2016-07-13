@@ -1,7 +1,6 @@
 package com.celements.model.classes.fields.number;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -10,7 +9,6 @@ import com.celements.model.classes.fields.AbstractClassField;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-@Immutable
 public abstract class NumberField<T extends Number> extends AbstractClassField<T> {
 
   private final Integer size;
