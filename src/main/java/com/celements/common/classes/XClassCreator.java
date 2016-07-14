@@ -29,13 +29,13 @@ public interface XClassCreator {
 
   /**
    * creates XClasses from all {@link ClassPackage}s if activated, class definition isn't
-   * blacklisted and XClasses don't exist yet
+   * blacklisted and XClasses don't exist. If they do exist, newly added fields are being created.
    */
   public void createXClasses();
 
   /**
    * creates XClasses from provided classPackage if class definition isn't blacklisted and XClasses
-   * don't exist
+   * don't exist. If they do exist, newly added fields are being created.
    *
    * @param classPackage
    * @throws XClassCreateException
@@ -43,7 +43,8 @@ public interface XClassCreator {
   public void createXClasses(ClassPackage classPackage) throws XClassCreateException;
 
   /**
-   * creates XClass from provided classDefinition if doesn't exist yet
+   * creates XClass from provided classDefinition if doesn't exist. If it does exist, newly added
+   * fields are being created.
    *
    * @param classDefinition
    * @throws XClassCreateException
