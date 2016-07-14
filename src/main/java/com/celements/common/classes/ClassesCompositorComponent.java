@@ -95,17 +95,17 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public boolean isActivated(String name) {
+    try {
+      return Utils.getComponentManager().lookup(ClassPackage.class, name).isActivated();
+    } catch (ComponentLookupException exc) {
+      LOGGER.debug("ClassDefinitionPackage '{}' doesn't exist", name);
+    }
     for (IClassCollectionRole classCollection : classCollections) {
       if (classCollection.getConfigName().equals(name)) {
         return classCollection.isActivated();
       }
     }
-    try {
-      return Utils.getComponentManager().lookup(ClassPackage.class, name).isActivated();
-    } catch (ComponentLookupException exc) {
-      LOGGER.debug("ClassDefinitionPackage '{}' doesn't exist", name);
-      return false;
-    }
+    return false;
   }
 
 }
