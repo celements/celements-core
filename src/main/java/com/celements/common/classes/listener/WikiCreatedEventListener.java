@@ -78,7 +78,7 @@ public class WikiCreatedEventListener implements EventListener {
       try {
         LOGGER.info("checking all class collections for db '{}'", database);
         getContext().setDatabase(database);
-        classesCompositor.checkAllClassCollections();
+        classesCompositor.checkClasses();
       } finally {
         getContext().setDatabase(dbBackup);
       }

@@ -27,6 +27,10 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.CustomClassField;
+import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -621,11 +625,89 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public void setProperty(BaseObject obj, String name, Object value) {
-    if (value instanceof Collection) {
-      value = Joiner.on('|').join((Iterable<?>) value);
+  public <T> T getProperty(DocumentReference docRef, ClassField<T> field)
+      throws DocumentNotExistsException {
+    return resolvePropertyValue(field, getProperty(docRef, field.getClassRef(), field.getName()));
+  }
+
+  @Override
+  public <T> T getProperty(XWikiDocument doc, ClassField<T> field) {
+    return resolvePropertyValue(field, getProperty(doc, field.getClassRef(), field.getName()));
+  }
+
+  private <T> T resolvePropertyValue(ClassField<T> field, Object value) {
+    try {
+      if (field instanceof CustomClassField) {
+        return ((CustomClassField<T>) field).resolve(value);
+      } else {
+        return field.getType().cast(value);
+      }
+    } catch (ClassCastException | IllegalArgumentException ex) {
+      throw new IllegalArgumentException("Field '" + field + "' ill defined, expecting type '"
+          + field.getType() + "' but got '" + value.getClass() + "'", ex);
     }
-    obj.set(name, value, getContext());
+  }
+
+  @Override
+  public List<ClassFieldValue<?>> getProperties(XWikiDocument doc, ClassDefinition classDef) {
+    List<ClassFieldValue<?>> ret = new ArrayList<>();
+    for (ClassField<?> field : classDef.getFields()) {
+      ret.add(new ClassFieldValue<Object>(castField(field), getProperty(doc, field)));
+    }
+    return ret;
+  }
+
+  // unchecked suppression is ok because every wildcard extends Object
+  @SuppressWarnings("unchecked")
+  private ClassField<Object> castField(ClassField<?> field) {
+    return (ClassField<Object>) field;
+  }
+
+  @Override
+  public boolean setProperty(BaseObject obj, String name, Object value) {
+    boolean hasChange = !Objects.equal(value, getProperty(obj, name));
+    if (hasChange) {
+      if (value instanceof Collection) {
+        value = Joiner.on('|').join((Collection<?>) value);
+      }
+      obj.set(name, value, getContext());
+    }
+    return hasChange;
+  }
+
+  @Override
+  public <T> XWikiDocument setProperty(DocumentReference docRef, ClassField<T> field, T value)
+      throws DocumentNotExistsException {
+    XWikiDocument doc = getDocument(docRef);
+    setProperty(doc, field, value);
+    return doc;
+  }
+
+  @Override
+  public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value) {
+    try {
+      return setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(),
+          serializePropertyValue(field, value));
+    } catch (ClassCastException ex) {
+      throw new IllegalArgumentException("CelObjectField ill defined: " + field, ex);
+    }
+  }
+
+  @Override
+  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue) {
+    return setProperty(doc, fieldValue.getField(), fieldValue.getValue());
+  }
+
+  private <T> Object serializePropertyValue(ClassField<T> field, T value) {
+    try {
+      if (field instanceof CustomClassField) {
+        return ((CustomClassField<T>) field).serialize(value);
+      } else {
+        return value;
+      }
+    } catch (ClassCastException | IllegalArgumentException ex) {
+      throw new IllegalArgumentException("Field '" + field + "' ill defined", ex);
+    }
   }
 
   @Override

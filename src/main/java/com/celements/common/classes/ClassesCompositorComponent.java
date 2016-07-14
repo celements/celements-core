@@ -19,16 +19,19 @@
  */
 package com.celements.common.classes;
 
-import java.util.Map;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 
+import com.celements.model.classes.ClassPackage;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class ClassesCompositorComponent implements IClassesCompositorComponent {
@@ -36,10 +39,13 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassesCompositorComponent.class);
 
   @Requirement
-  private Map<String, IClassCollectionRole> classCollectionMap;
+  private XClassCreator classCreator;
 
   @Requirement
-  private Map<String, ICelementsClassCollection> classCollectionMap_old;
+  private List<IClassCollectionRole> classCollections;
+
+  @Requirement
+  private List<ICelementsClassCollection> classCollectionsOld;
 
   @Requirement
   private Execution execution;
@@ -49,16 +55,23 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
   }
 
   @Override
-  public void checkAllClassCollections() {
-    LOGGER.info("start checkAllClassCollections for wiki '{}'", getContext().getDatabase());
+  public void checkClasses() {
+    LOGGER.info("start checkClasses for wiki '{}'", getContext().getDatabase());
+    classCreator.createXClasses();
     checkClassCollections();
     checkOldClassCollections();
-    LOGGER.debug("finish checkAllClassCollections for wiki '{}'", getContext().getDatabase());
+    LOGGER.debug("finish checkClasses for wiki '{}'", getContext().getDatabase());
+  }
+
+  @Override
+  @Deprecated
+  public void checkAllClassCollections() {
+    checkClasses();
   }
 
   @Deprecated
   void checkOldClassCollections() {
-    for (ICelementsClassCollection classCollection : classCollectionMap_old.values()) {
+    for (ICelementsClassCollection classCollection : classCollectionsOld) {
       try {
         classCollection.runUpdate(getContext());
       } catch (XWikiException xwe) {
@@ -68,8 +81,9 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
     }
   }
 
+  @Deprecated
   void checkClassCollections() {
-    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
+    for (IClassCollectionRole classCollection : classCollections) {
       try {
         classCollection.runUpdate();
       } catch (XWikiException xwe) {
@@ -81,8 +95,12 @@ public class ClassesCompositorComponent implements IClassesCompositorComponent {
 
   @Override
   public boolean isActivated(String name) {
-    // TODO build map in initialize with key name and value hint to avoid loop here
-    for (IClassCollectionRole classCollection : classCollectionMap.values()) {
+    try {
+      return Utils.getComponentManager().lookup(ClassPackage.class, name).isActivated();
+    } catch (ComponentLookupException exc) {
+      LOGGER.debug("ClassDefinitionPackage '{}' doesn't exist", name);
+    }
+    for (IClassCollectionRole classCollection : classCollections) {
       if (classCollection.getConfigName().equals(name)) {
         return classCollection.isActivated();
       }

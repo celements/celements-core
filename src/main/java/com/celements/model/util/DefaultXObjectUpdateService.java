@@ -11,8 +11,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Objects;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -28,8 +28,8 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   private IWebUtilsService webUtilsService;
 
   @Override
-  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap)
-      throws ClassDocumentLoadException {
+  @Deprecated
+  public boolean updateFromMap(XWikiDocument doc, Map<String, Object> fieldMap) {
     boolean hasChanged = false;
     Map<String, BaseObject> objMap = getObjectMap(doc, fieldMap.keySet());
     for (String field : fieldMap.keySet()) {
@@ -49,8 +49,7 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
     return hasChanged;
   }
 
-  private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields)
-      throws ClassDocumentLoadException {
+  private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields) {
     Map<String, BaseObject> ret = new HashMap<>();
     for (String field : fields) {
       String className = extractClassName(field);
@@ -82,6 +81,21 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
       LOGGER.info("failed to extract fieldName from '{}'");
     }
     return fieldName;
+  }
+
+  @Override
+  public boolean update(XWikiDocument doc, Set<ClassFieldValue<?>> fieldValues) {
+    boolean hasChanged = false;
+    for (ClassFieldValue<?> fieldValue : fieldValues) {
+      Object oldVal = modelAccess.getProperty(doc, fieldValue.getField());
+      if (!Objects.equal(oldVal, fieldValue.getValue())) {
+        modelAccess.setProperty(doc, fieldValue);
+        hasChanged = true;
+        LOGGER.trace("update: '{}' has changed from '{}'", fieldValue.getField(), oldVal);
+      }
+    }
+    LOGGER.info("update: for doc '{}' hasChanged '{}'", doc, hasChanged);
+    return hasChanged;
   }
 
 }

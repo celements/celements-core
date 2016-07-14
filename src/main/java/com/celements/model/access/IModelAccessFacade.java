@@ -15,6 +15,9 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -306,7 +309,26 @@ public interface IModelAccessFacade {
    */
   public Object getProperty(BaseObject obj, String name);
 
-  public void setProperty(BaseObject obj, String name, Object value);
+  @Nullable
+  public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull ClassField<T> field)
+      throws DocumentNotExistsException;
+
+  @Nullable
+  public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
+
+  @NotNull
+  public List<ClassFieldValue<?>> getProperties(@NotNull XWikiDocument doc,
+      @NotNull ClassDefinition classDef);
+
+  public boolean setProperty(BaseObject obj, String name, Object value);
+
+  public <T> XWikiDocument setProperty(@NotNull DocumentReference docRef,
+      @NotNull ClassField<T> field, @Nullable T value) throws DocumentNotExistsException;
+
+  public <T> boolean setProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field,
+      @Nullable T value);
+
+  public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue);
 
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use

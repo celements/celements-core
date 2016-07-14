@@ -23,6 +23,12 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.DateField;
+import com.celements.model.classes.fields.StringField;
+import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
@@ -789,18 +795,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     assertEquals(1, modelAccess.getXObjects(doc, classRef2).size());
   }
 
-  private BaseObject addObj(DocumentReference classRef, String key, String value) {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
-    if (key != null) {
-      obj.setStringValue(key, value);
-    }
-    doc.addXObject(obj);
-    return obj;
-  }
-
   @Test
-  public void testGetProperty_String() throws Exception {
+  public void test_getProperty_String() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     String val = "val";
@@ -814,7 +810,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_String_emptyString() throws Exception {
+  public void test_getProperty_String_emptyString() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     String val = "";
@@ -828,7 +824,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_Number() throws Exception {
+  public void test_getProperty_Number() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     int val = 5;
@@ -842,7 +838,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_Date() throws Exception {
+  public void test_getProperty_Date() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     Date val = new Date();
@@ -856,7 +852,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetProperty_Date_Timestamp() throws Exception {
+  public void test_getProperty_Date_Timestamp() throws Exception {
     BaseObject obj = new BaseObject();
     String name = "name";
     Date date = new Date();
@@ -871,7 +867,78 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_String() throws Exception {
+  public void test_getProperty_ClassField() throws Exception {
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    String val = "val";
+    addObj(classRef, field.getName(), val);
+
+    replayDefault();
+    String ret = modelAccess.getProperty(doc, field);
+    verifyDefault();
+
+    assertEquals(val, ret);
+  }
+
+  @Test
+  public void test_getProperty_ClassField_illegalField() throws Exception {
+    ClassField<Date> field = new DateField.Builder(classRef, "name").build();
+    addObj(classRef, field.getName(), "val");
+
+    replayDefault();
+    try {
+      modelAccess.getProperty(doc, field);
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
+      assertTrue(iae.getMessage().contains("class.any.name"));
+      assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
+    } finally {
+      verifyDefault();
+    }
+
+  }
+
+  @Test
+  public void test_getProperty_ClassField_docRef() throws Exception {
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    String val = "val";
+    addObj(classRef, field.getName(), val);
+
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
+    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        doc).once();
+
+    replayDefault();
+    String ret = modelAccess.getProperty(doc.getDocumentReference(), field);
+    verifyDefault();
+
+    assertEquals(val, ret);
+  }
+
+  @Test
+  public void test_getProperties() {
+    ClassDefinition classDef = Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME);
+    String val = "value";
+    addObj(classDef.getClassRef(), TestClassDefinition.FIELD_MY_STRING.getName(), val);
+
+    replayDefault();
+    List<ClassFieldValue<?>> ret = modelAccess.getProperties(doc, classDef);
+    verifyDefault();
+
+    assertEquals(classDef.getFields().size(), ret.size());
+    for (int i = 0; i < ret.size(); i++) {
+      ClassField<?> field = classDef.getFields().get(i);
+      assertEquals(field, ret.get(i).getField());
+      if (field.equals(TestClassDefinition.FIELD_MY_STRING)) {
+        assertEquals(val, ret.get(i).getValue());
+      } else {
+        assertNull(ret.get(i).getValue());
+      }
+    }
+  }
+
+  @Test
+  public void test_setProperty_String() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -888,7 +955,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_Number() throws Exception {
+  public void test_setProperty_Number() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -905,7 +972,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_Date() throws Exception {
+  public void test_setProperty_Date() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -922,7 +989,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testSetProperty_List() throws Exception {
+  public void test_setProperty_List() throws Exception {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     String name = "name";
@@ -935,6 +1002,79 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
     assertEquals(1, obj.getFieldList().size());
     assertEquals("A|B", ((BaseProperty) obj.get(name)).getValue());
+  }
+
+  @Test
+  public void test_setProperty_ClassField() throws Exception {
+    String val = "val";
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
+    BaseObject obj = addObj(classRef, field.getName(), "");
+
+    expectPropertyClass(classRef, field.getName(), new StringClass());
+
+    replayDefault();
+    modelAccess.setProperty(doc, fieldValue);
+    verifyDefault();
+
+    assertEquals(1, obj.getFieldList().size());
+    assertEquals(val, obj.getStringValue(field.getName()));
+  }
+
+  @Test
+  public void test_setProperty_ClassField_illegalField() throws Exception {
+    ClassField<Date> field = new DateField.Builder(classRef, "name").build();
+    ClassFieldValue<Date> fieldValue = new ClassFieldValue<>(field, new Date());
+    BaseClass bClass = expectNewBaseObject(classRef);
+
+    expectPropertyClass(bClass, field.getName(), new StringClass());
+
+    replayDefault();
+    try {
+      modelAccess.setProperty(doc, fieldValue);
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
+      assertTrue(iae.getMessage().contains("class.any.name"));
+      assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
+    } finally {
+      verifyDefault();
+    }
+  }
+
+  @Test
+  public void test_setProperty_ClassField_newObj() throws Exception {
+    String val = "val";
+    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
+    BaseClass bClass = expectNewBaseObject(classRef);
+    expectPropertyClass(bClass, field.getName(), new StringClass());
+
+    replayDefault();
+    modelAccess.setProperty(doc, fieldValue);
+    verifyDefault();
+
+    BaseObject obj = doc.getXObject(classRef);
+    assertEquals(1, obj.getFieldList().size());
+    assertEquals(val, obj.getStringValue(field.getName()));
+  }
+
+  @Test
+  public void test_setProperty_getProperty_customField() throws Exception {
+    ClassField<DocumentReference> field = TestClassDefinition.FIELD_MY_DOCREF;
+    DocumentReference toStoreRef = new DocumentReference("myDB", "mySpace", "myDoc");
+
+    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    expectPropertyClass(bClass, field.getName(), new StringClass());
+
+    replayDefault();
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, toStoreRef));
+    DocumentReference ret = modelAccess.getProperty(doc, field);
+    verifyDefault();
+
+    assertEquals(toStoreRef, ret);
+    String objValue = modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
+        field.getName());
+    assertEquals(modelAccess.webUtilsService.serializeRef(toStoreRef), objValue);
   }
 
   @Test
@@ -995,6 +1135,16 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       // expected
     }
     verifyDefault();
+  }
+
+  private BaseObject addObj(DocumentReference classRef, String key, String value) {
+    BaseObject obj = new BaseObject();
+    obj.setXClassReference(classRef);
+    if (key != null) {
+      obj.setStringValue(key, value);
+    }
+    doc.addXObject(obj);
+    return obj;
   }
 
   private Capture<XWikiDocument> expectExists(boolean result) throws XWikiException {

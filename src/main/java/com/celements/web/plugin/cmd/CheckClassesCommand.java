@@ -44,16 +44,11 @@ public class CheckClassesCommand {
   public static final String MEDIALIB_CONFIG_CLASS = OldCoreLegacyClasses.MEDIALIB_CONFIG_CLASS;
 
   /**
-   * @deprecated instead use
-   *             {@link IClassesCompositorComponent#checkAllClassCollections()}
+   * @deprecated instead use {@link IClassesCompositorComponent#checkAllClassCollections()}
    */
   @Deprecated
   public void checkClasses() {
-    IClassesCompositorComponent compComponent = Utils.getComponent(
-        IClassesCompositorComponent.class);
-    if (compComponent != null) {
-      compComponent.checkAllClassCollections();
-    }
+    Utils.getComponent(IClassesCompositorComponent.class).checkAllClassCollections();
   }
 
 }
