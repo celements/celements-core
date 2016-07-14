@@ -1,7 +1,9 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
+import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +33,7 @@ public class NumberFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
+    assertInstancesOf(NumberField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(DoubleField.class);
     assertImmutable(FloatField.class);
     assertImmutable(LongField.class);

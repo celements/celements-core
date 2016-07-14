@@ -2,7 +2,9 @@ package com.celements.model.classes.fields;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
+import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +16,9 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.fields.list.DBListField;
+import com.celements.model.classes.fields.list.ListField;
 import com.celements.model.classes.fields.list.StaticListField;
+import com.celements.model.classes.fields.list.StringListField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -22,7 +26,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
-public class StringListFieldTest extends AbstractComponentTest {
+public class ListFieldTest extends AbstractComponentTest {
 
   private StaticListField.Builder fieldBuilder;
 
@@ -43,6 +47,8 @@ public class StringListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
+    assertInstancesOf(ListField.class, areImmutable(), allowingForSubclassing());
+    assertInstancesOf(StringListField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(StaticListField.class);
     assertImmutable(DBListField.class);
   }

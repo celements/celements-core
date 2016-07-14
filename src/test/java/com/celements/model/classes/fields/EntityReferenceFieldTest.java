@@ -1,7 +1,9 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
+import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +33,7 @@ public class EntityReferenceFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
+    assertInstancesOf(EntityReferenceField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(WikiReferenceField.class);
     assertImmutable(SpaceReferenceField.class);
     assertImmutable(DocumentReferenceField.class);

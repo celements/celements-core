@@ -1,7 +1,10 @@
 package com.celements.model.classes.fields;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
+import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +17,7 @@ public class ClassFieldTest extends AbstractComponentTest {
 
   private TestClassField field;
 
-  DocumentReference classRef = new DocumentReference("wiki", "class", "any");
+  DocumentReference classRef;
   String name = "name";
   String prettyName = "prettyName";
   String validationRegExp = "validationRegExp";
@@ -24,13 +27,27 @@ public class ClassFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
+    classRef = new DocumentReference("wiki", "class", "any");
     field = new TestClassField.Builder(classRef, name).size(5).prettyName(
         prettyName).validationRegExp(validationRegExp).validationMessage(validationMessage).build();
   }
 
   @Test
   public void test_immutability() {
+    assertInstancesOf(AbstractClassField.class, areImmutable(), allowingForSubclassing(),
+        assumingFields("classRef").areNotModifiedAndDoNotEscape());
     assertImmutable(TestClassField.class);
+  }
+
+  @Test
+  public void test_immutability_classRef_isNotModifiedAndDoesNotEscape() throws Exception {
+    DocumentReference intClassRef = field.getClassRef();
+    assertThat(field.getClassRef(), not(sameInstance(intClassRef)));
+    assertThat(field.getClassRef(), is(intClassRef));
+    intClassRef.setName("asdf");
+    assertThat(field.getClassRef(), not(equalTo(intClassRef)));
+    classRef.setName("asdf");
+    assertThat(field.getClassRef(), not(equalTo(classRef)));
   }
 
   @Test
@@ -56,7 +73,6 @@ public class ClassFieldTest extends AbstractComponentTest {
   @Test
   public void test_getters() throws Exception {
     assertEquals(classRef, field.getClassRef());
-    assertNotSame(classRef, field.getClassRef());
     assertEquals(name, field.getName());
     assertEquals(TestClassField.class, field.getType());
     assertEquals(prettyName, field.getPrettyName());
