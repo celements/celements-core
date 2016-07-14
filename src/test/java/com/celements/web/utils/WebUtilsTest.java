@@ -19,6 +19,7 @@
  */
 package com.celements.web.utils;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -34,7 +35,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.navigation.Navigation;
 import com.celements.navigation.TreeNode;
@@ -49,24 +50,22 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class WebUtilsTest extends AbstractBridgedComponentTestCase {
+public class WebUtilsTest extends AbstractComponentTest {
 
   private WebUtils celUtils;
   private XWikiURLFactory mockURLFactory;
-  private XWikiStoreInterface mockXStore;
 
+  @Override
   @Before
-  public void setUp_WebUtilsTest() throws Exception {
+  public void setUp() throws Exception {
+    super.setUp();
     celUtils = new WebUtils();
     mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
-    mockXStore = createMockAndAddToDefault(XWikiStoreInterface.class);
-    expect(getWikiMock().getStore()).andReturn(mockXStore).anyTimes();
     getContext().setURLFactory(mockURLFactory);
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
     expect(registerComponentMock(CoreConfiguration.class).getDefaultDocumentSyntax()).andReturn(
