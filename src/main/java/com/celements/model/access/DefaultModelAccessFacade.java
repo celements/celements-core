@@ -146,7 +146,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    *             </p>
    */
   @Deprecated
-  private XWikiDocument getDocumentFromWiki(DocumentReference docRef) {
+  protected XWikiDocument getDocumentFromWiki(DocumentReference docRef) {
     try {
       return getWiki().getDocument(docRef, getContext());
     } catch (XWikiException xwe) {
@@ -154,7 +154,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
   }
 
-  private XWikiDocument getDocumentFromStore(DocumentReference docRef, String lang) {
+  protected XWikiDocument getDocumentFromStore(DocumentReference docRef, String lang) {
     String database = getContext().getDatabase();
     try {
       getContext().setDatabase(docRef.getWikiReference().getName());
@@ -177,7 +177,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
   }
 
-  private XWikiDocument createDocumentInternal(DocumentReference docRef) {
+  protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
     XWikiDocument doc = getDocumentCloneInternal(docRef);
     Date creationDate = new Date();
     doc.setDefaultLanguage(webUtilsService.getDefaultLanguage());
@@ -231,11 +231,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    *             </p>
    */
   @Deprecated
-  private boolean existsFromWiki(DocumentReference docRef) {
+  protected boolean existsFromWiki(DocumentReference docRef) {
     return getWiki().exists(docRef, getContext());
   }
 
-  private boolean existsFromStore(DocumentReference docRef, String lang) {
+  protected boolean existsFromStore(DocumentReference docRef, String lang) {
     String database = getContext().getDatabase();
     try {
       getContext().setDatabase(docRef.getWikiReference().getName());
