@@ -88,10 +88,10 @@ public class Navigation implements INavigation {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(Navigation.class);
 
-  private static final String _NAVIGATION_COUNTER_KEY = NavigationApi.class.getCanonicalName()
+  private static final String NAVIGATION_COUNTER_KEY = NavigationApi.class.getCanonicalName()
       + "_NavigationCounter";
 
-  private static final String _LANGUAGE_MENU_DATA_TYPE = "languages";
+  private static final String LANGUAGE_MENU_DATA_TYPE = "languages";
 
   public PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
 
@@ -295,7 +295,7 @@ public class Navigation implements INavigation {
           } catch (XWikiException e) {
             LOGGER.error("addNavigationForParent failed for [" + parentRef + "].", e);
           }
-        } else if (_LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
+        } else if (LANGUAGE_MENU_DATA_TYPE.equals(dataType)) {
           navBuilder.useStream(outStream);
           generateLanguageMenu(navBuilder, getContext());
         }
@@ -708,15 +708,15 @@ public class Navigation implements INavigation {
   static String newNavIdForContext() {
     ExecutionContext executionContext = Utils.getComponent(Execution.class).getContext();
     Long navCounter = getNavCounterFromContext(executionContext) + 1;
-    executionContext.setProperty(_NAVIGATION_COUNTER_KEY, navCounter);
+    executionContext.setProperty(NAVIGATION_COUNTER_KEY, navCounter);
     return "N" + navCounter;
   }
 
   private static Long getNavCounterFromContext(ExecutionContext executionContext) {
-    if (executionContext.getProperty(_NAVIGATION_COUNTER_KEY) == null) {
+    if (executionContext.getProperty(NAVIGATION_COUNTER_KEY) == null) {
       return new Long(0);
     }
-    java.lang.Object navCounterObj = executionContext.getProperty(_NAVIGATION_COUNTER_KEY);
+    java.lang.Object navCounterObj = executionContext.getProperty(NAVIGATION_COUNTER_KEY);
     if (navCounterObj instanceof Long) {
       return (Long) navCounterObj + 1;
     } else {
