@@ -848,7 +848,7 @@ public class Navigation implements INavigation {
       toHierarchyLevel = config.getToHierarchyLevel();
       showInactiveToLevel = config.getShowInactiveToLevel();
       menuPart = config.getMenuPart();
-      nodeSpaceRef = config.getNodeSpaceRef();
+      nodeSpaceRef = config.getNodeSpaceRef().orNull();
       dataType = config.getDataType();
       try {
         setLayoutType(config.getLayoutType());

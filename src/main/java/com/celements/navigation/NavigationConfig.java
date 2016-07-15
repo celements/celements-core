@@ -1,6 +1,5 @@
 package com.celements.navigation;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
@@ -10,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -56,8 +56,8 @@ public final class NavigationConfig {
       return this;
     }
 
-    public Builder configName(@Nullable String val) {
-      configName = Optional.fromNullable(Strings.emptyToNull(val));
+    public Builder configName(@NotNull String val) {
+      configName = Optional.of(Strings.emptyToNull(val));
       return this;
     }
 
@@ -76,24 +76,24 @@ public final class NavigationConfig {
       return this;
     }
 
-    public Builder menuPart(@Nullable String val) {
-      menuPart = Optional.fromNullable(Strings.emptyToNull(val));
+    public Builder menuPart(@NotNull String val) {
+      menuPart = Optional.of(Strings.emptyToNull(val));
       return this;
     }
 
     public Builder nodeSpaceRef(@NotNull SpaceReference val) {
       Preconditions.checkNotNull(val);
-      nodeSpaceRef = Optional.of(new SpaceReference(val.clone()));
+      nodeSpaceRef = Optional.of(ModelUtils.cloneReference(val, SpaceReference.class));
       return this;
     }
 
-    public Builder dataType(@Nullable String val) {
-      dataType = Optional.fromNullable(Strings.emptyToNull(val));
+    public Builder dataType(@NotNull String val) {
+      dataType = Optional.of(Strings.emptyToNull(val));
       return this;
     }
 
-    public Builder layoutType(@Nullable String val) {
-      layoutType = Optional.fromNullable(Strings.emptyToNull(val));
+    public Builder layoutType(@NotNull String val) {
+      layoutType = Optional.of(Strings.emptyToNull(val));
       return this;
     }
 
@@ -104,13 +104,13 @@ public final class NavigationConfig {
       return this;
     }
 
-    public Builder presentationTypeHint(@Nullable String val) {
-      presentationTypeHint = Optional.fromNullable(Strings.emptyToNull(val));
+    public Builder presentationTypeHint(@NotNull String val) {
+      presentationTypeHint = Optional.of(Strings.emptyToNull(val));
       return this;
     }
 
-    public Builder cmCssClass(@Nullable String val) {
-      cmCssClass = Optional.fromNullable(Strings.emptyToNull(val));
+    public Builder cmCssClass(@NotNull String val) {
+      cmCssClass = Optional.of(Strings.emptyToNull(val));
       return this;
     }
 
@@ -150,11 +150,6 @@ public final class NavigationConfig {
     this.nrOfItemsPerPage = builder.nrOfItemsPerPage;
     this.presentationTypeHint = builder.presentationTypeHint;
     this.cmCssClass = builder.cmCssClass;
-  }
-
-  @Nullable
-  final private <T> T firstNotNullOrNull(@Nullable T firstObj, @Nullable T secondObj) {
-    return Optional.fromNullable(firstObj).or(Optional.fromNullable(secondObj)).orNull();
   }
 
   @NotNull
@@ -205,12 +200,12 @@ public final class NavigationConfig {
     return menuPart.or("");
   }
 
-  @Nullable
-  public SpaceReference getNodeSpaceRef() {
+  @NotNull
+  public Optional<SpaceReference> getNodeSpaceRef() {
     if (nodeSpaceRef.isPresent()) {
-      return new SpaceReference(nodeSpaceRef.get().clone());
+      return Optional.of(ModelUtils.cloneReference(nodeSpaceRef.get(), SpaceReference.class));
     }
-    return null;
+    return Optional.absent();
   }
 
   @NotNull
@@ -227,18 +222,18 @@ public final class NavigationConfig {
     return Math.max(nrOfItemsPerPage.or(UNLIMITED_ITEMS_PER_PAGE), UNLIMITED_ITEMS_PER_PAGE);
   }
 
-  @Nullable
-  public IPresentationTypeRole getPresentationType() {
+  @NotNull
+  public Optional<IPresentationTypeRole> getPresentationType() {
     String thePresentationTypeHint = presentationTypeHint.or("default");
     try {
       LOGGER.info("setPresentationType to [" + thePresentationTypeHint + "].");
-      return Utils.getComponent(IWebUtilsService.class).lookup(IPresentationTypeRole.class,
-          thePresentationTypeHint);
+      return Optional.of(Utils.getComponent(IWebUtilsService.class).lookup(
+          IPresentationTypeRole.class, thePresentationTypeHint));
     } catch (ComponentLookupException failedToLoadException) {
       LOGGER.error("setPresentationType failed to load IPresentationTypeRole for hint ["
           + thePresentationTypeHint + "].", failedToLoadException);
     }
-    return null;
+    return Optional.absent();
   }
 
   @NotNull
