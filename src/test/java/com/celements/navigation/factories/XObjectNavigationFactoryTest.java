@@ -15,8 +15,6 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigation;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.NavigationConfig;
-import com.celements.navigation.factories.NavigationFactory;
-import com.celements.navigation.factories.XObjectNavigationFactory;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;

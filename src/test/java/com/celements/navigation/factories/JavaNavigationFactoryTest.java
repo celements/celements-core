@@ -49,7 +49,8 @@ public class JavaNavigationFactoryTest extends AbstractComponentTest {
         "RichText");
     defaultPageTypeRef = new PageTypeReference(defaultPageTypeDocRef.getName(),
         XObjectPageTypeProvider.X_OBJECT_PAGE_TYPE_PROVIDER, Collections.<String>emptyList());
-    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(defaultPageTypeRef).anyTimes();
+    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(
+        defaultPageTypeRef).anyTimes();
   }
 
   @Test
@@ -83,11 +84,12 @@ public class JavaNavigationFactoryTest extends AbstractComponentTest {
     Integer itemsPerPage = 20;
     String presentationTypeHint = null;
     String cmCssClass = "cm_cssTestClass2";
-    final NavigationConfig expectedNavConfig = new NavigationConfig.Builder().configName(configName).fromHierarchyLevel(
-        fromHierarchyLevel).toHierarchyLevel(toHierarchyLevel).showInactiveToLevel(
-        showInactiveToLevel).menuPart(menuPart).dataType(dataType).nodeSpaceRef(nodeSpaceRef).layoutType(
-        layoutType).nrOfItemsPerPage(itemsPerPage).presentationTypeHint(presentationTypeHint).cmCssClass(
-        cmCssClass).build();
+    final NavigationConfig expectedNavConfig = new NavigationConfig.Builder().configName(
+        configName).fromHierarchyLevel(fromHierarchyLevel).toHierarchyLevel(
+            toHierarchyLevel).showInactiveToLevel(showInactiveToLevel).menuPart(menuPart).dataType(
+                dataType).nodeSpaceRef(nodeSpaceRef).layoutType(layoutType).nrOfItemsPerPage(
+                    itemsPerPage).presentationTypeHint(presentationTypeHint).cmCssClass(
+                        cmCssClass).build();
     expect(testConfigurator.handles(eq(pageTypeRef))).andReturn(true);
     expect(testConfigurator.getNavigationConfig(eq(pageTypeRef))).andReturn(expectedNavConfig);
     replayDefault();
