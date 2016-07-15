@@ -34,7 +34,7 @@ public final class NavigationConfig {
     // Required parameters
     private boolean enabled;
 
-    // Optional parameters - initialized to Optional
+    // Optional parameters - initialized to Optional.absent()
     private Optional<String> configName = Optional.absent();
     private Optional<Integer> fromHierarchyLevel = Optional.absent();
     private Optional<Integer> toHierarchyLevel = Optional.absent();
