@@ -48,7 +48,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
-    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef());
+    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());
     assertEquals("default for fromHierarchyLevel must be greater than zero.", 1,
         navConfig.getFromHierarchyLevel());
     verifyDefault();
@@ -68,7 +68,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
-    assertEquals(parentSpaceRef, navConfig.getNodeSpaceRef());
+    assertEquals(parentSpaceRef, navConfig.getNodeSpaceRef().get());
     verifyDefault();
   }
 
@@ -86,7 +86,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
-    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef());
+    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());
     verifyDefault();
   }
 
@@ -107,7 +107,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         "testPresentationType"))).andReturn(componentInstance);
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.loadConfigFromObject(navConfigObj);
-    assertSame(componentInstance, navConfig.getPresentationType());
+    assertSame(componentInstance, navConfig.getPresentationType().get());
     verifyDefault();
   }
 
@@ -235,7 +235,7 @@ public class XObjectNavigationFactoryTest extends AbstractComponentTest {
         getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.getNavigationConfig(cellConfigDocRef);
-    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef());
+    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());
     verifyDefault();
   }
 

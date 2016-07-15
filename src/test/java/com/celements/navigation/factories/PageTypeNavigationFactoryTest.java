@@ -167,7 +167,7 @@ public class PageTypeNavigationFactoryTest extends AbstractComponentTest {
         getContext().getDatabase()));
     replayDefault();
     NavigationConfig navConfig = xobjNavFactory.getNavigationConfig(testDocRef);
-    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef());
+    assertEquals(mySpaceRef, navConfig.getNodeSpaceRef().get());
     verifyDefault();
   }
 

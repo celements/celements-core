@@ -70,8 +70,8 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
   private BaseObject getConfigBaseObj(@NotNull DocumentReference configReference) {
     BaseObject prefObj = null;
     try {
-      prefObj = modelAccess.getXObject(configReference,
-          navClassConfig.getNavigationConfigClassRef(configReference.getWikiReference()));
+      prefObj = modelAccess.getXObject(configReference, navClassConfig.getNavigationConfigClassRef(
+          configReference.getWikiReference()));
     } catch (DocumentLoadException | DocumentNotExistsException exp) {
       LOGGER.info("failed to load navigation from '{}'", configReference, exp);
     }
@@ -85,7 +85,9 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
       String configName = prefObj.getStringValue(INavigationClassConfig.MENU_ELEMENT_NAME_FIELD);
       LOGGER.debug("loadConfigFromObject: configName [" + configName + "] from doc ["
           + prefObj.getDocumentReference() + "].");
-      b.configName(configName);
+      if (!Strings.isNullOrEmpty(configName)) {
+        b.configName(configName);
+      }
       if (isValueSet(prefObj, INavigationClassConfig.FROM_HIERARCHY_LEVEL_FIELD)) {
         b.fromHierarchyLevel(prefObj.getIntValue(INavigationClassConfig.FROM_HIERARCHY_LEVEL_FIELD,
             NavigationConfig.DEFAULT_MIN_LEVEL));
@@ -96,22 +98,37 @@ public final class XObjectNavigationFactory extends AbstractNavigationFactory<Do
       }
       if (isValueSet(prefObj, INavigationClassConfig.SHOW_INACTIVE_TO_LEVEL_FIELD)) {
         b.showInactiveToLevel(prefObj.getIntValue(
-            INavigationClassConfig.SHOW_INACTIVE_TO_LEVEL_FIELD,
-            NavigationConfig.DEFAULT_MIN_LEVEL - 1));
+            INavigationClassConfig.SHOW_INACTIVE_TO_LEVEL_FIELD, NavigationConfig.DEFAULT_MIN_LEVEL
+                - 1));
       }
-      b.menuPart(prefObj.getStringValue(INavigationClassConfig.MENU_PART_FIELD));
+      String menuPart = prefObj.getStringValue(INavigationClassConfig.MENU_PART_FIELD);
+      if (!Strings.isNullOrEmpty(menuPart)) {
+        b.menuPart(menuPart);
+      }
       String spaceName = prefObj.getStringValue(INavigationClassConfig.MENU_SPACE_FIELD);
       if (!Strings.isNullOrEmpty(spaceName)) {
         b.nodeSpaceRef(webUtilsService.resolveSpaceReference(spaceName));
       }
-      b.dataType(prefObj.getStringValue("data_type"));
-      b.layoutType(prefObj.getStringValue("layout_type"));
+      String dataType = prefObj.getStringValue("data_type");
+      if (!Strings.isNullOrEmpty(dataType)) {
+        b.dataType(dataType);
+      }
+      String layoutPart = prefObj.getStringValue("layout_type");
+      if (!Strings.isNullOrEmpty(layoutPart)) {
+        b.layoutType(layoutPart);
+      }
       if (isValueSet(prefObj, INavigationClassConfig.ITEMS_PER_PAGE)) {
         b.showInactiveToLevel(prefObj.getIntValue(INavigationClassConfig.ITEMS_PER_PAGE,
             NavigationConfig.UNLIMITED_ITEMS_PER_PAGE));
       }
-      b.presentationTypeHint(prefObj.getStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD));
-      b.cmCssClass(prefObj.getStringValue(INavigationClassConfig.CM_CSS_CLASS_FIELD));
+      String presTypeHint = prefObj.getStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD);
+      if (!Strings.isNullOrEmpty(presTypeHint)) {
+        b.presentationTypeHint(presTypeHint);
+      }
+      String cmCssClass = prefObj.getStringValue(INavigationClassConfig.CM_CSS_CLASS_FIELD);
+      if (!Strings.isNullOrEmpty(cmCssClass)) {
+        b.cmCssClass(cmCssClass);
+      }
       return b.build();
     } else {
       return NavigationConfig.DEFAULTS;
