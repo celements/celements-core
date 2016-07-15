@@ -856,7 +856,7 @@ public class Navigation implements INavigation {
         LOGGER.error("loadConfig failed on setLayoutType.", exp);
       }
       nrOfItemsPerPage = config.getNrOfItemsPerPage();
-      presentationType = config.getPresentationType();
+      presentationType = config.getPresentationType().orNull();
       cmCssClass = config.getCssClass();
     }
   }

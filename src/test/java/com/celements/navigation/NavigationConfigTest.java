@@ -13,6 +13,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.NavigationConfig.Builder;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.web.Utils;
 
 public class NavigationConfigTest extends AbstractComponentTest {
@@ -227,8 +228,8 @@ public class NavigationConfigTest extends AbstractComponentTest {
         getContext().getDatabase()));
     navBuilder.nodeSpaceRef(nodeSpaceRef);
     NavigationConfig navConfig = navBuilder.build();
-    SpaceReference firstReturnNodeSpace = navConfig.getNodeSpaceRef();
-    assertEquals("expected equals nodeSpaceRef", nodeSpaceRef, firstReturnNodeSpace);
+    Optional<SpaceReference> firstReturnNodeSpace = navConfig.getNodeSpaceRef();
+    assertEquals("expected equals nodeSpaceRef", nodeSpaceRef, firstReturnNodeSpace.get());
     assertNotSame("expected defensive copy of nodeSpaceRef", nodeSpaceRef, firstReturnNodeSpace);
     assertNotSame("expected defensive copy of nodeSpaceRef", firstReturnNodeSpace,
         navConfig.getNodeSpaceRef());
