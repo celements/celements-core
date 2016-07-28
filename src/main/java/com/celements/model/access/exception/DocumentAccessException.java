@@ -9,13 +9,30 @@ public class DocumentAccessException extends Exception {
   private final DocumentReference docRef;
 
   public DocumentAccessException(DocumentReference docRef) {
-    super(docRef != null ? docRef.toString() : "null");
+    super(getMessage(docRef, null));
+    this.docRef = docRef;
+  }
+
+  public DocumentAccessException(DocumentReference docRef, String lang) {
+    super(getMessage(docRef, lang));
     this.docRef = docRef;
   }
 
   public DocumentAccessException(DocumentReference docRef, Throwable cause) {
-    super(docRef != null ? docRef.toString() : "null", cause);
+    super(getMessage(docRef, null), cause);
     this.docRef = docRef;
+  }
+
+  public DocumentAccessException(DocumentReference docRef, String lang, Throwable cause) {
+    super(getMessage(docRef, lang), cause);
+    this.docRef = docRef;
+  }
+
+  private static String getMessage(DocumentReference docRef, String lang) {
+    if (docRef != null) {
+      return new StringBuilder(docRef.toString()).append(" - ").append(lang).toString();
+    }
+    return "null";
   }
 
   public DocumentReference getDocumentReference() {

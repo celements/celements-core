@@ -10,8 +10,16 @@ public class DocumentNotExistsException extends DocumentAccessException {
     super(docRef);
   }
 
+  public DocumentNotExistsException(DocumentReference docRef, String lang) {
+    super(docRef, lang);
+  }
+
   public DocumentNotExistsException(DocumentReference docRef, Throwable cause) {
     super(docRef, cause);
+  }
+
+  public DocumentNotExistsException(DocumentReference docRef, String lang, Throwable cause) {
+    super(docRef, lang, cause);
   }
 
 }

@@ -33,7 +33,6 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -42,18 +41,14 @@ public class AttachmentServiceTest extends AbstractComponentTest {
 
   private AttachmentService attService;
   private XWikiDocument doc;
-  private XWikiStoreInterface xwikiStoreMock;
 
   @Before
   public void setUp_AttachmentServiceTest() throws ComponentLookupException, Exception {
     attService = (AttachmentService) Utils.getComponent(IAttachmentServiceRole.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
     doc.setMetaDataDirty(false);
-    xwikiStoreMock = createMockAndAddToDefault(XWikiStoreInterface.class);
-    doc.setStore(xwikiStoreMock);
     doc.setNew(false);
     doc.setSyntax(Syntax.XWIKI_1_0);
-    expect(getWikiMock().getStore()).andReturn(xwikiStoreMock).anyTimes();
   }
 
   @Test

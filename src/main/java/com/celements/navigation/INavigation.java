@@ -21,6 +21,8 @@ package com.celements.navigation;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -33,7 +35,7 @@ public interface INavigation {
 
   /**
    * setFromHierarchyLevel
-   * 
+   *
    * @param fromHierarchyLevel
    *          starting (including) at Hierarchy Level 1 = mainMenu , 0 = spaceMenu
    *          (including all first mainMenuItems of all Spaces)
@@ -44,7 +46,7 @@ public interface INavigation {
 
   /**
    * setToHierarchyLevel
-   * 
+   *
    * @param toHierarchyLevel
    *          ending (including) with Hierarchy Level
    */
@@ -95,6 +97,14 @@ public interface INavigation {
 
   public boolean isNavigationEnabled();
 
+  public void loadConfig(@NotNull NavigationConfig config);
+
+  /**
+   * @Deprecated since 1.140 instead use XObjectNavigationFactory
+   */
+  @Deprecated
+  public void loadConfigFromObject(BaseObject prefObj);
+
   public void loadConfigByName(String configName, XWikiContext context);
 
   public void setCMcssClass(String cmCssClass);
@@ -118,8 +128,6 @@ public interface INavigation {
   public void addUlCSSClass(String cssClass);
 
   public void setNavFilter(INavFilter<BaseObject> navFilter);
-
-  public void loadConfigFromObject(BaseObject prefObj);
 
   public void setLanguage(String language);
 

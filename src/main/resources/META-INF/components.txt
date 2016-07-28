@@ -130,5 +130,10 @@ com.celements.configuration.CelementsDefaultConfigurationSource
 com.celements.configuration.CelementsAllConfigurationSource
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
+com.celements.common.classes.DefaultXClassCreator
 com.celements.web.service.LastStartupTimeStamp
 com.celements.pagetype.xobject.XObjectPageTypeUtils
+com.celements.navigation.factories.XObjectNavigationFactory
+com.celements.navigation.factories.JavaNavigationFactory
+com.celements.navigation.factories.PageTypeNavigationFactory
+com.celements.navigation.factories.DefaultNavigationFactory

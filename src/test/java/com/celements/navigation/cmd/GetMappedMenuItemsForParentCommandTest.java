@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -39,16 +38,13 @@ public class GetMappedMenuItemsForParentCommandTest extends AbstractComponentTes
 
   private GetMappedMenuItemsForParentCommand getMenuItemsCmd;
   private XWikiContext context;
-  private XWiki xwiki;
   private XWikiStoreInterface mockStore;
 
   @Before
   public void setUp_GetMappedMenuItemsForParentCommandTest() throws Exception {
     context = getContext();
-    xwiki = getWikiMock();
     getMenuItemsCmd = new GetMappedMenuItemsForParentCommand();
-    mockStore = createMockAndAddToDefault(XWikiStoreInterface.class);
-    expect(xwiki.getStore()).andReturn(mockStore).anyTimes();
+    mockStore = getStoreMock();
   }
 
   @Test

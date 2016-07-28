@@ -50,13 +50,13 @@ public class NavigationApi extends Api {
   }
 
   public static NavigationApi createNavigation(XWikiContext context) {
-    return getAPIObject(new Navigation(Navigation.newNavIdForContext(context)), context);
+    return getAPIObject(Navigation.createNavigation(), context);
   }
 
   /**
    * getMultilingualMenuName DOES NOT allow empty menu names as return value in contrast
    * to getMultilingualMenuNameOnly
-   * 
+   *
    * @param fullName
    * @param language
    * @return
@@ -78,7 +78,7 @@ public class NavigationApi extends Api {
   /**
    * getMultilingualMenuNameOnly DOES allow empty menu names as return value in contrast
    * to getMultilingualMenuName
-   * 
+   *
    * @param fullName
    * @param language
    * @return
@@ -131,6 +131,7 @@ public class NavigationApi extends Api {
    *          (default: $doc.web)
    * @deprecated since 2.57.0 instead use setNodeSpace
    */
+  @Deprecated
   public void setMenuSpace(String menuSpace) {
     navigation.setMenuSpace(menuSpace);
   }

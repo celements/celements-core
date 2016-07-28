@@ -132,7 +132,7 @@ public interface IWebUtilsService {
 
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
 
-  public WikiReference resolveWikiReference(String wikiName);
+  public WikiReference resolveWikiReference(@Nullable String wikiName);
 
   public AttachmentReference resolveAttachmentReference(String fullName);
 

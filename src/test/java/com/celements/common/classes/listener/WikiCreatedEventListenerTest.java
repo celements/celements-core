@@ -43,12 +43,12 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
   }
 
   @Test
-  public void testOnEvent() {
+  public void testOnEvent() throws Exception {
     String database = "db";
     Event event = new WikiCreatedEvent(database);
 
     expect(remoteObsMngContextMock.isRemoteState()).andReturn(false).atLeastOnce();
-    classesCmpMock.checkAllClassCollections();
+    classesCmpMock.checkClasses();
     expectLastCall().andDelegateTo(new TestClassesCompositor(database)).once();
 
     String db = getContext().getDatabase();
@@ -73,6 +73,11 @@ public class WikiCreatedEventListenerTest extends AbstractBridgedComponentTestCa
 
     TestClassesCompositor(String database) {
       this.database = database;
+    }
+
+    @Override
+    public void checkClasses() {
+      assertEquals(database, getContext().getDatabase());
     }
 
     @Override

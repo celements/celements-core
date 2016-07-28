@@ -37,7 +37,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.classes.IClassCollectionRole;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.TestMessageTool;
 import com.celements.navigation.filter.INavFilter;
@@ -838,11 +837,12 @@ public class NavigationTest extends AbstractComponentTest {
     navFilterMock.setMenuPart(eq(""));
     expectLastCall().once();
     String spaceName = "MySpace";
-    EntityReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
         getContext().getDatabase()));
     expect(tNServiceMock.getSubNodesForParent(eq(mySpaceRef), same(navFilterMock))).andReturn(
         Collections.<TreeNode>emptyList());
     expect(wUServiceMock.hasParentSpace(eq(spaceName))).andReturn(false);
+    expect(wUServiceMock.resolveSpaceReference(eq(spaceName))).andReturn(mySpaceRef).anyTimes();
     replayDefault();
     nav.loadConfigFromObject(navConfigObj);
     assertEquals("MySpace", nav.getMenuSpace(getContext()));
@@ -901,7 +901,8 @@ public class NavigationTest extends AbstractComponentTest {
     navConfigObj.setDocumentReference(cellConfigDocRef);
     navConfigObj.setXClassReference(getNavClasses().getNavigationConfigClassRef(
         getContext().getDatabase()));
-    navConfigObj.setStringValue(NavigationClasses.PRESENTATION_TYPE_FIELD, "testPresentationType");
+    navConfigObj.setStringValue(INavigationClassConfig.PRESENTATION_TYPE_FIELD,
+        "testPresentationType");
     IPresentationTypeRole componentInstance = createMockAndAddToDefault(
         IPresentationTypeRole.class);
     IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
@@ -909,6 +910,65 @@ public class NavigationTest extends AbstractComponentTest {
         "testPresentationType"))).andReturn(componentInstance);
     replayDefault();
     nav.loadConfigFromObject(navConfigObj);
+    verifyDefault();
+    assertSame(componentInstance, nav.getPresentationType());
+  }
+
+  @Test
+  public void testLoadConfig_defaults() {
+    String spaceName = "MySpace";
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        getContext().getDatabase()));
+    NavigationConfig navConfig = new NavigationConfig.Builder().nodeSpaceRef(mySpaceRef).build();
+    replayDefault();
+    nav.loadConfig(navConfig);
+    assertEquals(mySpaceRef, nav.getNodeSpaceRef());
+    assertEquals("MySpace", nav.getNodeSpaceRef().getName());
+    assertEquals("default for fromHierarchyLevel must be greater than zero.", 1,
+        nav.fromHierarchyLevel);
+    verifyDefault();
+  }
+
+  @Test
+  public void testLoadConfig_menuSpace() {
+    String nodeSpaceName = "theMenuSpace";
+    SpaceReference parentSpaceRef = new SpaceReference(nodeSpaceName, new WikiReference(
+        getContext().getDatabase()));
+    NavigationConfig navConfig = new NavigationConfig.Builder().nodeSpaceRef(
+        parentSpaceRef).build();
+    replayDefault();
+    nav.loadConfig(navConfig);
+    assertEquals(parentSpaceRef, nav.getNodeSpaceRef());
+    assertEquals("theMenuSpace", nav.getNodeSpaceRef().getName());
+    verifyDefault();
+  }
+
+  @Test
+  public void testLoadConfig_menuSpace_empty() {
+    String spaceName = "MySpace";
+    SpaceReference mySpaceRef = new SpaceReference(spaceName, new WikiReference(
+        getContext().getDatabase()));
+    NavigationConfig navConfig = new NavigationConfig.Builder().nodeSpaceRef(mySpaceRef).build();
+    replayDefault();
+    nav.loadConfig(navConfig);
+    assertEquals(mySpaceRef, nav.getNodeSpaceRef());
+    assertEquals("MySpace", nav.getNodeSpaceRef().getName());
+    verifyDefault();
+  }
+
+  @Test
+  public void testLoadConfig_presentationType_notEmpty() throws Exception {
+    IPresentationTypeRole componentInstance = createMockAndAddToDefault(
+        IPresentationTypeRole.class);
+    IWebUtilsService wUServiceMock = registerComponentMock(IWebUtilsService.class);
+    expect(wUServiceMock.lookup(eq(IPresentationTypeRole.class), eq(
+        "testPresentationType"))).andReturn(componentInstance);
+    String presentationTypeHint = "testPresentationType";
+    NavigationConfig navConfig = new NavigationConfig.Builder().presentationTypeHint(
+        presentationTypeHint).build();
+    replayDefault();
+    nav.loadConfig(navConfig);
+    assertEquals(componentInstance, nav.getPresentationType());
     verifyDefault();
     assertSame(componentInstance, nav.getPresentationType());
   }
@@ -1526,9 +1586,8 @@ public class NavigationTest extends AbstractComponentTest {
     return new DocumentReference(getContext().getDatabase(), "MySpace", docName);
   }
 
-  private NavigationClasses getNavClasses() {
-    return (NavigationClasses) Utils.getComponent(IClassCollectionRole.class,
-        "celements.celNavigationClasses");
+  private INavigationClassConfig getNavClasses() {
+    return Utils.getComponent(INavigationClassConfig.class);
   }
 
 }

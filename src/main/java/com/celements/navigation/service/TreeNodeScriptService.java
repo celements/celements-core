@@ -15,6 +15,10 @@ import com.celements.emptycheck.service.IEmptyCheckRole;
 import com.celements.navigation.NavigationApi;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.cmd.ReorderSaveCommand;
+import com.celements.navigation.factories.JavaNavigationFactory;
+import com.celements.navigation.factories.NavigationFactory;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,14 +36,41 @@ public class TreeNodeScriptService implements ScriptService {
   ITreeNodeCache treeNodeCache;
 
   @Requirement
+  NavigationFactory<DocumentReference> navFactory;
+
+  @Requirement(JavaNavigationFactory.JAVA_NAV_FACTORY_HINT)
+  NavigationFactory<PageTypeReference> javaNavFactory;
+
+  @Requirement
+  IPageTypeRole pageTypeService;
+
+  @Requirement
   Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  /**
+   * @deprecated since 2.80 instead use getDefaultNavigation() or getEmptyNavigation()
+   */
+  @Deprecated
   public NavigationApi createNavigation() {
     return NavigationApi.createNavigation(getContext());
+  }
+
+  public NavigationApi getEmptyNavigation() {
+    return NavigationApi.createNavigation(getContext());
+  }
+
+  public NavigationApi getJavaNavigation(String pageTypeName) {
+    PageTypeReference configReference = pageTypeService.getPageTypeRefByConfigName(pageTypeName);
+    return NavigationApi.getAPIObject(javaNavFactory.createNavigation(configReference),
+        getContext());
+  }
+
+  public NavigationApi getDefaultNavigation() {
+    return NavigationApi.getAPIObject(navFactory.createNavigation(), getContext());
   }
 
   public void enableMappedMenuItems() {

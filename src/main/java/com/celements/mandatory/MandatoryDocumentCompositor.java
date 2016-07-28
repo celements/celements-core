@@ -32,7 +32,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 @Component
 public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositorRole {
@@ -50,6 +49,7 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public void checkAllMandatoryDocuments() {
     LOGGER.info("checkAllMandatoryDocuments for wiki [" + getContext().getDatabase() + "].");
     for (String mandatoryDocKey : getMandatoryDocumentsList()) {
@@ -58,7 +58,7 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
         LOGGER.trace("checkDocuments with [" + mandatoryDoc.getClass() + "].");
         mandatoryDoc.checkDocuments();
         LOGGER.trace("end checkDocuments with [" + mandatoryDoc.getClass() + "].");
-      } catch (XWikiException exp) {
+      } catch (Exception exp) {
         LOGGER.error("Exception checking mandatory documents for component "
             + mandatoryDoc.getClass(), exp);
       }

@@ -100,8 +100,8 @@ public class TreeNodeTest extends AbstractComponentTest {
     DocumentReference docRef2 = new DocumentReference(context.getDatabase(), "MySpace", "myPage");
     TreeNode treeNodeTest = new TreeNode(docRef2, new SpaceReference("MySpace", new WikiReference(
         context.getDatabase())), 1, partNameGetterMock);
-    expect(partNameGetterMock.getPartName(eq(docRef2))).andThrow(
-        new RuntimeException("partNameGetter must be called lazily for"
+    expect(partNameGetterMock.getPartName(eq(docRef2))).andThrow(new RuntimeException(
+        "partNameGetter must be called lazily for"
             + " NotMappedMenuItems for performance reasons.")).anyTimes();
     replayDefault();
     assertTrue(treeNode.equals(treeNodeTest));
