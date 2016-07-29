@@ -855,7 +855,9 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
     /**
      * IMPORTANT: do not change anything on the synchronization of this method.
-     * It is very delicate and will likely break memory visibility of the loaded document
+     * e.g. do not change to lazy initialization of lodedDoc or similar. It is not working.
+     * It is a very delicate case and very likely memory visibility breaks in 1 out of 100'000
+     * document loads.
      */
     synchronized XWikiDocument loadDocument(String key, XWikiDocument doc, XWikiContext context)
         throws XWikiException {

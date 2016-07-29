@@ -209,7 +209,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   @Test
   public void test_multiRuns_singleThreaded_scenario1_fixed() throws Exception {
     int cores = 1;
-    int executeRuns = 20000;
+    int executeRuns = 10000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
@@ -223,7 +223,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   @Test
   public void test_multiRuns_singleThreaded_scenario1() throws Exception {
     int cores = 1;
-    int executeRuns = 20000;
+    int executeRuns = 10000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
@@ -235,10 +235,12 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_multiThreaded_scenario1_fixed() throws Exception {
+  public void test_multiThreaded_scenario1_fixed_DocumentCacheStore() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    int executeRuns = 30000;
+    // tested with up to 1'000'000 executeRuns on a intel quadcore 4770 without any race conditions!
+    // int executeRuns = 1000000;
+    int executeRuns = 80000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
@@ -253,7 +255,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
    * IMPORTANT: This test shows, that XWikiCacheStore is broken!!!
    */
   @Test
-  public void test_multiThreaded_scenario1() throws Exception {
+  public void test_failing_multiThreaded_scenario1_XWikiCacheStore() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
     int executeRuns = 30000;
