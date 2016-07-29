@@ -65,6 +65,7 @@ import com.xpn.xwiki.web.Utils;
 public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(DocumentCacheStore.class);
+  private final static Logger LOGGER_DL = LoggerFactory.getLogger(DocumentLoader.class);
 
   public static final String COMPONENT_NAME = "DocumentCacheStore";
 
@@ -262,13 +263,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   private DocumentLoader getDocumentLoader(String key) {
     DocumentLoader docLoader = documentLoaderMap.get(key);
     if (docLoader == null) {
-      LOGGER.info("create document loader for '{}' in thread '{}'", key,
+      LOGGER.debug("create document loader for '{}' in thread '{}'", key,
           Thread.currentThread().getId());
       docLoader = new DocumentLoader(key);
       DocumentLoader setDocLoader = documentLoaderMap.putIfAbsent(key, docLoader);
       if (setDocLoader != null) {
         docLoader = setDocLoader;
-        LOGGER.debug("replace with existing from map for key '{}' in thread '{}'", key,
+        LOGGER.info("replace with existing from map for key '{}' in thread '{}'", key,
             Thread.currentThread().getId());
       }
     }
@@ -876,13 +877,15 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         // generated. Therefore we double check here that still no document is in cache.
         loadedDoc = getCache().get(key);
         if (loadedDoc == null) {
-          LOGGER.trace("DocumentLoader: Trying to get doc '{}' for real", key);
+          LOGGER_DL.trace("DocumentLoader-{}: Trying to get doc '{}' for real",
+              Thread.currentThread().getId(), key);
           // IMPORTANT: do not clone here. Creating new document is much faster.
           loadedDoc = new XWikiDocument(doc.getDocumentReference());
           loadedDoc.setLanguage(doc.getLanguage());
           loadedDoc = store.loadXWikiDoc(loadedDoc, context);
           loadedDoc.setStore(store);
-          LOGGER.info("DocumentLoader: put doc '{}' in cache", key);
+          LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache", Thread.currentThread().getId(),
+              key);
           getCache().set(key, loadedDoc);
           getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
         }
