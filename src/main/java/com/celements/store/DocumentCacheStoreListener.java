@@ -3,6 +3,8 @@ package com.celements.store;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -20,6 +22,8 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 public class DocumentCacheStoreListener implements EventListener {
 
   public static final String COMPONENT_NAME = "DocumentCacheStoreListener";
+
+  private final static Logger LOGGER = LoggerFactory.getLogger(DocumentCacheStore.class);
 
   @Requirement
   private RemoteObservationManagerContext remoteObservationManagerContext;
@@ -60,10 +64,16 @@ public class DocumentCacheStoreListener implements EventListener {
     // only react to remote events since local actions are already taken into account
     if (this.remoteObservationManagerContext.isRemoteState()) {
       if (event instanceof WikiDeletedEvent) {
+        WikiDeletedEvent wikiEvent = (WikiDeletedEvent) event;
+        LOGGER.info("WikiDeletedEvent '{}': completely flushing DocumentCacheStore",
+            wikiEvent.getWikiId());
         getDocCacheStore().flushCache();
       } else {
         XWikiDocument doc = (XWikiDocument) source;
+        LOGGER.info("DocumentEvent: invalidating doc cache for '{}'", doc.getDocumentReference());
         getDocCacheStore().invalidateCacheFromClusterEvent(doc);
+        LOGGER.debug("DocumentEvent: after invalidating doc cache for '{}'",
+            doc.getDocumentReference());
       }
     }
   }
