@@ -289,6 +289,30 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  public List<String> getAllowedLanguages(SpaceReference spaceRef) {
+    List<String> languages = new ArrayList<String>();
+    String curDB = getContext().getDatabase();
+    try {
+      getContext().setDatabase(spaceRef.getParent().getName());
+      String spaceLanguages = getContext().getWiki().getSpacePreference("languages",
+          spaceRef.getName(), "", getContext());
+      languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
+      languages.remove("");
+      if (languages.size() > 0) {
+        LOGGER.debug("getAllowedLanguages: returning [" + spaceLanguages + "] for space ["
+            + spaceRef.getName() + "]");
+        return languages;
+      }
+      LOGGER.warn("Deprecated usage of Preferences field 'language'."
+          + " Instead use 'languages'.");
+      return Arrays.asList(getContext().getWiki().getSpacePreference("language", spaceRef.getName(),
+          "", getContext()).split("[ ,]"));
+    } finally {
+      getContext().setDatabase(curDB);
+    }
+  }
+
+  @Override
   public Date parseDate(String date, String format) {
     try {
       return new SimpleDateFormat(format).parse(date);
