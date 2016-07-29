@@ -262,10 +262,14 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   private DocumentLoader getDocumentLoader(String key) {
     DocumentLoader docLoader = documentLoaderMap.get(key);
     if (docLoader == null) {
+      LOGGER.info("create document loader for '{}' in thread '{}'", key,
+          Thread.currentThread().getId());
       docLoader = new DocumentLoader(key);
       DocumentLoader setDocLoader = documentLoaderMap.putIfAbsent(key, docLoader);
       if (setDocLoader != null) {
         docLoader = setDocLoader;
+        LOGGER.debug("replace with existing from map for key '{}' in thread '{}'", key,
+            Thread.currentThread().getId());
       }
     }
     return docLoader;
@@ -878,7 +882,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
           loadedDoc.setLanguage(doc.getLanguage());
           loadedDoc = store.loadXWikiDoc(loadedDoc, context);
           loadedDoc.setStore(store);
-          LOGGER.debug("DocumentLoader: put doc '{}' in cache", key);
+          LOGGER.info("DocumentLoader: put doc '{}' in cache", key);
           getCache().set(key, loadedDoc);
           getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
         }
