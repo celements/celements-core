@@ -10,6 +10,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.auth.AuthenticationScriptService;
@@ -137,6 +138,10 @@ public class WebUtilsScriptService implements ScriptService {
 
   public List<String> getAllowedLanguages(String spaceName) {
     return webUtilsService.getAllowedLanguages(spaceName);
+  }
+
+  public List<String> getAllowedLanguages(SpaceReference spaceRef) {
+    return webUtilsService.getAllowedLanguages(spaceRef);
   }
 
   public String getParentSpace() {

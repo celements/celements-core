@@ -74,7 +74,8 @@ public interface IWebUtilsService {
    */
   public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
 
-  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef, boolean includeDoc);
+  public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
+      boolean includeDoc);
 
   public String getDocSectionAsJSON(String regex, DocumentReference docRef, int section)
       throws XWikiException;
@@ -85,6 +86,10 @@ public interface IWebUtilsService {
   public int countSections(String regex, DocumentReference docRef) throws XWikiException;
 
   public List<String> getAllowedLanguages();
+
+  public List<String> getAllowedLanguages(String spaceName);
+
+  public List<String> getAllowedLanguages(SpaceReference spaceRef);
 
   public Date parseDate(String date, String format);
 
@@ -140,7 +145,8 @@ public interface IWebUtilsService {
 
   public EntityReference resolveEntityReference(String name, EntityType type);
 
-  public EntityReference resolveEntityReference(String name, EntityType type, WikiReference wikiRef);
+  public EntityReference resolveEntityReference(String name, EntityType type,
+      WikiReference wikiRef);
 
   /**
    * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
@@ -281,8 +287,6 @@ public interface IWebUtilsService {
   public WikiReference getWikiRef(DocumentReference docRef);
 
   public WikiReference getWikiRef(EntityReference ref);
-
-  public List<String> getAllowedLanguages(String spaceName);
 
   public DocumentReference getWikiTemplateDocRef();
 
