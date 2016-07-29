@@ -886,6 +886,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
           loadedDoc.setStore(store);
           LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache", Thread.currentThread().getId(),
               key);
+          // XXX check if this is an possible unsafe publication over the cache
           getCache().set(key, loadedDoc);
           getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
         }
