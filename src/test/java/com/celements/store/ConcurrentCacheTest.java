@@ -238,15 +238,22 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   public void test_multiThreaded_scenario1_fixed_DocumentCacheStore() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    // tested with up to 1'000'000 executeRuns on a intel quadcore 4770 without any race conditions!
-    // int executeRuns = 1000000;
-    int executeRuns = 80000;
+    // tested with up to 2'000'000 executeRuns on a intel quadcore 4770 without triggering any race
+    // conditions!
+    int executeRuns = 2000000;
+    // int executeRuns = 80000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
+    theCacheStoreFixed.canceledLoading.set(0);
     assertSuccessFullRuns(testScenario1(theCacheStoreFixed, cores, executeRuns));
     if (verifyDocLoads) {
-      assertEquals(expectedCountDocLoads.get(), countDocLoads.get());
+      int countLoads = countDocLoads.get();
+      int expectedLoads = expectedCountDocLoads.get();
+      assertTrue("invalidating during load leads to multiple loads for one invalidation, thus"
+          + " expected loads '" + expectedLoads + "' must be lower equal to count loads '"
+          + countLoads + "', canceledLoading '" + theCacheStoreFixed.canceledLoading.get() + "'",
+          expectedLoads <= countLoads);
     }
     verifyDefault();
   }

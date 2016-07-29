@@ -23,6 +23,8 @@ package com.celements.store;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
@@ -93,6 +95,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   private Cache<Boolean> pageExistCache;
 
   private final ConcurrentMap<String, DocumentLoader> documentLoaderMap = new ConcurrentHashMap<>();
+  public final AtomicInteger canceledLoading = new AtomicInteger(0);
 
   private XWikiContext getContext() {
     return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
@@ -282,10 +285,9 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   }
 
   void invalidateCacheFromClusterEvent(String key) {
-    if (documentLoaderMap.containsKey(key)) {
-      documentLoaderMap.remove(key);
-      // TODO check handle loading document and cancel, restart, invalidate...???
-      LOGGER.warn("invalidating cache for loading document '{}'", key);
+    final DocumentLoader docLoader = documentLoaderMap.remove(key);
+    if (docLoader != null) {
+      docLoader.invalidate();
     }
     if (getCache() != null) {
       getCache().remove(key);
@@ -851,50 +853,83 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   private class DocumentLoader {
 
-    private XWikiDocument loadedDoc;
+    private volatile XWikiDocument loadedDoc;
     private final String key;
+    private AtomicBoolean invalidated = new AtomicBoolean(false);
 
-    public DocumentLoader(String key) {
+    private DocumentLoader(String key) {
       this.key = key;
+    }
+
+    private void invalidate() {
+      invalidated.set(true);
+      LOGGER_DL.debug("invalidated cache during loading document.");
     }
 
     /**
      * IMPORTANT: do not change anything on the synchronization of this method.
-     * e.g. do not change to lazy initialization of lodedDoc or similar. It is not working.
-     * It is a very delicate case and very likely memory visibility breaks in 1 out of 100'000
-     * document loads.
+     * It is a very delicate case and very likely memory visibility breaks in less than 1 out of
+     * 100'000 document loads. Thus it is difficult to test for correctness.
      */
-    synchronized XWikiDocument loadDocument(String key, XWikiDocument doc, XWikiContext context)
-        throws XWikiException {
+    synchronized private XWikiDocument loadDocument(String key, XWikiDocument doc,
+        XWikiContext context) throws XWikiException {
+      checkArgument(key);
+      if (loadedDoc == null) {
+        synchronized (this) {
+          if (loadedDoc == null) {
+            // if a thread is just between the document cache miss and getting the documentLoader
+            // when the documentLoader removes itself from the map, then a new documentLoader is
+            // generated. Therefore we double check here that still no document is in cache.
+            loadedDoc = getCache().get(key);
+            if (loadedDoc == null) {
+              XWikiDocument newDoc;
+              do {
+                // use a further synchronized method call to prevent an unsafe publication of the
+                // new
+                // document over the cache
+                newDoc = new DocumentBuilder().buildDocument(key, doc, context);
+                if (invalidated.get()) {
+                  LOGGER_DL.info("DocumentLoader-{}: invalidated docloader '{}' reloading",
+                      Thread.currentThread().getId(), key);
+                  canceledLoading.incrementAndGet();
+                }
+              } while (invalidated.compareAndSet(true, false));
+              loadedDoc = newDoc;
+              LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache",
+                  Thread.currentThread().getId(), key);
+              getCache().set(key, loadedDoc);
+              getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
+              documentLoaderMap.remove(key);
+            }
+          }
+        }
+      }
+      return loadedDoc;
+    }
+
+    private void checkArgument(String key) {
       if (!this.key.equals(key)) {
         throw new RuntimeException(
             "DocumentLoader illegally used with a different key (registered key:" + this.key
                 + ", loading doc key: " + key + ").");
       }
-      if (loadedDoc == null) {
-        // if a thread is just between the document cache miss and getting the documentLoader
-        // when the documentLoader removes itself from the map, then a new documentLoader is
-        // generated. Therefore we double check here that still no document is in cache.
-        loadedDoc = getCache().get(key);
-        if (loadedDoc == null) {
-          LOGGER_DL.trace("DocumentLoader-{}: Trying to get doc '{}' for real",
-              Thread.currentThread().getId(), key);
-          // IMPORTANT: do not clone here. Creating new document is much faster.
-          loadedDoc = new XWikiDocument(doc.getDocumentReference());
-          loadedDoc.setLanguage(doc.getLanguage());
-          loadedDoc = store.loadXWikiDoc(loadedDoc, context);
-          loadedDoc.setStore(store);
-          LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache", Thread.currentThread().getId(),
-              key);
-          // XXX check if this is an possible unsafe publication over the cache
-          getCache().set(key, loadedDoc);
-          getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
-        }
-        documentLoaderMap.remove(key);
-      }
-      return loadedDoc;
     }
 
+    private class DocumentBuilder {
+
+      private synchronized XWikiDocument buildDocument(String key, XWikiDocument doc,
+          XWikiContext context) throws XWikiException {
+        LOGGER_DL.trace("DocumentLoader-{}: Trying to get doc '{}' for real",
+            Thread.currentThread().getId(), key);
+        // IMPORTANT: do not clone here. Creating new document is much faster.
+        XWikiDocument buildDoc = new XWikiDocument(doc.getDocumentReference());
+        buildDoc.setLanguage(doc.getLanguage());
+        buildDoc = store.loadXWikiDoc(buildDoc, context);
+        buildDoc.setStore(store);
+        return buildDoc;
+      }
+
+    }
   }
 
 }
