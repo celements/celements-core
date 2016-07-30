@@ -23,7 +23,6 @@ package com.celements.store;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.python.google.common.base.Strings;
@@ -87,22 +86,30 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   /**
    * Lazy initialized according to backing store strategy configuration.
+   * The store field is immutable in the following way:
+   * even though it could be initialized in multiple threads because of missing memory visibility,
+   * it always results in the same value. Thus a thread could not tell if it was multiple times
+   * initialized. Hence no volatile modificator is needed.
    */
   private XWikiStoreInterface store;
 
-  private Cache<XWikiDocument> cache;
+  /**
+   * CAUTION: Lazy initialized of cache thus volatile is needed.
+   */
+  private volatile Cache<XWikiDocument> cache;
 
-  private Cache<Boolean> pageExistCache;
+  /**
+   * CAUTION: Lazy initialized of cache thus volatile is needed.
+   */
+  private volatile Cache<Boolean> pageExistCache;
 
   private final ConcurrentMap<String, DocumentLoader> documentLoaderMap = new ConcurrentHashMap<>();
-  public final AtomicInteger canceledLoading = new AtomicInteger(0);
-  public final AtomicInteger skipLoading = new AtomicInteger(0);
 
   private XWikiContext getContext() {
     return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
   }
 
-  private void initalizeCache() {
+  void initalizeCache() {
     if ((this.cache == null) || (this.pageExistCache == null)) {
       synchronized (this) {
         try {
@@ -128,7 +135,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     lru.setMaxEntries(getPageExistCacheCapacity());
     cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
     Cache<Boolean> pageExistcache = getCacheFactory().newCache(cacheConfiguration);
-    setPageExistCache(pageExistcache);
+    this.pageExistCache = pageExistcache;
   }
 
   CacheFactory getCacheFactory() {
@@ -160,7 +167,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     lru.setMaxEntries(getPageCacheCapacity());
     cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
     Cache<XWikiDocument> pageCache = getCacheFactory().newCache(cacheConfiguration);
-    setCache(pageCache);
+    this.cache = pageCache;
   }
 
   private int getPageCacheCapacity() {
@@ -187,11 +194,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   @Override
   public XWikiStoreInterface getStore() {
     if (this.store == null) {
-      synchronized (this) {
-        if (this.store == null) {
-          this.store = Utils.getComponent(XWikiStoreInterface.class, getBackingStoreHint());
-        }
-      }
+      this.store = Utils.getComponent(XWikiStoreInterface.class, getBackingStoreHint());
     }
     return this.store;
   }
@@ -238,7 +241,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   }
 
   @Override
-  public void flushCache() {
+  public synchronized void flushCache() {
+    LOGGER.warn("flushCache may lead to serious memory visability problems.");
     if (this.cache != null) {
       this.cache.dispose();
       this.cache = null;
@@ -285,17 +289,30 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     invalidateCacheFromClusterEvent(key);
   }
 
-  void invalidateCacheFromClusterEvent(String key) {
-    final DocumentLoader docLoader = documentLoaderMap.remove(key);
-    if (docLoader != null) {
-      docLoader.invalidate();
+  InvalidateState invalidateCacheFromClusterEvent(String key) {
+    InvalidateState invalidState = InvalidateState.CACHE_MISS;
+    final DocumentLoader docLoader = documentLoaderMap.get(key);
+    boolean invalidateDocLoader = (docLoader != null);
+    if (invalidateDocLoader) {
+      invalidState = docLoader.invalidate();
     }
+    XWikiDocument oldCachedDoc = null;
     if (getCache() != null) {
-      getCache().remove(key);
+      oldCachedDoc = getDocFromCache(key);
+      if (oldCachedDoc != null) {
+        synchronized (oldCachedDoc) {
+          oldCachedDoc = getDocFromCache(key);
+          if (oldCachedDoc != null) {
+            getCache().remove(key);
+            invalidState = InvalidateState.REMOVED;
+          }
+        }
+      }
     }
     if (getPageExistCache() != null) {
       getPageExistCache().remove(key);
     }
+    return invalidState;
   }
 
   @Override
@@ -303,16 +320,21 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     LOGGER.trace("Cache: begin for docRef '{}' in cache", doc.getDocumentReference());
     String key = getKey(doc);
     LOGGER.debug("Cache: Trying to get doc '{}' from cache", key);
-    XWikiDocument cachedoc = getCache().get(key);
+    XWikiDocument cachedoc = getDocFromCache(key);
     if (cachedoc != null) {
-      doc = cachedoc;
       LOGGER.debug("Cache: got doc '{}' from cache", key);
     } else {
-      doc = getDocumentLoader(key).loadDocument(key, doc, context);
+      cachedoc = getDocumentLoader(key).loadDocument(key, doc, context);
     }
-    doc.setFromCache(true);
     LOGGER.trace("Cache: end for doc '{}' in cache", key);
-    return doc;
+    return cachedoc;
+  }
+
+  /**
+   * getCache is private, thus for tests we need getDocFromCache to check the cache state
+   */
+  XWikiDocument getDocFromCache(String key) {
+    return getCache().get(key);
   }
 
   @Override
@@ -753,9 +775,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
    */
   @Override
   public boolean isWikiNameAvailable(String wikiName, XWikiContext context) throws XWikiException {
-    synchronized (wikiName) {
-      return getStore().isWikiNameAvailable(wikiName, context);
-    }
+    return getStore().isWikiNameAvailable(wikiName, context);
   }
 
   /**
@@ -765,10 +785,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
    *      com.xpn.xwiki.XWikiContext)
    */
   @Override
-  public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
-    synchronized (wikiName) {
-      getStore().createWiki(wikiName, context);
-    }
+  public synchronized void createWiki(String wikiName, XWikiContext context) throws XWikiException {
+    getStore().createWiki(wikiName, context);
   }
 
   /**
@@ -778,11 +796,9 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
    *      com.xpn.xwiki.XWikiContext)
    */
   @Override
-  public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException {
-    synchronized (wikiName) {
-      getStore().deleteWiki(wikiName, context);
-      flushCache();
-    }
+  public synchronized void deleteWiki(String wikiName, XWikiContext context) throws XWikiException {
+    getStore().deleteWiki(wikiName, context);
+    flushCache();
   }
 
   @Override
@@ -798,29 +814,21 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     }
 
     boolean result = getStore().exists(doc, context);
-    getPageExistCache().set(key, new Boolean(result));
+    getPageExistCache().set(key, Boolean.valueOf(result));
 
     return result;
   }
 
-  public Cache<XWikiDocument> getCache() {
+  private Cache<XWikiDocument> getCache() {
     // make sure cache is initialized
     initalizeCache();
     return this.cache;
   }
 
-  public void setCache(Cache<XWikiDocument> cache) {
-    this.cache = cache;
-  }
-
-  public Cache<Boolean> getPageExistCache() {
+  private Cache<Boolean> getPageExistCache() {
     // make sure cache is initialized
     initalizeCache();
     return this.pageExistCache;
-  }
-
-  public void setPageExistCache(Cache<Boolean> pageExistCache) {
-    this.pageExistCache = pageExistCache;
   }
 
   @Override
@@ -852,19 +860,49 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().getQueryManager();
   }
 
+  static enum InvalidateState {
+
+    CACHE_MISS, REMOVED, LOADING_CANCELED, LOADING_MULTI_CANCELED, LOADING_CANCEL_FAILED
+
+  }
+
+  private static final int _DOCSTATE_LOADING = 0;
+  private static final int _DOCSTATE_FINISHED = Integer.MAX_VALUE;
+
   private class DocumentLoader {
 
     private volatile XWikiDocument loadedDoc;
     private final String key;
-    private AtomicBoolean invalidated = new AtomicBoolean(false);
+
+    /**
+     * if loadingState equals _DOCSTATE_LOADING than a valid loading is about to start or in process
+     * if loadingState is lower _DOCSTATE_LOADING than a loading has been successful canceled and a
+     * reload will take place
+     * if loadingState equals _DOCSTATE_FINISHED or is at least greater _DOCSTATE_LOADING loading
+     * finished before any canceling happened
+     */
+    private final AtomicInteger loadingState = new AtomicInteger(_DOCSTATE_LOADING);
 
     private DocumentLoader(String key) {
       this.key = key;
     }
 
-    private void invalidate() {
-      invalidated.set(true);
-      LOGGER_DL.debug("invalidated cache during loading document.");
+    private InvalidateState invalidate() {
+      InvalidateState invalidState;
+      int beforeState = loadingState.getAndDecrement();
+      if (beforeState < 0) {
+        if (loadedDoc != null) {
+          LOGGER_DL.warn("should not happen: possible lifelock! {}", this.key);
+        }
+        invalidState = InvalidateState.LOADING_MULTI_CANCELED;
+      } else if (beforeState == 0) {
+        invalidState = InvalidateState.LOADING_CANCELED;
+      } else {
+        invalidState = InvalidateState.LOADING_CANCEL_FAILED;
+      }
+      boolean succInvalidated = beforeState <= 0;
+      LOGGER_DL.debug("invalidated cache during loading document. {}", succInvalidated);
+      return invalidState;
     }
 
     /**
@@ -872,8 +910,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
      * It is a very delicate case and very likely memory visibility breaks in less than 1 out of
      * 100'000 document loads. Thus it is difficult to test for correctness.
      */
-    synchronized private XWikiDocument loadDocument(String key, XWikiDocument doc,
-        XWikiContext context) throws XWikiException {
+    private XWikiDocument loadDocument(String key, XWikiDocument doc, XWikiContext context)
+        throws XWikiException {
       checkArgument(key);
       if (loadedDoc == null) {
         synchronized (this) {
@@ -883,29 +921,27 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
             // generated. Therefore we double check here that still no document is in cache.
             loadedDoc = getCache().get(key);
             if (loadedDoc == null) {
-              XWikiDocument newDoc;
+              XWikiDocument newDoc = null;
               do {
                 // use a further synchronized method call to prevent an unsafe publication of the
-                // new
-                // document over the cache
-                newDoc = new DocumentBuilder().buildDocument(key, doc, context);
-                if (invalidated.get()) {
+                // new document over the cache
+                if ((loadingState.getAndSet(_DOCSTATE_LOADING) < _DOCSTATE_LOADING)
+                    && (newDoc != null)) {
                   LOGGER_DL.info("DocumentLoader-{}: invalidated docloader '{}' reloading",
                       Thread.currentThread().getId(), key);
-                  canceledLoading.incrementAndGet();
                 }
-              } while (invalidated.compareAndSet(true, false));
-              loadedDoc = newDoc;
+                newDoc = new DocumentBuilder().buildDocument(key, doc, context);
+              } while (!loadingState.compareAndSet(_DOCSTATE_LOADING, _DOCSTATE_FINISHED));
               LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache",
                   Thread.currentThread().getId(), key);
-              getCache().set(key, loadedDoc);
-              getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
-              documentLoaderMap.remove(key);
+              getCache().set(key, newDoc);
+              getPageExistCache().set(key, Boolean.valueOf(!newDoc.isNew()));
+              loadedDoc = newDoc;
             } else {
-              LOGGER_DL.info("DocumentLoader-{}: found in cache cancel loding for '{}'",
+              LOGGER_DL.info("DocumentLoader-{}: found in cache skip loding for '{}'",
                   Thread.currentThread().getId(), key);
-              skipLoading.incrementAndGet();
             }
+            documentLoaderMap.remove(key);
           }
         }
       }
@@ -931,6 +967,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         buildDoc.setLanguage(doc.getLanguage());
         buildDoc = store.loadXWikiDoc(buildDoc, context);
         buildDoc.setStore(store);
+        buildDoc.setFromCache(true);
         return buildDoc;
       }
 

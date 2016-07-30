@@ -52,6 +52,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.pagetype.IPageTypeClassConfig;
+import com.celements.store.DocumentCacheStore.InvalidateState;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -97,9 +98,14 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
    * Nevertheless is it important to check that the cache is working at all.
    * Hence test it with and without counting.
    */
-  private final boolean verifyDocLoads = true;
+  private final boolean verifyDocLoads = false;
   private final AtomicInteger countDocLoads = new AtomicInteger();
   private final AtomicInteger expectedCountDocLoads = new AtomicInteger();
+  private final AtomicInteger expectedCountDocLoadsFixed = new AtomicInteger();
+  private final AtomicInteger failedToRemoveFromCacheCount = new AtomicInteger(0);
+  private final AtomicInteger invalidatedLoadingCount = new AtomicInteger(0);
+  private final AtomicInteger failedToInvalidatedLoadingCount = new AtomicInteger(0);
+  private final AtomicInteger invalidatedMultipleCount = new AtomicInteger(0);
 
   @SuppressWarnings("deprecation")
   @Before
@@ -129,10 +135,6 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expect(getWikiMock().getXClass(isA(DocumentReference.class), isA(
         XWikiContext.class))).andStubDelegateTo(new TestXWiki());
     createBaseObjects();
-    if (verifyDocLoads) {
-      countDocLoads.set(0);
-      expectedCountDocLoads.set(1);
-    }
   }
 
   @Test
@@ -140,13 +142,11 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand(theCacheStoreFixed);
-    LoadDocCheckResult result = testLoadCommand.call();
-    assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
+    preloadCache(theCacheStoreFixed);
     if (verifyDocLoads) {
-      assertEquals(expectedCountDocLoads.get(), countDocLoads.get());
+      assertEquals(expectedCountDocLoadsFixed.get(), countDocLoads.get());
     }
-    assertNotNull("Expecting document in cache.", theCacheStoreFixed.getCache().get(
+    assertNotNull("Expecting document in cache.", theCacheStoreFixed.getDocFromCache(
         theCacheStoreFixed.getKey(testDocRef, "")));
     verifyDefault();
   }
@@ -156,9 +156,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand(theCacheStore);
-    LoadDocCheckResult result = testLoadCommand.call();
-    assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
+    preloadCache(theCacheStore);
     if (verifyDocLoads) {
       assertEquals(expectedCountDocLoads.get(), countDocLoads.get());
     }
@@ -171,6 +169,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
+    preloadCache(theCacheStoreFixed);
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(1);
     Future<LoadDocCheckResult> testFuture = theExecutor.submit(
         (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(theCacheStoreFixed));
@@ -181,7 +180,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     LoadDocCheckResult result = testFuture.get();
     assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
     if (verifyDocLoads) {
-      assertEquals(expectedCountDocLoads.get(), countDocLoads.get());
+      assertEquals(expectedCountDocLoadsFixed.get(), countDocLoads.get());
     }
     verifyDefault();
   }
@@ -191,6 +190,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
+    preloadCache(theCacheStore);
     ScheduledExecutorService theExecutor = Executors.newScheduledThreadPool(1);
     Future<LoadDocCheckResult> testFuture = theExecutor.submit(
         (Callable<LoadDocCheckResult>) new LoadXWikiDocCommand(theCacheStore));
@@ -209,13 +209,13 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   @Test
   public void test_multiRuns_singleThreaded_scenario1_fixed() throws Exception {
     int cores = 1;
-    int executeRuns = 10000;
+    int executeRuns = 5000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
     assertSuccessFullRuns(testScenario1(theCacheStoreFixed, cores, executeRuns));
     if (verifyDocLoads) {
-      assertEquals(expectedCountDocLoads.get(), countDocLoads.get());
+      assertEquals(expectedCountDocLoadsFixed.get(), countDocLoads.get());
     }
     verifyDefault();
   }
@@ -223,7 +223,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   @Test
   public void test_multiRuns_singleThreaded_scenario1() throws Exception {
     int cores = 1;
-    int executeRuns = 10000;
+    int executeRuns = 5000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
@@ -238,23 +238,25 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   public void test_multiThreaded_scenario1_fixed_DocumentCacheStore() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
-    // tested with up to 2'000'000 executeRuns on a intel quadcore 4770 without triggering any race
-    // conditions!
-    int executeRuns = 2000000;
-    // int executeRuns = 80000;
+    // tested on an intel quadcore 4770
+    // without triggering any race condition! Tested with up to 10'000'000 executeRuns!
+    // int executeRuns = 10000000;
+    int executeRuns = 30000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
-    theCacheStoreFixed.canceledLoading.set(0);
     assertSuccessFullRuns(testScenario1(theCacheStoreFixed, cores, executeRuns));
     if (verifyDocLoads) {
       int countLoads = countDocLoads.get();
-      int expectedLoads = expectedCountDocLoads.get();
+      int expectedLoads = expectedCountDocLoadsFixed.get();
+      final String failingDetails = " expected loads '" + expectedLoads
+          + "' must be lower equal to count loads '" + countLoads + "'\n diff '" + (countLoads
+              - expectedLoads) + "'\n invalidatedLoadingCount '" + invalidatedLoadingCount.get()
+          + "'\n invalidatedMultipleCount '" + invalidatedMultipleCount.get()
+          + "'\n failedToInvalidatedLoadingCount '" + failedToInvalidatedLoadingCount.get()
+          + "'\n failedToRemoveFromCacheCount '" + failedToRemoveFromCacheCount.get() + "'";
       assertTrue("invalidating during load leads to multiple loads for one invalidation, thus\n"
-          + " expected loads '" + expectedLoads + "' must be lower equal to count loads '\n"
-          + countLoads + "', canceledLoading '" + theCacheStoreFixed.canceledLoading.get() + "'"
-          + "',\n skipLoading '" + theCacheStoreFixed.skipLoading.get() + "'",
-          expectedLoads <= countLoads);
+          + failingDetails, expectedLoads <= countLoads);
     }
     verifyDefault();
   }
@@ -266,12 +268,14 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   public void test_failing_multiThreaded_scenario1_XWikiCacheStore() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
+    // on an intel quadcore 4770 first race condition generally happens already after a few thousand
     int executeRuns = 30000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
+    List<Future<LoadDocCheckResult>> testResults = testScenario1(theCacheStore, cores, executeRuns);
     try {
-      assertSuccessFullRuns(testScenario1(theCacheStore, cores, executeRuns));
+      assertSuccessFullRuns(testResults);
       fail();
     } catch (AssertionError exp) {
       // expected
@@ -279,9 +283,20 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     if (verifyDocLoads) {
       assertTrue("no synchronisation on loading must lead to concurrent loads."
           + " Thus more than the expected loads must have happend.",
-          expectedCountDocLoads.get() < countDocLoads.get());
+          expectedCountDocLoads.get() <= countDocLoads.get());
     }
     verifyDefault();
+  }
+
+  private void preloadCache(XWikiCacheStoreInterface store) throws Exception {
+    if (verifyDocLoads) {
+      countDocLoads.set(0);
+      expectedCountDocLoads.set(1);
+      expectedCountDocLoadsFixed.set(1);
+    }
+    LoadXWikiDocCommand testLoadCommand = new LoadXWikiDocCommand(store);
+    LoadDocCheckResult result = testLoadCommand.call();
+    assertTrue(Arrays.deepToString(result.getMessages().toArray()), result.isSuccessfull());
   }
 
   private void setupTestMocks() {
@@ -318,6 +333,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private List<Future<LoadDocCheckResult>> testScenario1(XWikiCacheStoreInterface store, int cores,
       int maxLoadTasks) throws Exception {
     fastFail.set(false);
+    preloadCache(store);
     final int numTimesFromCache = cores * 3;
     final int oneRunRepeats = 200;
     int count = (maxLoadTasks / (oneRunRepeats * numTimesFromCache)) + 1;
@@ -331,7 +347,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
             * numTimesFromCache);
         for (int i = 0; i < oneRunRepeats; i++) {
           if (i > 0) {
-            loadTasks.add(new ResetCacheEntryCommand());
+            loadTasks.add(new RefreshCacheEntryCommand(store));
             loadTasks.add(new LoadXWikiDocCommand(store));
           }
           for (int j = 1; j <= numTimesFromCache; j++) {
@@ -515,30 +531,74 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     theCacheStore = new XWikiCacheStore(store, defaultContext);
     theCacheStoreFixed = (DocumentCacheStore) Utils.getComponent(XWikiStoreInterface.class,
         DocumentCacheStore.COMPONENT_NAME);
-    theCacheStoreFixed.getCache(); // ensure cache is initialized
+    theCacheStoreFixed.initalizeCache(); // ensure cache is initialized
     theCacheStoreFixed.getStore(); // ensure store is initialized
     defaultMocks = Collections.unmodifiableCollection(getDefaultMocks());
   }
 
-  private class ResetCacheEntryCommand implements Callable<LoadDocCheckResult> {
+  private class RefreshCacheEntryCommand implements Callable<LoadDocCheckResult> {
+
+    private XWikiCacheStoreInterface store;
+
+    public RefreshCacheEntryCommand(XWikiCacheStoreInterface store) {
+      this.store = store;
+    }
 
     @Override
     public LoadDocCheckResult call() throws Exception {
-      if (verifyDocLoads) {
-        expectedCountDocLoads.incrementAndGet();
+      if (!successfullRemoveFromCache()) {
+        if (verifyDocLoads) {
+          failedToRemoveFromCacheCount.incrementAndGet();
+        }
       }
+      return new LoadDocCheckResult();
+    }
+
+    boolean successfullRemoveFromCache() {
+      if (store instanceof DocumentCacheStore) {
+        return newStore();
+      } else {
+        return oldStore();
+      }
+    }
+
+    private boolean newStore() {
       String key = theCacheStoreFixed.getKey(testDocRef, "");
-      if (theCacheStoreFixed.getCache() != null) {
-        theCacheStoreFixed.invalidateCacheFromClusterEvent(key);
+      final InvalidateState invalidState = theCacheStoreFixed.invalidateCacheFromClusterEvent(key);
+      if (verifyDocLoads) {
+        switch (invalidState) {
+          case LOADING_CANCELED:
+            invalidatedLoadingCount.incrementAndGet();
+            break;
+          case REMOVED:
+            expectedCountDocLoadsFixed.incrementAndGet();
+            break;
+          case LOADING_MULTI_CANCELED:
+            invalidatedMultipleCount.incrementAndGet();
+            break;
+          default:
+            failedToInvalidatedLoadingCount.incrementAndGet();
+            break;
+        }
       }
-      key = theCacheStore.getKey(wikiName, testFullName, "");
+      return (invalidState.equals(InvalidateState.LOADING_CANCELED) || invalidState.equals(
+          InvalidateState.REMOVED));
+    }
+
+    private boolean oldStore() {
+      String key = theCacheStore.getKey(wikiName, testFullName, "");
+      XWikiDocument oldCachedDoc = null;
       if (theCacheStore.getCache() != null) {
+        oldCachedDoc = theCacheStore.getCache().get(key);
         theCacheStore.getCache().remove(key);
+        if (verifyDocLoads) {
+          expectedCountDocLoads.incrementAndGet();
+        }
       }
       if (theCacheStore.getPageExistCache() != null) {
         theCacheStore.getPageExistCache().remove(key);
       }
-      return new LoadDocCheckResult();
+      return oldCachedDoc != null;
     }
 
   }
@@ -570,6 +630,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     private final LoadDocCheckResult result = new LoadDocCheckResult();
     private final XWikiCacheStoreInterface store;
 
+    protected XWikiCacheStoreInterface getStore() {
+      return this.store;
+    }
+
     public LoadXWikiDocCommand(XWikiCacheStoreInterface store) {
       this.store = store;
     }
@@ -580,6 +644,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
     @Override
     public LoadDocCheckResult call() throws Exception {
+      return callInternal();
+    }
+
+    protected LoadDocCheckResult callInternal() {
       try {
         try {
           hasNewContext = (getExecutionContext() == null);
@@ -650,7 +718,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       try {
         XWikiDocument myDoc = new XWikiDocument(testDocRef);
         try {
-          loadedXWikiDoc = store.loadXWikiDoc(myDoc, getContext());
+          loadedXWikiDoc = getStore().loadXWikiDoc(myDoc, getContext());
         } catch (XWikiException exp) {
           throw new IllegalStateException(exp);
         }
