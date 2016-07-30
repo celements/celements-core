@@ -97,7 +97,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
    * Nevertheless is it important to check that the cache is working at all.
    * Hence test it with and without counting.
    */
-  private final boolean verifyDocLoads = false;
+  private final boolean verifyDocLoads = true;
   private final AtomicInteger countDocLoads = new AtomicInteger();
   private final AtomicInteger expectedCountDocLoads = new AtomicInteger();
 
@@ -250,9 +250,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     if (verifyDocLoads) {
       int countLoads = countDocLoads.get();
       int expectedLoads = expectedCountDocLoads.get();
-      assertTrue("invalidating during load leads to multiple loads for one invalidation, thus"
-          + " expected loads '" + expectedLoads + "' must be lower equal to count loads '"
-          + countLoads + "', canceledLoading '" + theCacheStoreFixed.canceledLoading.get() + "'",
+      assertTrue("invalidating during load leads to multiple loads for one invalidation, thus\n"
+          + " expected loads '" + expectedLoads + "' must be lower equal to count loads '\n"
+          + countLoads + "', canceledLoading '" + theCacheStoreFixed.canceledLoading.get() + "'"
+          + "',\n skipLoading '" + theCacheStoreFixed.skipLoading.get() + "'",
           expectedLoads <= countLoads);
     }
     verifyDefault();

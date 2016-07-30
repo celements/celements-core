@@ -96,6 +96,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   private final ConcurrentMap<String, DocumentLoader> documentLoaderMap = new ConcurrentHashMap<>();
   public final AtomicInteger canceledLoading = new AtomicInteger(0);
+  public final AtomicInteger skipLoading = new AtomicInteger(0);
 
   private XWikiContext getContext() {
     return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
@@ -900,6 +901,10 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
               getCache().set(key, loadedDoc);
               getPageExistCache().set(key, new Boolean(!loadedDoc.isNew()));
               documentLoaderMap.remove(key);
+            } else {
+              LOGGER_DL.info("DocumentLoader-{}: found in cache cancel loding for '{}'",
+                  Thread.currentThread().getId(), key);
+              skipLoading.incrementAndGet();
             }
           }
         }
