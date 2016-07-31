@@ -70,6 +70,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   public static final String COMPONENT_NAME = "DocumentCacheStore";
 
+  public static final String PARAM_CACHE_CAPACITY = "xwiki.store.cache.capacity";
+  public static final String PARAM_PAGEEXIST_CAPACITY = "xwiki.store.cache.pageexistcapacity";
   public static final String BACKING_STORE_STRATEGY = "celements.store.cache.storeStrategy";
 
   @Requirement
@@ -138,7 +140,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     this.pageExistCache = pageExistcache;
   }
 
-  CacheFactory getCacheFactory() {
+  private CacheFactory getCacheFactory() {
     try {
       return cacheManager.getCacheFactory();
     } catch (ComponentLookupException exp) {
@@ -148,12 +150,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   private int getPageExistCacheCapacity() {
     int pageExistCacheCapacity = 10000;
-    String existsCapacity = getContext().getWiki().Param("xwiki.store.cache.pageexistcapacity");
+    String existsCapacity = getContext().getWiki().Param(PARAM_PAGEEXIST_CAPACITY);
     if (existsCapacity != null) {
       try {
         pageExistCacheCapacity = Integer.parseInt(existsCapacity);
       } catch (NumberFormatException exp) {
-        LOGGER.warn("Failed to read xwiki.store.cache.pageexistcapacity using default '{}'",
+        LOGGER.warn("Failed to read '{}' using default '{}'", PARAM_PAGEEXIST_CAPACITY,
             pageExistCacheCapacity, exp);
       }
     }
@@ -172,7 +174,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   private int getPageCacheCapacity() {
     int cacheCapacity = 100;
-    String capacity = getContext().getWiki().Param("xwiki.store.cache.capacity");
+    String capacity = getContext().getWiki().Param(PARAM_CACHE_CAPACITY);
     if (capacity != null) {
       try {
         cacheCapacity = Integer.parseInt(capacity);
@@ -804,18 +806,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   @Override
   public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
     String key = getKey(doc);
-    try {
-      Boolean result = getPageExistCache().get(key);
-
-      if (result != null) {
-        return result;
-      }
-    } catch (Exception e) {
+    Boolean result = getPageExistCache().get(key);
+    if (result != null) {
+      return result;
     }
 
-    boolean result = getStore().exists(doc, context);
+    result = getStore().exists(doc, context);
     getPageExistCache().set(key, Boolean.valueOf(result));
-
     return result;
   }
 
@@ -965,7 +962,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         // IMPORTANT: do not clone here. Creating new document is much faster.
         XWikiDocument buildDoc = new XWikiDocument(doc.getDocumentReference());
         buildDoc.setLanguage(doc.getLanguage());
-        buildDoc = store.loadXWikiDoc(buildDoc, context);
+        buildDoc = getStore().loadXWikiDoc(buildDoc, context);
         buildDoc.setStore(store);
         buildDoc.setFromCache(true);
         return buildDoc;
