@@ -74,7 +74,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   public static final String PARAM_PAGEEXIST_CAPACITY = "xwiki.store.cache.pageexistcapacity";
   public static final String BACKING_STORE_STRATEGY = "celements.store.cache.storeStrategy";
 
-  @Requirement
+  @Requirement("celementsproperties")
   private ConfigurationSource config;
 
   @Requirement
