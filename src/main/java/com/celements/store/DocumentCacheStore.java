@@ -196,7 +196,9 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   @Override
   public XWikiStoreInterface getStore() {
     if (this.store == null) {
-      this.store = Utils.getComponent(XWikiStoreInterface.class, getBackingStoreHint());
+      String backingStoreHint = getBackingStoreHint();
+      setStore(Utils.getComponent(XWikiStoreInterface.class, backingStoreHint));
+      LOGGER.info("backing store initialized '{}' for hint '{}'", this.store, backingStoreHint);
     }
     return this.store;
   }
@@ -206,6 +208,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     if (COMPONENT_NAME.equals(strategy)) {
       strategy = "default";
     }
+    LOGGER.debug("get backing store hint '{}'", strategy);
     return strategy;
   }
 
