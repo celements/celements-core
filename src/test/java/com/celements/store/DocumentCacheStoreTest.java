@@ -57,7 +57,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     docCacheStore.saveXWikiDoc(existingDocument, getContext());
     XWikiDocument existingDocSaved = savingDocCapture.getValue();
     assertSame(existingDocument, existingDocSaved);
-    String key = docCacheStore.getKey(existingDocument);
+    String key = docCacheStore.getKeyWithLang(existingDocument);
     assertNull("on saving doc must be removed from Cache", docCacheStore.getDocFromCache(key));
     verifyDefault();
   }
@@ -86,7 +86,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     docCacheStore.saveXWikiDoc(existingDocument, getContext(), bTransaction);
     XWikiDocument existingDocSaved = savingDocCapture.getValue();
     assertSame(existingDocument, existingDocSaved);
-    String key = docCacheStore.getKey(existingDocument);
+    String key = docCacheStore.getKeyWithLang(existingDocument);
     assertNull("on saving doc must be removed from Cache", docCacheStore.getDocFromCache(key));
     verifyDefault();
   }
@@ -95,7 +95,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
   public void testGetKey() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument testDoc = new XWikiDocument(docRef);
-    assertEquals("wiki:space.page", docCacheStore.getKey(testDoc));
+    assertEquals("wiki:space.page", docCacheStore.getKeyWithLang(testDoc));
   }
 
   @Test
@@ -103,19 +103,19 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument testDoc = new XWikiDocument(docRef);
     testDoc.setLanguage("en");
-    assertEquals("wiki:space.page:en", docCacheStore.getKey(testDoc));
+    assertEquals("wiki:space.page:en", docCacheStore.getKeyWithLang(testDoc));
   }
 
   @Test
   public void testGetKey_docRef_deflang() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
-    assertEquals("wiki:space.page", docCacheStore.getKey(docRef, ""));
+    assertEquals("wiki:space.page", docCacheStore.getKeyWithLang(docRef, ""));
   }
 
   @Test
   public void testGetKey_docRef_lang() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
-    assertEquals("wiki:space.page:fr", docCacheStore.getKey(docRef, "fr"));
+    assertEquals("wiki:space.page:fr", docCacheStore.getKeyWithLang(docRef, "fr"));
   }
 
   @Test
@@ -130,7 +130,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     XWikiDocument inputParamDoc = new XWikiDocument(docRef);
     XWikiDocument existingDocument = docCacheStore.loadXWikiDoc(inputParamDoc, getContext());
     assertTrue(existingDocument.isFromCache());
-    String key = docCacheStore.getKey(existingDocument);
+    String key = docCacheStore.getKeyWithLang(existingDocument);
     assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
     assertTrue("doc expected in exists cache", docCacheStore.exists(existingDocument,
         getContext()));
@@ -151,7 +151,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     XWikiDocument inputParamDoc = new XWikiDocument(docRef);
     XWikiDocument existingDocument = docCacheStore.loadXWikiDoc(inputParamDoc, getContext());
     assertTrue(existingDocument.isFromCache());
-    String key = docCacheStore.getKey(existingDocument);
+    String key = docCacheStore.getKeyWithLang(existingDocument);
     assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
     assertTrue("doc expected in exists cache", docCacheStore.exists(existingDocument,
         getContext()));
@@ -178,7 +178,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     assertEquals(inputParamDoc.getLanguage(), querySaveDoc.getLanguage());
     assertFalse(existingDocument.isNew());
     assertTrue(existingDocument.isFromCache());
-    String key = docCacheStore.getKey(existingDocument);
+    String key = docCacheStore.getKeyWithLang(existingDocument);
     assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
     assertTrue(docCacheStore.exists(existingDocument, getContext()));
 
@@ -209,7 +209,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     docCacheStore.deleteXWikiDoc(existingDocument, getContext());
     XWikiDocument existingDocDeleted = deletingDocCapture.getValue();
     assertSame(existingDocument, existingDocDeleted);
-    String key = docCacheStore.getKey(existingDocument);
+    String key = docCacheStore.getKeyWithLang(existingDocument);
     assertNull("on deleting doc must be removed from Cache", docCacheStore.getDocFromCache(key));
     verifyDefault();
   }

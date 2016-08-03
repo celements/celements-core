@@ -178,7 +178,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
-    XWikiDocument doc = getDocumentCloneInternal(docRef);
+    XWikiDocument doc = getDocumentFromStore(docRef, webUtilsService.getDefaultLanguage());
     Date creationDate = new Date();
     doc.setDefaultLanguage(webUtilsService.getDefaultLanguage());
     doc.setLanguage("");

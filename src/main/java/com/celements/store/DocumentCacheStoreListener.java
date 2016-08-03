@@ -71,11 +71,15 @@ public class DocumentCacheStoreListener implements EventListener {
       } else {
         XWikiDocument doc = (XWikiDocument) source;
         LOGGER.info("DocumentEvent: invalidating doc cache for '{}'", doc.getDocumentReference());
-        getDocCacheStore().invalidateCacheFromClusterEvent(doc);
+        getDocCacheStore().removeDocFromCache(doc, getDocExists(event));
         LOGGER.debug("DocumentEvent: after invalidating doc cache for '{}'",
             doc.getDocumentReference());
       }
     }
+  }
+
+  private boolean getDocExists(Event event) {
+    return ((event instanceof DocumentCreatedEvent) || (event instanceof DocumentUpdatedEvent));
   }
 
   private DocumentCacheStore getDocCacheStore() {

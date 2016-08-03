@@ -147,7 +147,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       assertEquals(expectedCountDocLoadsFixed.get(), countDocLoads.get());
     }
     assertNotNull("Expecting document in cache.", theCacheStoreFixed.getDocFromCache(
-        theCacheStoreFixed.getKey(testDocRef, "")));
+        theCacheStoreFixed.getKeyWithLang(testDocRef, "")));
     verifyDefault();
   }
 
@@ -209,7 +209,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   @Test
   public void test_multiRuns_singleThreaded_scenario1_fixed() throws Exception {
     int cores = 1;
-    int executeRuns = 5000;
+    int executeRuns = 30000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
@@ -563,8 +563,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     }
 
     private boolean newStore() {
-      String key = theCacheStoreFixed.getKey(testDocRef, "");
-      final InvalidateState invalidState = theCacheStoreFixed.invalidateCacheFromClusterEvent(key);
+      final InvalidateState invalidState = theCacheStoreFixed.removeDocFromCache(new XWikiDocument(
+          testDocRef), true);
       if (verifyDocLoads) {
         switch (invalidState) {
           case LOADING_CANCELED:
