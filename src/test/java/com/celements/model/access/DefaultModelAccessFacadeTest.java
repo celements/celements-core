@@ -128,7 +128,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setDefaultLanguage("");
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
-    modelAccess.webUtilsService = webUtilsMock;
+    modelAccess.webUtils = webUtilsMock;
     expect(webUtilsMock.getDefaultLanguage(eq(
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
     Capture<XWikiDocument> captExists = expectExists(true);
@@ -147,7 +147,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setDefaultLanguage("de");
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
-    modelAccess.webUtilsService = webUtilsMock;
+    modelAccess.webUtils = webUtilsMock;
     expect(webUtilsMock.getDefaultLanguage(eq(
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
     Capture<XWikiDocument> captExists = expectExists(false);
@@ -167,7 +167,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     doc.setDefaultLanguage("de");
     doc.setLanguage("");
     IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
-    modelAccess.webUtilsService = webUtilsMock;
+    modelAccess.webUtils = webUtilsMock;
     expect(webUtilsMock.getDefaultLanguage(eq(
         doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
     Capture<XWikiDocument> captExists = expectExists(true);
@@ -1074,7 +1074,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     assertEquals(toStoreRef, ret);
     String objValue = modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
         field.getName());
-    assertEquals(modelAccess.webUtilsService.serializeRef(toStoreRef), objValue);
+    assertEquals(modelAccess.webUtils.serializeRef(toStoreRef), objValue);
   }
 
   @Test
