@@ -72,8 +72,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   public static final String COMPONENT_NAME = "DocumentCacheStore";
 
-  public static final String PARAM_CACHE_CAPACITY = "xwiki.store.cache.capacity";
-  public static final String PARAM_PAGEEXIST_CAPACITY = "xwiki.store.cache.pageexistcapacity";
+  public static final String PARAM_DOC_CACHE_CAPACITY = "xwiki.store.cache.capacity";
+  public static final String PARAM_EXIST_CACHE_CAPACITY = "xwiki.store.cache.pageexistcapacity";
   public static final String BACKING_STORE_STRATEGY = "celements.store.cache.storeStrategy";
 
   @Requirement("xwikiproperties")
@@ -86,7 +86,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   private Execution execution;
 
   @Requirement("default")
-  private EntityReferenceSerializer<String> serializer_default;
+  private EntityReferenceSerializer<String> serializerDefault;
 
   /**
    * Lazy initialized according to backing store strategy configuration.
@@ -100,28 +100,28 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   /**
    * CAUTION: Lazy initialized of cache thus volatile is needed.
    */
-  private volatile Cache<XWikiDocument> cache;
+  private volatile Cache<XWikiDocument> docCache;
 
   /**
    * CAUTION: Lazy initialized of cache thus volatile is needed.
    */
-  private volatile Cache<Boolean> pageExistCache;
+  private volatile Cache<Boolean> existCache;
 
   private final ConcurrentMap<String, DocumentLoader> documentLoaderMap = new ConcurrentHashMap<>();
 
   private XWikiContext getContext() {
-    return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
-  void initalizeCache() {
-    if ((this.cache == null) || (this.pageExistCache == null)) {
+  void initalize() {
+    if ((this.docCache == null) || (this.existCache == null)) {
       synchronized (this) {
         try {
-          if (this.cache == null) {
-            initializePageCache();
+          if (this.docCache == null) {
+            initializeDocCache();
           }
-          if (this.pageExistCache == null) {
-            initializePageExistCache();
+          if (this.existCache == null) {
+            initializeExistCache();
           }
         } catch (CacheException cacheExp) {
           LOGGER.error("Failed to initialize document cache.", cacheExp);
@@ -131,15 +131,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     }
   }
 
-  private void initializePageExistCache() throws CacheException {
-    CacheConfiguration cacheConfiguration;
-    cacheConfiguration = new CacheConfiguration();
-    cacheConfiguration.setConfigurationId("xwiki.store.pageexistcache");
+  private void initializeExistCache() throws CacheException {
+    CacheConfiguration config = new CacheConfiguration();
+    config.setConfigurationId("xwiki.store.pageexistcache");
     LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-    lru.setMaxEntries(getPageExistCacheCapacity());
-    cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
-    Cache<Boolean> pageExistcache = getCacheFactory().newCache(cacheConfiguration);
-    this.pageExistCache = pageExistcache;
+    lru.setMaxEntries(getExistCacheCapacity());
+    config.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
+    existCache = getCacheFactory().newCache(config);
   }
 
   private CacheFactory getCacheFactory() {
@@ -150,46 +148,45 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     }
   }
 
-  private int getPageExistCacheCapacity() {
-    int pageExistCacheCapacity = 10000;
-    String existsCapacity = getContext().getWiki().Param(PARAM_PAGEEXIST_CAPACITY);
+  private int getExistCacheCapacity() {
+    int existCacheCapacity = 10000;
+    String existsCapacity = getContext().getWiki().Param(PARAM_EXIST_CACHE_CAPACITY);
     if (existsCapacity != null) {
       try {
-        pageExistCacheCapacity = Integer.parseInt(existsCapacity);
+        existCacheCapacity = Integer.parseInt(existsCapacity);
       } catch (NumberFormatException exp) {
-        LOGGER.warn("Failed to read '{}' using default '{}'", PARAM_PAGEEXIST_CAPACITY,
-            pageExistCacheCapacity, exp);
+        LOGGER.warn("Failed to read '{}' using default '{}'", PARAM_EXIST_CACHE_CAPACITY,
+            existCacheCapacity, exp);
       }
     }
-    return pageExistCacheCapacity;
+    return existCacheCapacity;
   }
 
-  private void initializePageCache() throws CacheException {
-    CacheConfiguration cacheConfiguration = new CacheConfiguration();
-    cacheConfiguration.setConfigurationId("xwiki.store.pagecache");
+  private void initializeDocCache() throws CacheException {
+    CacheConfiguration config = new CacheConfiguration();
+    config.setConfigurationId("xwiki.store.pagecache");
     LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-    lru.setMaxEntries(getPageCacheCapacity());
-    cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
-    Cache<XWikiDocument> pageCache = getCacheFactory().newCache(cacheConfiguration);
-    this.cache = pageCache;
+    lru.setMaxEntries(getDocCacheCapacity());
+    config.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
+    docCache = getCacheFactory().newCache(config);
   }
 
-  private int getPageCacheCapacity() {
-    int cacheCapacity = 100;
-    String capacity = getContext().getWiki().Param(PARAM_CACHE_CAPACITY);
+  private int getDocCacheCapacity() {
+    int docCacheCapacity = 100;
+    String capacity = getContext().getWiki().Param(PARAM_DOC_CACHE_CAPACITY);
     if (capacity != null) {
       try {
-        cacheCapacity = Integer.parseInt(capacity);
+        docCacheCapacity = Integer.parseInt(capacity);
       } catch (NumberFormatException exp) {
-        LOGGER.warn("Failed to read xwiki.store.cache.capacity using default '{}'", cacheCapacity,
-            exp);
+        LOGGER.warn("Failed to read xwiki.store.cache.capacity using default '{}'",
+            docCacheCapacity, exp);
       }
     }
-    return cacheCapacity;
+    return docCacheCapacity;
   }
 
   @Override
-  public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context)
+  public void initCache(int docCacheCapacity, int existCacheCapacity, XWikiContext context)
       throws XWikiException {
     LOGGER.info("initCache externally called. This is not supported. The document cache initializes"
         + " automatically on start.");
@@ -234,20 +231,19 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   @Override
   public synchronized void flushCache() {
-    LOGGER.warn("flushCache may lead to serious memory visability problems.");
-    if (this.cache != null) {
-      this.cache.dispose();
-      this.cache = null;
+    LOGGER.warn("flushCache may lead to serious memory visibility problems.");
+    if (this.docCache != null) {
+      this.docCache.dispose();
+      this.docCache = null;
     }
-
-    if (this.pageExistCache != null) {
-      this.pageExistCache.dispose();
-      this.pageExistCache = null;
+    if (this.existCache != null) {
+      this.existCache.dispose();
+      this.existCache = null;
     }
   }
 
   public String getKey(DocumentReference docRef) {
-    return serializer_default.serialize(docRef);
+    return serializerDefault.serialize(docRef);
   }
 
   public String getKeyWithLang(DocumentReference docRef, String language) {
@@ -260,8 +256,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   public String getKeyWithLang(XWikiDocument doc) {
     String language = doc.getLanguage();
-    if (language.isEmpty()) {
-      language = doc.getDefaultLanguage();
+    if (language.isEmpty() || language.equals(doc.getDefaultLanguage())) {
+      language = "";
     }
     return getKeyWithLang(doc.getDocumentReference(), language);
   }
@@ -302,9 +298,9 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         returnState = invState;
       }
     }
-    if (getPageExistCache() != null) {
+    if (getExistCache() != null) {
       if ((doc.getTranslation() == 0) || (docExists == Boolean.TRUE)) {
-        getPageExistCache().remove(origKey);
+        getExistCache().remove(origKey);
         updateExistsCache(key, docExists);
       }
       updateExistsCache(getKeyWithLang(doc), docExists);
@@ -314,27 +310,27 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   private void updateExistsCache(String key, Boolean docExists) {
     if (docExists == null) {
-      getPageExistCache().remove(key);
+      getExistCache().remove(key);
     } else {
-      getPageExistCache().set(key, docExists);
+      getExistCache().set(key, docExists);
     }
   }
 
-  InvalidateState invalidateDocCache(String keyWithLang) {
+  InvalidateState invalidateDocCache(String key) {
     InvalidateState invalidState = InvalidateState.CACHE_MISS;
-    final DocumentLoader docLoader = documentLoaderMap.get(keyWithLang);
+    final DocumentLoader docLoader = documentLoaderMap.get(key);
     boolean invalidateDocLoader = (docLoader != null);
     if (invalidateDocLoader) {
       invalidState = docLoader.invalidate();
     }
     XWikiDocument oldCachedDoc = null;
-    if (getCache() != null) {
-      oldCachedDoc = getDocFromCache(keyWithLang);
+    if (getDocCache() != null) {
+      oldCachedDoc = getDocFromCache(key);
       if (oldCachedDoc != null) {
         synchronized (oldCachedDoc) {
-          oldCachedDoc = getDocFromCache(keyWithLang);
+          oldCachedDoc = getDocFromCache(key);
           if (oldCachedDoc != null) {
-            getCache().remove(keyWithLang);
+            getDocCache().remove(key);
             invalidState = InvalidateState.REMOVED;
           }
         }
@@ -370,14 +366,14 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   }
 
   private boolean doesNotExistsForKey(String key) {
-    return getPageExistCache().get(key) == Boolean.FALSE;
+    return getExistCache().get(key) == Boolean.FALSE;
   }
 
   /**
    * getCache is private, thus for tests we need getDocFromCache to check the cache state
    */
   XWikiDocument getDocFromCache(String key) {
-    return getCache().get(key);
+    return getDocCache().get(key);
   }
 
   @Override
@@ -391,29 +387,17 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().getClassList(context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see XWikiStoreInterface#countDocuments(String, XWikiContext)
-   */
   @Override
   public int countDocuments(String wheresql, XWikiContext context) throws XWikiException {
     return getStore().countDocuments(wheresql, context);
   }
 
-  /**
-   * @since 2.2M2
-   */
   @Override
   public List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context)
       throws XWikiException {
     return getStore().searchDocumentReferences(wheresql, context);
   }
 
-  /**
-   * @deprecated since 2.2M2 use
-   *             {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
-   */
   @Override
   @Deprecated
   public List<String> searchDocumentsNames(String wheresql, XWikiContext context)
@@ -421,19 +405,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().searchDocumentsNames(wheresql, context);
   }
 
-  /**
-   * @since 2.2M2
-   */
   @Override
   public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start,
       XWikiContext context) throws XWikiException {
     return getStore().searchDocumentReferences(wheresql, nb, start, context);
   }
 
-  /**
-   * @deprecated since 2.2M2 use
-   *             {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
-   */
   @Override
   @Deprecated
   public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
@@ -441,19 +418,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().searchDocumentsNames(wheresql, nb, start, context);
   }
 
-  /**
-   * @since 2.2M2
-   */
   @Override
   public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start,
       String selectColumns, XWikiContext context) throws XWikiException {
     return getStore().searchDocumentReferences(wheresql, nb, start, selectColumns, context);
   }
 
-  /**
-   * @deprecated since 2.2M2 use
-   *             {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
-   */
   @Override
   @Deprecated
   public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
@@ -461,9 +431,6 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
   }
 
-  /**
-   * @since 2.2M2
-   */
   @Override
   public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb,
       int start, List<?> parameterValues, XWikiContext context) throws XWikiException {
@@ -471,10 +438,6 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         context);
   }
 
-  /**
-   * @deprecated since 2.2M2 use
-   *             {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
-   */
   @Override
   @Deprecated
   public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
@@ -483,18 +446,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         context);
   }
 
-  /**
-   * @since 2.2M2
-   */
   @Override
   public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause,
       List<?> parameterValues, XWikiContext context) throws XWikiException {
     return getStore().searchDocumentReferences(parametrizedSqlClause, parameterValues, context);
   }
 
-  /**
-   * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
-   */
   @Override
   @Deprecated
   public List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues,
@@ -520,88 +477,42 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().injectCustomMappings(doc, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname,
       XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, distinctbyname, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-   *      boolean,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname,
       boolean customMapping, XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, distinctbyname, customMapping, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int,
-   *      int,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, int nb,
       int start, XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, distinctbyname, nb, start, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-   *      boolean, int, int,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname,
       boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, distinctbyname, customMapping, nb, start, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, XWikiContext context)
       throws XWikiException {
     return getStore().searchDocuments(wheresql, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start,
       XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, nb, start, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-   *      boolean, boolean, int,
-   *      int, com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname,
       boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context)
@@ -610,13 +521,6 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         start, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int,
-   *      int, java.util.List,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb,
       int start, List<?> parameterValues, XWikiContext context) throws XWikiException {
@@ -624,25 +528,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, java.util.List,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues,
       XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, parameterValues, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-   *      boolean, int, int,
-   *      java.util.List, com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
       boolean customMapping, int nb, int start, List<?> parameterValues, XWikiContext context)
@@ -651,26 +542,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         parameterValues, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
-   *      java.util.List,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start,
       List<?> parameterValues, XWikiContext context) throws XWikiException {
     return getStore().searchDocuments(wheresql, nb, start, parameterValues, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
-   *      boolean, boolean, int,
-   *      int, java.util.List, com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
       boolean customMapping, boolean checkRight, int nb, int start, List<?> parameterValues,
@@ -679,11 +556,6 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
         start, parameterValues, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
-   */
   @Override
   public int countDocuments(String parametrizedSqlClause, List<?> parameterValues,
       XWikiContext context) throws XWikiException {
@@ -714,18 +586,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().loadLinks(docId, context, bTransaction);
   }
 
-  /**
-   * @since 2.2M2
-   */
   @Override
   public List<DocumentReference> loadBacklinks(DocumentReference documentReference,
       boolean bTransaction, XWikiContext context) throws XWikiException {
     return getStore().loadBacklinks(documentReference, bTransaction, context);
   }
 
-  /**
-   * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
-   */
   @Override
   @Deprecated
   public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
@@ -745,94 +611,45 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     getStore().deleteLinks(docId, context, bTransaction);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public <T> List<T> search(String sql, int nb, int start, XWikiContext context)
       throws XWikiException {
     return getStore().search(sql, nb, start, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
-   *      java.lang.Object[][],
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams,
       XWikiContext context) throws XWikiException {
     return getStore().search(sql, nb, start, whereParams, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.util.List,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public <T> List<T> search(String sql, int nb, int start, List<?> parameterValues,
       XWikiContext context) throws XWikiException {
     return getStore().search(sql, nb, start, parameterValues, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
-   *      java.lang.Object[][],
-   *      java.util.List, com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams,
       List<?> parameterValues, XWikiContext context) throws XWikiException {
     return getStore().search(sql, nb, start, whereParams, parameterValues, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#cleanUp(com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public synchronized void cleanUp(XWikiContext context) {
     getStore().cleanUp(context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#isWikiNameAvailable(java.lang.String,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public boolean isWikiNameAvailable(String wikiName, XWikiContext context) throws XWikiException {
     return getStore().isWikiNameAvailable(wikiName, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#createWiki(java.lang.String,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public synchronized void createWiki(String wikiName, XWikiContext context) throws XWikiException {
     getStore().createWiki(wikiName, context);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see com.xpn.xwiki.store.XWikiStoreInterface#deleteWiki(java.lang.String,
-   *      com.xpn.xwiki.XWikiContext)
-   */
   @Override
   public synchronized void deleteWiki(String wikiName, XWikiContext context) throws XWikiException {
     getStore().deleteWiki(wikiName, context);
@@ -842,25 +659,23 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   @Override
   public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
     String key = getKey(doc.getDocumentReference());
-    Boolean result = getPageExistCache().get(key);
+    Boolean result = getExistCache().get(key);
     if (result != null) {
       return result;
     }
     result = getStore().exists(doc, context);
-    getPageExistCache().set(key, result);
+    getExistCache().set(key, result);
     return result;
   }
 
-  private Cache<XWikiDocument> getCache() {
-    // make sure cache is initialized
-    initalizeCache();
-    return this.cache;
+  private Cache<XWikiDocument> getDocCache() {
+    initalize(); // make sure cache is initialized
+    return this.docCache;
   }
 
-  private Cache<Boolean> getPageExistCache() {
-    // make sure cache is initialized
-    initalizeCache();
-    return this.pageExistCache;
+  private Cache<Boolean> getExistCache() {
+    initalize(); // make sure cache is initialized
+    return this.existCache;
   }
 
   @Override
@@ -884,9 +699,6 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     return getStore().getTranslationList(doc, context);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public QueryManager getQueryManager() {
     return getStore().getQueryManager();
@@ -951,7 +763,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
             // if a thread is just between the document cache miss and getting the documentLoader
             // when the documentLoader removes itself from the map, then a new documentLoader is
             // generated. Therefore we double check here that still no document is in cache.
-            loadedDoc = getCache().get(key);
+            loadedDoc = getDocCache().get(key);
             if (loadedDoc == null) {
               XWikiDocument newDoc = null;
               do {
@@ -967,13 +779,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
               LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache",
                   Thread.currentThread().getId(), key);
               if (!newDoc.isNew()) {
-                getCache().set(getKeyWithLang(newDoc), newDoc);
-                getPageExistCache().set(getKey(newDoc.getDocumentReference()), true);
-                getPageExistCache().set(getKeyWithLang(newDoc), true);
+                getDocCache().set(getKeyWithLang(newDoc), newDoc);
+                getExistCache().set(getKey(newDoc.getDocumentReference()), true);
+                getExistCache().set(getKeyWithLang(newDoc), true);
               } else if (newDoc.getTranslation() == 0) {
-                getPageExistCache().set(getKey(newDoc.getDocumentReference()), false);
+                getExistCache().set(getKey(newDoc.getDocumentReference()), false);
               } else {
-                getPageExistCache().set(getKeyWithLang(newDoc), false);
+                getExistCache().set(getKeyWithLang(newDoc), false);
               }
               loadedDoc = newDoc;
             } else {
