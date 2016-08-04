@@ -116,14 +116,11 @@ public class AttachmentServiceTest extends AbstractComponentTest {
     getContext().getWiki().saveDocument(capture(savedDocCapture), isA(String.class), eq(false),
         same(getContext()));
     expectLastCall();
-    XWikiAttachment att1 = new XWikiAttachment();
-    att1.setFilename(name1);
+    XWikiAttachment att1 = new XWikiAttachment(doc, name1);
     doc.getAttachmentList().add(att1);
-    XWikiAttachment att2 = new XWikiAttachment();
-    att2.setFilename(name2);
+    XWikiAttachment att2 = new XWikiAttachment(doc, name2);
     doc.getAttachmentList().add(att2);
-    XWikiAttachment att3 = new XWikiAttachment();
-    att3.setFilename(name3);
+    XWikiAttachment att3 = new XWikiAttachment(doc, name3);
     doc.getAttachmentList().add(att3);
     expect(getWikiMock().hasAttachmentRecycleBin(same(getContext()))).andReturn(false).anyTimes();
     XWikiAttachmentStoreInterface store = createMockAndAddToDefault(
@@ -185,17 +182,13 @@ public class AttachmentServiceTest extends AbstractComponentTest {
     String comment2 = "deleted attachments " + names2;
     ((TestMessageTool) getContext().getMessageTool()).injectMessage("core.comment."
         + "deleteAttachmentComment", Arrays.asList(names2), comment2);
-    XWikiAttachment att2 = new XWikiAttachment();
-    att2.setFilename(name2);
+    XWikiAttachment att2 = new XWikiAttachment(doc2, name2);
     doc2.getAttachmentList().add(att2);
-    XWikiAttachment att3 = new XWikiAttachment();
-    att3.setFilename(name3);
+    XWikiAttachment att3 = new XWikiAttachment(doc, name3);
     doc.getAttachmentList().add(att3);
-    XWikiAttachment att4 = new XWikiAttachment();
-    att4.setFilename(name4);
+    XWikiAttachment att4 = new XWikiAttachment(doc2, name4);
     doc2.getAttachmentList().add(att4);
-    XWikiAttachment att5 = new XWikiAttachment();
-    att5.setFilename(name5);
+    XWikiAttachment att5 = new XWikiAttachment(doc, name5);
     doc.getAttachmentList().add(att5);
     expect(getWikiMock().hasAttachmentRecycleBin(same(getContext()))).andReturn(false).anyTimes();
     XWikiAttachmentStoreInterface store = createMockAndAddToDefault(
@@ -210,8 +203,9 @@ public class AttachmentServiceTest extends AbstractComponentTest {
     List<XWikiAttachment> delAttList = attCaptures.getValues();
     assertEquals(4, delAttList.size());
     for (XWikiAttachment delAtt : delAttList) {
-      assertTrue(attList.contains(new AttachmentReference(delAtt.getFilename(),
-          delAtt.getDoc().getDocumentReference())));
+      AttachmentReference attRef = new AttachmentReference(delAtt.getFilename(),
+          delAtt.getDoc().getDocumentReference());
+      assertTrue("attRef not found." + attRef, attList.contains(attRef));
     }
     List<XWikiDocument> savedDocsList = savedDocsCapture.getValues();
     assertEquals(2, savedDocsList.size());
