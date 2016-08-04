@@ -71,6 +71,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getDocument() throws Exception {
+    doc.setNew(true);
+    doc.setFromCache(false);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
@@ -79,7 +81,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     XWikiDocument ret = modelAccess.getDocument(doc.getDocumentReference());
     verifyDefault();
     assertEquals(doc, ret);
-    assertNotSame("must be cloned for cache safety", doc, ret);
+    assertTrue(ret.isNew());
+    assertFalse(ret.isFromCache());
+    assertSame("do not clone if isNew", doc, ret);
   }
 
   @Test
@@ -190,6 +194,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void test_createDocument() throws Exception {
     getConfigurationSource().setProperty("default_language", "de");
     Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
+    doc.setNew(true);
+    doc.setFromCache(false);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         false).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
@@ -203,7 +209,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     XWikiDocument ret = modelAccess.createDocument(doc.getDocumentReference());
     verifyDefault();
     assertEquals(doc.getDocumentReference(), ret.getDocumentReference());
-    assertNotSame("must be cloned for cache safety", doc, ret);
+    assertTrue(ret.isNew());
+    assertFalse(ret.isFromCache());
+    assertSame("do not clone if isNew", doc, ret);
     assertEquals("de", ret.getDefaultLanguage());
     assertEquals("", ret.getLanguage());
     assertTrue(beforeCreationDate.before(ret.getCreationDate()));
@@ -259,6 +267,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getOrCreateDocument_get() throws Exception {
+    doc.setNew(true);
+    doc.setFromCache(false);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         true).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
@@ -267,7 +277,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
     verifyDefault();
     assertEquals(doc, ret);
-    assertNotSame("must be cloned for cache safety", doc, ret);
+    assertTrue(ret.isNew());
+    assertFalse(ret.isFromCache());
+    assertSame("do not clone if isNew", doc, ret);
     assertFalse(doc.isMetaDataDirty());
   }
 
@@ -290,6 +302,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getOrCreateDocument_create() throws Exception {
+    doc.setNew(true);
+    doc.setFromCache(false);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         false).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
@@ -298,7 +312,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
     verifyDefault();
     assertEquals(doc.getDocumentReference(), ret.getDocumentReference());
-    assertNotSame("must be cloned for cache safety", doc, ret);
+    assertTrue(ret.isNew());
+    assertFalse(ret.isFromCache());
+    assertSame("do not clone if isNew", doc, ret);
     assertTrue(ret.isMetaDataDirty());
   }
 
@@ -1156,6 +1172,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   private Capture<XWikiDocument> expectLoad(XWikiDocument result) throws XWikiException {
     Capture<XWikiDocument> capt = new Capture<>();
     expect(storeMock.loadXWikiDoc(capture(capt), same(getContext()))).andReturn(result).once();
+    result.setFromCache(!result.isNew());
     return capt;
   }
 
