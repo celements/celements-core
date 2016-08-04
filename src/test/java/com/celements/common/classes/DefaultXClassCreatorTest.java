@@ -31,14 +31,16 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.ModelAccessStub;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.TestClassPackage;
 import com.celements.model.classes.TestClassDefinitionRole;
+import com.celements.model.classes.TestClassPackage;
 import com.celements.model.classes.fields.ClassField;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -55,17 +57,17 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   public void setUp() throws Exception {
     super.setUp();
     registerComponentMock(IModelAccessFacade.class);
+    ModelAccessStub.init();
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
-    classPackage = Utils.getComponent(ClassPackage.class,
-        TestClassPackage.NAME);
+    classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
     classDef = Utils.getComponent(TestClassDefinitionRole.class, TestClassDefinition.NAME);
   }
 
   @Test
   public void test_createXClasses_notActive() throws Exception {
-    expect(getMock(ConfigurationSource.class).getProperty(
-        ClassPackage.CFG_SRC_KEY)).andReturn(Collections.emptyList()).anyTimes();
+    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
+        Collections.emptyList()).anyTimes();
 
     replayDefault();
     creator.createXClasses();
@@ -74,9 +76,8 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_blacklisted() throws Exception {
-    expect(getMock(ConfigurationSource.class).getProperty(
-        ClassPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
-            classPackage.getName())).anyTimes();
+    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
+        Arrays.asList(classPackage.getName())).anyTimes();
     expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
         Arrays.asList(classDef.getName())).anyTimes();
 
@@ -87,26 +88,21 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses() throws Exception {
-    XWikiDocument doc = new XWikiDocument(classDef.getClassRef());
+    DocumentReference docRef = classDef.getClassRef();
+    XWikiDocument doc = new XWikiDocument(docRef);
+    ModelAccessStub.get().injectDoc(docRef, doc);
 
-    expect(getMock(ConfigurationSource.class).getProperty(
-        ClassPackage.CFG_SRC_KEY)).andReturn(Arrays.asList(
-            classPackage.getName())).anyTimes();
+    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
+        Arrays.asList(classPackage.getName())).anyTimes();
     expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
         null).anyTimes();
-
-    expect(getMock(IModelAccessFacade.class).exists(classDef.getClassRef())).andReturn(true).times(
-        2);
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(
-        classDef.getClassRef()))).andReturn(doc).times(2);
-    getMock(IModelAccessFacade.class).saveDocument(same(doc), eq("updated XClass"));
-    expectLastCall().once();
 
     replayDefault();
     creator.createXClasses();
     creator.createXClasses(); // save is only called once
     verifyDefault();
 
+    assertEquals(1, ModelAccessStub.get().getInjectedDoc(docRef).getSavedCount());
     assertEquals(classDef.isInternalMapping(), doc.getXClass().hasInternalCustomMapping());
     @SuppressWarnings("unchecked")
     List<BaseCollection> xFields = new ArrayList<>(doc.getXClass().getFieldList());
