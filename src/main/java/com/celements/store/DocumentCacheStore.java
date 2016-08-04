@@ -660,11 +660,11 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
   public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
     String key = getKey(doc.getDocumentReference());
     Boolean result = getExistCache().get(key);
-    if (result != null) {
-      return result;
+    if (result == null) {
+      result = getStore().exists(doc, context);
+      getExistCache().set(key, result);
     }
-    result = getStore().exists(doc, context);
-    getExistCache().set(key, result);
+    LOGGER.info("exists return '{}' for '{}'", result, key);
     return result;
   }
 
