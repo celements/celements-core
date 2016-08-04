@@ -59,13 +59,13 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public static final String DEFAULT_LANG = "";
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  protected IWebUtilsService webUtils;
 
   @Requirement
-  IRightsAccessFacadeRole rightsAccess;
+  protected IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
-  private Execution execution;
+  protected Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
@@ -180,7 +180,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
     XWikiDocument doc = getDocumentCloneInternal(docRef);
     Date creationDate = new Date();
-    doc.setDefaultLanguage(webUtilsService.getDefaultLanguage());
+    doc.setDefaultLanguage(webUtils.getDefaultLanguage());
     doc.setLanguage("");
     doc.setCreationDate(creationDate);
     doc.setContentUpdateDate(creationDate);
@@ -312,7 +312,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
-      getContext().setDatabase(webUtilsService.getWikiRef(doc).getName());
+      getContext().setDatabase(webUtils.getWikiRef(doc).getName());
       LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
           doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
@@ -431,7 +431,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       Collection<?> values) {
     checkNotNull(classRef);
     checkState(!isTranslation(doc));
-    classRef = webUtilsService.checkWikiRef(classRef, doc);
+    classRef = webUtils.checkWikiRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
         ImmutableList.<BaseObject>of())) {
@@ -526,7 +526,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef) {
     checkNotNull(doc);
     checkNotNull(classRef);
-    classRef = webUtilsService.checkWikiRef(classRef, doc);
+    classRef = webUtils.checkWikiRef(classRef, doc);
     try {
       return doc.newXObject(classRef, getContext());
     } catch (XWikiException xwe) {
