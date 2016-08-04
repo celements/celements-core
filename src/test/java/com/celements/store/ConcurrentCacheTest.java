@@ -499,6 +499,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
           theDoc.setAuthor("XWiki.testAuthor");
           theDoc.setCreationDate(new java.sql.Date(new Date().getTime() - 5000L));
           theDoc.setContentUpdateDate(new java.sql.Date(new Date().getTime() - 2000L));
+          theDoc.setLanguage("");
+          theDoc.setDefaultLanguage("en");
         }
         return this;
       }
