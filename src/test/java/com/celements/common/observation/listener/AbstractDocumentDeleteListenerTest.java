@@ -57,6 +57,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     origDocMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(origDocMock.getDocumentReference()).andReturn(docRef).anyTimes();
+    expect(docMock.isFromCache()).andReturn(true).anyTimes();
 
     listener = new TestDocumentDeleteListener();
     listener.modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -207,7 +208,10 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
+    expect(origDocMock.isFromCache()).andReturn(true).anyTimes();
     expect(origDocMock.clone()).andReturn(origDocMock).once();
+    origDocMock.setFromCache(eq(false));
+    expectLastCall().once();
 
     replayDefault();
     listener.onEvent(event, docMock, context);
