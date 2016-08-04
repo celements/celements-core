@@ -107,13 +107,14 @@ public class PageTypeResolverService implements IPageTypeResolverRole {
 
   @Override
   public PageTypeReference getPageTypeRefForDocWithDefault(DocumentReference docRef) {
+    PageTypeReference pageTypeRef;
     try {
       XWikiDocument doc = modelAccess.getDocument(docRef);
-      return getPageTypeRefForDocWithDefault(doc);
-    } catch (DocumentNotExistsException exp) {
-      LOGGER.error("Failed to get XWikiDocument for [" + docRef + "].", exp);
+      pageTypeRef = getPageTypeRefForDocWithDefault(doc);
+    } catch (DocumentNotExistsException notExistsExp) {
+      pageTypeRef = getDefaultPageTypeRefForDoc(docRef);
     }
-    return getDefaultPageTypeRefForDoc(docRef);
+    return pageTypeRef;
   }
 
   @Override
