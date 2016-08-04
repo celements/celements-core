@@ -39,6 +39,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
     Capture<XWikiDocument> querySaveDocCapture = new Capture<>();
     expect(mockStore.loadXWikiDoc(capture(querySaveDocCapture), same(getContext()))).andReturn(
         savedDoc).once();
@@ -67,6 +68,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
     Capture<XWikiDocument> querySaveDocCapture = new Capture<>();
     boolean bTransaction = false;
     expect(mockStore.loadXWikiDoc(capture(querySaveDocCapture), same(getContext()))).andReturn(
@@ -119,10 +121,11 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testInvalidateCacheFromClusterEventXWikiDocument() throws Exception {
+  public void testInvalidateCacheFromClusterEvent_docExists() throws Exception {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
     expect(mockStore.loadXWikiDoc(isA(XWikiDocument.class), same(getContext()))).andReturn(
         savedDoc).once();
     replayDefault();
@@ -134,7 +137,29 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
     assertTrue("doc expected in exists cache", docCacheStore.exists(existingDocument,
         getContext()));
-    docCacheStore.invalidateCacheFromClusterEvent(existingDocument);
+    docCacheStore.removeDocFromCache(existingDocument, true);
+    assertNull("doc not in cache anymore", docCacheStore.getDocFromCache(key));
+    verifyDefault();
+  }
+
+  @Test
+  public void testInvalidateCacheFromClusterEvent_docNOTExists() throws Exception {
+    DocumentReference docRef = new DocumentReference("wiki", "space", "page");
+    XWikiDocument savedDoc = new XWikiDocument(docRef);
+    savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
+    expect(mockStore.loadXWikiDoc(isA(XWikiDocument.class), same(getContext()))).andReturn(
+        savedDoc).once();
+    replayDefault();
+    docCacheStore.initalizeCache();
+    XWikiDocument inputParamDoc = new XWikiDocument(docRef);
+    XWikiDocument existingDocument = docCacheStore.loadXWikiDoc(inputParamDoc, getContext());
+    assertTrue(existingDocument.isFromCache());
+    String key = docCacheStore.getKeyWithLang(existingDocument);
+    assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
+    assertTrue("doc expected in exists cache", docCacheStore.exists(existingDocument,
+        getContext()));
+    docCacheStore.removeDocFromCache(existingDocument, false);
     assertNull("doc not in cache anymore", docCacheStore.getDocFromCache(key));
     verifyDefault();
   }
@@ -144,6 +169,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
     expect(mockStore.loadXWikiDoc(isA(XWikiDocument.class), same(getContext()))).andReturn(
         savedDoc).once();
     replayDefault();
@@ -155,7 +181,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
     assertTrue("doc expected in exists cache", docCacheStore.exists(existingDocument,
         getContext()));
-    docCacheStore.invalidateCacheFromClusterEvent(key);
+    docCacheStore.invalidateDocCache(key);
     assertNull("doc not in cache anymore", docCacheStore.getDocFromCache(key));
     verifyDefault();
   }
@@ -165,6 +191,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
     Capture<XWikiDocument> querySaveDocCapture = new Capture<>();
     expect(mockStore.loadXWikiDoc(capture(querySaveDocCapture), same(getContext()))).andReturn(
         savedDoc).once();
@@ -191,6 +218,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
     Capture<XWikiDocument> querySavedDocCapture = new Capture<>();
     expect(mockStore.loadXWikiDoc(capture(querySavedDocCapture), same(getContext()))).andReturn(
         savedDoc).once();
