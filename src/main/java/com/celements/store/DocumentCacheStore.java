@@ -284,13 +284,16 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   InvalidateState removeDocFromCache(XWikiDocument doc, Boolean docExists) {
     InvalidateState returnState = InvalidateState.CACHE_MISS;
-    String key = getKey(doc.getDocumentReference());
-    String origKey = getKey(doc.getOriginalDocument().getDocumentReference());
     Set<String> docKeys = new HashSet<>();
-    docKeys.add(getKeyWithLang(doc));
+    String key = getKey(doc.getDocumentReference());
+    String origKey = "";
+    if (doc.getOriginalDocument() != null) {
+      origKey = getKey(doc.getOriginalDocument().getDocumentReference());
+      docKeys.add(origKey);
+      docKeys.add(getKeyWithLang(doc.getOriginalDocument()));
+    }
     docKeys.add(key);
-    docKeys.add(getKeyWithLang(doc.getOriginalDocument()));
-    docKeys.add(origKey);
+    docKeys.add(getKeyWithLang(doc));
     for (String k : docKeys) {
       InvalidateState invState = invalidateDocCache(k);
       if (invState == InvalidateState.REMOVED) {
