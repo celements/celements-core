@@ -531,7 +531,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     theCacheStore = new XWikiCacheStore(store, defaultContext);
     theCacheStoreFixed = (DocumentCacheStore) Utils.getComponent(XWikiStoreInterface.class,
         DocumentCacheStore.COMPONENT_NAME);
-    theCacheStoreFixed.initalizeCache(); // ensure cache is initialized
+    theCacheStoreFixed.initalize(); // ensure cache is initialized
     theCacheStoreFixed.getStore(); // ensure store is initialized
     defaultMocks = Collections.unmodifiableCollection(getDefaultMocks());
   }
