@@ -256,8 +256,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   public String getKeyWithLang(XWikiDocument doc) {
     String language = doc.getLanguage();
-    if (language.isEmpty()) {
-      language = doc.getDefaultLanguage();
+    if (language.isEmpty() || language.equals(doc.getDefaultLanguage())) {
+      language = "";
     }
     return getKeyWithLang(doc.getDocumentReference(), language);
   }
