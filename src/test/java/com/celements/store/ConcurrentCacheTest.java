@@ -209,7 +209,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   @Test
   public void test_multiRuns_singleThreaded_scenario1_fixed() throws Exception {
     int cores = 1;
-    int executeRuns = 30000;
+    int executeRuns = 5000;
     setupTestMocks();
     replayDefault();
     initStorePrepareMultiThreadMocks();
