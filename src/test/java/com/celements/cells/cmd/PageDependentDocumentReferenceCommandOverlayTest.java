@@ -136,6 +136,9 @@ public class PageDependentDocumentReferenceCommandOverlayTest extends AbstractCo
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
     expect(leftParentDoc.getDefaultLanguage()).andReturn("en").anyTimes();
     expect(leftParentDoc.clone()).andReturn(leftParentDoc);
+    expect(leftParentDoc.isFromCache()).andReturn(true);
+    leftParentDoc.setFromCache(eq(false));
+    expectLastCall();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
         cellDocRef);

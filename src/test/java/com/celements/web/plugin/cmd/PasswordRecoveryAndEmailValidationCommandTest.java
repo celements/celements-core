@@ -246,6 +246,9 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(contentDocRef), same(context))).andReturn(doc);
     expect(doc.clone()).andReturn(doc).once();
+    expect(doc.isFromCache()).andReturn(true).once();
+    doc.setFromCache(false);
+    expectLastCall().once();
     String adminLang = "en";
     expect(doc.getTranslatedDocument(eq(adminLang), same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
@@ -312,6 +315,9 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     expect(xwiki.exists(eq(contentDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(contentDocRef), same(context))).andReturn(doc);
     expect(doc.clone()).andReturn(doc).once();
+    expect(doc.isFromCache()).andReturn(true).once();
+    doc.setFromCache(false);
+    expectLastCall().once();
     expect(doc.getTranslatedDocument(eq("de"), same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
     expect(doc.getTitle()).andReturn(title);
@@ -382,6 +388,9 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(contentCel2WebDocRef), same(context))).andReturn(doc);
     expect(doc.clone()).andReturn(doc).once();
+    expect(doc.isFromCache()).andReturn(true).once();
+    doc.setFromCache(false);
+    expectLastCall().once();
     String adminLang = "en";
     expect(doc.getTranslatedDocument(eq(adminLang), same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
@@ -448,6 +457,9 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(contentCel2WebDocRef), same(context))).andReturn(doc);
     expect(doc.clone()).andReturn(doc).once();
+    expect(doc.isFromCache()).andReturn(true).once();
+    doc.setFromCache(false);
+    expectLastCall().once();
     expect(doc.getTranslatedDocument(eq("de"), same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
     expect(doc.getTitle()).andReturn(title);
@@ -575,6 +587,9 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(contentCel2WebDocRef), same(context))).andReturn(doc);
     expect(doc.clone()).andReturn(doc).once();
+    expect(doc.isFromCache()).andReturn(true).once();
+    doc.setFromCache(false);
+    expectLastCall().once();
     String adminLang = "en";
     expect(doc.getTranslatedDocument(eq(adminLang), same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
@@ -643,6 +658,9 @@ public class PasswordRecoveryAndEmailValidationCommandTest extends AbstractCompo
     expect(xwiki.exists(eq(contentCel2WebDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(contentCel2WebDocRef), same(context))).andReturn(doc);
     expect(doc.clone()).andReturn(doc).once();
+    expect(doc.isFromCache()).andReturn(true).once();
+    doc.setFromCache(false);
+    expectLastCall().once();
     expect(doc.getTranslatedDocument(eq("de"), same(context))).andReturn(doc).anyTimes();
     expect(doc.getRenderedContent(same(context))).andReturn(content);
     expect(doc.getTitle()).andReturn(title);
