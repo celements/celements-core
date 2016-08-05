@@ -426,8 +426,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   @Override
   @Deprecated
-  public List<String> searchDocumentsNames(String wheresql, int nb, int start,
-      String selectColumns, XWikiContext context) throws XWikiException {
+  public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
+      XWikiContext context) throws XWikiException {
     return getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
   }
 
@@ -778,14 +778,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
               } while (!loadingState.compareAndSet(_DOCSTATE_LOADING, _DOCSTATE_FINISHED));
               LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache",
                   Thread.currentThread().getId(), key);
-              final String defKey = getKey(newDoc.getDocumentReference());
               final String keyWithLang = getKeyWithLang(newDoc);
               if (!newDoc.isNew()) {
                 getDocCache().set(keyWithLang, newDoc);
-                getExistCache().set(defKey, true);
+                getExistCache().set(getKey(newDoc.getDocumentReference()), true);
                 getExistCache().set(keyWithLang, true);
               } else {
-                LOGGER_DL.debug("DocumentLoader-{}: loading trans '{}' failed. Setting exists"
+                LOGGER_DL.debug("DocumentLoader-{}: loading '{}' failed. Setting exists"
                     + " to FALSE for '{}'", Thread.currentThread().getId(), key, keyWithLang);
                 getExistCache().set(keyWithLang, false);
               }
