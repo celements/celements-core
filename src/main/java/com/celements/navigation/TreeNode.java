@@ -28,10 +28,11 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.model.util.ModelUtils;
+import com.celements.model.util.IModelUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Immutable TreeNode with optional lazy getter for PartName
@@ -75,8 +76,8 @@ public final class TreeNode {
   private TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @Nullable String partName, @Nullable PartNameGetter strategy) {
     Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
-    this.docRef = ModelUtils.cloneReference(docRef, DocumentReference.class);
-    this.parentRef = (parentRef != null) ? ModelUtils.cloneReference(parentRef) : null;
+    this.docRef = getModelUtils().cloneRef(docRef, DocumentReference.class);
+    this.parentRef = (parentRef != null) ? getModelUtils().cloneRef(parentRef) : null;
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
     this.partName = (strategy == null) ? Strings.nullToEmpty(partName) : partName;
     this.partNameStrategy = strategy;
@@ -94,7 +95,7 @@ public final class TreeNode {
     } else {
       ref = parentRef;
     }
-    return ModelUtils.cloneReference(ref);
+    return getModelUtils().cloneRef(ref);
   }
 
   @NotNull
@@ -141,6 +142,10 @@ public final class TreeNode {
     return new StringBuilder().append("TreeNode [docRef=").append(docRef).append(
         ", parentRef=").append(parentRef).append(", position=").append(position).append(
             ", partName=").append(partName).append("]").toString();
+  }
+
+  private static IModelUtils getModelUtils() {
+    return Utils.getComponent(IModelUtils.class);
   }
 
 }

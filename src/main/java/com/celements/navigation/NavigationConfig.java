@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.model.util.ModelUtils;
+import com.celements.model.util.IModelUtils;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -83,7 +83,7 @@ public final class NavigationConfig {
 
     public Builder nodeSpaceRef(@NotNull SpaceReference val) {
       Preconditions.checkNotNull(val);
-      nodeSpaceRef = Optional.of(ModelUtils.cloneReference(val, SpaceReference.class));
+      nodeSpaceRef = Optional.of(getModelUtils().cloneRef(val, SpaceReference.class));
       return this;
     }
 
@@ -203,7 +203,7 @@ public final class NavigationConfig {
   @NotNull
   public Optional<SpaceReference> getNodeSpaceRef() {
     if (nodeSpaceRef.isPresent()) {
-      return Optional.of(ModelUtils.cloneReference(nodeSpaceRef.get(), SpaceReference.class));
+      return Optional.of(getModelUtils().cloneRef(nodeSpaceRef.get(), SpaceReference.class));
     }
     return Optional.absent();
   }
@@ -239,6 +239,10 @@ public final class NavigationConfig {
   @NotNull
   public String getCssClass() {
     return cmCssClass.or("");
+  }
+
+  private static IModelUtils getModelUtils() {
+    return Utils.getComponent(IModelUtils.class);
   }
 
 }
