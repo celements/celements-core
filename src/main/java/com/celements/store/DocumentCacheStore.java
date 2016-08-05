@@ -159,6 +159,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
             existCacheCapacity, exp);
       }
     }
+    int docCacheCapacity = getDocCacheCapacity();
+    if (existCacheCapacity < docCacheCapacity) {
+      LOGGER.warn("WARNING: document exists cache capacity is smaller configured than docCache "
+          + "capacity. Ignoring exists cache configuration '{}' and using doc cache capacity '{}'"
+          + " instead.", existCacheCapacity, docCacheCapacity);
+      existCacheCapacity = docCacheCapacity;
+    }
     return existCacheCapacity;
   }
 
