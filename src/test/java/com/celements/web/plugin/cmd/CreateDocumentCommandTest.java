@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,13 +30,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase {
+@Deprecated
+public class CreateDocumentCommandTest extends AbstractComponentTest {
 
   private CreateDocumentCommand createDocumentCmd;
   private IPageTypeRole pageTypeServiceMock;
@@ -74,7 +76,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, null);
     assertNotNull(theDoc);
     XWikiDocument captNewDoc = docCaptcher.getValue();
-    assertNotSame(theNewDoc, captNewDoc);
+    assertFalse("must be cloned if it is from cache", captNewDoc.isFromCache());
     assertSame(theDoc, captNewDoc);
     assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     verifyDefault();
@@ -101,7 +103,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     assertNotNull(theDoc);
     XWikiDocument captNewDoc = docCaptcher.getValue();
     XWikiDocument captNewDoc2 = docCaptcher2.getValue();
-    assertNotSame(theNewDoc, captNewDoc);
+    assertFalse("must be cloned if it is from cache", captNewDoc.isFromCache());
     assertSame(captNewDoc2, captNewDoc);
     assertSame(theDoc, captNewDoc);
     assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
@@ -123,7 +125,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType, false);
     XWikiDocument captNewDoc = docCaptcher.getValue();
-    assertNotSame(theNewDoc, captNewDoc);
+    assertFalse("must be cloned if it is from cache", captNewDoc.isFromCache());
     assertSame(theDoc, captNewDoc);
     assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     assertNotNull(theDoc);

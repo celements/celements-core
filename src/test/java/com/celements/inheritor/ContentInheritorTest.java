@@ -40,130 +40,136 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class ContentInheritorTest extends AbstractComponentTest {
 
-  private ContentInheritor _contentInheritor;
-  private IIteratorFactory<DocumentIterator> _iteratorFactory;
-  private XWikiContext _context;
-  private XWiki _xwiki;
-  private List<String> _docList;
+  private ContentInheritor contentInheritor;
+  private IIteratorFactory<DocumentIterator> iteratorFactory;
+  private XWikiContext context;
+  private XWiki xwiki;
+  private List<String> docList;
 
   @Before
   public void setUp_ContentInheritorTest() throws Exception {
-    _context = getContext();
-    _xwiki = getWikiMock();
-    _contentInheritor = new ContentInheritor();
-    _docList = new ArrayList<String>();
-    _iteratorFactory = getTestIteratorFactory(_docList);
+    context = getContext();
+    xwiki = getWikiMock();
+    contentInheritor = new ContentInheritor();
+    docList = new ArrayList<String>();
+    iteratorFactory = getTestIteratorFactory(docList);
   }
 
   @Test
   public void testSetEmptyDocumentChecker() {
     IEmptyDocumentChecker emptyDocumentChecker = new DefaultEmptyDocumentChecker();
-    _contentInheritor.setEmptyDocumentChecker(emptyDocumentChecker);
-    assertEquals(emptyDocumentChecker, _contentInheritor.getEmptyDocumentChecker());
+    contentInheritor.setEmptyDocumentChecker(emptyDocumentChecker);
+    assertEquals(emptyDocumentChecker, contentInheritor.getEmptyDocumentChecker());
   }
 
   @Test
   public void testGetEmptyDocumentChecker() {
-    assertTrue(_contentInheritor.getEmptyDocumentChecker() != null);
-    assertTrue(_contentInheritor.getEmptyDocumentChecker() instanceof DefaultEmptyDocumentChecker);
+    assertTrue(contentInheritor.getEmptyDocumentChecker() != null);
+    assertTrue(contentInheritor.getEmptyDocumentChecker() instanceof DefaultEmptyDocumentChecker);
   }
 
   @Test
   public void testGetTitle() throws Exception {
-    _context.setLanguage("de");
-    DocumentReference docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc1");
+    context.setLanguage("de");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Test", "Doc1");
     String title1 = "Title1";
-    _docList.add("Test.Doc1");
+    docList.add("Test.Doc1");
     XWikiDocument testDoc1 = new XWikiDocument(docRef);
     testDoc1.setDefaultLanguage("de");
     testDoc1.setTitle(title1);
-    expect(_xwiki.getDocument(eq(docRef), same(_context))).andReturn(testDoc1).anyTimes();
-    expect(_xwiki.exists(eq(docRef), same(_context))).andReturn(true).anyTimes();
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc1).anyTimes();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
+    contentInheritor.setIteratorFactory(iteratorFactory);
     replayDefault();
-    assertSame("Expecting title.", title1, _contentInheritor.getTitle());
+    assertEquals("Expecting title.", title1, contentInheritor.getTitle());
     verifyDefault();
   }
 
   @Test
   public void testGetTranslatedTitle() throws Exception {
-    _docList.add("Test.Doc");
-    DocumentReference docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
+    docList.add("Test.Doc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Test", "Doc");
     String title_de = "Deutscher Titel";
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setTitle(title_de);
     XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
-    expect(testDoc1.clone()).andReturn(testDoc1).anyTimes();
-    expect(testDoc1.getTranslatedDocument(eq("de"), same(_context))).andReturn(
+    expect(testDoc1.clone()).andReturn(testDoc1).atLeastOnce();
+    expect(testDoc1.isFromCache()).andReturn(true).atLeastOnce();
+    testDoc1.setFromCache(eq(false));
+    expectLastCall().atLeastOnce();
+    expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
-    expect(_xwiki.getDocument(eq(docRef), same(_context))).andReturn(testDoc1).anyTimes();
-    expect(_xwiki.exists(eq(docRef), same(_context))).andReturn(true).anyTimes();
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
-    _contentInheritor.setLanguage("de");
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc1).anyTimes();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
+    contentInheritor.setIteratorFactory(iteratorFactory);
+    contentInheritor.setLanguage("de");
     replayDefault();
-    assertSame("Expecting german title.", title_de, _contentInheritor.getTranslatedTitle(_context));
+    assertEquals("Expecting german title.", title_de, contentInheritor.getTranslatedTitle(context));
     verifyDefault();
   }
 
   @Test
   public void testGetContent() throws XWikiException {
-    _context.setLanguage("de");
-    _docList.add("Test.Doc1");
-    DocumentReference docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc1");
+    context.setLanguage("de");
+    docList.add("Test.Doc1");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Test", "Doc1");
     String content1 = "Content1";
     XWikiDocument testDoc1 = new XWikiDocument(docRef);
     testDoc1.setDefaultLanguage("de");
     testDoc1.setContent(content1);
-    expect(_xwiki.getDocument(eq(docRef), same(_context))).andReturn(testDoc1).anyTimes();
-    expect(_xwiki.exists(eq(docRef), same(_context))).andReturn(true).anyTimes();
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc1).anyTimes();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
+    contentInheritor.setIteratorFactory(iteratorFactory);
     replayDefault();
-    assertSame("Expecting content.", content1, _contentInheritor.getContent());
+    assertEquals("Expecting content.", content1, contentInheritor.getContent());
     verifyDefault();
   }
 
   @Test
   public void testGetTranslatedContent() throws Exception {
-    _docList.add("Test.Doc");
+    docList.add("Test.Doc");
     String content_de = "Deutscher Inhalt";
-    DocumentReference docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
+    DocumentReference docRef = new DocumentReference(context.getDatabase(), "Test", "Doc");
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setContent(content_de);
     XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
     expect(testDoc1.clone()).andReturn(testDoc1).anyTimes();
-    expect(testDoc1.getTranslatedDocument(eq("de"), same(_context))).andReturn(
+    expect(testDoc1.isFromCache()).andReturn(true).atLeastOnce();
+    testDoc1.setFromCache(eq(false));
+    expectLastCall().atLeastOnce();
+    expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
-    expect(_xwiki.getDocument(eq(docRef), same(_context))).andReturn(testDoc1).anyTimes();
-    expect(_xwiki.exists(eq(docRef), same(_context))).andReturn(true).anyTimes();
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
-    _contentInheritor.setLanguage("de");
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(testDoc1).anyTimes();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).anyTimes();
+    contentInheritor.setIteratorFactory(iteratorFactory);
+    contentInheritor.setLanguage("de");
     replayDefault();
-    assertSame("Expecting german content.", content_de, _contentInheritor.getTranslatedContent(
-        _context));
+    assertEquals("Expecting german content.", content_de, contentInheritor.getTranslatedContent(
+        context));
     verifyDefault();
   }
 
   @Test
   public void testGetTitle_defaultValue() {
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
-    assertEquals("", _contentInheritor.getTitle());
-    assertEquals("", _contentInheritor.getTitle(""));
-    assertEquals("-", _contentInheritor.getTitle("-"));
-    assertEquals(null, _contentInheritor.getTitle(null));
+    contentInheritor.setIteratorFactory(iteratorFactory);
+    assertEquals("", contentInheritor.getTitle());
+    assertEquals("", contentInheritor.getTitle(""));
+    assertEquals("-", contentInheritor.getTitle("-"));
+    assertEquals(null, contentInheritor.getTitle(null));
   }
 
   @Test
   public void testGetTitle_noSuchObject() {
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
-    assertEquals("", _contentInheritor.getTitle());
+    contentInheritor.setIteratorFactory(iteratorFactory);
+    assertEquals("", contentInheritor.getTitle());
   }
 
   @Test
   public void testGetTitle_noIteratorFactory() {
     try {
-      _contentInheritor.getTitle();
+      contentInheritor.getTitle();
       fail("Expecting exception.");
     } catch (IllegalStateException ex) {
       // expected behaviour
@@ -172,23 +178,23 @@ public class ContentInheritorTest extends AbstractComponentTest {
 
   @Test
   public void testGetContent_defaultValue() {
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
-    assertEquals("", _contentInheritor.getContent());
-    assertEquals("", _contentInheritor.getContent(""));
-    assertEquals("-", _contentInheritor.getContent("-"));
-    assertEquals(null, _contentInheritor.getContent(null));
+    contentInheritor.setIteratorFactory(iteratorFactory);
+    assertEquals("", contentInheritor.getContent());
+    assertEquals("", contentInheritor.getContent(""));
+    assertEquals("-", contentInheritor.getContent("-"));
+    assertEquals(null, contentInheritor.getContent(null));
   }
 
   @Test
   public void testGetContent_noSuchObject() {
-    _contentInheritor.setIteratorFactory(_iteratorFactory);
-    assertEquals("", _contentInheritor.getContent());
+    contentInheritor.setIteratorFactory(iteratorFactory);
+    assertEquals("", contentInheritor.getContent());
   }
 
   @Test
   public void testGetContent_noIteratorFactory() {
     try {
-      _contentInheritor.getContent();
+      contentInheritor.getContent();
       fail("Expecting exception.");
     } catch (IllegalStateException ex) {
       // expected behaviour

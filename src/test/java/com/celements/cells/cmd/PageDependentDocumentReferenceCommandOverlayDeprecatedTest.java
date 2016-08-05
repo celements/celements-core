@@ -141,6 +141,9 @@ public class PageDependentDocumentReferenceCommandOverlayDeprecatedTest extends
     expect(leftParentDoc.getDefaultLanguage()).andReturn("en");
     expect(leftParentDoc.getDocumentReference()).andReturn(expDepDocRef).atLeastOnce();
     expect(leftParentDoc.clone()).andReturn(leftParentDoc);
+    expect(leftParentDoc.isFromCache()).andReturn(true);
+    leftParentDoc.setFromCache(eq(false));
+    expectLastCall();
     replayDefault();
     DocumentReference depDocRef = pageDepDocRefCmd.getDependentDocumentReference(myDocRef,
         cellDocRef);

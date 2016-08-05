@@ -263,7 +263,7 @@ public class NavigationTest extends AbstractComponentTest {
     currentDoc.addXObject(ptObj);
     expect(getWikiMock().exists(eq(currentDocRef), same(getContext()))).andReturn(true);
     expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(
-        currentDoc).times(3);
+        currentDoc).once();
     String testPageType = "TestPageType";
     expect(ptServiceMock.getPageTypeRefByConfigName(testPageType)).andReturn(new PageTypeReference(
         testPageType, "myTestProvider", Collections.<String>emptyList()));
