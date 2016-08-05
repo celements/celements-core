@@ -668,7 +668,10 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     String key = getKey(doc.getDocumentReference());
     Boolean result = getExistCache().get(key);
     if (result == null) {
-      result = getStore().exists(doc, context);
+      result = (getDocCache().get(key) != null);
+      if (!result) {
+        result = getStore().exists(doc, context);
+      }
       getExistCache().set(key, result);
     }
     LOGGER.info("exists return '{}' for '{}'", result, key);
