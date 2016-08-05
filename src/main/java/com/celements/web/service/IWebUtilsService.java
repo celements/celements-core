@@ -30,7 +30,6 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -38,6 +37,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.IModelContext;
+import com.celements.model.util.IModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -74,6 +76,12 @@ public interface IWebUtilsService {
    */
   public DocumentReference getParentForLevel(int level) throws IndexOutOfBoundsException;
 
+  /**
+   * @deprecated since 2.63.0
+   * @deprecated instead use IDocumentParentsListerRole.getDocumentParentsList(
+   *             DocumentReference docRef, boolean includeDoc)
+   */
+  @Deprecated
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc);
 
@@ -127,53 +135,79 @@ public interface IWebUtilsService {
 
   public String getParentSpace(String spaceName);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public DocumentReference resolveDocumentReference(String fullName);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public EntityReference resolveRelativeEntityReference(String name, EntityType type);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public SpaceReference resolveSpaceReference(String spaceName);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public WikiReference resolveWikiReference(@Nullable String wikiName);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public AttachmentReference resolveAttachmentReference(String fullName);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public EntityReference resolveEntityReference(String name, EntityType type);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
+   */
+  @Deprecated
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef);
 
   /**
-   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
-   * requested generic type
-   *
-   * @param name
-   *          to be resolved
-   * @param token
-   *          for the reference type
-   * @return a resolved reference
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
    */
+  @Deprecated
   @NotNull
   public <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token);
 
   /**
-   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
-   * requested generic type
-   *
-   * @param name
-   *          to be resolved
-   * @param token
-   *          for the reference type
-   * @param baseRef
-   *          a reference used as base for resolving
-   * @return a resolved reference
+   * @deprecated instead use {@link IModelUtils#resolveRef(String, Class, EntityReference)}
    */
+  @Deprecated
   @NotNull
   public <T extends EntityReference> T resolveReference(@NotNull String name,
       @NotNull Class<T> token, @Nullable EntityReference baseRef);
@@ -280,32 +314,74 @@ public interface IWebUtilsService {
 
   public String getMajorVersion(XWikiDocument doc);
 
+  /**
+   * @deprecated instead use {@link IModelContext#getCurrentWiki()}
+   */
+  @Deprecated
   public WikiReference getWikiRef();
 
+  /**
+   * @deprecated instead use {@link IModelUtils#extractRef(EntityReference, EntityReference, Class)}
+   */
+  @Deprecated
   public WikiReference getWikiRef(XWikiDocument doc);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#extractRef(EntityReference, EntityReference, Class)}
+   */
+  @Deprecated
   public WikiReference getWikiRef(DocumentReference docRef);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#extractRef(EntityReference, EntityReference, Class)}
+   */
+  @Deprecated
   public WikiReference getWikiRef(EntityReference ref);
 
   public DocumentReference getWikiTemplateDocRef();
 
   public XWikiDocument getWikiTemplateDoc();
 
+  /**
+   * @deprecated instead use {@link IModelUtils#serializeRef(EntityReference)}
+   */
+  @Deprecated
   public EntityReferenceSerializer<String> getRefDefaultSerializer();
 
+  /**
+   * @deprecated instead use {@link IModelUtils#serializeRefLocal(EntityReference)}
+   */
+  @Deprecated
   public EntityReferenceSerializer<String> getRefLocalSerializer();
 
+  /**
+   * @deprecated instead use {@link IModelUtils#serializeRef(EntityReference)}
+   */
+  @Deprecated
   public String serializeRef(EntityReference entityRef);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#serializeRef(EntityReference)} or
+   *             {@link IModelUtils#serializeRefLocal(EntityReference)}
+   */
+  @Deprecated
   public String serializeRef(EntityReference entityRef, boolean local);
 
   public Map<String, String[]> getRequestParameterMap();
 
   public String getInheritedTemplatedPath(DocumentReference localTemplateRef);
 
+  /**
+   * @deprecated instead use
+   *             {@link IModelAccessFacade#deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
+   */
+  @Deprecated
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException;
 
+  /**
+   * @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
+   */
+  @Deprecated
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash) throws XWikiException;
 
   public String getTemplatePathOnDisk(String renderTemplatePath);
@@ -320,10 +396,13 @@ public interface IWebUtilsService {
 
   public boolean isLayoutEditor();
 
+  @Deprecated
   public String cleanupXHTMLtoHTML5(String xhtml);
 
+  @Deprecated
   public String cleanupXHTMLtoHTML5(String xhtml, DocumentReference doc);
 
+  @Deprecated
   public String cleanupXHTMLtoHTML5(String xhtml, SpaceReference layoutRef);
 
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN);
@@ -393,35 +472,35 @@ public interface IWebUtilsService {
   public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
 
   /**
-   * checks and corrects the WikiReference on docRef compared to current wiki.
-   *
-   * @param docRef
-   * @return
+   * @deprecated instead use {@link IModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
+  @Deprecated
   public DocumentReference checkWikiRef(DocumentReference docRef);
 
   /**
-   * checks and corrects the WikiReference on docRef compared to toDoc.
-   *
-   * @param docRef
-   * @param toDoc
-   * @return
+   * @deprecated instead use {@link IModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
+  @Deprecated
   public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc);
 
   /**
-   * checks and corrects the WikiReference on docRef compared to toDoc.
-   *
-   * @param docRef
-   * @param toRef
-   * @return
+   * @deprecated instead use {@link IModelUtils#adjustRef(EntityReference, Class, EntityReference)}
    */
+  @Deprecated
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef);
 
-  public void setUser(DocumentReference userReference, boolean main);
-
+  /**
+   * @deprecated instead use {@link IModelUtils#adjustRef(EntityReference, Class, EntityReference)}
+   */
+  @Deprecated
   public DocumentReference setWikiReference(DocumentReference docRef, String wikiName);
 
+  /**
+   * @deprecated instead use {@link IModelUtils#adjustRef(EntityReference, Class, EntityReference)}
+   */
+  @Deprecated
   public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef);
+
+  public void setUser(DocumentReference userReference, boolean main);
 
 }

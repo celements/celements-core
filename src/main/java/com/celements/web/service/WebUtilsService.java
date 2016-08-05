@@ -60,7 +60,8 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
-import com.celements.model.util.ModelUtils;
+import com.celements.model.context.IModelContext;
+import com.celements.model.util.IModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
@@ -76,8 +77,6 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -112,6 +111,12 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Requirement("relative")
   EntityReferenceResolver<String> relativeRefResolver;
+
+  @Requirement
+  IModelContext context;
+
+  @Requirement
+  IModelUtils modelUtils;
 
   /**
    * Used to get the template path mapping information.
@@ -167,13 +172,7 @@ public class WebUtilsService implements IWebUtilsService {
     return parent;
   }
 
-  /**
-   * @deprecated since 2.63.0
-   * @deprecated instead use IDocumentParentsListerRole.getDocumentParentsList(
-   *             DocumentReference docRef, boolean includeDoc)
-   */
   @Override
-  @Deprecated
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
     return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
@@ -354,9 +353,6 @@ public class WebUtilsService implements IWebUtilsService {
     return getAdminLanguage(getContext().getUser());
   }
 
-  /**
-   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
-   */
   @Deprecated
   @Override
   public String getAdminLanguage(String userFullName) {
@@ -458,60 +454,62 @@ public class WebUtilsService implements IWebUtilsService {
     return getContext().getWiki().getSpacePreference("parent", spaceName, "", getContext());
   }
 
+  @Deprecated
   @Override
   public DocumentReference resolveDocumentReference(String fullName) {
     return resolveDocumentReference(fullName, null);
   }
 
+  @Deprecated
   @Override
   public DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef) {
-    return resolveReference(fullName, DocumentReference.class, wikiRef);
+    return modelUtils.resolveRef(fullName, DocumentReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public SpaceReference resolveSpaceReference(String spaceName) {
     return resolveSpaceReference(spaceName, null);
   }
 
+  @Deprecated
   @Override
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef) {
-    return resolveReference(spaceName, SpaceReference.class, wikiRef);
+    return modelUtils.resolveRef(spaceName, SpaceReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public WikiReference resolveWikiReference(String wikiName) {
-    return resolveWikiReference(wikiName, getWikiRef());
+    return modelUtils.resolveRef(wikiName, WikiReference.class);
   }
 
-  private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
-    WikiReference wikiRef = null;
-    if (!Strings.isNullOrEmpty(wikiName)) {
-      wikiRef = new WikiReference(wikiName);
-    }
-    return MoreObjects.firstNonNull(wikiRef, defaultWikiRef);
-  }
-
+  @Deprecated
   @Override
   public AttachmentReference resolveAttachmentReference(String fullName) {
     return resolveAttachmentReference(fullName, null);
   }
 
+  @Deprecated
   @Override
   public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef) {
-    return resolveReference(fullName, AttachmentReference.class, wikiRef);
+    return modelUtils.resolveRef(fullName, AttachmentReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type) {
-    return resolveEntityReference(name, type, null);
+    return relativeRefResolver.resolve(name, type);
   }
 
+  @Deprecated
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef) {
-    return resolveReference(name, ModelUtils.ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
+    return modelUtils.resolveRef(name, modelUtils.getEntityTypeMap().inverse().get(type), wikiRef);
   }
 
+  @Deprecated
   @Override
   public EntityReference resolveRelativeEntityReference(String name, EntityType type) {
     EntityReference ref = relativeRefResolver.resolve(name, type);
@@ -519,27 +517,17 @@ public class WebUtilsService implements IWebUtilsService {
     return ref;
   }
 
+  @Deprecated
   @Override
   public <T extends EntityReference> T resolveReference(String name, Class<T> token) {
     return resolveReference(name, token, null);
   }
 
+  @Deprecated
   @Override
   public <T extends EntityReference> T resolveReference(String name, Class<T> token,
       EntityReference baseRef) {
-    baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
-    EntityReference reference;
-    EntityType type = ModelUtils.ENTITY_TYPE_MAP.get(token);
-    if (type == null) {
-      throw new IllegalArgumentException("Unsupported entity class: " + token);
-    } else if (type == EntityType.WIKI) {
-      reference = resolveWikiReference(name, getWikiRef(baseRef));
-    } else {
-      reference = refResolver.resolve(name, type, baseRef);
-    }
-    T ret = ModelUtils.cloneReference(reference, token);
-    LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
-    return ret;
+    return modelUtils.resolveRef(name, token, baseRef);
   }
 
   @Override
@@ -850,14 +838,14 @@ public class WebUtilsService implements IWebUtilsService {
     String docParentStr = "";
     if (!documentParentsList.isEmpty()) {
       DocumentReference docParentRef = documentParentsList.get(0);
-      docParentStr = serializer_default.serialize(docParentRef);
+      docParentStr = modelUtils.serializeRef(docParentRef);
     }
     docData.put("parent", docParentStr);
     String parentsListStr = "";
     String parentsListMNStr = "";
     MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
     for (DocumentReference parentDocRef : documentParentsList) {
-      String parentDocFN = serializer_default.serialize(parentDocRef);
+      String parentDocFN = modelUtils.serializeRef(parentDocRef);
       parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN,
           getContext().getLanguage(), getContext()) + ",";
       parentsListStr += parentDocFN + ",";
@@ -877,13 +865,13 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("contentUpdateDate", "" + xwikiDoc.getContentUpdateDate().getTime());
     docData.put("version", xwikiDoc.getVersion());
     docData.put("title", xwikiDoc.getTitle());
-    docData.put("template", serializer_local.serialize(xwikiDoc.getTemplateDocumentReference()));
+    docData.put("template", modelUtils.serializeRefLocal(xwikiDoc.getTemplateDocumentReference()));
     docData.put("getDefaultTemplate", xwikiDoc.getDefaultTemplate());
     docData.put("getValidationScript", xwikiDoc.getValidationScript());
     docData.put("comment", xwikiDoc.getComment());
     docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
-    docData.put("menuName", menuNameCmd.getMultilingualMenuName(serializer_default.serialize(
+    docData.put("menuName", menuNameCmd.getMultilingualMenuName(modelUtils.serializeRef(
         xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
     // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
@@ -1076,31 +1064,28 @@ public class WebUtilsService implements IWebUtilsService {
     return splitedStr;
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef() {
-    return getWikiRef((EntityReference) null);
+    return context.getCurrentWiki();
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef(XWikiDocument doc) {
-    EntityReference ref = ((doc != null) ? doc.getDocumentReference() : null);
-    return getWikiRef(ref);
+    return getWikiRef(doc != null ? doc.getDocumentReference() : null);
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef(DocumentReference ref) {
     return getWikiRef((EntityReference) ref);
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef(EntityReference ref) {
-    WikiReference ret = null;
-    if (ref != null) {
-      ret = new WikiReference(ref.extractReference(EntityType.WIKI));
-    } else {
-      ret = new WikiReference(getContext().getDatabase());
-    }
-    return ret;
+    return modelUtils.extractRef(ref, context.getCurrentWiki(), WikiReference.class);
   }
 
   @Override
@@ -1130,27 +1115,31 @@ public class WebUtilsService implements IWebUtilsService {
     return null;
   }
 
+  @Deprecated
   @Override
   public EntityReferenceSerializer<String> getRefDefaultSerializer() {
     return serializer_default;
   }
 
+  @Deprecated
   @Override
   public EntityReferenceSerializer<String> getRefLocalSerializer() {
     return serializer_local;
   }
 
+  @Deprecated
   @Override
   public String serializeRef(EntityReference entityRef) {
-    return getRefDefaultSerializer().serialize(entityRef);
+    return modelUtils.serializeRef(entityRef);
   }
 
+  @Deprecated
   @Override
   public String serializeRef(EntityReference entityRef, boolean local) {
     if (local) {
-      return getRefLocalSerializer().serialize(entityRef);
+      return modelUtils.serializeRefLocal(entityRef);
     } else {
-      return getRefDefaultSerializer().serialize(entityRef);
+      return modelUtils.serializeRef(entityRef);
     }
   }
 
@@ -1205,10 +1194,6 @@ public class WebUtilsService implements IWebUtilsService {
     return centralTemplateRef;
   }
 
-  /**
-   * @deprecated instead use
-   *             {@link IModelAccessFacade# deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
-   */
   @Deprecated
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
@@ -1219,9 +1204,6 @@ public class WebUtilsService implements IWebUtilsService {
     }
   }
 
-  /**
-   * @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
-   */
   @Deprecated
   @Override
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash) throws XWikiException {
@@ -1477,24 +1459,22 @@ public class WebUtilsService implements IWebUtilsService {
     return componentManager.lookupMap(role);
   }
 
+  @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef) {
-    return checkWikiRef(docRef, (DocumentReference) null);
+    return checkWikiRef(docRef, context.getCurrentWiki());
   }
 
+  @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
     return checkWikiRef(docRef, toDoc.getDocumentReference());
   }
 
+  @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
-    WikiReference wikiRef = getWikiRef(toRef);
-    if (!docRef.getWikiReference().equals(wikiRef)) {
-      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
-          docRef.getLastSpaceReference().getName(), wikiRef));
-    }
-    return docRef;
+    return modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
   }
 
   private IDocumentParentsListerRole getDocumentParentsLister() {
@@ -1504,23 +1484,21 @@ public class WebUtilsService implements IWebUtilsService {
     return docParentsLister;
   }
 
+  @Deprecated
+  @Override
+  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName) {
+    return setWikiReference(docRef, modelUtils.resolveRef(wikiName, WikiReference.class));
+  }
+
+  @Deprecated
+  @Override
+  public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef) {
+    return modelUtils.adjustRef(docRef, DocumentReference.class, wikiRef);
+  }
+
   @Override
   public void setUser(DocumentReference userReference, boolean main) {
     getContext().setUser("XWiki." + userReference.getName(), main);
-  }
-
-  @Override
-  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName) {
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    return new DocumentReference(wikiName, docRef.getLastSpaceReference().getName(),
-        docRef.getName());
-  }
-
-  @Override
-  public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef) {
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    SpaceReference spaceRef = new SpaceReference(docRef.getLastSpaceReference().getName(), wikiRef);
-    return new DocumentReference(docRef.getName(), spaceRef);
   }
 
 }
