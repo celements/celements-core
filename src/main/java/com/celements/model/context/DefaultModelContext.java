@@ -1,11 +1,13 @@
 package com.celements.model.context;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 
+@Component
 public class DefaultModelContext implements IModelContext {
 
   @Requirement

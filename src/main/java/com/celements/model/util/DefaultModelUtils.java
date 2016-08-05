@@ -43,7 +43,7 @@ public class DefaultModelUtils implements IModelUtils {
   @Requirement
   private IModelContext context;
 
-  @Requirement("relative") // TODO???
+  @Requirement // TODO???
   private EntityReferenceResolver<String> resolver;
 
   @Requirement
@@ -58,12 +58,12 @@ public class DefaultModelUtils implements IModelUtils {
   }
 
   @Override
-  public EntityReference cloneReference(EntityReference ref) {
-    return cloneReference(ref, getEntityTypeMap().inverse().get(ref.getType()));
+  public EntityReference cloneRef(EntityReference ref) {
+    return cloneRef(ref, getEntityTypeMap().inverse().get(ref.getType()));
   }
 
   @Override
-  public <T extends EntityReference> T cloneReference(EntityReference ref, Class<T> token) {
+  public <T extends EntityReference> T cloneRef(EntityReference ref, Class<T> token) {
     try {
       ref = ref.clone();
       T ret;
@@ -101,7 +101,7 @@ public class DefaultModelUtils implements IModelUtils {
     } else {
       ref = resolver.resolve(name, type, baseRef);
     }
-    return cloneReference(ref, token); // ensure memory visibility
+    return cloneRef(ref, token); // ensure memory visibility
   }
 
   @Override
@@ -117,9 +117,12 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T extractRef(EntityReference fromRef, T defaultRef,
       Class<T> token) {
-    EntityReference extractedRef = fromRef.extractReference(getEntityTypeMap().get(token));
-    if (extractedRef != null) {
-      return cloneReference(extractedRef, token);
+    EntityReference ref = null;
+    if (fromRef != null) {
+      ref = fromRef.extractReference(getEntityTypeMap().get(token));
+    }
+    if (ref != null) {
+      return cloneRef(ref, token);
     } else {
       return checkNotNull(defaultRef);
     }
@@ -129,7 +132,7 @@ public class DefaultModelUtils implements IModelUtils {
   public <T extends EntityReference> T adjustRef(T ref, Class<T> token, EntityReference toRef) {
     toRef = MoreObjects.firstNonNull(toRef, context.getCurrentWiki());
     EntityReference ret;
-    ret = cloneReference(ref); // to not modify argument
+    ret = cloneRef(ref); // to not modify argument
     EntityReference current = ret;
     while (current != null) {
       if (current.getType() != toRef.getType()) {
@@ -143,7 +146,7 @@ public class DefaultModelUtils implements IModelUtils {
         break;
       }
     }
-    return cloneReference(ret, token); // ensure memory visibility
+    return cloneRef(ret, token); // ensure memory visibility
   }
 
 }

@@ -21,7 +21,7 @@ public interface IModelUtils {
    * @return a cloned instance of the reference
    */
   @NotNull
-  public EntityReference cloneReference(@NotNull EntityReference ref);
+  public EntityReference cloneRef(@NotNull EntityReference ref);
 
   /**
    * @param ref
@@ -31,7 +31,7 @@ public interface IModelUtils {
    * @return a cloned instance of the reference of type T
    */
   @NotNull
-  public <T extends EntityReference> T cloneReference(@NotNull EntityReference ref,
+  public <T extends EntityReference> T cloneRef(@NotNull EntityReference ref,
       @NotNull Class<T> token);
 
   /**
@@ -70,7 +70,7 @@ public interface IModelUtils {
   public String serializeRefLocal(@NotNull EntityReference ref);
 
   @NotNull
-  public <T extends EntityReference> T extractRef(@NotNull EntityReference fromRef,
+  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
       @NotNull T defaultRef, @NotNull Class<T> token);
 
   /**
