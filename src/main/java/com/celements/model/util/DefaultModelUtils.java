@@ -59,6 +59,7 @@ public class DefaultModelUtils implements IModelUtils {
 
   @Override
   public boolean isAbsoluteRef(EntityReference ref) {
+    checkNotNull(ref);
     return ref.extractReference(EntityType.values()[0]) != null;
   }
 
@@ -73,6 +74,8 @@ public class DefaultModelUtils implements IModelUtils {
 
   @Override
   public <T extends EntityReference> T cloneRef(EntityReference ref, Class<T> token) {
+    checkNotNull(ref);
+    checkNotNull(token);
     try {
       ref = ref.clone();
       T ret;
@@ -98,11 +101,16 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T resolveRef(String name, Class<T> token,
       EntityReference baseRef) {
+    checkNotNull(name);
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("name may not be empty");
+    }
+    checkNotNull(token);
     baseRef = MoreObjects.firstNonNull(baseRef, context.getCurrentWiki());
     EntityReference ref;
     EntityType type = getEntityTypeMap().get(token);
     if (type == null) {
-      throw new IllegalArgumentException("Unsupported entity class: " + token);
+      throw new IllegalArgumentException("Unable to resolve for entity class: " + token);
     } else if (type == EntityType.WIKI) {
       // resolver cannot handle WikiReference
       if (!Strings.isNullOrEmpty(name)) {
@@ -118,11 +126,13 @@ public class DefaultModelUtils implements IModelUtils {
 
   @Override
   public String serializeRef(EntityReference ref) {
+    checkNotNull(ref);
     return serializer.serialize(ref);
   }
 
   @Override
   public String serializeRefLocal(EntityReference ref) {
+    checkNotNull(ref);
     return serializerLocal.serialize(ref);
   }
 

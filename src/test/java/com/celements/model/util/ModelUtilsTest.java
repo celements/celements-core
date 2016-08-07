@@ -117,6 +117,16 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_resolveRef_empty() {
+    try {
+      modelUtils.resolveRef("", DocumentReference.class);
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
+      // expected
+    }
+  }
+
+  @Test
   public void test_adjustRef_higherLevel_1() {
     EntityReference toRef = new WikiReference("oWiki");
     DocumentReference ret = modelUtils.adjustRef(docRef, DocumentReference.class, toRef);

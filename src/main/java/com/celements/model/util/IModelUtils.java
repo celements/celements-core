@@ -44,7 +44,7 @@ public interface IModelUtils {
    * requested generic type
    *
    * @param name
-   *          to be resolved
+   *          to be resolved, may not be empty
    * @param token
    *          for the reference type
    * @param baseRef
