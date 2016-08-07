@@ -499,7 +499,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type) {
-    return relativeRefResolver.resolve(name, type);
+    return resolveEntityReference(name, type, null);
   }
 
   @Deprecated
@@ -1468,7 +1468,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
-    return checkWikiRef(docRef, toDoc.getDocumentReference());
+    return checkWikiRef(docRef, toDoc.getDocumentReference().getWikiReference());
   }
 
   @Deprecated

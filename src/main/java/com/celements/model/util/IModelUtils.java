@@ -13,7 +13,10 @@ import com.google.common.collect.BiMap;
 @ComponentRole
 public interface IModelUtils {
 
+  @NotNull
   public BiMap<Class<? extends EntityReference>, EntityType> getEntityTypeMap();
+
+  public boolean isAbsoluteRef(@NotNull EntityReference ref);
 
   /**
    * @param ref
@@ -29,6 +32,8 @@ public interface IModelUtils {
    * @param token
    *          type of the reference
    * @return a cloned instance of the reference of type T
+   * @throws IllegalArgumentException
+   *           when relative references are being cloned as subtypes of {@link EntityReference}
    */
   @NotNull
   public <T extends EntityReference> T cloneRef(@NotNull EntityReference ref,
@@ -68,6 +73,10 @@ public interface IModelUtils {
 
   @NotNull
   public String serializeRefLocal(@NotNull EntityReference ref);
+
+  @Nullable
+  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
+      @NotNull Class<T> token);
 
   @NotNull
   public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,

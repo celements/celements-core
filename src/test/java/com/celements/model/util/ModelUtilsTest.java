@@ -4,9 +4,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -28,7 +30,18 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_cloneReference() {
+  public void test_isAbsoluteRef() {
+    assertTrue(modelUtils.isAbsoluteRef(docRef));
+    assertTrue(modelUtils.isAbsoluteRef(docRef.getLastSpaceReference()));
+    assertTrue(modelUtils.isAbsoluteRef(docRef.getWikiReference()));
+    assertFalse(modelUtils.isAbsoluteRef(getRelativeRefResolver().resolve(
+        modelUtils.serializeRefLocal(docRef), EntityType.DOCUMENT)));
+    assertTrue(modelUtils.isAbsoluteRef(getRelativeRefResolver().resolve(modelUtils.serializeRef(
+        docRef), EntityType.DOCUMENT)));
+  }
+
+  @Test
+  public void test_cloneRef() {
     DocumentReference ref = docRef;
     EntityReference newRef = modelUtils.cloneRef(ref);
     assertTrue(newRef instanceof DocumentReference);
@@ -39,7 +52,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_cloneReference_wikiRef() {
+  public void test_cloneRef_wikiRef() {
     WikiReference ref = docRef.getWikiReference();
     WikiReference newRef = modelUtils.cloneRef(ref, WikiReference.class);
     assertNotSame(ref, newRef);
@@ -49,7 +62,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_cloneReference_spaceRef() {
+  public void test_cloneRef_spaceRef() {
     SpaceReference ref = docRef.getLastSpaceReference();
     SpaceReference newRef = modelUtils.cloneRef(ref, SpaceReference.class);
     assertNotSame(ref, newRef);
@@ -59,7 +72,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_cloneReference_docRef() {
+  public void test_cloneRef_docRef() {
     DocumentReference ref = docRef;
     DocumentReference newRef = modelUtils.cloneRef(ref, DocumentReference.class);
     assertNotSame(ref, newRef);
@@ -69,10 +82,34 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_cloneReference_entityRef() {
+  public void test_cloneRef_entityRef() {
     DocumentReference ref = docRef;
     EntityReference newRef = modelUtils.cloneRef(ref, EntityReference.class);
     assertTrue(newRef instanceof DocumentReference);
+    assertNotSame(ref, newRef);
+    assertEquals(ref, newRef);
+    ref.getParent().setName("asdf");
+    assertFalse(ref.equals(newRef));
+  }
+
+  @Test
+  public void test_cloneRef_relative() {
+    EntityReference ref = getRelativeRefResolver().resolve(modelUtils.serializeRefLocal(docRef),
+        EntityType.DOCUMENT);
+    try {
+      modelUtils.cloneRef(ref, DocumentReference.class);
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
+      // expected
+    }
+  }
+
+  @Test
+  public void test_cloneRef_relative_asEntityRef() {
+    EntityReference ref = getRelativeRefResolver().resolve(modelUtils.serializeRefLocal(docRef),
+        EntityType.DOCUMENT);
+    EntityReference newRef = modelUtils.cloneRef(ref);
+    assertFalse(newRef instanceof DocumentReference);
     assertNotSame(ref, newRef);
     assertEquals(ref, newRef);
     ref.getParent().setName("asdf");
@@ -117,6 +154,11 @@ public class ModelUtilsTest extends AbstractComponentTest {
     DocumentReference ret = modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
     assertEquals("expecting docRef if lower level entity", docRef, ret);
     assertNotSame(docRef, ret);
+  }
+
+  @SuppressWarnings("unchecked")
+  private EntityReferenceResolver<String> getRelativeRefResolver() {
+    return Utils.getComponent(EntityReferenceResolver.class, "relative");
   }
 
 }

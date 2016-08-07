@@ -43,7 +43,7 @@ public class DefaultModelUtils implements IModelUtils {
   @Requirement
   private IModelContext context;
 
-  @Requirement // TODO???
+  @Requirement
   private EntityReferenceResolver<String> resolver;
 
   @Requirement
@@ -58,8 +58,17 @@ public class DefaultModelUtils implements IModelUtils {
   }
 
   @Override
+  public boolean isAbsoluteRef(EntityReference ref) {
+    return ref.extractReference(EntityType.values()[0]) != null;
+  }
+
+  @Override
   public EntityReference cloneRef(EntityReference ref) {
-    return cloneRef(ref, getEntityTypeMap().inverse().get(ref.getType()));
+    Class<? extends EntityReference> token = EntityReference.class;
+    if (isAbsoluteRef(ref)) {
+      token = getEntityTypeMap().inverse().get(ref.getType());
+    }
+    return cloneRef(ref, token);
   }
 
   @Override
@@ -67,10 +76,13 @@ public class DefaultModelUtils implements IModelUtils {
     try {
       ref = ref.clone();
       T ret;
-      if (token != EntityReference.class) {
+      if (token == EntityReference.class) {
+        ret = token.cast(ref);
+      } else if (isAbsoluteRef(ref)) {
         ret = token.getConstructor(EntityReference.class).newInstance(ref);
       } else {
-        ret = token.cast(ref);
+        throw new IllegalArgumentException("Relative references can only be returned as "
+            + "EntityReference");
       }
       return ret;
     } catch (ReflectiveOperationException | SecurityException exc) {
@@ -117,6 +129,11 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T extractRef(EntityReference fromRef, T defaultRef,
       Class<T> token) {
+    return MoreObjects.firstNonNull(extractRef(fromRef, token), checkNotNull(defaultRef));
+  }
+
+  @Override
+  public <T extends EntityReference> T extractRef(EntityReference fromRef, Class<T> token) {
     EntityReference ref = null;
     if (fromRef != null) {
       ref = fromRef.extractReference(getEntityTypeMap().get(token));
@@ -124,7 +141,7 @@ public class DefaultModelUtils implements IModelUtils {
     if (ref != null) {
       return cloneRef(ref, token);
     } else {
-      return checkNotNull(defaultRef);
+      return null;
     }
   }
 
