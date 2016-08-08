@@ -746,6 +746,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     }
   }
 
+  /**
+   * forces same wikiRef to classRef as for onDoc
+   */
   private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
     return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
         onDoc.getDocumentReference(), modelContext.getCurrentWiki(), WikiReference.class));
