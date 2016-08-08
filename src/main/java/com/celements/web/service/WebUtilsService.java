@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -60,6 +61,7 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.IModelContext;
 import com.celements.model.util.IModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
@@ -74,7 +76,6 @@ import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
-import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -255,10 +256,6 @@ public class WebUtilsService implements IWebUtilsService {
   private String renderText(String velocityText) {
     return getContext().getWiki().getRenderingEngine().renderText("{pre}" + velocityText + "{/pre}",
         getContext().getDoc(), getContext());
-  }
-
-  private boolean isEmptyRTEString(String rteContent) {
-    return new EmptyCheckCommand().isEmptyRTEString(rteContent);
   }
 
   @Override
@@ -481,7 +478,11 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference resolveWikiReference(String wikiName) {
-    return modelUtils.resolveRef(wikiName, WikiReference.class);
+    if (!Strings.isNullOrEmpty(wikiName)) {
+      return modelUtils.resolveRef(wikiName, WikiReference.class);
+    } else {
+      return context.getCurrentWiki();
+    }
   }
 
   @Deprecated
@@ -762,26 +763,24 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
-    if ((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName),
-        getContext())) {
-      XWikiDocument filterDoc = null;
+    if (!Strings.isNullOrEmpty(tagName)) {
       try {
-        filterDoc = getContext().getWiki().getDocument(resolveDocumentReference(tagName),
-            getContext());
-      } catch (XWikiException xwe) {
-        LOGGER.error("Exception getting tag document '" + tagName + "'", xwe);
-      }
-      DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), "Classes",
-          "FilebaseTag");
-      if ((filterDoc != null) && (filterDoc.getXObjectSize(tagClassRef) > 0)) {
-        List<Attachment> filteredAttachments = new ArrayList<Attachment>();
-        for (Attachment attachment : attachments) {
-          String attFN = attachment.getDocument().getFullName() + "/" + attachment.getFilename();
-          if (null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
-            filteredAttachments.add(attachment);
+        XWikiDocument filterDoc = getModelAccess().getDocument(modelUtils.resolveRef(tagName,
+            DocumentReference.class));
+        DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), "Classes",
+            "FilebaseTag");
+        if (filterDoc.getXObjectSize(tagClassRef) > 0) {
+          List<Attachment> filteredAttachments = new ArrayList<Attachment>();
+          for (Attachment attachment : attachments) {
+            String attFN = attachment.getDocument().getFullName() + "/" + attachment.getFilename();
+            if (null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
+              filteredAttachments.add(attachment);
+            }
           }
+          return filteredAttachments;
         }
-        return filteredAttachments;
+      } catch (DocumentNotExistsException xwe) {
+        LOGGER.info("tag document '" + tagName + "' doesn't exist");
       }
     }
     return attachments;
@@ -1424,7 +1423,12 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
-    return modelUtils.getEntityTypeMap().get(modelUtils.resolveRefClass(fullName));
+    try {
+      return modelUtils.getEntityTypeMap().get(modelUtils.resolveRefClass(fullName));
+    } catch (IllegalArgumentException | NullPointerException exc) {
+      LOGGER.warn("usage of deprecated method discouraged", exc);
+      return null;
+    }
   }
 
   @Override

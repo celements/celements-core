@@ -180,8 +180,12 @@ public class DefaultModelUtils implements IModelUtils {
 
   @Override
   public <T extends EntityReference> T extractRef(EntityReference fromRef, Class<T> token) {
+    EntityReference extractedRef = null;
     if (fromRef != null) {
-      return cloneRef(fromRef.extractReference(getEntityTypeForToken(token)), token);
+      extractedRef = fromRef.extractReference(getEntityTypeForToken(token));
+    }
+    if (extractedRef != null) {
+      return cloneRef(extractedRef, token);
     } else {
       return null;
     }
@@ -190,8 +194,8 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T adjustRef(T ref, Class<T> token, EntityReference toRef) {
     toRef = MoreObjects.firstNonNull(toRef, context.getCurrentWiki());
-    EntityReference ret = cloneRef(ref); // avoid modifying argument
-    EntityReference current = ret;
+    EntityReference adjustedRef = cloneRef(ref); // avoid modifying argument
+    EntityReference current = adjustedRef;
     while (current != null) {
       if (current.getType() != toRef.getType()) {
         current = current.getParent();
@@ -199,12 +203,12 @@ public class DefaultModelUtils implements IModelUtils {
         if (current.getChild() != null) {
           current.getChild().setParent(toRef);
         } else {
-          ret = toRef;
+          adjustedRef = toRef;
         }
         break;
       }
     }
-    return cloneRef(ret, token); // effective immutability
+    return cloneRef(adjustedRef, token); // effective immutability
   }
 
   private EntityType getEntityTypeForToken(Class<? extends EntityReference> token) {

@@ -52,6 +52,8 @@ public interface IModelUtils {
    * @param name
    *          the string representation
    * @return the resolved reference class
+   * @throws IllegalArgumentException
+   *           for illegal strings
    */
   @NotNull
   public Class<? extends EntityReference> resolveRefClass(@NotNull String name);

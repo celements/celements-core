@@ -18,6 +18,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
@@ -30,7 +31,9 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
+import com.celements.model.context.IModelContext;
 import com.celements.model.util.ClassFieldValue;
+import com.celements.model.util.IModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -63,6 +66,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Requirement
   protected IRightsAccessFacadeRole rightsAccess;
+
+  @Requirement
+  protected IModelUtils modelUtils;
+
+  @Requirement
+  protected IModelContext modelContext;
 
   @Requirement
   protected Execution execution;
@@ -312,7 +321,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
-      getContext().setDatabase(webUtils.getWikiRef(doc).getName());
+      modelContext.setCurrentWiki(modelUtils.extractRef(doc.getDocumentReference(),
+          WikiReference.class));
       LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
           doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
@@ -426,7 +436,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       Collection<?> values) {
     checkNotNull(classRef);
     checkState(!isTranslation(doc));
-    classRef = webUtils.checkWikiRef(classRef, doc);
+    classRef = adjustClassRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
         ImmutableList.<BaseObject>of())) {
@@ -521,7 +531,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef) {
     checkNotNull(doc);
     checkNotNull(classRef);
-    classRef = webUtils.checkWikiRef(classRef, doc);
+    classRef = adjustClassRef(classRef, doc);
     try {
       return doc.newXObject(classRef, getContext());
     } catch (XWikiException xwe) {
@@ -729,6 +739,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throw new AttachmentNotExistsException(new AttachmentReference(filename,
           document.getDocumentReference()));
     }
+  }
+
+  private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
+    return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
+        onDoc.getDocumentReference(), modelContext.getCurrentWiki(), WikiReference.class));
   }
 
 }
