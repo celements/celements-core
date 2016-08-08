@@ -18,8 +18,10 @@ import com.xpn.xwiki.web.Utils;
 
 public class ModelUtilsTest extends AbstractComponentTest {
 
-  DocumentReference docRef = new DocumentReference("doc", new SpaceReference("space",
-      new WikiReference("wiki")));
+  WikiReference wikiRef = new WikiReference("wiki");
+  SpaceReference spaceRef = new SpaceReference("space", wikiRef);
+  DocumentReference docRef = new DocumentReference("doc", spaceRef);
+  AttachmentReference attRef = new AttachmentReference("att.jpg", docRef);
 
   DefaultModelUtils modelUtils;
 
@@ -39,8 +41,8 @@ public class ModelUtilsTest extends AbstractComponentTest {
   @Test
   public void test_isAbsoluteRef() {
     assertTrue(modelUtils.isAbsoluteRef(docRef));
-    assertTrue(modelUtils.isAbsoluteRef(docRef.getLastSpaceReference()));
-    assertTrue(modelUtils.isAbsoluteRef(docRef.getWikiReference()));
+    assertTrue(modelUtils.isAbsoluteRef(spaceRef));
+    assertTrue(modelUtils.isAbsoluteRef(wikiRef));
     assertFalse(modelUtils.isAbsoluteRef(getRelativeRefResolver().resolve(
         modelUtils.serializeRefLocal(docRef), EntityType.DOCUMENT)));
     assertTrue(modelUtils.isAbsoluteRef(getRelativeRefResolver().resolve(modelUtils.serializeRef(
@@ -60,7 +62,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
 
   @Test
   public void test_cloneRef_wikiRef() {
-    WikiReference ref = docRef.getWikiReference();
+    WikiReference ref = wikiRef;
     WikiReference newRef = modelUtils.cloneRef(ref, WikiReference.class);
     assertNotSame(ref, newRef);
     assertEquals(ref, newRef);
@@ -70,7 +72,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
 
   @Test
   public void test_cloneRef_spaceRef() {
-    SpaceReference ref = docRef.getLastSpaceReference();
+    SpaceReference ref = spaceRef;
     SpaceReference newRef = modelUtils.cloneRef(ref, SpaceReference.class);
     assertNotSame(ref, newRef);
     assertEquals(ref, newRef);
@@ -105,9 +107,8 @@ public class ModelUtilsTest extends AbstractComponentTest {
         EntityType.DOCUMENT);
     try {
       modelUtils.cloneRef(ref, DocumentReference.class);
-      fail("expecting IllegalArgumentException");
+      fail("expecting failure, cannot clone relative reference to specific implementation");
     } catch (IllegalArgumentException iae) {
-      // expected
     }
   }
 
@@ -129,37 +130,92 @@ public class ModelUtilsTest extends AbstractComponentTest {
     assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space"));
     assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc"));
     assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc"));
-    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("wiki:space.doc@att"));
-    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("space.doc@att"));
+    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("wiki:space.doc@att.jpg"));
+    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("space.doc@att.jpg"));
     try {
       modelUtils.resolveRefClass("doc@att");
       fail("expecting failure because of relative ref");
     } catch (IllegalArgumentException iae) {
-      // expected
-    }
-  }
-
-  @Test
-  public void test_resolveRef_empty() {
-    try {
-      modelUtils.resolveRef("", DocumentReference.class);
-      fail("expecting IllegalArgumentException");
-    } catch (IllegalArgumentException iae) {
-      // expected
     }
   }
 
   @Test
   public void test_resolveRef() {
-    Utils.getComponent(IModelContext.class).setCurrentWiki(docRef.getWikiReference());
-    AttachmentReference ref = new AttachmentReference("file", docRef);
-    assertEquals(ref, modelUtils.resolveRef("wiki:space.doc@file", AttachmentReference.class));
-    assertEquals(ref, modelUtils.resolveRef("space.doc@file", AttachmentReference.class));
-    // assertEquals(ref, modelUtils.resolveRef("doc@file", AttachmentReference.class));
-    // assertEquals(ref, modelUtils.resolveRef("file", AttachmentReference.class));
-    assertEquals(ref, modelUtils.resolveRef("file", AttachmentReference.class, docRef));
-    assertEquals(ref, modelUtils.resolveRef("file", AttachmentReference.class,
-        docRef.getLastSpaceReference()));
+    WikiReference oWikiRef = new WikiReference("otherWiki");
+    Utils.getComponent(IModelContext.class).setCurrentWiki(wikiRef);
+    assertEquals(wikiRef, modelUtils.resolveRef("wiki", WikiReference.class));
+    // assertEquals(wikiRef, modelUtils.resolveRef("", WikiReference.class)); TODO
+    assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class));
+    assertEquals(spaceRef, modelUtils.resolveRef("space", SpaceReference.class));
+    assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class, oWikiRef));
+    assertEquals(new SpaceReference(spaceRef.getName(), oWikiRef), modelUtils.resolveRef("space",
+        SpaceReference.class, oWikiRef));
+    assertEquals(docRef, modelUtils.resolveRef("wiki:space.doc", DocumentReference.class));
+    assertEquals(docRef, modelUtils.resolveRef("space.doc", DocumentReference.class));
+    assertEquals(docRef, modelUtils.resolveRef("doc", DocumentReference.class, spaceRef));
+  }
+
+  @Test
+  public void test_resolveRef_failure() {
+    try {
+      modelUtils.resolveRef("doc", DocumentReference.class, wikiRef);
+      fail("expecting failure, space reference missing");
+    } catch (IllegalArgumentException iae) {
+    }
+    try {
+      modelUtils.resolveRef("doc", DocumentReference.class);
+      fail("expecting failure, space reference missing");
+    } catch (IllegalArgumentException iae) {
+    }
+    try {
+      modelUtils.resolveRef("", DocumentReference.class);
+      fail("expecting failure for empty string");
+    } catch (IllegalArgumentException iae) {
+    }
+  }
+
+  @Test
+  public void test_serialzeRef() {
+    assertEquals("wiki", modelUtils.serializeRef(wikiRef));
+    assertEquals("wiki:space", modelUtils.serializeRef(spaceRef));
+    assertEquals("wiki:space.doc", modelUtils.serializeRef(docRef));
+    assertEquals("wiki:space.doc@att.jpg", modelUtils.serializeRef(attRef));
+    try {
+      modelUtils.serializeRef(null);
+      fail("expecting failure for null value");
+    } catch (NullPointerException npe) {
+      // expected
+    }
+  }
+
+  @Test
+  public void test_serialzeRefLocal() {
+    assertEquals("", modelUtils.serializeRefLocal(wikiRef));
+    assertEquals("space", modelUtils.serializeRefLocal(spaceRef));
+    assertEquals("space.doc", modelUtils.serializeRefLocal(docRef));
+    assertEquals("space.doc@att.jpg", modelUtils.serializeRefLocal(attRef));
+    try {
+      modelUtils.serializeRefLocal(null);
+      fail("expecting failure for null value");
+    } catch (NullPointerException npe) {
+    }
+  }
+
+  @Test
+  public void test_extractRef() {
+    assertEquals(wikiRef, modelUtils.extractRef(docRef, WikiReference.class));
+    assertEquals(spaceRef, modelUtils.extractRef(docRef, SpaceReference.class));
+    assertEquals(docRef, modelUtils.extractRef(docRef, DocumentReference.class));
+    assertEquals(null, modelUtils.extractRef(docRef, AttachmentReference.class));
+    assertEquals(attRef, modelUtils.extractRef(attRef, AttachmentReference.class));
+    assertNotSame(docRef, modelUtils.extractRef(docRef, DocumentReference.class));
+  }
+
+  @Test
+  public void test_extractRef_default() {
+    assertEquals(docRef, modelUtils.extractRef(docRef, new DocumentReference("other", spaceRef),
+        DocumentReference.class));
+    assertEquals(attRef, modelUtils.extractRef(docRef, attRef, AttachmentReference.class));
   }
 
   @Test
@@ -168,8 +224,8 @@ public class ModelUtilsTest extends AbstractComponentTest {
     DocumentReference ret = modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
     assertEquals(toRef, ret.getWikiReference());
     assertEquals(docRef.getName(), ret.getName());
-    assertEquals(docRef.getLastSpaceReference().getName(), ret.getLastSpaceReference().getName());
-    assertFalse(docRef.getWikiReference().equals(ret.getWikiReference()));
+    assertEquals(spaceRef.getName(), ret.getLastSpaceReference().getName());
+    assertEquals("wiki should have changed", toRef, ret.getWikiReference());
   }
 
   @Test
@@ -178,8 +234,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
     DocumentReference ret = modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
     assertEquals(toRef, ret.getLastSpaceReference());
     assertEquals(docRef.getName(), ret.getName());
-    assertFalse(docRef.getLastSpaceReference().equals(ret.getLastSpaceReference()));
-    assertFalse(docRef.getWikiReference().equals(ret.getWikiReference()));
+    assertEquals("space should have changed", toRef, ret.getLastSpaceReference());
   }
 
   @Test
@@ -188,14 +243,12 @@ public class ModelUtilsTest extends AbstractComponentTest {
     DocumentReference ret = modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
     assertEquals("expecting toRef if same level entity", toRef, ret);
     assertNotSame(toRef, ret);
-    assertFalse(docRef.getName().equals(ret.getName()));
-    assertFalse(docRef.getLastSpaceReference().equals(ret.getLastSpaceReference()));
-    assertFalse(docRef.getWikiReference().equals(ret.getWikiReference()));
+    assertEquals("doc should have changed", toRef, ret);
   }
 
   @Test
   public void test_adjustRef_lowerLevel() {
-    EntityReference toRef = new AttachmentReference("att", new DocumentReference("oWiki", "oSpace",
+    EntityReference toRef = new AttachmentReference("oAtt", new DocumentReference("oWiki", "oSpace",
         "oDoc"));
     DocumentReference ret = modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
     assertEquals("expecting docRef if lower level entity", docRef, ret);

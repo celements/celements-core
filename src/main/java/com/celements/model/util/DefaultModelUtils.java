@@ -24,7 +24,6 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.context.IModelContext;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
@@ -33,6 +32,11 @@ public class DefaultModelUtils implements IModelUtils {
 
   private final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
   private final Map<Class<? extends EntityReference>, String> REGEX_MAP;
+
+  public static final String REGEX_WORD = "[a-zA-Z0-9]+";
+  public static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
+  public static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
+  public static final String REGEX_ATT = REGEX_DOC + "\\@" + ".+";
 
   {
     Map<Class<? extends EntityReference>, EntityType> map = new HashMap<>();
@@ -44,21 +48,17 @@ public class DefaultModelUtils implements IModelUtils {
     map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
     ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
     Map<Class<? extends EntityReference>, String> regexMap = new LinkedHashMap<>();
-    String regexWord = "[a-zA-Z0-9]+";
-    regexMap.put(WikiReference.class, regexWord);
-    String regexSpace = "(" + regexWord + "\\:)?" + regexWord;
-    regexMap.put(SpaceReference.class, regexSpace);
-    String regexDoc = regexSpace + "\\." + regexWord;
-    regexMap.put(DocumentReference.class, regexDoc);
-    String regexAtt = regexDoc + "\\@" + regexWord;
-    regexMap.put(AttachmentReference.class, regexAtt);
+    regexMap.put(WikiReference.class, REGEX_WORD);
+    regexMap.put(SpaceReference.class, REGEX_SPACE);
+    regexMap.put(DocumentReference.class, REGEX_DOC);
+    regexMap.put(AttachmentReference.class, REGEX_ATT);
     REGEX_MAP = Collections.unmodifiableMap(regexMap);
   }
 
   @Requirement
   private IModelContext context;
 
-  @Requirement
+  @Requirement("explicit")
   private EntityReferenceResolver<String> resolver;
 
   @Requirement
@@ -141,35 +141,19 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T resolveRef(String name, Class<T> token,
       EntityReference baseRef) {
-    EntityType type = getEntityTypeForToken(checkNotNull(token));
-    baseRef = MoreObjects.firstNonNull(baseRef, context.getCurrentWiki());
-    validateName(name, token);
-    EntityReference ref;
-    if (type.ordinal() > 0) {
-      ref = resolver.resolve(name, type, baseRef);
-    } else {
-      // resolver cannot handle root reference
-      ref = resolveRootRef(name, baseRef);
-    }
-    return cloneRef(ref, token); // ensure memory visibility
-  }
-
-  private void validateName(String name, Class<? extends EntityReference> token) {
     if (checkNotNull(name).isEmpty()) {
       throw new IllegalArgumentException("name may not be empty");
-    } else if (!name.matches(REGEX_MAP.get(token))) {
-      throw new IllegalArgumentException("name '" + name + "' is not valid for class " + token);
     }
-  }
-
-  private EntityReference resolveRootRef(String name, EntityReference baseRef) {
-    EntityReference ref;
-    if (!Strings.isNullOrEmpty(name)) {
-      ref = new WikiReference(name);
+    EntityType type = getEntityTypeForToken(token);
+    baseRef = MoreObjects.firstNonNull(baseRef, context.getCurrentWiki());
+    EntityReference resolvedRef;
+    if (type.ordinal() == 0) {
+      // resolver cannot handle root reference
+      resolvedRef = new WikiReference(name);
     } else {
-      ref = extractRef(baseRef, context.getCurrentWiki(), WikiReference.class);
+      resolvedRef = resolver.resolve(name, type, baseRef);
     }
-    return ref;
+    return cloneRef(resolvedRef, token); // effective immutability
   }
 
   Class<? extends EntityReference> getRootRefClass() {
@@ -196,12 +180,8 @@ public class DefaultModelUtils implements IModelUtils {
 
   @Override
   public <T extends EntityReference> T extractRef(EntityReference fromRef, Class<T> token) {
-    EntityReference ref = null;
     if (fromRef != null) {
-      ref = fromRef.extractReference(getEntityTypeForToken(token));
-    }
-    if (ref != null) {
-      return cloneRef(ref, token);
+      return cloneRef(fromRef.extractReference(getEntityTypeForToken(token)), token);
     } else {
       return null;
     }
@@ -210,8 +190,7 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T adjustRef(T ref, Class<T> token, EntityReference toRef) {
     toRef = MoreObjects.firstNonNull(toRef, context.getCurrentWiki());
-    EntityReference ret;
-    ret = cloneRef(ref); // to not modify argument
+    EntityReference ret = cloneRef(ref); // avoid modifying argument
     EntityReference current = ret;
     while (current != null) {
       if (current.getType() != toRef.getType()) {
@@ -225,7 +204,7 @@ public class DefaultModelUtils implements IModelUtils {
         break;
       }
     }
-    return cloneRef(ret, token); // ensure memory visibility
+    return cloneRef(ret, token); // effective immutability
   }
 
   private EntityType getEntityTypeForToken(Class<? extends EntityReference> token) {
