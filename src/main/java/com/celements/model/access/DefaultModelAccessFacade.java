@@ -368,7 +368,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    * all.
    */
   private XWikiDocument cloneDoc(XWikiDocument doc) {
-    return doc.clone();
+    if (doc.isFromCache()) {
+      XWikiDocument clonedDoc = doc.clone();
+      clonedDoc.setFromCache(false);
+      return clonedDoc;
+    }
+    return doc;
   }
 
   private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
