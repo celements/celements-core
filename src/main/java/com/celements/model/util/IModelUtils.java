@@ -7,6 +7,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.google.common.collect.BiMap;
 
@@ -38,6 +39,25 @@ public interface IModelUtils {
   @NotNull
   public <T extends EntityReference> T cloneRef(@NotNull EntityReference ref,
       @NotNull Class<T> token);
+
+  /**
+   * resolves the reference class for the given absolute name ({@link WikiReference} may be
+   * missing).<br>
+   * <br>
+   * simple names default to {@link WikiReference}.
+   *
+   * @param name
+   *          the string respresentation
+   * @return the resolved reference class
+   */
+  @NotNull
+  public Class<? extends EntityReference> resolveRefClass(@NotNull String name);
+
+  @NotNull
+  public EntityReference resolveRef(@NotNull String name);
+
+  @NotNull
+  public EntityReference resolveRef(@NotNull String name, @Nullable EntityReference baseRef);
 
   /**
    * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the

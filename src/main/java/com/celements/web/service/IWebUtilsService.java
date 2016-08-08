@@ -60,11 +60,6 @@ public interface IWebUtilsService {
    */
   public static final Date DATE_HIGH = new Date(253402297140000L);
 
-  public static final String REGEX_WORD = "[a-zA-Z0-9]*";
-  public static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
-  public static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
-  public static final String REGEX_ATT = REGEX_DOC + "\\@.*";
-
   /**
    * Returns level of hierarchy with level=1 returning root which is null, else
    * corresponding DocumentReference or throws IndexOutOfBoundsException
@@ -432,23 +427,15 @@ public interface IWebUtilsService {
   public WikiReference getCentralWikiRef();
 
   /**
-   * resolves the {@link EntityType} for the given fullName.<br>
-   * <br>
-   * Simple names will return {@link EntityType#WIKI}.
-   *
-   * @param fullName
-   * @return
+   * @deprecated instead use {@link IModelUtils#resolveRefClass(String)}
    */
+  @Deprecated
   public EntityType resolveEntityTypeForFullName(String fullName);
 
   /**
-   * resolves the {@link EntityType} for the given fullName.
-   *
-   * @param fullName
-   * @param defaultNameType
-   *          EntityType used if given fullName is just a simple name
-   * @return
+   * @deprecated instead use {@link IModelUtils#resolveRefClass(String)}
    */
+  @Deprecated
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType);
 
   /**

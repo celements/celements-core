@@ -1415,28 +1415,16 @@ public class WebUtilsService implements IWebUtilsService {
     return CENTRAL_WIKI_REF;
   }
 
+  @Deprecated
   @Override
   public EntityType resolveEntityTypeForFullName(String fullName) {
     return resolveEntityTypeForFullName(fullName, null);
   }
 
+  @Deprecated
   @Override
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
-    EntityType ret = null;
-    if (StringUtils.isNotBlank(fullName)) {
-      if (fullName.matches(REGEX_WORD)) {
-        ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
-      } else if (fullName.matches(REGEX_SPACE)) {
-        ret = EntityType.SPACE;
-      } else if (fullName.matches(REGEX_DOC)) {
-        ret = EntityType.DOCUMENT;
-      } else if (fullName.matches(REGEX_ATT)) {
-        ret = EntityType.ATTACHMENT;
-      }
-    }
-    LOGGER.debug("resolveEntityTypeForFullName: got '" + ret + "' for fullName '" + fullName
-        + "' and default '" + defaultNameType + "'");
-    return ret;
+    return modelUtils.getEntityTypeMap().get(modelUtils.resolveRefClass(fullName));
   }
 
   @Override

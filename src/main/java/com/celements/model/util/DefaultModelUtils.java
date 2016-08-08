@@ -2,8 +2,12 @@ package com.celements.model.util;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -28,6 +32,7 @@ import com.google.common.collect.ImmutableBiMap;
 public class DefaultModelUtils implements IModelUtils {
 
   private final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
+  private final Map<Class<? extends EntityReference>, String> REGEX_MAP;
 
   {
     Map<Class<? extends EntityReference>, EntityType> map = new HashMap<>();
@@ -35,9 +40,19 @@ public class DefaultModelUtils implements IModelUtils {
     map.put(SpaceReference.class, EntityType.SPACE);
     map.put(DocumentReference.class, EntityType.DOCUMENT);
     map.put(AttachmentReference.class, EntityType.ATTACHMENT);
-    map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
     map.put(ObjectReference.class, EntityType.OBJECT);
+    map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
     ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
+    Map<Class<? extends EntityReference>, String> regexMap = new LinkedHashMap<>();
+    String regexWord = "[a-zA-Z0-9]+";
+    regexMap.put(WikiReference.class, regexWord);
+    String regexSpace = "(" + regexWord + "\\:)?" + regexWord;
+    regexMap.put(SpaceReference.class, regexSpace);
+    String regexDoc = regexSpace + "\\." + regexWord;
+    regexMap.put(DocumentReference.class, regexDoc);
+    String regexAtt = regexDoc + "\\@" + regexWord;
+    regexMap.put(AttachmentReference.class, regexAtt);
+    REGEX_MAP = Collections.unmodifiableMap(regexMap);
   }
 
   @Requirement
@@ -94,6 +109,31 @@ public class DefaultModelUtils implements IModelUtils {
   }
 
   @Override
+  public Class<? extends EntityReference> resolveRefClass(String name) {
+    if (!checkNotNull(name).isEmpty()) {
+      Set<Class<? extends EntityReference>> tokens = new LinkedHashSet<>(); // keeps insertion order
+      tokens.add(getRootRefClass());
+      tokens.addAll(REGEX_MAP.keySet());
+      for (Class<? extends EntityReference> token : tokens) {
+        if (name.matches(REGEX_MAP.get(token))) {
+          return token;
+        }
+      }
+    }
+    throw new IllegalArgumentException("No valid reference class found for '" + name + "'");
+  }
+
+  @Override
+  public EntityReference resolveRef(String name) {
+    return resolveRef(name, (EntityReference) null);
+  }
+
+  @Override
+  public EntityReference resolveRef(String name, EntityReference baseRef) {
+    return resolveRef(name, resolveRefClass(name), baseRef);
+  }
+
+  @Override
   public <T extends EntityReference> T resolveRef(String name, Class<T> token) {
     return resolveRef(name, token, null);
   }
@@ -101,27 +141,39 @@ public class DefaultModelUtils implements IModelUtils {
   @Override
   public <T extends EntityReference> T resolveRef(String name, Class<T> token,
       EntityReference baseRef) {
-    checkNotNull(name);
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("name may not be empty");
-    }
-    checkNotNull(token);
+    EntityType type = getEntityTypeForToken(checkNotNull(token));
     baseRef = MoreObjects.firstNonNull(baseRef, context.getCurrentWiki());
+    validateName(name, token);
     EntityReference ref;
-    EntityType type = getEntityTypeMap().get(token);
-    if (type == null) {
-      throw new IllegalArgumentException("Unable to resolve for entity class: " + token);
-    } else if (type == EntityType.WIKI) {
-      // resolver cannot handle WikiReference
-      if (!Strings.isNullOrEmpty(name)) {
-        ref = new WikiReference(name);
-      } else {
-        ref = extractRef(baseRef, context.getCurrentWiki(), WikiReference.class);
-      }
-    } else {
+    if (type.ordinal() > 0) {
       ref = resolver.resolve(name, type, baseRef);
+    } else {
+      // resolver cannot handle root reference
+      ref = resolveRootRef(name, baseRef);
     }
     return cloneRef(ref, token); // ensure memory visibility
+  }
+
+  private void validateName(String name, Class<? extends EntityReference> token) {
+    if (checkNotNull(name).isEmpty()) {
+      throw new IllegalArgumentException("name may not be empty");
+    } else if (!name.matches(REGEX_MAP.get(token))) {
+      throw new IllegalArgumentException("name '" + name + "' is not valid for class " + token);
+    }
+  }
+
+  private EntityReference resolveRootRef(String name, EntityReference baseRef) {
+    EntityReference ref;
+    if (!Strings.isNullOrEmpty(name)) {
+      ref = new WikiReference(name);
+    } else {
+      ref = extractRef(baseRef, context.getCurrentWiki(), WikiReference.class);
+    }
+    return ref;
+  }
+
+  Class<? extends EntityReference> getRootRefClass() {
+    return getEntityTypeMap().inverse().get(EntityType.values()[0]);
   }
 
   @Override
@@ -146,7 +198,7 @@ public class DefaultModelUtils implements IModelUtils {
   public <T extends EntityReference> T extractRef(EntityReference fromRef, Class<T> token) {
     EntityReference ref = null;
     if (fromRef != null) {
-      ref = fromRef.extractReference(getEntityTypeMap().get(token));
+      ref = fromRef.extractReference(getEntityTypeForToken(token));
     }
     if (ref != null) {
       return cloneRef(ref, token);
@@ -174,6 +226,15 @@ public class DefaultModelUtils implements IModelUtils {
       }
     }
     return cloneRef(ret, token); // ensure memory visibility
+  }
+
+  private EntityType getEntityTypeForToken(Class<? extends EntityReference> token) {
+    EntityType type = getEntityTypeMap().get(checkNotNull(token));
+    if (type != null) {
+      return type;
+    } else {
+      throw new IllegalArgumentException("No entity type for class: " + token);
+    }
   }
 
 }

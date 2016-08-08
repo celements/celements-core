@@ -13,6 +13,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.IModelContext;
 import com.xpn.xwiki.web.Utils;
 
 public class ModelUtilsTest extends AbstractComponentTest {
@@ -20,13 +21,19 @@ public class ModelUtilsTest extends AbstractComponentTest {
   DocumentReference docRef = new DocumentReference("doc", new SpaceReference("space",
       new WikiReference("wiki")));
 
-  IModelUtils modelUtils;
+  DefaultModelUtils modelUtils;
 
   @Before
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    modelUtils = Utils.getComponent(IModelUtils.class);
+    modelUtils = (DefaultModelUtils) Utils.getComponent(IModelUtils.class);
+  }
+
+  @Test
+  public void test_rootRefClass() {
+    assertSame("WikiReference has to be the root reference", WikiReference.class,
+        modelUtils.getRootRefClass());
   }
 
   @Test
@@ -117,6 +124,22 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_resolveRefClass() {
+    assertEquals(WikiReference.class, modelUtils.resolveRefClass("wiki"));
+    assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space"));
+    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc"));
+    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc"));
+    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("wiki:space.doc@att"));
+    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("space.doc@att"));
+    try {
+      modelUtils.resolveRefClass("doc@att");
+      fail("expecting failure because of relative ref");
+    } catch (IllegalArgumentException iae) {
+      // expected
+    }
+  }
+
+  @Test
   public void test_resolveRef_empty() {
     try {
       modelUtils.resolveRef("", DocumentReference.class);
@@ -124,6 +147,19 @@ public class ModelUtilsTest extends AbstractComponentTest {
     } catch (IllegalArgumentException iae) {
       // expected
     }
+  }
+
+  @Test
+  public void test_resolveRef() {
+    Utils.getComponent(IModelContext.class).setCurrentWiki(docRef.getWikiReference());
+    AttachmentReference ref = new AttachmentReference("file", docRef);
+    assertEquals(ref, modelUtils.resolveRef("wiki:space.doc@file", AttachmentReference.class));
+    assertEquals(ref, modelUtils.resolveRef("space.doc@file", AttachmentReference.class));
+    // assertEquals(ref, modelUtils.resolveRef("doc@file", AttachmentReference.class));
+    // assertEquals(ref, modelUtils.resolveRef("file", AttachmentReference.class));
+    assertEquals(ref, modelUtils.resolveRef("file", AttachmentReference.class, docRef));
+    assertEquals(ref, modelUtils.resolveRef("file", AttachmentReference.class,
+        docRef.getLastSpaceReference()));
   }
 
   @Test
