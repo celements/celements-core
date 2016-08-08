@@ -9,9 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Objects;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -25,7 +26,7 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   private IModelAccessFacade modelAccess;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private IModelUtils modelUtils;
 
   @Override
   @Deprecated
@@ -33,12 +34,12 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
     boolean hasChanged = false;
     Map<String, BaseObject> objMap = getObjectMap(doc, fieldMap.keySet());
     for (String field : fieldMap.keySet()) {
-      BaseObject obj = objMap.get(extractClassName(field));
+      ObjectPropertyReference fieldRef = resolveFieldRef(field, doc);
+      BaseObject obj = objMap.get(fieldRef.getParent().getName());
       Object newVal = fieldMap.get(field);
-      String fieldName = extractFieldName(field);
-      Object oldVal = modelAccess.getProperty(obj, fieldName);
+      Object oldVal = modelAccess.getProperty(obj, fieldRef.getName());
       if (!ObjectUtils.equals(oldVal, newVal)) {
-        modelAccess.setProperty(obj, fieldName, newVal);
+        modelAccess.setProperty(obj, fieldRef.getName(), newVal);
         hasChanged = true;
         LOGGER.trace("update: '" + field + "' has changed from '" + oldVal + "' to '" + newVal
             + "'");
@@ -52,10 +53,11 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   private Map<String, BaseObject> getObjectMap(XWikiDocument doc, Set<String> fields) {
     Map<String, BaseObject> ret = new HashMap<>();
     for (String field : fields) {
-      String className = extractClassName(field);
+      ObjectPropertyReference fieldRef = resolveFieldRef(field, doc);
+      String className = fieldRef.getParent().getName();
       if (!ret.containsKey(className)) {
-        BaseObject obj = modelAccess.getOrCreateXObject(doc,
-            webUtilsService.resolveDocumentReference(className));
+        BaseObject obj = modelAccess.getOrCreateXObject(doc, modelUtils.resolveRef(className,
+            DocumentReference.class));
         ret.put(className, obj);
       }
     }
@@ -63,24 +65,8 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
     return ret;
   }
 
-  private String extractClassName(String str) {
-    String className = "";
-    try {
-      className = str.substring(0, str.lastIndexOf("."));
-    } catch (IndexOutOfBoundsException exc) {
-      LOGGER.info("failed to extract className from '{}'");
-    }
-    return className;
-  }
-
-  private String extractFieldName(String str) {
-    String fieldName = "";
-    try {
-      fieldName = str.substring(str.lastIndexOf(".") + 1);
-    } catch (IndexOutOfBoundsException exc) {
-      LOGGER.info("failed to extract fieldName from '{}'");
-    }
-    return fieldName;
+  private ObjectPropertyReference resolveFieldRef(String field, XWikiDocument doc) {
+    return modelUtils.resolveRef(field, ObjectPropertyReference.class, doc.getDocumentReference());
   }
 
   @Override

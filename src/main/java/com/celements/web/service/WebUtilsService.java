@@ -63,6 +63,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.context.IModelContext;
+import com.celements.model.util.DefaultModelUtils;
 import com.celements.model.util.IModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
@@ -78,6 +79,7 @@ import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
+import com.google.common.base.MoreObjects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -460,7 +462,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef) {
-    return modelUtils.resolveRef(fullName, DocumentReference.class, wikiRef);
+    return resolveReference(fullName, DocumentReference.class, wikiRef);
   }
 
   @Deprecated
@@ -472,17 +474,21 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef) {
-    return modelUtils.resolveRef(spaceName, SpaceReference.class, wikiRef);
+    return resolveReference(spaceName, SpaceReference.class, wikiRef);
   }
 
   @Deprecated
   @Override
   public WikiReference resolveWikiReference(String wikiName) {
+    return resolveWikiReference(wikiName, context.getCurrentWiki());
+  }
+
+  private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
+    WikiReference wikiRef = null;
     if (!Strings.isNullOrEmpty(wikiName)) {
-      return modelUtils.resolveRef(wikiName, WikiReference.class);
-    } else {
-      return context.getCurrentWiki();
+      wikiRef = new WikiReference(wikiName);
     }
+    return MoreObjects.firstNonNull(wikiRef, defaultWikiRef);
   }
 
   @Deprecated
@@ -507,7 +513,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef) {
-    return modelUtils.resolveRef(name, modelUtils.getEntityTypeMap().inverse().get(type), wikiRef);
+    return resolveReference(name, modelUtils.getEntityTypeMap().inverse().get(type), wikiRef);
   }
 
   @Deprecated
@@ -528,7 +534,19 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public <T extends EntityReference> T resolveReference(String name, Class<T> token,
       EntityReference baseRef) {
-    return modelUtils.resolveRef(name, token, baseRef);
+    baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
+    EntityReference reference;
+    EntityType type = modelUtils.getEntityTypeMap().get(token);
+    if (type == null) {
+      throw new IllegalArgumentException("Unsupported entity class: " + token);
+    } else if (type == EntityType.WIKI) {
+      reference = resolveWikiReference(name, getWikiRef(baseRef));
+    } else {
+      reference = refResolver.resolve(name, type, baseRef);
+    }
+    T ret = modelUtils.cloneRef(reference, token);
+    LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
+    return ret;
   }
 
   @Override
@@ -763,24 +781,26 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   List<Attachment> filterAttachmentsByTag(List<Attachment> attachments, String tagName) {
-    if (!Strings.isNullOrEmpty(tagName)) {
+    if ((tagName != null) && getContext().getWiki().exists(resolveDocumentReference(tagName),
+        getContext())) {
+      XWikiDocument filterDoc = null;
       try {
-        XWikiDocument filterDoc = getModelAccess().getDocument(modelUtils.resolveRef(tagName,
-            DocumentReference.class));
-        DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), "Classes",
-            "FilebaseTag");
-        if (filterDoc.getXObjectSize(tagClassRef) > 0) {
-          List<Attachment> filteredAttachments = new ArrayList<Attachment>();
-          for (Attachment attachment : attachments) {
-            String attFN = attachment.getDocument().getFullName() + "/" + attachment.getFilename();
-            if (null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
-              filteredAttachments.add(attachment);
-            }
+        filterDoc = getContext().getWiki().getDocument(resolveDocumentReference(tagName),
+            getContext());
+      } catch (XWikiException xwe) {
+        LOGGER.error("Exception getting tag document '" + tagName + "'", xwe);
+      }
+      DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), "Classes",
+          "FilebaseTag");
+      if ((filterDoc != null) && (filterDoc.getXObjectSize(tagClassRef) > 0)) {
+        List<Attachment> filteredAttachments = new ArrayList<Attachment>();
+        for (Attachment attachment : attachments) {
+          String attFN = attachment.getDocument().getFullName() + "/" + attachment.getFilename();
+          if (null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
+            filteredAttachments.add(attachment);
           }
-          return filteredAttachments;
         }
-      } catch (DocumentNotExistsException xwe) {
-        LOGGER.info("tag document '" + tagName + "' doesn't exist");
+        return filteredAttachments;
       }
     }
     return attachments;
@@ -1423,12 +1443,21 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
-    try {
-      return modelUtils.getEntityTypeMap().get(modelUtils.resolveRefClass(fullName));
-    } catch (IllegalArgumentException | NullPointerException exc) {
-      LOGGER.warn("usage of deprecated method discouraged", exc);
-      return null;
+    EntityType ret = null;
+    if (StringUtils.isNotBlank(fullName)) {
+      if (fullName.matches(DefaultModelUtils.REGEX_WORD)) {
+        ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
+      } else if (fullName.matches(DefaultModelUtils.REGEX_SPACE)) {
+        ret = EntityType.SPACE;
+      } else if (fullName.matches(DefaultModelUtils.REGEX_DOC)) {
+        ret = EntityType.DOCUMENT;
+      } else if (fullName.matches(DefaultModelUtils.REGEX_ATT)) {
+        ret = EntityType.ATTACHMENT;
+      }
     }
+    LOGGER.debug("resolveEntityTypeForFullName: got '" + ret + "' for fullName '" + fullName
+        + "' and default '" + defaultNameType + "'");
+    return ret;
   }
 
   @Override
@@ -1454,19 +1483,24 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef) {
-    return checkWikiRef(docRef, context.getCurrentWiki());
+    return checkWikiRef(docRef, (DocumentReference) null);
   }
 
   @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
-    return checkWikiRef(docRef, toDoc.getDocumentReference().getWikiReference());
+    return checkWikiRef(docRef, toDoc.getDocumentReference());
   }
 
   @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
-    return modelUtils.adjustRef(docRef, DocumentReference.class, toRef);
+    WikiReference wikiRef = getWikiRef(toRef);
+    if (!docRef.getWikiReference().equals(wikiRef)) {
+      docRef = new DocumentReference(docRef.getName(), new SpaceReference(
+          docRef.getLastSpaceReference().getName(), wikiRef));
+    }
+    return docRef;
   }
 
   private IDocumentParentsListerRole getDocumentParentsLister() {

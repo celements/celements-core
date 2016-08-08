@@ -17,11 +17,9 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.collect.ImmutableSet;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -127,18 +125,13 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
   public void test_updateFromMap_invalidClassName() throws Exception {
     Map<String, Object> fieldMap = new HashMap<>();
     fieldMap.put("invalidString", "asdf");
-    Throwable cause = new XWikiException();
-
-    expect(getWikiMock().getXClass(eq(new DocumentReference("xwikidb", "Main", "WebHome")), same(
-        getContext()))).andThrow(cause).once();
 
     replayDefault();
     try {
       xObjUpdateService.updateFromMap(doc, fieldMap);
-      fail("should throw ClassDocumentLoadException");
-    } catch (ClassDocumentLoadException cdle) {
+      fail("should throw IllegalArgumentException, invalid fieldMap entry");
+    } catch (IllegalArgumentException iae) {
       // expected
-      assertSame(cause, cdle.getCause());
     }
     verifyDefault();
 
