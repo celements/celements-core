@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -17,6 +16,10 @@ public interface IModelUtils {
   @NotNull
   public BiMap<Class<? extends EntityReference>, EntityType> getEntityTypeMap();
 
+  /**
+   * @param ref
+   * @return false if the given reference is relative
+   */
   public boolean isAbsoluteRef(@NotNull EntityReference ref);
 
   /**
@@ -47,21 +50,40 @@ public interface IModelUtils {
    * simple names default to {@link WikiReference}.
    *
    * @param name
-   *          the string respresentation
+   *          the string representation
    * @return the resolved reference class
    */
   @NotNull
   public Class<? extends EntityReference> resolveRefClass(@NotNull String name);
 
+  /**
+   * resolves an absolute reference from the given name
+   *
+   * @param name
+   *          to be resolved, may not be empty
+   * @return a resolved reference
+   * @throws IllegalArgumentException
+   *           if unable to resolve absolute reference from name
+   */
   @NotNull
   public EntityReference resolveRef(@NotNull String name);
 
+  /**
+   * resolves an absolute reference from the given name and baseRef
+   *
+   * @param name
+   *          to be resolved, may not be empty
+   * @param baseRef
+   *          a reference used as base for resolving
+   * @return a resolved reference
+   * @throws IllegalArgumentException
+   *           if unable to resolve absolute reference from name and baseRef
+   */
   @NotNull
   public EntityReference resolveRef(@NotNull String name, @Nullable EntityReference baseRef);
 
   /**
-   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
-   * requested generic type
+   * resolves an absolute reference from the given name and baseRef
    *
    * @param name
    *          to be resolved, may not be empty
@@ -70,34 +92,61 @@ public interface IModelUtils {
    * @param baseRef
    *          a reference used as base for resolving
    * @return a resolved reference
+   * @throws IllegalArgumentException
+   *           if unable to resolve absolute reference from name and baseRef
    */
   @NotNull
   public <T extends EntityReference> T resolveRef(@NotNull String name, @NotNull Class<T> token,
       @Nullable EntityReference baseRef);
 
   /**
-   * using {@link DefaultStringEntityReferenceResolver} but properly returning an instance of the
-   * requested generic type
+   * resolves an absolute reference from the given name
    *
    * @param name
-   *          to be resolved
+   *          to be resolved, may not be empty
    * @param token
    *          for the reference type
    * @return a resolved reference
+   * @throws IllegalArgumentException
+   *           if unable to resolve absolute reference from name
    */
   @NotNull
   public <T extends EntityReference> T resolveRef(@NotNull String name, @NotNull Class<T> token);
 
+  /**
+   * @param ref
+   * @return serialised global string representation of the given reference (e.g. "wiki:space.doc")
+   */
   @NotNull
   public String serializeRef(@NotNull EntityReference ref);
 
+  /**
+   * @param ref
+   * @return serialised local string representation of the given reference (e.g. "space.doc")
+   */
   @NotNull
   public String serializeRefLocal(@NotNull EntityReference ref);
 
+  /**
+   * @param fromRef
+   *          the reference to extract from
+   * @param token
+   *          reference class to extract
+   * @return the extracted reference, may be null
+   */
   @Nullable
   public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
       @NotNull Class<T> token);
 
+  /**
+   * @param fromRef
+   *          the reference to extract from
+   * @param defaultRef
+   *          the default reference when unable to extract a reference
+   * @param token
+   *          reference class to extract
+   * @return the extracted reference, may NOT be null
+   */
   @NotNull
   public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
       @NotNull T defaultRef, @NotNull Class<T> token);
