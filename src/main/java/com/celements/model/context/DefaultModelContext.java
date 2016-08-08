@@ -13,19 +13,20 @@ public class DefaultModelContext implements IModelContext {
   @Requirement
   private Execution execution;
 
-  private XWikiContext getContext() {
+  @Override
+  public XWikiContext getXWikiContext() {
     return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
   public WikiReference getCurrentWiki() {
-    return new WikiReference(getContext().getDatabase());
+    return new WikiReference(getXWikiContext().getDatabase());
   }
 
   @Override
   public WikiReference setCurrentWiki(WikiReference wiki) {
     WikiReference oldWiki = getCurrentWiki();
-    getContext().setDatabase(wiki.getName());
+    getXWikiContext().setDatabase(wiki.getName());
     return oldWiki;
   }
 

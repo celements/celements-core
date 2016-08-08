@@ -5,8 +5,12 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.WikiReference;
 
+import com.xpn.xwiki.XWikiContext;
+
 @ComponentRole
 public interface IModelContext {
+
+  public XWikiContext getXWikiContext();
 
   /**
    * @return the current wiki set in context
