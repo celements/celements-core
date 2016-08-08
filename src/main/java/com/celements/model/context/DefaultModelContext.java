@@ -22,4 +22,11 @@ public class DefaultModelContext implements IModelContext {
     return new WikiReference(getContext().getDatabase());
   }
 
+  @Override
+  public WikiReference setCurrentWiki(WikiReference wiki) {
+    WikiReference oldWiki = getCurrentWiki();
+    getContext().setDatabase(wiki.getName());
+    return oldWiki;
+  }
+
 }
