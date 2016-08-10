@@ -11,10 +11,10 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
-import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -24,8 +24,11 @@ public class DefaultModelContext implements ModelContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelContext.class);
 
+  @Requirement(CelementsFromWikiConfigurationSource.NAME)
+  ConfigurationSource wikiConfigSrc;
+
   @Requirement
-  ConfigurationSource cfgSrc;
+  ConfigurationSource defaultConfigSrc;
 
   @Requirement
   private Execution execution;
@@ -71,20 +74,12 @@ public class DefaultModelContext implements ModelContext {
 
   @Override
   public String getDefaultLanguage(EntityReference ref) {
-    WikiReference wikiBefore = getWiki();
-    DocumentReference docBefore = getDoc();
-    try {
-      setWiki(getModelUtils().extractRef(ref, getWiki(), WikiReference.class));
-      String defaultLang = getDefaultLangFromDoc(ref);
-      if (Strings.isNullOrEmpty(defaultLang)) {
-        defaultLang = getDefaultLangFromCfgSrc(ref);
-      }
-      LOGGER.trace("getDefaultLanguage: for '{}' got lang" + " '{}'", ref, defaultLang);
-      return defaultLang;
-    } finally {
-      setWiki(wikiBefore);
-      setDoc(docBefore);
+    String ret = getDefaultLangFromDoc(ref);
+    if (ret.isEmpty()) {
+      ret = getDefaultLangFromConfigSrc(ref);
     }
+    LOGGER.trace("getDefaultLanguage: for '{}' got lang" + " '{}'", ref, ret);
+    return ret;
   }
 
   private String getDefaultLangFromDoc(EntityReference ref) {
@@ -100,12 +95,24 @@ public class DefaultModelContext implements ModelContext {
     return ret;
   }
 
-  private String getDefaultLangFromCfgSrc(EntityReference ref) {
-    SpaceReference spaceRef = getModelUtils().extractRef(ref, SpaceReference.class);
-    if (spaceRef != null) {
-      setDoc(new DocumentReference(WEB_PREF_DOC_NAME, spaceRef));
+  private String getDefaultLangFromConfigSrc(EntityReference ref) {
+    WikiReference wikiBefore = getWiki();
+    DocumentReference docBefore = getDoc();
+    try {
+      ConfigurationSource configSrc;
+      setWiki(getModelUtils().extractRef(ref, getWiki(), WikiReference.class));
+      SpaceReference spaceRef = getModelUtils().extractRef(ref, SpaceReference.class);
+      if (spaceRef != null) {
+        setDoc(new DocumentReference(WEB_PREF_DOC_NAME, spaceRef));
+        configSrc = defaultConfigSrc; // checks space preferences
+      } else {
+        configSrc = wikiConfigSrc; // skips space preferences
+      }
+      return configSrc.getProperty(CFG_KEY_DEFAULT_LANG, FALLBACK_DEFAULT_LANG);
+    } finally {
+      setWiki(wikiBefore);
+      setDoc(docBefore);
     }
-    return cfgSrc.getProperty(CFG_KEY_DEFAULT_LANG, FALLBACK_DEFAULT_LANG);
   }
 
   private ModelUtils getModelUtils() {

@@ -14,6 +14,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -28,7 +29,9 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   public void setUp() throws Exception {
     super.setUp();
     registerComponentMock(IModelAccessFacade.class);
+    registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME);
     modelContext = (DefaultModelContext) Utils.getComponent(ModelContext.class);
+    modelContext.defaultConfigSrc = createMockAndAddToDefault(ConfigurationSource.class);
   }
 
   @Test
@@ -56,17 +59,9 @@ public class DefaultModelContextTest extends AbstractComponentTest {
 
   @Test
   public void test_getDefaultLanguage() {
-    assertDefaultContext();
-    replayDefault();
-    assertEquals(ModelContext.FALLBACK_DEFAULT_LANG, modelContext.getDefaultLanguage());
-    verifyDefault();
-    assertDefaultContext();
-  }
-
-  @Test
-  public void test_getDefaultLanguage_cfg() {
     String lang = "xk";
-    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    expect(modelContext.wikiConfigSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+        ModelContext.FALLBACK_DEFAULT_LANG))).andReturn(lang).once();
     replayDefault();
     assertEquals(lang, modelContext.getDefaultLanguage());
     verifyDefault();
@@ -76,8 +71,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   public void test_getDefaultLanguage_wiki() {
     final String lang = "xk";
     final WikiReference wikiRef = new WikiReference("wiki");
-    modelContext.cfgSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    expect(modelContext.cfgSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+    expect(modelContext.wikiConfigSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
         ModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
 
           @Override
@@ -100,8 +94,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
     final String lang = "xk";
     final SpaceReference spaceRef = new SpaceReference("space", new WikiReference("wiki"));
     final DocumentReference webPrefDocRef = getWebPrefDocRef(spaceRef);
-    modelContext.cfgSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    expect(modelContext.cfgSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+    expect(modelContext.defaultConfigSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
         ModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
 
           @Override
@@ -129,8 +122,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
     XWikiDocument doc = new XWikiDocument(docRef);
     expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(doc).once();
     final DocumentReference webPrefDocRef = getWebPrefDocRef(docRef.getLastSpaceReference());
-    modelContext.cfgSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    expect(modelContext.cfgSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+    expect(modelContext.defaultConfigSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
         ModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
 
           @Override
