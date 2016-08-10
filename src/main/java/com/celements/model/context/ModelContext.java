@@ -33,15 +33,31 @@ public interface ModelContext {
   @NotNull
   public WikiReference setWiki(@NotNull WikiReference wikiRef);
 
+  /**
+   * @return the current doc set in context
+   */
   @Nullable
   public DocumentReference getDoc();
 
+  /**
+   * @param docRef
+   *          to be set in context
+   * @return the doc which was set before
+   */
   @Nullable
   public DocumentReference setDoc(@NotNull DocumentReference docRef);
 
+  /**
+   * @return the default language for the current wiki
+   */
   @NotNull
   public String getDefaultLanguage();
 
+  /**
+   * @param ref
+   *          from which the default language is extracted (document, space, or wiki)
+   * @return the default language for the given reference
+   */
   @NotNull
   public String getDefaultLanguage(@NotNull EntityReference ref);
 
