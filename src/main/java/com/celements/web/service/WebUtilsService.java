@@ -144,7 +144,7 @@ public class WebUtilsService implements IWebUtilsService {
   IDefaultEmptyDocStrategyRole emptyChecker;
 
   @Requirement
-  ConfigurationSource defaultConfigSrc;
+  private ConfigurationSource defaultConfigSrc;
 
   /*
    * not loaded as requirement due to cyclic dependency
@@ -270,7 +270,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public List<String> getAllowedLanguages(String spaceName) {
-    List<String> languages = new ArrayList<String>();
+    List<String> languages = new ArrayList<>();
     String spaceLanguages = getContext().getWiki().getSpacePreference("languages", spaceName, "",
         getContext());
     languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
@@ -287,7 +287,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public List<String> getAllowedLanguages(SpaceReference spaceRef) {
-    List<String> languages = new ArrayList<String>();
+    List<String> languages = new ArrayList<>();
     String curDB = getContext().getDatabase();
     try {
       getContext().setDatabase(spaceRef.getParent().getName());
@@ -391,6 +391,7 @@ public class WebUtilsService implements IWebUtilsService {
     return adminLanguage;
   }
 
+  @Deprecated
   @Override
   public String getDefaultLanguage() {
     return getDefaultLanguage((SpaceReference) null);
@@ -406,6 +407,7 @@ public class WebUtilsService implements IWebUtilsService {
     return getDefaultLanguage(spaceRef);
   }
 
+  @Deprecated
   @Override
   public String getDefaultLanguage(SpaceReference spaceRef) {
     String defaultLang = "";
@@ -430,7 +432,7 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.trace("getDefaultLanguage: for currentDoc '{}' and spaceRef '{}' got lang" + " '{}'",
         getContext().getDoc(), spaceRef, defaultLang);
     return defaultLang;
-  }
+    }
 
   @Override
   public boolean hasParentSpace() {
@@ -479,7 +481,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference resolveWikiReference(String wikiName) {
-    return resolveWikiReference(wikiName, context.getCurrentWiki());
+    return resolveWikiReference(wikiName, context.getWiki());
   }
 
   private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
@@ -700,7 +702,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb) {
-    List<XWikiAttachment> atts = new ArrayList<XWikiAttachment>(doc.getAttachmentList());
+    List<XWikiAttachment> atts = new ArrayList<>(doc.getAttachmentList());
     if (comparator != null) {
       Collections.sort(atts, comparator);
     }
@@ -731,7 +733,7 @@ public class WebUtilsService implements IWebUtilsService {
     try {
       List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
       if (imagesOnly) {
-        for (Attachment att : new ArrayList<Attachment>(attachments)) {
+        for (Attachment att : new ArrayList<>(attachments)) {
           if (!att.isImage()) {
             attachments.remove(att);
           }
@@ -747,7 +749,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName, String tagName,
       String comparator, boolean imagesOnly, int start, int nb) throws ClassNotFoundException {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     try {
       for (String docName : getContext().getWiki().getSpaceDocsName(spaceName, getContext())) {
         DocumentReference docRef = new DocumentReference(getContext().getDatabase(), spaceName,
@@ -770,7 +772,7 @@ public class WebUtilsService implements IWebUtilsService {
       throw e;
     }
     if (imagesOnly) {
-      for (Attachment att : new ArrayList<Attachment>(attachments)) {
+      for (Attachment att : new ArrayList<>(attachments)) {
         if (!att.isImage()) {
           attachments.remove(att);
         }
@@ -792,7 +794,7 @@ public class WebUtilsService implements IWebUtilsService {
       DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), "Classes",
           "FilebaseTag");
       if ((filterDoc != null) && (filterDoc.getXObjectSize(tagClassRef) > 0)) {
-        List<Attachment> filteredAttachments = new ArrayList<Attachment>();
+        List<Attachment> filteredAttachments = new ArrayList<>();
         for (Attachment attachment : attachments) {
           String attFN = attachment.getDocument().getFullName() + "/" + attachment.getFilename();
           if (null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
@@ -831,7 +833,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   <T> List<T> reduceListToSize(List<T> list, int start, int nb) {
-    List<T> countedAtts = new ArrayList<T>();
+    List<T> countedAtts = new ArrayList<>();
     if ((start <= 0) && ((nb <= 0) || (nb >= list.size()))) {
       countedAtts = list;
     } else if (start < list.size()) {
@@ -844,7 +846,7 @@ public class WebUtilsService implements IWebUtilsService {
   Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc, boolean bWithObjects,
       boolean bWithRendering, boolean bWithAttachmentContent, boolean bWithVersions)
       throws XWikiException {
-    Map<String, String> docData = new LinkedHashMap<String, String>();
+    Map<String, String> docData = new LinkedHashMap<>();
     DocumentReference docRef = xwikiDoc.getDocumentReference();
     docData.put("web", docRef.getLastSpaceReference().getName());
     docData.put("name", docRef.getName());
@@ -1054,7 +1056,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2) {
-    List<BaseObject> resultList = new ArrayList<BaseObject>();
+    List<BaseObject> resultList = new ArrayList<>();
     if (doc != null) {
       List<BaseObject> allObjects = doc.getXObjects(classRef);
       if (allObjects != null) {
@@ -1085,7 +1087,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference getWikiRef() {
-    return context.getCurrentWiki();
+    return context.getWiki();
   }
 
   @Deprecated
@@ -1103,7 +1105,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference getWikiRef(EntityReference ref) {
-    return modelUtils.extractRef(ref, context.getCurrentWiki(), WikiReference.class);
+    return modelUtils.extractRef(ref, context.getWiki(), WikiReference.class);
   }
 
   @Override
@@ -1166,7 +1168,7 @@ public class WebUtilsService implements IWebUtilsService {
     XWikiRequest request = getContext().getRequest();
     if (request != null) {
       Map<?, ?> requestMap = request.getParameterMap();
-      Map<String, String[]> convertedMap = new HashMap<String, String[]>();
+      Map<String, String[]> convertedMap = new HashMap<>();
       for (Object keyObj : requestMap.keySet()) {
         String key = keyObj.toString();
         String[] value = getValueAsStringArray(requestMap.get(keyObj));
@@ -1335,7 +1337,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     for (String docFN : docsFN) {
       try {
         LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
@@ -1358,7 +1360,7 @@ public class WebUtilsService implements IWebUtilsService {
   public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
       String defLang) {
     String templateContent;
-    List<String> langList = new ArrayList<String>();
+    List<String> langList = new ArrayList<>();
     if (lang != null) {
       langList.add(lang);
     }

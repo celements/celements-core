@@ -18,6 +18,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
@@ -37,7 +38,6 @@ import com.celements.model.util.IModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -60,9 +60,6 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelAccessFacade.class);
 
   public static final String DEFAULT_LANG = "";
-
-  @Requirement
-  protected IWebUtilsService webUtils;
 
   @Requirement
   protected IRightsAccessFacadeRole rightsAccess;
@@ -189,7 +186,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
     XWikiDocument doc = getDocumentCloneInternal(docRef);
     Date creationDate = new Date();
-    doc.setDefaultLanguage(webUtils.getDefaultLanguage());
+    doc.setDefaultLanguage(getDefaultLangForCreatingDoc(docRef));
     doc.setLanguage("");
     doc.setCreationDate(creationDate);
     doc.setContentUpdateDate(creationDate);
@@ -200,6 +197,20 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     doc.setContent("");
     doc.setMetaDataDirty(true);
     return doc;
+  }
+
+  /**
+   * when creating doc, get default language from space. except get it from wiki directly when
+   * creating web preferences
+   */
+  private String getDefaultLangForCreatingDoc(DocumentReference docRef) {
+    EntityReference fromRef;
+    if (docRef.getName().equals(IModelContext.WEB_PREF_DOC_NAME)) {
+      fromRef = docRef.getWikiReference();
+    } else {
+      fromRef = docRef.getLastSpaceReference();
+    }
+    return modelContext.getDefaultLanguage(fromRef);
   }
 
   @Override
@@ -321,8 +332,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
-      modelContext.setCurrentWiki(modelUtils.extractRef(doc.getDocumentReference(),
-          WikiReference.class));
+      modelContext.setWiki(modelUtils.extractRef(doc.getDocumentReference(), WikiReference.class));
       LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
           doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
@@ -667,7 +677,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public List<ClassFieldValue<?>> getProperties(XWikiDocument doc, ClassDefinition classDef) {
     List<ClassFieldValue<?>> ret = new ArrayList<>();
     for (ClassField<?> field : classDef.getFields()) {
-      ret.add(new ClassFieldValue<Object>(castField(field), getProperty(doc, field)));
+      ret.add(new ClassFieldValue<>(castField(field), getProperty(doc, field)));
     }
     return ret;
   }
@@ -751,7 +761,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    */
   private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
     return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
-        onDoc.getDocumentReference(), modelContext.getCurrentWiki(), WikiReference.class));
+        onDoc.getDocumentReference(), modelContext.getWiki(), WikiReference.class));
   }
 
 }

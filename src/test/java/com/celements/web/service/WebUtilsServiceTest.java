@@ -13,11 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -26,6 +24,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.IModelContext;
 import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
@@ -51,14 +50,12 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   private XWikiContext context;
   private XWiki xwiki;
   private WebUtilsService webUtilsService;
-  private ConfigurationSource backupDefConfSrc;
 
   @Before
   public void setUp_WebUtilsServiceTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
     webUtilsService = (WebUtilsService) Utils.getComponent(IWebUtilsService.class);
-    backupDefConfSrc = webUtilsService.defaultConfigSrc;
     expect(xwiki.isVirtualMode()).andReturn(true).anyTimes();
     webUtilsService.docParentsLister = createMockAndAddToDefault(IDocumentParentsListerRole.class);
   }
@@ -66,7 +63,6 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @After
   public void tearDown_WebUtilsServiceTest() throws Exception {
     webUtilsService.docParentsLister = null;
-    webUtilsService.defaultConfigSrc = backupDefConfSrc;
   }
 
   @Test
@@ -1160,7 +1156,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   public void testGetRequestParameterMap() {
     XWikiRequest mockXWikiRequest = createMock(XWikiRequest.class);
     context.setRequest(mockXWikiRequest);
-    Map<Object, Object> requestMap = new HashMap<Object, Object>();
+    Map<Object, Object> requestMap = new HashMap<>();
     requestMap.put("asdf", "1");
     requestMap.put("qwer", new String[] { "2", "3" });
 
@@ -1432,7 +1428,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFilterAttachmentsByTag_null() {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(null, null, getContext()));
     attachments.add(new Attachment(null, null, getContext()));
     List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, null);
@@ -1441,7 +1437,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFilterAttachmentsByTag_empty() {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(null, null, getContext()));
     attachments.add(new Attachment(null, null, getContext()));
     List<Attachment> atts = webUtilsService.filterAttachmentsByTag(attachments, "");
@@ -1450,7 +1446,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testFilterAttachmentsByTag_tagDoesNotExist() {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(null, null, getContext()));
     attachments.add(new Attachment(null, null, getContext()));
     expect(xwiki.exists(eq(webUtilsService.resolveDocumentReference("Tag.T")), same(
@@ -1464,7 +1460,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testFilterAttachmentsByTag_filterHasNoTagLists() throws XWikiException {
     String tagName = "Tag.Tags";
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(null, null, getContext()));
     attachments.add(new Attachment(null, null, getContext()));
     DocumentReference tagRef = webUtilsService.resolveDocumentReference(tagName);
@@ -1501,7 +1497,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
         false))).andReturn(null).once();
     expect(tagDoc.getXObject(eq(tagClassRef), eq("attachment"), eq(docName + "/cde.jpg"), eq(
         false))).andReturn(new BaseObject()).once();
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(theDoc,
         "abc.jpg"), getContext()));
     attachments.add(new Attachment(theDoc.newDocument(getContext()), new XWikiAttachment(theDoc,
@@ -1848,12 +1844,9 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testGetDefaultLanguage() {
-    String lang = "en";
-    webUtilsService.defaultConfigSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    // IMPORTANT: in unstable-2.0 defaultLanguage may never be empty
-    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(
-        "en"))).andReturn(lang).atLeastOnce();
+  public void testGetDefaultLanguage_cfgSrc() throws Exception {
+    String lang = "xk";
+    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
     replayDefault();
     assertEquals(lang, webUtilsService.getDefaultLanguage());
     verifyDefault();
@@ -1865,22 +1858,10 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
     final WikiReference wikiRef = new WikiReference("wiki");
     final SpaceReference spaceRef = new SpaceReference("space", wikiRef);
     DocumentReference webPrefDocRef = new DocumentReference("WebPreferences", spaceRef);
-    webUtilsService.defaultConfigSrc = createMockAndAddToDefault(ConfigurationSource.class);
 
     expect(xwiki.exists(eq(webPrefDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(webPrefDocRef), same(context))).andReturn(new XWikiDocument(
         webPrefDocRef)).once();
-    expect(webUtilsService.defaultConfigSrc.getProperty(eq("default_language"), eq(
-        "en"))).andAnswer(new IAnswer<String>() {
-
-          @Override
-          public String answer() throws Throwable {
-            assertEquals(wikiRef.getName(), getContext().getDatabase());
-            assertEquals(spaceRef,
-                getContext().getDoc().getDocumentReference().getLastSpaceReference());
-            return lang;
-          }
-        }).once();
 
     assertEquals("xwikidb", getContext().getDatabase());
     assertNull(getContext().getDoc());
@@ -1900,7 +1881,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   private List<BaseObject> getSortTestBaseObjects() {
-    List<BaseObject> objs = new ArrayList<BaseObject>();
+    List<BaseObject> objs = new ArrayList<>();
     BaseObject obj = new BaseObject();
     obj.setXClassReference(getBOClassRef());
     obj.setStringValue("s1", "c");

@@ -14,6 +14,7 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -28,9 +29,9 @@ import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.DateField;
 import com.celements.model.classes.fields.StringField;
+import com.celements.model.context.IModelContext;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -129,31 +130,27 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getDocument_translatedDocument_defaultLanguage_empty() throws Exception {
+    String lang = "de";
     doc.setDefaultLanguage("");
     doc.setLanguage("");
-    IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
-    modelAccess.webUtils = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
+    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Capture<XWikiDocument> captExists = expectExists(true);
     Capture<XWikiDocument> captLoad = expectLoad(doc);
     replayDefault();
-    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "de");
+    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
     verifyDefault();
     assertEquals(doc, theDoc);
     assertNotSame("must be cloned for cache safety", doc, theDoc);
-    assertCapture(captExists, doc.getDocumentReference(), "de");
-    assertCapture(captLoad, doc.getDocumentReference(), "de");
+    assertCapture(captExists, doc.getDocumentReference(), lang);
+    assertCapture(captLoad, doc.getDocumentReference(), lang);
   }
 
   @Test
   public void test_getDocument_translatedDocument_noTranslation() throws Exception {
-    doc.setDefaultLanguage("de");
+    String lang = "de";
+    doc.setDefaultLanguage(lang);
     doc.setLanguage("");
-    IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
-    modelAccess.webUtils = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
+    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Capture<XWikiDocument> captExists = expectExists(false);
     replayDefault();
     try {
@@ -168,15 +165,13 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getDocument_translatedDocument() throws Exception {
-    doc.setDefaultLanguage("de");
+    String lang = "de";
+    doc.setDefaultLanguage(lang);
     doc.setLanguage("");
-    IWebUtilsService webUtilsMock = createMockAndAddToDefault(IWebUtilsService.class);
-    modelAccess.webUtils = webUtilsMock;
-    expect(webUtilsMock.getDefaultLanguage(eq(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn("de").anyTimes();
+    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Capture<XWikiDocument> captExists = expectExists(true);
     XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
-    theTdoc.setDefaultLanguage("de");
+    theTdoc.setDefaultLanguage(lang);
     theTdoc.setLanguage("en");
     theTdoc.setNew(false);
     theTdoc.setSyntax(Syntax.XWIKI_1_0);
@@ -192,7 +187,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_createDocument() throws Exception {
-    getConfigurationSource().setProperty("default_language", "de");
+    String lang = "de";
+    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
     doc.setNew(true);
     doc.setFromCache(false);
@@ -201,6 +197,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
+    expectSpacePreferences(doc.getDocumentReference().getLastSpaceReference());
     replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
@@ -212,7 +209,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     assertTrue(ret.isNew());
     assertFalse(ret.isFromCache());
     assertSame("do not clone if isNew", doc, ret);
-    assertEquals("de", ret.getDefaultLanguage());
+    assertEquals(lang, ret.getDefaultLanguage());
     assertEquals("", ret.getLanguage());
     assertTrue(beforeCreationDate.before(ret.getCreationDate()));
     assertTrue(beforeCreationDate.before(ret.getContentUpdateDate()));
@@ -308,6 +305,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
         false).once();
     expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         doc).once();
+    expectSpacePreferences(doc.getDocumentReference().getLastSpaceReference());
     replayDefault();
     XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
     verifyDefault();
@@ -343,6 +341,14 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     } catch (NullPointerException npe) {
       // expected
     }
+  }
+
+  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
+    DocumentReference webPrefDocRef = new DocumentReference(IModelContext.WEB_PREF_DOC_NAME,
+        spaceRef);
+    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
+        new XWikiDocument(webPrefDocRef)).once();
   }
 
   @Test
@@ -1090,7 +1096,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     assertEquals(toStoreRef, ret);
     String objValue = modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
         field.getName());
-    assertEquals(modelAccess.webUtils.serializeRef(toStoreRef), objValue);
+    assertEquals(modelAccess.modelUtils.serializeRef(toStoreRef), objValue);
   }
 
   @Test

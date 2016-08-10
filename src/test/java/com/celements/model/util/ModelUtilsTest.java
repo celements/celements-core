@@ -142,7 +142,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   @Test
   public void test_resolveRef() {
     WikiReference oWikiRef = new WikiReference("otherWiki");
-    Utils.getComponent(IModelContext.class).setCurrentWiki(wikiRef);
+    Utils.getComponent(IModelContext.class).setWiki(wikiRef);
     assertEquals(wikiRef, modelUtils.resolveRef("wiki", WikiReference.class));
     // assertEquals(wikiRef, modelUtils.resolveRef("", WikiReference.class)); TODO
     assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class));

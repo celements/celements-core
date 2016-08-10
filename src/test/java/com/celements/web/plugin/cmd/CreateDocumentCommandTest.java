@@ -29,8 +29,10 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.IModelContext;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.xpn.xwiki.XWikiException;
@@ -64,6 +66,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
   public void testCreateDocument_noPageType() throws Exception {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
+    expectSpacePreferences(docRef.getLastSpaceReference());
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
@@ -87,6 +90,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     String pageType = "RichText";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
+    expectSpacePreferences(docRef.getLastSpaceReference());
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
@@ -115,6 +119,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
     String pageType = "RichText";
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
         "myNewDocument");
+    expectSpacePreferences(docRef.getLastSpaceReference());
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
     expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
@@ -148,6 +153,14 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
       // expected
     }
     verifyDefault();
+  }
+
+  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
+    DocumentReference webPrefDocRef = new DocumentReference(IModelContext.WEB_PREF_DOC_NAME,
+        spaceRef);
+    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
+        new XWikiDocument(webPrefDocRef)).once();
   }
 
 }

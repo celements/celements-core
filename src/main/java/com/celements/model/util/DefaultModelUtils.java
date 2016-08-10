@@ -145,7 +145,7 @@ public class DefaultModelUtils implements IModelUtils {
       throw new IllegalArgumentException("name may not be empty");
     }
     EntityType type = getEntityTypeForToken(token);
-    baseRef = MoreObjects.firstNonNull(baseRef, context.getCurrentWiki());
+    baseRef = MoreObjects.firstNonNull(baseRef, context.getWiki());
     EntityReference resolvedRef;
     if (type.ordinal() == 0) {
       // resolver cannot handle root reference
@@ -193,7 +193,7 @@ public class DefaultModelUtils implements IModelUtils {
 
   @Override
   public <T extends EntityReference> T adjustRef(T ref, Class<T> token, EntityReference toRef) {
-    toRef = MoreObjects.firstNonNull(toRef, context.getCurrentWiki());
+    toRef = MoreObjects.firstNonNull(toRef, context.getWiki());
     EntityReference adjustedRef = cloneRef(ref); // avoid modifying argument
     EntityReference current = adjustedRef;
     while (current != null) {

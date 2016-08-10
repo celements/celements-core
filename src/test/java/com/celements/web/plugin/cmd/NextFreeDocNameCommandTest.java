@@ -11,11 +11,13 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.IModelContext;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.nextfreedoc.NextFreeDocService;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -46,6 +48,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
   public void testGetNextTitledPageFullName() throws Exception {
     String title = "asdf";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
+    expectSpacePreferences(spaceRef);
     ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
@@ -77,6 +80,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
   public void testGetNextTitledPageDocRef() throws Exception {
     String title = "asdf";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
+    expectSpacePreferences(spaceRef);
     ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
@@ -108,6 +112,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
   public void testGetNextUntitledPageFullName() throws Exception {
     String title = "untitled";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
+    expectSpacePreferences(spaceRef);
     ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
@@ -139,6 +144,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
   public void testGetNextUntitledPageName() throws Exception {
     String title = "untitled";
     DocumentReference docRef = new DocumentReference(title + num, spaceRef);
+    expectSpacePreferences(spaceRef);
     ((NextFreeDocService) Utils.getComponent(INextFreeDocRole.class)).injectNum(spaceRef, title,
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
@@ -164,6 +170,14 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
       // expected
     }
     verifyDefault();
+  }
+
+  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
+    DocumentReference webPrefDocRef = new DocumentReference(IModelContext.WEB_PREF_DOC_NAME,
+        spaceRef);
+    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
+        new XWikiDocument(webPrefDocRef)).once();
   }
 
   private String serialize(DocumentReference docRef) {

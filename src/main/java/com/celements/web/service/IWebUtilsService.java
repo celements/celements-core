@@ -112,14 +112,22 @@ public interface IWebUtilsService {
 
   public String getAdminLanguage(DocumentReference userRef);
 
+  /**
+   * @deprecated instead use {@link IModelContext#getDefaultLanguage()}
+   */
+  @Deprecated
   public String getDefaultLanguage();
 
   /**
-   * @deprecated instead use {@link #getDefaultLanguage(SpaceReference)}
+   * @deprecated instead use {@link IModelContext#getDefaultLanguage(EntityReference)}
    */
   @Deprecated
   public String getDefaultLanguage(String spaceName);
 
+  /**
+   * @deprecated instead use {@link IModelContext#getDefaultLanguage(EntityReference)}
+   */
+  @Deprecated
   public String getDefaultLanguage(SpaceReference spaceRef);
 
   public boolean hasParentSpace();
@@ -310,7 +318,7 @@ public interface IWebUtilsService {
   public String getMajorVersion(XWikiDocument doc);
 
   /**
-   * @deprecated instead use {@link IModelContext#getCurrentWiki()}
+   * @deprecated instead use {@link IModelContext#getWiki()}
    */
   @Deprecated
   public WikiReference getWikiRef();

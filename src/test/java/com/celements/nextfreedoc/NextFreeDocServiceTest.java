@@ -21,6 +21,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.context.IModelContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,6 +58,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         context.getDatabase()));
     String title = "asdf";
     nextFreeDocService.injectNum(spaceRef, title, 5);
+    expectSpacePreferences(spaceRef);
 
     DocumentReference docRef1 = new DocumentReference(title + 5, spaceRef);
     expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).atLeastOnce();
@@ -116,6 +118,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference(
         context.getDatabase()));
     nextFreeDocService.injectNum(spaceRef, INextFreeDocRole.UNTITLED_NAME, 5);
+    expectSpacePreferences(spaceRef);
 
     DocumentReference docRef1 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 5, spaceRef);
     expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).once();
@@ -266,7 +269,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     Query query2 = new DefaultQuery("statement", null, queryExecutorMock);
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andReturn(query2).once();
-    noDigit = new ArrayList<Object>(noDigit);
+    noDigit = new ArrayList<>(noDigit);
     noDigit.add(name); // to make sure offset depends on return size
     expect(queryExecutorMock.execute(same(query2))).andReturn(noDigit).once();
     Query query3 = new DefaultQuery("statement", null, queryExecutorMock);
@@ -330,6 +333,14 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     assertEquals("SELECT doc.name FROM XWikiDocument doc WHERE doc.space=:space "
         + "AND doc.name LIKE :name ORDER BY LENGTH(doc.name) DESC, doc.name DESC",
         nextFreeDocService.getHighestNumHQL());
+  }
+
+  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
+    DocumentReference webPrefDocRef = new DocumentReference(IModelContext.WEB_PREF_DOC_NAME,
+        spaceRef);
+    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
+    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
+        new XWikiDocument(webPrefDocRef)).once();
   }
 
 }
