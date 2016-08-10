@@ -249,11 +249,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     }
   }
 
-  public String getKey(DocumentReference docRef) {
-    return serializerDefault.serialize(docRef);
+  String getKey(DocumentReference docRef) {
+    DocumentReference cacheDocRef = new DocumentReference(getContext().getDatabase(),
+        docRef.getLastSpaceReference().getName(), docRef.getName());
+    return serializerDefault.serialize(cacheDocRef);
   }
 
-  public String getKeyWithLang(DocumentReference docRef, String language) {
+  String getKeyWithLang(DocumentReference docRef, String language) {
     if (Strings.isNullOrEmpty(language)) {
       return getKey(docRef);
     } else {
@@ -261,7 +263,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
     }
   }
 
-  public String getKeyWithLang(XWikiDocument doc) {
+  String getKeyWithLang(XWikiDocument doc) {
     String language = doc.getLanguage();
     if (language.isEmpty() || language.equals(doc.getDefaultLanguage())) {
       language = "";
