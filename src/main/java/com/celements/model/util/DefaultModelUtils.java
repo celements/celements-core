@@ -22,13 +22,13 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
 @Component
-public class DefaultModelUtils implements IModelUtils {
+public class DefaultModelUtils implements ModelUtils {
 
   private final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
   private final Map<Class<? extends EntityReference>, String> REGEX_MAP;
@@ -56,7 +56,7 @@ public class DefaultModelUtils implements IModelUtils {
   }
 
   @Requirement
-  private IModelContext context;
+  private ModelContext context;
 
   @Requirement("explicit")
   private EntityReferenceResolver<String> resolver;

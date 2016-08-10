@@ -32,9 +32,9 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ClassFieldValue;
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -65,10 +65,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   protected IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
-  protected IModelUtils modelUtils;
+  protected ModelUtils modelUtils;
 
   @Requirement
-  protected IModelContext modelContext;
+  protected ModelContext modelContext;
 
   @Requirement
   protected Execution execution;
@@ -205,7 +205,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    */
   private String getDefaultLangForCreatingDoc(DocumentReference docRef) {
     EntityReference fromRef;
-    if (docRef.getName().equals(IModelContext.WEB_PREF_DOC_NAME)) {
+    if (docRef.getName().equals(ModelContext.WEB_PREF_DOC_NAME)) {
       fromRef = docRef.getWikiReference();
     } else {
       fromRef = docRef.getLastSpaceReference();

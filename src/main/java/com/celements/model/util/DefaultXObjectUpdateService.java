@@ -26,7 +26,7 @@ public class DefaultXObjectUpdateService implements IXObjectUpdateRole {
   private IModelAccessFacade modelAccess;
 
   @Requirement
-  private IModelUtils modelUtils;
+  private ModelUtils modelUtils;
 
   @Override
   @Deprecated

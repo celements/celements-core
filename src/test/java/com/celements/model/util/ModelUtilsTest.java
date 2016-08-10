@@ -13,7 +13,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.web.Utils;
 
 public class ModelUtilsTest extends AbstractComponentTest {
@@ -29,7 +29,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    modelUtils = (DefaultModelUtils) Utils.getComponent(IModelUtils.class);
+    modelUtils = (DefaultModelUtils) Utils.getComponent(ModelUtils.class);
   }
 
   @Test
@@ -142,7 +142,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   @Test
   public void test_resolveRef() {
     WikiReference oWikiRef = new WikiReference("otherWiki");
-    Utils.getComponent(IModelContext.class).setWiki(wikiRef);
+    Utils.getComponent(ModelContext.class).setWiki(wikiRef);
     assertEquals(wikiRef, modelUtils.resolveRef("wiki", WikiReference.class));
     // assertEquals(wikiRef, modelUtils.resolveRef("", WikiReference.class)); TODO
     assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class));

@@ -29,7 +29,7 @@ import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.DateField;
 import com.celements.model.classes.fields.StringField;
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.xpn.xwiki.XWikiException;
@@ -133,7 +133,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     String lang = "de";
     doc.setDefaultLanguage("");
     doc.setLanguage("");
-    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Capture<XWikiDocument> captExists = expectExists(true);
     Capture<XWikiDocument> captLoad = expectLoad(doc);
     replayDefault();
@@ -150,7 +150,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     String lang = "de";
     doc.setDefaultLanguage(lang);
     doc.setLanguage("");
-    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Capture<XWikiDocument> captExists = expectExists(false);
     replayDefault();
     try {
@@ -168,7 +168,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     String lang = "de";
     doc.setDefaultLanguage(lang);
     doc.setLanguage("");
-    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Capture<XWikiDocument> captExists = expectExists(true);
     XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
     theTdoc.setDefaultLanguage(lang);
@@ -188,7 +188,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_createDocument() throws Exception {
     String lang = "de";
-    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
     Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
     doc.setNew(true);
     doc.setFromCache(false);
@@ -344,7 +344,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
-    DocumentReference webPrefDocRef = new DocumentReference(IModelContext.WEB_PREF_DOC_NAME,
+    DocumentReference webPrefDocRef = new DocumentReference(ModelContext.WEB_PREF_DOC_NAME,
         spaceRef);
     expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(

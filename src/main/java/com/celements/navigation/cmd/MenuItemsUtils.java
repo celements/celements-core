@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.web.Utils;
 
 public class MenuItemsUtils {
@@ -13,7 +13,7 @@ public class MenuItemsUtils {
   }
 
   public static EntityReference resolveParentRef(@NotNull String parentFN) {
-    return (parentFN.isEmpty()) ? null : Utils.getComponent(IModelUtils.class).resolveRef(parentFN);
+    return (parentFN.isEmpty()) ? null : Utils.getComponent(ModelUtils.class).resolveRef(parentFN);
   }
 
 }

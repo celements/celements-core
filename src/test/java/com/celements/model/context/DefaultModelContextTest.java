@@ -15,7 +15,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
@@ -28,7 +28,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   public void setUp() throws Exception {
     super.setUp();
     registerComponentMock(IModelAccessFacade.class);
-    modelContext = (DefaultModelContext) Utils.getComponent(IModelContext.class);
+    modelContext = (DefaultModelContext) Utils.getComponent(ModelContext.class);
   }
 
   @Test
@@ -58,7 +58,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   public void test_getDefaultLanguage() {
     assertDefaultContext();
     replayDefault();
-    assertEquals(IModelContext.FALLBACK_DEFAULT_LANG, modelContext.getDefaultLanguage());
+    assertEquals(ModelContext.FALLBACK_DEFAULT_LANG, modelContext.getDefaultLanguage());
     verifyDefault();
     assertDefaultContext();
   }
@@ -66,7 +66,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   @Test
   public void test_getDefaultLanguage_cfg() {
     String lang = "xk";
-    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
     replayDefault();
     assertEquals(lang, modelContext.getDefaultLanguage());
     verifyDefault();
@@ -77,8 +77,8 @@ public class DefaultModelContextTest extends AbstractComponentTest {
     final String lang = "xk";
     final WikiReference wikiRef = new WikiReference("wiki");
     modelContext.cfgSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    expect(modelContext.cfgSrc.getProperty(eq(IModelContext.CFG_KEY_DEFAULT_LANG), eq(
-        IModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
+    expect(modelContext.cfgSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+        ModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
 
           @Override
           public String answer() throws Throwable {
@@ -101,8 +101,8 @@ public class DefaultModelContextTest extends AbstractComponentTest {
     final SpaceReference spaceRef = new SpaceReference("space", new WikiReference("wiki"));
     final DocumentReference webPrefDocRef = getWebPrefDocRef(spaceRef);
     modelContext.cfgSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    expect(modelContext.cfgSrc.getProperty(eq(IModelContext.CFG_KEY_DEFAULT_LANG), eq(
-        IModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
+    expect(modelContext.cfgSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+        ModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
 
           @Override
           public String answer() throws Throwable {
@@ -130,8 +130,8 @@ public class DefaultModelContextTest extends AbstractComponentTest {
     expect(getMock(IModelAccessFacade.class).getDocument(eq(docRef))).andReturn(doc).once();
     final DocumentReference webPrefDocRef = getWebPrefDocRef(docRef.getLastSpaceReference());
     modelContext.cfgSrc = createMockAndAddToDefault(ConfigurationSource.class);
-    expect(modelContext.cfgSrc.getProperty(eq(IModelContext.CFG_KEY_DEFAULT_LANG), eq(
-        IModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
+    expect(modelContext.cfgSrc.getProperty(eq(ModelContext.CFG_KEY_DEFAULT_LANG), eq(
+        ModelContext.FALLBACK_DEFAULT_LANG))).andAnswer(new IAnswer<String>() {
 
           @Override
           public String answer() throws Throwable {
@@ -172,7 +172,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   }
 
   private DocumentReference getWebPrefDocRef(EntityReference ref) {
-    return Utils.getComponent(IModelUtils.class).resolveRef(IModelContext.WEB_PREF_DOC_NAME,
+    return Utils.getComponent(ModelUtils.class).resolveRef(ModelContext.WEB_PREF_DOC_NAME,
         DocumentReference.class, ref);
   }
 

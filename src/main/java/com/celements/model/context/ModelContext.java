@@ -11,7 +11,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.xpn.xwiki.XWikiContext;
 
 @ComponentRole
-public interface IModelContext {
+public interface ModelContext {
 
   public static final String WEB_PREF_DOC_NAME = "WebPreferences";
   public static final String CFG_KEY_DEFAULT_LANG = "default_language";

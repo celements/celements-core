@@ -13,14 +13,14 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 @Component
-public class DefaultModelContext implements IModelContext {
+public class DefaultModelContext implements ModelContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelContext.class);
 
@@ -108,8 +108,8 @@ public class DefaultModelContext implements IModelContext {
     return cfgSrc.getProperty(CFG_KEY_DEFAULT_LANG, FALLBACK_DEFAULT_LANG);
   }
 
-  private IModelUtils getModelUtils() {
-    return Utils.getComponent(IModelUtils.class);
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
   private IModelAccessFacade getModelAccess() {

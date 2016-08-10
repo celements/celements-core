@@ -11,7 +11,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.google.common.collect.BiMap;
 
 @ComponentRole
-public interface IModelUtils {
+public interface ModelUtils {
 
   @NotNull
   public BiMap<Class<? extends EntityReference>, EntityType> getEntityTypeMap();

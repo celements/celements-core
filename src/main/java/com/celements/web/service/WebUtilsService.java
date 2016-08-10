@@ -61,9 +61,9 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.DefaultModelUtils;
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
@@ -115,10 +115,10 @@ public class WebUtilsService implements IWebUtilsService {
   EntityReferenceResolver<String> relativeRefResolver;
 
   @Requirement
-  IModelContext context;
+  ModelContext context;
 
   @Requirement
-  IModelUtils modelUtils;
+  ModelUtils modelUtils;
 
   /**
    * Used to get the template path mapping information.

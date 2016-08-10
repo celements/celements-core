@@ -21,7 +21,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -336,7 +336,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
   }
 
   private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
-    DocumentReference webPrefDocRef = new DocumentReference(IModelContext.WEB_PREF_DOC_NAME,
+    DocumentReference webPrefDocRef = new DocumentReference(ModelContext.WEB_PREF_DOC_NAME,
         spaceRef);
     expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
     expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(

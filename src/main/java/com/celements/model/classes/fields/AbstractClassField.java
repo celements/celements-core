@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -132,8 +132,8 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
         : getModelUtils().serializeRef(classRef)) + "." + name;
   }
 
-  protected static IModelUtils getModelUtils() {
-    return Utils.getComponent(IModelUtils.class);
+  protected static ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }

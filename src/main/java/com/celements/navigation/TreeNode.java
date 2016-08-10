@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -144,8 +144,8 @@ public final class TreeNode {
             ", partName=").append(partName).append("]").toString();
   }
 
-  private static IModelUtils getModelUtils() {
-    return Utils.getComponent(IModelUtils.class);
+  private static ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }

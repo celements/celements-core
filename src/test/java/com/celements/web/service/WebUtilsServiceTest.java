@@ -24,7 +24,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.context.IModelContext;
+import com.celements.model.context.ModelContext;
 import com.celements.parents.IDocumentParentsListerRole;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.web.comparators.XWikiAttachmentAscendingChangeDateComparator;
@@ -1846,7 +1846,7 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   @Test
   public void testGetDefaultLanguage_cfgSrc() throws Exception {
     String lang = "xk";
-    getConfigurationSource().setProperty(IModelContext.CFG_KEY_DEFAULT_LANG, lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
     replayDefault();
     assertEquals(lang, webUtilsService.getDefaultLanguage());
     verifyDefault();

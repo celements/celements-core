@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.model.util.IModelUtils;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -241,8 +241,8 @@ public final class NavigationConfig {
     return cmCssClass.or("");
   }
 
-  private static IModelUtils getModelUtils() {
-    return Utils.getComponent(IModelUtils.class);
+  private static ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
