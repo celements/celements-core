@@ -33,8 +33,8 @@ import org.xwiki.configuration.internal.CompositeConfigurationSource;
  * <li>celements properties file (celements.properties)</li>
  * <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
- * Should be used when a configuration should not be overriden by the user in his/her
- * profile (in which case the {@link CelementsAllConfigurationSource} should be used.
+ * Should be used when a configuration should not be overriden by space preferences (in which case
+ * the {@link CelementsDefaultConfigurationSource} should be used.
  */
 @Component(CelementsFromWikiConfigurationSource.NAME)
 public class CelementsFromWikiConfigurationSource extends CompositeConfigurationSource implements
