@@ -1,8 +1,5 @@
 package com.celements.model.classes;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -41,12 +38,6 @@ public class TestClassDefinition extends AbstractClassDefinition implements
   @Override
   public boolean isInternalMapping() {
     return true;
-  }
-
-  @Override
-  public List<ClassField<?>> getFields() {
-    return Arrays.<ClassField<?>>asList(FIELD_MY_STRING, FIELD_MY_INT, FIELD_MY_BOOL,
-        FIELD_MY_DOCREF);
   }
 
   private static ClassField<String> getFieldMyString() {
