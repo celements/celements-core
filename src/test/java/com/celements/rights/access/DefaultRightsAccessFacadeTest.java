@@ -76,7 +76,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   public void testHasAccessLevel_document_edit_Guest_false_deprecated() throws Exception {
     XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
     expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
-    XWikiUser user = new XWikiUser(XWikiRightService.GUEST_USER);
+    XWikiUser user = new XWikiUser(XWikiRightService.GUEST_USER_FULLNAME);
     String spaceName = "MySpace";
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     SpaceReference spaceRef = new SpaceReference(spaceName, wikiRef);
@@ -153,7 +153,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
   public void testHasAccessLevel_document_edit_Guest_false() throws Exception {
     XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
     expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
-    XWikiUser user = new XWikiUser(XWikiRightService.GUEST_USER);
+    XWikiUser user = new XWikiUser(XWikiRightService.GUEST_USER_FULLNAME);
     String spaceName = "MySpace";
     WikiReference wikiRef = new WikiReference(context.getDatabase());
     SpaceReference spaceRef = new SpaceReference(spaceName, wikiRef);

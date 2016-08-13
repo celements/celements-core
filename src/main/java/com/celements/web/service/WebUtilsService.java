@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -60,6 +61,8 @@ import com.celements.emptycheck.internal.IDefaultEmptyDocStrategyRole;
 import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.DefaultModelUtils;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
@@ -73,11 +76,9 @@ import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.sajson.Builder;
 import com.celements.web.comparators.BaseObjectComparator;
 import com.celements.web.plugin.cmd.CelSendMail;
-import com.celements.web.plugin.cmd.EmptyCheckCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -113,6 +114,12 @@ public class WebUtilsService implements IWebUtilsService {
   @Requirement("relative")
   EntityReferenceResolver<String> relativeRefResolver;
 
+  @Requirement
+  ModelContext context;
+
+  @Requirement
+  ModelUtils modelUtils;
+
   /**
    * Used to get the template path mapping information.
    */
@@ -137,7 +144,7 @@ public class WebUtilsService implements IWebUtilsService {
   IDefaultEmptyDocStrategyRole emptyChecker;
 
   @Requirement
-  ConfigurationSource defaultConfigSrc;
+  private ConfigurationSource defaultConfigSrc;
 
   /*
    * not loaded as requirement due to cyclic dependency
@@ -167,13 +174,7 @@ public class WebUtilsService implements IWebUtilsService {
     return parent;
   }
 
-  /**
-   * @deprecated since 2.63.0
-   * @deprecated instead use IDocumentParentsListerRole.getDocumentParentsList(
-   *             DocumentReference docRef, boolean includeDoc)
-   */
   @Override
-  @Deprecated
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
     return getDocumentParentsLister().getDocumentParentsList(docRef, includeDoc);
@@ -258,10 +259,6 @@ public class WebUtilsService implements IWebUtilsService {
         getContext().getDoc(), getContext());
   }
 
-  private boolean isEmptyRTEString(String rteContent) {
-    return new EmptyCheckCommand().isEmptyRTEString(rteContent);
-  }
-
   @Override
   public List<String> getAllowedLanguages() {
     if ((getContext() != null) && (getContext().getDoc() != null)) {
@@ -273,7 +270,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public List<String> getAllowedLanguages(String spaceName) {
-    List<String> languages = new ArrayList<String>();
+    List<String> languages = new ArrayList<>();
     String spaceLanguages = getContext().getWiki().getSpacePreference("languages", spaceName, "",
         getContext());
     languages.addAll(Arrays.asList(spaceLanguages.split("[ ,]")));
@@ -290,7 +287,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public List<String> getAllowedLanguages(SpaceReference spaceRef) {
-    List<String> languages = new ArrayList<String>();
+    List<String> languages = new ArrayList<>();
     String curDB = getContext().getDatabase();
     try {
       getContext().setDatabase(spaceRef.getParent().getName());
@@ -354,9 +351,6 @@ public class WebUtilsService implements IWebUtilsService {
     return getAdminLanguage(getContext().getUser());
   }
 
-  /**
-   * @deprecated since 2.34.0 instead use getAdminLanguage(DocumentReference userRef)
-   */
   @Deprecated
   @Override
   public String getAdminLanguage(String userFullName) {
@@ -397,6 +391,7 @@ public class WebUtilsService implements IWebUtilsService {
     return adminLanguage;
   }
 
+  @Deprecated
   @Override
   public String getDefaultLanguage() {
     return getDefaultLanguage((SpaceReference) null);
@@ -412,6 +407,7 @@ public class WebUtilsService implements IWebUtilsService {
     return getDefaultLanguage(spaceRef);
   }
 
+  @Deprecated
   @Override
   public String getDefaultLanguage(SpaceReference spaceRef) {
     String defaultLang = "";
@@ -436,7 +432,7 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.trace("getDefaultLanguage: for currentDoc '{}' and spaceRef '{}' got lang" + " '{}'",
         getContext().getDoc(), spaceRef, defaultLang);
     return defaultLang;
-  }
+    }
 
   @Override
   public boolean hasParentSpace() {
@@ -458,29 +454,34 @@ public class WebUtilsService implements IWebUtilsService {
     return getContext().getWiki().getSpacePreference("parent", spaceName, "", getContext());
   }
 
+  @Deprecated
   @Override
   public DocumentReference resolveDocumentReference(String fullName) {
     return resolveDocumentReference(fullName, null);
   }
 
+  @Deprecated
   @Override
   public DocumentReference resolveDocumentReference(String fullName, WikiReference wikiRef) {
     return resolveReference(fullName, DocumentReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public SpaceReference resolveSpaceReference(String spaceName) {
     return resolveSpaceReference(spaceName, null);
   }
 
+  @Deprecated
   @Override
   public SpaceReference resolveSpaceReference(String spaceName, WikiReference wikiRef) {
     return resolveReference(spaceName, SpaceReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public WikiReference resolveWikiReference(String wikiName) {
-    return resolveWikiReference(wikiName, getWikiRef());
+    return resolveWikiReference(wikiName, context.getWiki());
   }
 
   private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
@@ -491,27 +492,32 @@ public class WebUtilsService implements IWebUtilsService {
     return MoreObjects.firstNonNull(wikiRef, defaultWikiRef);
   }
 
+  @Deprecated
   @Override
   public AttachmentReference resolveAttachmentReference(String fullName) {
     return resolveAttachmentReference(fullName, null);
   }
 
+  @Deprecated
   @Override
   public AttachmentReference resolveAttachmentReference(String fullName, WikiReference wikiRef) {
     return resolveReference(fullName, AttachmentReference.class, wikiRef);
   }
 
+  @Deprecated
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type) {
     return resolveEntityReference(name, type, null);
   }
 
+  @Deprecated
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef) {
-    return resolveReference(name, ModelUtils.ENTITY_TYPE_MAP.inverse().get(type), wikiRef);
+    return resolveReference(name, modelUtils.getEntityTypeMap().inverse().get(type), wikiRef);
   }
 
+  @Deprecated
   @Override
   public EntityReference resolveRelativeEntityReference(String name, EntityType type) {
     EntityReference ref = relativeRefResolver.resolve(name, type);
@@ -519,17 +525,19 @@ public class WebUtilsService implements IWebUtilsService {
     return ref;
   }
 
+  @Deprecated
   @Override
   public <T extends EntityReference> T resolveReference(String name, Class<T> token) {
     return resolveReference(name, token, null);
   }
 
+  @Deprecated
   @Override
   public <T extends EntityReference> T resolveReference(String name, Class<T> token,
       EntityReference baseRef) {
     baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
     EntityReference reference;
-    EntityType type = ModelUtils.ENTITY_TYPE_MAP.get(token);
+    EntityType type = modelUtils.getEntityTypeMap().get(token);
     if (type == null) {
       throw new IllegalArgumentException("Unsupported entity class: " + token);
     } else if (type == EntityType.WIKI) {
@@ -537,7 +545,7 @@ public class WebUtilsService implements IWebUtilsService {
     } else {
       reference = refResolver.resolve(name, type, baseRef);
     }
-    T ret = ModelUtils.cloneReference(reference, token);
+    T ret = modelUtils.cloneRef(reference, token);
     LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
     return ret;
   }
@@ -694,7 +702,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<XWikiAttachment> getAttachmentListSorted(XWikiDocument doc,
       Comparator<XWikiAttachment> comparator, boolean imagesOnly, int start, int nb) {
-    List<XWikiAttachment> atts = new ArrayList<XWikiAttachment>(doc.getAttachmentList());
+    List<XWikiAttachment> atts = new ArrayList<>(doc.getAttachmentList());
     if (comparator != null) {
       Collections.sort(atts, comparator);
     }
@@ -725,7 +733,7 @@ public class WebUtilsService implements IWebUtilsService {
     try {
       List<Attachment> attachments = getAttachmentListSorted(doc, comparator);
       if (imagesOnly) {
-        for (Attachment att : new ArrayList<Attachment>(attachments)) {
+        for (Attachment att : new ArrayList<>(attachments)) {
           if (!att.isImage()) {
             attachments.remove(att);
           }
@@ -741,7 +749,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<Attachment> getAttachmentListForTagSortedSpace(String spaceName, String tagName,
       String comparator, boolean imagesOnly, int start, int nb) throws ClassNotFoundException {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     try {
       for (String docName : getContext().getWiki().getSpaceDocsName(spaceName, getContext())) {
         DocumentReference docRef = new DocumentReference(getContext().getDatabase(), spaceName,
@@ -764,7 +772,7 @@ public class WebUtilsService implements IWebUtilsService {
       throw e;
     }
     if (imagesOnly) {
-      for (Attachment att : new ArrayList<Attachment>(attachments)) {
+      for (Attachment att : new ArrayList<>(attachments)) {
         if (!att.isImage()) {
           attachments.remove(att);
         }
@@ -786,7 +794,7 @@ public class WebUtilsService implements IWebUtilsService {
       DocumentReference tagClassRef = new DocumentReference(getContext().getDatabase(), "Classes",
           "FilebaseTag");
       if ((filterDoc != null) && (filterDoc.getXObjectSize(tagClassRef) > 0)) {
-        List<Attachment> filteredAttachments = new ArrayList<Attachment>();
+        List<Attachment> filteredAttachments = new ArrayList<>();
         for (Attachment attachment : attachments) {
           String attFN = attachment.getDocument().getFullName() + "/" + attachment.getFilename();
           if (null != filterDoc.getXObject(tagClassRef, "attachment", attFN, false)) {
@@ -825,7 +833,7 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   <T> List<T> reduceListToSize(List<T> list, int start, int nb) {
-    List<T> countedAtts = new ArrayList<T>();
+    List<T> countedAtts = new ArrayList<>();
     if ((start <= 0) && ((nb <= 0) || (nb >= list.size()))) {
       countedAtts = list;
     } else if (start < list.size()) {
@@ -838,7 +846,7 @@ public class WebUtilsService implements IWebUtilsService {
   Map<String, String> xwikiDoctoLinkedMap(XWikiDocument xwikiDoc, boolean bWithObjects,
       boolean bWithRendering, boolean bWithAttachmentContent, boolean bWithVersions)
       throws XWikiException {
-    Map<String, String> docData = new LinkedHashMap<String, String>();
+    Map<String, String> docData = new LinkedHashMap<>();
     DocumentReference docRef = xwikiDoc.getDocumentReference();
     docData.put("web", docRef.getLastSpaceReference().getName());
     docData.put("name", docRef.getName());
@@ -850,14 +858,14 @@ public class WebUtilsService implements IWebUtilsService {
     String docParentStr = "";
     if (!documentParentsList.isEmpty()) {
       DocumentReference docParentRef = documentParentsList.get(0);
-      docParentStr = serializer_default.serialize(docParentRef);
+      docParentStr = modelUtils.serializeRef(docParentRef);
     }
     docData.put("parent", docParentStr);
     String parentsListStr = "";
     String parentsListMNStr = "";
     MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
     for (DocumentReference parentDocRef : documentParentsList) {
-      String parentDocFN = serializer_default.serialize(parentDocRef);
+      String parentDocFN = modelUtils.serializeRef(parentDocRef);
       parentsListMNStr += menuNameCmd.getMultilingualMenuName(parentDocFN,
           getContext().getLanguage(), getContext()) + ",";
       parentsListStr += parentDocFN + ",";
@@ -877,13 +885,13 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("contentUpdateDate", "" + xwikiDoc.getContentUpdateDate().getTime());
     docData.put("version", xwikiDoc.getVersion());
     docData.put("title", xwikiDoc.getTitle());
-    docData.put("template", serializer_local.serialize(xwikiDoc.getTemplateDocumentReference()));
+    docData.put("template", modelUtils.serializeRefLocal(xwikiDoc.getTemplateDocumentReference()));
     docData.put("getDefaultTemplate", xwikiDoc.getDefaultTemplate());
     docData.put("getValidationScript", xwikiDoc.getValidationScript());
     docData.put("comment", xwikiDoc.getComment());
     docData.put("minorEdit", String.valueOf(xwikiDoc.isMinorEdit()));
     docData.put("syntaxId", xwikiDoc.getSyntax().toIdString());
-    docData.put("menuName", menuNameCmd.getMultilingualMenuName(serializer_default.serialize(
+    docData.put("menuName", menuNameCmd.getMultilingualMenuName(modelUtils.serializeRef(
         xwikiDoc.getDocumentReference()), getContext().getLanguage(), getContext()));
     // docData.put("hidden", String.valueOf(xwikiDoc.isHidden()));
 
@@ -1048,7 +1056,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2) {
-    List<BaseObject> resultList = new ArrayList<BaseObject>();
+    List<BaseObject> resultList = new ArrayList<>();
     if (doc != null) {
       List<BaseObject> allObjects = doc.getXObjects(classRef);
       if (allObjects != null) {
@@ -1076,31 +1084,28 @@ public class WebUtilsService implements IWebUtilsService {
     return splitedStr;
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef() {
-    return getWikiRef((EntityReference) null);
+    return context.getWiki();
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef(XWikiDocument doc) {
-    EntityReference ref = ((doc != null) ? doc.getDocumentReference() : null);
-    return getWikiRef(ref);
+    return getWikiRef(doc != null ? doc.getDocumentReference() : null);
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef(DocumentReference ref) {
     return getWikiRef((EntityReference) ref);
   }
 
+  @Deprecated
   @Override
   public WikiReference getWikiRef(EntityReference ref) {
-    WikiReference ret = null;
-    if (ref != null) {
-      ret = new WikiReference(ref.extractReference(EntityType.WIKI));
-    } else {
-      ret = new WikiReference(getContext().getDatabase());
-    }
-    return ret;
+    return modelUtils.extractRef(ref, context.getWiki(), WikiReference.class);
   }
 
   @Override
@@ -1130,27 +1135,31 @@ public class WebUtilsService implements IWebUtilsService {
     return null;
   }
 
+  @Deprecated
   @Override
   public EntityReferenceSerializer<String> getRefDefaultSerializer() {
     return serializer_default;
   }
 
+  @Deprecated
   @Override
   public EntityReferenceSerializer<String> getRefLocalSerializer() {
     return serializer_local;
   }
 
+  @Deprecated
   @Override
   public String serializeRef(EntityReference entityRef) {
-    return getRefDefaultSerializer().serialize(entityRef);
+    return modelUtils.serializeRef(entityRef);
   }
 
+  @Deprecated
   @Override
   public String serializeRef(EntityReference entityRef, boolean local) {
     if (local) {
-      return getRefLocalSerializer().serialize(entityRef);
+      return modelUtils.serializeRefLocal(entityRef);
     } else {
-      return getRefDefaultSerializer().serialize(entityRef);
+      return modelUtils.serializeRef(entityRef);
     }
   }
 
@@ -1159,7 +1168,7 @@ public class WebUtilsService implements IWebUtilsService {
     XWikiRequest request = getContext().getRequest();
     if (request != null) {
       Map<?, ?> requestMap = request.getParameterMap();
-      Map<String, String[]> convertedMap = new HashMap<String, String[]>();
+      Map<String, String[]> convertedMap = new HashMap<>();
       for (Object keyObj : requestMap.keySet()) {
         String key = keyObj.toString();
         String[] value = getValueAsStringArray(requestMap.get(keyObj));
@@ -1205,10 +1214,6 @@ public class WebUtilsService implements IWebUtilsService {
     return centralTemplateRef;
   }
 
-  /**
-   * @deprecated instead use
-   *             {@link IModelAccessFacade# deleteDocumentWithoutTranslations(XWikiDocument, boolean)}
-   */
   @Deprecated
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws XWikiException {
@@ -1219,9 +1224,6 @@ public class WebUtilsService implements IWebUtilsService {
     }
   }
 
-  /**
-   * @deprecated instead use {@link IModelAccessFacade#deleteDocument(XWikiDocument, boolean)}
-   */
   @Deprecated
   @Override
   public void deleteAllDocuments(XWikiDocument doc, boolean totrash) throws XWikiException {
@@ -1335,7 +1337,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public List<Attachment> getAttachmentsForDocs(List<String> docsFN) {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     for (String docFN : docsFN) {
       try {
         LOGGER.info("getAttachmentsForDocs: processing doc " + docFN);
@@ -1358,7 +1360,7 @@ public class WebUtilsService implements IWebUtilsService {
   public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
       String defLang) {
     String templateContent;
-    List<String> langList = new ArrayList<String>();
+    List<String> langList = new ArrayList<>();
     if (lang != null) {
       langList.add(lang);
     }
@@ -1433,22 +1435,24 @@ public class WebUtilsService implements IWebUtilsService {
     return CENTRAL_WIKI_REF;
   }
 
+  @Deprecated
   @Override
   public EntityType resolveEntityTypeForFullName(String fullName) {
     return resolveEntityTypeForFullName(fullName, null);
   }
 
+  @Deprecated
   @Override
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
     EntityType ret = null;
     if (StringUtils.isNotBlank(fullName)) {
-      if (fullName.matches(REGEX_WORD)) {
+      if (fullName.matches(DefaultModelUtils.REGEX_WORD)) {
         ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
-      } else if (fullName.matches(REGEX_SPACE)) {
+      } else if (fullName.matches(DefaultModelUtils.REGEX_SPACE)) {
         ret = EntityType.SPACE;
-      } else if (fullName.matches(REGEX_DOC)) {
+      } else if (fullName.matches(DefaultModelUtils.REGEX_DOC)) {
         ret = EntityType.DOCUMENT;
-      } else if (fullName.matches(REGEX_ATT)) {
+      } else if (fullName.matches(DefaultModelUtils.REGEX_ATT)) {
         ret = EntityType.ATTACHMENT;
       }
     }
@@ -1477,16 +1481,19 @@ public class WebUtilsService implements IWebUtilsService {
     return componentManager.lookupMap(role);
   }
 
+  @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef) {
     return checkWikiRef(docRef, (DocumentReference) null);
   }
 
+  @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, XWikiDocument toDoc) {
     return checkWikiRef(docRef, toDoc.getDocumentReference());
   }
 
+  @Deprecated
   @Override
   public DocumentReference checkWikiRef(DocumentReference docRef, EntityReference toRef) {
     WikiReference wikiRef = getWikiRef(toRef);
@@ -1504,23 +1511,21 @@ public class WebUtilsService implements IWebUtilsService {
     return docParentsLister;
   }
 
+  @Deprecated
+  @Override
+  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName) {
+    return setWikiReference(docRef, modelUtils.resolveRef(wikiName, WikiReference.class));
+  }
+
+  @Deprecated
+  @Override
+  public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef) {
+    return modelUtils.adjustRef(docRef, DocumentReference.class, wikiRef);
+  }
+
   @Override
   public void setUser(DocumentReference userReference, boolean main) {
     getContext().setUser("XWiki." + userReference.getName(), main);
-  }
-
-  @Override
-  public DocumentReference setWikiReference(DocumentReference docRef, String wikiName) {
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    return new DocumentReference(wikiName, docRef.getLastSpaceReference().getName(),
-        docRef.getName());
-  }
-
-  @Override
-  public DocumentReference setWikiReference(DocumentReference docRef, WikiReference wikiRef) {
-    // IMPORTANT do not use setWikiReference, because it is dropped in xwiki 4.5.4
-    SpaceReference spaceRef = new SpaceReference(docRef.getLastSpaceReference().getName(), wikiRef);
-    return new DocumentReference(docRef.getName(), spaceRef);
   }
 
 }

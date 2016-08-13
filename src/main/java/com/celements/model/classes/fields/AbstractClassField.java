@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.util.ModelUtils;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -35,7 +34,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
     public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
       Objects.requireNonNull(classRef);
-      this.classRef = ModelUtils.cloneReference(classRef, DocumentReference.class);
+      this.classRef = getModelUtils().cloneRef(classRef, DocumentReference.class);
       this.name = Objects.requireNonNull(Strings.emptyToNull(name));
     }
 
@@ -70,7 +69,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public DocumentReference getClassRef() {
-    return ModelUtils.cloneReference(classRef, DocumentReference.class);
+    return getModelUtils().cloneRef(classRef, DocumentReference.class);
   }
 
   @Override
@@ -129,11 +128,12 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public String toString(boolean local) {
-    return getWebUtils().serializeRef(classRef, local) + "." + name;
+    return (local ? getModelUtils().serializeRefLocal(classRef)
+        : getModelUtils().serializeRef(classRef)) + "." + name;
   }
 
-  protected static IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
+  protected static ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
