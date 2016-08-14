@@ -35,9 +35,9 @@ public class PlainTextCommand {
   public String convertHtmlToPlainText(String htmlContent) throws ConvertToPlainTextException {
     try {
       return internalConvert(htmlContent);
-    } catch (Throwable throwable) {
-      // Caching Stackoverflow because of https://bugs.openjdk.java.net/browse/JDK-7172359
-      throw new ConvertToPlainTextException("Fail to convertToPlainText.", throwable);
+    } catch (StackOverflowError | Exception exp) {
+      // Catching Stackoverflow because of https://bugs.openjdk.java.net/browse/JDK-7172359
+      throw new ConvertToPlainTextException("Fail to convertToPlainText.", exp);
     }
   }
 
