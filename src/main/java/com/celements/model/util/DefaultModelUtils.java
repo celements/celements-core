@@ -33,8 +33,9 @@ public class DefaultModelUtils implements ModelUtils {
   private final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
   private final Map<Class<? extends EntityReference>, String> REGEX_MAP;
 
-  public static final String REGEX_WORD = "[a-zA-Z0-9]+";
-  public static final String REGEX_SPACE = "(" + REGEX_WORD + "\\:)?" + REGEX_WORD;
+  public static final String REGEX_WORD = "[a-zA-Z0-9_-]+";
+  public static final String REGEX_WIKINAME = "[a-zA-Z0-9]+";
+  public static final String REGEX_SPACE = "(" + REGEX_WIKINAME + "\\:)?" + REGEX_WORD;
   public static final String REGEX_DOC = REGEX_SPACE + "\\." + REGEX_WORD;
   public static final String REGEX_ATT = REGEX_DOC + "\\@" + ".+";
 
@@ -48,7 +49,7 @@ public class DefaultModelUtils implements ModelUtils {
     map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
     ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
     Map<Class<? extends EntityReference>, String> regexMap = new LinkedHashMap<>();
-    regexMap.put(WikiReference.class, REGEX_WORD);
+    regexMap.put(WikiReference.class, REGEX_WIKINAME);
     regexMap.put(SpaceReference.class, REGEX_SPACE);
     regexMap.put(DocumentReference.class, REGEX_DOC);
     regexMap.put(AttachmentReference.class, REGEX_ATT);

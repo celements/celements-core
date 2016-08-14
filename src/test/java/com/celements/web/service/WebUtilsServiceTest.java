@@ -1674,8 +1674,15 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
 
   @Test
   public void testResolveEntityTypeForFullName_invalid() {
-    String fullName = "mySpace_myDoc";
-    assertNull(webUtilsService.resolveEntityTypeForFullName(fullName));
+    String fullName = "mySpace myDoc";
+    EntityType entityType = webUtilsService.resolveEntityTypeForFullName(fullName);
+    assertNull("expected null but got " + entityType, entityType);
+  }
+
+  @Test
+  public void testResolveEntityTypeForFullName_specialChars() {
+    assertEquals(EntityType.SPACE, webUtilsService.resolveEntityTypeForFullName("mySpace_myDoc"));
+    assertEquals(EntityType.SPACE, webUtilsService.resolveEntityTypeForFullName("mySpace-myDoc"));
   }
 
   @Test
