@@ -140,6 +140,20 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_resolveRefClass_specialChars() {
+    assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space_test"));
+    assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space-test"));
+    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc_test"));
+    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc-test"));
+    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc_test"));
+    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc-test"));
+    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass(
+        "wiki:space.doc@att-test.jpg"));
+    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass(
+        "wiki:space.doc@att_test.jpg"));
+  }
+
+  @Test
   public void test_resolveRef() {
     WikiReference oWikiRef = new WikiReference("otherWiki");
     Utils.getComponent(ModelContext.class).setWiki(wikiRef);

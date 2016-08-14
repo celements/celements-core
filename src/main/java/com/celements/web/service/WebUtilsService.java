@@ -432,7 +432,7 @@ public class WebUtilsService implements IWebUtilsService {
     LOGGER.trace("getDefaultLanguage: for currentDoc '{}' and spaceRef '{}' got lang" + " '{}'",
         getContext().getDoc(), spaceRef, defaultLang);
     return defaultLang;
-    }
+  }
 
   @Override
   public boolean hasParentSpace() {
@@ -1446,7 +1446,7 @@ public class WebUtilsService implements IWebUtilsService {
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
     EntityType ret = null;
     if (StringUtils.isNotBlank(fullName)) {
-      if (fullName.matches(DefaultModelUtils.REGEX_WORD)) {
+      if (fullName.matches(DefaultModelUtils.REGEX_WIKINAME)) {
         ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
       } else if (fullName.matches(DefaultModelUtils.REGEX_SPACE)) {
         ret = EntityType.SPACE;
