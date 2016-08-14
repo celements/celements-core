@@ -1150,12 +1150,18 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public String serializeRef(EntityReference entityRef) {
+    if (entityRef == null) {
+      return null;
+    }
     return modelUtils.serializeRef(entityRef);
   }
 
   @Deprecated
   @Override
   public String serializeRef(EntityReference entityRef, boolean local) {
+    if (entityRef == null) {
+      return null;
+    }
     if (local) {
       return modelUtils.serializeRefLocal(entityRef);
     } else {

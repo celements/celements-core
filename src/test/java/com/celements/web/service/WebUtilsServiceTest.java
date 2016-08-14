@@ -634,6 +634,24 @@ public class WebUtilsServiceTest extends AbstractComponentTest {
   }
 
   @Test
+  @Deprecated
+  public void testSerializeRef_null() {
+    assertNull(webUtilsService.serializeRef(null));
+  }
+
+  @Test
+  @Deprecated
+  public void testSerializeRef_local_null() {
+    assertNull(webUtilsService.serializeRef(null, true));
+  }
+
+  @Test
+  @Deprecated
+  public void testSerializeRef_default_null() {
+    assertNull(webUtilsService.serializeRef(null, false));
+  }
+
+  @Test
   public void testReplaceInternalWithExternalLinks_nothingToReplace() {
     String host = "www.bla.com";
     String test = "test";
