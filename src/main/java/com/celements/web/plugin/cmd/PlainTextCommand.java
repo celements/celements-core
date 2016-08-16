@@ -32,17 +32,34 @@ public class PlainTextCommand {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(PlainTextCommand.class);
 
+  public String convertHtmlToPlainText(String htmlContent) throws ConvertToPlainTextException {
+    try {
+      return internalConvert(htmlContent);
+    } catch (StackOverflowError | Exception exp) {
+      // Catching Stackoverflow because of https://bugs.openjdk.java.net/browse/JDK-7172359
+      throw new ConvertToPlainTextException("Fail to convertToPlainText.", exp);
+    }
+  }
+
+  /**
+   * @deprecated instead use <code>convertHtmlToPlainText</code>
+   */
+  @Deprecated
   public String convertToPlainText(String htmlContent) {
     try {
-      Reader in = new StringReader(htmlContent);
-      Html2Text parser = new Html2Text();
-      parser.parse(in);
-      in.close();
-      return parser.getText();
+      return internalConvert(htmlContent);
     } catch (IOException ioExp) {
       LOGGER.error("Fail to convertToPlainText: ", ioExp);
     }
     return "";
+  }
+
+  private String internalConvert(String htmlContent) throws IOException {
+    Reader in = new StringReader(htmlContent);
+    Html2Text parser = new Html2Text();
+    parser.parse(in);
+    in.close();
+    return parser.getText();
   }
 
 }
