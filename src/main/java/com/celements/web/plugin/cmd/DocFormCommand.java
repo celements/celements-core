@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.docform.DocFormRequestKey;
 import com.celements.docform.DocFormRequestKeyParser;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -55,7 +56,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * DocFormCommand handles validation of a request with document/object fields and ensures
  * that they are correctly prepared for save. IMPORTANT: use exactly ONE instance of this
  * class for each XWikiContext (each request).
- * 
+ *
  * @author fabian
  */
 public class DocFormCommand {
@@ -77,7 +78,7 @@ public class DocFormCommand {
 
   public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    XWikiDocument doc = context.getWiki().getDocument(docRef, context);
+    XWikiDocument doc = getUpdateDoc(docRef, context);
     String template = context.getRequest().getParameter("template");
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}' and request " + "'{}'",
@@ -160,7 +161,7 @@ public class DocFormCommand {
   }
 
   XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context) throws XWikiException {
-    XWikiDocument doc = context.getWiki().getDocument(docRef, context);
+    XWikiDocument doc = getModelAccessFacade().getOrCreateDocument(docRef);
     if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
       doc.setDefaultLanguage(context.getLanguage());
     }
@@ -320,8 +321,8 @@ public class DocFormCommand {
     BaseClass bclass = null;
     DocumentReference bclassDocRef = getWebUtilsService().resolveDocumentReference(className);
     try {
-      bclass = context.getWiki().getDocument(bclassDocRef, context).getXClass();
-    } catch (XWikiException exp) {
+      bclass = getModelAccessFacade().getDocument(bclassDocRef).getXClass();
+    } catch (DocumentNotExistsException exp) {
       LOGGER.error("Cannot get document class [" + className + "].", exp);
     }
     return bclass;
@@ -355,8 +356,8 @@ public class DocFormCommand {
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext) ((Execution) Utils.getComponent(
-        Execution.class)).getContext().getProperty("xwikicontext");
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
   }
 
 }
