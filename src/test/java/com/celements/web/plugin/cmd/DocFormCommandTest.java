@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -33,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.docform.DocFormRequestKey;
 import com.celements.docform.DocFormRequestKeyParser;
 import com.xpn.xwiki.XWiki;
@@ -48,7 +49,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
-public class DocFormCommandTest extends AbstractBridgedComponentTestCase {
+public class DocFormCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
