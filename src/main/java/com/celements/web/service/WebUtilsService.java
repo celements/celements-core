@@ -885,7 +885,7 @@ public class WebUtilsService implements IWebUtilsService {
     docData.put("contentUpdateDate", "" + xwikiDoc.getContentUpdateDate().getTime());
     docData.put("version", xwikiDoc.getVersion());
     docData.put("title", xwikiDoc.getTitle());
-    docData.put("template", modelUtils.serializeRefLocal(xwikiDoc.getTemplateDocumentReference()));
+    docData.put("template", serializeRef(xwikiDoc.getTemplateDocumentReference(), true));
     docData.put("getDefaultTemplate", xwikiDoc.getDefaultTemplate());
     docData.put("getValidationScript", xwikiDoc.getValidationScript());
     docData.put("comment", xwikiDoc.getComment());
