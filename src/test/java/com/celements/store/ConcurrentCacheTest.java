@@ -538,26 +538,97 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     defaultMocks = Collections.unmodifiableCollection(getDefaultMocks());
   }
 
-  private class RefreshCacheEntryCommand implements Callable<LoadDocCheckResult> {
+  private class LoadDocCheckResult {
 
-    private XWikiCacheStoreInterface store;
+    private final List<String> messages = new Vector<String>();
 
-    public RefreshCacheEntryCommand(XWikiCacheStoreInterface store) {
+    public void addMessage(String message) {
+      messages.add(message);
+      fastFail.set(true);
+    }
+
+    public boolean isSuccessfull() {
+      return (messages.size() == 0);
+    }
+
+    public List<String> getMessages() {
+      return messages;
+    }
+
+  }
+
+  private abstract class AbstractXWikiTestFuture extends AbstractXWikiRunnable implements
+      Callable<LoadDocCheckResult> {
+
+    private boolean hasNewContext;
+    private final LoadDocCheckResult result = new LoadDocCheckResult();
+    private final XWikiCacheStoreInterface store;
+
+    protected AbstractXWikiTestFuture(XWikiCacheStoreInterface store) {
       this.store = store;
+    }
+
+    protected XWikiCacheStoreInterface getStore() {
+      return this.store;
+    }
+
+    private ExecutionContext getExecutionContext() {
+      return Utils.getComponent(Execution.class).getContext();
+    }
+
+    protected LoadDocCheckResult getResult() {
+      return result;
     }
 
     @Override
     public LoadDocCheckResult call() throws Exception {
+      try {
+        try {
+          hasNewContext = (getExecutionContext() == null);
+          if (hasNewContext) {
+            initExecutionContext();
+            getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, defaultMocks);
+            getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY,
+                defaultContext.clone());
+          }
+          try {
+            runInternal();
+          } finally {
+            if (hasNewContext) {
+              // cleanup execution context
+              cleanupExecutionContext();
+            }
+          }
+        } catch (ExecutionContextException e) {
+          LOGGER.error("Failed to initialize execution context", e);
+        }
+      } catch (Throwable exp) {
+        // anything could happen in the test and we want to catch all failures
+        getResult().addMessage("Exception: " + exp.getMessage() + "\n"
+            + ExceptionUtils.getStackTrace(exp));
+      }
+      return getResult();
+    }
+
+  }
+
+  private class RefreshCacheEntryCommand extends AbstractXWikiTestFuture {
+
+    public RefreshCacheEntryCommand(XWikiCacheStoreInterface store) {
+      super(store);
+    }
+
+    @Override
+    public void runInternal() {
       if (!successfullRemoveFromCache()) {
         if (verifyDocLoads) {
           failedToRemoveFromCacheCount.incrementAndGet();
         }
       }
-      return new LoadDocCheckResult();
     }
 
     boolean successfullRemoveFromCache() {
-      if (store instanceof DocumentCacheStore) {
+      if (getStore() instanceof DocumentCacheStore) {
         return newStore();
       } else {
         return oldStore();
@@ -605,118 +676,57 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   }
 
-  private class LoadDocCheckResult {
-
-    private final List<String> messages = new Vector<String>();
-
-    public void addMessage(String message) {
-      messages.add(message);
-      fastFail.set(true);
-    }
-
-    public boolean isSuccessfull() {
-      return (messages.size() == 0);
-    }
-
-    public List<String> getMessages() {
-      return messages;
-    }
-
-  }
-
-  private class LoadXWikiDocCommand extends AbstractXWikiRunnable implements
-      Callable<LoadDocCheckResult> {
+  private class LoadXWikiDocCommand extends AbstractXWikiTestFuture {
 
     private XWikiDocument loadedXWikiDoc;
-    private boolean hasNewContext;
-    private final LoadDocCheckResult result = new LoadDocCheckResult();
-    private final XWikiCacheStoreInterface store;
-
-    protected XWikiCacheStoreInterface getStore() {
-      return this.store;
-    }
 
     public LoadXWikiDocCommand(XWikiCacheStoreInterface store) {
-      this.store = store;
-    }
-
-    private ExecutionContext getExecutionContext() {
-      return Utils.getComponent(Execution.class).getContext();
+      super(store);
     }
 
     @Override
-    public LoadDocCheckResult call() throws Exception {
-      return callInternal();
-    }
-
-    protected LoadDocCheckResult callInternal() {
-      try {
-        try {
-          hasNewContext = (getExecutionContext() == null);
-          if (hasNewContext) {
-            initExecutionContext();
-            getExecutionContext().setProperty(EXECUTIONCONTEXT_KEY_MOCKS, defaultMocks);
-            getExecutionContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY,
-                defaultContext.clone());
-          }
-          try {
-            runInternal();
-            testLoadedDocument();
-          } finally {
-            if (hasNewContext) {
-              // cleanup execution context
-              cleanupExecutionContext();
-            }
-          }
-        } catch (ExecutionContextException e) {
-          LOGGER.error("Failed to initialize execution context", e);
-        }
-      } catch (Throwable exp) {
-        // anything could happen in the test and we want to catch all failures
-        result.addMessage("Exception: " + exp.getMessage() + "\n" + ExceptionUtils.getStackTrace(
-            exp));
-      }
-      return result;
+    protected void runInternal() {
+      loadTestDocument();
+      testLoadedDocument();
     }
 
     private void testLoadedDocument() {
       if (loadedXWikiDoc != null) {
         if (loadedXWikiDoc.isNew()) {
-          result.addMessage("unexpected: isNew is true");
+          getResult().addMessage("unexpected: isNew is true");
         }
         if (!loadedXWikiDoc.isMostRecent()) {
-          result.addMessage("unexpected: isMostRecent is false");
+          getResult().addMessage("unexpected: isMostRecent is false");
         }
         for (BaseObject theTestObj : baseObjMap.get(testDocRef)) {
           Map<DocumentReference, List<BaseObject>> loadedObjs = loadedXWikiDoc.getXObjects();
           final List<BaseObject> xclassObjs = loadedObjs.get(theTestObj.getXClassReference());
           if (!xclassObjs.contains(theTestObj)) {
-            result.addMessage("Object missing " + theTestObj);
+            getResult().addMessage("Object missing " + theTestObj);
           } else {
             BaseObject theLoadedObj = xclassObjs.get(xclassObjs.indexOf(theTestObj));
             if (theLoadedObj == theTestObj) {
-              result.addMessage("Object is same " + theTestObj);
+              getResult().addMessage("Object is same " + theTestObj);
             } else {
               for (String theFieldName : theTestObj.getPropertyNames()) {
                 BaseProperty theField = (BaseProperty) theLoadedObj.getField(theFieldName);
                 BaseProperty theTestField = (BaseProperty) theTestObj.getField(theFieldName);
                 if (theField == theTestField) {
-                  result.addMessage("Field is same " + theField);
+                  getResult().addMessage("Field is same " + theField);
                 } else if (!theTestField.getValue().equals(theField.getValue())) {
-                  result.addMessage("Field value missmatch expected: " + theField + "\n but found: "
-                      + theField.getValue());
+                  getResult().addMessage("Field value missmatch expected: " + theField
+                      + "\n but found: " + theField.getValue());
                 }
               }
             }
           }
         }
       } else {
-        result.addMessage("Loaded document reference is null.");
+        getResult().addMessage("Loaded document reference is null.");
       }
     }
 
-    @Override
-    public void runInternal() {
+    private void loadTestDocument() {
       try {
         XWikiDocument myDoc = new XWikiDocument(testDocRef);
         try {
