@@ -37,7 +37,7 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.appScript.AppScriptScriptService;
 import com.celements.auth.AuthenticationScriptService;
 import com.celements.captcha.CaptchaScriptService;
-import com.celements.css.CSSScriptService;
+import com.celements.css.CssScriptService;
 import com.celements.emptycheck.service.EmptyCheckScriptService;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.javascript.JSScriptService;
@@ -93,10 +93,10 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 public class CelementsWebPluginApi extends Api {
 
   /**
-   * @Deprecated: since 2.59 instead use variable in {@link CSSScriptService}
+   * @Deprecated: since 2.59 instead use variable in {@link CssScriptService}
    */
   @Deprecated
-  public static final String CELEMENTS_CSSCOMMAND = CSSScriptService.CELEMENTS_CSSCOMMAND;
+  public static final String CELEMENTS_CSSCOMMAND = CssScriptService.CELEMENTS_CSSCOMMAND;
 
   /**
    * @Deprecated: since 2.59 instead use variable in {@link JSScriptService}
@@ -589,7 +589,7 @@ public class CelementsWebPluginApi extends Api {
   // }
 
   /**
-   * @deprecated since 2.59 instead use {@link CSSScriptService #getAllCSS()}
+   * @deprecated since 2.59 instead use {@link CssScriptService #getAllCSS()}
    */
   @Deprecated
   public List<CSS> getAllCSS() throws XWikiException {
@@ -597,7 +597,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link CSSScriptService #displayAllCSS()}
+   * @deprecated since 2.59 instead use {@link CssScriptService #displayAllCSS()}
    */
   @Deprecated
   public String displayAllCSS() throws XWikiException {
@@ -605,7 +605,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link CSSScriptService #getRTEContentCSS()}
+   * @deprecated since 2.59 instead use {@link CssScriptService #getRTEContentCSS()}
    */
   @Deprecated
   public List<CSS> getRTEContentCSS() throws XWikiException {
@@ -613,7 +613,7 @@ public class CelementsWebPluginApi extends Api {
   }
 
   /**
-   * @deprecated since 2.59 instead use {@link CSSScriptService #includeCSSPage(String)}
+   * @deprecated since 2.59 instead use {@link CssScriptService #includeCSSPage(String)}
    */
   @Deprecated
   public void includeCSSPage(String css) {
@@ -622,7 +622,7 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link CSSScriptService #includeCSSAfterPreferences(String)}
+   *             {@link CssScriptService #includeCSSAfterPreferences(String)}
    */
   @Deprecated
   public void includeCSSAfterPreferences(String css) throws XWikiException {
@@ -631,7 +631,7 @@ public class CelementsWebPluginApi extends Api {
 
   /**
    * @deprecated since 2.59 instead use
-   *             {@link CSSScriptService #includeCSSAfterSkin(String)}
+   *             {@link CssScriptService #includeCSSAfterSkin(String)}
    */
   @Deprecated
   public void includeCSSAfterSkin(String css) {
@@ -2083,8 +2083,8 @@ public class CelementsWebPluginApi extends Api {
     return (CaptchaScriptService) Utils.getComponent(ScriptService.class, "captcha");
   }
 
-  private CSSScriptService getCSSScriptService() {
-    return (CSSScriptService) Utils.getComponent(ScriptService.class, "css");
+  private CssScriptService getCSSScriptService() {
+    return (CssScriptService) Utils.getComponent(ScriptService.class, "css");
   }
 
   private LegacySkinScriptService getLegacySkinScriptService() {
