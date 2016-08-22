@@ -435,13 +435,13 @@ public interface IWebUtilsService {
   public WikiReference getCentralWikiRef();
 
   /**
-   * @deprecated instead use {@link ModelUtils#resolveRefClass(String)}
+   * @deprecated instead use {@link ModelUtils#identifyClassFromName(String)}
    */
   @Deprecated
   public EntityType resolveEntityTypeForFullName(String fullName);
 
   /**
-   * @deprecated instead use {@link ModelUtils#resolveRefClass(String)}
+   * @deprecated instead use {@link ModelUtils#identifyClassFromName(String)}
    */
   @Deprecated
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType);

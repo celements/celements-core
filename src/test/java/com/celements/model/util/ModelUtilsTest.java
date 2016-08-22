@@ -35,7 +35,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   @Test
   public void test_rootRefClass() {
     assertSame("WikiReference has to be the root reference", WikiReference.class,
-        modelUtils.getRootRefClass());
+        References.getRootClass());
   }
 
   @Test
@@ -125,31 +125,32 @@ public class ModelUtilsTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_resolveRefClass() {
-    assertEquals(WikiReference.class, modelUtils.resolveRefClass("wiki"));
-    assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space"));
-    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc"));
-    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc"));
-    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("wiki:space.doc@att.jpg"));
-    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass("space.doc@att.jpg"));
+  public void test_identifyClassFromName() {
+    assertEquals(WikiReference.class, modelUtils.identifyClassFromName("wiki"));
+    assertEquals(SpaceReference.class, modelUtils.identifyClassFromName("wiki:space"));
+    assertEquals(DocumentReference.class, modelUtils.identifyClassFromName("wiki:space.doc"));
+    assertEquals(DocumentReference.class, modelUtils.identifyClassFromName("space.doc"));
+    assertEquals(AttachmentReference.class, modelUtils.identifyClassFromName(
+        "wiki:space.doc@att.jpg"));
+    assertEquals(AttachmentReference.class, modelUtils.identifyClassFromName("space.doc@att.jpg"));
     try {
-      modelUtils.resolveRefClass("doc@att");
+      modelUtils.identifyClassFromName("doc@att");
       fail("expecting failure because of relative ref");
     } catch (IllegalArgumentException iae) {
     }
   }
 
   @Test
-  public void test_resolveRefClass_specialChars() {
-    assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space_test"));
-    assertEquals(SpaceReference.class, modelUtils.resolveRefClass("wiki:space-test"));
-    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc_test"));
-    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("wiki:space.doc-test"));
-    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc_test"));
-    assertEquals(DocumentReference.class, modelUtils.resolveRefClass("space.doc-test"));
-    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass(
+  public void test_identifyClassFromName_specialChars() {
+    assertEquals(SpaceReference.class, modelUtils.identifyClassFromName("wiki:space_test"));
+    assertEquals(SpaceReference.class, modelUtils.identifyClassFromName("wiki:space-test"));
+    assertEquals(DocumentReference.class, modelUtils.identifyClassFromName("wiki:space.doc_test"));
+    assertEquals(DocumentReference.class, modelUtils.identifyClassFromName("wiki:space.doc-test"));
+    assertEquals(DocumentReference.class, modelUtils.identifyClassFromName("space.doc_test"));
+    assertEquals(DocumentReference.class, modelUtils.identifyClassFromName("space.doc-test"));
+    assertEquals(AttachmentReference.class, modelUtils.identifyClassFromName(
         "wiki:space.doc@att-test.jpg"));
-    assertEquals(AttachmentReference.class, modelUtils.resolveRefClass(
+    assertEquals(AttachmentReference.class, modelUtils.identifyClassFromName(
         "wiki:space.doc@att_test.jpg"));
   }
 

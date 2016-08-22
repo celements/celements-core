@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.References;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -34,7 +35,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
     public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
       Objects.requireNonNull(classRef);
-      this.classRef = getModelUtils().cloneRef(classRef, DocumentReference.class);
+      this.classRef = References.cloneRef(classRef, DocumentReference.class);
       this.name = Objects.requireNonNull(Strings.emptyToNull(name));
     }
 
@@ -69,7 +70,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public DocumentReference getClassRef() {
-    return getModelUtils().cloneRef(classRef, DocumentReference.class);
+    return References.cloneRef(classRef, DocumentReference.class);
   }
 
   @Override

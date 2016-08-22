@@ -4,17 +4,11 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.google.common.collect.BiMap;
-
 @ComponentRole
 public interface ModelUtils {
-
-  @NotNull
-  public BiMap<Class<? extends EntityReference>, EntityType> getEntityTypeMap();
 
   /**
    * @param ref
@@ -44,19 +38,58 @@ public interface ModelUtils {
       @NotNull Class<T> token);
 
   /**
-   * resolves the reference class for the given absolute name ({@link WikiReference} may be
+   * @param fromRef
+   *          the reference to extract from
+   * @param token
+   *          reference class to extract
+   * @return the extracted reference, may be null
+   */
+  @Nullable
+  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
+      @NotNull Class<T> token);
+
+  /**
+   * @param fromRef
+   *          the reference to extract from
+   * @param defaultRef
+   *          the default reference when unable to extract a reference
+   * @param token
+   *          reference class to extract
+   * @return the extracted reference, may NOT be null
+   */
+  @NotNull
+  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
+      @NotNull T defaultRef, @NotNull Class<T> token);
+
+  /**
+   * adjust a reference to another one of higher order, e.g. a docRef to another wikiRef.
+   *
+   * @param ref
+   *          to be adjusted
+   * @param token
+   *          for the reference type
+   * @param toRef
+   *          it is adjusted to
+   * @return a new instance of the adjusted reference or ref if toRef was of lower order
+   */
+  @NotNull
+  public <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
+      @Nullable EntityReference toRef);
+
+  /**
+   * identifies the reference class for the given absolute name ({@link WikiReference} may be
    * missing).<br>
    * <br>
    * simple names default to {@link WikiReference}.
    *
    * @param name
    *          the string representation
-   * @return the resolved reference class
+   * @return the identified reference class
    * @throws IllegalArgumentException
    *           for illegal strings
    */
   @NotNull
-  public Class<? extends EntityReference> resolveRefClass(@NotNull String name);
+  public Class<? extends EntityReference> identifyClassFromName(@NotNull String name);
 
   /**
    * resolves an absolute reference from the given name
@@ -128,44 +161,5 @@ public interface ModelUtils {
    */
   @NotNull
   public String serializeRefLocal(@NotNull EntityReference ref);
-
-  /**
-   * @param fromRef
-   *          the reference to extract from
-   * @param token
-   *          reference class to extract
-   * @return the extracted reference, may be null
-   */
-  @Nullable
-  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
-      @NotNull Class<T> token);
-
-  /**
-   * @param fromRef
-   *          the reference to extract from
-   * @param defaultRef
-   *          the default reference when unable to extract a reference
-   * @param token
-   *          reference class to extract
-   * @return the extracted reference, may NOT be null
-   */
-  @NotNull
-  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
-      @NotNull T defaultRef, @NotNull Class<T> token);
-
-  /**
-   * adjust a reference to another one of higher order, e.g. a docRef to another wikiRef.
-   *
-   * @param ref
-   *          to be adjusted
-   * @param token
-   *          for the reference type
-   * @param toRef
-   *          it is adjusted to
-   * @return a new instance of the adjusted reference or ref if toRef was of lower order
-   */
-  @NotNull
-  public <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
-      @Nullable EntityReference toRef);
 
 }

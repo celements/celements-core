@@ -62,8 +62,8 @@ import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.DefaultModelUtils;
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.References;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
@@ -514,7 +514,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef) {
-    return resolveReference(name, modelUtils.getEntityTypeMap().inverse().get(type), wikiRef);
+    return resolveReference(name, References.getClassForEntityType(type), wikiRef);
   }
 
   @Deprecated
@@ -537,7 +537,7 @@ public class WebUtilsService implements IWebUtilsService {
       EntityReference baseRef) {
     baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
     EntityReference reference;
-    EntityType type = modelUtils.getEntityTypeMap().get(token);
+    EntityType type = References.getEntityTypeForClass(token);
     if (type == null) {
       throw new IllegalArgumentException("Unsupported entity class: " + token);
     } else if (type == EntityType.WIKI) {
@@ -1452,13 +1452,13 @@ public class WebUtilsService implements IWebUtilsService {
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
     EntityType ret = null;
     if (StringUtils.isNotBlank(fullName)) {
-      if (fullName.matches(DefaultModelUtils.REGEX_WIKINAME)) {
+      if (fullName.matches(References.REGEX_WIKINAME)) {
         ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
-      } else if (fullName.matches(DefaultModelUtils.REGEX_SPACE)) {
+      } else if (fullName.matches(References.REGEX_SPACE)) {
         ret = EntityType.SPACE;
-      } else if (fullName.matches(DefaultModelUtils.REGEX_DOC)) {
+      } else if (fullName.matches(References.REGEX_DOC)) {
         ret = EntityType.DOCUMENT;
-      } else if (fullName.matches(DefaultModelUtils.REGEX_ATT)) {
+      } else if (fullName.matches(References.REGEX_ATT)) {
         ret = EntityType.ATTACHMENT;
       }
     }
