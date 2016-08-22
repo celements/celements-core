@@ -682,7 +682,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
       }
       getExistCache().set(key, result);
     }
-    LOGGER.info("exists return '{}' for '{}'", result, key);
+    LOGGER.trace("exists return '{}' for '{}'", result, key);
     return result;
   }
 
@@ -794,7 +794,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
                 // new document over the cache
                 newDoc = new DocumentBuilder().buildDocument(key, doc, context);
               } while (!loadingState.compareAndSet(_DOCSTATE_LOADING, _DOCSTATE_FINISHED));
-              LOGGER_DL.info("DocumentLoader-{}: put doc '{}' in cache",
+              LOGGER_DL.debug("DocumentLoader-{}: put doc '{}' in cache",
                   Thread.currentThread().getId(), key);
               final String keyWithLang = getKeyWithLang(newDoc);
               if (!newDoc.isNew()) {
@@ -808,7 +808,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
               }
               loadedDoc = newDoc;
             } else {
-              LOGGER_DL.info("DocumentLoader-{}: found in cache skip loding for '{}'",
+              LOGGER_DL.debug("DocumentLoader-{}: found in cache skip loding for '{}'",
                   Thread.currentThread().getId(), key);
             }
             documentLoaderMap.remove(key);
