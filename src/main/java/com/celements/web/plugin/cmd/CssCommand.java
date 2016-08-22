@@ -22,7 +22,6 @@ package com.celements.web.plugin.cmd;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -63,8 +62,8 @@ public class CssCommand {
     LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
 
     Set<CSS> includedCSS = new HashSet<CSS>();
-    for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
-      CSS css = (CSS) iterator.next();
+    for (CSS css2 : cssList) {
+      CSS css = css2;
       if (!includedCSS.contains(css) && (css != null)) {
         LOGGER.debug("CSS to add to result List: " + css.toString());
         cssResultList.add(css);
@@ -105,8 +104,8 @@ public class CssCommand {
     LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
 
     Set<CSS> includedCSS = new HashSet<CSS>();
-    for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
-      CSS css = (CSS) iterator.next();
+    for (CSS css2 : cssList) {
+      CSS css = css2;
       if ((css != null) && !includedCSS.contains(css) && css.isContentCSS()) {
         LOGGER.debug("RTE content CSS to add to result List: " + css.toString());
         cssResultList.add(css);
@@ -226,7 +225,7 @@ public class CssCommand {
   }
 
   private List<BaseObject> addUserSkinCss(Document docAPI) {
-    if (docAPI != null) {
+    if ((docAPI != null) && (docAPI.getDocument() != null)) {
       return addUserSkinCss(docAPI.getDocument());
     }
     return Collections.emptyList();

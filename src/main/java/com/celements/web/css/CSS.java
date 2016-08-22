@@ -20,6 +20,7 @@
 package com.celements.web.css;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
@@ -33,11 +34,21 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * TODO make an API class but which is given back to velocity calls.
- * 
+ *
  * @author edoardo
  */
 public abstract class CSS extends Api {
 
+  private static XWikiContext getContext() {
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
+  }
+
+  public CSS() {
+    super(getContext());
+  }
+
+  @Deprecated
   public CSS(XWikiContext context) {
     super(context);
   }

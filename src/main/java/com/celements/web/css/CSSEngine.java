@@ -56,6 +56,7 @@ public class CSSEngine implements ICSSEngine {
    *         of API and backend. Extract business objects (controller) from CSS classes
    *         and use them here.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
       XWikiContext context) {
@@ -74,7 +75,7 @@ public class CSSEngine implements ICSSEngine {
             if (cssObj != null) {
               LOGGER.debug("includeCSS: adding baseObject [" + cssObj.getStringValue("cssname")
                   + "].");
-              cssList.add(new CSSBaseObject(cssObj, context));
+              cssList.add(new CSSBaseObject(cssObj));
             }
           }
         }
