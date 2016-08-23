@@ -469,17 +469,16 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   private void expectLoadEmptyAttachmentList(Session sessionMock) {
     String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
-    Query query = new TestQuery<>(loadAttachmentHql,
-        new QueryList<XWikiAttachment>() {
+    Query query = new TestQuery<>(loadAttachmentHql, new QueryList<XWikiAttachment>() {
 
-          @Override
-          public List<XWikiAttachment> list(String string, Map<String, Object> params)
-              throws HibernateException {
-            List<XWikiAttachment> attList = new ArrayList<>();
-            return attList;
-          }
+      @Override
+      public List<XWikiAttachment> list(String string, Map<String, Object> params)
+          throws HibernateException {
+        List<XWikiAttachment> attList = new ArrayList<>();
+        return attList;
+      }
 
-        });
+    });
     expect(sessionMock.createQuery(eq(loadAttachmentHql))).andReturn(query).anyTimes();
   }
 
