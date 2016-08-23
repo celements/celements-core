@@ -201,6 +201,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface {
 
   @Override
   public XWikiStoreInterface getStore() {
+    // return default store here because XWiki.getHibernateStore() relies on it
     return Utils.getComponent(XWikiStoreInterface.class);
   }
 
