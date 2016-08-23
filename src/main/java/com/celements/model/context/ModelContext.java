@@ -4,11 +4,11 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @ComponentRole
 public interface ModelContext {
@@ -37,15 +37,15 @@ public interface ModelContext {
    * @return the current doc set in context
    */
   @Nullable
-  public DocumentReference getDoc();
+  public XWikiDocument getDoc();
 
   /**
-   * @param docRef
+   * @param doc
    *          to be set in context
    * @return the doc which was set before
    */
   @Nullable
-  public DocumentReference setDoc(@NotNull DocumentReference docRef);
+  public XWikiDocument setDoc(@Nullable XWikiDocument doc);
 
   /**
    * @return the default language for the current wiki

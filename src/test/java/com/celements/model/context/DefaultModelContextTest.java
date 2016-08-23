@@ -46,13 +46,12 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   @Test
   public void test_getDoc_setDoc() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(docRef))).andReturn(
-        new XWikiDocument(docRef)).once();
+    XWikiDocument doc = new XWikiDocument(docRef);
     replayDefault();
     assertNull(modelContext.getDoc());
-    assertNull(modelContext.setDoc(docRef));
-    assertEquals(docRef, modelContext.getDoc());
-    assertEquals(docRef, modelContext.setDoc(null));
+    assertNull(modelContext.setDoc(doc));
+    assertEquals(doc, modelContext.getDoc());
+    assertEquals(doc, modelContext.setDoc(null));
     assertNull(modelContext.getDoc());
     verifyDefault();
   }
@@ -90,7 +89,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getDefaultLanguage_space() {
+  public void test_getDefaultLanguage_space() throws Exception {
     final String lang = "xk";
     final SpaceReference spaceRef = new SpaceReference("space", new WikiReference("wiki"));
     final DocumentReference webPrefDocRef = getWebPrefDocRef(spaceRef);
@@ -104,7 +103,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
             return lang;
           }
         }).once();
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(webPrefDocRef))).andReturn(
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(webPrefDocRef))).andReturn(
         new XWikiDocument(webPrefDocRef)).once();
 
     assertDefaultContext();
@@ -132,7 +131,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
             return lang;
           }
         }).once();
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(webPrefDocRef))).andReturn(
+    expect(getMock(IModelAccessFacade.class).getDocument(eq(webPrefDocRef))).andReturn(
         new XWikiDocument(webPrefDocRef)).once();
 
     assertDefaultContext();

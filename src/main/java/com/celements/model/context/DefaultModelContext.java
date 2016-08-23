@@ -51,20 +51,15 @@ public class DefaultModelContext implements ModelContext {
   }
 
   @Override
-  public DocumentReference getDoc() {
-    XWikiDocument doc = getXWikiContext().getDoc();
-    return doc != null ? doc.getDocumentReference() : null;
+  public XWikiDocument getDoc() {
+    return getXWikiContext().getDoc();
   }
 
   @Override
-  public DocumentReference setDoc(DocumentReference docRef) {
-    DocumentReference oldDocRef = getDoc();
-    XWikiDocument doc = null;
-    if (docRef != null) {
-      doc = getModelAccess().getOrCreateDocument(docRef);
-    }
+  public XWikiDocument setDoc(XWikiDocument doc) {
+    XWikiDocument oldDoc = getDoc();
     getXWikiContext().setDoc(doc);
-    return oldDocRef;
+    return oldDoc;
   }
 
   @Override
@@ -97,13 +92,13 @@ public class DefaultModelContext implements ModelContext {
 
   private String getDefaultLangFromConfigSrc(EntityReference ref) {
     WikiReference wikiBefore = getWiki();
-    DocumentReference docBefore = getDoc();
+    XWikiDocument docBefore = getDoc();
     try {
       ConfigurationSource configSrc;
       setWiki(getModelUtils().extractRef(ref, getWiki(), WikiReference.class));
-      SpaceReference spaceRef = getModelUtils().extractRef(ref, SpaceReference.class);
-      if (spaceRef != null) {
-        setDoc(new DocumentReference(WEB_PREF_DOC_NAME, spaceRef));
+      XWikiDocument spacePrefDoc = getSpacePrefDoc(ref);
+      if (spacePrefDoc != null) {
+        setDoc(spacePrefDoc);
         configSrc = defaultConfigSrc; // checks space preferences
       } else {
         configSrc = wikiConfigSrc; // skips space preferences
@@ -113,6 +108,19 @@ public class DefaultModelContext implements ModelContext {
       setWiki(wikiBefore);
       setDoc(docBefore);
     }
+  }
+
+  private XWikiDocument getSpacePrefDoc(EntityReference ref) {
+    XWikiDocument ret = null;
+    SpaceReference spaceRef = getModelUtils().extractRef(ref, SpaceReference.class);
+    if (spaceRef != null) {
+      try {
+        ret = getModelAccess().getDocument(new DocumentReference(WEB_PREF_DOC_NAME, spaceRef));
+      } catch (DocumentNotExistsException exc) {
+        LOGGER.debug("no web preferences for space '{}'", spaceRef);
+      }
+    }
+    return ret;
   }
 
   private ModelUtils getModelUtils() {
