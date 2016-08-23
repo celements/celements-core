@@ -31,7 +31,7 @@ public class TestClassDefinition extends AbstractClassDefinition implements
   }
 
   @Override
-  public DocumentReference getClassRef() {
+  protected DocumentReference getClassRefInternal() {
     return CLASS_REF;
   }
 

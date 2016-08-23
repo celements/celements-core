@@ -9,17 +9,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.util.ModelUtils;
 
 public abstract class AbstractClassDefinition implements ClassDefinition {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractClassDefinition.class);
 
   @Requirement
+  protected ModelUtils modelUtils;
+
+  @Requirement
   protected ConfigurationSource configSrc;
 
   private volatile List<ClassField<?>> fields;
+
+  @Override
+  public DocumentReference getClassRef() {
+    return getClassRef(null);
+  }
+
+  @Override
+  public DocumentReference getClassRef(WikiReference wikiRef) {
+    return modelUtils.adjustRef(getClassRefInternal(), DocumentReference.class, wikiRef);
+  }
+
+  /**
+   * @return class ref for this class definition. wiki will be adjusted
+   */
+  protected abstract DocumentReference getClassRefInternal();
 
   @Override
   public boolean isBlacklisted() {

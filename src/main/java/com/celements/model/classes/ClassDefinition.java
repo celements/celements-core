@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.classes.fields.ClassField;
 
@@ -18,9 +19,15 @@ public interface ClassDefinition {
   public String getName();
 
   /**
-   * @return the document reference on which the class is defined
+   * @return the document reference on which the class is defined, using current wiki
    */
   public DocumentReference getClassRef();
+
+  /**
+   * @param wikiRef
+   * @return the document reference on which the class is defined, using given wiki
+   */
+  public DocumentReference getClassRef(WikiReference wikiRef);
 
   /**
    * @return true if the class definition is blacklisted
