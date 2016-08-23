@@ -396,7 +396,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private void expectBaseObjectLoad(Session sessionMock) {
     String loadBaseObjectHql = "from BaseObject as bobject where bobject.name = :name order by "
         + "bobject.number";
-    Query queryObj = new TestQuery<BaseObject>(loadBaseObjectHql, new QueryList<BaseObject>() {
+    Query queryObj = new TestQuery<>(loadBaseObjectHql, new QueryList<BaseObject>() {
 
       @Override
       public List<BaseObject> list(String string, Map<String, Object> params)
@@ -421,7 +421,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   private void expectPropertiesLoad(Session sessionMock) {
     String loadPropHql = "select prop.name, prop.classType from BaseProperty as prop where "
         + "prop.id.id = :id";
-    Query queryProp = new TestQuery<String[]>(loadPropHql, new QueryList<String[]>() {
+    Query queryProp = new TestQuery<>(loadPropHql, new QueryList<String[]>() {
 
       @Override
       public List<String[]> list(String string, Map<String, Object> params)
@@ -469,17 +469,16 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   private void expectLoadEmptyAttachmentList(Session sessionMock) {
     String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
-    Query query = new TestQuery<XWikiAttachment>(loadAttachmentHql,
-        new QueryList<XWikiAttachment>() {
+    Query query = new TestQuery<>(loadAttachmentHql, new QueryList<XWikiAttachment>() {
 
-          @Override
-          public List<XWikiAttachment> list(String string, Map<String, Object> params)
-              throws HibernateException {
-            List<XWikiAttachment> attList = new ArrayList<>();
-            return attList;
-          }
+      @Override
+      public List<XWikiAttachment> list(String string, Map<String, Object> params)
+          throws HibernateException {
+        List<XWikiAttachment> attList = new ArrayList<>();
+        return attList;
+      }
 
-        });
+    });
     expect(sessionMock.createQuery(eq(loadAttachmentHql))).andReturn(query).anyTimes();
   }
 
@@ -540,7 +539,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   private class LoadDocCheckResult {
 
-    private final List<String> messages = new Vector<String>();
+    private final List<String> messages = new Vector<>();
 
     public void addMessage(String message) {
       messages.add(message);
@@ -771,7 +770,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     public TestQuery(String queryStr, QueryList<T> listStub) {
       super(queryStr, FlushMode.AUTO, null, null);
       this.listStub = listStub;
-      this.params = new HashMap<String, Object>();
+      this.params = new HashMap<>();
       theQueryMock = createMock(Query.class);
       replay(theQueryMock);
     }
