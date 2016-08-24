@@ -1,25 +1,25 @@
 package com.celements.model.access.exception;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 public class DocumentAccessRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 2808580562362027580L;
 
-  private final DocumentReference docRef;
+  private final EntityReference ref;
 
-  public DocumentAccessRuntimeException(DocumentReference docRef) {
-    super(docRef != null ? docRef.toString() : "null");
-    this.docRef = docRef;
+  public DocumentAccessRuntimeException(EntityReference ref) {
+    super(ref != null ? ref.toString() : "null");
+    this.ref = ref;
   }
 
-  public DocumentAccessRuntimeException(DocumentReference docRef, Throwable cause) {
-    super(docRef != null ? docRef.toString() : "null", cause);
-    this.docRef = docRef;
+  public DocumentAccessRuntimeException(EntityReference ref, Throwable cause) {
+    super(ref != null ? ref.toString() : "null", cause);
+    this.ref = ref;
   }
 
-  public DocumentReference getDocumentReference() {
-    return docRef;
+  public EntityReference getReference() {
+    return ref;
   }
 
 }
