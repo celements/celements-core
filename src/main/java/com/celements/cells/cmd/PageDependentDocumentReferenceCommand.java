@@ -211,6 +211,8 @@ public class PageDependentDocumentReferenceCommand {
           depDefaultDocList, pageDepDoc.getDocumentReference());
       return pageDepDoc.getDocumentReference();
     } else {
+      LOGGER.debug("getDependentDefaultDocumentReference: docList '{}', no default doc found!"
+          + " Using spaceDefault", depDefaultDocList);
       // XXX What should be the default?
       // For now using spaceDefault for backwards compatibility
       return spaceDefault;
