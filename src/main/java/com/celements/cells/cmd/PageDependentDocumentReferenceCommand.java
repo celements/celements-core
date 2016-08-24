@@ -281,7 +281,7 @@ public class PageDependentDocumentReferenceCommand {
     SpaceReference spaceRef;
     try {
       if (!"".equals(getDepCellSpace(cellDocRef))) {
-        SpaceReference curSpaceRef = (SpaceReference) getCurrentDocumentSpaceRef(docRef);
+        SpaceReference curSpaceRef = getCurrentDocumentSpaceRef(docRef);
         /*
          * IMPORTANT: do not use .clone() on any reference it will not be available on
          * unstable branch
@@ -435,7 +435,7 @@ public class PageDependentDocumentReferenceCommand {
   }
 
   private EntityReferenceSerializer<String> getRefSerializer() {
-    return getWebUtilsService().getRefLocalSerializer();
+    return getWebUtilsService().getRefDefaultSerializer();
   }
 
 }
