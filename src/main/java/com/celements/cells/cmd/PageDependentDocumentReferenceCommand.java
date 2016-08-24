@@ -216,6 +216,7 @@ public class PageDependentDocumentReferenceCommand {
   }
 
   public void setCurrentLayoutRef(SpaceReference currentLayoutRef) {
+    LOGGER.info("setCurrentLayoutRef: '{}'", currentLayoutRef);
     this.currentLayoutRef = currentLayoutRef;
   }
 
