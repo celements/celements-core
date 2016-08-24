@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.docform.DocFormRequestKey;
 import com.celements.docform.DocFormRequestKeyParser;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,7 +58,10 @@ public class DocFormCommandTest extends AbstractComponentTest {
   private String db;
 
   @Before
-  public void setUp_DocFormCommandTest() throws Exception {
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
     docFormCmd = new DocFormCommand();
@@ -220,12 +224,12 @@ public class DocFormCommandTest extends AbstractComponentTest {
     regexProp.setValue("/.{1,5}/");
     BaseProperty msgProp = new StringProperty();
     msgProp.setValue("msg");
-    Map<String, BaseProperty> propfields = new HashMap<String, BaseProperty>();
+    Map<String, BaseProperty> propfields = new HashMap<>();
     PropertyClass property = new PropertyClass();
     propfields.put("validationRegExp", regexProp);
     propfields.put("validationMessage", msgProp);
     property.setFields(propfields);
-    Map<String, PropertyClass> fields = new HashMap<String, PropertyClass>();
+    Map<String, PropertyClass> fields = new HashMap<>();
     fields.put("testField", property);
     BaseClass bclass = new BaseClass();
     bclass.setFields(fields);
@@ -289,7 +293,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void testUpdateDocFromMap() throws XWikiException {
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
     data.put("C.D_1_blabla2", new String[] { "Another Blabla Value" });
     BaseObject obj = createMock(BaseObject.class);
@@ -310,14 +314,14 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expectLastCall().atLeastOnce();
     replay(obj, obj2);
     XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
-    Vector<BaseObject> cDobjects = new Vector<BaseObject>();
+    Vector<BaseObject> cDobjects = new Vector<>();
     cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
     DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     expect(xwiki.exists(eq(fullNameRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(fullNameRef), same(context))).andReturn(defaultDoc).times(2);
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
-    Vector<BaseObject> cDobjects2 = new Vector<BaseObject>();
+    Vector<BaseObject> cDobjects2 = new Vector<>();
     cDobjects2.add(obj2);
     DocumentReference abClassRef = new DocumentReference(db, "A", "B");
     specificDoc.setXObjects(abClassRef, cDobjects2);
@@ -339,7 +343,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
   @Test
   public void testUpdateDocFromMap_newFromTemplate_titleAndContent() throws XWikiException {
     context.setLanguage("de");
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("Oh.Noes_title", new String[] { "Blabla Value" });
     data.put("content", new String[] { "Another Blabla Value" });
     DocumentReference fullNameRef = new DocumentReference(db, "Full", "Name");
@@ -376,7 +380,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void testUpdateDocFromMap_newFromTemplate() throws XWikiException {
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("Oh.Noes_A.B_0_blabla", new String[] { "Blabla Value" });
     data.put("C.D_1_blabla2", new String[] { "Another Blabla Value" });
     BaseObject obj = createMock(BaseObject.class);
@@ -397,20 +401,15 @@ public class DocFormCommandTest extends AbstractComponentTest {
     expectLastCall().atLeastOnce();
     replay(obj, obj2);
     XWikiDocument defaultDoc = new XWikiDocument(fullNameRef);
-    Vector<BaseObject> cDobjects = new Vector<BaseObject>();
+    Vector<BaseObject> cDobjects = new Vector<>();
     cDobjects.addAll(Arrays.asList(new BaseObject(), obj));
     DocumentReference cdClassRef = new DocumentReference(db, "C", "D");
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     DocumentReference doc1Ref = new DocumentReference(db, "Full", "Name");
     expect(xwiki.exists(eq(doc1Ref), same(context))).andReturn(false).atLeastOnce();
-    expect(xwiki.getDocument(eq(doc1Ref), same(context))).andReturn(defaultDoc).times(2);
-    DocumentReference webDocRef = new DocumentReference(db, "Full", "WebPreferences");
-    expect(xwiki.exists(eq(webDocRef), same(context))).andReturn(true).atLeastOnce();
-    XWikiDocument webDoc = new XWikiDocument(webDocRef);
-    webDoc.setNew(false);
-    expect(xwiki.getDocument(eq(webDocRef), same(context))).andReturn(webDoc).atLeastOnce();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(doc1Ref))).andReturn(defaultDoc).times(2);
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
-    Vector<BaseObject> cDobjects2 = new Vector<BaseObject>();
+    Vector<BaseObject> cDobjects2 = new Vector<>();
     cDobjects2.add(obj2);
     DocumentReference abClassRef = new DocumentReference(db, "A", "B");
     specificDoc.setXObjects(abClassRef, cDobjects2);
@@ -444,7 +443,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("content", new String[] { value });
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
@@ -472,7 +471,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("A.B_0_content", new String[] { value });
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
@@ -500,7 +499,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("title", new String[] { value });
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
@@ -528,7 +527,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
-    Map<String, String[]> data = new HashMap<String, String[]>();
+    Map<String, String[]> data = new HashMap<>();
     data.put("A.B_0_title", new String[] { value });
 
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
@@ -546,7 +545,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
 
   @Test
   public void testPrepareMapForDocUpdate() {
-    Map<String, Object> inMap = new HashMap<String, Object>();
+    Map<String, Object> inMap = new HashMap<>();
     String key1 = "key1";
     String key2 = "key2";
     String val1 = "Value1";

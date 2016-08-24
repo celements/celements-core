@@ -35,14 +35,13 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.context.ModelContext;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.TreeNode;
 import com.celements.navigation.filter.InternalRightsFilter;
 import com.celements.navigation.service.ITreeNodeService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -57,7 +56,10 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
   private INavigationClassConfig navClassConfig;
 
   @Before
-  public void setUp_FileBaseTagsCmdTest() throws Exception {
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
     mockTreeNodeSrv = registerComponentMock(ITreeNodeService.class);
@@ -328,7 +330,6 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     String celFileBaseName = "Content_attachments";
     SpaceReference celFileBaseRef = new SpaceReference(celFileBaseName, new WikiReference(
         context.getDatabase()));
-    expectSpacePreferences(celFileBaseRef);
     expect(xwiki.getSpacePreference(eq("cel_centralfilebase"), eq(""), same(context))).andReturn(
         celFileBaseName).anyTimes();
     DocumentReference tagDocRef = new DocumentReference(context.getDatabase(), celFileBaseName,
@@ -341,7 +342,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
             0))).atLeastOnce();
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
     existingTagDoc.setNew(false);
-    expect(xwiki.getDocument(eq(tagDocRef), same(context))).andReturn(existingTagDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(tagDocRef))).andReturn(existingTagDoc);
     BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();
@@ -364,14 +365,6 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
     assertEquals("expecting attached object", 1, menuItemObj.getIntValue(
         INavigationClassConfig.MENU_POSITION_FIELD));
     verifyDefault();
-  }
-
-  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
-    DocumentReference webPrefDocRef = new DocumentReference(ModelContext.WEB_PREF_DOC_NAME,
-        spaceRef);
-    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
-        new XWikiDocument(webPrefDocRef)).once();
   }
 
 }
