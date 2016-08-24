@@ -9,6 +9,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 @ComponentRole
 public interface ModelContext {
@@ -46,6 +47,15 @@ public interface ModelContext {
    */
   @Nullable
   public XWikiDocument setDoc(@Nullable XWikiDocument doc);
+
+  @Nullable
+  public XWikiUser getUser();
+
+  @Nullable
+  public XWikiUser setUser(@Nullable XWikiUser user);
+
+  @NotNull
+  public String getUserName();
 
   /**
    * @return the default language for the current wiki

@@ -1,5 +1,7 @@
 package com.celements.model.context;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -17,6 +19,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
 @Component
@@ -60,6 +63,27 @@ public class DefaultModelContext implements ModelContext {
     XWikiDocument oldDoc = getDoc();
     getXWikiContext().setDoc(doc);
     return oldDoc;
+  }
+
+  @Override
+  public XWikiUser getUser() {
+    return getXWikiContext().getXWikiUser();
+  }
+
+  @Override
+  public XWikiUser setUser(@Nullable XWikiUser user) {
+    XWikiUser oldUser = getUser();
+    if (user != null) {
+      getXWikiContext().setUser(user.getUser(), user.isMain());
+    } else {
+      getXWikiContext().setUser(null);
+    }
+    return oldUser;
+  }
+
+  @Override
+  public String getUserName() {
+    return getXWikiContext().getUser();
   }
 
   @Override
