@@ -52,7 +52,7 @@ public class PageDependentDocumentReferenceCommand {
   public static final String PROPNAME_SPACE_NAME = "space_name";
   public static final String PROPNAME_IS_INHERITABLE = "is_inheritable";
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(
+  private static Logger LOGGER = LoggerFactory.getLogger(
       PageDependentDocumentReferenceCommand.class);
 
   PageLayoutCommand pageLayoutCmd;
@@ -73,12 +73,12 @@ public class PageDependentDocumentReferenceCommand {
 
   public DocumentReference getDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef) {
-    _LOGGER.debug("getDocumentReference: document [" + docRef + "] cellDocRef [" + cellDocRef
+    LOGGER.debug("getDocumentReference: document [" + docRef + "] cellDocRef [" + cellDocRef
         + "] context language [" + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
       return getDependentDocumentReference(docRef, cellDocRef);
     }
-    _LOGGER.info("getDocumentReference: isCurrentDoc returning " + docRef);
+    LOGGER.info("getDocumentReference: isCurrentDoc returning " + docRef);
     return docRef;
   }
 
@@ -94,13 +94,13 @@ public class PageDependentDocumentReferenceCommand {
 
   public DocumentReference getDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef, boolean isInheritable) {
-    _LOGGER.debug("getDocumentReference: document [" + docRef + "] cellDocRef [" + cellDocRef
+    LOGGER.debug("getDocumentReference: document [" + docRef + "] cellDocRef [" + cellDocRef
         + "] isInheritable [" + isInheritable + "] context language [" + getContext().getLanguage()
         + "].");
     if (!isCurrentDocument(cellDocRef)) {
       return getDependentDocumentReference(docRef, cellDocRef, isInheritable);
     }
-    _LOGGER.info("getDocumentReference: isCurrentDoc returning " + docRef);
+    LOGGER.info("getDocumentReference: isCurrentDoc returning " + docRef);
     return docRef;
   }
 
@@ -115,7 +115,7 @@ public class PageDependentDocumentReferenceCommand {
 
   public XWikiDocument getDocument(XWikiDocument document, DocumentReference cellDocRef)
       throws XWikiException {
-    _LOGGER.debug("getDocument: document [" + document.getDocumentReference() + "] cellDocRef ["
+    LOGGER.debug("getDocument: document [" + document.getDocumentReference() + "] cellDocRef ["
         + cellDocRef + "] context language [" + getContext().getLanguage() + "].");
     if (!isCurrentDocument(cellDocRef)) {
       DocumentReference dependentDocRef = getDependentDocumentReference(
@@ -147,13 +147,13 @@ public class PageDependentDocumentReferenceCommand {
 
   public XWikiDocument getTranslatedDocument(XWikiDocument document, DocumentReference cellDocRef)
       throws XWikiException {
-    _LOGGER.debug("getTranslatedDocument: document [" + document.getDocumentReference()
+    LOGGER.debug("getTranslatedDocument: document [" + document.getDocumentReference()
         + "] cellDocRef [" + cellDocRef + "] context language [" + getContext().getLanguage()
         + "].");
     if (!isCurrentDocument(cellDocRef)) {
       XWikiDocument tdoc = getDocument(document, cellDocRef).getTranslatedDocument(
           getContext().getLanguage(), getContext());
-      _LOGGER.trace("getTranslatedDocument returning tdoc [" + tdoc.getDocumentReference()
+      LOGGER.trace("getTranslatedDocument returning tdoc [" + tdoc.getDocumentReference()
           + "] lang [" + tdoc.getLanguage() + "," + tdoc.getDefaultLanguage() + "].");
       return tdoc;
     }
@@ -168,22 +168,22 @@ public class PageDependentDocumentReferenceCommand {
   DocumentReference getDependentDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef, boolean isInheritable) {
     SpaceReference depDocSpaceRef = getDependentDocumentSpaceRef(docRef, cellDocRef);
-    _LOGGER.debug("getDependentDocumentReference: docRef [" + docRef + "] cellDocRef [" + cellDocRef
+    LOGGER.debug("getDependentDocumentReference: docRef [" + docRef + "] cellDocRef [" + cellDocRef
         + "] isInheritable [" + isInheritable + "] depDocSpaceRef [" + depDocSpaceRef + "].");
     if (isInheritable) {
       List<String> depDocList = getDependentDocList(docRef, depDocSpaceRef.getName());
-      if (_LOGGER.isDebugEnabled()) {
-        _LOGGER.debug("getDependentDocumentReference: inheritable for [" + docRef + "]"
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("getDependentDocumentReference: inheritable for [" + docRef + "]"
             + " depDocList [" + Arrays.deepToString(depDocList.toArray(new String[0])) + "]. ");
       } else {
-        _LOGGER.info("getDependentDocumentReference: inheritable for [" + docRef + "]. ");
+        LOGGER.info("getDependentDocumentReference: inheritable for [" + docRef + "]. ");
       }
       XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(depDocList,
           getContext()).getDocument();
       if (pageDepDoc != null) {
         return pageDepDoc.getDocumentReference();
       } else {
-        _LOGGER.debug("getDependentDocumentReference: inheritable result was null."
+        LOGGER.debug("getDependentDocumentReference: inheritable result was null."
             + " Fallback to [" + depDocSpaceRef + "." + PDC_DEFAULT_CONTENT_NAME + "]");
         return getDependentDefaultDocumentReference(docRef, cellDocRef);
       }
@@ -222,6 +222,7 @@ public class PageDependentDocumentReferenceCommand {
   SpaceReference getCurrentLayoutRef() {
     if (currentLayoutRef == null) {
       currentLayoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
+      LOGGER.info("getCurrentLayoutRef: '{}'", currentLayoutRef);
     }
     return currentLayoutRef;
   }
@@ -232,7 +233,7 @@ public class PageDependentDocumentReferenceCommand {
     try {
       depCellSpace = getDepCellSpace(cellDocRef);
     } catch (XWikiException exp) {
-      _LOGGER.warn("Failed to get layoutDefault because unable to get depCellSpace for ["
+      LOGGER.warn("Failed to get layoutDefault because unable to get depCellSpace for ["
           + cellDocRef + "] omitting layout default.", exp);
     }
     return getLayoutDefaultDocRef(currLayoutRef, depCellSpace);
@@ -289,14 +290,14 @@ public class PageDependentDocumentReferenceCommand {
         spaceRef = new SpaceReference(curSpaceRef.getName() + "_" + getDepCellSpace(cellDocRef),
             (WikiReference) curSpaceRef.getParent());
       } else {
-        _LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
+        LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
             + " check with isCurrentDocument method before calling"
             + " getDependentDocumentSpace!");
         spaceRef = getCurrentDocumentSpaceRef(docRef);
       }
     } catch (XWikiException exp) {
       spaceRef = getCurrentDocumentSpaceRef(docRef);
-      _LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from [" + cellDocRef
+      LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from [" + cellDocRef
           + "] assuming" + " [" + spaceRef + "] for document space.", exp);
     }
     return spaceRef;
@@ -309,14 +310,14 @@ public class PageDependentDocumentReferenceCommand {
       String depCellSpace = getDepCellSpace(cellDocRef);
       spaceRef = getDependentWikiSpaceRef(depCellSpace);
       if (spaceRef == null) {
-        _LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
+        LOGGER.warn("getDependentDocumentSpace: fallback to currentDocument. Please"
             + " check with isCurrentDocument method before calling"
             + " getDependentDocumentSpace!");
         spaceRef = getCurrentDocumentSpaceRef(docRef);
       }
     } catch (XWikiException exp) {
       spaceRef = getCurrentDocumentSpaceRef(docRef);
-      _LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from [" + cellDocRef
+      LOGGER.error("getDependentDocumentSpace: Failed to get getDepCellSpace from [" + cellDocRef
           + "] assuming" + " [" + spaceRef + "] for document space.", exp);
     }
     return spaceRef;
@@ -332,7 +333,7 @@ public class PageDependentDocumentReferenceCommand {
   }
 
   SpaceReference getCurrentDocumentSpaceRef(DocumentReference docRef) {
-    _LOGGER.info("getCurrentDocumentSpaceRef for document [" + docRef + "].");
+    LOGGER.info("getCurrentDocumentSpaceRef for document [" + docRef + "].");
     SpaceReference spaceRef;
     List<SpaceReference> currentSpaces = docRef.getSpaceReferences();
     if (currentSpaces.size() > 0) {
@@ -340,7 +341,7 @@ public class PageDependentDocumentReferenceCommand {
     } else {
       spaceRef = new SpaceReference(getConfigProvider().getDefaultValue(EntityType.SPACE),
           new WikiReference(getContext().getDatabase()));
-      _LOGGER.warn("getCurrentDocumentSpaceRef: no space reference for current Document" + " ["
+      LOGGER.warn("getCurrentDocumentSpaceRef: no space reference for current Document" + " ["
           + docRef + "] found. Fallback to default [" + spaceRef + "].");
     }
     return spaceRef;
@@ -350,7 +351,7 @@ public class PageDependentDocumentReferenceCommand {
     try {
       return "".equals(getDepCellSpace(cellDocRef));
     } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get PageDepCellConfigClass object from [" + cellDocRef + "].", exp);
+      LOGGER.error("Failed to get PageDepCellConfigClass object from [" + cellDocRef + "].", exp);
       // return true, because without config we are unable to determine the document
       return true;
     }
@@ -360,12 +361,12 @@ public class PageDependentDocumentReferenceCommand {
     BaseObject cellConfObj = getDepCellXObject(cellDocRef);
     if (cellConfObj != null) {
       String spaceName = cellConfObj.getStringValue(PROPNAME_SPACE_NAME);
-      _LOGGER.debug("getDepCellSpace: spaceName [" + spaceName + "] for [" + cellDocRef + "]");
+      LOGGER.debug("getDepCellSpace: spaceName [" + spaceName + "] for [" + cellDocRef + "]");
       if (spaceName != null) {
         return spaceName;
       }
     } else {
-      _LOGGER.debug("getDepCellSpace: no cellConfObj found for [" + cellDocRef + "]");
+      LOGGER.debug("getDepCellSpace: no cellConfObj found for [" + cellDocRef + "]");
     }
     return "";
   }
@@ -385,7 +386,7 @@ public class PageDependentDocumentReferenceCommand {
         return (cellConfObj.getIntValue(PROPNAME_IS_INHERITABLE, 0) != 0);
       }
     } catch (XWikiException exp) {
-      _LOGGER.error("Faild to check if isInheritable for [" + cellDocRef.getLastSpaceReference()
+      LOGGER.error("Faild to check if isInheritable for [" + cellDocRef.getLastSpaceReference()
           + "." + cellDocRef.getName() + "].", exp);
     }
     return false;
