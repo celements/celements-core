@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.cells.ICellsClassConfig;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -46,8 +47,16 @@ public class PageDependentDocumentReferenceCommand {
 
   public static final String PDC_DEFAULT_CONTENT_NAME = "PDC-Default_Content";
   public static final String PDC_WIKIDEFAULT_SPACE_NAME = "PDC-WikiDefault";
-  public static final String PAGE_DEP_CELL_CONFIG_CLASS_SPACE = "Celements";
-  public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
+  /**
+   * @deprecated instead use ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE
+   */
+  @Deprecated
+  public static final String PAGE_DEP_CELL_CONFIG_CLASS_SPACE = ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE;
+  /**
+   * @deprecated instead use ICellsClassConfig.PAGE_DEP_CELL_CONFIG_CLASS_DOC
+   */
+  @Deprecated
+  public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = ICellsClassConfig.PAGE_DEP_CELL_CONFIG_CLASS_DOC;
 
   public static final String PROPNAME_SPACE_NAME = "space_name";
   public static final String PROPNAME_IS_INHERITABLE = "is_inheritable";
@@ -403,7 +412,8 @@ public class PageDependentDocumentReferenceCommand {
 
   private BaseObject getDepCellXObject(DocumentReference cellDocRef) throws XWikiException {
     BaseObject cellConfObj = getContext().getWiki().getDocument(cellDocRef,
-        getContext()).getXObject(getPageDepCellConfigClassDocRef());
+        getContext()).getXObject(getCellsClassConfig().getPageDepCellConfigClassRef(
+            cellDocRef.getWikiReference().getName()));
     return cellConfObj;
   }
 
@@ -415,10 +425,19 @@ public class PageDependentDocumentReferenceCommand {
     return getPageDepCellConfigClassDocRef();
   }
 
+  /**
+   * @deprecated since 2.81 instead use
+   *             {@link ICellsClassConfig#getPageDepCellConfigClassRef(String)}
+   */
+  @Deprecated
   public DocumentReference getPageDepCellConfigClassDocRef() {
     DocumentReference pageDepConfigClassRef = new DocumentReference(getContext().getDatabase(),
         PAGE_DEP_CELL_CONFIG_CLASS_SPACE, PAGE_DEP_CELL_CONFIG_CLASS_DOC);
     return pageDepConfigClassRef;
+  }
+
+  private ICellsClassConfig getCellsClassConfig() {
+    return Utils.getComponent(ICellsClassConfig.class);
   }
 
   private IWebUtilsService getWebUtilsService() {
@@ -430,7 +449,7 @@ public class PageDependentDocumentReferenceCommand {
 
   private XWikiContext getContext() {
     return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
-        "xwikicontext");
+        XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   private EntityReferenceValueProvider getConfigProvider() {

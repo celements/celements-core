@@ -13,22 +13,24 @@ public class CellsClassConfig implements ICellsClassConfig {
 
   @Override
   public DocumentReference getPageLayoutPropertiesClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements", "PageLayoutPropertiesClass");
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, "PageLayoutPropertiesClass");
   }
 
   @Override
   public DocumentReference getGroupCellClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements", "GroupCellClass");
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, "GroupCellClass");
   }
 
   @Override
   public DocumentReference getPageDepCellConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements", "PageDepCellConfigClass");
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE,
+        PAGE_DEP_CELL_CONFIG_CLASS_DOC);
   }
 
   @Override
   public DocumentReference getTranslationBoxCellConfigClassRef(String wikiName) {
-    return new DocumentReference(wikiName, "Celements", "TranslationBoxCellConfigClass");
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE,
+        "TranslationBoxCellConfigClass");
   }
 
 }
