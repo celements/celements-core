@@ -207,6 +207,8 @@ public class PageDependentDocumentReferenceCommand {
     XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(depDefaultDocList,
         getContext()).getDocument();
     if (pageDepDoc != null) {
+      LOGGER.debug("getDependentDefaultDocumentReference: docList '{}', pageDepDoc '{}'",
+          depDefaultDocList, pageDepDoc.getDocumentReference());
       return pageDepDoc.getDocumentReference();
     } else {
       // XXX What should be the default?
