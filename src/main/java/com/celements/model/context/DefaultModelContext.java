@@ -54,6 +54,11 @@ public class DefaultModelContext implements ModelContext {
   }
 
   @Override
+  public WikiReference getMainWiki() {
+    return new WikiReference(getXWikiContext().getMainXWiki());
+  }
+
+  @Override
   public XWikiDocument getDoc() {
     return getXWikiContext().getDoc();
   }

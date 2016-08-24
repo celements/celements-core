@@ -34,6 +34,9 @@ public interface ModelContext {
   @NotNull
   public WikiReference setWiki(@NotNull WikiReference wikiRef);
 
+  @NotNull
+  public WikiReference getMainWiki();
+
   /**
    * @return the current doc set in context
    */
