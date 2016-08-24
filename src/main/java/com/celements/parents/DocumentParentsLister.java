@@ -103,11 +103,13 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
 
   private void setParent(List<DocumentReference> parents, DocumentReference toAdd)
       throws XDocRecursionException {
-    if (!parents.contains(toAdd)) {
+    if (toAdd == null) {
+      LOGGER.warn("tried to add null as parent for doc '{}'", Iterables.getFirst(parents, null));
+    } else if (parents.contains(toAdd)) {
+      throw new XDocRecursionException(toAdd);
+    } else {
       parents.add(toAdd);
       LOGGER.trace("added '{}' to parent list", toAdd);
-    } else {
-      throw new XDocRecursionException(toAdd);
     }
   }
 
