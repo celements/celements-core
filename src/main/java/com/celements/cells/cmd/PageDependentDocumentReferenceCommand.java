@@ -200,9 +200,13 @@ public class PageDependentDocumentReferenceCommand {
     depDefaultDocList.add(getRefSerializer().serialize(getWikiDefaultDocRef(docRef, cellDocRef)));
     if (getCurrentLayoutRef() != null) {
       DocumentReference layoutDefault = getLayoutDefaultDocRef(getCurrentLayoutRef(), cellDocRef);
+      LOGGER.trace("getDependentDefaultDocumentReference: layout default docRef '{}'",
+          layoutDefault);
       if (layoutDefault != null) {
         depDefaultDocList.add(getRefSerializer().serialize(layoutDefault));
       }
+    } else {
+      LOGGER.trace("getDependentDefaultDocumentReference: no current layout reference found.");
     }
     XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(depDefaultDocList,
         getContext()).getDocument();
