@@ -14,7 +14,6 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -55,7 +54,16 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   private XWikiStoreInterface storeMock;
 
   @Before
-  public void setUp_DefaultModelAccessFacadeTest() {
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    registerComponentMock(XWikiDocumentCreator.class, "default", new XWikiDocumentCreator() {
+
+      @Override
+      public XWikiDocument create(DocumentReference docRef) {
+        return new XWikiDocument(docRef);
+      }
+    });
     modelAccess = (DefaultModelAccessFacade) Utils.getComponent(IModelAccessFacade.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
     doc.setSyntax(Syntax.XWIKI_1_0);
@@ -189,15 +197,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void test_createDocument() throws Exception {
     String lang = "de";
     getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
-    Date beforeCreationDate = new Date(System.currentTimeMillis() - 1000); // doc drops ms
-    doc.setNew(true);
-    doc.setFromCache(false);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         false).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        doc).once();
     expect(getWikiMock().isVirtualMode()).andReturn(true).anyTimes();
-    expectSpacePreferences(doc.getDocumentReference().getLastSpaceReference());
     replayDefault();
     // important only call setUser after replayDefault. In unstable-2.0 branch setUser
     // calls xwiki.isVirtualMode
@@ -208,34 +210,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     assertEquals(doc.getDocumentReference(), ret.getDocumentReference());
     assertTrue(ret.isNew());
     assertFalse(ret.isFromCache());
-    assertSame("do not clone if isNew", doc, ret);
-    assertEquals(lang, ret.getDefaultLanguage());
-    assertEquals("", ret.getLanguage());
-    assertTrue(beforeCreationDate.before(ret.getCreationDate()));
-    assertTrue(beforeCreationDate.before(ret.getContentUpdateDate()));
-    assertTrue(beforeCreationDate.before(ret.getDate()));
-    assertEquals(userName, ret.getCreator());
-    assertEquals(userName, ret.getAuthor());
-    assertEquals(0, ret.getTranslation());
-    assertEquals("", ret.getContent());
-    assertTrue(ret.isMetaDataDirty());
-  }
-
-  @Test
-  public void test_createDocument_failed() throws Exception {
-    Throwable cause = new XWikiException();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        false).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andThrow(
-        cause).once();
-    replayDefault();
-    try {
-      modelAccess.createDocument(doc.getDocumentReference());
-      fail("expecting DocumentLoadException");
-    } catch (DocumentLoadException exc) {
-      assertSame(cause, exc.getCause());
-    }
-    verifyDefault();
   }
 
   @Test
@@ -299,38 +273,15 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getOrCreateDocument_create() throws Exception {
-    doc.setNew(true);
-    doc.setFromCache(false);
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         false).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        doc).once();
-    expectSpacePreferences(doc.getDocumentReference().getLastSpaceReference());
     replayDefault();
     XWikiDocument ret = modelAccess.getOrCreateDocument(doc.getDocumentReference());
     verifyDefault();
     assertEquals(doc.getDocumentReference(), ret.getDocumentReference());
     assertTrue(ret.isNew());
     assertFalse(ret.isFromCache());
-    assertSame("do not clone if isNew", doc, ret);
     assertTrue(ret.isMetaDataDirty());
-  }
-
-  @Test
-  public void test_getOrCreateDocument_create_failed() throws Exception {
-    Throwable cause = new XWikiException();
-    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
-        false).once();
-    expect(getWikiMock().getDocument(eq(doc.getDocumentReference()), same(getContext()))).andThrow(
-        cause).once();
-    replayDefault();
-    try {
-      modelAccess.getOrCreateDocument(doc.getDocumentReference());
-      fail("expecting DocumentLoadException");
-    } catch (DocumentLoadException exc) {
-      assertSame(cause, exc.getCause());
-    }
-    verifyDefault();
   }
 
   @Test
@@ -341,14 +292,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     } catch (NullPointerException npe) {
       // expected
     }
-  }
-
-  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
-    DocumentReference webPrefDocRef = new DocumentReference(ModelContext.WEB_PREF_DOC_NAME,
-        spaceRef);
-    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
-        new XWikiDocument(webPrefDocRef)).once();
   }
 
   @Test

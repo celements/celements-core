@@ -18,7 +18,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
@@ -69,6 +68,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Requirement
   protected ModelContext modelContext;
+
+  @Requirement
+  protected XWikiDocumentCreator docCreator;
 
   @Requirement
   protected Execution execution;
@@ -177,40 +179,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentAlreadyExistsException {
     checkNotNull(docRef);
     if (!exists(docRef)) {
-      return createDocumentInternal(docRef);
+      return docCreator.create(docRef);
     } else {
       throw new DocumentAlreadyExistsException(docRef);
     }
-  }
-
-  protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
-    XWikiDocument doc = getDocumentCloneInternal(docRef);
-    Date creationDate = new Date();
-    doc.setDefaultLanguage(getDefaultLangForCreatingDoc(docRef));
-    doc.setLanguage("");
-    doc.setCreationDate(creationDate);
-    doc.setContentUpdateDate(creationDate);
-    doc.setDate(creationDate);
-    doc.setCreator(getContext().getUser());
-    doc.setAuthor(getContext().getUser());
-    doc.setTranslation(0);
-    doc.setContent("");
-    doc.setMetaDataDirty(true);
-    return doc;
-  }
-
-  /**
-   * when creating doc, get default language from space. except get it from wiki directly when
-   * creating web preferences
-   */
-  private String getDefaultLangForCreatingDoc(DocumentReference docRef) {
-    EntityReference fromRef;
-    if (docRef.getName().equals(ModelContext.WEB_PREF_DOC_NAME)) {
-      fromRef = docRef.getWikiReference();
-    } else {
-      fromRef = docRef.getLastSpaceReference();
-    }
-    return modelContext.getDefaultLanguage(fromRef);
   }
 
   @Override
@@ -219,7 +191,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (exists(docRef)) {
       return getDocumentCloneInternal(docRef);
     } else {
-      return createDocumentInternal(docRef);
+      return docCreator.create(docRef);
     }
   }
 

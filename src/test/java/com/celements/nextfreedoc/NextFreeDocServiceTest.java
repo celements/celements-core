@@ -21,10 +21,9 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.context.ModelContext;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -41,7 +40,10 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
   private XWikiStoreInterface storeMock;
 
   @Before
-  public void setUp_NextFreeDocNameCommandTest() throws Exception {
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
     nextFreeDocService = (NextFreeDocService) Utils.getComponent(INextFreeDocRole.class);
@@ -58,20 +60,15 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
         context.getDatabase()));
     String title = "asdf";
     nextFreeDocService.injectNum(spaceRef, title, 5);
-    expectSpacePreferences(spaceRef);
 
     DocumentReference docRef1 = new DocumentReference(title + 5, spaceRef);
     expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).atLeastOnce();
 
     DocumentReference docRef2 = new DocumentReference(title + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()).once();
-
-    DocumentReference docRef3 = new DocumentReference(title + 7, spaceRef);
-    expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).atLeastOnce();
-    XWikiDocument doc3 = new XWikiDocument(docRef3);
-    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
-    expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+    XWikiDocument doc2 = new XWikiDocument(docRef2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2))).andReturn(doc2);
+    expect(storeMock.loadLock(eq(doc2.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
 
@@ -79,7 +76,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference ret = nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
     verifyDefault();
 
-    assertEquals(docRef3, ret);
+    assertEquals(docRef2, ret);
   }
 
   @Test
@@ -118,20 +115,15 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     SpaceReference spaceRef = new SpaceReference("mySpace", new WikiReference(
         context.getDatabase()));
     nextFreeDocService.injectNum(spaceRef, INextFreeDocRole.UNTITLED_NAME, 5);
-    expectSpacePreferences(spaceRef);
 
     DocumentReference docRef1 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 5, spaceRef);
     expect(xwiki.exists(eq(docRef1), same(context))).andReturn(true).once();
 
     DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()).once();
-
-    DocumentReference docRef3 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 7, spaceRef);
-    expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).once();
-    XWikiDocument doc3 = new XWikiDocument(docRef3);
-    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
-    expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+    XWikiDocument doc2 = new XWikiDocument(docRef2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2))).andReturn(doc2);
+    expect(storeMock.loadLock(eq(doc2.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
 
@@ -139,7 +131,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference ret = nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
     verifyDefault();
 
-    assertEquals(docRef3, ret);
+    assertEquals(docRef2, ret);
   }
 
   @Test
@@ -333,14 +325,6 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     assertEquals("SELECT doc.name FROM XWikiDocument doc WHERE doc.space=:space "
         + "AND doc.name LIKE :name ORDER BY LENGTH(doc.name) DESC, doc.name DESC",
         nextFreeDocService.getHighestNumHQL());
-  }
-
-  private void expectSpacePreferences(SpaceReference spaceRef) throws XWikiException {
-    DocumentReference webPrefDocRef = new DocumentReference(ModelContext.WEB_PREF_DOC_NAME,
-        spaceRef);
-    expect(getWikiMock().exists(eq(webPrefDocRef), same(getContext()))).andReturn(true).once();
-    expect(getWikiMock().getDocument(eq(webPrefDocRef), same(getContext()))).andReturn(
-        new XWikiDocument(webPrefDocRef)).once();
   }
 
 }
