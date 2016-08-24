@@ -10,11 +10,13 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.fields.number.ByteField;
 import com.celements.model.classes.fields.number.DoubleField;
 import com.celements.model.classes.fields.number.FloatField;
 import com.celements.model.classes.fields.number.IntField;
 import com.celements.model.classes.fields.number.LongField;
 import com.celements.model.classes.fields.number.NumberField;
+import com.celements.model.classes.fields.number.ShortField;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
 public class NumberFieldTest extends AbstractComponentTest {
@@ -38,6 +40,8 @@ public class NumberFieldTest extends AbstractComponentTest {
     assertImmutable(FloatField.class);
     assertImmutable(LongField.class);
     assertImmutable(IntField.class);
+    assertImmutable(ShortField.class);
+    assertImmutable(ByteField.class);
   }
 
   @Test
