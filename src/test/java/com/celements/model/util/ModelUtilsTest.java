@@ -221,9 +221,8 @@ public class ModelUtilsTest extends AbstractComponentTest {
     assertEquals(wikiRef, modelUtils.extractRef(docRef, WikiReference.class).get());
     assertEquals(spaceRef, modelUtils.extractRef(docRef, SpaceReference.class).get());
     assertEquals(docRef, modelUtils.extractRef(docRef, DocumentReference.class).get());
-    assertEquals(null, modelUtils.extractRef(docRef, AttachmentReference.class).get());
-    assertEquals(attRef, modelUtils.extractRef(attRef, AttachmentReference.class).get());
     assertFalse(modelUtils.extractRef(docRef, AttachmentReference.class).isPresent());
+    assertEquals(attRef, modelUtils.extractRef(attRef, AttachmentReference.class).get());
     assertNotSame(docRef, modelUtils.extractRef(docRef, DocumentReference.class).get());
   }
 
