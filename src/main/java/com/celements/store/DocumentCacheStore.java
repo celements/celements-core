@@ -20,9 +20,12 @@
  */
 package com.celements.store;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -879,20 +882,24 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
     StringBuilder sb = new StringBuilder();
     sb.append("select distinct doc.name, doc.space, doc.language, doc.version "
         + "from XWikiDocument as doc");
+    Map<String, String> bindValues = new HashMap<>();
     Optional<SpaceReference> spaceRef = References.extractRef(filterRef, SpaceReference.class);
     Optional<DocumentReference> docRef = References.extractRef(filterRef, DocumentReference.class);
     if (spaceRef.isPresent()) {
       sb.append(" where doc.space = :spaceName");
+      bindValues.put("spaceName", spaceRef.get().getName());
       if (docRef.isPresent()) {
         sb.append(" and doc.name = :docName");
+        bindValues.put("docName", docRef.get().getName());
       }
     }
     String hql = sb.toString();
     Query query = getQueryManager().createQuery(hql, Query.HQL);
     query.setWiki(References.extractRef(filterRef, WikiReference.class).or(
         context.getWikiRef()).getName());
-    query.bindValue("spaceName", spaceRef.isPresent() ? spaceRef.get().getName() : "");
-    query.bindValue("docName", docRef.isPresent() ? docRef.get().getName() : "");
+    for (Entry<String, String> bind : bindValues.entrySet()) {
+      query.bindValue(bind.getKey(), bind.getValue());
+    }
     return query;
   }
 
