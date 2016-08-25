@@ -157,7 +157,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   @Test
   public void test_resolveRef() {
     WikiReference oWikiRef = new WikiReference("otherWiki");
-    Utils.getComponent(ModelContext.class).setWiki(wikiRef);
+    Utils.getComponent(ModelContext.class).setWikiRef(wikiRef);
     assertEquals(wikiRef, modelUtils.resolveRef("wiki", WikiReference.class));
     // assertEquals(wikiRef, modelUtils.resolveRef("", WikiReference.class)); TODO
     assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class));
@@ -218,19 +218,13 @@ public class ModelUtilsTest extends AbstractComponentTest {
 
   @Test
   public void test_extractRef() {
-    assertEquals(wikiRef, modelUtils.extractRef(docRef, WikiReference.class));
-    assertEquals(spaceRef, modelUtils.extractRef(docRef, SpaceReference.class));
-    assertEquals(docRef, modelUtils.extractRef(docRef, DocumentReference.class));
-    assertEquals(null, modelUtils.extractRef(docRef, AttachmentReference.class));
-    assertEquals(attRef, modelUtils.extractRef(attRef, AttachmentReference.class));
-    assertNotSame(docRef, modelUtils.extractRef(docRef, DocumentReference.class));
-  }
-
-  @Test
-  public void test_extractRef_default() {
-    assertEquals(docRef, modelUtils.extractRef(docRef, new DocumentReference("other", spaceRef),
-        DocumentReference.class));
-    assertEquals(attRef, modelUtils.extractRef(docRef, attRef, AttachmentReference.class));
+    assertEquals(wikiRef, modelUtils.extractRef(docRef, WikiReference.class).get());
+    assertEquals(spaceRef, modelUtils.extractRef(docRef, SpaceReference.class).get());
+    assertEquals(docRef, modelUtils.extractRef(docRef, DocumentReference.class).get());
+    assertEquals(null, modelUtils.extractRef(docRef, AttachmentReference.class).get());
+    assertEquals(attRef, modelUtils.extractRef(attRef, AttachmentReference.class).get());
+    assertFalse(modelUtils.extractRef(docRef, AttachmentReference.class).isPresent());
+    assertNotSame(docRef, modelUtils.extractRef(docRef, DocumentReference.class).get());
   }
 
   @Test

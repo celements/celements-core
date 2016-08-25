@@ -5,7 +5,8 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
+
+import com.google.common.base.Optional;
 
 @ComponentRole
 public interface ModelUtils {
@@ -42,24 +43,11 @@ public interface ModelUtils {
    *          the reference to extract from
    * @param token
    *          reference class to extract
-   * @return the extracted reference, may be null
+   * @return optional of the extracted reference
    */
   @Nullable
-  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
+  public <T extends EntityReference> Optional<T> extractRef(@Nullable EntityReference fromRef,
       @NotNull Class<T> token);
-
-  /**
-   * @param fromRef
-   *          the reference to extract from
-   * @param defaultRef
-   *          the default reference when unable to extract a reference
-   * @param token
-   *          reference class to extract
-   * @return the extracted reference, may NOT be null
-   */
-  @NotNull
-  public <T extends EntityReference> T extractRef(@Nullable EntityReference fromRef,
-      @NotNull T defaultRef, @NotNull Class<T> token);
 
   /**
    * adjust a reference to another one of higher order, e.g. a docRef to another wikiRef.
@@ -77,10 +65,9 @@ public interface ModelUtils {
       @Nullable EntityReference toRef);
 
   /**
-   * identifies the reference class for the given absolute name ({@link WikiReference} may be
-   * missing).<br>
+   * identifies the reference class for the given absolute name (root type may be missing).<br>
    * <br>
-   * simple names default to {@link WikiReference}.
+   * simple names default to the root entity type.
    *
    * @param name
    *          the string representation

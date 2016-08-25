@@ -37,10 +37,10 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   @Test
   public void test_getWiki_setWiki() {
     WikiReference defaultWikiRef = new WikiReference("xwikidb");
-    assertEquals(defaultWikiRef, modelContext.getWiki());
+    assertEquals(defaultWikiRef, modelContext.getWikiRef());
     WikiReference wikiRef = new WikiReference("db");
-    assertEquals(defaultWikiRef, modelContext.setWiki(wikiRef));
-    assertEquals(wikiRef, modelContext.getWiki());
+    assertEquals(defaultWikiRef, modelContext.setWikiRef(wikiRef));
+    assertEquals(wikiRef, modelContext.getWikiRef());
   }
 
   @Test

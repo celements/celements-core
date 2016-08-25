@@ -9,6 +9,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -18,7 +21,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
@@ -72,11 +75,26 @@ public class References {
     return EntityType.values()[0]; // EntityType.WIKI
   }
 
+  /**
+   * @return the class for the root entity type
+   */
   public static Class<? extends EntityReference> getRootClass() {
     return ENTITY_TYPE_MAP.inverse().get(getRootEntityType());
   }
 
-  public static Class<? extends EntityReference> identifyClassFromName(String name) {
+  /**
+   * identifies the reference class for the given absolute name (root type may be missing).<br>
+   * <br>
+   * simple names default to the root entity type.
+   *
+   * @param name
+   *          the string representation
+   * @return the identified reference class
+   * @throws IllegalArgumentException
+   *           for illegal strings
+   */
+  @NotNull
+  public static Class<? extends EntityReference> identifyClassFromName(@NotNull String name) {
     if (!checkNotNull(name).isEmpty()) {
       Set<Class<? extends EntityReference>> tokens = new LinkedHashSet<>(); // keeps insertion order
       tokens.add(getRootClass());
@@ -90,12 +108,22 @@ public class References {
     throw new IllegalArgumentException("No valid reference class found for '" + name + "'");
   }
 
-  public static boolean isAbsoluteRef(EntityReference ref) {
+  /**
+   * @param ref
+   * @return false if the given reference is relative
+   */
+  public static boolean isAbsoluteRef(@NotNull EntityReference ref) {
     checkNotNull(ref);
     return ref.extractReference(getRootEntityType()) != null;
   }
 
-  public static EntityReference cloneRef(EntityReference ref) {
+  /**
+   * @param ref
+   *          the reference to be cloned
+   * @return a cloned instance of the reference
+   */
+  @NotNull
+  public static EntityReference cloneRef(@NotNull EntityReference ref) {
     Class<? extends EntityReference> token = EntityReference.class;
     if (isAbsoluteRef(ref)) {
       token = ENTITY_TYPE_MAP.inverse().get(ref.getType());
@@ -103,7 +131,18 @@ public class References {
     return cloneRef(ref, token);
   }
 
-  public static <T extends EntityReference> T cloneRef(EntityReference ref, Class<T> token) {
+  /**
+   * @param ref
+   *          the reference to be cloned
+   * @param token
+   *          type of the reference
+   * @return a cloned instance of the reference of type T
+   * @throws IllegalArgumentException
+   *           when relative references are being cloned as subtypes of {@link EntityReference}
+   */
+  @NotNull
+  public static <T extends EntityReference> T cloneRef(@NotNull EntityReference ref,
+      @NotNull Class<T> token) {
     checkNotNull(ref);
     checkNotNull(token);
     try {
@@ -123,25 +162,39 @@ public class References {
     }
   }
 
-  public static <T extends EntityReference> T extractRef(EntityReference fromRef, T defaultRef,
-      Class<T> token) {
-    return MoreObjects.firstNonNull(extractRef(fromRef, token), checkNotNull(defaultRef));
-  }
-
-  public static <T extends EntityReference> T extractRef(EntityReference fromRef, Class<T> token) {
+  /**
+   * @param fromRef
+   *          the reference to extract from
+   * @param token
+   *          reference class to extract
+   * @return optional of the extracted reference
+   */
+  public static <T extends EntityReference> Optional<T> extractRef(
+      @Nullable EntityReference fromRef, @NotNull Class<T> token) {
     EntityReference extractedRef = null;
     if (fromRef != null) {
       extractedRef = fromRef.extractReference(getEntityTypeForClass(token));
     }
     if (extractedRef != null) {
-      return cloneRef(extractedRef, token);
-    } else {
-      return null;
+      return Optional.of(cloneRef(extractedRef, token));
     }
+    return Optional.absent();
   }
 
-  public static <T extends EntityReference> T adjustRef(T ref, Class<T> token,
-      EntityReference toRef) {
+  /**
+   * adjust a reference to another one of higher order, e.g. a docRef to another wikiRef.
+   *
+   * @param ref
+   *          to be adjusted
+   * @param token
+   *          for the reference type
+   * @param toRef
+   *          it is adjusted to
+   * @return a new instance of the adjusted reference or ref if toRef was of lower order
+   */
+  @NotNull
+  public static <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
+      @Nullable EntityReference toRef) {
     checkNotNull(toRef);
     EntityReference adjustedRef = cloneRef(ref); // avoid modifying argument
     EntityReference current = adjustedRef;

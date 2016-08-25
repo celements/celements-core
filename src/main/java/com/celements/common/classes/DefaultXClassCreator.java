@@ -55,7 +55,7 @@ public class DefaultXClassCreator implements XClassCreator {
 
   @Override
   public void createXClasses() {
-    LOGGER.info("create classes for database '{}'", context.getWiki());
+    LOGGER.info("create classes for database '{}'", context.getWikiRef());
     for (ClassPackage classPackage : classPackages) {
       if (classPackage.isActivated()) {
         try {
