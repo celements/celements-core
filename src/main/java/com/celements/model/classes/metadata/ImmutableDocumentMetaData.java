@@ -3,6 +3,7 @@ package com.celements.model.classes.metadata;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.suigeneris.jrcs.rcs.Version;
@@ -11,6 +12,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.util.References;
 import com.google.common.base.Strings;
 
+@Immutable
 public final class ImmutableDocumentMetaData implements DocumentMetaData {
 
   private final DocumentReference docRef;

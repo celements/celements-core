@@ -12,6 +12,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.context.ModelContext;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 
 @Component
 public class DefaultModelUtils implements ModelUtils {
@@ -44,19 +45,14 @@ public class DefaultModelUtils implements ModelUtils {
   }
 
   @Override
-  public <T extends EntityReference> T extractRef(EntityReference fromRef, T defaultRef,
+  public <T extends EntityReference> Optional<T> extractRef(EntityReference fromRef,
       Class<T> token) {
-    return References.extractRef(fromRef, defaultRef, token);
-  }
-
-  @Override
-  public <T extends EntityReference> T extractRef(EntityReference fromRef, Class<T> token) {
     return References.extractRef(fromRef, token);
   }
 
   @Override
   public <T extends EntityReference> T adjustRef(T ref, Class<T> token, EntityReference toRef) {
-    return References.adjustRef(ref, token, MoreObjects.firstNonNull(toRef, context.getWiki()));
+    return References.adjustRef(ref, token, MoreObjects.firstNonNull(toRef, context.getWikiRef()));
   }
 
   @Override
@@ -86,7 +82,7 @@ public class DefaultModelUtils implements ModelUtils {
       throw new IllegalArgumentException("name may not be empty");
     }
     EntityType type = References.getEntityTypeForClass(token);
-    baseRef = MoreObjects.firstNonNull(baseRef, context.getWiki());
+    baseRef = MoreObjects.firstNonNull(baseRef, context.getWikiRef());
     EntityReference resolvedRef;
     if (type.ordinal() == 0) {
       // resolver cannot handle root reference

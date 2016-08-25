@@ -24,7 +24,7 @@ public interface ModelContext {
    * @return the current wiki set in context
    */
   @NotNull
-  public WikiReference getWiki();
+  public WikiReference getWikiRef();
 
   /**
    * @param wikiRef
@@ -32,10 +32,10 @@ public interface ModelContext {
    * @return the wiki which was set before
    */
   @NotNull
-  public WikiReference setWiki(@NotNull WikiReference wikiRef);
+  public WikiReference setWikiRef(@NotNull WikiReference wikiRef);
 
   @NotNull
-  public WikiReference getMainWiki();
+  public WikiReference getMainWikiRef();
 
   /**
    * @return the current doc set in context

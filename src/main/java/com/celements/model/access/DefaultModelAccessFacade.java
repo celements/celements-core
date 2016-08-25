@@ -22,12 +22,12 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
-import com.celements.model.access.exception.DocumentAccessRuntimeException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.ModelAccessRuntimeException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
@@ -274,7 +274,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       deleteDocument(getDocument(docRef), totrash);
     } catch (DocumentNotExistsException exc) {
       LOGGER.debug("doc trying to delete does not exist '{}'", docRef, exc);
-    } catch (DocumentAccessRuntimeException exc) {
+    } catch (ModelAccessRuntimeException exc) {
       throw new DocumentDeleteException(docRef, exc);
     }
   }
@@ -304,7 +304,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
-      modelContext.setWiki(modelUtils.extractRef(doc.getDocumentReference(), WikiReference.class));
+      modelContext.setWikiRef(modelUtils.extractRef(doc.getDocumentReference(),
+          WikiReference.class).get());
       LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
           doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
@@ -733,7 +734,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    */
   private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
     return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
-        onDoc.getDocumentReference(), modelContext.getWiki(), WikiReference.class));
+        onDoc.getDocumentReference(), WikiReference.class).or(modelContext.getWikiRef()));
   }
 
 }

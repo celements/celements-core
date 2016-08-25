@@ -17,6 +17,7 @@ import com.celements.configuration.CelementsFromWikiConfigurationSource;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -42,19 +43,19 @@ public class DefaultModelContext implements ModelContext {
   }
 
   @Override
-  public WikiReference getWiki() {
+  public WikiReference getWikiRef() {
     return new WikiReference(getXWikiContext().getDatabase());
   }
 
   @Override
-  public WikiReference setWiki(WikiReference wikiRef) {
-    WikiReference oldWiki = getWiki();
+  public WikiReference setWikiRef(WikiReference wikiRef) {
+    WikiReference oldWiki = getWikiRef();
     getXWikiContext().setDatabase(wikiRef.getName());
     return oldWiki;
   }
 
   @Override
-  public WikiReference getMainWiki() {
+  public WikiReference getMainWikiRef() {
     return new WikiReference(getXWikiContext().getMainXWiki());
   }
 
@@ -93,7 +94,7 @@ public class DefaultModelContext implements ModelContext {
 
   @Override
   public String getDefaultLanguage() {
-    return getDefaultLanguage(getWiki());
+    return getDefaultLanguage(getWikiRef());
   }
 
   @Override
@@ -108,10 +109,10 @@ public class DefaultModelContext implements ModelContext {
 
   private String getDefaultLangFromDoc(EntityReference ref) {
     String ret = "";
-    DocumentReference docRef = getModelUtils().extractRef(ref, DocumentReference.class);
-    if (docRef != null) {
+    Optional<DocumentReference> docRef = getModelUtils().extractRef(ref, DocumentReference.class);
+    if (docRef.isPresent()) {
       try {
-        ret = getModelAccess().getDocument(docRef).getDefaultLanguage();
+        ret = getModelAccess().getDocument(docRef.get()).getDefaultLanguage();
       } catch (DocumentNotExistsException exc) {
         LOGGER.info("trying to get language for inexistent document '{}'", docRef);
       }
@@ -120,11 +121,11 @@ public class DefaultModelContext implements ModelContext {
   }
 
   private String getDefaultLangFromConfigSrc(EntityReference ref) {
-    WikiReference wikiBefore = getWiki();
+    WikiReference wikiBefore = getWikiRef();
     XWikiDocument docBefore = getDoc();
     try {
       ConfigurationSource configSrc;
-      setWiki(getModelUtils().extractRef(ref, getWiki(), WikiReference.class));
+      setWikiRef(getModelUtils().extractRef(ref, WikiReference.class).or(getWikiRef()));
       XWikiDocument spacePrefDoc = getSpacePrefDoc(ref);
       if (spacePrefDoc != null) {
         setDoc(spacePrefDoc);
@@ -134,17 +135,18 @@ public class DefaultModelContext implements ModelContext {
       }
       return configSrc.getProperty(CFG_KEY_DEFAULT_LANG, FALLBACK_DEFAULT_LANG);
     } finally {
-      setWiki(wikiBefore);
+      setWikiRef(wikiBefore);
       setDoc(docBefore);
     }
   }
 
   private XWikiDocument getSpacePrefDoc(EntityReference ref) {
     XWikiDocument ret = null;
-    SpaceReference spaceRef = getModelUtils().extractRef(ref, SpaceReference.class);
-    if (spaceRef != null) {
+    Optional<SpaceReference> spaceRef = getModelUtils().extractRef(ref, SpaceReference.class);
+    if (spaceRef.isPresent()) {
       try {
-        ret = getModelAccess().getDocument(new DocumentReference(WEB_PREF_DOC_NAME, spaceRef));
+        ret = getModelAccess().getDocument(new DocumentReference(WEB_PREF_DOC_NAME,
+            spaceRef.get()));
       } catch (DocumentNotExistsException exc) {
         LOGGER.debug("no web preferences for space '{}'", spaceRef);
       }

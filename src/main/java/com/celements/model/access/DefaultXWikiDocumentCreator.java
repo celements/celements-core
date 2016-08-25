@@ -50,7 +50,7 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
     } else {
       toExtractClass = SpaceReference.class;
     }
-    return context.getDefaultLanguage(References.extractRef(docRef, toExtractClass));
+    return context.getDefaultLanguage(References.extractRef(docRef, toExtractClass).get());
   }
 
 }

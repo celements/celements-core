@@ -481,7 +481,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference resolveWikiReference(String wikiName) {
-    return resolveWikiReference(wikiName, context.getWiki());
+    return resolveWikiReference(wikiName, context.getWikiRef());
   }
 
   private WikiReference resolveWikiReference(String wikiName, WikiReference defaultWikiRef) {
@@ -1087,7 +1087,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference getWikiRef() {
-    return context.getWiki();
+    return context.getWikiRef();
   }
 
   @Deprecated
@@ -1105,7 +1105,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Deprecated
   @Override
   public WikiReference getWikiRef(EntityReference ref) {
-    return modelUtils.extractRef(ref, context.getWiki(), WikiReference.class);
+    return modelUtils.extractRef(ref, WikiReference.class).or(context.getWikiRef());
   }
 
   @Override

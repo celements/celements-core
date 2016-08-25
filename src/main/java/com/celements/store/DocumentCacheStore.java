@@ -44,16 +44,20 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
-import com.celements.model.access.exception.DocumentMetaDataLoadException;
+import com.celements.model.access.exception.MetaDataLoadException;
 import com.celements.model.classes.metadata.DocumentMetaData;
 import com.celements.model.classes.metadata.ImmutableDocumentMetaData;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.References;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -73,7 +77,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  */
 @Component(DocumentCacheStore.COMPONENT_NAME)
-public class DocumentCacheStore implements XWikiCacheStoreInterface, XWikiStoreMetaDataExtension {
+public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataStoreExtension {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(DocumentCacheStore.class);
   private final static Logger LOGGER_DL = LoggerFactory.getLogger(DocumentLoader.class);
@@ -259,7 +263,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, XWikiStoreM
   }
 
   String getKey(DocumentReference docRef) {
-    DocumentReference cacheDocRef = new DocumentReference(context.getWiki().getName(),
+    DocumentReference cacheDocRef = new DocumentReference(context.getWikiRef().getName(),
         docRef.getLastSpaceReference().getName(), docRef.getName());
     return modelUtils.serializeRef(cacheDocRef);
   }
@@ -850,34 +854,46 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, XWikiStoreM
   }
 
   @Override
-  public Set<DocumentMetaData> listDocumentMetaData(String hqlWhereClause) {
+  public Set<DocumentMetaData> listDocumentMetaData(EntityReference filterRef) {
     Set<DocumentMetaData> ret = new LinkedHashSet<>();
-    String hql = "select distinct doc.name, doc.space, doc.language, doc.version "
-        + "from XWikiDocument as doc ";
-    if (Strings.isNullOrEmpty(hqlWhereClause)) {
-      if ((hqlWhereClause.charAt(0) != ',') && !hqlWhereClause.toLowerCase().contains("where")) {
-        hql += "where ";
-      }
-      hql += hqlWhereClause;
-    }
     try {
-      Query query = getQueryManager().createQuery(hql, Query.HQL);
-      query.setWiki(context.getWiki().getName());
+      Query query = buildDocumentMetaDataQuery(filterRef);
       for (Object[] docData : query.<Object[]>execute()) {
-        DocumentReference docRef = new DocumentReference((String) docData[0], new SpaceReference(
-            (String) docData[1], context.getWiki()));
+        DocumentReference docRef = new DocumentReference(query.getWiki(), (String) docData[1],
+            (String) docData[0]);
         ret.add(new ImmutableDocumentMetaData.Builder(docRef).language((String) docData[2]).version(
             new Version((String) docData[3])).build());
       }
-      LOGGER.info("listDocumentMetaData: found {} docs with whereClause '{}'", ret.size(),
-          hqlWhereClause);
+      LOGGER.info("listDocumentMetaData: found {} docs with hql '{}' for filterRef '{}'",
+          ret.size(), filterRef);
     } catch (QueryException exc) {
-      throw new DocumentMetaDataLoadException(context.getWiki(), exc);
+      throw new MetaDataLoadException(filterRef, exc);
     }
-    if (getBackingStore() instanceof XWikiStoreMetaDataExtension) {
-      ret.addAll(((XWikiStoreMetaDataExtension) getBackingStore()).listDocumentMetaData(""));
+    if (getBackingStore() instanceof MetaDataStoreExtension) {
+      ret.addAll(((MetaDataStoreExtension) getBackingStore()).listDocumentMetaData(filterRef));
     }
     return ret;
+  }
+
+  private Query buildDocumentMetaDataQuery(EntityReference filterRef) throws QueryException {
+    StringBuilder sb = new StringBuilder();
+    sb.append("select distinct doc.name, doc.space, doc.language, doc.version "
+        + "from XWikiDocument as doc");
+    Optional<SpaceReference> spaceRef = References.extractRef(filterRef, SpaceReference.class);
+    Optional<DocumentReference> docRef = References.extractRef(filterRef, DocumentReference.class);
+    if (spaceRef.isPresent()) {
+      sb.append(" where doc.space = :spaceName");
+      if (docRef.isPresent()) {
+        sb.append(" and doc.name = :docName");
+      }
+    }
+    String hql = sb.toString();
+    Query query = getQueryManager().createQuery(hql, Query.HQL);
+    query.setWiki(References.extractRef(filterRef, WikiReference.class).or(
+        context.getWikiRef()).getName());
+    query.bindValue("spaceName", spaceRef.isPresent() ? spaceRef.get().getName() : "");
+    query.bindValue("docName", docRef.isPresent() ? docRef.get().getName() : "");
+    return query;
   }
 
 }
