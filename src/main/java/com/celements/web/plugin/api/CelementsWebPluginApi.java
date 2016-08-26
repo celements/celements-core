@@ -1264,6 +1264,11 @@ public class CelementsWebPluginApi extends Api {
     return (PageLayoutCommand) context.get(CELEMENTS_PAGE_LAYOUT_COMMAND);
   }
 
+  /**
+   * @deprecated since 2.82 instead use
+   *             {@link LayoutScriptService #canRenderLayout(SpaceReference)}
+   */
+  @Deprecated
   public boolean canRenderLayout(SpaceReference spaceRef) {
     return getPageLayoutCmd().canRenderLayout(spaceRef);
   }
