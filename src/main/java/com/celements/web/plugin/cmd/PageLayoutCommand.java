@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -59,7 +59,7 @@ public class PageLayoutCommand {
 
   public static final String XWIKICFG_CELEMENTS_LAYOUT_DEFAULT = "celements.layout.default";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PageLayoutCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(PageLayoutCommand.class);
 
   QueryManager queryManager;
 
@@ -246,7 +246,9 @@ public class PageLayoutCommand {
   }
 
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    LOGGER.info("renderPageLayout: for layoutRef '{}'", layoutSpaceRef);
     layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    LOGGER.debug("renderPageLayout: after decideLocalOrCentral layoutRef '{}'", layoutSpaceRef);
     return renderPageLayoutLocal(layoutSpaceRef);
   }
 
