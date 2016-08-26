@@ -858,6 +858,8 @@ public class Navigation implements INavigation {
       nrOfItemsPerPage = config.getNrOfItemsPerPage();
       presentationType = config.getPresentationType().orNull();
       cmCssClass = config.getCssClass();
+    } else {
+      LOGGER.info("loadConfig: nafigation '{}' disabled!", config.getConfigName());
     }
   }
 
