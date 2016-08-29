@@ -127,12 +127,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   /**
-   * returns an xwiki document for readonly usage CAUTION: never ever change anything on
-   * the returned XWikiDocument, because it is the object in cache. Thus the same object
-   * will be returned for the following requests. If you change this object, concurrent
-   * request might get a partially modified object, or worse, if an error occurs during
-   * the save (or no save call happens), the cached object will not reflect the actual
+   * CAUTION: never ever change anything on the returned XWikiDocument, because it is the object in
+   * cache. Thus the same object will be returned for the following requests. If you change this
+   * object, concurrent request might get a partially modified object, or worse, if an error occurs
+   * during the save (or no save call happens), the cached object will not reflect the actual
    * document at all.
+   *
+   * @param docRef
+   * @param lang
+   * @return an xwiki document for readonly usage
+   * @throws DocumentNotExistsException
    */
   private XWikiDocument getDocumentReadOnly(DocumentReference docRef, String lang)
       throws DocumentNotExistsException {
@@ -361,6 +365,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
     XWikiDocument doc = new XWikiDocument(docRef);
+    if ("default".equals(lang)) {
+      lang = "";
+    }
     doc.setLanguage(lang);
     return doc;
   }
