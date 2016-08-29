@@ -868,7 +868,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
             new Version((String) docData[3])).build());
       }
       LOGGER.info("listDocumentMetaData: found {} docs with hql '{}' for filterRef '{}'",
-          ret.size(), filterRef);
+          ret.size(), query.getStatement(), filterRef);
     } catch (QueryException exc) {
       throw new MetaDataLoadException(filterRef, exc);
     }
