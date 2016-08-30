@@ -1,4 +1,4 @@
-package com.celements.model.classes.metadata;
+package com.celements.model.metadata;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;

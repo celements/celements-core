@@ -55,9 +55,9 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
 import com.celements.model.access.exception.MetaDataLoadException;
-import com.celements.model.classes.metadata.DocumentMetaData;
-import com.celements.model.classes.metadata.ImmutableDocumentMetaData;
 import com.celements.model.context.ModelContext;
+import com.celements.model.metadata.DocumentMetaData;
+import com.celements.model.metadata.ImmutableDocumentMetaData;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
 import com.google.common.base.Optional;
