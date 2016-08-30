@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,25 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
       }
     }
     return Collections.unmodifiableList(fields);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getClassRef());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ClassDefinition) {
+      ClassDefinition other = (ClassDefinition) obj;
+      return Objects.equals(this.getClassRef(), other.getClassRef());
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append(modelUtils.serializeRefLocal(getClassRef())).toString();
   }
 
 }
