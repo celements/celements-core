@@ -137,6 +137,22 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getDocument_defaultLanguage() throws Exception {
+    String lang = "default";
+    doc.setDefaultLanguage("");
+    doc.setLanguage("");
+    Capture<XWikiDocument> captExists = expectExists(true);
+    Capture<XWikiDocument> captLoad = expectLoad(doc);
+    replayDefault();
+    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
+    verifyDefault();
+    assertEquals(doc, theDoc);
+    assertNotSame("must be cloned for cache safety", doc, theDoc);
+    assertCapture(captExists, doc.getDocumentReference(), ""); // empty string instead of 'default'
+    assertCapture(captLoad, doc.getDocumentReference(), ""); // empty string instead of 'default'
+  }
+
+  @Test
   public void test_getDocument_translatedDocument_defaultLanguage_empty() throws Exception {
     String lang = "de";
     doc.setDefaultLanguage("");
