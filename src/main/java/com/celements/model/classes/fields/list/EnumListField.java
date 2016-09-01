@@ -24,9 +24,9 @@ public final class EnumListField<E extends Enum<E>> extends ListField<E> {
 
     private final Class<E> enumType;
 
-    public Builder(@NotNull String className, @NotNull String name,
+    public Builder(@NotNull String classDefName, @NotNull String name,
         @NotNull Class<E> enumType) {
-      super(className, name);
+      super(classDefName, name);
       this.enumType = Preconditions.checkNotNull(enumType);
     }
 

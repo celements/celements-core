@@ -10,8 +10,8 @@ public final class DoubleField extends NumberField<Double> {
 
   public static class Builder extends NumberField.Builder<Builder, Double> {
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

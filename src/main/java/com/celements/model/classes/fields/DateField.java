@@ -22,8 +22,8 @@ public final class DateField extends AbstractClassField<Date> {
     private Integer emptyIsToday;
     private String dateFormat;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

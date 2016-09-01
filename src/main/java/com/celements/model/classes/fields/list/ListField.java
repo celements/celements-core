@@ -34,8 +34,8 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
     private Boolean picker;
     private String separator;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     public B multiSelect(@Nullable Boolean val) {

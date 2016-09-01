@@ -11,8 +11,8 @@ public final class SpaceReferenceField extends EntityReferenceField<SpaceReferen
 
   public static class Builder extends EntityReferenceField.Builder<Builder, SpaceReference> {
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

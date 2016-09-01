@@ -40,7 +40,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_constr_null_className() throws Exception {
+  public void test_constr_null_classDefName() throws Exception {
     try {
       new TestClassField.Builder(null, field.getName()).build();
       fail("expecting NullPointerException");

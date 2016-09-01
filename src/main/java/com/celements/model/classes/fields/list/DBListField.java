@@ -18,8 +18,8 @@ public final class DBListField extends StringListField {
 
     private String sql;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

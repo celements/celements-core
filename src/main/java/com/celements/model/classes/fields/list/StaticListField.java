@@ -22,8 +22,8 @@ public final class StaticListField extends StringListField {
 
     private List<String> values;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
       values = new ArrayList<>();
     }
 

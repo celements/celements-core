@@ -16,8 +16,8 @@ public final class TestClassField extends AbstractClassField<TestClassField> {
 
     private Integer size;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

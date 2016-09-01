@@ -10,8 +10,8 @@ public final class ShortField extends NumberField<Short> {
 
   public static class Builder extends NumberField.Builder<Builder, Short> {
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

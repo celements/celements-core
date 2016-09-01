@@ -16,8 +16,8 @@ public final class StringField extends AbstractClassField<String> {
 
     private Integer size;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

@@ -18,8 +18,8 @@ public final class BooleanField extends AbstractClassField<Boolean> {
     private String displayType;
     private Integer defaultValue;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

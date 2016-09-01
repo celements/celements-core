@@ -21,8 +21,8 @@ public abstract class EntityReferenceField<T extends EntityReference> extends Ab
 
     private Integer size;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      super(className, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     public B size(@Nullable Integer val) {

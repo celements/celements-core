@@ -17,7 +17,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
-  private final String className;
+  private final String classDefName;
   private final String name;
   private final String prettyName;
   private final String validationRegExp;
@@ -25,14 +25,14 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   public abstract static class Builder<B extends Builder<B, T>, T> {
 
-    private final String className;
+    private final String classDefName;
     private final String name;
     private String prettyName;
     private String validationRegExp;
     private String validationMessage;
 
-    public Builder(@NotNull String className, @NotNull String name) {
-      this.className = Objects.requireNonNull(className);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      this.classDefName = Objects.requireNonNull(classDefName);
       this.name = Objects.requireNonNull(Strings.emptyToNull(name));
     }
 
@@ -58,7 +58,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   }
 
   protected AbstractClassField(@NotNull Builder<?, T> builder) {
-    this.className = builder.className;
+    this.classDefName = builder.classDefName;
     this.name = builder.name;
     this.prettyName = builder.prettyName;
     this.validationRegExp = builder.validationRegExp;
@@ -67,7 +67,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public ClassDefinition getClassDef() {
-    return Utils.getComponent(ClassDefinition.class, className);
+    return Utils.getComponent(ClassDefinition.class, classDefName);
   }
 
   @Override
@@ -107,14 +107,14 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(className, name);
+    return Objects.hash(classDefName, name);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AbstractClassField) {
       AbstractClassField<?> other = (AbstractClassField<?>) obj;
-      return Objects.equals(this.className, other.className) && Objects.equals(this.name,
+      return Objects.equals(this.classDefName, other.classDefName) && Objects.equals(this.name,
           other.name);
     }
     return false;
