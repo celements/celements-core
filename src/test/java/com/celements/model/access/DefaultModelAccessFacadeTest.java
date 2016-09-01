@@ -54,9 +54,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   private XWikiStoreInterface storeMock;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(XWikiDocumentCreator.class, "default", new XWikiDocumentCreator() {
 
       @Override

@@ -26,9 +26,7 @@ public class ModelUtilsTest extends AbstractComponentTest {
   DefaultModelUtils modelUtils;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     modelUtils = (DefaultModelUtils) Utils.getComponent(ModelUtils.class);
   }
 

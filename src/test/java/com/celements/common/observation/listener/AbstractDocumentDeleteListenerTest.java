@@ -49,9 +49,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
   private Event deletedEventMock;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     wiki = getWikiMock();

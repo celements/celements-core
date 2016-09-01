@@ -32,7 +32,7 @@ public class BuilderTest {
   private Builder builder;
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     builder = new Builder();
   }
 

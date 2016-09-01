@@ -43,7 +43,7 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
   private GetCellDocument cmd;
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     super.setUp();
     cmd = new GetCellDocument();
     context = getContext();

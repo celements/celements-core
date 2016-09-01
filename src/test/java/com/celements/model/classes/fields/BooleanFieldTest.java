@@ -17,10 +17,8 @@ public class BooleanFieldTest extends AbstractComponentTest {
   String displayType = "displayType";
   Integer defaultValue = 5;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     field = new BooleanField.Builder(TestClassDefinition.NAME, "name").displayType(
         displayType).defaultValue(defaultValue).build();
   }

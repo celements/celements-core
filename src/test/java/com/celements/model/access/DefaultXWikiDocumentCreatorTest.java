@@ -25,9 +25,7 @@ public class DefaultXWikiDocumentCreatorTest extends AbstractComponentTest {
   private DocumentReference docRef;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(ConfigurationSource.class, "all", getConfigurationSource());
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME,
         getConfigurationSource());

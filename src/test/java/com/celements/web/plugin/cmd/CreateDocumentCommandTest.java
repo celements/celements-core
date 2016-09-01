@@ -43,9 +43,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
   private IPageTypeRole pageTypeServiceMock;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(XWikiDocumentCreator.class);
     pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
     createDocumentCmd = new CreateDocumentCommand();

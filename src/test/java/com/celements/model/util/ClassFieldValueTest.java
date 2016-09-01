@@ -14,10 +14,8 @@ public class ClassFieldValueTest extends AbstractComponentTest {
   private StringField field;
   private String val;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
     val = "val";
   }

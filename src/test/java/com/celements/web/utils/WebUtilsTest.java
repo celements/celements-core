@@ -60,10 +60,8 @@ public class WebUtilsTest extends AbstractComponentTest {
   private WebUtils celUtils;
   private XWikiURLFactory mockURLFactory;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     celUtils = new WebUtils();
     mockURLFactory = createMockAndAddToDefault(XWikiURLFactory.class);
     getContext().setURLFactory(mockURLFactory);
@@ -85,7 +83,7 @@ public class WebUtilsTest extends AbstractComponentTest {
 
   @Test
   public void testPrepareMaxCoverSet() {
-    ArrayList<String> threeElems = new ArrayList<String>(Arrays.asList(new String[] { "1", "lj",
+    ArrayList<String> threeElems = new ArrayList<>(Arrays.asList(new String[] { "1", "lj",
         "lizh" }));
     assertEquals(3, celUtils.prepareMaxCoverSet(0, threeElems).size());
     assertEquals(3, celUtils.prepareMaxCoverSet(1, threeElems).size());
@@ -102,7 +100,7 @@ public class WebUtilsTest extends AbstractComponentTest {
     String fullName = "Test.Gallery";
     XWikiDocument testGalleryDoc = new XWikiDocument();
     testGalleryDoc.setFullName(fullName);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     TestImgAttachment imgAtt = new TestImgAttachment();
     imgAtt.setFilename("TestImg.jpg");
     attList.add(imgAtt);
@@ -146,7 +144,7 @@ public class WebUtilsTest extends AbstractComponentTest {
     XWikiDocument webPrefDoc = new XWikiDocument(webPrefDocRef);
     expect(getWikiMock().getDocument(eq(webPrefDocRef), eq(getContext()))).andReturn(
         webPrefDoc).atLeastOnce();
-    Vector<BaseObject> navObjects = new Vector<BaseObject>();
+    Vector<BaseObject> navObjects = new Vector<>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(8, webPrefDoc));
@@ -258,7 +256,7 @@ public class WebUtilsTest extends AbstractComponentTest {
         webPrefDoc).atLeastOnce();
     expect(getWikiMock().getSpacePreference(eq("skin"), same(getContext()))).andReturn(
         "Skins.MySkin").atLeastOnce();
-    Vector<BaseObject> navObjects = new Vector<BaseObject>();
+    Vector<BaseObject> navObjects = new Vector<>();
     navObjects.add(createNavObj(5, webPrefDoc));
     navObjects.add(createNavObj(4, webPrefDoc));
     navObjects.add(createNavObj(3, webPrefDoc));

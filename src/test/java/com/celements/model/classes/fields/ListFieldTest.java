@@ -37,10 +37,8 @@ public class ListFieldTest extends AbstractComponentTest {
   private Boolean picker = true;
   private String separator = ",";
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     fieldBuilder = new StaticListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
         multiSelect).size(size).displayType(displayType).picker(picker).separator(separator);
   }

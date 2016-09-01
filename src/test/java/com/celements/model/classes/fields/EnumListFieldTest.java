@@ -30,10 +30,8 @@ public class EnumListFieldTest extends AbstractComponentTest {
 
   private EnumListField.Builder<TestEnum> fieldBuilder;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     fieldBuilder = new EnumListField.Builder<>(TestClassDefinition.NAME, "name", TestEnum.class);
   }
 

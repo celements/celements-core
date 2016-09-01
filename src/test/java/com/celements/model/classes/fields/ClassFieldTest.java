@@ -25,10 +25,8 @@ public class ClassFieldTest extends AbstractComponentTest {
   String validationRegExp = "validationRegExp";
   String validationMessage = "validationMessage";
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     classRef = new DocumentReference("wiki", "class", "any");
     field = new TestClassField.Builder(TestClassDefinition.NAME, name).size(5).prettyName(
         prettyName).validationRegExp(validationRegExp).validationMessage(validationMessage).build();

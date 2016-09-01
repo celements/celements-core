@@ -24,10 +24,8 @@ public class EntityReferenceFieldTest extends AbstractComponentTest {
 
   Integer size = 5;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     field = new DocumentReferenceField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 

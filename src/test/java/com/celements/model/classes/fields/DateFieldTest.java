@@ -18,10 +18,8 @@ public class DateFieldTest extends AbstractComponentTest {
   Integer emptyIsToday = 3;
   String dateFormat = "dateFormat";
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     field = new DateField.Builder(TestClassDefinition.NAME, "name").size(size).emptyIsToday(
         emptyIsToday).dateFormat(dateFormat).build();
   }

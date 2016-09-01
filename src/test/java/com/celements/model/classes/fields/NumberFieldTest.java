@@ -25,10 +25,8 @@ public class NumberFieldTest extends AbstractComponentTest {
 
   Integer size = 5;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     field = new IntField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 

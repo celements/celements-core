@@ -16,10 +16,8 @@ public class CelementsFromWikiConfigurationSourceTest extends AbstractComponentT
 
   private CelementsFromWikiConfigurationSource cfgSrc;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     String hint = CelementsFromWikiConfigurationSource.NAME;
     Utils.getComponentManager().unregisterComponent(ConfigurationSource.class, hint);
     CelementsFromWikiConfigurationSource instance = new CelementsFromWikiConfigurationSource();

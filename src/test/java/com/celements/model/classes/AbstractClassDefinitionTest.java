@@ -16,9 +16,7 @@ public class AbstractClassDefinitionTest extends AbstractComponentTest {
   private ClassDefinition testClass;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     testClass = Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME);
   }
 

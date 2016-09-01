@@ -25,9 +25,7 @@ public class LocalEventListenerTest extends AbstractComponentTest {
   private LocalEventListener listener;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMocks(RemoteObservationManagerConfiguration.class,
         RemoteObservationManager.class);
     listener = (LocalEventListener) Utils.getComponent(EventListener.class,
