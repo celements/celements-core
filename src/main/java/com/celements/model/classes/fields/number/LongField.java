@@ -3,15 +3,15 @@ package com.celements.model.classes.fields.number;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
+
 
 @Immutable
 public final class LongField extends NumberField<Long> {
 
   public static class Builder extends NumberField.Builder<Builder, Long> {
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String className, @NotNull String name) {
+      super(className, name);
     }
 
     @Override

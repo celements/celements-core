@@ -7,7 +7,7 @@ import java.util.List;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
+
 
 import com.google.common.base.Joiner;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -22,8 +22,8 @@ public final class StaticListField extends StringListField {
 
     private List<String> values;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String className, @NotNull String name) {
+      super(className, name);
       values = new ArrayList<>();
     }
 

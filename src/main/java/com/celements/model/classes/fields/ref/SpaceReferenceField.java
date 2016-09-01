@@ -3,7 +3,7 @@ package com.celements.model.classes.fields.ref;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
+
 import org.xwiki.model.reference.SpaceReference;
 
 @Immutable
@@ -11,8 +11,8 @@ public final class SpaceReferenceField extends EntityReferenceField<SpaceReferen
 
   public static class Builder extends EntityReferenceField.Builder<Builder, SpaceReference> {
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String className, @NotNull String name) {
+      super(className, name);
     }
 
     @Override
