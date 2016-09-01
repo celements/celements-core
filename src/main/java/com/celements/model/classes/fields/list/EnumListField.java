@@ -8,7 +8,7 @@ import java.util.List;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
+
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -24,9 +24,9 @@ public final class EnumListField<E extends Enum<E>> extends ListField<E> {
 
     private final Class<E> enumType;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name,
+    public Builder(@NotNull String classDefName, @NotNull String name,
         @NotNull Class<E> enumType) {
-      super(classRef, name);
+      super(classDefName, name);
       this.enumType = Preconditions.checkNotNull(enumType);
     }
 

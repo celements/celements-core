@@ -34,10 +34,8 @@ public class DefaultXObjectUpdateServiceTest extends AbstractComponentTest {
 
   private IModelAccessFacade modelAccessMock;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     init(false);
     doc = new XWikiDocument(new DocumentReference("xwikidb", "space", "doc"));
     classRef = new DocumentReference("xwikidb", "class", "any");

@@ -25,7 +25,7 @@ import org.junit.Test;
 public class DefaultTest {
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
   }
 
   @Test

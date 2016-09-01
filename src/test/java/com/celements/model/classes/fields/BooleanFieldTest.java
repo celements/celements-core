@@ -5,9 +5,9 @@ import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.TestClassDefinition;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 
 public class BooleanFieldTest extends AbstractComponentTest {
@@ -17,12 +17,10 @@ public class BooleanFieldTest extends AbstractComponentTest {
   String displayType = "displayType";
   Integer defaultValue = 5;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
-    field = new BooleanField.Builder(new DocumentReference("wiki", "class", "any"),
-        "name").displayType(displayType).defaultValue(defaultValue).build();
+  public void prepareTest() throws Exception {
+    field = new BooleanField.Builder(TestClassDefinition.NAME, "name").displayType(
+        displayType).defaultValue(defaultValue).build();
   }
 
   @Test

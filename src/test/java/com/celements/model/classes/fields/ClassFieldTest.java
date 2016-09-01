@@ -1,6 +1,5 @@
 package com.celements.model.classes.fields;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
@@ -11,7 +10,10 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.TestClassDefinition;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.web.Utils;
 
 public class ClassFieldTest extends AbstractComponentTest {
 
@@ -23,12 +25,10 @@ public class ClassFieldTest extends AbstractComponentTest {
   String validationRegExp = "validationRegExp";
   String validationMessage = "validationMessage";
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     classRef = new DocumentReference("wiki", "class", "any");
-    field = new TestClassField.Builder(classRef, name).size(5).prettyName(
+    field = new TestClassField.Builder(TestClassDefinition.NAME, name).size(5).prettyName(
         prettyName).validationRegExp(validationRegExp).validationMessage(validationMessage).build();
   }
 
@@ -40,18 +40,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_immutability_classRef_isNotModifiedAndDoesNotEscape() throws Exception {
-    DocumentReference intClassRef = field.getClassRef();
-    assertThat(field.getClassRef(), not(sameInstance(intClassRef)));
-    assertThat(field.getClassRef(), is(intClassRef));
-    intClassRef.setName("asdf");
-    assertThat(field.getClassRef(), not(equalTo(intClassRef)));
-    classRef.setName("asdf");
-    assertThat(field.getClassRef(), not(equalTo(classRef)));
-  }
-
-  @Test
-  public void test_constr_null_classRef() throws Exception {
+  public void test_constr_null_classDefName() throws Exception {
     try {
       new TestClassField.Builder(null, field.getName()).build();
       fail("expecting NullPointerException");
@@ -63,7 +52,7 @@ public class ClassFieldTest extends AbstractComponentTest {
   @Test
   public void test_constr_null_name() throws Exception {
     try {
-      new TestClassField.Builder(field.getClassRef(), null).build();
+      new TestClassField.Builder(TestClassDefinition.NAME, null).build();
       fail("expecting NullPointerException");
     } catch (NullPointerException npe) {
       // expected
@@ -72,7 +61,8 @@ public class ClassFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_getters() throws Exception {
-    assertEquals(classRef, field.getClassRef());
+    assertSame(Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME),
+        field.getClassDef());
     assertEquals(name, field.getName());
     assertEquals(TestClassField.class, field.getType());
     assertEquals(prettyName, field.getPrettyName());
@@ -92,39 +82,35 @@ public class ClassFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_equals() throws Exception {
-    assertTrue(field.equals(new TestClassField.Builder(field.getClassRef(),
-        field.getName()).build()));
-    assertTrue(field.equals(new StringField.Builder(field.getClassRef(), field.getName()).build()));
-    assertTrue(field.equals(new TestClassField.Builder(field.getClassRef(),
-        field.getName()).prettyName("asdf").validationRegExp("asdf").validationMessage(
-            "asdf").build()));
-    assertFalse(field.equals(new TestClassField.Builder(field.getClassRef(), "name2").build()));
-    DocumentReference classRefOther = new DocumentReference(field.getClassRef());
-    classRefOther.setName("other");
-    assertFalse(field.equals(new TestClassField.Builder(classRefOther, field.getName()).build()));
+    assertTrue(field.equals(getBuilder().build()));
+    assertTrue(field.equals(getBuilder().build()));
+    assertTrue(field.equals(getBuilder().prettyName("asdf").validationRegExp(
+        "asdf").validationMessage("asdf").build()));
+    assertFalse(field.equals(new TestClassField.Builder(field.getClassDef().getName(),
+        "other").build()));
+    assertFalse(field.equals(new TestClassField.Builder("other", field.getName()).build()));
     assertFalse(field.equals(null));
   }
 
   @Test
   public void test_hashCode() throws Exception {
-    assertTrue(field.hashCode() == new TestClassField.Builder(field.getClassRef(),
+    assertTrue(field.hashCode() == getBuilder().build().hashCode());
+    assertTrue(field.hashCode() == getBuilder().build().hashCode());
+    assertTrue(field.hashCode() == getBuilder().prettyName("asdf").validationRegExp(
+        "asdf").validationMessage("asdf").build().hashCode());
+    assertFalse(field.hashCode() == new TestClassField.Builder(field.getClassDef().getName(),
+        "other").build().hashCode());
+    assertFalse(field.hashCode() == new TestClassField.Builder("other",
         field.getName()).build().hashCode());
-    assertTrue(field.hashCode() == new StringField.Builder(field.getClassRef(),
-        field.getName()).build().hashCode());
-    assertTrue(field.hashCode() == new TestClassField.Builder(field.getClassRef(),
-        field.getName()).prettyName("asdf").validationRegExp("asdf").validationMessage(
-            "asdf").build().hashCode());
-    assertFalse(field.hashCode() == new TestClassField.Builder(field.getClassRef(),
-        "name2").build().hashCode());
-    DocumentReference classRefOther = new DocumentReference(field.getClassRef());
-    classRefOther.setName("other");
-    assertFalse(field.hashCode() == new TestClassField.Builder(classRefOther,
-        field.getName()).build().hashCode());
+  }
+
+  private TestClassField.Builder getBuilder() {
+    return new TestClassField.Builder(field.getClassDef().getName(), field.getName());
   }
 
   @Test
   public void test_toString() throws Exception {
-    assertEquals("class.any.name", field.toString());
+    assertEquals("classes.test.name", field.toString());
   }
 
 }

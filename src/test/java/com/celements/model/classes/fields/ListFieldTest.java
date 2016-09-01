@@ -15,6 +15,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.list.DBListField;
 import com.celements.model.classes.fields.list.ListField;
 import com.celements.model.classes.fields.list.StaticListField;
@@ -36,13 +37,10 @@ public class ListFieldTest extends AbstractComponentTest {
   private Boolean picker = true;
   private String separator = ",";
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
-    fieldBuilder = new StaticListField.Builder(new DocumentReference("wiki", "class", "any"),
-        "name").multiSelect(multiSelect).size(size).displayType(displayType).picker(
-            picker).separator(separator);
+  public void prepareTest() throws Exception {
+    fieldBuilder = new StaticListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
+        multiSelect).size(size).displayType(displayType).picker(picker).separator(separator);
   }
 
   @Test
@@ -61,7 +59,7 @@ public class ListFieldTest extends AbstractComponentTest {
     assertEquals(displayType, field.getDisplayType());
     assertEquals(picker, field.getPicker());
     assertEquals(separator, field.getSeparator());
-    assertEquals("|", new StaticListField.Builder(field.getClassRef(),
+    assertEquals("|", new StaticListField.Builder(TestClassDefinition.NAME,
         field.getName()).build().getSeparator());
   }
 
@@ -81,11 +79,12 @@ public class ListFieldTest extends AbstractComponentTest {
   @Test
   public void test_resolve_serialize() throws Exception {
     StaticListField field = fieldBuilder.values(Arrays.asList("A", "B", "C", "D")).build();
+    DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    XWikiDocument doc = new XWikiDocument(classRef);
     List<String> value = Arrays.asList("B");
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
@@ -94,19 +93,19 @@ public class ListFieldTest extends AbstractComponentTest {
     verifyDefault();
 
     assertEquals(value, ret);
-    assertEquals(value, modelAccess.getXObject(doc, field.getClassRef()).getListValue(
-        field.getName()));
+    assertEquals(value, modelAccess.getXObject(doc, classRef).getListValue(field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
     StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
         "D")).build();
+    DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    XWikiDocument doc = new XWikiDocument(classRef);
     List<String> value = Arrays.asList("B", "D");
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
@@ -115,18 +114,18 @@ public class ListFieldTest extends AbstractComponentTest {
     verifyDefault();
 
     assertEquals(value, ret);
-    assertEquals(value, modelAccess.getXObject(doc, field.getClassRef()).getListValue(
-        field.getName()));
+    assertEquals(value, modelAccess.getXObject(doc, classRef).getListValue(field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
     StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
         "D")).build();
+    DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    XWikiDocument doc = new XWikiDocument(classRef);
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
@@ -139,8 +138,7 @@ public class ListFieldTest extends AbstractComponentTest {
     assertTrue(ret1.isEmpty());
     assertNotNull(ret2);
     assertTrue(ret2.isEmpty());
-    assertTrue(modelAccess.getXObject(doc, field.getClassRef()).getListValue(
-        field.getName()).isEmpty());
+    assertTrue(modelAccess.getXObject(doc, classRef).getListValue(field.getName()).isEmpty());
   }
 
 }

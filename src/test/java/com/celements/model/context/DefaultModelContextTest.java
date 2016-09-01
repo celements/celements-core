@@ -25,9 +25,7 @@ public class DefaultModelContextTest extends AbstractComponentTest {
   private DefaultModelContext modelContext;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(IModelAccessFacade.class);
     registerComponentMock(ConfigurationSource.class, CelementsFromWikiConfigurationSource.NAME);
     modelContext = (DefaultModelContext) Utils.getComponent(ModelContext.class);

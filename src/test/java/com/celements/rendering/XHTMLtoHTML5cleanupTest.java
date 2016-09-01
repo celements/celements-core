@@ -10,7 +10,7 @@ public class XHTMLtoHTML5cleanupTest {
   XHTMLtoHTML5cleanup cleaner;
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     cleaner = new XHTMLtoHTML5cleanup();
   }
 

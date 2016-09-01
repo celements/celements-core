@@ -10,8 +10,8 @@ public final class DocumentReferenceField extends EntityReferenceField<DocumentR
 
   public static class Builder extends EntityReferenceField.Builder<Builder, DocumentReference> {
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

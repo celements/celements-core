@@ -56,9 +56,7 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
   private INavigationClassConfig navClassConfig;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();

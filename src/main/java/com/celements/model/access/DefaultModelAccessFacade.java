@@ -632,12 +632,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public <T> T getProperty(DocumentReference docRef, ClassField<T> field)
       throws DocumentNotExistsException {
-    return resolvePropertyValue(field, getProperty(docRef, field.getClassRef(), field.getName()));
+    return resolvePropertyValue(field, getProperty(docRef, field.getClassDef().getClassRef(),
+        field.getName()));
   }
 
   @Override
   public <T> T getProperty(XWikiDocument doc, ClassField<T> field) {
-    return resolvePropertyValue(field, getProperty(doc, field.getClassRef(), field.getName()));
+    return resolvePropertyValue(field, getProperty(doc, field.getClassDef().getClassRef(),
+        field.getName()));
   }
 
   private <T> T resolvePropertyValue(ClassField<T> field, Object value) {
@@ -691,8 +693,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value) {
     try {
-      return setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(),
-          serializePropertyValue(field, value));
+      return setProperty(getOrCreateXObject(doc, field.getClassDef().getClassRef()),
+          field.getName(), serializePropertyValue(field, value));
     } catch (ClassCastException ex) {
       throw new IllegalArgumentException("CelObjectField ill defined: " + field, ex);
     }

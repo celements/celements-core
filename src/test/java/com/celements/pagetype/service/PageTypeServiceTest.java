@@ -54,7 +54,7 @@ public class PageTypeServiceTest extends AbstractComponentTest {
   private IPageTypeProviderRole providerMock;
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     super.setUp();
     providerMock = registerComponentMock(IPageTypeProviderRole.class, MOCK_PROVIDER);
     ptService = (PageTypeService) Utils.getComponent(IPageTypeRole.class);

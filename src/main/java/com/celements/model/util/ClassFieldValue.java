@@ -47,11 +47,7 @@ public class ClassFieldValue<T> {
 
   @Override
   public String toString() {
-    return toString(true);
-  }
-
-  public String toString(boolean local) {
-    return field.toString(local) + ": " + value;
+    return new StringBuilder().append(field).append(": ").append(value).toString();
   }
 
   @SuppressWarnings("unchecked")

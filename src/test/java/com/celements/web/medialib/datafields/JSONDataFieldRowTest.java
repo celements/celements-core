@@ -25,7 +25,7 @@ import org.junit.Test;
 public class JSONDataFieldRowTest {
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
   }
 
   @Test

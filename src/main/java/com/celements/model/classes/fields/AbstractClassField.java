@@ -5,10 +5,8 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
-
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.util.ModelUtils;
-import com.celements.model.util.References;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -19,7 +17,7 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractClassField<T> implements ClassField<T> {
 
-  private final DocumentReference classRef;
+  private final String classDefName;
   private final String name;
   private final String prettyName;
   private final String validationRegExp;
@@ -27,15 +25,14 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   public abstract static class Builder<B extends Builder<B, T>, T> {
 
-    private final DocumentReference classRef;
+    private final String classDefName;
     private final String name;
     private String prettyName;
     private String validationRegExp;
     private String validationMessage;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      Objects.requireNonNull(classRef);
-      this.classRef = References.cloneRef(classRef, DocumentReference.class);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      this.classDefName = Objects.requireNonNull(classDefName);
       this.name = Objects.requireNonNull(Strings.emptyToNull(name));
     }
 
@@ -61,7 +58,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   }
 
   protected AbstractClassField(@NotNull Builder<?, T> builder) {
-    this.classRef = builder.classRef;
+    this.classDefName = builder.classDefName;
     this.name = builder.name;
     this.prettyName = builder.prettyName;
     this.validationRegExp = builder.validationRegExp;
@@ -69,8 +66,8 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   }
 
   @Override
-  public DocumentReference getClassRef() {
-    return References.cloneRef(classRef, DocumentReference.class);
+  public ClassDefinition getClassDef() {
+    return Utils.getComponent(ClassDefinition.class, classDefName);
   }
 
   @Override
@@ -110,27 +107,22 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(classRef, name);
+    return Objects.hash(classDefName, name);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof AbstractClassField) {
       AbstractClassField<?> other = (AbstractClassField<?>) obj;
-      return Objects.equals(this.classRef, other.classRef) && Objects.equals(this.name, other.name);
+      return Objects.equals(this.classDefName, other.classDefName) && Objects.equals(this.name,
+          other.name);
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return toString(true);
-  }
-
-  @Override
-  public String toString(boolean local) {
-    return (local ? getModelUtils().serializeRefLocal(classRef)
-        : getModelUtils().serializeRef(classRef)) + "." + name;
+    return new StringBuilder().append(getClassDef()).append(".").append(name).toString();
   }
 
   protected static ModelUtils getModelUtils() {

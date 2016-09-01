@@ -58,9 +58,7 @@ public class DocFormCommandTest extends AbstractComponentTest {
   private String db;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();

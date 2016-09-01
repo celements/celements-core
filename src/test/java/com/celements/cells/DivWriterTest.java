@@ -29,7 +29,7 @@ public class DivWriterTest {
   private DivWriter divWriter;
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     divWriter = new DivWriter();
   }
 

@@ -70,10 +70,8 @@ public class NavigationTest extends AbstractComponentTest {
   private PageLayoutCommand mockLayoutCmd;
   private XWikiRightService mockRightService;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     currentDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     getContext().setDoc(currentDoc);

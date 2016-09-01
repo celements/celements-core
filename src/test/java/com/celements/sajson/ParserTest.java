@@ -33,7 +33,7 @@ public class ParserTest {
 
   @SuppressWarnings("unchecked")
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     jsonEventHandlerMock = createStrictMock(ILexicalParser.class);
     jsonParser = new Parser(null, jsonEventHandlerMock);
   }

@@ -5,9 +5,9 @@ import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.TestClassDefinition;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 public class StringFieldTest extends AbstractComponentTest {
@@ -16,12 +16,9 @@ public class StringFieldTest extends AbstractComponentTest {
 
   Integer size = 5;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
-    field = new StringField.Builder(new DocumentReference("wiki", "class", "any"), "name").size(
-        size).build();
+  public void prepareTest() throws Exception {
+    field = new StringField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 
   @Test

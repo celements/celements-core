@@ -5,9 +5,9 @@ import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.TestClassDefinition;
 import com.xpn.xwiki.objects.classes.DateClass;
 
 public class DateFieldTest extends AbstractComponentTest {
@@ -18,12 +18,10 @@ public class DateFieldTest extends AbstractComponentTest {
   Integer emptyIsToday = 3;
   String dateFormat = "dateFormat";
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
-    field = new DateField.Builder(new DocumentReference("wiki", "class", "any"), "name").size(
-        size).emptyIsToday(emptyIsToday).dateFormat(dateFormat).build();
+  public void prepareTest() throws Exception {
+    field = new DateField.Builder(TestClassDefinition.NAME, "name").size(size).emptyIsToday(
+        emptyIsToday).dateFormat(dateFormat).build();
   }
 
   @Test

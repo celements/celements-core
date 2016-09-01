@@ -54,9 +54,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   private XWikiStoreInterface storeMock;
 
   @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(XWikiDocumentCreator.class, "default", new XWikiDocumentCreator() {
 
       @Override
@@ -849,9 +847,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_ClassField() throws Exception {
-    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
     String val = "val";
-    addObj(classRef, field.getName(), val);
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
 
     replayDefault();
     String ret = modelAccess.getProperty(doc, field);
@@ -862,15 +860,15 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_ClassField_illegalField() throws Exception {
-    ClassField<Date> field = new DateField.Builder(classRef, "name").build();
-    addObj(classRef, field.getName(), "val");
+    ClassField<Date> field = new DateField.Builder(TestClassDefinition.NAME, "name").build();
+    addObj(field.getClassDef().getClassRef(), field.getName(), "val");
 
     replayDefault();
     try {
       modelAccess.getProperty(doc, field);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
-      assertTrue(iae.getMessage().contains("class.any.name"));
+      assertTrue(iae.getMessage().contains("classes.test.name"));
       assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
     } finally {
       verifyDefault();
@@ -880,9 +878,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_ClassField_docRef() throws Exception {
-    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
     String val = "val";
-    addObj(classRef, field.getName(), val);
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
 
     expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
         true).once();
@@ -988,11 +986,11 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_setProperty_ClassField() throws Exception {
     String val = "val";
-    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
-    BaseObject obj = addObj(classRef, field.getName(), "");
+    BaseObject obj = addObj(field.getClassDef().getClassRef(), field.getName(), "");
 
-    expectPropertyClass(classRef, field.getName(), new StringClass());
+    expectPropertyClass(field.getClassDef().getClassRef(), field.getName(), new StringClass());
 
     replayDefault();
     modelAccess.setProperty(doc, fieldValue);
@@ -1004,9 +1002,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_ClassField_illegalField() throws Exception {
-    ClassField<Date> field = new DateField.Builder(classRef, "name").build();
+    ClassField<Date> field = new DateField.Builder(TestClassDefinition.NAME, "name").build();
     ClassFieldValue<Date> fieldValue = new ClassFieldValue<>(field, new Date());
-    BaseClass bClass = expectNewBaseObject(classRef);
+    BaseClass bClass = expectNewBaseObject(field.getClassDef().getClassRef());
 
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
@@ -1015,7 +1013,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       modelAccess.setProperty(doc, fieldValue);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
-      assertTrue(iae.getMessage().contains("class.any.name"));
+      assertTrue(iae.getMessage().contains("classes.test.name"));
       assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
     } finally {
       verifyDefault();
@@ -1025,16 +1023,16 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_setProperty_ClassField_newObj() throws Exception {
     String val = "val";
-    ClassField<String> field = new StringField.Builder(classRef, "name").build();
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
-    BaseClass bClass = expectNewBaseObject(classRef);
+    BaseClass bClass = expectNewBaseObject(field.getClassDef().getClassRef());
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
     replayDefault();
     modelAccess.setProperty(doc, fieldValue);
     verifyDefault();
 
-    BaseObject obj = doc.getXObject(classRef);
+    BaseObject obj = doc.getXObject(field.getClassDef().getClassRef());
     assertEquals(1, obj.getFieldList().size());
     assertEquals(val, obj.getStringValue(field.getName()));
   }
@@ -1044,7 +1042,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     ClassField<DocumentReference> field = TestClassDefinition.FIELD_MY_DOCREF;
     DocumentReference toStoreRef = new DocumentReference("myDB", "mySpace", "myDoc");
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(field.getClassDef().getClassRef());
     expectPropertyClass(bClass, field.getName(), new StringClass());
 
     replayDefault();
@@ -1053,7 +1051,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     verifyDefault();
 
     assertEquals(toStoreRef, ret);
-    String objValue = modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
+    String objValue = modelAccess.getXObject(doc, field.getClassDef().getClassRef()).getStringValue(
         field.getName());
     assertEquals(modelAccess.modelUtils.serializeRef(toStoreRef), objValue);
   }

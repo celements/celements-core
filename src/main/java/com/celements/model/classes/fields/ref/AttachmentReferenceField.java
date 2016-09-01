@@ -4,15 +4,15 @@ import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
+
 
 @Immutable
 public final class AttachmentReferenceField extends EntityReferenceField<AttachmentReference> {
 
   public static class Builder extends EntityReferenceField.Builder<Builder, AttachmentReference> {
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override
