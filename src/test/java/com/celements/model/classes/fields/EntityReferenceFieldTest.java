@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ref.AttachmentReferenceField;
 import com.celements.model.classes.fields.ref.DocumentReferenceField;
 import com.celements.model.classes.fields.ref.EntityReferenceField;
@@ -27,8 +28,7 @@ public class EntityReferenceFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new DocumentReferenceField.Builder(new DocumentReference("wiki", "class", "any"),
-        "name").size(size).build();
+    field = new DocumentReferenceField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 
   @Test
@@ -54,12 +54,12 @@ public class EntityReferenceFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_serialize() throws Exception {
-    assertEquals("wiki:class.any", field.serialize(field.getClassRef()));
+    assertEquals("xwikidb:classes.test", field.serialize(field.getClassDef().getClassRef()));
   }
 
   @Test
   public void test_resolve() throws Exception {
-    assertEquals(field.getClassRef(), field.resolve("wiki:class.any"));
+    assertEquals(field.getClassDef().getClassRef(), field.resolve("xwikidb:classes.test"));
   }
 
 }

@@ -7,9 +7,9 @@ import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.number.ByteField;
 import com.celements.model.classes.fields.number.DoubleField;
 import com.celements.model.classes.fields.number.FloatField;
@@ -29,8 +29,7 @@ public class NumberFieldTest extends AbstractComponentTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    field = new IntField.Builder(new DocumentReference("wiki", "class", "any"), "name").size(
-        size).build();
+    field = new IntField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 
   @Test
