@@ -11,14 +11,20 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
+import com.celements.model.util.References;
 
 public abstract class AbstractClassDefinition implements ClassDefinition {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractClassDefinition.class);
+
+  @Requirement
+  protected ModelContext context;
 
   @Requirement
   protected ModelUtils modelUtils;
@@ -30,18 +36,20 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
 
   @Override
   public DocumentReference getClassRef() {
-    return getClassRef(null);
+    return getClassRef(context.getWikiRef());
   }
 
   @Override
   public DocumentReference getClassRef(WikiReference wikiRef) {
-    return modelUtils.adjustRef(getClassRefInternal(), DocumentReference.class, wikiRef);
+    EntityReference ref = References.cloneRef(getRelativeClassRef());
+    ref.getRoot().setParent(wikiRef);
+    return new DocumentReference(ref);
   }
 
   /**
-   * @return class ref for this class definition. wiki will be adjusted
+   * @return relative class ref (without wiki) for this class definition.
    */
-  protected abstract DocumentReference getClassRefInternal();
+  protected abstract EntityReference getRelativeClassRef();
 
   @Override
   public boolean isBlacklisted() {
@@ -87,7 +95,7 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
 
   @Override
   public String toString() {
-    return new StringBuilder().append(modelUtils.serializeRefLocal(getClassRef())).toString();
+    return modelUtils.serializeRef(getRelativeClassRef());
   }
 
 }
