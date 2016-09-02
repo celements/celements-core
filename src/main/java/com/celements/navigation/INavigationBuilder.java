@@ -20,6 +20,7 @@
 package com.celements.navigation;
 
 import java.util.NavigableSet;
+import java.util.Set;
 
 public interface INavigationBuilder {
 
@@ -29,7 +30,7 @@ public interface INavigationBuilder {
   @Deprecated
   public void openLevel(String mainUlCSSClasses);
 
-  public void openLevel(NavigableSet<String> mainUlCSSClasses);
+  public void openLevel(Set<String> mainUlCSSClasses);
 
   public void closeLevel();
 
@@ -57,6 +58,6 @@ public interface INavigationBuilder {
       boolean isActive, boolean isLastItem, String cssClasses);
 
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
-      boolean isActive, boolean isLastItem, NavigableSet<String> cssClasses);
+      boolean isActive, boolean isLastItem, Set<String> cssClasses);
 
 }

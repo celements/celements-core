@@ -20,7 +20,8 @@
 package com.celements.navigation;
 
 import java.util.Arrays;
-import java.util.NavigableSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,14 +43,14 @@ public class ListBuilder implements INavigationBuilder {
   }
 
   @Override
-  public void openLevel(NavigableSet<String> mainUlCSSClasses) {
+  public void openLevel(Set<String> mainUlCSSClasses) {
     outStream.append("<ul");
     addCssClasses(mainUlCSSClasses);
     outStream.append(">");
     isFirstItem = true;
   }
 
-  private void addCssClasses(NavigableSet<String> cssClasses) {
+  private void addCssClasses(Set<String> cssClasses) {
     if (!cssClasses.isEmpty()) {
       outStream.append(" class=\"");
       outStream.append(StringUtils.join(cssClasses, ' '));
@@ -86,9 +87,9 @@ public class ListBuilder implements INavigationBuilder {
     return uniqueId;
   }
 
-  NavigableSet<String> getCssClasses(boolean isFirstItem, boolean isLastItem, boolean isActive,
-      NavigableSet<String> additionalCssClasses) {
-    NavigableSet<String> cssClass = new TreeSet<>(additionalCssClasses);
+  Set<String> getCssClasses(boolean isFirstItem, boolean isLastItem, boolean isActive,
+      Set<String> additionalCssClasses) {
+    Set<String> cssClass = new LinkedHashSet<>(additionalCssClasses);
     if (isFirstItem) {
       cssClass.add("first");
     }
@@ -106,12 +107,12 @@ public class ListBuilder implements INavigationBuilder {
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
       boolean isActive, boolean isLastItem, String cssClasses) {
     appendMenuItemLink(menuItemName, hrefLink, multilingualName, isActive, isLastItem,
-        new TreeSet<String>(Arrays.asList(StringUtils.split(cssClasses, ' '))));
+        new LinkedHashSet<String>(Arrays.asList(StringUtils.split(cssClasses, ' '))));
   }
 
   @Override
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
-      boolean isActive, boolean isLastItem, NavigableSet<String> cssClasses) {
+      boolean isActive, boolean isLastItem, Set<String> cssClasses) {
     outStream.append("<a ");
     addCssClasses(getCssClasses(isFirstItem, isLastItem, isActive, cssClasses));
     outStream.append(" ");

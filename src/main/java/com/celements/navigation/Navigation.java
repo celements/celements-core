@@ -22,9 +22,9 @@ package com.celements.navigation;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
@@ -115,7 +115,7 @@ public class Navigation implements INavigation {
 
   private String cmCssClass;
 
-  private NavigableSet<String> mainUlCssClasses;
+  private Set<String> mainUlCssClasses;
 
   private String emptyDictKeySuffix;
 
@@ -158,7 +158,7 @@ public class Navigation implements INavigation {
       throw new IllegalStateException("Native List Layout Type not available!", exp);
     }
     this.nodeSpaceRef = null;
-    this.mainUlCssClasses = new TreeSet<>();
+    this.mainUlCssClasses = new LinkedHashSet<>();
     this.cmCssClass = "";
     utils = WebUtils.getInstance();
   }
