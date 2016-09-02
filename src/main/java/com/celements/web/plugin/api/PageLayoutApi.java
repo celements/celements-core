@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.ICellsClassConfig;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -56,6 +57,22 @@ public class PageLayoutApi extends Api {
 
   public String getPrettyName() {
     return pageLayoutCmd.getPrettyName(layoutSpaceRef);
+  }
+
+  public String getVersion() {
+    return pageLayoutCmd.getVersion(layoutSpaceRef);
+  }
+
+  public String getLayoutType() {
+    return pageLayoutCmd.getLayoutType(layoutSpaceRef);
+  }
+
+  public boolean isPageLayoutType() {
+    return ICellsClassConfig.PAGE_LAYOUT_VALUE.equals(getLayoutType());
+  }
+
+  public boolean isEditorLayoutType() {
+    return ICellsClassConfig.EDITOR_LAYOUT_VALUE.equals(getLayoutType());
   }
 
   /**

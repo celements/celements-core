@@ -172,14 +172,14 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     expect(inheritor.getStringValue(eq("page_layout"), (String) isNull())).andReturn(layoutName);
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "mySpace",
         "WebHome");
-    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(new XWikiDocument(
         webHomeDocRef));
     expect(xwiki.exists(eq(new DocumentReference(context.getDatabase(), layoutName, "WebHome")),
         same(context))).andReturn(false);
     DocumentReference centralLayoutPropDocRef = new DocumentReference("celements2web", layoutName,
         "WebHome");
-    expect(xwiki.exists(eq(centralLayoutPropDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(centralLayoutPropDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument centralLayoutPropDoc = new XWikiDocument(centralLayoutPropDocRef);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference centralPagePropClassRef = new DocumentReference("celements2web",
@@ -241,7 +241,8 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
         same(context))).andReturn(false);
     DocumentReference centralSimpleLayoutDocRef = new DocumentReference("celements2web",
         "SimpleLayout", "WebHome");
-    expect(xwiki.exists(eq(centralSimpleLayoutDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(centralSimpleLayoutDocRef), same(context))).andReturn(
+        true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(centralSimpleLayoutDocRef);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference("celements2web",
@@ -301,7 +302,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
     DocumentReference layoutPropDocRef = new DocumentReference("celements2web", "MyPageLayout",
         "WebHome");
-    expect(xwiki.exists(eq(layoutPropDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(layoutPropDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(layoutPropDocRef);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference("celements2web",
@@ -329,7 +330,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
         "WebHome");
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(false);
     DocumentReference layoutPropDocRef = new DocumentReference("someDB", "MyPageLayout", "WebHome");
-    expect(xwiki.exists(eq(layoutPropDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(layoutPropDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(layoutPropDocRef);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference("someDB",
@@ -350,6 +351,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     verifyAll(injectedInheritorFactory, inheritor);
   }
 
+  @Deprecated
   @Test
   public void testGetPageLayoutForDoc_layoutSpace() throws Exception {
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
@@ -357,7 +359,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     String fullName = "MyPageLayout.MyDocName";
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
         "WebHome");
-    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
@@ -368,7 +370,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(layoutPropDoc);
     DocumentReference layoutEditorPropDocRef = new DocumentReference(context.getDatabase(),
         "CelLayoutEditor", "WebHome");
-    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutEditorPropDoc = new XWikiDocument(layoutEditorPropDocRef);
     BaseObject layoutEditorPropObj = new BaseObject();
     layoutEditorPropObj.setXClassReference(pagePropClassRef);
@@ -380,6 +382,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     verifyAll(injectedInheritorFactory);
   }
 
+  @Deprecated
   @Test
   public void testGetPageLayoutForDoc_layoutSpace_centralLayoutEditor() throws Exception {
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
@@ -387,7 +390,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     String fullName = "MyPageLayout.MyDocName";
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "MyPageLayout",
         "WebHome");
-    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
     BaseObject layoutPropObj = new BaseObject();
     DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
@@ -401,7 +404,8 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(false);
     DocumentReference centralLayoutEditorPropDocRef = new DocumentReference("celements2web",
         "CelLayoutEditor", "WebHome");
-    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(true);
+    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
+        true).atLeastOnce();
     XWikiDocument layoutEditorPropDoc = new XWikiDocument(centralLayoutEditorPropDocRef);
     BaseObject layoutEditorPropObj = new BaseObject();
     DocumentReference centralPagePropClassRef = new DocumentReference("celements2web",
@@ -464,12 +468,14 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference myCellDocRef = new DocumentReference(context.getDatabase(), layoutName,
         "myCell");
     XWikiDocument myCellDoc = new XWikiDocument(myCellDocRef);
+    expect(xwiki.exists(eq(myCellDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(myCellDocRef), same(context))).andReturn(myCellDoc).once();
     xwiki.deleteAllDocuments(same(myCellDoc), same(context));
     expectLastCall().once();
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), layoutName,
         "WebHome");
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).once();
     xwiki.deleteAllDocuments(same(webHomeDoc), same(context));
     expectLastCall().once();
@@ -525,7 +531,7 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
   public void testLayoutEditorAvailable_local() throws Exception {
     DocumentReference layoutEditorPropDocRef = new DocumentReference(context.getDatabase(),
         PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
-    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true).once();
+    expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument layoutEditorPropDoc = new XWikiDocument(layoutEditorPropDocRef);
     expect(xwiki.getDocument(eq(layoutEditorPropDocRef), same(context))).andReturn(
         layoutEditorPropDoc).once();
@@ -547,7 +553,8 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(layoutEditorPropDocRef), same(context))).andReturn(false).once();
     DocumentReference centralLayoutEditorPropDocRef = new DocumentReference("celements2web",
         PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
-    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(true).once();
+    expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
+        true).atLeastOnce();
     XWikiDocument centralLayoutEditorPropDoc = new XWikiDocument(centralLayoutEditorPropDocRef);
     expect(xwiki.getDocument(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
         centralLayoutEditorPropDoc).once();
