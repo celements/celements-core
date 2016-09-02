@@ -12,6 +12,7 @@ public interface ICellsClassConfig {
       + CELEMENTS_CELL_CLASS_NAME;
   public static final String CELLCLASS_IDNAME_FIELD = "idname";
   public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
+  public static final String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
 
   public DocumentReference getCellClassRef(String wikiName);
 
