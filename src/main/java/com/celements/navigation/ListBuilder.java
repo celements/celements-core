@@ -19,6 +19,11 @@
  */
 package com.celements.navigation;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+
+import org.apache.commons.lang.StringUtils;
+
 public class ListBuilder implements INavigationBuilder {
 
   private StringBuilder outStream;
@@ -29,33 +34,47 @@ public class ListBuilder implements INavigationBuilder {
     this.uniqueName = navUniqueId;
   }
 
+  @Override
+  @Deprecated
   public void openLevel(String mainUlCSSClasses) {
-    outStream.append("<ul" + addCssClasses(mainUlCSSClasses) + ">");
+    openLevel(new LinkedHashSet<String>(Arrays.asList(StringUtils.split(mainUlCSSClasses, ' '))));
+  }
+
+  @Override
+  public void openLevel(LinkedHashSet<String> mainUlCSSClasses) {
+    outStream.append("<ul");
+    addCssClasses(mainUlCSSClasses);
+    outStream.append(">");
     isFirstItem = true;
   }
 
-  private String addCssClasses(String cssClasses) {
-    if (!"".equals(cssClasses.trim())) {
-      return " class=\"" + cssClasses.trim() + "\" ";
-    } else {
-      return "";
+  private void addCssClasses(LinkedHashSet<String> cssClasses) {
+    if (!cssClasses.isEmpty()) {
+      outStream.append(" class=\"");
+      outStream.append(StringUtils.join(cssClasses, ' '));
+      outStream.append("\" ");
     }
   }
 
+  @Override
   public void closeLevel() {
     outStream.append("</ul>");
   }
 
+  @Override
   public String getLayoutTypeName() {
-    return Navigation.LIST_LAYOUT_TYPE;
+    return NavigationConfig.LIST_LAYOUT_TYPE;
   }
 
+  @Override
   public void useStream(StringBuilder outStream) {
     this.outStream = outStream;
   }
 
-  private String addUniqueElementId(String menuItemName) {
-    return "id=\"" + getUniqueId(menuItemName) + "\"";
+  private void addUniqueElementId(String menuItemName) {
+    outStream.append("id=\"");
+    outStream.append(getUniqueId(menuItemName));
+    outStream.append("\"");
   }
 
   String getUniqueId(String... params) {
@@ -66,34 +85,51 @@ public class ListBuilder implements INavigationBuilder {
     return uniqueId;
   }
 
-  String getCssClasses(boolean isFirstItem, boolean isLastItem, boolean isActive,
-      String additionalCssClasses) {
-    String cssClass = additionalCssClasses;
+  LinkedHashSet<String> getCssClasses(boolean isFirstItem, boolean isLastItem, boolean isActive,
+      LinkedHashSet<String> additionalCssClasses) {
+    LinkedHashSet<String> cssClass = new LinkedHashSet<>(additionalCssClasses);
     if (isFirstItem) {
-      cssClass += " first";
+      cssClass.add("first");
     }
     if (isLastItem) {
-      cssClass += " last";
+      cssClass.add("last");
     }
     if (isActive) {
-      cssClass += " active";
+      cssClass.add("active");
     }
     return cssClass;
   }
 
+  @Override
+  @Deprecated
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
       boolean isActive, boolean isLastItem, String cssClasses) {
-    outStream.append("<a " + addCssClasses(getCssClasses(isFirstItem, isLastItem, isActive,
-        cssClasses)) + " " + addUniqueElementId(menuItemName) + " href=\"" + hrefLink + "\">"
-        + multilingualName + "</a>");
+    appendMenuItemLink(menuItemName, hrefLink, multilingualName, isActive, isLastItem,
+        new LinkedHashSet<String>(Arrays.asList(StringUtils.split(cssClasses, ' '))));
+  }
+
+  @Override
+  public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
+      boolean isActive, boolean isLastItem, LinkedHashSet<String> cssClasses) {
+    outStream.append("<a ");
+    addCssClasses(getCssClasses(isFirstItem, isLastItem, isActive, cssClasses));
+    outStream.append(" ");
+    addUniqueElementId(menuItemName);
+    outStream.append(" href=\"");
+    outStream.append(hrefLink);
+    outStream.append("\">");
+    outStream.append(multilingualName);
+    outStream.append("</a>");
     isFirstItem = false;
   }
 
+  @Override
   public void closeMenuItemOut() {
     outStream.append("<!-- IE6 --></li>");
     isFirstItem = false;
   }
 
+  @Override
   public void openMenuItemOut() {
     outStream.append("<li>");
   }
