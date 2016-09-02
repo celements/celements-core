@@ -12,7 +12,13 @@ public interface ICellsClassConfig {
       + CELEMENTS_CELL_CLASS_NAME;
   public static final String CELLCLASS_IDNAME_FIELD = "idname";
   public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
+
   public static final String PAGE_LAYOUT_PROPERTIES_CLASS_DOC = "PageLayoutPropertiesClass";
+  public static final String PAGE_LAYOUT_PROPERTIES_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
+      + PAGE_LAYOUT_PROPERTIES_CLASS_DOC;
+  public static final String LAYOUT_TYPE_FIELD = "layout_type";
+  public static final String EDITOR_LAYOUT_VALUE = "editorLayout";
+  public static final String PAGE_LAYOUT_VALUE = "pageLayout";
 
   public DocumentReference getCellClassRef(String wikiName);
 

@@ -77,6 +77,7 @@ public class CellsClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "celCellsClasses";
   }
@@ -147,6 +148,9 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextAreaField("license", "License", 15, 30);
     needsUpdate |= bclass.addTextField("version", "Version", 30);
     needsUpdate |= bclass.addStaticListField("doctype", "Doctype", 1, false, "XHTML 1.1|HTML 5",
+        "select");
+    needsUpdate |= bclass.addStaticListField(ICellsClassConfig.LAYOUT_TYPE_FIELD, "Layout Type", 1,
+        false, ICellsClassConfig.PAGE_LAYOUT_VALUE + "|" + ICellsClassConfig.EDITOR_LAYOUT_VALUE,
         "select");
 
     if (!"internal".equals(bclass.getCustomMapping())) {
