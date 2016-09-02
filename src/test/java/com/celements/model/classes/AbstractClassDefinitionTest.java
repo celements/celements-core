@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
@@ -18,6 +20,15 @@ public class AbstractClassDefinitionTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     testClass = Utils.getComponent(ClassDefinition.class, TestClassDefinition.NAME);
+  }
+
+  @Test
+  public void test_getClassRef() throws Exception {
+    assertEquals(new DocumentReference(getContext().getDatabase(), "classes", "test"),
+        testClass.getClassRef());
+    WikiReference wiki = new WikiReference("asdf");
+    assertEquals(new DocumentReference(wiki.getName(), "classes", "test"), testClass.getClassRef(
+        wiki));
   }
 
   @Test

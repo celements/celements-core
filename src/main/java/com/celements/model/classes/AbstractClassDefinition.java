@@ -18,6 +18,7 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
+import com.google.common.base.Preconditions;
 
 public abstract class AbstractClassDefinition implements ClassDefinition {
 
@@ -42,6 +43,8 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
   @Override
   public DocumentReference getClassRef(WikiReference wikiRef) {
     EntityReference ref = References.cloneRef(getRelativeClassRef());
+    Preconditions.checkState(!References.extractRef(ref, WikiReference.class).isPresent(),
+        "wiki must be missing from relative class ref");
     ref.getRoot().setParent(wikiRef);
     return new DocumentReference(ref);
   }
