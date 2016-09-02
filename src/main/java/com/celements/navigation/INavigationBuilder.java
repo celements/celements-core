@@ -19,17 +19,17 @@
  */
 package com.celements.navigation;
 
-import java.util.LinkedHashSet;
+import java.util.NavigableSet;
 
 public interface INavigationBuilder {
 
   /**
-   * @deprecated since 2.82 instead use {@link INavigationBuilder#openLevel(LinkedHashSet)}
+   * @deprecated since 2.82 instead use {@link INavigationBuilder#openLevel(NavigableSet)}
    */
   @Deprecated
   public void openLevel(String mainUlCSSClasses);
 
-  public void openLevel(LinkedHashSet<String> mainUlCSSClasses);
+  public void openLevel(NavigableSet<String> mainUlCSSClasses);
 
   public void closeLevel();
 
@@ -50,13 +50,13 @@ public interface INavigationBuilder {
 
   /**
    * @deprecated since 2.82 instead use
-   *             {@link INavigationBuilder#appendMenuItemLink(String, String, String, boolean, boolean, LinkedHashSet)}
+   *             {@link INavigationBuilder#appendMenuItemLink(String, String, String, boolean, boolean, NavigableSet)}
    */
   @Deprecated
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
       boolean isActive, boolean isLastItem, String cssClasses);
 
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
-      boolean isActive, boolean isLastItem, LinkedHashSet<String> cssClasses);
+      boolean isActive, boolean isLastItem, NavigableSet<String> cssClasses);
 
 }
