@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -905,7 +906,7 @@ public class Navigation implements INavigation {
 
   @Override
   public String getCMcssClass() {
-    if ((cmCssClass == null) || "".equals(cmCssClass)) {
+    if (Strings.isNullOrEmpty(cmCssClass)) {
       return getPresentationType().getDefaultCssClass();
     } else {
       return cmCssClass;
