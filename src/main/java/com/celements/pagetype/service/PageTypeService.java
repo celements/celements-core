@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,7 @@ import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.category.IPageTypeCategoryRole;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -85,8 +87,20 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   @Override
-  public IPageTypeCategoryRole getTypeCategoryForCatName(String categoryName) {
-    return getTypeNameToCategoryMap().get(categoryName);
+  public Optional<IPageTypeCategoryRole> getTypeCategoryForCatName(String categoryName) {
+    return Optional.fromNullable(getTypeNameToCategoryMap().get(categoryName));
+  }
+
+  @Override
+  public List<String> getTypesForCategory(String categoryName, boolean onlyVisible) {
+    Optional<IPageTypeCategoryRole> typeCategory = getTypeCategoryForCatName(categoryName);
+    if (typeCategory.isPresent()) {
+      return getPageTypesConfigNamesForCategories(typeCategory.get().getAllTypeNames(),
+          onlyVisible);
+    } else {
+      LOGGER.warn("cannot find types category name ''", categoryName);
+    }
+    return Collections.emptyList();
   }
 
   @Override

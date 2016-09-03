@@ -91,15 +91,11 @@ public class PageTypeScriptService implements ScriptService {
   }
 
   public List<String> getAvailableTypesForCategory(String categoryName) {
-    IPageTypeCategoryRole typeCategory = pageTypeService.getTypeCategoryForCatName(categoryName);
-    return pageTypeService.getPageTypesConfigNamesForCategories(typeCategory.getAllTypeNames(),
-        true);
+    return pageTypeService.getTypesForCategory(categoryName, true);
   }
 
   public List<String> getAllTypesForCategory(String categoryName) {
-    IPageTypeCategoryRole typeCategory = pageTypeService.getTypeCategoryForCatName(categoryName);
-    return pageTypeService.getPageTypesConfigNamesForCategories(typeCategory.getAllTypeNames(),
-        false);
+    return pageTypeService.getTypesForCategory(categoryName, false);
   }
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {
