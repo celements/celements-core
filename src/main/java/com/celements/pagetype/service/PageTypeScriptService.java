@@ -21,7 +21,6 @@ package com.celements.pagetype.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -106,9 +105,9 @@ public class PageTypeScriptService implements ScriptService {
     return pageTypeService.getPageTypeConfigForPageTypeRef(pageTypeRef);
   }
 
-  public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
+  public List<PageTypeReference> getPageTypeRefsForCategories(List<String> catList,
       boolean onlyVisible) {
-    return pageTypeService.getPageTypeRefsForCategories(catList, onlyVisible);
+    return pageTypeService.getPageTypeRefsForCategories(new HashSet<>(catList), onlyVisible);
   }
 
   public PageTypeReference getPageTypeRef(DocumentReference docRef) {
