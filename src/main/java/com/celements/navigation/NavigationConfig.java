@@ -1,8 +1,7 @@
 package com.celements.navigation;
 
 import java.util.LinkedHashSet;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.Set;
 
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
@@ -256,8 +255,8 @@ public final class NavigationConfig {
   }
 
   @NotNull
-  public NavigableSet<String> getMainUlCSSClasses() {
-    return new TreeSet<String>(mainUlCSSClasses);
+  public Set<String> getMainUlCSSClasses() {
+    return new LinkedHashSet<String>(mainUlCSSClasses);
   }
 
   private static ModelUtils getModelUtils() {
