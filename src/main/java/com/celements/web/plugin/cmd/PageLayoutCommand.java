@@ -192,6 +192,7 @@ public class PageLayoutCommand {
   }
 
   public BaseObject getLayoutPropertyObj(SpaceReference layoutSpaceRef) {
+    layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
     XWikiDocument layoutPropDoc = getLayoutPropDoc(layoutSpaceRef);
     if (layoutPropDoc != null) {
       return layoutPropDoc.getXObject(getPageLayoutPropertiesClassRef(
