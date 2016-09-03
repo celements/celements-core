@@ -41,17 +41,27 @@ public class PageTypeScriptService implements ScriptService {
   @Requirement
   IPageTypeResolverRole pageTypeResolver;
 
+  @Deprecated
   @Requirement
   IPageTypeCategoryRole pageTypeCategory;
 
+  @Deprecated
   @Requirement("cellTypeCategory")
   IPageTypeCategoryRole cellTypeCategory;
 
+  /**
+   * @Deprecated since 2.82 instead use getAllTypesForCategory('pageType')
+   */
+  @Deprecated
   public List<String> getAllPageTypes() {
     return pageTypeService.getPageTypesConfigNamesForCategories(pageTypeCategory.getAllTypeNames(),
         false);
   }
 
+  /**
+   * @Deprecated since 2.82 instead use getAvailableTypesForCategory('pageType')
+   */
+  @Deprecated
   public List<String> getAvailablePageTypes() {
     return pageTypeService.getPageTypesConfigNamesForCategories(pageTypeCategory.getAllTypeNames(),
         true);
@@ -62,14 +72,34 @@ public class PageTypeScriptService implements ScriptService {
         onlyVisible);
   }
 
+  /**
+   * @Deprecated since 2.82 instead use getAllTypesForCategory('celltype')
+   */
+  @Deprecated
   public List<String> getAllCellTypes() {
     return pageTypeService.getPageTypesConfigNamesForCategories(cellTypeCategory.getAllTypeNames(),
         false);
   }
 
+  /**
+   * @Deprecated since 2.82 instead use getAvailableTypesForCategory('celltype')
+   */
+  @Deprecated
   public List<String> getAvailableCellTypes() {
     return pageTypeService.getPageTypesConfigNamesForCategories(cellTypeCategory.getAllTypeNames(),
         true);
+  }
+
+  public List<String> getAvailableTypesForCategory(String categoryName) {
+    IPageTypeCategoryRole typeCategory = pageTypeService.getTypeCategoryForCatName(categoryName);
+    return pageTypeService.getPageTypesConfigNamesForCategories(typeCategory.getAllTypeNames(),
+        true);
+  }
+
+  public List<String> getAllTypesForCategory(String categoryName) {
+    IPageTypeCategoryRole typeCategory = pageTypeService.getTypeCategoryForCatName(categoryName);
+    return pageTypeService.getPageTypesConfigNamesForCategories(typeCategory.getAllTypeNames(),
+        false);
   }
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {

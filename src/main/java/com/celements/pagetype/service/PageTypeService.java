@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.IPageTypeProviderRole;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.category.IPageTypeCategoryRole;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -57,6 +60,36 @@ public class PageTypeService implements IPageTypeRole {
   @Requirement
   private IModelAccessFacade modelAccess;
 
+  @Requirement
+  private List<IPageTypeCategoryRole> pageTypeCategoryList;
+
+  private final ConcurrentMap<String, IPageTypeCategoryRole> typeNameToCategoryMap = new ConcurrentHashMap<>();
+
+  private ConcurrentMap<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
+    if (typeNameToCategoryMap.isEmpty()) {
+      synchronized (typeNameToCategoryMap) {
+        if (typeNameToCategoryMap.isEmpty()) {
+          for (IPageTypeCategoryRole typeCategory : pageTypeCategoryList) {
+            IPageTypeCategoryRole beforeRegCat = typeNameToCategoryMap.putIfAbsent(
+                typeCategory.getTypeName(), typeCategory);
+            if (beforeRegCat != null) {
+              LOGGER.warn("Page type category collision on category name '{}' the colliding"
+                  + " category '{}' is shadowed by ''.", typeCategory.getTypeName(),
+                  typeCategory.getClass(), beforeRegCat.getClass());
+            }
+          }
+        }
+      }
+    }
+    return typeNameToCategoryMap;
+  }
+
+  @Override
+  public IPageTypeCategoryRole getTypeCategoryForCatName(String categoryName) {
+    return getTypeNameToCategoryMap().get(categoryName);
+  }
+
+  @Override
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {
     if (pageTypeName != null) {
       PageTypeReference pageTypeRef = getPageTypeRefByConfigName(pageTypeName);
@@ -65,10 +98,12 @@ public class PageTypeService implements IPageTypeRole {
     return null;
   }
 
+  @Override
   public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef) {
     return getProviderForPageTypeRef(pageTypeRef).getPageTypeByReference(pageTypeRef);
   }
 
+  @Override
   public PageTypeReference getPageTypeRefByConfigName(String pageTypeName) {
     return getPageTypeRefsByConfigNames().get(pageTypeName);
   }
@@ -77,6 +112,7 @@ public class PageTypeService implements IPageTypeRole {
     return pageTypeProviders.get(pageTypeRef.getProviderHint());
   }
 
+  @Override
   public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
       boolean onlyVisible) {
     List<String> pageTypeConfigNameList = new ArrayList<String>();
@@ -88,6 +124,7 @@ public class PageTypeService implements IPageTypeRole {
     return pageTypeConfigNameList;
   }
 
+  @Override
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible) {
     if (onlyVisible) {
