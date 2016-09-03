@@ -76,7 +76,7 @@ public class LayoutScriptService implements ScriptService {
     return false;
   }
 
-  public PageLayoutApi getPageLayoutApiForName(SpaceReference layoutSpaceRef) {
+  public PageLayoutApi getPageLayoutApiForRef(SpaceReference layoutSpaceRef) {
     return new PageLayoutApi(layoutSpaceRef, getContext());
   }
 
