@@ -129,8 +129,9 @@ public class CellsClasses extends AbstractClassCollection {
   BaseClass getPageLayoutPropertiesClass() throws XWikiException {
     XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference pageLayoutPropertiesClassRef = getPageLayoutPropertiesClassRef(
+    DocumentReference pageLayoutPropertiesClassRef = cellsClassConfig.getPageLayoutPropertiesClassRef(
         getContext().getDatabase());
+    LOGGER.debug("getPageLayoutPropertiesClass for db '" + getContext().getDatabase() + "'.");
 
     try {
       doc = getContext().getWiki().getDocument(pageLayoutPropertiesClassRef, getContext());
@@ -158,6 +159,8 @@ public class CellsClasses extends AbstractClassCollection {
       bclass.setCustomMapping("internal");
     }
 
+    LOGGER.debug("getPageLayoutPropertiesClass for db '" + getContext().getDatabase()
+        + "' needs update '" + needsUpdate + "'.");
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
