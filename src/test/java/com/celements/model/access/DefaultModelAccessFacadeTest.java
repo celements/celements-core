@@ -55,7 +55,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(XWikiDocumentCreator.class, "default", new XWikiDocumentCreator() {
+    registerComponentMock(XWikiDocumentCreator.class, "default", new DefaultXWikiDocumentCreator() {
 
       @Override
       public XWikiDocument create(DocumentReference docRef) {
