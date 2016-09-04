@@ -34,7 +34,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.ModelAccessStub;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
@@ -54,7 +53,6 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(IModelAccessFacade.class);
     ModelAccessStub.init();
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
