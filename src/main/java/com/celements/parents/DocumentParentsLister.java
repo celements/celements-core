@@ -25,7 +25,7 @@ import com.google.common.collect.Iterables;
 @Component
 public class DocumentParentsLister implements IDocumentParentsListerRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(DocumentParentsLister.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(DocumentParentsLister.class);
 
   @Requirement
   Map<String, IDocParentProviderRole> docParentProviderMap;
@@ -39,24 +39,25 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef,
       boolean includeDoc) {
-    ArrayList<DocumentReference> parents = new ArrayList<DocumentReference>();
+    ArrayList<DocumentReference> parents = new ArrayList<>();
     try {
       setParent(parents, docRef);
       boolean hasMore = true;
       while (hasMore) {
         setPrimaryParents(parents);
-        hasMore = setSecondaryProviderParent(parents);
+        hasMore = setSecondaryParent(parents);
       }
       if (!includeDoc) {
         parents.remove(0);
       }
     } catch (XDocRecursionException recExp) {
-      _LOGGER.info("Recursion in document parents found [" + recExp + "].");
+      LOGGER.info("Recursion in document parents found [" + recExp + "].");
     }
     return parents;
   }
 
   private void setPrimaryParents(List<DocumentReference> parents) throws XDocRecursionException {
+    LOGGER.debug("setPrimaryParents started with: {}", parents);
     for (String providerName : getPrimaryProviderNames()) {
       IDocParentProviderRole provider = docParentProviderMap.get(providerName);
       DocumentReference docRef = Iterables.getLast(parents);
@@ -64,10 +65,12 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
         setParent(parents, parentRef);
       }
     }
+    LOGGER.debug("setPrimaryParents finished with: {}", parents);
   }
 
-  private boolean setSecondaryProviderParent(List<DocumentReference> parents)
+  private boolean setSecondaryParent(List<DocumentReference> parents)
       throws XDocRecursionException {
+    LOGGER.debug("setSecondaryParent started with: {}", parents);
     DocumentReference docRef = Iterables.getLast(parents);
     List<DocumentReference> nextParents = Collections.emptyList();
     Iterator<String> iter = getSecondaryProviderNames().iterator();
@@ -75,15 +78,15 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
       nextParents = docParentProviderMap.get(iter.next()).getDocumentParentsList(docRef);
       nextParents = checkPageTypes(nextParents);
     }
-    if (!nextParents.isEmpty()) {
+    boolean hasNext = !nextParents.isEmpty();
+    if (hasNext) {
       setParent(parents, nextParents.get(0));
       if (nextParents.size() > 1) {
-        _LOGGER.warn("Received multiple parents for '{}': {}", docRef, nextParents);
+        LOGGER.warn("Received multiple parents for '{}': {}", docRef, nextParents);
       }
-      return true;
-    } else {
-      return false;
     }
+    LOGGER.debug("setSecondaryParent finished with: {}", parents);
+    return hasNext;
   }
 
   private List<DocumentReference> checkPageTypes(List<DocumentReference> parents) {
@@ -100,10 +103,13 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
 
   private void setParent(List<DocumentReference> parents, DocumentReference toAdd)
       throws XDocRecursionException {
-    if (!parents.contains(toAdd)) {
-      parents.add(toAdd);
-    } else {
+    if (toAdd == null) {
+      LOGGER.warn("tried to add null as parent for doc '{}'", Iterables.getFirst(parents, null));
+    } else if (parents.contains(toAdd)) {
       throw new XDocRecursionException(toAdd);
+    } else {
+      parents.add(toAdd);
+      LOGGER.trace("added '{}' to parent list", toAdd);
     }
   }
 

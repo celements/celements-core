@@ -11,6 +11,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.nextfreedoc.NextFreeDocService;
 import com.celements.web.service.IWebUtilsService;
@@ -33,7 +34,8 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
   private XWikiStoreInterface storeMock;
 
   @Before
-  public void setUp_NextFreeDocNameCommandTest() throws Exception {
+  public void prepareTest() throws Exception {
+    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
     nextFreeDocNameCmd = new NextFreeDocNameCommand();
@@ -50,7 +52,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -81,7 +83,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -112,7 +114,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -143,7 +145,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(theDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();

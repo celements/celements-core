@@ -52,10 +52,8 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   private ClassPackage classPackage;
   private ClassDefinition classDef;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     registerComponentMock(IModelAccessFacade.class);
     ModelAccessStub.init();
     registerComponentMock(ConfigurationSource.class);

@@ -38,7 +38,7 @@ public class PageTypeReferenceTest {
   private PageTypeReference pageTypeRef;
 
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     pageTypeRef = new PageTypeReference(CONFIG_NAME, PROVIDER_HIND, CATEGORIES);
   }
 

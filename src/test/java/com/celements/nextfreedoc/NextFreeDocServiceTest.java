@@ -21,9 +21,9 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -40,7 +40,8 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
   private XWikiStoreInterface storeMock;
 
   @Before
-  public void setUp_NextFreeDocNameCommandTest() throws Exception {
+  public void prepareTest() throws Exception {
+    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     xwiki = getWikiMock();
     nextFreeDocService = (NextFreeDocService) Utils.getComponent(INextFreeDocRole.class);
@@ -63,13 +64,9 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
 
     DocumentReference docRef2 = new DocumentReference(title + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).atLeastOnce();
-    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()).once();
-
-    DocumentReference docRef3 = new DocumentReference(title + 7, spaceRef);
-    expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).atLeastOnce();
-    XWikiDocument doc3 = new XWikiDocument(docRef3);
-    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
-    expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+    XWikiDocument doc2 = new XWikiDocument(docRef2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2))).andReturn(doc2);
+    expect(storeMock.loadLock(eq(doc2.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
 
@@ -77,7 +74,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference ret = nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
     verifyDefault();
 
-    assertEquals(docRef3, ret);
+    assertEquals(docRef2, ret);
   }
 
   @Test
@@ -122,13 +119,9 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
 
     DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).once();
-    expect(xwiki.getDocument(eq(docRef2), same(context))).andThrow(new XWikiException()).once();
-
-    DocumentReference docRef3 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 7, spaceRef);
-    expect(xwiki.exists(eq(docRef3), same(context))).andReturn(false).once();
-    XWikiDocument doc3 = new XWikiDocument(docRef3);
-    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).once();
-    expect(storeMock.loadLock(eq(doc3.getId()), same(context), eq(true))).andReturn(null).once();
+    XWikiDocument doc2 = new XWikiDocument(docRef2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2))).andReturn(doc2);
+    expect(storeMock.loadLock(eq(doc2.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
 
@@ -136,7 +129,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference ret = nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
     verifyDefault();
 
-    assertEquals(docRef3, ret);
+    assertEquals(docRef2, ret);
   }
 
   @Test
@@ -266,7 +259,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     Query query2 = new DefaultQuery("statement", null, queryExecutorMock);
     expect(queryManagerMock.createQuery(eq(nextFreeDocService.getHighestNumHQL()), eq(
         "hql"))).andReturn(query2).once();
-    noDigit = new ArrayList<Object>(noDigit);
+    noDigit = new ArrayList<>(noDigit);
     noDigit.add(name); // to make sure offset depends on return size
     expect(queryExecutorMock.execute(same(query2))).andReturn(noDigit).once();
     Query query3 = new DefaultQuery("statement", null, queryExecutorMock);

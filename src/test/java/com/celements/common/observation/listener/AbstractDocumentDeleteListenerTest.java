@@ -23,6 +23,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,7 +49,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
   private Event deletedEventMock;
 
   @Before
-  public void setUp_AbstractDocumentDeleteListenerTest() throws Exception {
+  public void prepareTest() throws Exception {
+    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
     wiki = getWikiMock();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
@@ -57,6 +59,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
     origDocMock = createMockAndAddToDefault(XWikiDocument.class);
     expect(origDocMock.getDocumentReference()).andReturn(docRef).anyTimes();
+    expect(docMock.isFromCache()).andReturn(true).anyTimes();
 
     listener = new TestDocumentDeleteListener();
     listener.modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -74,7 +77,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
   @Test
   public void testGetEvents() {
-    Set<Class<? extends Event>> eventClasses = new HashSet<Class<? extends Event>>();
+    Set<Class<? extends Event>> eventClasses = new HashSet<>();
     for (Event theEvent : listener.getEvents()) {
       eventClasses.add(theEvent.getClass());
     }
@@ -207,22 +210,9 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
     obsManagerMock.notify(same(deletingEventMock), same(docMock), same(context));
     expectLastCall().once();
+    expect(origDocMock.isFromCache()).andReturn(true).anyTimes();
     expect(origDocMock.clone()).andReturn(origDocMock).once();
-
-    replayDefault();
-    listener.onEvent(event, docMock, context);
-    verifyDefault();
-  }
-
-  @Test
-  public void testOnEvent_ing_origDocLoad_fail() throws XWikiException {
-    Event event = new DocumentDeletingEvent();
-
-    expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
-    expect(docMock.getOriginalDocument()).andReturn(null).once();
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(false).once();
-    expect(wiki.getDocument(eq(docRef), same(context))).andThrow(new XWikiException()).once();
-    docMock.setOriginalDocument(isNull(XWikiDocument.class));
+    origDocMock.setFromCache(eq(false));
     expectLastCall().once();
 
     replayDefault();

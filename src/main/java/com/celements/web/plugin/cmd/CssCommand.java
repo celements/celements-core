@@ -22,7 +22,6 @@ package com.celements.web.plugin.cmd;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -33,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.css.ICssExtensionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSEngine;
@@ -63,8 +64,8 @@ public class CssCommand {
     LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
 
     Set<CSS> includedCSS = new HashSet<CSS>();
-    for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
-      CSS css = (CSS) iterator.next();
+    for (CSS css2 : cssList) {
+      CSS css = css2;
       if (!includedCSS.contains(css) && (css != null)) {
         LOGGER.debug("CSS to add to result List: " + css.toString());
         cssResultList.add(css);
@@ -105,8 +106,8 @@ public class CssCommand {
     LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
 
     Set<CSS> includedCSS = new HashSet<CSS>();
-    for (Iterator<CSS> iterator = cssList.iterator(); iterator.hasNext();) {
-      CSS css = (CSS) iterator.next();
+    for (CSS css2 : cssList) {
+      CSS css = css2;
       if ((css != null) && !includedCSS.contains(css) && css.isContentCSS()) {
         LOGGER.debug("RTE content CSS to add to result List: " + css.toString());
         cssResultList.add(css);
@@ -220,14 +221,33 @@ public class CssCommand {
       List<BaseObject> baseList = new ArrayList<BaseObject>();
       baseList.addAll(addUserSkinCss(pageLayoutDoc));
       baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagelayout_cssdoc")));
+      baseList.addAll(addUserSkinCss((DocumentReference) vcontext.get(
+          "after_pagelayout_cssdocref")));
       cssList = includeCSS(css, "cel_css_list_pagelayout", baseList, context);
     }
     return cssList;
   }
 
+  /**
+   * CAUTION!!! needs programming rights!!
+   *
+   * @deprecated 2.81 instead use {@link addUserSkinCss(DocumentReference)}
+   */
+  @Deprecated
   private List<BaseObject> addUserSkinCss(Document docAPI) {
-    if (docAPI != null) {
+    if ((docAPI != null) && (docAPI.getDocument() != null)) {
       return addUserSkinCss(docAPI.getDocument());
+    }
+    return Collections.emptyList();
+  }
+
+  private List<BaseObject> addUserSkinCss(DocumentReference docRef) {
+    if (docRef != null) {
+      try {
+        return addUserSkinCss(getModelAccess().getDocument(docRef));
+      } catch (DocumentNotExistsException exp) {
+        LOGGER.info("addUserSkinCss: document does not exist '{}'", docRef);
+      }
     }
     return Collections.emptyList();
   }
@@ -258,6 +278,10 @@ public class CssCommand {
   private List<CSS> includeCSS(String css, String field, List<BaseObject> baseCSSList,
       XWikiContext context) {
     return CSSEngine.getCSSEngine(context).includeCSS(css, field, baseCSSList, context);
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
   }
 
 }

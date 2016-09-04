@@ -13,6 +13,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.list.EnumListField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -29,12 +30,9 @@ public class EnumListFieldTest extends AbstractComponentTest {
 
   private EnumListField.Builder<TestEnum> fieldBuilder;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
-    fieldBuilder = new EnumListField.Builder<TestEnum>(new DocumentReference("wiki", "class",
-        "any"), "name", TestEnum.class);
+  public void prepareTest() throws Exception {
+    fieldBuilder = new EnumListField.Builder<>(TestClassDefinition.NAME, "name", TestEnum.class);
   }
 
   @Test
@@ -53,11 +51,12 @@ public class EnumListFieldTest extends AbstractComponentTest {
   @Test
   public void test_resolve_serialize() throws Exception {
     EnumListField<TestEnum> field = fieldBuilder.build();
+    DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    XWikiDocument doc = new XWikiDocument(classRef);
     TestEnum value = TestEnum.B;
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
@@ -66,18 +65,19 @@ public class EnumListFieldTest extends AbstractComponentTest {
     verifyDefault();
 
     assertEquals(Arrays.asList(value), ret);
-    assertEquals(value.name(), modelAccess.getXObject(doc, field.getClassRef()).getStringValue(
+    assertEquals(value.name(), modelAccess.getXObject(doc, classRef).getStringValue(
         field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
     EnumListField<TestEnum> field = fieldBuilder.multiSelect(true).build();
+    DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    XWikiDocument doc = new XWikiDocument(classRef);
     List<TestEnum> value = Arrays.asList(TestEnum.B, TestEnum.D);
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
@@ -86,17 +86,18 @@ public class EnumListFieldTest extends AbstractComponentTest {
     verifyDefault();
 
     assertEquals(value, ret);
-    assertEquals(Arrays.asList("B", "D"), modelAccess.getXObject(doc,
-        field.getClassRef()).getListValue(field.getName()));
+    assertEquals(Arrays.asList("B", "D"), modelAccess.getXObject(doc, classRef).getListValue(
+        field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
     EnumListField<TestEnum> field = fieldBuilder.multiSelect(true).build();
+    DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-    XWikiDocument doc = new XWikiDocument(field.getClassRef());
+    XWikiDocument doc = new XWikiDocument(classRef);
 
-    BaseClass bClass = expectNewBaseObject(field.getClassRef());
+    BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
@@ -109,8 +110,7 @@ public class EnumListFieldTest extends AbstractComponentTest {
     assertTrue(ret1.isEmpty());
     assertNotNull(ret2);
     assertTrue(ret2.isEmpty());
-    assertTrue(modelAccess.getXObject(doc, field.getClassRef()).getListValue(
-        field.getName()).isEmpty());
+    assertTrue(modelAccess.getXObject(doc, classRef).getListValue(field.getName()).isEmpty());
   }
 
 }

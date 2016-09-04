@@ -19,6 +19,7 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -29,19 +30,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.XWikiDocumentCreator;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase {
+@Deprecated
+public class CreateDocumentCommandTest extends AbstractComponentTest {
 
   private CreateDocumentCommand createDocumentCmd;
   private IPageTypeRole pageTypeServiceMock;
 
   @Before
-  public void setUp_CreateDocumentCommandTest() throws Exception {
+  public void prepareTest() throws Exception {
+    registerComponentMock(XWikiDocumentCreator.class);
     pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
     createDocumentCmd = new CreateDocumentCommand();
   }
@@ -64,7 +67,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
         "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theNewDoc);
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(""))).andReturn(null).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
     getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false), same(
@@ -74,7 +77,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, null);
     assertNotNull(theDoc);
     XWikiDocument captNewDoc = docCaptcher.getValue();
-    assertNotSame(theNewDoc, captNewDoc);
+    assertFalse("must be cloned if it is from cache", captNewDoc.isFromCache());
     assertSame(theDoc, captNewDoc);
     assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     verifyDefault();
@@ -87,7 +90,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
         "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
@@ -101,7 +104,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     assertNotNull(theDoc);
     XWikiDocument captNewDoc = docCaptcher.getValue();
     XWikiDocument captNewDoc2 = docCaptcher2.getValue();
-    assertNotSame(theNewDoc, captNewDoc);
+    assertFalse("must be cloned if it is from cache", captNewDoc.isFromCache());
     assertSame(captNewDoc2, captNewDoc);
     assertSame(theDoc, captNewDoc);
     assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
@@ -115,7 +118,7 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
         "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andReturn(theNewDoc).once();
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
@@ -123,28 +126,10 @@ public class CreateDocumentCommandTest extends AbstractBridgedComponentTestCase 
     replayDefault();
     XWikiDocument theDoc = createDocumentCmd.createDocument(docRef, pageType, false);
     XWikiDocument captNewDoc = docCaptcher.getValue();
-    assertNotSame(theNewDoc, captNewDoc);
+    assertFalse("must be cloned if it is from cache", captNewDoc.isFromCache());
     assertSame(theDoc, captNewDoc);
     assertEquals(theNewDoc.getDocumentReference(), captNewDoc.getDocumentReference());
     assertNotNull(theDoc);
-    verifyDefault();
-  }
-
-  @Test
-  public void testCreateDocument_XWE() throws Exception {
-    String pageType = "RichText";
-    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "mySpace",
-        "myNewDocument");
-    expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
-    expect(getWikiMock().getDocument(eq(docRef), same(getContext()))).andThrow(
-        new XWikiException()).once();
-    replayDefault();
-    try {
-      createDocumentCmd.createDocument(docRef, pageType, false);
-      fail("expecting XWE");
-    } catch (XWikiException xwe) {
-      // expected
-    }
     verifyDefault();
   }
 

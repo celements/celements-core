@@ -34,7 +34,7 @@ public class LexicalParserTest {
 
   @SuppressWarnings("unchecked")
   @Before
-  public void setUp() throws Exception {
+  public void prepareTest() throws Exception {
     mockEventHandler = createStrictMock(IEventHandler.class);
     lexicalParser = new LexicalParser<IGenericLiteral>(ERulesLiteral.RULES_ARRAY, mockEventHandler);
   }

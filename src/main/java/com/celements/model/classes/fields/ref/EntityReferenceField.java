@@ -3,7 +3,7 @@ package com.celements.model.classes.fields.ref;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
+
 import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.classes.fields.AbstractClassField;
@@ -21,8 +21,8 @@ public abstract class EntityReferenceField<T extends EntityReference> extends Ab
 
     private Integer size;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     public B size(@Nullable Integer val) {
@@ -54,7 +54,7 @@ public abstract class EntityReferenceField<T extends EntityReference> extends Ab
   public Object serialize(T value) {
     Object ret = null;
     if (value != null) {
-      ret = getWebUtils().serializeRef(value);
+      ret = getModelUtils().serializeRef(value);
     }
     return ret;
   }
@@ -63,7 +63,7 @@ public abstract class EntityReferenceField<T extends EntityReference> extends Ab
   public T resolve(Object obj) {
     T ret = null;
     if (obj != null) {
-      ret = getWebUtils().resolveReference(obj.toString(), getType());
+      ret = getModelUtils().resolveRef(obj.toString(), getType());
     }
     return ret;
   }

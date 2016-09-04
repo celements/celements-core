@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.python.google.common.base.Objects;
-import org.xwiki.model.reference.DocumentReference;
+
 
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
@@ -34,8 +34,8 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
     private Boolean picker;
     private String separator;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     public B multiSelect(@Nullable Boolean val) {

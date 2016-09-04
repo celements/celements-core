@@ -18,23 +18,25 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.ClassDocumentLoadException;
-import com.celements.model.access.exception.DocumentAccessRuntimeException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.access.exception.ModelAccessRuntimeException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
+import com.celements.model.context.ModelContext;
 import com.celements.model.util.ClassFieldValue;
+import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -59,10 +61,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public static final String DEFAULT_LANG = "";
 
   @Requirement
-  protected IWebUtilsService webUtils;
+  protected IRightsAccessFacadeRole rightsAccess;
 
   @Requirement
-  protected IRightsAccessFacadeRole rightsAccess;
+  protected ModelUtils modelUtils;
+
+  @Requirement
+  protected ModelContext modelContext;
+
+  @Requirement
+  protected XWikiDocumentCreator docCreator;
 
   @Requirement
   protected Execution execution;
@@ -119,12 +127,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   /**
-   * returns an xwiki document for readonly usage CAUTION: never ever change anything on
-   * the returned XWikiDocument, because it is the object in cache. Thus the same object
-   * will be returned for the following requests. If you change this object, concurrent
-   * request might get a partially modified object, or worse, if an error occurs during
-   * the save (or no save call happens), the cached object will not reflect the actual
+   * CAUTION: never ever change anything on the returned XWikiDocument, because it is the object in
+   * cache. Thus the same object will be returned for the following requests. If you change this
+   * object, concurrent request might get a partially modified object, or worse, if an error occurs
+   * during the save (or no save call happens), the cached object will not reflect the actual
    * document at all.
+   *
+   * @param docRef
+   * @param lang
+   * @return an xwiki document for readonly usage
+   * @throws DocumentNotExistsException
    */
   private XWikiDocument getDocumentReadOnly(DocumentReference docRef, String lang)
       throws DocumentNotExistsException {
@@ -171,26 +183,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentAlreadyExistsException {
     checkNotNull(docRef);
     if (!exists(docRef)) {
-      return createDocumentInternal(docRef);
+      return docCreator.create(docRef);
     } else {
       throw new DocumentAlreadyExistsException(docRef);
     }
-  }
-
-  protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
-    XWikiDocument doc = getDocumentCloneInternal(docRef);
-    Date creationDate = new Date();
-    doc.setDefaultLanguage(webUtils.getDefaultLanguage());
-    doc.setLanguage("");
-    doc.setCreationDate(creationDate);
-    doc.setContentUpdateDate(creationDate);
-    doc.setDate(creationDate);
-    doc.setCreator(getContext().getUser());
-    doc.setAuthor(getContext().getUser());
-    doc.setTranslation(0);
-    doc.setContent("");
-    doc.setMetaDataDirty(true);
-    return doc;
   }
 
   @Override
@@ -199,7 +195,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (exists(docRef)) {
       return getDocumentCloneInternal(docRef);
     } else {
-      return createDocumentInternal(docRef);
+      return docCreator.create(docRef);
     }
   }
 
@@ -282,7 +278,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       deleteDocument(getDocument(docRef), totrash);
     } catch (DocumentNotExistsException exc) {
       LOGGER.debug("doc trying to delete does not exist '{}'", docRef, exc);
-    } catch (DocumentAccessRuntimeException exc) {
+    } catch (ModelAccessRuntimeException exc) {
       throw new DocumentDeleteException(docRef, exc);
     }
   }
@@ -312,7 +308,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     String dbBefore = getContext().getDatabase();
     try {
-      getContext().setDatabase(webUtils.getWikiRef(doc).getName());
+      modelContext.setWikiRef(modelUtils.extractRef(doc.getDocumentReference(),
+          WikiReference.class).get());
       LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
           doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
       try {
@@ -358,11 +355,19 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    * all.
    */
   private XWikiDocument cloneDoc(XWikiDocument doc) {
-    return doc.clone();
+    if (doc.isFromCache()) {
+      XWikiDocument clonedDoc = doc.clone();
+      clonedDoc.setFromCache(false);
+      return clonedDoc;
+    }
+    return doc;
   }
 
   private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
     XWikiDocument doc = new XWikiDocument(docRef);
+    if ("default".equals(lang)) {
+      lang = "";
+    }
     doc.setLanguage(lang);
     return doc;
   }
@@ -426,7 +431,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       Collection<?> values) {
     checkNotNull(classRef);
     checkState(!isTranslation(doc));
-    classRef = webUtils.checkWikiRef(classRef, doc);
+    classRef = adjustClassRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
         ImmutableList.<BaseObject>of())) {
@@ -521,7 +526,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef) {
     checkNotNull(doc);
     checkNotNull(classRef);
-    classRef = webUtils.checkWikiRef(classRef, doc);
+    classRef = adjustClassRef(classRef, doc);
     try {
       return doc.newXObject(classRef, getContext());
     } catch (XWikiException xwe) {
@@ -627,12 +632,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public <T> T getProperty(DocumentReference docRef, ClassField<T> field)
       throws DocumentNotExistsException {
-    return resolvePropertyValue(field, getProperty(docRef, field.getClassRef(), field.getName()));
+    return resolvePropertyValue(field, getProperty(docRef, field.getClassDef().getClassRef(),
+        field.getName()));
   }
 
   @Override
   public <T> T getProperty(XWikiDocument doc, ClassField<T> field) {
-    return resolvePropertyValue(field, getProperty(doc, field.getClassRef(), field.getName()));
+    return resolvePropertyValue(field, getProperty(doc, field.getClassDef().getClassRef(),
+        field.getName()));
   }
 
   private <T> T resolvePropertyValue(ClassField<T> field, Object value) {
@@ -652,7 +659,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public List<ClassFieldValue<?>> getProperties(XWikiDocument doc, ClassDefinition classDef) {
     List<ClassFieldValue<?>> ret = new ArrayList<>();
     for (ClassField<?> field : classDef.getFields()) {
-      ret.add(new ClassFieldValue<Object>(castField(field), getProperty(doc, field)));
+      ret.add(new ClassFieldValue<>(castField(field), getProperty(doc, field)));
     }
     return ret;
   }
@@ -686,8 +693,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value) {
     try {
-      return setProperty(getOrCreateXObject(doc, field.getClassRef()), field.getName(),
-          serializePropertyValue(field, value));
+      return setProperty(getOrCreateXObject(doc, field.getClassDef().getClassRef()),
+          field.getName(), serializePropertyValue(field, value));
     } catch (ClassCastException ex) {
       throw new IllegalArgumentException("CelObjectField ill defined: " + field, ex);
     }
@@ -729,6 +736,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throw new AttachmentNotExistsException(new AttachmentReference(filename,
           document.getDocumentReference()));
     }
+  }
+
+  /**
+   * forces same wikiRef to classRef as for onDoc
+   */
+  private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
+    return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
+        onDoc.getDocumentReference(), WikiReference.class).or(modelContext.getWikiRef()));
   }
 
 }

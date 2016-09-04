@@ -20,13 +20,14 @@
 package com.celements.web.plugin.cmd;
 
 import java.io.IOException;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.Stack;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -58,7 +59,7 @@ public class PageLayoutCommand {
 
   public static final String XWIKICFG_CELEMENTS_LAYOUT_DEFAULT = "celements.layout.default";
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(PageLayoutCommand.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(PageLayoutCommand.class);
 
   QueryManager queryManager;
 
@@ -175,7 +176,7 @@ public class PageLayoutCommand {
 
   /**
    * checks if the layout exists locally (in terms of layoutSpaceRef)
-   * 
+   *
    * @param layoutSpaceRef
    * @return
    */
@@ -213,7 +214,7 @@ public class PageLayoutCommand {
 
   /**
    * getLayoutPropDoc
-   * 
+   *
    * @param layoutSpaceRef
    *          may not be null (NPE if null)
    * @return property doc for layoutSpaceRef
@@ -245,14 +246,16 @@ public class PageLayoutCommand {
   }
 
   public String renderPageLayout(SpaceReference layoutSpaceRef) {
+    LOGGER.info("renderPageLayout: for layoutRef '{}'", layoutSpaceRef);
     layoutSpaceRef = decideLocalOrCentral(layoutSpaceRef);
+    LOGGER.debug("renderPageLayout: after decideLocalOrCentral layoutRef '{}'", layoutSpaceRef);
     return renderPageLayoutLocal(layoutSpaceRef);
   }
 
   /**
    * renderPageLayout(SpaceReference) does NOT check any access rights. Or if the given
    * layout exists. This MUST be done before calling renderPageLayout(SpaceReference).
-   * 
+   *
    * @param layoutSpaceRef
    * @return
    */
@@ -295,18 +298,19 @@ public class PageLayoutCommand {
   }
 
   @SuppressWarnings("unchecked")
-  private Stack<SpaceReference> getRenderingLayoutStack() {
+  private Deque<SpaceReference> getRenderingLayoutStack() {
     ExecutionContext execContext = getExecution().getContext();
     if (execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY) == null) {
-      execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY, new Stack<SpaceReference>());
+      Deque<SpaceReference> layoutStack = new LinkedList<SpaceReference>();
+      execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY, layoutStack);
     }
-    return (Stack<SpaceReference>) execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY);
+    return (Deque<SpaceReference>) execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY);
   }
 
   /**
    * getPageLayoutForCurrentDoc checks that the layout returned exists and that it may be
    * used by the current context database.
-   * 
+   *
    * @return
    */
   public SpaceReference getPageLayoutForCurrentDoc() {
@@ -356,7 +360,7 @@ public class PageLayoutCommand {
   /**
    * prohibit layout access in different db except central celements2web (or default
    * layout configured on disk). TODO add allowedDBs to layout properties
-   * 
+   *
    * @param layoutSpaceRef
    * @return
    */
@@ -419,7 +423,7 @@ public class PageLayoutCommand {
 
   /**
    * For TESTS ONLY!!!
-   * 
+   *
    * @param injectedInheritorFactory
    */
   void inject_TEST_InheritorFactory(InheritorFactory injectedInheritorFactory) {
@@ -458,7 +462,7 @@ public class PageLayoutCommand {
 
   /**
    * Export an page layout space into XAR using Packaging plugin.
-   * 
+   *
    * @param layoutSpaceRef
    *          the layout space reference of the application to export.
    * @param withDocHistory

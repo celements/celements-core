@@ -29,7 +29,7 @@ public class ERequestLiteralTest {
   private Parser cmReqParser;
 
   @Before
-  public void setUp() {
+  public void prepareTest() {
     cmReqParser = Parser.createLexicalParser(ERequestLiteral.REQUEST_ARRAY,
         new TestRequestHandler());
   }

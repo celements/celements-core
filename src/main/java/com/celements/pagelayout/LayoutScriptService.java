@@ -93,6 +93,10 @@ public class LayoutScriptService implements ScriptService {
     return getPageLayoutCmd().layoutExists(layoutSpaceRef);
   }
 
+  public boolean canRenderLayout(SpaceReference spaceRef) {
+    return getPageLayoutCmd().canRenderLayout(spaceRef);
+  }
+
   public boolean useXWikiLoginLayout() {
     return "1".equals(getContext().getWiki().getSpacePreference("xwikiLoginLayout",
         "celements.xwikiLoginLayout", "1", getContext()));

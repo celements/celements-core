@@ -70,10 +70,8 @@ public class NavigationTest extends AbstractComponentTest {
   private PageLayoutCommand mockLayoutCmd;
   private XWikiRightService mockRightService;
 
-  @Override
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
+  public void prepareTest() throws Exception {
     currentDocRef = new DocumentReference(getContext().getDatabase(), "MySpace", "MyCurrentDoc");
     currentDoc = new XWikiDocument(currentDocRef);
     getContext().setDoc(currentDoc);
@@ -263,7 +261,7 @@ public class NavigationTest extends AbstractComponentTest {
     currentDoc.addXObject(ptObj);
     expect(getWikiMock().exists(eq(currentDocRef), same(getContext()))).andReturn(true);
     expect(getWikiMock().getDocument(eq(currentDocRef), same(getContext()))).andReturn(
-        currentDoc).times(3);
+        currentDoc).once();
     String testPageType = "TestPageType";
     expect(ptServiceMock.getPageTypeRefByConfigName(testPageType)).andReturn(new PageTypeReference(
         testPageType, "myTestProvider", Collections.<String>emptyList()));

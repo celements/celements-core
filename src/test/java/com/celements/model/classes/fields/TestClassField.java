@@ -4,8 +4,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
-
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
@@ -18,8 +16,8 @@ public final class TestClassField extends AbstractClassField<TestClassField> {
 
     private Integer size;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     @Override

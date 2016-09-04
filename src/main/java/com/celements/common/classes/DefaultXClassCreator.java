@@ -33,7 +33,7 @@ import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.fields.ClassField;
-import com.celements.web.service.IWebUtilsService;
+import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -48,14 +48,14 @@ public class DefaultXClassCreator implements XClassCreator {
   protected IModelAccessFacade modelAccess;
 
   @Requirement
-  protected IWebUtilsService webUtils;
+  protected ModelContext context;
 
   @Requirement
   private List<ClassPackage> classPackages;
 
   @Override
   public void createXClasses() {
-    LOGGER.info("create classes for database '{}'", webUtils.getWikiRef());
+    LOGGER.info("create classes for database '{}'", context.getWikiRef());
     for (ClassPackage classPackage : classPackages) {
       if (classPackage.isActivated()) {
         try {

@@ -41,8 +41,14 @@ public class CSSBaseObject extends CSS {
 
   private AttachmentURLCommand attURLcmd = new AttachmentURLCommand();
 
+  @Deprecated
   public CSSBaseObject(BaseObject obj, XWikiContext context) {
     super(context);
+    this.obj = obj;
+  }
+
+  public CSSBaseObject(BaseObject obj) {
+    super();
     this.obj = obj;
   }
 

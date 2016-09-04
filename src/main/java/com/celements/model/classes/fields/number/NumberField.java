@@ -3,7 +3,7 @@ package com.celements.model.classes.fields.number;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.DocumentReference;
+
 
 import com.celements.model.classes.fields.AbstractClassField;
 import com.xpn.xwiki.objects.classes.NumberClass;
@@ -18,8 +18,8 @@ public abstract class NumberField<T extends Number> extends AbstractClassField<T
 
     private Integer size;
 
-    public Builder(@NotNull DocumentReference classRef, @NotNull String name) {
-      super(classRef, name);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name);
     }
 
     public B size(@Nullable Integer val) {
