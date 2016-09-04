@@ -8,6 +8,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @ComponentRole
 public interface XWikiDocumentCreator {
 
+  public XWikiDocument createWithoutDefaults(DocumentReference docRef);
+
   public XWikiDocument create(DocumentReference docRef);
 
 }
