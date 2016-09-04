@@ -67,13 +67,19 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
     return getInjectedDoc(docRef, DEFAULT_LANG);
   }
 
-  public void injectDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
+  public InjectedDoc injectDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
     checkIsNotInjected(docRef, lang);
-    getInjectedDocs(docRef).put(lang, new InjectedDoc(doc));
+    InjectedDoc injDoc = new InjectedDoc(doc);
+    getInjectedDocs(docRef).put(lang, injDoc);
+    return injDoc;
   }
 
-  public void injectDoc(DocumentReference docRef, XWikiDocument doc) {
-    injectDoc(docRef, DEFAULT_LANG, doc);
+  public InjectedDoc injectDoc(DocumentReference docRef, XWikiDocument doc) {
+    return injectDoc(docRef, DEFAULT_LANG, doc);
+  }
+
+  public InjectedDoc injectNewDoc(DocumentReference docRef) {
+    return injectDoc(docRef, docCreator.createWithoutDefaults(docRef));
   }
 
   public InjectedDoc removeInjectedDoc(DocumentReference docRef, String lang) {
@@ -122,9 +128,7 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
 
   @Override
   protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
-    XWikiDocument doc = super.createDocumentInternal(docRef);
-    injectDoc(docRef, doc);
-    return doc;
+    return injectNewDoc(docRef).doc();
   }
 
   @Override

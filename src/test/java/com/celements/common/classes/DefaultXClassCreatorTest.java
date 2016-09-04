@@ -85,8 +85,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Test
   public void test_createXClasses() throws Exception {
     DocumentReference docRef = classDef.getClassRef();
-    XWikiDocument doc = new XWikiDocument(docRef);
-    ModelAccessStub.get().injectDoc(docRef, doc);
+    XWikiDocument doc = ModelAccessStub.get().injectNewDoc(docRef).doc();
 
     expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
         Arrays.asList(classPackage.getName())).anyTimes();
