@@ -41,48 +41,68 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
     }
   }
 
-  private Map<DocumentReference, Map<String, InjectedDoc>> docInject = new HashMap<>();
+  private Map<DocumentReference, Map<String, InjectedDoc>> injDocs = new HashMap<>();
 
   private Map<String, InjectedDoc> getInjectedDocs(DocumentReference docRef) {
-    if (!docInject.containsKey(docRef)) {
-      docInject.put(docRef, new HashMap<String, InjectedDoc>());
+    if (!injDocs.containsKey(docRef)) {
+      injDocs.put(docRef, new HashMap<String, InjectedDoc>());
     }
-    return docInject.get(docRef);
-  }
-
-  public InjectedDoc injectDoc(DocumentReference docRef, XWikiDocument doc) {
-    return injectDoc(docRef, DEFAULT_LANG, doc);
-  }
-
-  public InjectedDoc injectDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
-    return getInjectedDocs(docRef).put(lang, new InjectedDoc(doc));
-  }
-
-  public InjectedDoc injectDocMock(DocumentReference docRef) {
-    return injectDoc(docRef, createDocMock(docRef));
-  }
-
-  public boolean isInjected(DocumentReference docRef) {
-    return isInjected(docRef, DEFAULT_LANG);
+    return injDocs.get(docRef);
   }
 
   public boolean isInjected(DocumentReference docRef, String lang) {
     return getInjectedDocs(docRef).containsKey(lang);
   }
 
+  public boolean isInjected(DocumentReference docRef) {
+    return isInjected(docRef, DEFAULT_LANG);
+  }
+
+  public InjectedDoc getInjectedDoc(DocumentReference docRef, String lang) {
+    checkIsInjected(docRef, lang);
+    return getInjectedDocs(docRef).get(lang);
+  }
+
   public InjectedDoc getInjectedDoc(DocumentReference docRef) {
     return getInjectedDoc(docRef, DEFAULT_LANG);
   }
 
-  public InjectedDoc getInjectedDoc(DocumentReference docRef, String lang) {
+  public void injectDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
+    checkIsNotInjected(docRef, lang);
+    getInjectedDocs(docRef).put(lang, new InjectedDoc(doc));
+  }
+
+  public void injectDoc(DocumentReference docRef, XWikiDocument doc) {
+    injectDoc(docRef, DEFAULT_LANG, doc);
+  }
+
+  public InjectedDoc removeInjectedDoc(DocumentReference docRef, String lang) {
+    checkIsInjected(docRef, lang);
+    return getInjectedDocs(docRef).remove(lang);
+  }
+
+  public InjectedDoc removeInjectedDoc(DocumentReference docRef) {
+    return removeInjectedDoc(docRef, DEFAULT_LANG);
+  }
+
+  public void removeAllInjectedDocs() {
+    injDocs.clear();
+  }
+
+  private void checkIsInjected(DocumentReference docRef, String lang) {
     Preconditions.checkState(isInjected(docRef, lang), "doc not injected: "
         + modelUtils.serializeRef(docRef) + "-" + lang);
-    return getInjectedDocs(docRef).get(lang);
+  }
+
+  private void checkIsNotInjected(DocumentReference docRef, String lang) {
+    Preconditions.checkState(!isInjected(docRef, lang), "doc already injected: "
+        + modelUtils.serializeRef(docRef) + "-" + lang);
   }
 
   @Override
+  @Deprecated
   protected XWikiDocument getDocumentFromWiki(DocumentReference docRef) {
-    return getInjectedDoc(docRef, DEFAULT_LANG).doc();
+    return getDocumentFromStore(docRef, DEFAULT_LANG);
   }
 
   @Override
@@ -110,20 +130,38 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
   @Override
   public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
       throws DocumentSaveException {
-    getInjectedDoc(doc.getDocumentReference(), doc.getLanguage()).saved++;
+    expectSave(doc.getDocumentReference(), doc.getLanguage());
+  }
+
+  private void expectSave(DocumentReference docRef, String lang) throws DocumentSaveException {
+    InjectedDoc injDoc = getInjectedDoc(docRef, lang);
+    if (!injDoc.throwSaveExc) {
+      injDoc.saved++;
+    } else {
+      throw new DocumentSaveException(injDoc.doc().getDocumentReference());
+    }
   }
 
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException {
     for (String lang : getInjectedDocs(doc.getDocumentReference()).keySet()) {
-      getInjectedDoc(doc.getDocumentReference(), lang).deleted++;
+      expectDelete(doc.getDocumentReference(), lang);
     }
   }
 
   @Override
   public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
       throws DocumentDeleteException {
-    getInjectedDoc(doc.getDocumentReference(), doc.getLanguage()).deleted++;
+    expectDelete(doc.getDocumentReference(), doc.getLanguage());
+  }
+
+  private void expectDelete(DocumentReference docRef, String lang) throws DocumentDeleteException {
+    InjectedDoc injDoc = getInjectedDoc(docRef, lang);
+    if (!injDoc.throwDeleteExc) {
+      injDoc.deleted++;
+    } else {
+      throw new DocumentDeleteException(injDoc.doc().getDocumentReference());
+    }
   }
 
   @Override
@@ -138,8 +176,12 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
   public class InjectedDoc {
 
     XWikiDocument doc;
-    long saved = 0;
-    long deleted = 0;
+
+    long saved;
+    boolean throwSaveExc;
+
+    long deleted;
+    boolean throwDeleteExc;
 
     InjectedDoc(XWikiDocument doc) {
       this.doc = checkNotNull(doc);
@@ -157,12 +199,20 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
       return saved > 0;
     }
 
+    public void setThrowSaveException(boolean setThrow) {
+      throwSaveExc = true;
+    }
+
     public long getDeletedCount() {
       return deleted;
     }
 
     public boolean wasDeleted() {
       return deleted > 0;
+    }
+
+    public void setThrowDeleteException(boolean setThrow) {
+      throwDeleteExc = true;
     }
 
   }

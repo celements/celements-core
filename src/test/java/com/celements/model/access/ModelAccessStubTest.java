@@ -8,6 +8,8 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.ModelAccessStub.InjectedDoc;
+import com.celements.model.access.exception.DocumentDeleteException;
+import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
@@ -56,6 +58,14 @@ public class ModelAccessStubTest extends AbstractComponentTest {
     modelAccess.saveDocument(doc);
     assertTrue(injDoc.wasSaved());
     assertEquals(2, injDoc.getSavedCount());
+
+    modelAccess.getInjectedDoc(docRef).setThrowSaveException(true);
+    try {
+      modelAccess.saveDocument(doc);
+      fail("expecting DocumentSaveException");
+    } catch (DocumentSaveException exc) {
+      // expected
+    }
   }
 
   @Test
@@ -69,8 +79,18 @@ public class ModelAccessStubTest extends AbstractComponentTest {
     modelAccess.deleteDocument(doc, true);
     assertTrue(injDoc.wasDeleted());
     assertEquals(1, injDoc.getDeletedCount());
+
     modelAccess.deleteDocument(doc, false);
+    assertTrue(injDoc.wasDeleted());
     assertEquals(2, injDoc.getDeletedCount());
+
+    modelAccess.getInjectedDoc(docRef).setThrowDeleteException(true);
+    try {
+      modelAccess.deleteDocument(doc, false);
+      fail("expecting DocumentDeleteException");
+    } catch (DocumentDeleteException exc) {
+      // expected
+    }
   }
 
 }
