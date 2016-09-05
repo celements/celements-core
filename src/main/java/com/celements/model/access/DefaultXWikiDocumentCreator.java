@@ -20,12 +20,10 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
   private ModelContext context;
 
   @Override
-  public XWikiDocument create(DocumentReference docRef) {
+  public XWikiDocument createWithoutDefaults(DocumentReference docRef) {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(true);
-    doc.setDefaultLanguage(getDefaultLangForCreatingDoc(docRef));
     doc.setLanguage("");
-    doc.setSyntax(doc.getSyntax()); // assures that syntax is set, 'new' has to be true
     Date creationDate = new Date();
     doc.setCreationDate(creationDate);
     doc.setContentUpdateDate(creationDate);
@@ -36,6 +34,14 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
     doc.setContent("");
     doc.setContentDirty(true);
     doc.setMetaDataDirty(true);
+    return doc;
+  }
+
+  @Override
+  public XWikiDocument create(DocumentReference docRef) {
+    XWikiDocument doc = createWithoutDefaults(docRef);
+    doc.setDefaultLanguage(getDefaultLangForCreatingDoc(docRef));
+    doc.setSyntax(doc.getSyntax()); // assures that syntax is set, 'new' has to be true
     return doc;
   }
 

@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -44,7 +43,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -67,28 +65,21 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   protected ModelUtils modelUtils;
 
   @Requirement
-  protected ModelContext modelContext;
+  protected ModelContext context;
 
   @Requirement
   protected XWikiDocumentCreator docCreator;
-
-  @Requirement
-  protected Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-  }
 
   /**
    * @deprecated instead use {@link #getStore()}
    */
   @Deprecated
   private XWiki getWiki() {
-    return getContext().getWiki();
+    return context.getXWikiContext().getWiki();
   }
 
   private XWikiStoreInterface getStore() {
-    return getContext().getWiki().getStore();
+    return context.getXWikiContext().getWiki().getStore();
   }
 
   @Override
@@ -113,9 +104,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public Document getApiDocument(XWikiDocument doc) throws NoAccessRightsException {
     if (rightsAccess.hasAccessLevel(doc.getDocumentReference(), EAccessLevel.VIEW)) {
-      return doc.newDocument(getContext());
+      return doc.newDocument(context.getXWikiContext());
     }
-    throw new NoAccessRightsException(doc.getDocumentReference(), getContext().getXWikiUser(),
+    throw new NoAccessRightsException(doc.getDocumentReference(), context.getUser(),
         EAccessLevel.VIEW);
   }
 
@@ -160,21 +151,21 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   protected XWikiDocument getDocumentFromWiki(DocumentReference docRef) {
     try {
-      return getWiki().getDocument(docRef, getContext());
+      return getWiki().getDocument(docRef, context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
   }
 
   protected XWikiDocument getDocumentFromStore(DocumentReference docRef, String lang) {
-    String database = getContext().getDatabase();
+    WikiReference currWikiRef = context.getWikiRef();
     try {
-      getContext().setDatabase(docRef.getWikiReference().getName());
-      return getStore().loadXWikiDoc(newDummyDoc(docRef, lang), getContext());
+      context.setWikiRef(docRef.getWikiReference());
+      return getStore().loadXWikiDoc(newDummyDoc(docRef, lang), context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     } finally {
-      getContext().setDatabase(database);
+      context.setWikiRef(currWikiRef);
     }
   }
 
@@ -183,7 +174,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentAlreadyExistsException {
     checkNotNull(docRef);
     if (!exists(docRef)) {
-      return docCreator.create(docRef);
+      return createDocumentInternal(docRef);
     } else {
       throw new DocumentAlreadyExistsException(docRef);
     }
@@ -195,8 +186,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (exists(docRef)) {
       return getDocumentCloneInternal(docRef);
     } else {
-      return docCreator.create(docRef);
+      return createDocumentInternal(docRef);
     }
+  }
+
+  protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
+    return docCreator.create(docRef);
   }
 
   @Override
@@ -228,18 +223,18 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    */
   @Deprecated
   protected boolean existsFromWiki(DocumentReference docRef) {
-    return getWiki().exists(docRef, getContext());
+    return getWiki().exists(docRef, context.getXWikiContext());
   }
 
   protected boolean existsFromStore(DocumentReference docRef, String lang) {
-    String database = getContext().getDatabase();
+    WikiReference currWikiRef = context.getWikiRef();
     try {
-      getContext().setDatabase(docRef.getWikiReference().getName());
-      return getStore().exists(newDummyDoc(docRef, lang), getContext());
+      context.setWikiRef(docRef.getWikiReference());
+      return getStore().exists(newDummyDoc(docRef, lang), context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     } finally {
-      getContext().setDatabase(database);
+      context.setWikiRef(currWikiRef);
     }
   }
 
@@ -260,12 +255,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentSaveException {
     checkNotNull(doc);
     try {
-      String username = getContext().getUser();
+      String username = context.getUserName();
       doc.setAuthor(username);
       if (doc.isNew()) {
         doc.setCreator(username);
       }
-      getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
+      getWiki().saveDocument(doc, comment, isMinorEdit, context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentSaveException(doc.getDocumentReference(), xwe);
     }
@@ -288,8 +283,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkNotNull(doc);
     List<XWikiDocument> toDelDocs = new ArrayList<>();
     try {
-      for (String lang : doc.getTranslationList(getContext())) {
-        XWikiDocument tdoc = doc.getTranslatedDocument(lang, getContext());
+      for (String lang : doc.getTranslationList(context.getXWikiContext())) {
+        XWikiDocument tdoc = doc.getTranslatedDocument(lang, context.getXWikiContext());
         if ((tdoc != null) && (tdoc != doc)) {
           toDelDocs.add(tdoc);
         }
@@ -306,29 +301,30 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
       throws DocumentDeleteException {
-    String dbBefore = getContext().getDatabase();
+    WikiReference currWikiRef = context.getWikiRef();
     try {
-      modelContext.setWikiRef(modelUtils.extractRef(doc.getDocumentReference(),
+      context.setWikiRef(modelUtils.extractRef(doc.getDocumentReference(),
           WikiReference.class).get());
-      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' dbBefore '{}' dbNow '{}'", doc,
-          doc.getLanguage(), totrash, dbBefore, getContext().getDatabase());
+      LOGGER.debug("deleteDocument: doc '{},{}', totrash '{}' currWiki '{}' nowWiki '{}'", doc,
+          doc.getLanguage(), totrash, currWikiRef, context.getWikiRef());
       try {
-        getWiki().deleteDocument(doc, totrash, getContext());
+        getWiki().deleteDocument(doc, totrash, context.getXWikiContext());
       } catch (XWikiException xwe) {
         throw new DocumentDeleteException(doc.getDocumentReference(), xwe);
       }
     } finally {
-      getContext().setDatabase(dbBefore);
+      context.setWikiRef(currWikiRef);
     }
   }
 
   @Override
   public Map<String, XWikiDocument> getTranslations(DocumentReference docRef) {
     Map<String, XWikiDocument> transMap = new HashMap<>();
-    String database = getContext().getDatabase();
+    WikiReference currWikiRef = context.getWikiRef();
     try {
-      getContext().setDatabase(docRef.getWikiReference().getName());
-      for (String lang : getStore().getTranslationList(newDummyDoc(docRef, null), getContext())) {
+      context.setWikiRef(docRef.getWikiReference());
+      for (String lang : getStore().getTranslationList(newDummyDoc(docRef, null),
+          context.getXWikiContext())) {
         try {
           transMap.put(lang, getDocument(docRef, lang));
         } catch (DocumentNotExistsException exc) {
@@ -338,7 +334,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     } finally {
-      getContext().setDatabase(database);
+      context.setWikiRef(currWikiRef);
     }
     return transMap;
   }
@@ -475,7 +471,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         if (rightsAccess.hasAccessLevel(obj.getDocumentReference(), EAccessLevel.VIEW)) {
           return getApiObjectWithoutRightCheck(obj);
         } else {
-          throw new NoAccessRightsException(obj.getDocumentReference(), getContext().getXWikiUser(),
+          throw new NoAccessRightsException(obj.getDocumentReference(), context.getUser(),
               EAccessLevel.VIEW);
         }
       } catch (IllegalStateException exp) {
@@ -487,7 +483,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public com.xpn.xwiki.api.Object getApiObjectWithoutRightCheck(BaseObject obj) {
-    return obj.newObjectApi(obj, getContext());
+    return obj.newObjectApi(obj, context.getXWikiContext());
   }
 
   @Override
@@ -528,7 +524,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     checkNotNull(classRef);
     classRef = adjustClassRef(classRef, doc);
     try {
-      return doc.newXObject(classRef, getContext());
+      return doc.newXObject(classRef, context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new ClassDocumentLoadException(classRef, xwe);
     }
@@ -677,7 +673,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       if (value instanceof Collection) {
         value = Joiner.on('|').join((Collection<?>) value);
       }
-      obj.set(name, value, getContext());
+      obj.set(name, value, context.getXWikiContext());
     }
     return hasChange;
   }
@@ -743,7 +739,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
    */
   private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
     return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
-        onDoc.getDocumentReference(), WikiReference.class).or(modelContext.getWikiRef()));
+        onDoc.getDocumentReference(), WikiReference.class).or(context.getWikiRef()));
   }
 
 }
