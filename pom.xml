@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>1.148-SNAPSHOT</version>
+  <version>PR73-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
     <!-- Add here all your dependencies -->
