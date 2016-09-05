@@ -19,11 +19,13 @@
  */
 package com.celements.web.plugin.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
 import com.xpn.xwiki.XWiki;
@@ -46,7 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
+public class PageLayoutCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -468,17 +470,23 @@ public class PageLayoutCommandTest extends AbstractBridgedComponentTestCase {
     DocumentReference myCellDocRef = new DocumentReference(context.getDatabase(), layoutName,
         "myCell");
     XWikiDocument myCellDoc = new XWikiDocument(myCellDocRef);
+    myCellDoc.setStore(storeMock);
     expect(xwiki.exists(eq(myCellDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(myCellDocRef), same(context))).andReturn(myCellDoc).once();
-    xwiki.deleteAllDocuments(same(myCellDoc), same(context));
+    xwiki.deleteDocument(same(myCellDoc), eq(true), same(context));
     expectLastCall().once();
+    expect(storeMock.getTranslationList(same(myCellDoc), same(context))).andReturn(
+        Collections.<String>emptyList()).once();
     DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), layoutName,
         "WebHome");
     XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
+    webHomeDoc.setStore(storeMock);
     expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).once();
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).once();
-    xwiki.deleteAllDocuments(same(webHomeDoc), same(context));
+    xwiki.deleteDocument(same(webHomeDoc), eq(true), same(context));
     expectLastCall().once();
+    expect(storeMock.getTranslationList(same(webHomeDoc), same(context))).andReturn(
+        Collections.<String>emptyList()).once();
     replayAll(queryManagerMock, queryMock);
     assertTrue(plCmd.deleteLayout(layoutSpaceRef));
     verifyAll(queryManagerMock, queryMock);
