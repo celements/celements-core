@@ -35,8 +35,20 @@ public class DivWriterTest {
 
   @Test
   public void testCloseLevel() {
+    String tagName = "";
+    String idname = "theId";
+    divWriter.openLevel(tagName, idname, "", "");
     divWriter.closeLevel();
-    assertEquals("</div>", divWriter.getAsString());
+    assertEquals("<div id=\"theId\"></div>", divWriter.getAsString());
+  }
+
+  @Test
+  public void testCloseLevel_tagName() {
+    String tagName = "form";
+    String idname = "theId2";
+    divWriter.openLevel(tagName, idname, "", "");
+    divWriter.closeLevel();
+    assertEquals("<form id=\"theId2\"></form>", divWriter.getAsString());
   }
 
   @Test

@@ -21,6 +21,12 @@ package com.celements.cells;
 
 public interface ICellWriter {
 
+  public void openLevel(String tagName, String idname, String cssClasses, String cssStyles);
+
+  /**
+   * @deprecated since 2.82 instead use openLevel(String, String, String, String)
+   */
+  @Deprecated
   public void openLevel(String idname, String cssClasses, String cssStyles);
 
   public void closeLevel();
