@@ -22,7 +22,6 @@ package com.celements.navigation;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -39,7 +38,7 @@ public class ListBuilder implements INavigationBuilder {
   @Override
   @Deprecated
   public void openLevel(String mainUlCSSClasses) {
-    openLevel(new TreeSet<String>(Arrays.asList(StringUtils.split(mainUlCSSClasses, ' '))));
+    openLevel(new LinkedHashSet<String>(Arrays.asList(StringUtils.split(mainUlCSSClasses, ' '))));
   }
 
   @Override
