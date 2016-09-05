@@ -40,6 +40,9 @@
       <column name="CEL_ID" not-null="true" />
       <generator class="assigned" />
     </id>
+    <property name="tagname" type="string">
+      <column name="CEL_TAGNAME" length="32" />
+    </property>
     <property name="idname" type="string">
       <column name="CEL_IDNAME" />
     </property>

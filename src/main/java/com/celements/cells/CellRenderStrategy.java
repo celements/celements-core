@@ -25,14 +25,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
@@ -47,28 +47,33 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   RenderCommand rendererCmd;
   PageLayoutCommand pageLayoutCmd = new PageLayoutCommand();
-  IWebUtilsService webUtilsService = Utils.getComponent(IWebUtilsService.class);
-  CellsClasses cellClasses = (CellsClasses) Utils.getComponent(IClassCollectionRole.class,
-      "celements.celCellsClasses");
+  private ICellsClassConfig cellClassConfig = Utils.getComponent(ICellsClassConfig.class);
+  private IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
+  private ModelUtils modelUtils = Utils.getComponent(ModelUtils.class);
 
   public CellRenderStrategy(XWikiContext context) {
     this.context = context;
   }
 
+  @Override
   public void endRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     cellWriter.closeLevel();
   }
 
+  @Override
   public void endRenderChildren(EntityReference parentRef) {
   }
 
+  @Override
   public void endRendering() {
   }
 
+  @Override
   public String getMenuPart(TreeNode node) {
     return "";
   }
 
+  @Override
   public SpaceReference getSpaceReference() {
     if (spaceReference == null) {
       return pageLayoutCmd.getDefaultLayoutSpaceReference();
@@ -77,15 +82,19 @@ public class CellRenderStrategy implements IRenderStrategy {
     }
   }
 
+  @Override
   public boolean isRenderCell(TreeNode node) {
     return node != null;
   }
 
+  @Override
   public boolean isRenderSubCells(EntityReference parentRef) {
     return parentRef != null;
   }
 
+  @Override
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
+    String tagName = "";
     String cssClasses = "cel_cell";
     String cssStyles = "";
     String idname = "";
@@ -93,32 +102,33 @@ public class CellRenderStrategy implements IRenderStrategy {
       DocumentReference cellDocRef = node.getDocumentReference();
       LOGGER.debug("startRenderCell: cellDocRef [" + cellDocRef + "] context db ["
           + context.getDatabase() + "].");
-      XWikiDocument cellDoc = context.getWiki().getDocument(cellDocRef, context);
-      BaseObject cellObj = cellDoc.getXObject(cellClasses.getCellClassRef(
+      BaseObject cellObj = modelAccess.getXObject(cellDocRef, cellClassConfig.getCellClassRef(
           cellDocRef.getWikiReference().getName()));
       if (cellObj != null) {
         String cellObjCssClasses = cellObj.getStringValue("css_classes");
         if ((cellObjCssClasses != null) && !"".equals(cellObjCssClasses)) {
           cssClasses += " " + cellObjCssClasses;
         }
+        tagName = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD);
         cssStyles = cellObj.getStringValue("css_styles");
-        idname = cellObj.getStringValue("idname");
+        idname = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD);
       }
       if ((idname == null) || "".equals(idname)) {
-        String nodeFN = webUtilsService.getRefDefaultSerializer().serialize(
-            node.getDocumentReference());
+        String nodeFN = modelUtils.serializeRef(node.getDocumentReference());
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
         idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
-    } catch (XWikiException e) {
-      LOGGER.error("failed to get cell [" + node.getDocumentReference() + "] document.", e);
+    } catch (DocumentNotExistsException exp) {
+      LOGGER.error("failed to get cell [" + node.getDocumentReference() + "] document.", exp);
     }
-    cellWriter.openLevel(idname, cssClasses, cssStyles);
+    cellWriter.openLevel(tagName, idname, cssClasses, cssStyles);
   }
 
+  @Override
   public void startRenderChildren(EntityReference parentRef) {
   }
 
+  @Override
   public void startRendering() {
     cellWriter.clear();
   }
@@ -128,10 +138,12 @@ public class CellRenderStrategy implements IRenderStrategy {
     return this;
   }
 
+  @Override
   public String getAsString() {
     return cellWriter.getAsString();
   }
 
+  @Override
   public void renderEmptyChildren(TreeNode node) {
     String cellContent = "";
     try {
@@ -153,6 +165,7 @@ public class CellRenderStrategy implements IRenderStrategy {
     return rendererCmd;
   }
 
+  @Override
   public void setSpaceReference(SpaceReference spaceReference) {
     this.spaceReference = spaceReference;
   }
