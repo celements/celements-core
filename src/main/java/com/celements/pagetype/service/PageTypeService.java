@@ -76,7 +76,7 @@ public class PageTypeService implements IPageTypeRole {
                 typeCategory.getTypeName(), typeCategory);
             if (beforeRegCat != null) {
               LOGGER.warn("Page type category collision on category name '{}' the colliding"
-                  + " category '{}' is shadowed by ''.", typeCategory.getTypeName(),
+                  + " category '{}' is shadowed by '{}'.", typeCategory.getTypeName(),
                   typeCategory.getClass(), beforeRegCat.getClass());
             }
           }
