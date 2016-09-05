@@ -45,10 +45,10 @@ import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
 import com.celements.inheritor.InheritorFactory;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -154,19 +154,19 @@ public class PageLayoutCommand {
   }
 
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {
-    XWiki xwiki = getContext().getWiki();
+    final boolean moveToTrash = true;
     try {
       Query spaceDocsQuery = getQueryManager().createQuery("where doc.space = :space", Query.XWQL);
       spaceDocsQuery.bindValue("space", layoutSpaceRef.getName());
       for (String docName : spaceDocsQuery.<String>execute()) {
         DocumentReference docReference = getWebUtilsService().resolveDocumentReference(docName);
-        xwiki.deleteAllDocuments(getModelAccess().getDocument(docReference), getContext());
+        getModelAccess().deleteDocument(docReference, moveToTrash);
       }
-      return true;
+      return moveToTrash;
     } catch (QueryException exp) {
       LOGGER.warn("Failed to get the list of documents while trying to delete space [{}]",
           layoutSpaceRef, exp);
-    } catch (DocumentNotExistsException | XWikiException exp) {
+    } catch (DocumentDeleteException exp) {
       LOGGER.error("deleteLayout: Failed to delete documents for space [{}].", layoutSpaceRef, exp);
     }
     return false;
