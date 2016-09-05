@@ -10,6 +10,7 @@ public interface ICellsClassConfig {
   public static final String CELEMENTS_CELL_CLASS_NAME = "CellClass";
   public static final String CELEMENTS_CELL_CLASS = CELEMENTS_CELL_CLASS_SPACE + "."
       + CELEMENTS_CELL_CLASS_NAME;
+  public static final String CELLCLASS_TAGNAME_FIELD = "tagname";
   public static final String CELLCLASS_IDNAME_FIELD = "idname";
   public static final String PAGE_DEP_CELL_CONFIG_CLASS_DOC = "PageDepCellConfigClass";
 
