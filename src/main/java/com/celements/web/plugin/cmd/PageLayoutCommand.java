@@ -133,13 +133,14 @@ public class PageLayoutCommand {
         try {
           XWikiDocument propXdoc = getModelAccess().getOrCreateDocument(standardPropDocRef(
               layoutSpaceRef));
-          BaseObject layoutPropObj = propXdoc.newXObject(getPageLayoutPropertiesClassRef(
-              propXdoc.getDocumentReference().getWikiReference().getName()), getContext());
+          BaseObject layoutPropObj = getModelAccess().newXObject(propXdoc,
+              getPageLayoutPropertiesClassRef(
+                  propXdoc.getDocumentReference().getWikiReference().getName()));
           layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
           layoutPropObj.setStringValue("doctype", getDocType());
           getModelAccess().saveDocument(propXdoc, "Creating page layout", false);
           return "cel_layout_create_successful";
-        } catch (DocumentSaveException | XWikiException exp) {
+        } catch (DocumentSaveException exp) {
           LOGGER.error("createNew: failed to create new page layout.", exp);
         }
       }
