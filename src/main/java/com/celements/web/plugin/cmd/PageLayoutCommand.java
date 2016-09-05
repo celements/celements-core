@@ -452,8 +452,7 @@ public class PageLayoutCommand {
 
   public String getLayoutType(SpaceReference layoutSpaceRef) {
     BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    if ((layoutPropertyObj != null) && (layoutPropertyObj.getStringValue(
-        ICellsClassConfig.LAYOUT_TYPE_FIELD) != null)) {
+    if (layoutPropertyObj != null) {
       return layoutPropertyObj.getStringValue(ICellsClassConfig.LAYOUT_TYPE_FIELD);
     }
     return ICellsClassConfig.PAGE_LAYOUT_VALUE;
