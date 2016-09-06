@@ -65,14 +65,19 @@ public class PageTypeService implements IPageTypeRole {
   @Requirement
   private List<IPageTypeCategoryRole> pageTypeCategoryList;
 
-  private final ConcurrentMap<String, IPageTypeCategoryRole> typeNameToCategoryMap = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, IPageTypeCategoryRole> typeNameToCatCache = new ConcurrentHashMap<>();
 
-  private ConcurrentMap<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
-    if (typeNameToCategoryMap.isEmpty()) {
-      synchronized (typeNameToCategoryMap) {
-        if (typeNameToCategoryMap.isEmpty()) {
+  @Override
+  public void resetTypeNameToCatCache() {
+    typeNameToCatCache.clear();
+  }
+
+  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
+    if (typeNameToCatCache.isEmpty()) {
+      synchronized (typeNameToCatCache) {
+        if (typeNameToCatCache.isEmpty()) {
           for (IPageTypeCategoryRole typeCategory : pageTypeCategoryList) {
-            IPageTypeCategoryRole beforeRegCat = typeNameToCategoryMap.putIfAbsent(
+            IPageTypeCategoryRole beforeRegCat = typeNameToCatCache.putIfAbsent(
                 typeCategory.getTypeName(), typeCategory);
             if (beforeRegCat != null) {
               LOGGER.warn("Page type category collision on category name '{}' the colliding"
@@ -83,7 +88,7 @@ public class PageTypeService implements IPageTypeRole {
         }
       }
     }
-    return typeNameToCategoryMap;
+    return Collections.unmodifiableMap(typeNameToCatCache);
   }
 
   @Override
@@ -95,8 +100,7 @@ public class PageTypeService implements IPageTypeRole {
   public List<String> getTypesForCategory(String categoryName, boolean onlyVisible) {
     Optional<IPageTypeCategoryRole> typeCategory = getTypeCategoryForCatName(categoryName);
     if (typeCategory.isPresent()) {
-      return getPageTypesConfigNamesForCategories(typeCategory.get().getAllTypeNames(),
-          onlyVisible);
+      return getPageTypesConfigNamesForCategories(typeCategory.get().getAllTypeNames(), onlyVisible);
     } else {
       LOGGER.warn("cannot find types category name ''", categoryName);
     }
@@ -127,14 +131,13 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   @Override
-  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
-      boolean onlyVisible) {
+  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList, boolean onlyVisible) {
     List<String> pageTypeConfigNameList = new ArrayList<String>();
     for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList, onlyVisible)) {
       pageTypeConfigNameList.add(pageTypeRef.getConfigName());
     }
-    LOGGER.debug("getPageTypesConfigNamesForCategories: return " + Arrays.deepToString(
-        pageTypeConfigNameList.toArray()));
+    LOGGER.debug("getPageTypesConfigNamesForCategories: return "
+        + Arrays.deepToString(pageTypeConfigNameList.toArray()));
     return pageTypeConfigNameList;
   }
 
@@ -148,9 +151,9 @@ public class PageTypeService implements IPageTypeRole {
           visiblePTSet.add(pageTypeRef);
         }
       }
-      LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
-          catList.toArray()) + "] and onlyVisible [" + onlyVisible + "] return "
-          + Arrays.deepToString(visiblePTSet.toArray()));
+      LOGGER.debug("getPageTypeRefsForCategories: for catList ["
+          + Arrays.deepToString(catList.toArray()) + "] and onlyVisible [" + onlyVisible
+          + "] return " + Arrays.deepToString(visiblePTSet.toArray()));
       return new ArrayList<PageTypeReference>(visiblePTSet);
     } else {
       return new ArrayList<PageTypeReference>(getPageTypeRefsForCategories(catList));
@@ -199,8 +202,9 @@ public class PageTypeService implements IPageTypeRole {
         }
       }
     }
-    LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
-        catList.toArray()) + "] return " + Arrays.deepToString(filteredPTset.toArray()));
+    LOGGER.debug("getPageTypeRefsForCategories: for catList ["
+        + Arrays.deepToString(catList.toArray()) + "] return "
+        + Arrays.deepToString(filteredPTset.toArray()));
     return filteredPTset;
   }
 
@@ -210,8 +214,8 @@ public class PageTypeService implements IPageTypeRole {
     checkNotNull(ref);
     try {
       BaseObject obj = modelAccess.getOrCreateXObject(doc, pageTypeClassConf.getPageTypeClassRef());
-      boolean hasChanged = !ref.getConfigName().equals(modelAccess.getProperty(obj,
-          IPageTypeClassConfig.PAGE_TYPE_FIELD));
+      boolean hasChanged = !ref.getConfigName().equals(
+          modelAccess.getProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD));
       if (hasChanged) {
         modelAccess.setProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD, ref.getConfigName());
       }

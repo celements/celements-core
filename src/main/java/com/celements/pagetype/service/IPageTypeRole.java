@@ -33,14 +33,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @ComponentRole
 public interface IPageTypeRole {
 
+  public void resetTypeNameToCatCache();
+
   public IPageTypeConfig getPageTypeConfig(String pageTypeName);
 
   public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef);
 
   public PageTypeReference getPageTypeRefByConfigName(String pageTypeName);
 
-  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
-      boolean onlyVisible);
+  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList, boolean onlyVisible);
 
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible);
@@ -50,4 +51,5 @@ public interface IPageTypeRole {
   public Optional<IPageTypeCategoryRole> getTypeCategoryForCatName(String categoryName);
 
   public List<String> getTypesForCategory(String categoryName, boolean onlyVisible);
+
 }
