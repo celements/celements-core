@@ -26,10 +26,14 @@ import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.category.IPageTypeCategoryRole;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @ComponentRole
 public interface IPageTypeRole {
+
+  public void resetTypeNameToCatCache();
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName);
 
@@ -37,11 +41,15 @@ public interface IPageTypeRole {
 
   public PageTypeReference getPageTypeRefByConfigName(String pageTypeName);
 
-  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
-      boolean onlyVisible);
+  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList, boolean onlyVisible);
 
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible);
 
   public boolean setPageType(XWikiDocument doc, PageTypeReference pageTypeRef);
+
+  public Optional<IPageTypeCategoryRole> getTypeCategoryForCatName(String categoryName);
+
+  public List<String> getTypesForCategory(String categoryName, boolean onlyVisible);
+
 }

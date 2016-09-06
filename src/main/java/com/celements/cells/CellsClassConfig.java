@@ -13,7 +13,8 @@ public class CellsClassConfig implements ICellsClassConfig {
 
   @Override
   public DocumentReference getPageLayoutPropertiesClassRef(String wikiName) {
-    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE, "PageLayoutPropertiesClass");
+    return new DocumentReference(wikiName, CELEMENTS_CELL_CLASS_SPACE,
+        PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
   }
 
   @Override
