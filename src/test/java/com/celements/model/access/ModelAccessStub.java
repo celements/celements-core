@@ -3,23 +3,33 @@ package com.celements.model.access;
 import static com.celements.common.test.CelementsTestUtils.*;
 import static com.google.common.base.Preconditions.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.util.ModelUtils;
 import com.google.common.base.Preconditions;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 @Component(ModelAccessStub.NAME)
-public class ModelAccessStub extends DefaultModelAccessFacade {
+public class ModelAccessStub implements ModelAccessStrategy {
 
   public static final String NAME = "modelAccessStub";
+
+  @Requirement
+  private XWikiDocumentCreator docCreator;
+
+  @Requirement
+  private ModelUtils modelUtils;
 
   public static ModelAccessStub get() {
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -34,7 +44,7 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
     try {
       ModelAccessStub modelAccess = (ModelAccessStub) Utils.getComponent(IModelAccessFacade.class,
           NAME);
-      registerComponentMock(IModelAccessFacade.class, "default", modelAccess);
+      registerComponentMock(ModelAccessStrategy.class, "default", modelAccess);
       return modelAccess;
     } catch (ComponentRepositoryException exc) {
       throw new RuntimeException("failed to register ModelAccessStub");
@@ -79,7 +89,7 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
   }
 
   public InjectedDoc injectNewDoc(DocumentReference docRef) {
-    return injectDoc(docRef, docCreator.createWithoutDefaults(docRef));
+    return injectDoc(docRef, createDocument(docRef));
   }
 
   public InjectedDoc removeInjectedDoc(DocumentReference docRef, String lang) {
@@ -106,29 +116,18 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
   }
 
   @Override
-  @Deprecated
-  protected XWikiDocument getDocumentFromWiki(DocumentReference docRef) {
-    return getDocumentFromStore(docRef, DEFAULT_LANG);
-  }
-
-  @Override
-  protected XWikiDocument getDocumentFromStore(DocumentReference docRef, String lang) {
+  public XWikiDocument getDocument(DocumentReference docRef, String lang) {
     return getInjectedDoc(docRef, lang).doc();
   }
 
   @Override
-  protected boolean existsFromWiki(DocumentReference docRef) {
-    return isInjected(docRef);
+  public XWikiDocument createDocument(DocumentReference docRef) {
+    return docCreator.createWithoutDefaults(docRef);
   }
 
   @Override
-  protected boolean existsFromStore(DocumentReference docRef, String lang) {
+  public boolean exists(DocumentReference docRef, String lang) {
     return isInjected(docRef, lang);
-  }
-
-  @Override
-  protected XWikiDocument createDocumentInternal(DocumentReference docRef) {
-    return injectNewDoc(docRef).doc();
   }
 
   @Override
@@ -148,14 +147,6 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
 
   @Override
   public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException {
-    for (String lang : getInjectedDocs(doc.getDocumentReference()).keySet()) {
-      expectDelete(doc.getDocumentReference(), lang);
-    }
-  }
-
-  @Override
-  public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
-      throws DocumentDeleteException {
     expectDelete(doc.getDocumentReference(), doc.getLanguage());
   }
 
@@ -169,12 +160,8 @@ public class ModelAccessStub extends DefaultModelAccessFacade {
   }
 
   @Override
-  public Map<String, XWikiDocument> getTranslations(DocumentReference docRef) {
-    Map<String, XWikiDocument> tMap = new HashMap<>();
-    for (String lang : getInjectedDocs(docRef).keySet()) {
-      tMap.put(lang, getInjectedDocs(docRef).get(lang).doc());
-    }
-    return tMap;
+  public List<String> getTranslations(DocumentReference docRef) {
+    return new ArrayList<>(getInjectedDocs(docRef).keySet());
   }
 
   public class InjectedDoc {
