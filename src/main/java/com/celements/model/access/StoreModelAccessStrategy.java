@@ -56,8 +56,8 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
   }
 
   @Override
-  public XWikiDocument createDocument(DocumentReference docRef) {
-    return docCreator.create(docRef);
+  public XWikiDocument createDocument(DocumentReference docRef, String lang) {
+    return docCreator.create(docRef, lang);
   }
 
   @Override
