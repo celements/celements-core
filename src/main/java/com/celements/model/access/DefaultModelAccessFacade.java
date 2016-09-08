@@ -102,7 +102,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentNotExistsException {
     checkNotNull(docRef);
     lang = normalizeLang(lang);
-    if (exists(docRef)) {
+    if (exists(docRef, lang)) {
       return strategy.getDocument(docRef, lang);
     } else {
       throw new DocumentNotExistsException(docRef);
@@ -113,7 +113,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public XWikiDocument createDocument(DocumentReference docRef)
       throws DocumentAlreadyExistsException {
     checkNotNull(docRef);
-    if (!exists(docRef)) {
+    if (!exists(docRef, DEFAULT_LANG)) {
       return strategy.createDocument(docRef, DEFAULT_LANG);
     } else {
       throw new DocumentAlreadyExistsException(docRef);
@@ -123,7 +123,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public XWikiDocument getOrCreateDocument(DocumentReference docRef) {
     try {
-      return getDocument(docRef);
+      return getDocument(docRef, DEFAULT_LANG);
     } catch (DocumentNotExistsException exc) {
       return strategy.createDocument(docRef, DEFAULT_LANG);
     }
