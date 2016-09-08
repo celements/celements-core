@@ -38,6 +38,13 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
 
       @Override
       protected XWikiDocument call() throws XWikiException {
+        /*
+         * XXX: this check and XWiki delegation is here because many unit tests do not yet use
+         * ModelAccessStub. accessing the store directly breaks all these tests
+         */
+        if (isDefaultLang(lang)) {
+          return getWiki().getDocument(docRef, context.getXWikiContext());
+        }
         return getStore().loadXWikiDoc(newDummyDoc(docRef, lang), context.getXWikiContext());
       }
     };
@@ -59,6 +66,13 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
 
       @Override
       protected Boolean call() throws XWikiException {
+        /*
+         * XXX: this check and XWiki delegation is here because many unit tests do not yet use
+         * ModelAccessStub. accessing the store directly breaks all these tests
+         */
+        if (isDefaultLang(lang)) {
+          return getWiki().exists(docRef, context.getXWikiContext());
+        }
         return getStore().exists(newDummyDoc(docRef, lang), context.getXWikiContext());
       }
     };
@@ -120,6 +134,10 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
+  }
+
+  private boolean isDefaultLang(String lang) {
+    return IModelAccessFacade.DEFAULT_LANG.equals(lang);
   }
 
   private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
