@@ -34,7 +34,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.ModelAccessStub;
+import com.celements.model.access.ModelMock;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
@@ -53,7 +53,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    ModelAccessStub.init();
+    ModelMock.init();
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
@@ -85,7 +85,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Test
   public void test_createXClasses() throws Exception {
     DocumentReference docRef = classDef.getClassRef();
-    XWikiDocument doc = ModelAccessStub.get().injectNewDoc(docRef).doc();
+    XWikiDocument doc = ModelMock.get().mockDoc(docRef).doc();
 
     expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
         Arrays.asList(classPackage.getName())).anyTimes();
@@ -97,7 +97,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     creator.createXClasses(); // save is only called once
     verifyDefault();
 
-    assertEquals(1, ModelAccessStub.get().getInjectedDoc(docRef).getSavedCount());
+    assertEquals(1, ModelMock.get().mockDoc(docRef).getSavedCount());
     assertEquals(classDef.isInternalMapping(), doc.getXClass().hasInternalCustomMapping());
     @SuppressWarnings("unchecked")
     List<BaseCollection> xFields = new ArrayList<>(doc.getXClass().getFieldList());
