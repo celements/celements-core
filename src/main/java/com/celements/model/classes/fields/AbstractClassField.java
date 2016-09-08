@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.util.ModelUtils;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -60,7 +61,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   protected AbstractClassField(@NotNull Builder<?, T> builder) {
     this.classDefName = builder.classDefName;
     this.name = builder.name;
-    this.prettyName = builder.prettyName;
+    this.prettyName = MoreObjects.firstNonNull(builder.prettyName, builder.name);
     this.validationRegExp = builder.validationRegExp;
     this.validationMessage = builder.validationMessage;
   }

@@ -77,6 +77,7 @@ public class CellsClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "celCellsClasses";
   }
@@ -90,21 +91,14 @@ public class CellsClasses extends AbstractClassCollection {
   }
 
   BaseClass getCellClass() throws XWikiException {
-    XWikiDocument doc;
     boolean needsUpdate = false;
-    DocumentReference cellClassRef = getCellClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(cellClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get cell class document.", exp);
-      doc = new XWikiDocument(cellClassRef);
-      needsUpdate = true;
-    }
-
+    DocumentReference cellClassRef = cellsClassConfig.getCellClassRef(getContext().getDatabase());
+    XWikiDocument doc = modelAccess.getOrCreateDocument(cellClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(cellClassRef);
-    needsUpdate |= bclass.addTextField(CELLCLASS_IDNAME_FIELD, "id attribute", 30);
+    needsUpdate |= bclass.addTextField(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, "tag name", 30);
+    needsUpdate |= bclass.addTextField(ICellsClassConfig.CELLCLASS_IDNAME_FIELD, "id attribute",
+        30);
     needsUpdate |= bclass.addTextField("css_classes", "CSS Classes", 30);
     needsUpdate |= bclass.addTextAreaField("css_styles", "CSS Styles", 15, 20);
 
@@ -130,15 +124,7 @@ public class CellsClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
     DocumentReference pageLayoutPropertiesClassRef = getPageLayoutPropertiesClassRef(
         getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(pageLayoutPropertiesClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get pageLayoutProperties class document.", exp);
-      doc = new XWikiDocument(pageLayoutPropertiesClassRef);
-      needsUpdate = true;
-    }
-
+    doc = modelAccess.getOrCreateDocument(pageLayoutPropertiesClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(pageLayoutPropertiesClassRef);
     needsUpdate |= bclass.addTextField("prettyname", "Layout Pretty Name", 30);
@@ -170,15 +156,7 @@ public class CellsClasses extends AbstractClassCollection {
     XWikiDocument doc;
     boolean needsUpdate = false;
     DocumentReference groupCellClassRef = getGroupCellClassRef(getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(groupCellClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get groupCell class document.", exp);
-      doc = new XWikiDocument(groupCellClassRef);
-      needsUpdate = true;
-    }
-
+    doc = modelAccess.getOrCreateDocument(groupCellClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(groupCellClassRef);
     needsUpdate |= bclass.addTextField("render_layout", "Render Layout", 30);
@@ -200,15 +178,7 @@ public class CellsClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
     DocumentReference pageDepCellConfigClassRef = getPageDepCellConfigClassRef(
         getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(pageDepCellConfigClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get pageDepCellConfig class document.", exp);
-      doc = new XWikiDocument(pageDepCellConfigClassRef);
-      needsUpdate = true;
-    }
-
+    doc = modelAccess.getOrCreateDocument(pageDepCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(pageDepCellConfigClassRef);
     needsUpdate |= bclass.addTextField("space_name", "Space Name", 30);
@@ -223,15 +193,7 @@ public class CellsClasses extends AbstractClassCollection {
     boolean needsUpdate = false;
     DocumentReference translationBoxCellConfigClassRef = cellsClassConfig.getTranslationBoxCellConfigClassRef(
         getContext().getDatabase());
-
-    try {
-      doc = getContext().getWiki().getDocument(translationBoxCellConfigClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get pageDepCellConfig class document.", exp);
-      doc = new XWikiDocument(translationBoxCellConfigClassRef);
-      needsUpdate = true;
-    }
-
+    doc = modelAccess.getOrCreateDocument(translationBoxCellConfigClassRef);
     BaseClass bclass = doc.getXClass();
     bclass.setDocumentReference(translationBoxCellConfigClassRef);
     needsUpdate |= bclass.addTextField("page_exceptions", "Page Exceptions (FullNames"
