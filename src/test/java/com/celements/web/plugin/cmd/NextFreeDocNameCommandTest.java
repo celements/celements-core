@@ -52,7 +52,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -83,7 +83,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -114,7 +114,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -145,7 +145,7 @@ public class NextFreeDocNameCommandTest extends AbstractComponentTest {
         num);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(false).once();
     XWikiDocument theDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theDoc);
     expect(storeMock.loadLock(eq(theDoc.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();

@@ -65,7 +65,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference docRef2 = new DocumentReference(title + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).atLeastOnce();
     XWikiDocument doc2 = new XWikiDocument(docRef2);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2))).andReturn(doc2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2), eq(""))).andReturn(doc2);
     expect(storeMock.loadLock(eq(doc2.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
@@ -120,7 +120,7 @@ public class NextFreeDocServiceTest extends AbstractComponentTest {
     DocumentReference docRef2 = new DocumentReference(INextFreeDocRole.UNTITLED_NAME + 6, spaceRef);
     expect(xwiki.exists(eq(docRef2), same(context))).andReturn(false).once();
     XWikiDocument doc2 = new XWikiDocument(docRef2);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2))).andReturn(doc2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef2), eq(""))).andReturn(doc2);
     expect(storeMock.loadLock(eq(doc2.getId()), same(context), eq(true))).andReturn(null).once();
     storeMock.saveLock(anyObject(XWikiLock.class), same(context), eq(true));
     expectLastCall().once();
