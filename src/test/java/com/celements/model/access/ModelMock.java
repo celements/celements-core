@@ -42,8 +42,7 @@ public class ModelMock implements ModelAccessStrategy {
 
   public static ModelMock init() {
     try {
-      ModelMock modelAccess = (ModelMock) Utils.getComponent(ModelAccessStrategy.class,
-          NAME);
+      ModelMock modelAccess = (ModelMock) Utils.getComponent(ModelAccessStrategy.class, NAME);
       registerComponentMock(ModelAccessStrategy.class, "default", modelAccess);
       return modelAccess;
     } catch (ComponentRepositoryException exc) {
@@ -89,7 +88,7 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   public MockDoc mockDoc(DocumentReference docRef) {
-    return mockDoc(docRef, createDocument(docRef));
+    return mockDoc(docRef, createDocument(docRef, DEFAULT_LANG));
   }
 
   public MockDoc removeMockedDoc(DocumentReference docRef, String lang) {
@@ -121,8 +120,8 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   @Override
-  public XWikiDocument createDocument(DocumentReference docRef) {
-    return docCreator.createWithoutDefaults(docRef);
+  public XWikiDocument createDocument(DocumentReference docRef, String lang) {
+    return docCreator.createWithoutDefaults(docRef, lang);
   }
 
   @Override
