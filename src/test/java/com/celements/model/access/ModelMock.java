@@ -23,7 +23,7 @@ import com.xpn.xwiki.web.Utils;
 @Component(ModelMock.NAME)
 public class ModelMock implements ModelAccessStrategy {
 
-  public static final String NAME = "modelAccessMock";
+  public static final String NAME = "modelMock";
 
   @Requirement
   private XWikiDocumentCreator docCreator;
@@ -50,73 +50,73 @@ public class ModelMock implements ModelAccessStrategy {
     }
   }
 
-  private Map<DocumentReference, Map<String, MockDoc>> mockDocs = new HashMap<>();
+  private Map<DocumentReference, Map<String, DocRecord>> docs = new HashMap<>();
 
-  private Map<String, MockDoc> getMockedDocs(DocumentReference docRef) {
-    if (!mockDocs.containsKey(docRef)) {
-      mockDocs.put(docRef, new HashMap<String, MockDoc>());
+  private Map<String, DocRecord> getDocs(DocumentReference docRef) {
+    if (!docs.containsKey(docRef)) {
+      docs.put(docRef, new HashMap<String, DocRecord>());
     }
-    return mockDocs.get(docRef);
+    return docs.get(docRef);
   }
 
-  public boolean isMocked(DocumentReference docRef, String lang) {
-    return getMockedDocs(docRef).containsKey(lang);
+  public boolean isRegistered(DocumentReference docRef, String lang) {
+    return getDocs(docRef).containsKey(lang);
   }
 
-  public boolean isMocked(DocumentReference docRef) {
-    return isMocked(docRef, DEFAULT_LANG);
+  public boolean isRegistered(DocumentReference docRef) {
+    return isRegistered(docRef, DEFAULT_LANG);
   }
 
-  public MockDoc getMockedDoc(DocumentReference docRef, String lang) {
-    checkIsMocked(docRef, lang);
-    return getMockedDocs(docRef).get(lang);
+  public DocRecord getDocRecord(DocumentReference docRef, String lang) {
+    checkIsRegistered(docRef, lang);
+    return getDocs(docRef).get(lang);
   }
 
-  public MockDoc getMockedDoc(DocumentReference docRef) {
-    return getMockedDoc(docRef, DEFAULT_LANG);
+  public DocRecord getDocRecord(DocumentReference docRef) {
+    return getDocRecord(docRef, DEFAULT_LANG);
   }
 
-  public MockDoc mockDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
-    checkIsNotMocked(docRef, lang);
-    MockDoc mockDoc = new MockDoc(doc);
-    getMockedDocs(docRef).put(lang, mockDoc);
+  public DocRecord registerDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
+    checkIsNotRegistered(docRef, lang);
+    DocRecord mockDoc = new DocRecord(doc);
+    getDocs(docRef).put(lang, mockDoc);
     return mockDoc;
   }
 
-  public MockDoc mockDoc(DocumentReference docRef, XWikiDocument doc) {
-    return mockDoc(docRef, DEFAULT_LANG, doc);
+  public DocRecord registerDoc(DocumentReference docRef, XWikiDocument doc) {
+    return registerDoc(docRef, DEFAULT_LANG, doc);
   }
 
-  public MockDoc mockDoc(DocumentReference docRef) {
-    return mockDoc(docRef, createDocument(docRef, DEFAULT_LANG));
+  public DocRecord registerDoc(DocumentReference docRef) {
+    return registerDoc(docRef, createDocument(docRef, DEFAULT_LANG));
   }
 
-  public MockDoc removeMockedDoc(DocumentReference docRef, String lang) {
-    checkIsMocked(docRef, lang);
-    return getMockedDocs(docRef).remove(lang);
+  public DocRecord removeRegisteredDoc(DocumentReference docRef, String lang) {
+    checkIsRegistered(docRef, lang);
+    return getDocs(docRef).remove(lang);
   }
 
-  public MockDoc removeMockedDoc(DocumentReference docRef) {
-    return removeMockedDoc(docRef, DEFAULT_LANG);
+  public DocRecord removeRegisteredDoc(DocumentReference docRef) {
+    return removeRegisteredDoc(docRef, DEFAULT_LANG);
   }
 
-  public void removeAllMockedDocs() {
-    mockDocs.clear();
+  public void removeAllRegisteredDocs() {
+    docs.clear();
   }
 
-  private void checkIsMocked(DocumentReference docRef, String lang) {
-    Preconditions.checkState(isMocked(docRef, lang), "doc not mocked: " + modelUtils.serializeRef(
-        docRef) + "-" + lang);
+  private void checkIsRegistered(DocumentReference docRef, String lang) {
+    Preconditions.checkState(isRegistered(docRef, lang), "doc not registered: "
+        + modelUtils.serializeRef(docRef) + "-" + lang);
   }
 
-  private void checkIsNotMocked(DocumentReference docRef, String lang) {
-    Preconditions.checkState(!isMocked(docRef, lang), "doc already mocked: "
+  private void checkIsNotRegistered(DocumentReference docRef, String lang) {
+    Preconditions.checkState(!isRegistered(docRef, lang), "doc already registered: "
         + modelUtils.serializeRef(docRef) + "-" + lang);
   }
 
   @Override
   public XWikiDocument getDocument(DocumentReference docRef, String lang) {
-    return getMockedDoc(docRef, lang).doc();
+    return getDocRecord(docRef, lang).doc();
   }
 
   @Override
@@ -126,7 +126,7 @@ public class ModelMock implements ModelAccessStrategy {
 
   @Override
   public boolean exists(DocumentReference docRef, String lang) {
-    return isMocked(docRef, lang);
+    return isRegistered(docRef, lang);
   }
 
   @Override
@@ -136,11 +136,11 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   private void expectSave(DocumentReference docRef, String lang) throws DocumentSaveException {
-    MockDoc mockDoc = getMockedDoc(docRef, lang);
-    if (!mockDoc.throwSaveExc) {
-      mockDoc.saved++;
+    DocRecord record = getDocRecord(docRef, lang);
+    if (!record.throwSaveExc) {
+      record.saved++;
     } else {
-      throw new DocumentSaveException(mockDoc.doc().getDocumentReference());
+      throw new DocumentSaveException(record.doc().getDocumentReference());
     }
   }
 
@@ -150,20 +150,20 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   private void expectDelete(DocumentReference docRef, String lang) throws DocumentDeleteException {
-    MockDoc mockDoc = getMockedDoc(docRef, lang);
-    if (!mockDoc.throwDeleteExc) {
-      mockDoc.deleted++;
+    DocRecord record = getDocRecord(docRef, lang);
+    if (!record.throwDeleteExc) {
+      record.deleted++;
     } else {
-      throw new DocumentDeleteException(mockDoc.doc().getDocumentReference());
+      throw new DocumentDeleteException(record.doc().getDocumentReference());
     }
   }
 
   @Override
   public List<String> getTranslations(DocumentReference docRef) {
-    return new ArrayList<>(getMockedDocs(docRef).keySet());
+    return new ArrayList<>(getDocs(docRef).keySet());
   }
 
-  public class MockDoc {
+  public class DocRecord {
 
     XWikiDocument doc;
 
@@ -173,7 +173,7 @@ public class ModelMock implements ModelAccessStrategy {
     long deleted;
     boolean throwDeleteExc;
 
-    MockDoc(XWikiDocument doc) {
+    DocRecord(XWikiDocument doc) {
       this.doc = checkNotNull(doc);
     }
 

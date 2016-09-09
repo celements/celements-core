@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.ModelMock.MockDoc;
+import com.celements.model.access.ModelMock.DocRecord;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.xpn.xwiki.web.Utils;
@@ -27,14 +27,14 @@ public class ModelAccessMockTest extends AbstractComponentTest {
 
   @Test
   public void test_get() throws Exception {
-    MockDoc doc = modelAccess.mockDoc(docRef);
-    assertSame(doc.doc(), modelAccess.getMockedDoc(docRef).doc());
+    DocRecord doc = modelAccess.registerDoc(docRef);
+    assertSame(doc.doc(), modelAccess.getDocRecord(docRef).doc());
   }
 
   @Test
   public void test_get_notMocked() throws Exception {
     try {
-      modelAccess.getMockedDoc(docRef);
+      modelAccess.getDocRecord(docRef);
       fail("expecting ISE");
     } catch (IllegalStateException exc) {
       // expected
@@ -43,7 +43,7 @@ public class ModelAccessMockTest extends AbstractComponentTest {
 
   @Test
   public void test_save() throws Exception {
-    MockDoc doc = modelAccess.mockDoc(docRef);
+    DocRecord doc = modelAccess.registerDoc(docRef);
 
     assertFalse(doc.wasSaved());
     assertEquals(0, doc.getSavedCount());
@@ -56,7 +56,7 @@ public class ModelAccessMockTest extends AbstractComponentTest {
     assertTrue(doc.wasSaved());
     assertEquals(2, doc.getSavedCount());
 
-    modelAccess.getMockedDoc(docRef).setThrowSaveException(true);
+    modelAccess.getDocRecord(docRef).setThrowSaveException(true);
     try {
       modelAccess.saveDocument(doc.doc(), "", false);
       fail("expecting DocumentSaveException");
@@ -67,7 +67,7 @@ public class ModelAccessMockTest extends AbstractComponentTest {
 
   @Test
   public void test_delete() throws Exception {
-    MockDoc doc = modelAccess.mockDoc(docRef);
+    DocRecord doc = modelAccess.registerDoc(docRef);
 
     assertFalse(doc.wasDeleted());
     assertEquals(0, doc.getDeletedCount());
@@ -80,7 +80,7 @@ public class ModelAccessMockTest extends AbstractComponentTest {
     assertTrue(doc.wasDeleted());
     assertEquals(2, doc.getDeletedCount());
 
-    modelAccess.getMockedDoc(docRef).setThrowDeleteException(true);
+    modelAccess.getDocRecord(docRef).setThrowDeleteException(true);
     try {
       modelAccess.deleteDocument(doc.doc(), false);
       fail("expecting DocumentDeleteException");
