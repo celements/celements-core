@@ -88,8 +88,12 @@ public class ModelMock implements ModelAccessStrategy {
     return registerDoc(docRef, IModelAccessFacade.DEFAULT_LANG, doc);
   }
 
+  public DocRecord registerDoc(DocumentReference docRef, String lang) {
+    return registerDoc(docRef, lang, docCreator.createWithoutDefaults(docRef, lang));
+  }
+
   public DocRecord registerDoc(DocumentReference docRef) {
-    return registerDoc(docRef, createDocument(docRef, IModelAccessFacade.DEFAULT_LANG));
+    return registerDoc(docRef, IModelAccessFacade.DEFAULT_LANG);
   }
 
   public DocRecord removeRegisteredDoc(DocumentReference docRef, String lang) {
@@ -124,18 +128,18 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   @Override
+  public boolean exists(DocumentReference docRef, String lang) {
+    return isRegistered(docRef, lang);
+  }
+
+  @Override
   public XWikiDocument getDocument(DocumentReference docRef, String lang) {
     return getDocRecord(docRef, lang).doc();
   }
 
   @Override
   public XWikiDocument createDocument(DocumentReference docRef, String lang) {
-    return docCreator.createWithoutDefaults(docRef, lang);
-  }
-
-  @Override
-  public boolean exists(DocumentReference docRef, String lang) {
-    return isRegistered(docRef, lang);
+    return registerDoc(docRef, lang).doc();
   }
 
   @Override

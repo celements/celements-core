@@ -23,9 +23,8 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.XWikiDocumentCreator;
+import com.celements.model.access.ModelMock;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,7 +35,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
   private TestDocumentDeleteListener listener;
   private XWikiContext context;
-  private XWiki wiki;
+  private ModelMock modelMock;
   private RemoteObservationManagerContext remoteObsManContextMock;
   private ObservationManager obsManagerMock;
 
@@ -50,9 +49,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(XWikiDocumentCreator.class);
     context = getContext();
-    wiki = getWikiMock();
+    modelMock = ModelMock.init();
     classRef = new DocumentReference("wiki", "Classes", "SomeClass");
     docRef = new DocumentReference("wiki", "Space", "SomeDoc");
     docMock = createMockAndAddToDefault(XWikiDocument.class);
@@ -203,8 +201,7 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
     expect(remoteObsManContextMock.isRemoteState()).andReturn(false).once();
     expect(docMock.getOriginalDocument()).andReturn(null).once();
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).once();
-    expect(wiki.getDocument(eq(docRef), same(context))).andReturn(origDocMock).once();
+    modelMock.registerDoc(docRef, origDocMock);
     docMock.setOriginalDocument(same(origDocMock));
     expectLastCall().once();
     expect(origDocMock.getXObject(eq(classRef))).andReturn(new BaseObject()).once();
