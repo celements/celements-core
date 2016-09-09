@@ -18,7 +18,9 @@ import com.celements.model.classes.fields.ref.DocumentReferenceField;
 public class TestClassDefinition extends AbstractClassDefinition implements
     TestClassDefinitionRole {
 
-  public static final String NAME = "Test.TestClass";
+  public static final String SPACE_NAME = "Classes";
+  public static final String DOC_NAME = "TestClass";
+  public static final String NAME = SPACE_NAME + "." + DOC_NAME;
 
   public static final ClassField<String> FIELD_MY_STRING = getFieldMyString();
   public static final ClassField<Integer> FIELD_MY_INT = getFieldMyInt();
@@ -32,7 +34,7 @@ public class TestClassDefinition extends AbstractClassDefinition implements
 
   @Override
   protected EntityReference getRelativeClassRef() {
-    return new EntityReference("test", EntityType.DOCUMENT, new EntityReference("classes",
+    return new EntityReference(DOC_NAME, EntityType.DOCUMENT, new EntityReference(SPACE_NAME,
         EntityType.SPACE));
   }
 
