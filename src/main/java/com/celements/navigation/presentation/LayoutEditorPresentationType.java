@@ -3,6 +3,7 @@ package com.celements.navigation.presentation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.python.google.common.base.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -32,41 +33,56 @@ public class LayoutEditorPresentationType extends DefaultPresentationType {
     return (CellsClasses) cellsClasses;
   }
 
+  @Override
   public String getDefaultCssClass() {
     return _CEL_CM_CELLEDITOR_MENUITEM;
   }
 
+  @Override
   public String getEmptyDictionaryKey() {
     return "cel_layout_nocells";
   }
 
+  @Override
   protected void appendMenuItemLink(StringBuilder outStream, boolean isFirstItem,
       boolean isLastItem, DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav)
       throws XWikiException {
+    StringBuilder menuItemHTML = new StringBuilder();
     String fullName = webUtilsService.getRefLocalSerializer().serialize(docRef);
+    menuItemHTML.append("<");
     String tagName;
     if (nav.hasLink()) {
       tagName = "a";
     } else {
       tagName = "span";
     }
-    String menuItemHTML = "<" + tagName;
+    menuItemHTML.append(tagName);
     if (nav.hasLink()) {
-      menuItemHTML += " href=\"" + nav.getMenuLink(docRef) + "\"";
+      menuItemHTML.append(" href=\"");
+      menuItemHTML.append(nav.getMenuLink(docRef));
+      menuItemHTML.append("\"");
     }
     if (nav.useImagesForNavigation()) {
-      menuItemHTML += " " + menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),
-          getContext());
+      menuItemHTML.append(" ");
+      menuItemHTML.append(menuNameCmd.addNavImageStyle(fullName, nav.getNavLanguage(),
+          getContext()));
     }
     String tooltip = menuNameCmd.addToolTip(fullName, nav.getNavLanguage(), getContext());
-    if (!"".equals(tooltip)) {
-      menuItemHTML += " " + tooltip;
+    if (!Strings.isNullOrEmpty(tooltip)) {
+      menuItemHTML.append(" ");
+      menuItemHTML.append(tooltip);
     }
     String menuName = menuNameCmd.getMultilingualMenuName(fullName, nav.getNavLanguage(),
         getContext());
-    menuItemHTML += nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem);
-    menuItemHTML += " " + nav.addUniqueElementId(docRef) + ">" + menuName + getIdName(docRef) + "</"
-        + tagName + ">";
+    menuItemHTML.append(nav.addCssClasses(docRef, true, isFirstItem, isLastItem, isLeaf, numItem));
+    menuItemHTML.append(" ");
+    menuItemHTML.append(nav.addUniqueElementId(docRef));
+    menuItemHTML.append(">");
+    menuItemHTML.append(menuName);
+    menuItemHTML.append(getIdName(docRef));
+    menuItemHTML.append("</");
+    menuItemHTML.append(tagName);
+    menuItemHTML.append(">");
     outStream.append(menuItemHTML);
   }
 

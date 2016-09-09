@@ -76,6 +76,14 @@ public class LayoutScriptService implements ScriptService {
     return false;
   }
 
+  public PageLayoutApi getPageLayoutApiForRef(SpaceReference layoutSpaceRef) {
+    return new PageLayoutApi(layoutSpaceRef, getContext());
+  }
+
+  /**
+   * @deprecated since 2.82 instead use getPageLayoutApiForName(SpaceReference)
+   */
+  @Deprecated
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
     return new PageLayoutApi(getWebUtilsService().resolveSpaceReference(layoutSpaceName),
         getContext());

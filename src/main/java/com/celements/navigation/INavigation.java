@@ -125,7 +125,7 @@ public interface INavigation {
 
   public void setHasLink(boolean hasLink);
 
-  public void addUlCSSClass(String cssClass);
+  public void addUlCSSClass(@NotNull String cssClass);
 
   public void setNavFilter(INavFilter<BaseObject> navFilter);
 
