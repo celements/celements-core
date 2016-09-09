@@ -50,10 +50,11 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   private XClassCreator creator;
   private ClassPackage classPackage;
   private ClassDefinition classDef;
+  private ModelMock modelMock;
 
   @Before
   public void prepareTest() throws Exception {
-    ModelMock.init();
+    modelMock = ModelMock.init();
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
@@ -85,8 +86,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Test
   public void test_createXClasses() throws Exception {
     DocumentReference docRef = classDef.getClassRef();
-    XWikiDocument doc = ModelMock.get().registerDoc(docRef).doc();
-    assertSame(doc, ModelMock.get().getDocRecord(docRef).doc());
+    XWikiDocument doc = modelMock.registerDoc(docRef).doc();
 
     expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
         Arrays.asList(classPackage.getName())).anyTimes();
@@ -98,7 +98,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     creator.createXClasses(); // save is only called once
     verifyDefault();
 
-    assertEquals(1, ModelMock.get().getDocRecord(docRef).getSavedCount());
+    assertEquals(1, modelMock.getDocRecord(docRef).getSavedCount());
     assertEquals(classDef.isInternalMapping(), doc.getXClass().hasInternalCustomMapping());
     @SuppressWarnings("unchecked")
     List<BaseCollection> xFields = new ArrayList<>(doc.getXClass().getFieldList());

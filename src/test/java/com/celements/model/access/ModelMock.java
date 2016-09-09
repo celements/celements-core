@@ -17,6 +17,7 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.util.ModelUtils;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
@@ -64,7 +65,7 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   public boolean isRegistered(DocumentReference docRef) {
-    return isRegistered(docRef, DEFAULT_LANG);
+    return isRegistered(docRef, IModelAccessFacade.DEFAULT_LANG);
   }
 
   public DocRecord getDocRecord(DocumentReference docRef, String lang) {
@@ -73,7 +74,7 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   public DocRecord getDocRecord(DocumentReference docRef) {
-    return getDocRecord(docRef, DEFAULT_LANG);
+    return getDocRecord(docRef, IModelAccessFacade.DEFAULT_LANG);
   }
 
   public DocRecord registerDoc(DocumentReference docRef, String lang, XWikiDocument doc) {
@@ -84,11 +85,11 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   public DocRecord registerDoc(DocumentReference docRef, XWikiDocument doc) {
-    return registerDoc(docRef, DEFAULT_LANG, doc);
+    return registerDoc(docRef, IModelAccessFacade.DEFAULT_LANG, doc);
   }
 
   public DocRecord registerDoc(DocumentReference docRef) {
-    return registerDoc(docRef, createDocument(docRef, DEFAULT_LANG));
+    return registerDoc(docRef, createDocument(docRef, IModelAccessFacade.DEFAULT_LANG));
   }
 
   public DocRecord removeRegisteredDoc(DocumentReference docRef, String lang) {
@@ -97,7 +98,7 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   public DocRecord removeRegisteredDoc(DocumentReference docRef) {
-    return removeRegisteredDoc(docRef, DEFAULT_LANG);
+    return removeRegisteredDoc(docRef, IModelAccessFacade.DEFAULT_LANG);
   }
 
   public void removeAllRegisteredDocs() {
@@ -105,13 +106,21 @@ public class ModelMock implements ModelAccessStrategy {
   }
 
   private void checkIsRegistered(DocumentReference docRef, String lang) {
-    Preconditions.checkState(isRegistered(docRef, lang), "doc not registered: "
-        + modelUtils.serializeRef(docRef) + "-" + lang);
+    Preconditions.checkState(isRegistered(docRef, lang), getErrorMsg("doc not registered", docRef,
+        lang));
   }
 
   private void checkIsNotRegistered(DocumentReference docRef, String lang) {
-    Preconditions.checkState(!isRegistered(docRef, lang), "doc already registered: "
-        + modelUtils.serializeRef(docRef) + "-" + lang);
+    Preconditions.checkState(!isRegistered(docRef, lang), getErrorMsg("doc already registered",
+        docRef, lang));
+  }
+
+  private StringBuilder getErrorMsg(String base, DocumentReference docRef, String lang) {
+    StringBuilder sb = new StringBuilder(base).append(": ").append(modelUtils.serializeRef(docRef));
+    if (!Strings.isNullOrEmpty(lang)) {
+      sb.append("-").append(lang);
+    }
+    return sb;
   }
 
   @Override
@@ -203,6 +212,12 @@ public class ModelMock implements ModelAccessStrategy {
 
     public void setThrowDeleteException(boolean setThrow) {
       throwDeleteExc = true;
+    }
+
+    @Override
+    public String toString() {
+      return "DocRecord [doc=" + doc() + ", savedCount=" + getSavedCount() + ", deletedCount="
+          + getDeletedCount() + "]";
     }
 
   }
