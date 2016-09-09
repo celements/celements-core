@@ -22,10 +22,14 @@ package com.celements.navigation;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.StringUtils;
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -50,6 +54,7 @@ import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.IWebUtils;
 import com.celements.web.utils.WebUtils;
+import com.google.common.base.Preconditions;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -111,7 +116,7 @@ public class Navigation implements INavigation {
 
   private String cmCssClass;
 
-  private String mainUlCssClasses;
+  private Set<String> mainUlCssClasses;
 
   private String emptyDictKeySuffix;
 
@@ -154,7 +159,7 @@ public class Navigation implements INavigation {
       throw new IllegalStateException("Native List Layout Type not available!", exp);
     }
     this.nodeSpaceRef = null;
-    this.mainUlCssClasses = "";
+    this.mainUlCssClasses = new LinkedHashSet<>();
     this.cmCssClass = "";
     utils = WebUtils.getInstance();
   }
@@ -476,9 +481,10 @@ public class Navigation implements INavigation {
     }
   }
 
+  @NotNull
   String getMainUlCSSClasses() {
-    if (!"".equals(mainUlCssClasses.trim())) {
-      return " class=\"" + mainUlCssClasses.trim() + "\" ";
+    if (!mainUlCssClasses.isEmpty()) {
+      return " class=\"" + StringUtils.join(mainUlCssClasses, ' ') + "\" ";
     } else {
       return "";
     }
@@ -486,9 +492,10 @@ public class Navigation implements INavigation {
 
   @Override
   public void addUlCSSClass(String cssClass) {
-    if (!(" " + mainUlCssClasses + " ").contains(" " + cssClass + " ")) {
-      mainUlCssClasses = mainUlCssClasses.trim() + " " + cssClass;
-    }
+    Preconditions.checkNotNull(cssClass);
+    cssClass = cssClass.trim();
+    Preconditions.checkArgument(cssClass.indexOf(' ') == -1);
+    mainUlCssClasses.add(cssClass);
   }
 
   private boolean hasedit() throws XWikiException {
@@ -859,6 +866,7 @@ public class Navigation implements INavigation {
       nrOfItemsPerPage = config.getNrOfItemsPerPage();
       presentationType = config.getPresentationType().orNull();
       cmCssClass = config.getCssClass();
+      mainUlCssClasses = config.getMainUlCSSClasses();
     } else {
       LOGGER.info("loadConfig: nafigation '{}' disabled!", config.getConfigName());
     }
@@ -866,7 +874,7 @@ public class Navigation implements INavigation {
 
   private void generateLanguageMenu(INavigationBuilder navBuilder, XWikiContext context) {
     List<String> langs = getWebUtilsService().getAllowedLanguages();
-    mainUlCssClasses += " language";
+    addUlCSSClass("language");
     navBuilder.openLevel(mainUlCssClasses);
     for (String language : langs) {
       navBuilder.openMenuItemOut();
@@ -898,7 +906,7 @@ public class Navigation implements INavigation {
 
   @Override
   public String getCMcssClass() {
-    if ((cmCssClass == null) || "".equals(cmCssClass)) {
+    if (Strings.isNullOrEmpty(cmCssClass)) {
       return getPresentationType().getDefaultCssClass();
     } else {
       return cmCssClass;

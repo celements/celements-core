@@ -19,9 +19,18 @@
  */
 package com.celements.navigation;
 
+import java.util.NavigableSet;
+import java.util.Set;
+
 public interface INavigationBuilder {
 
+  /**
+   * @deprecated since 2.82 instead use {@link INavigationBuilder#openLevel(NavigableSet)}
+   */
+  @Deprecated
   public void openLevel(String mainUlCSSClasses);
+
+  public void openLevel(Set<String> mainUlCSSClasses);
 
   public void closeLevel();
 
@@ -30,7 +39,7 @@ public interface INavigationBuilder {
   /**
    * Deprecated the stream must be completely owned by the Builder clients must use
    * toString to get the content of the stream.
-   * 
+   *
    * @param outStream
    */
   @Deprecated
@@ -40,7 +49,15 @@ public interface INavigationBuilder {
 
   public void closeMenuItemOut();
 
+  /**
+   * @deprecated since 2.82 instead use
+   *             {@link INavigationBuilder#appendMenuItemLink(String, String, String, boolean, boolean, NavigableSet)}
+   */
+  @Deprecated
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
       boolean isActive, boolean isLastItem, String cssClasses);
+
+  public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
+      boolean isActive, boolean isLastItem, Set<String> cssClasses);
 
 }

@@ -101,4 +101,5 @@ public interface IOldCoreClassConfig {
 
   public DocumentReference getFromStorageClassRef(WikiReference wikiRef);
 
+  public DocumentReference getXWikiUsersClassRef(WikiReference wikiRef);
 }
