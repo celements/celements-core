@@ -28,7 +28,7 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   }
 
   @Override
-  public boolean exists(final DocumentReference docRef, final String lang) {
+  public boolean exists(DocumentReference docRef, String lang) {
     return getWiki().exists(docRef, context.getXWikiContext());
   }
 
@@ -47,7 +47,7 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   }
 
   @Override
-  public void saveDocument(final XWikiDocument doc, final String comment, final boolean isMinorEdit)
+  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
       throws DocumentSaveException {
     try {
       getWiki().saveDocument(doc, comment, isMinorEdit, context.getXWikiContext());
@@ -57,8 +57,7 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   }
 
   @Override
-  public void deleteDocument(final XWikiDocument doc, final boolean totrash)
-      throws DocumentDeleteException {
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException {
     try {
       getWiki().deleteDocument(doc, totrash, context.getXWikiContext());
     } catch (XWikiException xwe) {
@@ -67,19 +66,13 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   }
 
   @Override
-  public List<String> getTranslations(final DocumentReference docRef) {
+  public List<String> getTranslations(DocumentReference docRef) {
     try {
       return getWiki().getDocument(docRef, context.getXWikiContext()).getTranslationList(
           context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
-  }
-
-  private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
-    XWikiDocument doc = new XWikiDocument(docRef);
-    doc.setLanguage(lang);
-    return doc;
   }
 
 }
