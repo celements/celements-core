@@ -20,8 +20,6 @@ public class TestClassDefinition extends AbstractClassDefinition implements
 
   public static final String NAME = "Test.TestClass";
 
-  public static final EntityReference CLASS_REF = new DocumentReference("db", "classes", "test");
-
   public static final ClassField<String> FIELD_MY_STRING = getFieldMyString();
   public static final ClassField<Integer> FIELD_MY_INT = getFieldMyInt();
   public static final ClassField<Boolean> FIELD_MY_BOOL = getFieldMyBool();

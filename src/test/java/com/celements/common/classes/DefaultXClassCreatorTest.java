@@ -31,9 +31,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
-import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.ModelMock;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
@@ -52,7 +53,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(IModelAccessFacade.class);
+    ModelMock.init();
     registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
@@ -83,25 +84,20 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses() throws Exception {
-    XWikiDocument doc = new XWikiDocument(classDef.getClassRef());
+    DocumentReference docRef = classDef.getClassRef();
+    XWikiDocument doc = ModelMock.get().mockDoc(docRef).doc();
 
     expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
         Arrays.asList(classPackage.getName())).anyTimes();
     expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
         null).anyTimes();
 
-    expect(getMock(IModelAccessFacade.class).exists(classDef.getClassRef())).andReturn(true).times(
-        2);
-    expect(getMock(IModelAccessFacade.class).getOrCreateDocument(eq(
-        classDef.getClassRef()))).andReturn(doc).times(2);
-    getMock(IModelAccessFacade.class).saveDocument(same(doc), eq("updated XClass"));
-    expectLastCall().once();
-
     replayDefault();
     creator.createXClasses();
     creator.createXClasses(); // save is only called once
     verifyDefault();
 
+    assertEquals(1, ModelMock.get().mockDoc(docRef).getSavedCount());
     assertEquals(classDef.isInternalMapping(), doc.getXClass().hasInternalCustomMapping());
     @SuppressWarnings("unchecked")
     List<BaseCollection> xFields = new ArrayList<>(doc.getXClass().getFieldList());

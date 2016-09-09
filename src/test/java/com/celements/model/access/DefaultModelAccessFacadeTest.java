@@ -55,13 +55,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(XWikiDocumentCreator.class, "default", new DefaultXWikiDocumentCreator() {
-
-      @Override
-      public XWikiDocument create(DocumentReference docRef) {
-        return new XWikiDocument(docRef);
-      }
-    });
+    registerComponentMock(XWikiDocumentCreator.class, "default", new TestXWikiDocumentCreator());
     modelAccess = (DefaultModelAccessFacade) Utils.getComponent(IModelAccessFacade.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
     doc.setSyntax(Syntax.XWIKI_1_0);
@@ -135,76 +129,91 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getDocument_defaultLanguage() throws Exception {
-    String lang = "default";
+  public void test_getDocument_cloneFromCache() throws Exception {
+    modelAccess.strategy = registerComponentMock(ModelAccessStrategy.class);
+    String lang = "";
     doc.setDefaultLanguage("");
     doc.setLanguage("");
-    Capture<XWikiDocument> captExists = expectExists(true);
-    Capture<XWikiDocument> captLoad = expectLoad(doc);
+    doc.setFromCache(true);
+    expect(modelAccess.strategy.exists(eq(doc.getDocumentReference()), eq(""))).andReturn(
+        true).once();
+    expect(modelAccess.strategy.getDocument(eq(doc.getDocumentReference()), eq(""))).andReturn(
+        doc).once();
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
     verifyDefault();
-    assertEquals(doc, theDoc);
-    assertNotSame("must be cloned for cache safety", doc, theDoc);
-    assertCapture(captExists, doc.getDocumentReference(), ""); // empty string instead of 'default'
-    assertCapture(captLoad, doc.getDocumentReference(), ""); // empty string instead of 'default'
+    assertNotSame(doc, theDoc);
+  }
+
+  @Test
+  public void test_getDocument_defaultLanguage() throws Exception {
+    modelAccess.strategy = registerComponentMock(ModelAccessStrategy.class);
+    String lang = "default";
+    doc.setDefaultLanguage("");
+    doc.setLanguage("");
+    expect(modelAccess.strategy.exists(eq(doc.getDocumentReference()), eq(""))).andReturn(
+        true).once(); // empty lang instead of 'default'
+    expect(modelAccess.strategy.getDocument(eq(doc.getDocumentReference()), eq(""))).andReturn(
+        doc).once(); // empty lang instead of 'default'
+    replayDefault();
+    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
+    verifyDefault();
+    assertSame(doc, theDoc);
   }
 
   @Test
   public void test_getDocument_translatedDocument_defaultLanguage_empty() throws Exception {
+    modelAccess.strategy = registerComponentMock(ModelAccessStrategy.class);
     String lang = "de";
     doc.setDefaultLanguage("");
-    doc.setLanguage("");
+    doc.setLanguage(lang);
     getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
-    Capture<XWikiDocument> captExists = expectExists(true);
-    Capture<XWikiDocument> captLoad = expectLoad(doc);
+    expect(modelAccess.strategy.exists(eq(doc.getDocumentReference()), eq(lang))).andReturn(
+        true).once();
+    expect(modelAccess.strategy.getDocument(eq(doc.getDocumentReference()), eq(lang))).andReturn(
+        doc).once();
     replayDefault();
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
     verifyDefault();
-    assertEquals(doc, theDoc);
-    assertNotSame("must be cloned for cache safety", doc, theDoc);
-    assertCapture(captExists, doc.getDocumentReference(), lang);
-    assertCapture(captLoad, doc.getDocumentReference(), lang);
+    assertSame(doc, theDoc);
   }
 
   @Test
   public void test_getDocument_translatedDocument_noTranslation() throws Exception {
-    String lang = "de";
-    doc.setDefaultLanguage(lang);
+    modelAccess.strategy = registerComponentMock(ModelAccessStrategy.class);
+    String defaultLang = "de";
+    String lang = "en";
+    doc.setDefaultLanguage(defaultLang);
     doc.setLanguage("");
-    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
-    Capture<XWikiDocument> captExists = expectExists(false);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, defaultLang);
+    expect(modelAccess.strategy.exists(eq(doc.getDocumentReference()), eq(lang))).andReturn(
+        false).once();
     replayDefault();
     try {
-      modelAccess.getDocument(doc.getDocumentReference(), "en");
+      modelAccess.getDocument(doc.getDocumentReference(), lang);
       fail("expecting DocumentNotExistsException");
     } catch (DocumentNotExistsException exc) {
       // expected
     }
     verifyDefault();
-    assertCapture(captExists, doc.getDocumentReference(), "en");
   }
 
   @Test
   public void test_getDocument_translatedDocument() throws Exception {
-    String lang = "de";
-    doc.setDefaultLanguage(lang);
-    doc.setLanguage("");
-    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, lang);
-    Capture<XWikiDocument> captExists = expectExists(true);
-    XWikiDocument theTdoc = new XWikiDocument(doc.getDocumentReference());
-    theTdoc.setDefaultLanguage(lang);
-    theTdoc.setLanguage("en");
-    theTdoc.setNew(false);
-    theTdoc.setSyntax(Syntax.XWIKI_1_0);
-    Capture<XWikiDocument> captLoad = expectLoad(theTdoc);
+    modelAccess.strategy = registerComponentMock(ModelAccessStrategy.class);
+    String defaultLang = "de";
+    String lang = "en";
+    doc.setDefaultLanguage(defaultLang);
+    doc.setLanguage(lang);
+    getConfigurationSource().setProperty(ModelContext.CFG_KEY_DEFAULT_LANG, defaultLang);
+    expect(modelAccess.strategy.exists(eq(doc.getDocumentReference()), eq(lang))).andReturn(
+        true).once();
+    expect(modelAccess.strategy.getDocument(eq(doc.getDocumentReference()), eq(lang))).andReturn(
+        doc).once();
     replayDefault();
-    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), "en");
+    XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
     verifyDefault();
-    assertEquals(theTdoc, theDoc);
-    assertNotSame("must be cloned for cache safety", theTdoc, theDoc);
-    assertCapture(captExists, doc.getDocumentReference(), "en");
-    assertCapture(captLoad, doc.getDocumentReference(), "en");
+    assertSame(doc, theDoc);
   }
 
   @Test
@@ -360,12 +369,14 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_exists_lang_none() throws Exception {
-    Capture<XWikiDocument> capt = expectExists(false);
+    modelAccess.strategy = registerComponentMock(ModelAccessStrategy.class);
+    expect(modelAccess.strategy.exists(eq(doc.getDocumentReference()), eq(""))).andReturn(
+        false).once(); // empty lang instead of null
+
     replayDefault();
     boolean ret = modelAccess.exists(doc.getDocumentReference(), null);
     verifyDefault();
     assertFalse(ret);
-    assertCapture(capt, doc.getDocumentReference(), "");
   }
 
   @Test
@@ -1132,17 +1143,31 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     return capt;
   }
 
-  private Capture<XWikiDocument> expectLoad(XWikiDocument result) throws XWikiException {
-    Capture<XWikiDocument> capt = new Capture<>();
-    expect(storeMock.loadXWikiDoc(capture(capt), same(getContext()))).andReturn(result).once();
-    result.setFromCache(!result.isNew());
-    return capt;
-  }
-
   private void assertCapture(Capture<XWikiDocument> capt, DocumentReference docRef, String lang) {
     assertNotNull(capt.getValue());
     assertEquals(docRef, capt.getValue().getDocumentReference());
     assertEquals(lang, capt.getValue().getLanguage());
+  }
+
+  private class TestXWikiDocumentCreator implements XWikiDocumentCreator {
+
+    @Override
+    public XWikiDocument createWithoutDefaults(DocumentReference docRef, String lang) {
+      XWikiDocument doc = new XWikiDocument(docRef);
+      doc.setLanguage(lang);
+      return doc;
+    }
+
+    @Override
+    public XWikiDocument create(DocumentReference docRef, String lang) {
+      return createWithoutDefaults(docRef, lang);
+    }
+
+    @Override
+    public XWikiDocument create(DocumentReference docRef) {
+      return create(docRef, IModelAccessFacade.DEFAULT_LANG);
+    }
+
   }
 
 }
