@@ -13,8 +13,13 @@ import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 
+/**
+ * Implementation of {@link ModelAccessStrategy} only accessing {@link XWiki}. Generally use
+ * {@link StoreModelAccessStrategy} if possible.
+ *
+ * @author Marc Sladek
+ */
 @Component
 public class LegacyModelAccessStrategy implements ModelAccessStrategy {
 
@@ -24,36 +29,19 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   @Requirement
   protected XWikiDocumentCreator docCreator;
 
-  /**
-   * @deprecated refactor calls to {@link #getStore()}
-   */
-  @Deprecated
   private XWiki getWiki() {
     return context.getXWikiContext().getWiki();
   }
 
-  private XWikiStoreInterface getStore() {
-    return context.getXWikiContext().getWiki().getStore();
+  @Override
+  public boolean exists(DocumentReference docRef, String lang) {
+    return getWiki().exists(docRef, context.getXWikiContext());
   }
 
   @Override
-  public XWikiDocument getDocument(final DocumentReference docRef, final String lang) {
-    ContextExecutor<XWikiDocument, XWikiException> exec = new ContextExecutor<XWikiDocument, XWikiException>() {
-
-      @Override
-      protected XWikiDocument call() throws XWikiException {
-        /*
-         * XXX: this check and XWiki delegation is here because many unit tests do not yet use
-         * ModelMock. accessing the store directly breaks all these tests. see also CELDEV-297
-         */
-        if (isDefaultLang(lang)) {
-          return getWiki().getDocument(docRef, context.getXWikiContext());
-        }
-        return getStore().loadXWikiDoc(newDummyDoc(docRef, lang), context.getXWikiContext());
-      }
-    };
+  public XWikiDocument getDocument(DocumentReference docRef, String lang) {
     try {
-      return exec.inWiki(docRef.getWikiReference()).execute();
+      return getWiki().getDocument(docRef, context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
@@ -65,89 +53,32 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   }
 
   @Override
-  public boolean exists(final DocumentReference docRef, final String lang) {
-    ContextExecutor<Boolean, XWikiException> exec = new ContextExecutor<Boolean, XWikiException>() {
-
-      @Override
-      protected Boolean call() throws XWikiException {
-        /*
-         * XXX: this check and XWiki delegation is here because many unit tests do not yet use
-         * ModelMock. accessing the store directly breaks all these tests. see also CELDEV-297
-         */
-        if (isDefaultLang(lang)) {
-          return getWiki().exists(docRef, context.getXWikiContext());
-        }
-        return getStore().exists(newDummyDoc(docRef, lang), context.getXWikiContext());
-      }
-    };
-    try {
-      return exec.inWiki(docRef.getWikiReference()).execute();
-    } catch (XWikiException xwe) {
-      throw new DocumentLoadException(docRef, xwe);
-    }
-  }
-
-  @Override
-  public void saveDocument(final XWikiDocument doc, final String comment, final boolean isMinorEdit)
+  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
       throws DocumentSaveException {
-    ContextExecutor<Void, XWikiException> exec = new ContextExecutor<Void, XWikiException>() {
-
-      @Override
-      protected Void call() throws XWikiException {
-        getWiki().saveDocument(doc, comment, isMinorEdit, context.getXWikiContext());
-        return null;
-      }
-    };
     try {
-      exec.inWiki(doc.getDocumentReference().getWikiReference()).execute();
+      getWiki().saveDocument(doc, comment, isMinorEdit, context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentSaveException(doc.getDocumentReference(), xwe);
     }
   }
 
   @Override
-  public void deleteDocument(final XWikiDocument doc, final boolean totrash)
-      throws DocumentDeleteException {
-    ContextExecutor<Void, XWikiException> exec = new ContextExecutor<Void, XWikiException>() {
-
-      @Override
-      protected Void call() throws XWikiException {
-        getWiki().deleteDocument(doc, totrash, context.getXWikiContext());
-        return null;
-      }
-    };
+  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException {
     try {
-      exec.inWiki(doc.getDocumentReference().getWikiReference()).execute();
+      getWiki().deleteDocument(doc, totrash, context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentDeleteException(doc.getDocumentReference(), xwe);
     }
   }
 
   @Override
-  public List<String> getTranslations(final DocumentReference docRef) {
-    ContextExecutor<List<String>, XWikiException> exec = new ContextExecutor<List<String>, XWikiException>() {
-
-      @Override
-      protected List<String> call() throws XWikiException {
-        return getStore().getTranslationList(newDummyDoc(docRef, IModelAccessFacade.DEFAULT_LANG),
-            context.getXWikiContext());
-      }
-    };
+  public List<String> getTranslations(DocumentReference docRef) {
     try {
-      return exec.inWiki(docRef.getWikiReference()).execute();
+      return getWiki().getDocument(docRef, context.getXWikiContext()).getTranslationList(
+          context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
-  }
-
-  private boolean isDefaultLang(String lang) {
-    return IModelAccessFacade.DEFAULT_LANG.equals(lang);
-  }
-
-  private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
-    XWikiDocument doc = new XWikiDocument(docRef);
-    doc.setLanguage(lang);
-    return doc;
   }
 
 }
