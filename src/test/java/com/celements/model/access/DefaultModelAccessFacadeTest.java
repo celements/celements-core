@@ -55,13 +55,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    registerComponentMock(XWikiDocumentCreator.class, "default", new DefaultXWikiDocumentCreator() {
-
-      @Override
-      public XWikiDocument create(DocumentReference docRef) {
-        return new XWikiDocument(docRef);
-      }
-    });
+    registerComponentMock(XWikiDocumentCreator.class, "default", new TestXWikiDocumentCreator());
     modelAccess = (DefaultModelAccessFacade) Utils.getComponent(IModelAccessFacade.class);
     doc = new XWikiDocument(new DocumentReference("db", "space", "doc"));
     doc.setSyntax(Syntax.XWIKI_1_0);
@@ -1149,17 +1143,31 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     return capt;
   }
 
-  private Capture<XWikiDocument> expectLoad(XWikiDocument result) throws XWikiException {
-    Capture<XWikiDocument> capt = new Capture<>();
-    expect(storeMock.loadXWikiDoc(capture(capt), same(getContext()))).andReturn(result).once();
-    result.setFromCache(!result.isNew());
-    return capt;
-  }
-
   private void assertCapture(Capture<XWikiDocument> capt, DocumentReference docRef, String lang) {
     assertNotNull(capt.getValue());
     assertEquals(docRef, capt.getValue().getDocumentReference());
     assertEquals(lang, capt.getValue().getLanguage());
+  }
+
+  private class TestXWikiDocumentCreator implements XWikiDocumentCreator {
+
+    @Override
+    public XWikiDocument createWithoutDefaults(DocumentReference docRef, String lang) {
+      XWikiDocument doc = new XWikiDocument(docRef);
+      doc.setLanguage(lang);
+      return doc;
+    }
+
+    @Override
+    public XWikiDocument create(DocumentReference docRef, String lang) {
+      return createWithoutDefaults(docRef, lang);
+    }
+
+    @Override
+    public XWikiDocument create(DocumentReference docRef) {
+      return create(docRef, IModelAccessFacade.DEFAULT_LANG);
+    }
+
   }
 
 }
