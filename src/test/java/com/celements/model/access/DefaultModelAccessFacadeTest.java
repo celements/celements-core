@@ -868,7 +868,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       modelAccess.getProperty(doc, field);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
-      assertTrue(iae.getMessage().contains("classes.test.name"));
+      assertTrue(iae.getMessage().contains(field.toString()));
       assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
     } finally {
       verifyDefault();
@@ -1013,7 +1013,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       modelAccess.setProperty(doc, fieldValue);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
-      assertTrue(iae.getMessage().contains("classes.test.name"));
+      assertTrue(iae.getMessage().contains(field.toString()));
       assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
     } finally {
       verifyDefault();

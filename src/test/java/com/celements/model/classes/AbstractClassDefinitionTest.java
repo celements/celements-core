@@ -24,11 +24,11 @@ public class AbstractClassDefinitionTest extends AbstractComponentTest {
 
   @Test
   public void test_getClassRef() throws Exception {
-    assertEquals(new DocumentReference(getContext().getDatabase(), "classes", "test"),
+    assertEquals(new DocumentReference(getContext().getDatabase(), "Classes", "TestClass"),
         testClass.getClassRef());
     WikiReference wiki = new WikiReference("asdf");
-    assertEquals(new DocumentReference(wiki.getName(), "classes", "test"), testClass.getClassRef(
-        wiki));
+    assertEquals(new DocumentReference(wiki.getName(), "Classes", "TestClass"),
+        testClass.getClassRef(wiki));
   }
 
   @Test
@@ -56,6 +56,12 @@ public class AbstractClassDefinitionTest extends AbstractComponentTest {
     assertTrue(testClass.getFields().contains(TestClassDefinition.FIELD_MY_STRING));
     assertTrue(testClass.getFields().contains(TestClassDefinition.FIELD_MY_INT));
     verifyDefault();
+  }
+
+  @Test
+  public void test_toString() throws Exception {
+    assertEquals(TestClassDefinition.SPACE_NAME + "." + TestClassDefinition.DOC_NAME,
+        testClass.toString());
   }
 
 }
