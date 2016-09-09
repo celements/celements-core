@@ -13,9 +13,10 @@ import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
 @Component
-public class LegacyModelAccessStrategy implements ModelAccessStrategy {
+public class StoreModelAccessStrategy implements ModelAccessStrategy {
 
   @Requirement
   protected ModelContext context;
@@ -23,19 +24,45 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
   @Requirement
   protected XWikiDocumentCreator docCreator;
 
+  /**
+   * @deprecated refactor calls to {@link #getStore()}
+   */
+  @Deprecated
   private XWiki getWiki() {
     return context.getXWikiContext().getWiki();
   }
 
-  @Override
-  public boolean exists(final DocumentReference docRef, final String lang) {
-    return getWiki().exists(docRef, context.getXWikiContext());
+  private XWikiStoreInterface getStore() {
+    return context.getXWikiContext().getWiki().getStore();
   }
 
   @Override
-  public XWikiDocument getDocument(DocumentReference docRef, String lang) {
+  public boolean exists(final DocumentReference docRef, final String lang) {
+    ContextExecutor<Boolean, XWikiException> exec = new ContextExecutor<Boolean, XWikiException>() {
+
+      @Override
+      protected Boolean call() throws XWikiException {
+        return getStore().exists(newDummyDoc(docRef, lang), context.getXWikiContext());
+      }
+    };
     try {
-      return getWiki().getDocument(docRef, context.getXWikiContext());
+      return exec.inWiki(docRef.getWikiReference()).execute();
+    } catch (XWikiException xwe) {
+      throw new DocumentLoadException(docRef, xwe);
+    }
+  }
+
+  @Override
+  public XWikiDocument getDocument(final DocumentReference docRef, final String lang) {
+    ContextExecutor<XWikiDocument, XWikiException> exec = new ContextExecutor<XWikiDocument, XWikiException>() {
+
+      @Override
+      protected XWikiDocument call() throws XWikiException {
+        return getStore().loadXWikiDoc(newDummyDoc(docRef, lang), context.getXWikiContext());
+      }
+    };
+    try {
+      return exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
@@ -46,6 +73,7 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
     return docCreator.create(docRef, lang);
   }
 
+  // TODO access store directly
   @Override
   public void saveDocument(final XWikiDocument doc, final String comment, final boolean isMinorEdit)
       throws DocumentSaveException {
@@ -56,6 +84,7 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
     }
   }
 
+  // TODO access store directly
   @Override
   public void deleteDocument(final XWikiDocument doc, final boolean totrash)
       throws DocumentDeleteException {
@@ -68,9 +97,16 @@ public class LegacyModelAccessStrategy implements ModelAccessStrategy {
 
   @Override
   public List<String> getTranslations(final DocumentReference docRef) {
+    ContextExecutor<List<String>, XWikiException> exec = new ContextExecutor<List<String>, XWikiException>() {
+
+      @Override
+      protected List<String> call() throws XWikiException {
+        return getStore().getTranslationList(newDummyDoc(docRef, IModelAccessFacade.DEFAULT_LANG),
+            context.getXWikiContext());
+      }
+    };
     try {
-      return getWiki().getDocument(docRef, context.getXWikiContext()).getTranslationList(
-          context.getXWikiContext());
+      return exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
