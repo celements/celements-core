@@ -14,7 +14,7 @@ public interface ModelAccessStrategy {
 
   public XWikiDocument getDocument(DocumentReference docRef, String lang);
 
-  public XWikiDocument createDocument(DocumentReference docRef);
+  public XWikiDocument createDocument(DocumentReference docRef, String lang);
 
   public boolean exists(DocumentReference docRef, String lang);
 

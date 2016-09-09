@@ -20,10 +20,10 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
   private ModelContext context;
 
   @Override
-  public XWikiDocument createWithoutDefaults(DocumentReference docRef) {
+  public XWikiDocument createWithoutDefaults(DocumentReference docRef, String lang) {
     XWikiDocument doc = new XWikiDocument(docRef);
     doc.setNew(true);
-    doc.setLanguage("");
+    doc.setLanguage(lang);
     Date creationDate = new Date();
     doc.setCreationDate(creationDate);
     doc.setContentUpdateDate(creationDate);
@@ -38,8 +38,8 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
   }
 
   @Override
-  public XWikiDocument create(DocumentReference docRef) {
-    XWikiDocument doc = createWithoutDefaults(docRef);
+  public XWikiDocument create(DocumentReference docRef, String lang) {
+    XWikiDocument doc = createWithoutDefaults(docRef, lang);
     doc.setDefaultLanguage(getDefaultLangForCreatingDoc(docRef));
     doc.setSyntax(doc.getSyntax()); // assures that syntax is set, 'new' has to be true
     return doc;
@@ -57,6 +57,11 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
       toExtractClass = SpaceReference.class;
     }
     return context.getDefaultLanguage(References.extractRef(docRef, toExtractClass).get());
+  }
+
+  @Override
+  public XWikiDocument create(DocumentReference docRef) {
+    return create(docRef, IModelAccessFacade.DEFAULT_LANG);
   }
 
 }

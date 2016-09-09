@@ -55,7 +55,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelAccessFacade.class);
 
   @Requirement
-  protected ModelAccessStrategy modelAccessStrategy;
+  protected ModelAccessStrategy strategy;
 
   @Requirement
   protected IRightsAccessFacadeRole rightsAccess;
@@ -102,8 +102,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentNotExistsException {
     checkNotNull(docRef);
     lang = normalizeLang(lang);
-    if (exists(docRef)) {
-      return modelAccessStrategy.getDocument(docRef, lang);
+    if (exists(docRef, lang)) {
+      return strategy.getDocument(docRef, lang);
     } else {
       throw new DocumentNotExistsException(docRef);
     }
@@ -113,8 +113,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public XWikiDocument createDocument(DocumentReference docRef)
       throws DocumentAlreadyExistsException {
     checkNotNull(docRef);
-    if (!exists(docRef)) {
-      return modelAccessStrategy.createDocument(docRef);
+    if (!exists(docRef, DEFAULT_LANG)) {
+      return strategy.createDocument(docRef, DEFAULT_LANG);
     } else {
       throw new DocumentAlreadyExistsException(docRef);
     }
@@ -123,9 +123,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   public XWikiDocument getOrCreateDocument(DocumentReference docRef) {
     try {
-      return getDocument(docRef);
+      return getDocument(docRef, DEFAULT_LANG);
     } catch (DocumentNotExistsException exc) {
-      return modelAccessStrategy.createDocument(docRef);
+      return strategy.createDocument(docRef, DEFAULT_LANG);
     }
   }
 
@@ -139,7 +139,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     boolean exists = false;
     if (docRef != null) {
       lang = normalizeLang(lang);
-      exists = modelAccessStrategy.exists(docRef, lang);
+      exists = strategy.exists(docRef, lang);
     }
     return exists;
   }
@@ -163,7 +163,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (doc.isNew()) {
       doc.setCreator(username);
     }
-    modelAccessStrategy.saveDocument(doc, comment, isMinorEdit);
+    strategy.saveDocument(doc, comment, isMinorEdit);
   }
 
   @Override
@@ -203,14 +203,14 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     checkNotNull(doc);
     LOGGER.debug("deleteDocument: doc '{}, {}', totrash '{}'", doc, doc.getLanguage(), totrash);
-    modelAccessStrategy.deleteDocument(doc, totrash);
+    strategy.deleteDocument(doc, totrash);
 
   }
 
   @Override
   public Map<String, XWikiDocument> getTranslations(DocumentReference docRef) {
     Map<String, XWikiDocument> transMap = new HashMap<>();
-    for (String lang : modelAccessStrategy.getTranslations(docRef)) {
+    for (String lang : strategy.getTranslations(docRef)) {
       lang = normalizeLang(lang);
       try {
         transMap.put(lang, getDocument(docRef, lang));

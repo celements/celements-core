@@ -49,15 +49,15 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       }
     };
     try {
-      return exec.execute(docRef.getWikiReference());
+      return exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
   }
 
   @Override
-  public XWikiDocument createDocument(DocumentReference docRef) {
-    return docCreator.create(docRef);
+  public XWikiDocument createDocument(DocumentReference docRef, String lang) {
+    return docCreator.create(docRef, lang);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       }
     };
     try {
-      return exec.execute(docRef.getWikiReference());
+      return exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }
@@ -95,7 +95,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       }
     };
     try {
-      exec.execute(doc.getDocumentReference().getWikiReference());
+      exec.inWiki(doc.getDocumentReference().getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentSaveException(doc.getDocumentReference(), xwe);
     }
@@ -113,7 +113,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       }
     };
     try {
-      exec.execute(doc.getDocumentReference().getWikiReference());
+      exec.inWiki(doc.getDocumentReference().getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentDeleteException(doc.getDocumentReference(), xwe);
     }
@@ -130,7 +130,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       }
     };
     try {
-      return exec.execute(docRef.getWikiReference());
+      return exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
       throw new DocumentLoadException(docRef, xwe);
     }

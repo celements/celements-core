@@ -67,7 +67,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
         "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theNewDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(""))).andReturn(null).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
     getWikiMock().saveDocument(capture(docCaptcher), eq("init document"), eq(false), same(
@@ -90,7 +90,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
         "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theNewDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
@@ -118,7 +118,7 @@ public class CreateDocumentCommandTest extends AbstractComponentTest {
         "myNewDocument");
     expect(getWikiMock().exists(eq(docRef), same(getContext()))).andReturn(false).once();
     XWikiDocument theNewDoc = new XWikiDocument(docRef);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef))).andReturn(theNewDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(docRef), eq(""))).andReturn(theNewDoc);
     PageTypeReference ptRef = new PageTypeReference(pageType, "", Collections.<String>emptyList());
     expect(pageTypeServiceMock.getPageTypeRefByConfigName(eq(pageType))).andReturn(ptRef).once();
     Capture<XWikiDocument> docCaptcher = new Capture<>();
