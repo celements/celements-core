@@ -2,6 +2,9 @@ package com.celements.model.access;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -12,17 +15,21 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @ComponentRole
 public interface ModelAccessStrategy {
 
-  public boolean exists(DocumentReference docRef, String lang);
+  public boolean exists(@NotNull DocumentReference docRef, @NotNull String lang);
 
-  public XWikiDocument getDocument(DocumentReference docRef, String lang);
+  @NotNull
+  public XWikiDocument getDocument(@NotNull DocumentReference docRef, @NotNull String lang);
 
-  public XWikiDocument createDocument(DocumentReference docRef, String lang);
+  @NotNull
+  public XWikiDocument createDocument(DocumentReference docRef, @NotNull String lang);
 
-  public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit)
-      throws DocumentSaveException;
+  public void saveDocument(@NotNull XWikiDocument doc, @Nullable String comment,
+      boolean isMinorEdit) throws DocumentSaveException;
 
-  public void deleteDocument(XWikiDocument doc, boolean totrash) throws DocumentDeleteException;
+  public void deleteDocument(@NotNull XWikiDocument doc, boolean totrash)
+      throws DocumentDeleteException;
 
-  public List<String> getTranslations(DocumentReference docRef);
+  @NotNull
+  public List<String> getTranslations(@NotNull DocumentReference docRef);
 
 }

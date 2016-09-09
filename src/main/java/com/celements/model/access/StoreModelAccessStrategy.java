@@ -15,6 +15,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
+/**
+ * Implementation of {@link ModelAccessStrategy} only accessing {@link XWikiStoreInterface}.
+ *
+ * @author Marc Sladek
+ */
 @Component
 public class StoreModelAccessStrategy implements ModelAccessStrategy {
 
