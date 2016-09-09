@@ -16,7 +16,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 @Component
-public class StoreModelAccessStrategy implements ModelAccessStrategy {
+public class LegacyModelAccessStrategy implements ModelAccessStrategy {
 
   @Requirement
   protected ModelContext context;
@@ -24,6 +24,10 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
   @Requirement
   protected XWikiDocumentCreator docCreator;
 
+  /**
+   * @deprecated refactor calls to {@link #getStore()}
+   */
+  @Deprecated
   private XWiki getWiki() {
     return context.getXWikiContext().getWiki();
   }
