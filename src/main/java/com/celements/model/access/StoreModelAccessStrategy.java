@@ -40,7 +40,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       protected XWikiDocument call() throws XWikiException {
         /*
          * XXX: this check and XWiki delegation is here because many unit tests do not yet use
-         * ModelAccessStub. accessing the store directly breaks all these tests
+         * ModelMock. accessing the store directly breaks all these tests. see also CELDEV-297
          */
         if (isDefaultLang(lang)) {
           return getWiki().getDocument(docRef, context.getXWikiContext());
@@ -68,7 +68,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
       protected Boolean call() throws XWikiException {
         /*
          * XXX: this check and XWiki delegation is here because many unit tests do not yet use
-         * ModelAccessStub. accessing the store directly breaks all these tests
+         * ModelMock. accessing the store directly breaks all these tests. see also CELDEV-297
          */
         if (isDefaultLang(lang)) {
           return getWiki().exists(docRef, context.getXWikiContext());
