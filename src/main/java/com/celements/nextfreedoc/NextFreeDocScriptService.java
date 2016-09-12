@@ -2,14 +2,13 @@ package com.celements.nextfreedoc;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.context.ModelContext;
 import com.celements.web.plugin.cmd.NextFreeDocNameCommand;
 import com.google.common.base.Strings;
-import com.xpn.xwiki.XWikiContext;
 
 @Component("nextfreedoc")
 public class NextFreeDocScriptService implements ScriptService {
@@ -18,16 +17,27 @@ public class NextFreeDocScriptService implements ScriptService {
   private INextFreeDocRole nextFreeDocService;
 
   @Requirement
-  private Execution execution;
+  private ModelContext context;
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  public DocumentReference getNextTitledPageDocRef(SpaceReference spaceRef, String title) {
+    if ((spaceRef != null) && !Strings.isNullOrEmpty(title)) {
+      return nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
+    }
+    return null;
   }
 
   @Deprecated
   public DocumentReference getNextTitledPageDocRef(String space, String title) {
     if ((space != null) && (title != null) && !"".equals(space) && !"".equals(title)) {
-      return new NextFreeDocNameCommand().getNextTitledPageDocRef(space, title, getContext());
+      return new NextFreeDocNameCommand().getNextTitledPageDocRef(space, title,
+          context.getXWikiContext());
+    }
+    return null;
+  }
+
+  public DocumentReference getNextUntitledPageDocRef(SpaceReference spaceRef) {
+    if (spaceRef != null) {
+      return nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
     }
     return null;
   }
@@ -35,7 +45,8 @@ public class NextFreeDocScriptService implements ScriptService {
   @Deprecated
   public String getNextUntitledPageFullName(String space) {
     if ((space != null) && !"".equals(space)) {
-      return new NextFreeDocNameCommand().getNextUntitledPageFullName(space, getContext());
+      return new NextFreeDocNameCommand().getNextUntitledPageFullName(space,
+          context.getXWikiContext());
     }
     return "";
   }
@@ -43,22 +54,9 @@ public class NextFreeDocScriptService implements ScriptService {
   @Deprecated
   public String getNextUntitledPageName(String space) {
     if ((space != null) && !"".equals(space)) {
-      return new NextFreeDocNameCommand().getNextUntitledPageName(space, getContext());
+      return new NextFreeDocNameCommand().getNextUntitledPageName(space, context.getXWikiContext());
     }
     return "";
   }
 
-  public DocumentReference getNextTitledPageDocRef(SpaceReference spaceRef, String title) {
-    if ((spaceRef != null) && !Strings.isNullOrEmpty(title)) {
-      nextFreeDocService.getNextTitledPageDocRef(spaceRef, title);
-    }
-    return null;
-  }
-
-  public DocumentReference getNextUntitledPageDocRef(SpaceReference spaceRef) {
-    if (spaceRef != null) {
-      nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
-    }
-    return null;
-  }
 }
