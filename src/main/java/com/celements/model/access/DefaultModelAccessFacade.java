@@ -2,6 +2,7 @@ package com.celements.model.access;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -426,7 +427,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values) {
     checkNotNull(classRef);
-    checkState(!isTranslation(doc));
+    checkNotTranslation(doc);
     classRef = adjustClassRef(classRef, doc);
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
@@ -440,7 +441,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
-    checkState(!isTranslation(doc));
+    checkNotTranslation(doc);
     Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
     for (DocumentReference classRef : doc.getXObjects().keySet()) {
       List<BaseObject> objs = getXObjects(doc, classRef);
@@ -449,6 +450,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       }
     }
     return Collections.unmodifiableMap(ret);
+  }
+
+  private void checkNotTranslation(XWikiDocument doc) {
+    String msg = "Trying to access XObjects on translation '{0}' of doc '{1}";
+    checkState(!isTranslation(doc), MessageFormat.format(msg, doc.getLanguage(),
+        doc.getDocumentReference()));
   }
 
   private boolean checkPropertyKeyValues(BaseObject obj, String key, Collection<?> checkValues) {
