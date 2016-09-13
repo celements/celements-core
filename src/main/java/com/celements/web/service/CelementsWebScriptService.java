@@ -49,14 +49,15 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.appScript.IAppScriptService;
 import com.celements.common.classes.IClassesCompositorComponent;
-import com.celements.common.classes.XClassCreateException;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
+import com.celements.model.access.ModelAccessScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
 import com.celements.navigation.service.ITreeNodeService;
 import com.celements.navigation.service.TreeNodeScriptService;
+import com.celements.pagetype.service.PageTypeScriptService;
 import com.celements.rendering.RenderCommand;
 import com.celements.rteConfig.IRTEConfigTemplateRole;
 import com.celements.sajson.Builder;
@@ -313,10 +314,18 @@ public class CelementsWebScriptService implements ScriptService {
     return new Locale(language, country);
   }
 
+  /**
+   * @deprecated instead use {@link ModelAccessScriptService}
+   */
+  @Deprecated
   public Document createDocument(DocumentReference newDocRef) {
     return createDocument(newDocRef, null);
   }
 
+  /**
+   * @deprecated instead use {@link ModelAccessScriptService} and {@link PageTypeScriptService}
+   */
+  @Deprecated
   public Document createDocument(DocumentReference newDocRef, String pageType) {
     LOGGER.trace("create new document for [" + newDocRef + "] and pageType [" + pageType + "].");
     XWikiDocument theNewDoc = new CreateDocumentCommand().createDocument(newDocRef, pageType);
@@ -937,7 +946,7 @@ public class CelementsWebScriptService implements ScriptService {
   public List<com.xpn.xwiki.api.Object> getRTETemplateList() {
     try {
       List<BaseObject> rteTemplateList = rteConfigTemplateService.getRTETemplateList();
-      List<com.xpn.xwiki.api.Object> rteTemplateListExternal = new ArrayList<com.xpn.xwiki.api.Object>();
+      List<com.xpn.xwiki.api.Object> rteTemplateListExternal = new ArrayList<>();
       for (BaseObject rteTmpl : rteTemplateList) {
         rteTemplateListExternal.add(rteTmpl.newObjectApi(rteTmpl, getContext()));
       }
