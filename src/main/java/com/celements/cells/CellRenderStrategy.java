@@ -19,9 +19,9 @@
  */
 package com.celements.cells;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.python.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CellRenderStrategy implements IRenderStrategy {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CellRenderStrategy.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CellRenderStrategy.class);
 
   private ICellWriter cellWriter;
   private XWikiContext context;
@@ -101,8 +101,8 @@ public class CellRenderStrategy implements IRenderStrategy {
     String idname = "";
     try {
       DocumentReference cellDocRef = node.getDocumentReference();
-      LOGGER.debug("startRenderCell: cellDocRef [" + cellDocRef + "] context db ["
-          + context.getDatabase() + "].");
+      LOGGER.debug("startRenderCell: cellDocRef [{}] context db [{}].", cellDocRef,
+          context.getDatabase());
       BaseObject cellObj = modelAccess.getXObject(cellDocRef, cellClassConfig.getCellClassRef(
           cellDocRef.getWikiReference().getName()));
       if (cellObj != null) {
@@ -120,7 +120,7 @@ public class CellRenderStrategy implements IRenderStrategy {
         idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
     } catch (DocumentNotExistsException exp) {
-      LOGGER.error("failed to get cell [" + node.getDocumentReference() + "] document.", exp);
+      LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
     }
     cellWriter.openLevel(tagName, idname, cssClasses, cssStyles);
   }
@@ -148,13 +148,13 @@ public class CellRenderStrategy implements IRenderStrategy {
   public void renderEmptyChildren(TreeNode node) {
     String cellContent = "";
     try {
-      LOGGER.debug("renderEmptyChildren: parent [" + node + "].");
+      LOGGER.debug("renderEmptyChildren: parent [{}].", node);
       long millisec = System.currentTimeMillis();
       cellContent = getRendererCmd().renderCelementsCell(node.getDocumentReference());
-      LOGGER.info("renderEmptyChildren: rendered parent [" + node + "]. Time used in millisec: "
-          + (System.currentTimeMillis() - millisec));
+      LOGGER.info("renderEmptyChildren: rendered parent [{}]. Time used in millisec: {}", node,
+          (System.currentTimeMillis() - millisec));
     } catch (XWikiException exp) {
-      LOGGER.error("failed to get cell [" + node + "] document to render cell" + " content.", exp);
+      LOGGER.error("failed to get cell [{}] document to render cell content.", node, exp);
     }
     cellWriter.appendContent(cellContent);
   }
