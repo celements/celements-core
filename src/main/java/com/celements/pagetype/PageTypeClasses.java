@@ -93,6 +93,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "celPageTypeClasses";
   }
@@ -135,6 +136,7 @@ public class PageTypeClasses extends AbstractClassCollection {
         "Has Page Title", "yesno");
     needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT,
         "Is Unconnected Parent", "yesno");
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME, "Tag Name", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
