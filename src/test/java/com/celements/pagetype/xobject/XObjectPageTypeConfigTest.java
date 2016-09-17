@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.PageType;
 import com.celements.pagetype.PageTypeClasses;
 import com.xpn.xwiki.XWiki;
@@ -164,6 +165,36 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj);
     replayAll();
     assertFalse(xObjPTconfig.isVisible());
+    verifyAll();
+  }
+
+  @Test
+  public void test_getPrettyName_absent() {
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj);
+    replayAll();
+    assertFalse(xObjPTconfig.defaultTagName().isPresent());
+    verifyAll();
+  }
+
+  @Test
+  public void test_getPrettyName_present() {
+    String tagName = "abstract";
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    testPageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME, tagName);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
+        testPageTypePropObj).atLeastOnce();
+    replayAll();
+    assertTrue(xObjPTconfig.defaultTagName().isPresent());
+    assertEquals(tagName, xObjPTconfig.defaultTagName().get());
     verifyAll();
   }
 

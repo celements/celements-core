@@ -5,6 +5,7 @@ import java.util.Set;
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.pagetype.category.IPageTypeCategoryRole;
+import com.google.common.base.Optional;
 
 @ComponentRole
 public interface IJavaPageTypeRole {
@@ -28,5 +29,7 @@ public interface IJavaPageTypeRole {
   public boolean isVisible();
 
   public boolean isUnconnectedParent();
+
+  public Optional<String> defaultTagName();
 
 }
