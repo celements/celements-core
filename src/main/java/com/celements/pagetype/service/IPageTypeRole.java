@@ -22,6 +22,8 @@ package com.celements.pagetype.service;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.pagetype.IPageTypeConfig;
@@ -39,9 +41,11 @@ public interface IPageTypeRole {
 
   public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef);
 
+  @Nullable
   public PageTypeReference getPageTypeRefByConfigName(String pageTypeName);
 
-  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList, boolean onlyVisible);
+  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
+      boolean onlyVisible);
 
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible);

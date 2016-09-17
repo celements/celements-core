@@ -30,8 +30,13 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.TreeNode;
+import com.celements.pagetype.IPageTypeConfig;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -95,7 +100,7 @@ public class CellRenderStrategy implements IRenderStrategy {
 
   @Override
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
-    String tagName = "";
+    Optional<String> tagName = Optional.absent();
     String cssClasses = "cel_cell";
     String cssStyles = "";
     String idname = "";
@@ -110,10 +115,10 @@ public class CellRenderStrategy implements IRenderStrategy {
         if (!Strings.isNullOrEmpty(cellObjCssClasses)) {
           cssClasses += " " + cellObjCssClasses;
         }
-        tagName = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD);
         cssStyles = cellObj.getStringValue("css_styles");
         idname = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD);
       }
+      tagName = getTagName(cellDocRef, cellObj);
       if (Strings.isNullOrEmpty(idname)) {
         String nodeFN = modelUtils.serializeRef(node.getDocumentReference());
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
@@ -122,7 +127,27 @@ public class CellRenderStrategy implements IRenderStrategy {
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
     }
-    cellWriter.openLevel(tagName, idname, cssClasses, cssStyles);
+    cellWriter.openLevel(tagName.orNull(), idname, cssClasses, cssStyles);
+  }
+
+  Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {
+    Optional<String> tagName = Optional.absent();
+    if (cellObj != null) {
+      tagName = Optional.fromNullable(Strings.emptyToNull(cellObj.getStringValue(
+          ICellsClassConfig.CELLCLASS_TAGNAME_FIELD)));
+    }
+    if (!tagName.isPresent()) {
+      PageTypeReference cellTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
+          cellDocRef);
+      IPageTypeConfig cellType = null;
+      if (cellTypeRef != null) {
+        cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
+        if (cellType != null) {
+          tagName = cellType.defaultTagName();
+        }
+      }
+    }
+    return tagName;
   }
 
   @Override
@@ -170,4 +195,13 @@ public class CellRenderStrategy implements IRenderStrategy {
   public void setSpaceReference(SpaceReference spaceReference) {
     this.spaceReference = spaceReference;
   }
+
+  IPageTypeResolverRole getPageTypeResolver() {
+    return Utils.getComponent(IPageTypeResolverRole.class);
+  }
+
+  IPageTypeRole getPageTypeService() {
+    return Utils.getComponent(IPageTypeRole.class);
+  }
+
 }

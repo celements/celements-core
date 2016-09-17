@@ -33,6 +33,7 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWiki;
@@ -49,13 +50,14 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   private XWiki xwiki;
   private RenderCommand mockctRendererCmd;
   private PageLayoutCommand pageLayoutCmdMock;
+  private IPageTypeResolverRole pageTypeResolverMock;
 
   @Before
   public void setUp_CellRendererTest() throws Exception {
+    pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
     outWriterMock = createMock(ICellWriter.class);
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
     mockctRendererCmd = createMock(RenderCommand.class);
     renderer.rendererCmd = mockctRendererCmd;
@@ -179,9 +181,12 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -204,9 +209,11 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell"), eq(cssStyles));
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell"), eq(cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -229,10 +236,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -256,10 +266,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -282,10 +295,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_styles", cssStyles);
     cellObj.setXClassReference(cellClassRef);
     doc.addXObject(cellObj);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:layoutDb..Skin.MasterCell";
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -311,9 +327,12 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(masterCellDb,
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayAll();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     verifyAll();
@@ -334,13 +353,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   private void replayAll(Object... mocks) {
-    replay(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
-    replay(mocks);
+    replay(outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
+    replayDefault(mocks);
   }
 
   private void verifyAll(Object... mocks) {
-    verify(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
-    verify(mocks);
+    verify(outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
+    verifyDefault(mocks);
   }
 
 }
