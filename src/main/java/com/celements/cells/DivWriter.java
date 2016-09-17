@@ -24,7 +24,11 @@ import java.util.LinkedList;
 
 import org.python.google.common.base.Strings;
 
+import com.google.common.base.MoreObjects;
+
 public class DivWriter implements ICellWriter {
+
+  private static final String TAGNAME_DIV = "div";
 
   private StringBuilder out;
   private Deque<String> openLevels = new LinkedList<>();
@@ -39,23 +43,21 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
-    if (Strings.isNullOrEmpty(tagName)) {
-      tagName = "div";
-    }
+    tagName = MoreObjects.firstNonNull(Strings.emptyToNull(tagName), TAGNAME_DIV);
     openLevels.push(tagName);
     getOut().append("<");
     getOut().append(tagName);
-    if ((idname != null) && !"".equals(idname)) {
+    if (!Strings.isNullOrEmpty(idname)) {
       getOut().append(" id=\"");
       getOut().append(idname);
       getOut().append("\"");
     }
-    if ((cssClasses != null) && !"".equals(cssClasses)) {
+    if (!Strings.isNullOrEmpty(cssClasses)) {
       getOut().append(" class=\"");
       getOut().append(cssClasses);
       getOut().append("\"");
     }
-    if ((cssStyles != null) && !"".equals(cssStyles)) {
+    if (!Strings.isNullOrEmpty(cssStyles)) {
       getOut().append(" style=\"");
       getOut().append(cssStyles.replaceAll("[\n\r]", ""));
       getOut().append("\"");

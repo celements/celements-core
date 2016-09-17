@@ -21,6 +21,7 @@ package com.celements.cells;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.python.google.common.base.Strings;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -106,14 +107,14 @@ public class CellRenderStrategy implements IRenderStrategy {
           cellDocRef.getWikiReference().getName()));
       if (cellObj != null) {
         String cellObjCssClasses = cellObj.getStringValue("css_classes");
-        if ((cellObjCssClasses != null) && !"".equals(cellObjCssClasses)) {
+        if (!Strings.isNullOrEmpty(cellObjCssClasses)) {
           cssClasses += " " + cellObjCssClasses;
         }
         tagName = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD);
         cssStyles = cellObj.getStringValue("css_styles");
         idname = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD);
       }
-      if ((idname == null) || "".equals(idname)) {
+      if (Strings.isNullOrEmpty(idname)) {
         String nodeFN = modelUtils.serializeRef(node.getDocumentReference());
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
         idname = "cell:" + nodeFN.replaceAll(":", "..");
