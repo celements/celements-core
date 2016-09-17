@@ -19,6 +19,7 @@
  */
 package com.celements.pagetype.xobject;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -30,28 +31,25 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.PageType;
-import com.celements.pagetype.PageTypeClasses;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase {
+public class XObjectPageTypeConfigTest extends AbstractComponentTest {
 
   private XObjectPageTypeConfig xObjPTconfig;
   private PageType pageTypeMock;
   private XWikiContext context;
-  private XWiki xwiki;
 
   @Before
   public void setUp_XObjectPageTypeConfigTest() throws Exception {
     context = getContext();
-    xObjPTconfig = new XObjectPageTypeConfig("PageTypes.TestPageType");
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    pageTypeMock = createMock(PageType.class);
+    DocumentReference testPageTypeDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "TestPageType");
+    xObjPTconfig = new XObjectPageTypeConfig(testPageTypeDocRef);
+    pageTypeMock = createMockAndAddToDefault(PageType.class);
     xObjPTconfig.pageType = pageTypeMock;
     expect(pageTypeMock.getConfigName(same(context))).andReturn("TestPageType").anyTimes();
   }
@@ -59,65 +57,65 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testGetCategories_noEmptyCategories() {
     expect(pageTypeMock.getCategories(same(context))).andReturn(Collections.<String>emptyList());
-    replayAll();
+    replayDefault();
     assertEquals(Arrays.asList(""), xObjPTconfig.getCategories());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetCategories() {
     expect(pageTypeMock.getCategories(same(context))).andReturn(Arrays.asList("cellType"));
-    replayAll();
+    replayDefault();
     assertEquals(Arrays.asList("cellType"), xObjPTconfig.getCategories());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testDisplayInFrameLayout_yes() {
     expect(pageTypeMock.showFrame(same(context))).andReturn(true);
-    replayAll();
+    replayDefault();
     assertTrue(xObjPTconfig.displayInFrameLayout());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testDisplayInFrameLayout_no() {
     expect(pageTypeMock.showFrame(same(context))).andReturn(false);
-    replayAll();
+    replayDefault();
     assertFalse(xObjPTconfig.displayInFrameLayout());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetName() {
-    replayAll();
+    replayDefault();
     assertEquals("TestPageType", xObjPTconfig.getName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPrettyName() {
     String expectedPrettyName = "Test Page Type Pretty Name";
     expect(pageTypeMock.getPrettyName(same(context))).andReturn(expectedPrettyName);
-    replayAll();
+    replayDefault();
     assertEquals(expectedPrettyName, xObjPTconfig.getPrettyName());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testHasPageTitle_yes() {
     expect(pageTypeMock.hasPageTitle(same(context))).andReturn(true);
-    replayAll();
+    replayDefault();
     assertTrue(xObjPTconfig.hasPageTitle());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testHasPageTitle_no() {
     expect(pageTypeMock.hasPageTitle(same(context))).andReturn(false);
-    replayAll();
+    replayDefault();
     assertFalse(xObjPTconfig.hasPageTitle());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -125,9 +123,9 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     String expectedRenderTemplate = "Templates.TestPageTypeView";
     expect(pageTypeMock.getRenderTemplate(eq("view"), same(context))).andReturn(
         expectedRenderTemplate);
-    replayAll();
+    replayDefault();
     assertEquals(expectedRenderTemplate, xObjPTconfig.getRenderTemplateForRenderMode("view"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -135,37 +133,37 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     String expectedRenderTemplate = "Templates.TestPageTypeEdit";
     expect(pageTypeMock.getRenderTemplate(eq("edit"), same(context))).andReturn(
         expectedRenderTemplate);
-    replayAll();
+    replayDefault();
     assertEquals(expectedRenderTemplate, xObjPTconfig.getRenderTemplateForRenderMode("edit"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testIsVisible_yes() throws Exception {
     BaseObject testPageTypePropObj = new BaseObject();
     EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
-        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
-        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypePropObj.setIntValue("visible", 1);
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj);
-    replayAll();
+    replayDefault();
     assertTrue(xObjPTconfig.isVisible());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testIsVisible_no() throws Exception {
     BaseObject testPageTypePropObj = new BaseObject();
     EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
-        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
-        PageTypeClasses.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     testPageTypePropObj.setIntValue("visible", 0);
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj);
-    replayAll();
+    replayDefault();
     assertFalse(xObjPTconfig.isVisible());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -176,9 +174,9 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
         IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
     testPageTypePropObj.setXClassReference(pageTypePropClassRef);
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj);
-    replayAll();
+    replayDefault();
     assertFalse(xObjPTconfig.defaultTagName().isPresent());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -192,27 +190,18 @@ public class XObjectPageTypeConfigTest extends AbstractBridgedComponentTestCase 
     testPageTypePropObj.setStringValue(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME, tagName);
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
         testPageTypePropObj).atLeastOnce();
-    replayAll();
+    replayDefault();
     assertTrue(xObjPTconfig.defaultTagName().isPresent());
     assertEquals(tagName, xObjPTconfig.defaultTagName().get());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testIsVisible_NPE_no_object() {
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(null);
-    replayAll();
+    replayDefault();
     assertFalse(xObjPTconfig.isVisible());
-    verifyAll();
+    verifyDefault();
   }
 
-  private void replayAll(Object... mocks) {
-    replay(xwiki, pageTypeMock);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, pageTypeMock);
-    verify(mocks);
-  }
 }
