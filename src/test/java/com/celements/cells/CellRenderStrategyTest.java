@@ -55,13 +55,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   @Before
   public void setUp_CellRendererTest() throws Exception {
     pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
-    outWriterMock = createMock(ICellWriter.class);
+    outWriterMock = createMockAndAddToDefault(ICellWriter.class);
     context = getContext();
     xwiki = getWikiMock();
     renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
-    mockctRendererCmd = createMock(RenderCommand.class);
+    mockctRendererCmd = createMockAndAddToDefault(RenderCommand.class);
     renderer.rendererCmd = mockctRendererCmd;
-    pageLayoutCmdMock = createMock(PageLayoutCommand.class);
+    pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     renderer.pageLayoutCmd = pageLayoutCmdMock;
   }
 
@@ -125,9 +125,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
         context.getDatabase()));
     expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
-    replayAll();
+    replayDefault();
     assertEquals("expecting default layout space", defaultLayout, renderer.getSpaceReference());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -135,9 +135,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
         context.getDatabase()));
     renderer.setSpaceReference(layoutSpaceRef);
-    replayAll();
+    replayDefault();
     assertEquals(layoutSpaceRef, renderer.getSpaceReference());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -149,9 +149,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
         context.getDatabase()));
     expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
-    replayAll();
+    replayDefault();
     assertEquals(defaultLayout, renderer.getSpaceReference());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -187,9 +187,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cssStyles));
     expectLastCall();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
-    replayAll();
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -214,9 +214,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell"), eq(cssStyles));
     expectLastCall();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
-    replayAll();
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -243,9 +243,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cssStyles));
     expectLastCall();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
-    replayAll();
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -273,9 +273,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cssStyles));
     expectLastCall();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
-    replayAll();
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -302,9 +302,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cssStyles));
     expectLastCall();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
-    replayAll();
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -333,9 +333,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cssStyles));
     expectLastCall();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
-    replayAll();
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -347,19 +347,11 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cellContentExpected).once();
     // ASSERT
     outWriterMock.appendContent(eq(cellContentExpected));
-    replayAll();
+    replayDefault();
     renderer.renderEmptyChildren(cellNode);
-    verifyAll();
+    verifyDefault();
   }
 
-  private void replayAll(Object... mocks) {
-    replay(outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
-    replayDefault(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
-    verifyDefault(mocks);
-  }
+  // TODO unit tests for getTagName
 
 }
