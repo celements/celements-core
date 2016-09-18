@@ -342,6 +342,9 @@ public class PageLayoutCommand {
   public SpaceReference getPageLayoutForDoc(DocumentReference documentReference) {
     long millisec = System.currentTimeMillis();
     LOGGER.debug("getPageLayoutForDoc: for [" + documentReference + "].");
+    if (documentReference == null) {
+      return null;
+    }
     SpaceReference layoutSpaceRef = null;
     if (layoutExists(documentReference.getLastSpaceReference())) {
       layoutSpaceRef = getCelLayoutEditorSpaceRef();
