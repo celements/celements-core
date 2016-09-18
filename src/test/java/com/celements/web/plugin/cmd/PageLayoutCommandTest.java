@@ -59,9 +59,8 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
   public void setUp_PageLayoutCommandTest() throws Exception {
     context = getContext();
     context.setAction("view");
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
-    storeMock = createMock(XWikiStoreInterface.class);
+    xwiki = getWikiMock();
+    storeMock = createMockAndAddToDefault(XWikiStoreInterface.class);
     expect(xwiki.getStore()).andReturn(storeMock).anyTimes();
     plCmd = new PageLayoutCommand();
   }
@@ -108,14 +107,14 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
     Capture<String> capturedHQL = new Capture<String>();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
-    replayAll();
+    replayDefault();
     Map<String, String> expectedPLmap = new HashMap<String, String>();
     expectedPLmap.put("layout1Space", "Layout 1 pretty name");
     expectedPLmap.put("layout2Space", "Layout 2 pretty name");
     assertEquals(expectedPLmap, plCmd.getAllPageLayouts());
     assertFalse("hql must not contain isActiv constrains.", capturedHQL.getValue().contains(
         "pl.isActive"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -125,47 +124,47 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
     Capture<String> capturedHQL = new Capture<String>();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
-    replayAll();
+    replayDefault();
     Map<String, String> expectedPLmap = new HashMap<String, String>();
     expectedPLmap.put("layout1Space", "Layout 1 pretty name");
     expectedPLmap.put("layout2Space", "Layout 2 pretty name");
     assertEquals(expectedPLmap, plCmd.getActivePageLyouts());
     assertTrue("hql must contain isActiv constrains.", capturedHQL.getValue().contains(
         "pl.isActive"));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testCheckLayoutAccess_localLayout_always() {
     SpaceReference layoutSpaceRef = new SpaceReference("myLayout", new WikiReference(
         context.getDatabase()));
-    replayAll();
+    replayDefault();
     assertTrue("local db always", plCmd.checkLayoutAccess(layoutSpaceRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testCheckLayoutAccess_celements2web_always() {
     SpaceReference layoutSpaceRef = new SpaceReference("celements2web", new WikiReference(
         context.getDatabase()));
-    replayAll();
+    replayDefault();
     assertTrue("celements2web always", plCmd.checkLayoutAccess(layoutSpaceRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testCheckLayoutAccess_noLocalLayout_never() {
     SpaceReference layoutSpaceRef = new SpaceReference("myLayout", new WikiReference("someDB"));
-    replayAll();
+    replayDefault();
     assertFalse("someDB never", plCmd.checkLayoutAccess(layoutSpaceRef));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
   public void testGetPageLayoutForDoc_null() throws Exception {
-    replayAll();
+    replayDefault();
     assertNull(plCmd.getPageLayoutForDoc(null));
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -198,13 +197,13 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     centralLayoutPropDoc.addXObject(layoutPropObj);
     expect(xwiki.getDocument(eq(centralLayoutPropDocRef), same(context))).andReturn(
         centralLayoutPropDoc);
-    replayAll(injectedInheritorFactory, inheritor);
+    replayDefault(injectedInheritorFactory, inheritor);
     SpaceReference pageLayoutForDoc = plCmd.getPageLayoutForDoc(docRef);
     assertNotNull(pageLayoutForDoc);
     SpaceReference centralLayoutRef = new SpaceReference(layoutName, new WikiReference(
         "celements2web"));
     assertEquals(centralLayoutRef, pageLayoutForDoc);
-    verifyAll(injectedInheritorFactory, inheritor);
+    verifyDefault(injectedInheritorFactory, inheritor);
   }
 
   @Test
@@ -225,9 +224,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         same(context))).andReturn(false);
     expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout", "WebHome")), same(
         context))).andReturn(false);
-    replayAll(injectedInheritorFactory, inheritor);
+    replayDefault(injectedInheritorFactory, inheritor);
     assertNull(plCmd.getPageLayoutForDoc(fullName, context));
-    verifyAll(injectedInheritorFactory, inheritor);
+    verifyDefault(injectedInheritorFactory, inheritor);
   }
 
   @Test
@@ -261,11 +260,11 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     layoutPropDoc.addXObject(layoutPropObj);
     expect(xwiki.getDocument(eq(centralSimpleLayoutDocRef), same(context))).andReturn(
         layoutPropDoc).once();
-    replayAll(injectedInheritorFactory, inheritor);
+    replayDefault(injectedInheritorFactory, inheritor);
     SpaceReference simpleLayoutSpaceRef = new SpaceReference("SimpleLayout", new WikiReference(
         "celements2web"));
     assertEquals(simpleLayoutSpaceRef, plCmd.getPageLayoutForDoc(myDocRef));
-    verifyAll(injectedInheritorFactory, inheritor);
+    verifyDefault(injectedInheritorFactory, inheritor);
   }
 
   @Test
@@ -291,9 +290,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         same(context))).andReturn(false);
     expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout", "WebHome")), same(
         context))).andReturn(false);
-    replayAll(injectedInheritorFactory, inheritor);
+    replayDefault(injectedInheritorFactory, inheritor);
     assertNull(plCmd.getPageLayoutForDoc(fullName, context));
-    verifyAll(injectedInheritorFactory, inheritor);
+    verifyDefault(injectedInheritorFactory, inheritor);
   }
 
   @Test
@@ -320,9 +319,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     layoutPropObj.setXClassReference(pagePropClassRef);
     layoutPropDoc.addXObject(layoutPropObj);
     expect(xwiki.getDocument(eq(layoutPropDocRef), same(context))).andReturn(layoutPropDoc).once();
-    replayAll(injectedInheritorFactory, inheritor);
+    replayDefault(injectedInheritorFactory, inheritor);
     assertEquals(layoutName, plCmd.getPageLayoutForDoc(fullName, context));
-    verifyAll(injectedInheritorFactory, inheritor);
+    verifyDefault(injectedInheritorFactory, inheritor);
   }
 
   @Test
@@ -354,10 +353,10 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         same(context))).andReturn(false);
     expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout", "WebHome")), same(
         context))).andReturn(false);
-    replayAll(injectedInheritorFactory, inheritor);
+    replayDefault(injectedInheritorFactory, inheritor);
     assertNull("no access to someDB:MyPageLayout", plCmd.getPageLayoutForDoc(new DocumentReference(
         context.getDatabase(), "mySpace", "MyDocName")));
-    verifyAll(injectedInheritorFactory, inheritor);
+    verifyDefault(injectedInheritorFactory, inheritor);
   }
 
   @Deprecated
@@ -386,9 +385,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     layoutEditorPropDoc.addXObject(layoutEditorPropObj);
     expect(xwiki.getDocument(eq(layoutEditorPropDocRef), same(context))).andReturn(
         layoutEditorPropDoc);
-    replayAll(injectedInheritorFactory);
+    replayDefault(injectedInheritorFactory);
     assertEquals("CelLayoutEditor", plCmd.getPageLayoutForDoc(fullName, context));
-    verifyAll(injectedInheritorFactory);
+    verifyDefault(injectedInheritorFactory);
   }
 
   @Deprecated
@@ -424,9 +423,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     layoutEditorPropDoc.addXObject(layoutEditorPropObj);
     expect(xwiki.getDocument(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(
         layoutEditorPropDoc);
-    replayAll(injectedInheritorFactory);
+    replayDefault(injectedInheritorFactory);
     assertEquals("celements2web:CelLayoutEditor", plCmd.getPageLayoutForDoc(fullName, context));
-    verifyAll(injectedInheritorFactory);
+    verifyDefault(injectedInheritorFactory);
   }
 
   @Test
@@ -455,9 +454,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         same(context))).andReturn(false);
     expect(xwiki.exists(eq(new DocumentReference("celements2web", "SimpleLayout", "WebHome")), same(
         context))).andReturn(false);
-    replayAll();
+    replayDefault();
     assertNull(plCmd.getLayoutPropDoc());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -494,18 +493,18 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expectLastCall().once();
     expect(storeMock.getTranslationList(same(webHomeDoc), same(context))).andReturn(
         Collections.<String>emptyList()).once();
-    replayAll(queryManagerMock, queryMock);
+    replayDefault(queryManagerMock, queryMock);
     assertTrue(plCmd.deleteLayout(layoutSpaceRef));
-    verifyAll(queryManagerMock, queryMock);
+    verifyDefault(queryManagerMock, queryMock);
   }
 
   @Test
   public void testGetDefaultLayout_default() {
     expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT), eq(
         PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
-    replayAll();
+    replayDefault();
     assertEquals("TestLayout", plCmd.getDefaultLayout());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -513,9 +512,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     context.setAction(null);
     expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT), eq(
         PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
-    replayAll();
+    replayDefault();
     assertEquals("TestLayout", plCmd.getDefaultLayout());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -525,9 +524,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
     expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
         + context.getAction()), eq("TestLayout"))).andReturn("LoginLayout");
-    replayAll();
+    replayDefault();
     assertEquals("LoginLayout", plCmd.getDefaultLayout());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -537,9 +536,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         PageLayoutCommand.SIMPLE_LAYOUT))).andReturn("TestLayout");
     expect(xwiki.Param(eq(PageLayoutCommand.XWIKICFG_CELEMENTS_LAYOUT_DEFAULT + "."
         + context.getAction()), eq("TestLayout"))).andReturn("EditLayout");
-    replayAll();
+    replayDefault();
     assertEquals("EditLayout", plCmd.getDefaultLayout());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -556,9 +555,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
     layoutPropObj.setXClassReference(localPagePropClassRef);
     layoutEditorPropDoc.addXObject(layoutPropObj);
-    replayAll();
+    replayDefault();
     assertTrue(plCmd.layoutEditorAvailable());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -579,9 +578,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
     layoutPropObj.setXClassReference(centralPagePropClassRef);
     centralLayoutEditorPropDoc.addXObject(layoutPropObj);
-    replayAll();
+    replayDefault();
     assertTrue(plCmd.layoutEditorAvailable());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -592,19 +591,9 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     DocumentReference centralLayoutEditorPropDocRef = new DocumentReference("celements2web",
         PageLayoutCommand.CEL_LAYOUT_EDITOR_PL_NAME, "WebHome");
     expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(false).once();
-    replayAll();
+    replayDefault();
     assertFalse(plCmd.layoutEditorAvailable());
-    verifyAll();
-  }
-
-  private void replayAll(Object... mocks) {
-    replay(xwiki, storeMock);
-    replay(mocks);
-  }
-
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, storeMock);
-    verify(mocks);
+    verifyDefault();
   }
 
 }
