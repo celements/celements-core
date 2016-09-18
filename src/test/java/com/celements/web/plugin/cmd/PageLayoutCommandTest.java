@@ -162,6 +162,13 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testGetPageLayoutForDoc_null() throws Exception {
+    replayAll();
+    assertNull(plCmd.getPageLayoutForDoc(null));
+    verifyAll();
+  }
+
+  @Test
   public void testGetPageLayoutForDoc_centralPageLayout() throws Exception {
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "mySpace", "MyDocName");
     InheritorFactory injectedInheritorFactory = createMock(InheritorFactory.class);
