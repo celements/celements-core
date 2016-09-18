@@ -137,17 +137,22 @@ public class CellRenderStrategy implements IRenderStrategy {
           ICellsClassConfig.CELLCLASS_TAGNAME_FIELD)));
     }
     if (!tagName.isPresent()) {
-      PageTypeReference cellTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
-          cellDocRef);
-      IPageTypeConfig cellType = null;
-      if (cellTypeRef != null) {
-        cellType = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
-        if (cellType != null) {
-          tagName = cellType.defaultTagName();
-        }
+      IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
+      if (cellTypeConfig != null) {
+        tagName = cellTypeConfig.defaultTagName();
       }
     }
     return tagName;
+  }
+
+  IPageTypeConfig getCellTypeConfig(DocumentReference cellDocRef) {
+    PageTypeReference cellTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
+        cellDocRef);
+    IPageTypeConfig cellTypeConfig = null;
+    if (cellTypeRef != null) {
+      cellTypeConfig = getPageTypeService().getPageTypeConfigForPageTypeRef(cellTypeRef);
+    }
+    return cellTypeConfig;
   }
 
   @Override

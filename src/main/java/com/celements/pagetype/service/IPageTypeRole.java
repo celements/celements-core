@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -39,7 +40,8 @@ public interface IPageTypeRole {
 
   public IPageTypeConfig getPageTypeConfig(String pageTypeName);
 
-  public IPageTypeConfig getPageTypeConfigForPageTypeRef(PageTypeReference pageTypeRef);
+  @Nullable
+  public IPageTypeConfig getPageTypeConfigForPageTypeRef(@NotNull PageTypeReference pageTypeRef);
 
   @Nullable
   public PageTypeReference getPageTypeRefByConfigName(String pageTypeName);
