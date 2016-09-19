@@ -26,8 +26,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
-import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWiki;
+import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -61,7 +60,7 @@ public class PageTypeClasses extends AbstractClassCollection {
   private IPageTypeClassConfig pageTypeClassConfig;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private ModelContext modelContext;
 
   /**
    * @deprecated instead use getPageTypePropertiesClassRef(WikiReference) in
@@ -93,24 +92,17 @@ public class PageTypeClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "celPageTypeClasses";
   }
 
   private BaseClass getPageTypePropertiesClass() throws XWikiException {
-    XWikiDocument doc;
-    XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
     DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig.getPageTypePropertiesClassRef(
-        webUtilsService.getWikiRef());
-    try {
-      doc = xwiki.getDocument(pageTypePropertiesClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get [" + pageTypePropertiesClassRef + "] class document", exp);
-      doc = new XWikiDocument(pageTypePropertiesClassRef);
-      needsUpdate = true;
-    }
+        modelContext.getWikiRef());
+    XWikiDocument doc = modelAccess.getOrCreateDocument(pageTypePropertiesClassRef);
 
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(pageTypePropertiesClassRef);
@@ -135,25 +127,18 @@ public class PageTypeClasses extends AbstractClassCollection {
         "Has Page Title", "yesno");
     needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT,
         "Is Unconnected Parent", "yesno");
+    needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME, "Tag Name", 30);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
 
   private BaseClass getPageTypeClass() throws XWikiException {
-    XWikiDocument doc;
-    XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
-        webUtilsService.getWikiRef());
-    try {
-      doc = xwiki.getDocument(pageTypeClassRef, getContext());
-    } catch (XWikiException exp) {
-      LOGGER.error("Failed to get [" + pageTypeClassRef + "] class document", exp);
-      doc = new XWikiDocument(pageTypeClassRef);
-      needsUpdate = true;
-    }
+        modelContext.getWikiRef());
+    XWikiDocument doc = modelAccess.getOrCreateDocument(pageTypeClassRef);
 
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(pageTypeClassRef);

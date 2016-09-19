@@ -21,13 +21,15 @@ package com.celements.cells;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.celements.cells.attribute.CellAttribute;
 
 public interface ICellWriter {
 
-  public void openLevel(String tagName, String idname, String cssClasses, String cssStyles);
+  public void openLevel(@Nullable String tagName, String idname, String cssClasses,
+      String cssStyles);
 
   /**
    * @deprecated since 2.82 instead use openLevel(String, String, String, String)

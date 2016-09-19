@@ -76,6 +76,9 @@
     <property name="doctype" type="string">
       <column name="CPL_DOCTYPE" length="12" />
     </property>
+    <property name="layout_type" type="string">
+      <column name="CPL_LAYOUTTYPE" length="12" />
+    </property>
   </class>
   <class entity-name="Classes.KeyValueClass" table="cel_keyvalue">
     <id name="id" type="integer" unsaved-value="undefined">

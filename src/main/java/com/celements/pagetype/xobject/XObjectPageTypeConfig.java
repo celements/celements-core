@@ -24,12 +24,14 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.python.google.common.base.Strings;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageType;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -122,6 +124,16 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
           IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT, 0) > 0);
     }
     return false;
+  }
+
+  @Override
+  public Optional<String> defaultTagName() {
+    BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
+    if (pageTypePropertiesObj != null) {
+      return Optional.fromNullable(Strings.emptyToNull(pageTypePropertiesObj.getStringValue(
+          IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME)));
+    }
+    return Optional.absent();
   }
 
 }
