@@ -26,6 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
@@ -101,8 +102,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   @Override
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     Optional<String> tagName = Optional.absent();
-    String cssClasses = "cel_cell";
-    String cssStyles = "";
+    AttributeBuilder attributes = new AttributeBuilder().addCssClasses("cel_cell");
     String idname = "";
     try {
       DocumentReference cellDocRef = node.getDocumentReference();
@@ -113,9 +113,9 @@ public class CellRenderStrategy implements IRenderStrategy {
       if (cellObj != null) {
         String cellObjCssClasses = cellObj.getStringValue("css_classes");
         if (!Strings.isNullOrEmpty(cellObjCssClasses)) {
-          cssClasses += " " + cellObjCssClasses;
+          attributes.addCssClasses(cellObjCssClasses);
         }
-        cssStyles = cellObj.getStringValue("css_styles");
+        attributes.addStyles(cellObj.getStringValue("css_styles"));
         idname = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD);
       }
       tagName = getTagName(cellDocRef, cellObj);
@@ -124,11 +124,12 @@ public class CellRenderStrategy implements IRenderStrategy {
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
         idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
+      attributes.addId(idname);
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
     }
-    // TODO add additional attributes given in parameters comming from page/cell/editField-Type
-    cellWriter.openLevel(tagName.orNull(), idname, cssClasses, cssStyles);
+    // TODO add additional attributes given in parameters coming from page/cell/editField-Type
+    cellWriter.openLevel(tagName.orNull(), attributes.build());
   }
 
   Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {

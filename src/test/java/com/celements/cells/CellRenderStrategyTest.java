@@ -24,14 +24,19 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
+import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.cells.attribute.CellAttribute;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
 import com.celements.pagetype.IPageTypeConfig;
@@ -229,12 +234,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
-        cssStyles));
-    expectLastCall();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -257,11 +263,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell"), eq(cssStyles));
-    expectLastCall();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes("", idname, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -285,12 +293,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
-        cssStyles));
-    expectLastCall();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -315,12 +324,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
-        cssStyles));
-    expectLastCall();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -344,12 +354,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:layoutDb..Skin.MasterCell";
-    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
-        cssStyles));
-    expectLastCall();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -375,12 +386,13 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
-    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
-        cssStyles));
-    expectLastCall();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
     expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
     verifyDefault();
   }
 
@@ -475,6 +487,25 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     assertNotNull(tagName);
     assertFalse(tagName.isPresent());
     verifyDefault();
+  }
+
+  private void assertDefaultAttributes(String cssClasses, String idname, String cssStyles,
+      Capture<List<CellAttribute>> capturedAttrList) {
+    List<CellAttribute> attrList = capturedAttrList.getValue();
+    assertNotNull(attrList);
+    assertFalse(attrList.isEmpty());
+    Map<String, CellAttribute> attrMap = new HashMap<>();
+    for (CellAttribute attr : attrList) {
+      attrMap.put(attr.getName(), attr);
+    }
+    assertTrue("id attribute not found", attrMap.containsKey("id"));
+    assertEquals("wrong id attribute", idname, attrMap.get("id").getValue().get());
+    assertTrue("cssClass attribute not found", attrMap.containsKey("class"));
+    assertEquals("wrong cssClass attribute", ("cel_cell " + cssClasses).trim(), attrMap.get(
+        "class").getValue().get());
+    assertTrue("styles attribute not found", attrMap.containsKey("style"));
+    assertEquals("wrong styles attribute", cssStyles.replaceAll("[\n\r]", ""), attrMap.get(
+        "style").getValue().get());
   }
 
 }

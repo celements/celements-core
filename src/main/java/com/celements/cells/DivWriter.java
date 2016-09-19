@@ -59,7 +59,7 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(List<CellAttribute> attributes) {
-    openLevel("", attributes);
+    openLevel(null, attributes);
   }
 
   @Override

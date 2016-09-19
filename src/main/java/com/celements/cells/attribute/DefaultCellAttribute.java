@@ -43,7 +43,7 @@ public class DefaultCellAttribute implements CellAttribute {
   private final String name;
   private final String value;
 
-  public DefaultCellAttribute(@NotNull String attrName, @Nullable String attrValue) {
+  private DefaultCellAttribute(@NotNull String attrName, @Nullable String attrValue) {
     this.name = attrName;
     this.value = Strings.emptyToNull(attrValue);
   }
