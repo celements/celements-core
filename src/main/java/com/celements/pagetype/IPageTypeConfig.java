@@ -21,6 +21,9 @@ package com.celements.pagetype;
 
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
+import com.celements.cells.attribute.AttributeBuilder;
 import com.google.common.base.Optional;
 
 /**
@@ -45,5 +48,7 @@ public interface IPageTypeConfig {
   public boolean isUnconnectedParent();
 
   public Optional<String> defaultTagName();
+
+  public void getAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef);
 
 }

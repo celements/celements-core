@@ -28,6 +28,7 @@ import org.python.google.common.base.Strings;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.pagetype.PageType;
@@ -134,6 +135,11 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
           IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME)));
     }
     return Optional.absent();
+  }
+
+  @Override
+  public void getAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
+    // TODO get attributes from pageTypeProperties
   }
 
 }

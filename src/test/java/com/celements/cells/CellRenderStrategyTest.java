@@ -237,7 +237,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        null).atLeastOnce();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -266,7 +267,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        null).atLeastOnce();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes("", idname, cssStyles, capturedAttrList);
@@ -296,7 +298,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        null).atLeastOnce();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -327,7 +330,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        null).atLeastOnce();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -357,7 +361,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        null).atLeastOnce();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
@@ -389,7 +394,8 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
     outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
     expectLastCall().once();
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(
+        null).atLeastOnce();
     replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
     assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);

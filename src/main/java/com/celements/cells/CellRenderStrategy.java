@@ -104,8 +104,8 @@ public class CellRenderStrategy implements IRenderStrategy {
     Optional<String> tagName = Optional.absent();
     AttributeBuilder attributes = new AttributeBuilder().addCssClasses("cel_cell");
     String idname = "";
+    DocumentReference cellDocRef = node.getDocumentReference();
     try {
-      DocumentReference cellDocRef = node.getDocumentReference();
       LOGGER.debug("startRenderCell: cellDocRef [{}] context db [{}].", cellDocRef,
           context.getDatabase());
       BaseObject cellObj = modelAccess.getXObject(cellDocRef, cellClassConfig.getCellClassRef(
@@ -128,7 +128,10 @@ public class CellRenderStrategy implements IRenderStrategy {
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
     }
-    // TODO add additional attributes given in parameters coming from page/cell/editField-Type
+    IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
+    if (cellTypeConfig != null) {
+      cellTypeConfig.getAttributes(attributes, cellDocRef);
+    }
     cellWriter.openLevel(tagName.orNull(), attributes.build());
   }
 

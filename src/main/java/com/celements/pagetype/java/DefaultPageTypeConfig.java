@@ -6,6 +6,7 @@ import java.util.List;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -89,4 +90,10 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   public Optional<String> defaultTagName() {
     return pageTypeImpl.defaultTagName();
   }
+
+  @Override
+  public void getAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
+    pageTypeImpl.getAttributes(attrBuilder, cellDocRef);
+  }
+
 }
