@@ -28,8 +28,8 @@ import com.celements.cells.attribute.CellAttribute;
 
 public interface ICellWriter {
 
-  public void openLevel(@Nullable String tagName, String idname, String cssClasses,
-      String cssStyles);
+  public void openLevel(@Nullable String tagName, @Nullable String idname,
+      @Nullable String cssClasses, @Nullable String cssStyles);
 
   /**
    * @deprecated since 2.82 instead use openLevel(String, String, String, String)
@@ -44,6 +44,12 @@ public interface ICellWriter {
   public String getAsString();
 
   public void appendContent(String content);
+
+  public void openLevel();
+
+  public void openLevel(@NotNull List<CellAttribute> attributes);
+
+  public void openLevel(@NotNull String tagName);
 
   public void openLevel(@NotNull String tagName, @NotNull List<CellAttribute> attributes);
 

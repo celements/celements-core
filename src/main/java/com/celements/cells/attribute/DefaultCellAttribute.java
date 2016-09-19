@@ -1,5 +1,7 @@
 package com.celements.cells.attribute;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -22,13 +24,13 @@ public class DefaultCellAttribute implements CellAttribute {
     private final Set<String> values = new LinkedHashSet<>();
     private String name;
 
-    public Builder attrName(String attrName) {
-      this.name = attrName;
+    public Builder attrName(@NotNull String attrName) {
+      this.name = checkNotNull(attrName);
       return this;
     }
 
-    public Builder addValue(String attrValue) {
-      values.add(attrValue);
+    public Builder addValue(@NotNull String attrValue) {
+      values.add(checkNotNull(attrValue).replaceAll("[\n\r]", ""));
       return this;
     }
 

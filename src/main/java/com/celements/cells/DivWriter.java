@@ -19,6 +19,7 @@
  */
 package com.celements.cells;
 
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,12 +30,8 @@ import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.CellAttribute;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
 
 public class DivWriter implements ICellWriter {
-
-  private static final Splitter CSS_CLASS_SPLITTER = Splitter.on(
-      " ").trimResults().omitEmptyStrings();
 
   private static final String TAGNAME_DIV = "div";
 
@@ -51,11 +48,23 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
-    AttributeBuilder attributes = new AttributeBuilder();
-    attributes.addNonEmptyAttribute("id", idname);
-    attributes.addNonEmptyAttribute("class", CSS_CLASS_SPLITTER.split(cssClasses));
-    attributes.addNonEmptyAttribute("style", cssStyles.replaceAll("[\n\r]", ""));
-    openLevel(tagName, attributes.build());
+    openLevel(tagName, new AttributeBuilder().addId(idname).addCssClasses(cssClasses).addStyles(
+        cssStyles).build());
+  }
+
+  @Override
+  public void openLevel() {
+    openLevel("");
+  }
+
+  @Override
+  public void openLevel(List<CellAttribute> attributes) {
+    openLevel("", attributes);
+  }
+
+  @Override
+  public void openLevel(String tagName) {
+    openLevel(tagName, Collections.<CellAttribute>emptyList());
   }
 
   @Override
