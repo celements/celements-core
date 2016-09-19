@@ -8,6 +8,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.IPageTypeConfig;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -82,5 +83,10 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   @Override
   public boolean isUnconnectedParent() {
     return pageTypeImpl.isUnconnectedParent();
+  }
+
+  @Override
+  public Optional<String> defaultTagName() {
+    return pageTypeImpl.defaultTagName();
   }
 }

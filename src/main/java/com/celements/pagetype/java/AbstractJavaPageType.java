@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.celements.pagetype.category.IPageTypeCategoryRole;
+import com.google.common.base.Optional;
 
 public abstract class AbstractJavaPageType implements IJavaPageTypeRole {
 
@@ -14,6 +15,11 @@ public abstract class AbstractJavaPageType implements IJavaPageTypeRole {
       categories.addAll(ptCat.getAllTypeNames());
     }
     return categories;
+  }
+
+  @Override
+  public Optional<String> defaultTagName() {
+    return Optional.absent();
   }
 
 }

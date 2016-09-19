@@ -17,6 +17,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
@@ -169,6 +170,24 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     expect(pageTypeImplMock.getName()).andReturn(pageTypeName).anyTimes();
     replayDefault();
     assertEquals(pageTypeName, testPageType.getPrettyName());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_defaultTagName_absent() {
+    expect(pageTypeImplMock.defaultTagName()).andReturn(Optional.<String>absent()).anyTimes();
+    replayDefault();
+    assertFalse(testPageType.defaultTagName().isPresent());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_defaultTagName_present() {
+    String tagName = "abstract";
+    expect(pageTypeImplMock.defaultTagName()).andReturn(Optional.fromNullable(tagName)).anyTimes();
+    replayDefault();
+    assertTrue(testPageType.defaultTagName().isPresent());
+    assertEquals(tagName, testPageType.defaultTagName().get());
     verifyDefault();
   }
 

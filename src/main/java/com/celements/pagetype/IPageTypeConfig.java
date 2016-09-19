@@ -21,6 +21,8 @@ package com.celements.pagetype;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 /**
  * Implementations of IPageTypeConfig may be exposed to non privileged code (e.g. scripts)
  */
@@ -41,5 +43,7 @@ public interface IPageTypeConfig {
   public boolean isVisible();
 
   public boolean isUnconnectedParent();
+
+  public Optional<String> defaultTagName();
 
 }

@@ -23,6 +23,7 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import org.junit.Before;
@@ -33,8 +34,13 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
+import com.celements.pagetype.IPageTypeConfig;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,17 +55,20 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   private XWiki xwiki;
   private RenderCommand mockctRendererCmd;
   private PageLayoutCommand pageLayoutCmdMock;
+  private IPageTypeResolverRole pageTypeResolverMock;
+  private IPageTypeRole pageTypeServiceMock;
 
   @Before
   public void setUp_CellRendererTest() throws Exception {
-    outWriterMock = createMock(ICellWriter.class);
+    pageTypeResolverMock = registerComponentMock(IPageTypeResolverRole.class);
+    pageTypeServiceMock = registerComponentMock(IPageTypeRole.class);
+    outWriterMock = createMockAndAddToDefault(ICellWriter.class);
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
+    xwiki = getWikiMock();
     renderer = new CellRenderStrategy(context).setOutputWriter(outWriterMock);
-    mockctRendererCmd = createMock(RenderCommand.class);
+    mockctRendererCmd = createMockAndAddToDefault(RenderCommand.class);
     renderer.rendererCmd = mockctRendererCmd;
-    pageLayoutCmdMock = createMock(PageLayoutCommand.class);
+    pageLayoutCmdMock = createMockAndAddToDefault(PageLayoutCommand.class);
     renderer.pageLayoutCmd = pageLayoutCmdMock;
   }
 
@@ -75,6 +84,45 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     renderer.rendererCmd = mockctRendererCmd;
     assertNotNull(renderer.getRendererCmd());
     assertSame("Expecting injected mock object.", mockctRendererCmd, renderer.getRendererCmd());
+  }
+
+  @Test
+  public void test_getCellTypeConfig_noTypeRef() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        null).once();
+    replayDefault();
+    assertNull(renderer.getCellTypeConfig(cellRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getCellTypeConfig_noTypeConfig() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    PageTypeReference cellTypeRef = new PageTypeReference("TestType", "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        cellTypeRef).once();
+    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
+        null).once();
+    replayDefault();
+    assertNull(renderer.getCellTypeConfig(cellRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getCellTypeConfig_withTypeConfig() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    PageTypeReference cellTypeRef = new PageTypeReference("TestType", "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        cellTypeRef).once();
+    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
+        typeConfig).once();
+    replayDefault();
+    assertSame(typeConfig, renderer.getCellTypeConfig(cellRef));
+    verifyDefault();
   }
 
   @Test
@@ -123,9 +171,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
         context.getDatabase()));
     expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
-    replayAll();
+    replayDefault();
     assertEquals("expecting default layout space", defaultLayout, renderer.getSpaceReference());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -133,9 +181,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     SpaceReference layoutSpaceRef = new SpaceReference("TestLayout", new WikiReference(
         context.getDatabase()));
     renderer.setSpaceReference(layoutSpaceRef);
-    replayAll();
+    replayDefault();
     assertEquals(layoutSpaceRef, renderer.getSpaceReference());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -147,9 +195,9 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     SpaceReference defaultLayout = new SpaceReference("SimpleLayout", new WikiReference(
         context.getDatabase()));
     expect(pageLayoutCmdMock.getDefaultLayoutSpaceReference()).andReturn(defaultLayout);
-    replayAll();
+    replayDefault();
     assertEquals(defaultLayout, renderer.getSpaceReference());
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -179,12 +227,15 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
-    replayAll();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -204,12 +255,14 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell"), eq(cssStyles));
-    replayAll();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell"), eq(cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -229,13 +282,16 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
-    replayAll();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -256,13 +312,16 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:Skin.MasterCell";
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
-    replayAll();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -282,13 +341,16 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_styles", cssStyles);
     cellObj.setXClassReference(cellClassRef);
     doc.addXObject(cellObj);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
     String idname = "cell:layoutDb..Skin.MasterCell";
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
-    replayAll();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -311,12 +373,15 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference(masterCellDb,
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
-    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true);
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc);
-    outWriterMock.openLevel(eq(""), eq(idname), eq("cel_cell " + cssClasses), eq(cssStyles));
-    replayAll();
+    expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
+    outWriterMock.openLevel(isNull(String.class), eq(idname), eq("cel_cell " + cssClasses), eq(
+        cssStyles));
+    expectLastCall();
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(docRef))).andReturn(null);
+    replayDefault();
     renderer.startRenderCell(node, isFirstItem, isLastItem);
-    verifyAll();
+    verifyDefault();
   }
 
   @Test
@@ -328,19 +393,88 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
         cellContentExpected).once();
     // ASSERT
     outWriterMock.appendContent(eq(cellContentExpected));
-    replayAll();
+    replayDefault();
     renderer.renderEmptyChildren(cellNode);
-    verifyAll();
+    verifyDefault();
   }
 
-  private void replayAll(Object... mocks) {
-    replay(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
-    replay(mocks);
+  // TODO unit tests for getTagName
+
+  @Test
+  public void test_getTagName_noCellConfig_fallback_CellType() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    String configName = "TestType";
+    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        cellTypeRef).once();
+    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
+        typeConfig).once();
+    expect(typeConfig.defaultTagName()).andReturn(Optional.of(configName)).once();
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef, null);
+    assertNotNull(tagName);
+    assertTrue(tagName.isPresent());
+    assertEquals(configName, tagName.get());
+    verifyDefault();
   }
 
-  private void verifyAll(Object... mocks) {
-    verify(xwiki, outWriterMock, mockctRendererCmd, pageLayoutCmdMock);
-    verify(mocks);
+  @Test
+  public void test_getTagName_emptyTagName_fallback_CellType() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    String configName = "TestType";
+    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        cellTypeRef).once();
+    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
+        typeConfig).once();
+    BaseObject cellObj = new BaseObject();
+    cellObj.setStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, "");
+    expect(typeConfig.defaultTagName()).andReturn(Optional.of(configName)).once();
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef, cellObj);
+    assertNotNull(tagName);
+    assertTrue(tagName.isPresent());
+    assertEquals(configName, tagName.get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getTagName_fromCellConfig() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    BaseObject cellObj = new BaseObject();
+    String expectedTagName = "form";
+    cellObj.setStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, expectedTagName);
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef, cellObj);
+    assertNotNull(tagName);
+    assertTrue(tagName.isPresent());
+    assertEquals(expectedTagName, tagName.get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getTagName_emptyTagName_fallback_CellType_noTagName() throws Exception {
+    DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
+    String configName = "TestType";
+    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        cellTypeRef).once();
+    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
+        typeConfig).once();
+    BaseObject cellObj = new BaseObject();
+    cellObj.setStringValue(ICellsClassConfig.CELLCLASS_TAGNAME_FIELD, "");
+    expect(typeConfig.defaultTagName()).andReturn(Optional.<String>absent()).once();
+    replayDefault();
+    Optional<String> tagName = renderer.getTagName(cellRef, cellObj);
+    assertNotNull(tagName);
+    assertFalse(tagName.isPresent());
+    verifyDefault();
   }
 
 }
