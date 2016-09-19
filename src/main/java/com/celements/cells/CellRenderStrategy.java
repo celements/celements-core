@@ -122,6 +122,7 @@ public class CellRenderStrategy implements IRenderStrategy {
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
     }
+    // TODO add additional attributes given in parameters comming from page/cell/editField-Type
     cellWriter.openLevel(tagName, idname, cssClasses, cssStyles);
   }
 

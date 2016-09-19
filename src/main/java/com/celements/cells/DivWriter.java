@@ -21,12 +21,20 @@ package com.celements.cells;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.python.google.common.base.Strings;
 
+import com.celements.cells.attribute.AttributeBuilder;
+import com.celements.cells.attribute.CellAttribute;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 
 public class DivWriter implements ICellWriter {
+
+  private static final Splitter CSS_CLASS_SPLITTER = Splitter.on(
+      " ").trimResults().omitEmptyStrings();
 
   private static final String TAGNAME_DIV = "div";
 
@@ -43,23 +51,26 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
+    AttributeBuilder attributes = new AttributeBuilder();
+    attributes.addNonEmptyAttribute("id", idname);
+    attributes.addNonEmptyAttribute("class", CSS_CLASS_SPLITTER.split(cssClasses));
+    attributes.addNonEmptyAttribute("style", cssStyles.replaceAll("[\n\r]", ""));
+    openLevel(tagName, attributes.build());
+  }
+
+  @Override
+  public void openLevel(String tagName, List<CellAttribute> attributes) {
     tagName = MoreObjects.firstNonNull(Strings.emptyToNull(tagName), TAGNAME_DIV);
     openLevels.push(tagName);
     getOut().append("<");
     getOut().append(tagName);
-    if (!Strings.isNullOrEmpty(idname)) {
-      getOut().append(" id=\"");
-      getOut().append(idname);
-      getOut().append("\"");
-    }
-    if (!Strings.isNullOrEmpty(cssClasses)) {
-      getOut().append(" class=\"");
-      getOut().append(cssClasses);
-      getOut().append("\"");
-    }
-    if (!Strings.isNullOrEmpty(cssStyles)) {
-      getOut().append(" style=\"");
-      getOut().append(cssStyles.replaceAll("[\n\r]", ""));
+    for (CellAttribute cellAttr : attributes) {
+      String attrName = cellAttr.getName();
+      getOut().append(" ");
+      getOut().append(attrName);
+      getOut().append("=\"");
+      Optional<String> attrValue = cellAttr.getValue();
+      getOut().append(attrValue.or(attrName));
       getOut().append("\"");
     }
     getOut().append(">");

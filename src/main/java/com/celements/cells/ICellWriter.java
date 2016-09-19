@@ -19,6 +19,12 @@
  */
 package com.celements.cells;
 
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
+import com.celements.cells.attribute.CellAttribute;
+
 public interface ICellWriter {
 
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles);
@@ -36,5 +42,7 @@ public interface ICellWriter {
   public String getAsString();
 
   public void appendContent(String content);
+
+  public void openLevel(@NotNull String tagName, @NotNull List<CellAttribute> attributes);
 
 }
