@@ -87,6 +87,28 @@ public final class TreeNode {
     return (parentRef == null);
   }
 
+  /**
+   * @return fullName for documentReference backing TreeNode
+   * @deprecated since 2.14.0 use getDocumentReference instead
+   *             2016.09.20, FP: CAUTION: this method is still used in velocity scripts.
+   *             e.g. LinkPicker.vm
+   */
+  @Deprecated
+  @NotNull
+  public String getFullName() {
+    return getModelUtils().serializeRefLocal(docRef);
+  }
+
+  /**
+   * @deprecated since 2.81 use getParentRef instead
+   *             2016.09.20, FP: CAUTION: this method may be still used in velocity scripts.
+   */
+  @Deprecated
+  @NotNull
+  public String getParent() {
+    return getModelUtils().serializeRefLocal(getParentRef());
+  }
+
   @NotNull
   public EntityReference getParentRef() {
     EntityReference ref;
