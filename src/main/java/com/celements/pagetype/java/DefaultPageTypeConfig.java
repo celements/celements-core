@@ -92,8 +92,8 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   }
 
   @Override
-  public void getAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
-    pageTypeImpl.getAttributes(attrBuilder, cellDocRef);
+  public void collectAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
+    pageTypeImpl.collectAttributes(attrBuilder, cellDocRef);
   }
 
 }

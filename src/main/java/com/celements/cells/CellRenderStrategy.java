@@ -130,7 +130,7 @@ public class CellRenderStrategy implements IRenderStrategy {
     }
     IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
     if (cellTypeConfig != null) {
-      cellTypeConfig.getAttributes(attributes, cellDocRef);
+      cellTypeConfig.collectAttributes(attributes, cellDocRef);
     }
     cellWriter.openLevel(tagName.orNull(), attributes.build());
   }

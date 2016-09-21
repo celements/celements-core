@@ -26,7 +26,7 @@ public abstract class AbstractJavaPageType implements IJavaPageTypeRole {
   }
 
   @Override
-  public void getAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
+  public void collectAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
     // default implementation: do nothing
   }
 

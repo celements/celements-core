@@ -49,6 +49,6 @@ public interface IPageTypeConfig {
 
   public Optional<String> defaultTagName();
 
-  public void getAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef);
+  public void collectAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef);
 
 }
