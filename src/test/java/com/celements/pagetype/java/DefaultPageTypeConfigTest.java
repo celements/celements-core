@@ -15,6 +15,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
@@ -188,6 +189,18 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     replayDefault();
     assertTrue(testPageType.defaultTagName().isPresent());
     assertEquals(tagName, testPageType.defaultTagName().get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_collectAttributes() {
+    DocumentReference cellDocRef = new DocumentReference(context.getDatabase(), "EditorLayout",
+        "myField");
+    AttributeBuilder attrBuilder = createMockAndAddToDefault(AttributeBuilder.class);
+    pageTypeImplMock.collectAttributes(same(attrBuilder), eq(cellDocRef));
+    expectLastCall().once();
+    replayDefault();
+    testPageType.collectAttributes(attrBuilder, cellDocRef);
     verifyDefault();
   }
 

@@ -26,8 +26,8 @@ import java.util.List;
 
 import org.python.google.common.base.Strings;
 
-import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 
@@ -48,8 +48,8 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
-    openLevel(tagName, new AttributeBuilder().addId(idname).addCssClasses(cssClasses).addStyles(
-        cssStyles).build());
+    openLevel(tagName, new DefaultAttributeBuilder().addId(idname).addCssClasses(
+        cssClasses).addStyles(cssStyles).build());
   }
 
   @Override

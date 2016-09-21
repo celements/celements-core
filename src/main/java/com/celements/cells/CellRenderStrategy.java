@@ -27,6 +27,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.attribute.AttributeBuilder;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
@@ -102,7 +103,7 @@ public class CellRenderStrategy implements IRenderStrategy {
   @Override
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     Optional<String> tagName = Optional.absent();
-    AttributeBuilder attributes = new AttributeBuilder().addCssClasses("cel_cell");
+    AttributeBuilder attributes = new DefaultAttributeBuilder().addCssClasses("cel_cell");
     String idname = "";
     DocumentReference cellDocRef = node.getDocumentReference();
     try {
