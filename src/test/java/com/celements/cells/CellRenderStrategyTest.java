@@ -36,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.celements.cells.attribute.AttributeBuilder;
 import com.celements.cells.attribute.CellAttribute;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.TreeNode;
@@ -403,6 +404,48 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testStartRenderCell_additionalAttributes() throws Exception {
+    String masterCellDb = context.getDatabase();
+    DocumentReference cellRef = new DocumentReference(masterCellDb, "Skin", "MasterCell");
+    boolean isLastItem = true;
+    boolean isFirstItem = false;
+    TreeNode node = new TreeNode(cellRef, null, 0);
+    XWikiDocument doc = new XWikiDocument(cellRef);
+    BaseObject cellObj = new BaseObject();
+    String cssClasses = "classes two";
+    String idname = "myDivId";
+    String cssStyles = "width:100px;\nheight:10px;\n";
+    cellObj.setStringValue("css_classes", cssClasses);
+    cellObj.setStringValue("idname", idname);
+    cellObj.setStringValue("css_styles", cssStyles);
+    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    cellObjList.add(cellObj);
+    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
+    doc.setXObjects(cellClassRef, cellObjList);
+    expect(xwiki.exists(eq(cellRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(cellRef), same(context))).andReturn(doc).atLeastOnce();
+    Capture<List<CellAttribute>> capturedAttrList = new Capture<>();
+    outWriterMock.openLevel(isNull(String.class), capture(capturedAttrList));
+    expectLastCall().once();
+    String configName = "TestType";
+    PageTypeReference cellTypeRef = new PageTypeReference(configName, "TestTypeComponent",
+        Arrays.asList(CellTypeCategory.CELLTYPE_NAME));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(eq(cellRef))).andReturn(
+        cellTypeRef).atLeastOnce();
+    IPageTypeConfig typeConfig = createMockAndAddToDefault(IPageTypeConfig.class);
+    expect(pageTypeServiceMock.getPageTypeConfigForPageTypeRef(eq(cellTypeRef))).andReturn(
+        typeConfig).atLeastOnce();
+    expect(typeConfig.defaultTagName()).andReturn(Optional.<String>absent()).atLeastOnce();
+    typeConfig.collectAttributes(isA(AttributeBuilder.class), eq(cellRef));
+    expectLastCall().once();
+    replayDefault();
+    renderer.startRenderCell(node, isFirstItem, isLastItem);
+    assertDefaultAttributes(cssClasses, idname, cssStyles, capturedAttrList);
+    verifyDefault();
+  }
+
+  @Test
   public void testRenderEmptyChildren() throws XWikiException {
     DocumentReference cellRef = new DocumentReference(context.getDatabase(), "Skin", "MasterCell");
     TreeNode cellNode = new TreeNode(cellRef, null, 0);
@@ -415,8 +458,6 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     renderer.renderEmptyChildren(cellNode);
     verifyDefault();
   }
-
-  // TODO unit tests for getTagName
 
   @Test
   public void test_getTagName_noCellConfig_fallback_CellType() throws Exception {
