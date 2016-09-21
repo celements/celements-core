@@ -23,6 +23,13 @@ public class AttributeBuilder {
 
   private final Map<String, DefaultCellAttribute.Builder> attributeMap = new LinkedHashMap<>();
 
+  public AttributeBuilder addEmptyAttribute(@NotNull String attrName) {
+    if (!attrName.isEmpty()) {
+      getAttributeBuilder(attrName);
+    }
+    return this;
+  }
+
   public AttributeBuilder addNonEmptyAttribute(@NotNull String attrName,
       @Nullable String attrValue) {
     checkNotNull(attrName);
