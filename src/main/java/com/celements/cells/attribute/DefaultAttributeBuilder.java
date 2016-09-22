@@ -23,6 +23,7 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
 
   @Override
   public AttributeBuilder addEmptyAttribute(String attrName) {
+    checkNotNull(attrName);
     if (!attrName.isEmpty()) {
       getAttributeBuilder(attrName);
     }
