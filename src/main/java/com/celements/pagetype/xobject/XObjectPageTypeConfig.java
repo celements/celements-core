@@ -139,7 +139,7 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public void collectAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef) {
-    // TODO get attributes from pageTypeProperties
+    // TODO CELDEV-344 : get attributes from pageTypeProperties
   }
 
 }
