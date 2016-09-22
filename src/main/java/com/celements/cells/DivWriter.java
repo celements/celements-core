@@ -79,7 +79,7 @@ public class DivWriter implements ICellWriter {
       getOut().append(attrName);
       getOut().append("=\"");
       Optional<String> attrValue = cellAttr.getValue();
-      // TODO check for HTML5 type. Only add default Value for XHMTL
+      // TODO CELDEV-343: check for HTML5 type. Only add default Value for XHMTL
       getOut().append(attrValue.or(attrName));
       getOut().append("\"");
     }
