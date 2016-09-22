@@ -23,11 +23,11 @@ public class DefaultAttributeBuilderTest {
 
   @Test
   public void testGetAttributeBuilder() {
-    Builder celAttrBuilder = attrBuilder.getAttributeBuilder("testAttribute");
+    Builder celAttrBuilder = attrBuilder.getCellAttributeBuilder("testAttribute");
     assertNotNull(celAttrBuilder);
-    Builder celAttrBuilder2 = attrBuilder.getAttributeBuilder("testAttribute");
+    Builder celAttrBuilder2 = attrBuilder.getCellAttributeBuilder("testAttribute");
     assertSame(celAttrBuilder, celAttrBuilder2);
-    Builder celAttrBuilderDiff = attrBuilder.getAttributeBuilder("testAttribute2");
+    Builder celAttrBuilderDiff = attrBuilder.getCellAttributeBuilder("testAttribute2");
     assertNotSame(celAttrBuilder, celAttrBuilderDiff);
   }
 

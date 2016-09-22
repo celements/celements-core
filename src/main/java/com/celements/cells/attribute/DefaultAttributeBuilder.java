@@ -25,7 +25,7 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
   public AttributeBuilder addEmptyAttribute(String attrName) {
     checkNotNull(attrName);
     if (!attrName.isEmpty()) {
-      getAttributeBuilder(attrName);
+      getCellAttributeBuilder(attrName);
     }
     return this;
   }
@@ -34,7 +34,7 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
   public AttributeBuilder addNonEmptyAttribute(String attrName, String attrValue) {
     checkNotNull(attrName);
     if (!attrName.isEmpty() && !Strings.isNullOrEmpty(attrValue)) {
-      getAttributeBuilder(attrName).addValue(attrValue);
+      getCellAttributeBuilder(attrName).addValue(attrValue);
     }
     return this;
   }
@@ -58,7 +58,7 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
     return Collections.unmodifiableList(attributeList);
   }
 
-  DefaultCellAttribute.Builder getAttributeBuilder(String attrName) {
+  DefaultCellAttribute.Builder getCellAttributeBuilder(String attrName) {
     if (!attributeMap.containsKey(attrName)) {
       attributeMap.put(attrName, new DefaultCellAttribute.Builder().attrName(attrName));
     }
