@@ -21,6 +21,8 @@ package com.celements.pagetype;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.cells.attribute.AttributeBuilder;
@@ -31,24 +33,30 @@ import com.google.common.base.Optional;
  */
 public interface IPageTypeConfig {
 
+  @NotNull
   public String getName();
 
+  @NotNull
   public String getPrettyName();
 
   public boolean hasPageTitle();
 
   public boolean displayInFrameLayout();
 
+  @NotNull
   public List<String> getCategories();
 
+  @NotNull
   public String getRenderTemplateForRenderMode(String renderMode);
 
   public boolean isVisible();
 
   public boolean isUnconnectedParent();
 
+  @NotNull
   public Optional<String> defaultTagName();
 
-  public void collectAttributes(AttributeBuilder attrBuilder, DocumentReference cellDocRef);
+  public void collectAttributes(@NotNull AttributeBuilder attrBuilder,
+      @NotNull DocumentReference cellDocRef);
 
 }
