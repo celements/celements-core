@@ -6,9 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.celements.cells.attribute.DefaultCellAttribute.Builder;
-import com.celements.common.test.AbstractComponentTest;
 
-public class DefaultCellAttributeTest extends AbstractComponentTest {
+public class DefaultCellAttributeTest {
 
   private Builder cellAttrBuilder;
 
