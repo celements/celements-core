@@ -35,6 +35,7 @@ public class DefaultCellAttribute implements CellAttribute {
     }
 
     public DefaultCellAttribute build() {
+      checkState(!Strings.isNullOrEmpty(name));
       return new DefaultCellAttribute(name, VALUES_JOINER.join(values));
     }
 
