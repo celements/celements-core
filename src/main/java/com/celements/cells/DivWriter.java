@@ -19,12 +19,17 @@
  */
 package com.celements.cells;
 
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.python.google.common.base.Strings;
 
+import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 
 public class DivWriter implements ICellWriter {
 
@@ -43,23 +48,39 @@ public class DivWriter implements ICellWriter {
 
   @Override
   public void openLevel(String tagName, String idname, String cssClasses, String cssStyles) {
+    openLevel(tagName, new DefaultAttributeBuilder().addId(idname).addCssClasses(
+        cssClasses).addStyles(cssStyles).build());
+  }
+
+  @Override
+  public void openLevel() {
+    openLevel("");
+  }
+
+  @Override
+  public void openLevel(List<CellAttribute> attributes) {
+    openLevel(null, attributes);
+  }
+
+  @Override
+  public void openLevel(String tagName) {
+    openLevel(tagName, Collections.<CellAttribute>emptyList());
+  }
+
+  @Override
+  public void openLevel(String tagName, List<CellAttribute> attributes) {
     tagName = MoreObjects.firstNonNull(Strings.emptyToNull(tagName), TAGNAME_DIV);
     openLevels.push(tagName);
     getOut().append("<");
     getOut().append(tagName);
-    if (!Strings.isNullOrEmpty(idname)) {
-      getOut().append(" id=\"");
-      getOut().append(idname);
-      getOut().append("\"");
-    }
-    if (!Strings.isNullOrEmpty(cssClasses)) {
-      getOut().append(" class=\"");
-      getOut().append(cssClasses);
-      getOut().append("\"");
-    }
-    if (!Strings.isNullOrEmpty(cssStyles)) {
-      getOut().append(" style=\"");
-      getOut().append(cssStyles.replaceAll("[\n\r]", ""));
+    for (CellAttribute cellAttr : attributes) {
+      String attrName = cellAttr.getName();
+      getOut().append(" ");
+      getOut().append(attrName);
+      getOut().append("=\"");
+      Optional<String> attrValue = cellAttr.getValue();
+      // TODO CELDEV-343: check for HTML5 type. Only add default Value for XHMTL
+      getOut().append(attrValue.or(attrName));
       getOut().append("\"");
     }
     getOut().append(">");

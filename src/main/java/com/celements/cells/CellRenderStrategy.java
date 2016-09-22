@@ -26,6 +26,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.attribute.AttributeBuilder;
+import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.util.ModelUtils;
@@ -101,11 +103,10 @@ public class CellRenderStrategy implements IRenderStrategy {
   @Override
   public void startRenderCell(TreeNode node, boolean isFirstItem, boolean isLastItem) {
     Optional<String> tagName = Optional.absent();
-    String cssClasses = "cel_cell";
-    String cssStyles = "";
+    AttributeBuilder attributes = new DefaultAttributeBuilder().addCssClasses("cel_cell");
     String idname = "";
+    DocumentReference cellDocRef = node.getDocumentReference();
     try {
-      DocumentReference cellDocRef = node.getDocumentReference();
       LOGGER.debug("startRenderCell: cellDocRef [{}] context db [{}].", cellDocRef,
           context.getDatabase());
       BaseObject cellObj = modelAccess.getXObject(cellDocRef, cellClassConfig.getCellClassRef(
@@ -113,9 +114,9 @@ public class CellRenderStrategy implements IRenderStrategy {
       if (cellObj != null) {
         String cellObjCssClasses = cellObj.getStringValue("css_classes");
         if (!Strings.isNullOrEmpty(cellObjCssClasses)) {
-          cssClasses += " " + cellObjCssClasses;
+          attributes.addCssClasses(cellObjCssClasses);
         }
-        cssStyles = cellObj.getStringValue("css_styles");
+        attributes.addStyles(cellObj.getStringValue("css_styles"));
         idname = cellObj.getStringValue(ICellsClassConfig.CELLCLASS_IDNAME_FIELD);
       }
       tagName = getTagName(cellDocRef, cellObj);
@@ -124,10 +125,15 @@ public class CellRenderStrategy implements IRenderStrategy {
         nodeFN = nodeFN.replaceAll(context.getDatabase() + ":", "");
         idname = "cell:" + nodeFN.replaceAll(":", "..");
       }
+      attributes.addId(idname);
     } catch (DocumentNotExistsException exp) {
       LOGGER.error("failed to get cell [{}] document.", node.getDocumentReference(), exp);
     }
-    cellWriter.openLevel(tagName.orNull(), idname, cssClasses, cssStyles);
+    IPageTypeConfig cellTypeConfig = getCellTypeConfig(cellDocRef);
+    if (cellTypeConfig != null) {
+      cellTypeConfig.collectAttributes(attributes, cellDocRef);
+    }
+    cellWriter.openLevel(tagName.orNull(), attributes.build());
   }
 
   Optional<String> getTagName(DocumentReference cellDocRef, BaseObject cellObj) {

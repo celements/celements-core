@@ -21,8 +21,14 @@ package com.celements.cells;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import com.celements.cells.attribute.CellAttribute;
+import com.celements.cells.attribute.DefaultCellAttribute;
 
 public class DivWriterTest {
 
@@ -157,6 +163,27 @@ public class DivWriterTest {
     divWriter.appendContent(content);
     assertEquals("appendContent must add the given content to the output stream", content,
         divWriter.getAsString());
+  }
+
+  @Test
+  public void testOpenLevel_Attributes() {
+    DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
+        "testName").addValue("testValue");
+    DefaultCellAttribute.Builder attrBuilder2 = new DefaultCellAttribute.Builder().attrName(
+        "testName2").addValue("testValue2");
+    List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build(),
+        (CellAttribute) attrBuilder2.build());
+    divWriter.openLevel(attributes);
+    String returnedString = divWriter.getAsString();
+    assertTrue("Must start with '<div ' but got '" + returnedString + "'",
+        returnedString.startsWith("<div "));
+    assertTrue("Must end with '>' but got '" + returnedString + "'", returnedString.endsWith(">"));
+    String attr1Expected = "testName=\"testValue\"";
+    assertTrue("Must contain '" + attr1Expected + "'", divWriter.getAsString().contains(
+        attr1Expected));
+    String attr2Expected = "testName2=\"testValue2\"";
+    assertTrue("Must contain '" + attr2Expected + "'", divWriter.getAsString().contains(
+        attr2Expected));
   }
 
 }
