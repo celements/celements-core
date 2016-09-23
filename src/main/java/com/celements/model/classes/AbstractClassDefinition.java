@@ -45,7 +45,7 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
     EntityReference ref = References.cloneRef(getRelativeClassRef());
     Preconditions.checkState(!References.extractRef(ref, WikiReference.class).isPresent(),
         "wiki must be missing from relative class ref");
-    ref.getRoot().setParent(wikiRef);
+    ref.getRoot().setParent(wikiRef.clone());
     return new DocumentReference(ref);
   }
 

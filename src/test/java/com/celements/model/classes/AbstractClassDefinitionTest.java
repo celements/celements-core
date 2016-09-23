@@ -7,7 +7,9 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -29,6 +31,17 @@ public class AbstractClassDefinitionTest extends AbstractComponentTest {
     WikiReference wiki = new WikiReference("asdf");
     assertEquals(new DocumentReference(wiki.getName(), "Classes", "TestClass"),
         testClass.getClassRef(wiki));
+  }
+
+  @Test
+  public void test_getClassRef_cloneWiki_setChild() throws Exception {
+    DocumentReference docRef = new DocumentReference("asdf", "Classes", "myDocName");
+    SpaceReference origSpaceRef = (SpaceReference) docRef.extractReference(EntityType.SPACE);
+    DocumentReference classRef = testClass.getClassRef(docRef.getWikiReference());
+    assertEquals(new DocumentReference("asdf", "Classes", "TestClass"), classRef);
+    assertEquals("myDocName", docRef.getName());
+    assertSame("WikiRef must be cloned because of setChild", origSpaceRef,
+        docRef.getWikiReference().getChild());
   }
 
   @Test
