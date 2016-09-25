@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.css.ICssExtensionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.ModelContext;
 import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.web.css.CSS;
 import com.celements.web.css.CSSEngine;
@@ -120,8 +121,8 @@ public class CssCommand {
 
   public List<CSS> includeCSSPage(String css, XWikiContext context) {
     List<BaseObject> skins = null;
-    if (!new PageLayoutCommand().layoutExists(
-        context.getDoc().getDocumentReference().getLastSpaceReference())) {
+    if ((context != null) && !new PageLayoutCommand().layoutExists(
+        getModelContext().getDoc().getDocumentReference().getLastSpaceReference())) {
       XWikiDocument doc = context.getDoc();
       skins = doc.getXObjects(getSkinsUserCssClassRef(context.getDatabase()));
       LOGGER.debug("CSS Page: " + doc.getDocumentReference() + " has attached " + ((skins != null)
@@ -282,6 +283,10 @@ public class CssCommand {
 
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private ModelContext getModelContext() {
+    return Utils.getComponent(ModelContext.class);
   }
 
 }
