@@ -42,12 +42,12 @@ public class DocumentParentsLister implements IDocumentParentsListerRole {
     ArrayList<DocumentReference> parents = new ArrayList<>();
     try {
       setParent(parents, docRef);
-      boolean hasMore = true;
+      boolean hasMore = !parents.isEmpty();
       while (hasMore) {
         setPrimaryParents(parents);
         hasMore = setSecondaryParent(parents);
       }
-      if (!includeDoc) {
+      if (!parents.isEmpty() && !includeDoc) {
         parents.remove(0);
       }
     } catch (XDocRecursionException recExp) {
