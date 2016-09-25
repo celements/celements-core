@@ -175,21 +175,24 @@ public class ExternalJavaScriptFilesCommand {
   }
 
   public String getAllExternalJavaScriptFiles() throws XWikiException {
-    VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
-    if ((vcontext != null) && vcontext.containsKey("skin_doc")) {
-      addAllExtJSfilesFromDoc(context.getWiki().getDocument(getWebUtils().resolveDocumentReference(
-          ((Document) vcontext.get("skin_doc")).getFullName()), context));
-    }
-    addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-        context.getDatabase(), "XWiki", "XWikiPreferences"), context));
-    addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-        context.getDatabase(),
-        context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
-        "WebPreferences"), context));
-    addAllExtJSfilesFromDoc(context.getDoc());
-    XWikiDocument pagetype = getPageTypeDoc(context.getDoc());
-    if (pagetype != null) {
-      addAllExtJSfilesFromDoc(pagetype);
+    if ((context != null) && (context.getDoc() != null)) {
+      VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
+      if ((vcontext != null) && vcontext.containsKey("skin_doc")) {
+        addAllExtJSfilesFromDoc(context.getWiki().getDocument(
+            getWebUtils().resolveDocumentReference(((Document) vcontext.get(
+                "skin_doc")).getFullName()), context));
+      }
+      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
+          context.getDatabase(), "XWiki", "XWikiPreferences"), context));
+      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
+          context.getDatabase(),
+          context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
+          "WebPreferences"), context));
+      addAllExtJSfilesFromDoc(context.getDoc());
+      XWikiDocument pagetype = getPageTypeDoc(context.getDoc());
+      if (pagetype != null) {
+        addAllExtJSfilesFromDoc(pagetype);
+      }
     }
     notifyExtJavaScriptFileListener();
     String jsIncludes = "";
