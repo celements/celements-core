@@ -552,6 +552,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public boolean isAdminUser() {
+    if (getContext() == null) {
+      return false;
+    }
     try {
       if ((getContext().getXWikiUser() != null)
           && (getContext().getWiki().getRightService() != null)
@@ -569,6 +572,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public boolean isSuperAdminUser() {
+    if (getContext() == null) {
+      return false;
+    }
     String user = getContext().getUser();
     LOGGER.trace("isSuperAdminUser: user [" + user + "] db [" + getContext().getDatabase() + "].");
     return (isAdminUser() && (user.startsWith("xwiki:") || getContext().isMainWiki()));
@@ -576,6 +582,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public boolean isLayoutEditor() {
+    if (getContext() == null) {
+      return false;
+    }
     String user = getContext().getUser();
     LOGGER.trace("isLayoutEditor: user [" + user + "] db [" + getContext().getDatabase() + "].");
     try {
@@ -593,6 +602,9 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public boolean isAdvancedAdmin() {
+    if (getContext() == null) {
+      return false;
+    }
     String user = getContext().getUser();
     LOGGER.trace("isAdvancedAdmin: user [" + user + "] db [" + getContext().getDatabase() + "].");
     try {
