@@ -552,11 +552,8 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public boolean isAdminUser() {
-    if (getContext() == null) {
-      return false;
-    }
     try {
-      if ((getContext().getXWikiUser() != null)
+      if ((getContext() != null) && (getContext().getXWikiUser() != null)
           && (getContext().getWiki().getRightService() != null)
           && (getContext().getDoc() != null)) {
         return (getContext().getWiki().getRightService().hasAdminRights(getContext())
@@ -582,7 +579,7 @@ public class WebUtilsService implements IWebUtilsService {
 
   @Override
   public boolean isLayoutEditor() {
-    if (getContext() == null) {
+    if ((getContext() == null) || (getContext().getXWikiUser() == null)) {
       return false;
     }
     String user = getContext().getUser();
