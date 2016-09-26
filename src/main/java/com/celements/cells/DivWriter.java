@@ -24,12 +24,13 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.python.google.common.base.Strings;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import com.celements.cells.attribute.CellAttribute;
 import com.celements.cells.attribute.DefaultAttributeBuilder;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 
 public class DivWriter implements ICellWriter {
 
@@ -80,7 +81,7 @@ public class DivWriter implements ICellWriter {
       getOut().append("=\"");
       Optional<String> attrValue = cellAttr.getValue();
       // TODO CELDEV-343: check for HTML5 type. Only add default Value for XHMTL
-      getOut().append(attrValue.or(attrName));
+      getOut().append(StringEscapeUtils.escapeHtml(attrValue.or(attrName)));
       getOut().append("\"");
     }
     getOut().append(">");

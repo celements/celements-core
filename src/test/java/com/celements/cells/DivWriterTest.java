@@ -179,11 +179,23 @@ public class DivWriterTest {
         returnedString.startsWith("<div "));
     assertTrue("Must end with '>' but got '" + returnedString + "'", returnedString.endsWith(">"));
     String attr1Expected = "testName=\"testValue\"";
-    assertTrue("Must contain '" + attr1Expected + "'", divWriter.getAsString().contains(
-        attr1Expected));
+    assertTrue("Must contain '" + attr1Expected + "'", returnedString.contains(attr1Expected));
     String attr2Expected = "testName2=\"testValue2\"";
-    assertTrue("Must contain '" + attr2Expected + "'", divWriter.getAsString().contains(
-        attr2Expected));
+    assertTrue("Must contain '" + attr2Expected + "'", returnedString.contains(attr2Expected));
   }
 
+  @Test
+  public void testOpenLevel_quotes() {
+    DefaultCellAttribute.Builder attrBuilder = new DefaultCellAttribute.Builder().attrName(
+        "testName").addValue("test. : -äöü\"Value");
+    List<CellAttribute> attributes = Arrays.asList((CellAttribute) attrBuilder.build());
+    divWriter.openLevel(attributes);
+    String returnedString = divWriter.getAsString();
+    assertTrue("Must start with '<div ' but got '" + returnedString + "'",
+        returnedString.startsWith("<div "));
+    assertTrue("Must end with '>' but got '" + returnedString + "'", returnedString.endsWith(">"));
+    String attrExpected = "testName=\"test. : -&auml;&ouml;&uuml;&quot;Value\"";
+    assertTrue("Must contain '" + attrExpected + "' but got '" + returnedString + "'",
+        returnedString.contains(attrExpected));
+  }
 }
