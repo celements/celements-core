@@ -1,5 +1,7 @@
 package com.celements.model.access;
 
+import static com.google.common.base.Preconditions.*;
+
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.context.ModelContext;
@@ -27,11 +29,10 @@ public abstract class ContextExecutor<T, E extends Throwable> {
   }
 
   public T execute() throws E {
+    checkState(wiki != null, "No wiki set for ContextExecutor");
     WikiReference currWiki = getContext().getWikiRef();
     try {
-      if (wiki != null) {
-        getContext().setWikiRef(wiki);
-      }
+      getContext().setWikiRef(wiki);
       return call();
     } finally {
       getContext().setWikiRef(currWiki);
