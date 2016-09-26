@@ -110,7 +110,7 @@ public class ClassFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_toString() throws Exception {
-    assertEquals("classes.test.name", field.toString());
+    assertEquals(field.getClassDef() + "." + name, field.toString());
   }
 
 }

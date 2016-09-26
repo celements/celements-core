@@ -1,5 +1,6 @@
 package com.celements.model.classes.fields;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
 import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
@@ -52,12 +53,16 @@ public class EntityReferenceFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_serialize() throws Exception {
-    assertEquals("xwikidb:classes.test", field.serialize(field.getClassDef().getClassRef()));
+    assertEquals(getClassDefFN(), field.serialize(field.getClassDef().getClassRef()));
   }
 
   @Test
   public void test_resolve() throws Exception {
-    assertEquals(field.getClassDef().getClassRef(), field.resolve("xwikidb:classes.test"));
+    assertEquals(field.getClassDef().getClassRef(), field.resolve(getClassDefFN()));
+  }
+
+  private String getClassDefFN() {
+    return getContext().getDatabase() + ":" + field.getClassDef().toString();
   }
 
 }

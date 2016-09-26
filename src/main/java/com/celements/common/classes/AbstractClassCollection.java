@@ -27,6 +27,8 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.classes.AbstractClassDefinition;
+import com.celements.model.classes.AbstractClassPackage;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,7 +47,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  * asked for.
  *
  * @author fabian pichler since 2.18.0
- * @deprecated instead use {@link AbstractClassCreator}
+ * @deprecated since 2.82 instead use {@link AbstractClassDefinition} and
+ *             {@link AbstractClassPackage}}
  */
 @Deprecated
 public abstract class AbstractClassCollection implements IClassCollectionRole {

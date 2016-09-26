@@ -1,5 +1,8 @@
 package com.celements.navigation;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
@@ -46,6 +49,7 @@ public final class NavigationConfig {
     private Optional<Integer> nrOfItemsPerPage = Optional.absent();
     private Optional<String> presentationTypeHint = Optional.absent();
     private Optional<String> cmCssClass = Optional.absent();
+    private LinkedHashSet<String> mainUlCSSClasses = new LinkedHashSet<>();
 
     public Builder() {
       enabled = true;
@@ -114,6 +118,11 @@ public final class NavigationConfig {
       return this;
     }
 
+    public Builder addMainUlCSSClass(@NotNull String val) {
+      mainUlCSSClasses.add(val);
+      return this;
+    }
+
     public NavigationConfig build() {
       return new NavigationConfig(this);
     }
@@ -132,6 +141,7 @@ public final class NavigationConfig {
   private final Optional<Integer> nrOfItemsPerPage;
   private final Optional<String> presentationTypeHint;
   private final Optional<String> cmCssClass;
+  private final LinkedHashSet<String> mainUlCSSClasses;
 
   private NavigationConfig() {
     this(new Builder().disable());
@@ -150,6 +160,7 @@ public final class NavigationConfig {
     this.nrOfItemsPerPage = builder.nrOfItemsPerPage;
     this.presentationTypeHint = builder.presentationTypeHint;
     this.cmCssClass = builder.cmCssClass;
+    this.mainUlCSSClasses = builder.mainUlCSSClasses;
   }
 
   @NotNull
@@ -168,6 +179,8 @@ public final class NavigationConfig {
       b.nrOfItemsPerPage = newConf.nrOfItemsPerPage.or(nrOfItemsPerPage);
       b.presentationTypeHint = newConf.presentationTypeHint.or(presentationTypeHint);
       b.cmCssClass = newConf.cmCssClass.or(cmCssClass);
+      b.mainUlCSSClasses.addAll(mainUlCSSClasses);
+      b.mainUlCSSClasses.addAll(newConf.mainUlCSSClasses);
       return b.build();
     } else {
       return DEFAULTS;
@@ -239,6 +252,11 @@ public final class NavigationConfig {
   @NotNull
   public String getCssClass() {
     return cmCssClass.or("");
+  }
+
+  @NotNull
+  public Set<String> getMainUlCSSClasses() {
+    return new LinkedHashSet<String>(mainUlCSSClasses);
   }
 
   private static ModelUtils getModelUtils() {

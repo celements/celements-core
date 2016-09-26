@@ -67,6 +67,6 @@ public class ClassFieldValueTest extends AbstractComponentTest {
   @Test
   public void test_toString() throws Exception {
     ClassFieldValue<String> fieldValue = new ClassFieldValue<>(field, val);
-    assertEquals("classes.test.name: val", fieldValue.toString());
+    assertEquals(fieldValue.getField() + ": " + val, fieldValue.toString());
   }
 }

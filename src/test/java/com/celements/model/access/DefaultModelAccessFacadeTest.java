@@ -346,25 +346,14 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_exists_lang_true() throws Exception {
+  public void test_exists_lang() throws Exception {
     String lang = "en";
-    Capture<XWikiDocument> capt = expectExists(true);
+    expect(getWikiMock().exists(eq(doc.getDocumentReference()), same(getContext()))).andReturn(
+        true).once();
     replayDefault();
     boolean ret = modelAccess.exists(doc.getDocumentReference(), lang);
     verifyDefault();
     assertTrue(ret);
-    assertCapture(capt, doc.getDocumentReference(), lang);
-  }
-
-  @Test
-  public void test_exists_lang_false() throws Exception {
-    String lang = "en";
-    Capture<XWikiDocument> capt = expectExists(false);
-    replayDefault();
-    boolean ret = modelAccess.exists(doc.getDocumentReference(), lang);
-    verifyDefault();
-    assertFalse(ret);
-    assertCapture(capt, doc.getDocumentReference(), lang);
   }
 
   @Test
@@ -879,7 +868,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       modelAccess.getProperty(doc, field);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
-      assertTrue(iae.getMessage().contains("classes.test.name"));
+      assertTrue(iae.getMessage().contains(field.toString()));
       assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
     } finally {
       verifyDefault();
@@ -1024,7 +1013,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       modelAccess.setProperty(doc, fieldValue);
       fail("expecting IllegalArgumentException");
     } catch (IllegalArgumentException iae) {
-      assertTrue(iae.getMessage().contains("classes.test.name"));
+      assertTrue(iae.getMessage().contains(field.toString()));
       assertTrue(iae.getCause().getClass().equals(ClassCastException.class));
     } finally {
       verifyDefault();
@@ -1135,12 +1124,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     }
     doc.addXObject(obj);
     return obj;
-  }
-
-  private Capture<XWikiDocument> expectExists(boolean result) throws XWikiException {
-    Capture<XWikiDocument> capt = new Capture<>();
-    expect(storeMock.exists(capture(capt), same(getContext()))).andReturn(result).once();
-    return capt;
   }
 
   private void assertCapture(Capture<XWikiDocument> capt, DocumentReference docRef, String lang) {
