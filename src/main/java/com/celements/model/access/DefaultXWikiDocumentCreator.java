@@ -38,6 +38,11 @@ public class DefaultXWikiDocumentCreator implements XWikiDocumentCreator {
   }
 
   @Override
+  public XWikiDocument createWithoutDefaults(DocumentReference docRef) {
+    return createWithoutDefaults(docRef, IModelAccessFacade.DEFAULT_LANG);
+  }
+
+  @Override
   public XWikiDocument create(DocumentReference docRef, String lang) {
     XWikiDocument doc = createWithoutDefaults(docRef, lang);
     doc.setDefaultLanguage(getDefaultLangForCreatingDoc(docRef));

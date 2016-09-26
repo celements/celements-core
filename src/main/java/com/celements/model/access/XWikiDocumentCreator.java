@@ -10,6 +10,8 @@ public interface XWikiDocumentCreator {
 
   public XWikiDocument createWithoutDefaults(DocumentReference docRef, String lang);
 
+  public XWikiDocument createWithoutDefaults(DocumentReference docRef);
+
   public XWikiDocument create(DocumentReference docRef, String lang);
 
   public XWikiDocument create(DocumentReference docRef);
