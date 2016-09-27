@@ -48,7 +48,7 @@ public final class LargeStringField extends StringField {
     return String.class;
   }
 
-  public Integer getRow() {
+  public Integer getRows() {
     return rows;
   }
 
