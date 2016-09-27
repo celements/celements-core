@@ -1,7 +1,6 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
-import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,11 +18,6 @@ public class StringFieldTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     field = new StringField.Builder(TestClassDefinition.NAME, "name").size(size).build();
-  }
-
-  @Test
-  public void test_immutability() {
-    assertImmutable(StringField.class);
   }
 
   @Test
