@@ -60,7 +60,7 @@ public class StringField extends AbstractClassField<String> {
     return element;
   }
 
-  public StringClass getStringPropertyClass() {
+  protected StringClass getStringPropertyClass() {
     return new StringClass();
   }
 

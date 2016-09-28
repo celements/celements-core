@@ -18,7 +18,6 @@ public final class LargeStringField extends StringField {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);
-      this.rows(rows);
     }
 
     @Override
@@ -43,20 +42,17 @@ public final class LargeStringField extends StringField {
     this.rows = builder.rows;
   }
 
-  @Override
-  public Class<String> getType() {
-    return String.class;
-  }
-
   public Integer getRows() {
     return rows;
   }
 
   @Override
-  public StringClass getStringPropertyClass() {
-    TextAreaClass textAreaClass = new TextAreaClass();
-    textAreaClass.setRows(rows);
-    return textAreaClass;
+  protected StringClass getStringPropertyClass() {
+    TextAreaClass element = new TextAreaClass();
+    if (rows != null) {
+      element.setRows(rows);
+    }
+    return element;
   }
 
 }
