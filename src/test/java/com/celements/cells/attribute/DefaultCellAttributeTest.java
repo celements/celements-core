@@ -76,4 +76,12 @@ public class DefaultCellAttributeTest {
     assertFalse(cellAttr.getValue().isPresent());
   }
 
+  @Test
+  public void testGetValue_emptyStr() {
+    cellAttrBuilder.attrName("myName");
+    DefaultCellAttribute cellAttr = cellAttrBuilder.addValue("").build();
+    assertTrue(cellAttr.getValue().isPresent());
+    assertEquals("", cellAttr.getValue().get());
+  }
+
 }
