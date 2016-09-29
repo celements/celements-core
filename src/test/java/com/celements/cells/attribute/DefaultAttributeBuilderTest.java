@@ -32,6 +32,20 @@ public class DefaultAttributeBuilderTest {
   }
 
   @Test
+  public void test_AddAttribute_empty() {
+    String attrName = "myAttr";
+    String attrValue = null;
+    attrBuilder.addAttribute(attrName, attrValue);
+    List<CellAttribute> cellAttrList = attrBuilder.build();
+    assertNotNull(cellAttrList);
+    assertFalse(cellAttrList.isEmpty());
+    assertEquals(attrName, cellAttrList.get(0).getName());
+    Optional<String> theValue = cellAttrList.get(0).getValue();
+    assertTrue(theValue.isPresent());
+    assertEquals("", theValue.get());
+  }
+
+  @Test
   public void testAddEmptyAttribute() {
     String attrName = "selected";
     attrBuilder.addEmptyAttribute(attrName);

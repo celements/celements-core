@@ -36,7 +36,11 @@ public class DefaultCellAttribute implements CellAttribute {
 
     public DefaultCellAttribute build() {
       checkState(!Strings.isNullOrEmpty(name));
-      return new DefaultCellAttribute(name, VALUES_JOINER.join(values));
+      String attrValue = null;
+      if (!values.isEmpty()) {
+        attrValue = VALUES_JOINER.join(values).trim();
+      }
+      return new DefaultCellAttribute(name, attrValue);
     }
 
   }
@@ -46,7 +50,7 @@ public class DefaultCellAttribute implements CellAttribute {
 
   private DefaultCellAttribute(@NotNull String attrName, @Nullable String attrValue) {
     this.name = attrName;
-    this.value = Strings.emptyToNull(attrValue);
+    this.value = attrValue;
   }
 
   @Override

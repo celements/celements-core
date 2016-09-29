@@ -22,6 +22,15 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
   private final Map<String, DefaultCellAttribute.Builder> attributeMap = new LinkedHashMap<>();
 
   @Override
+  public AttributeBuilder addAttribute(String attrName, String attrValue) {
+    checkNotNull(attrName);
+    if (!attrName.isEmpty()) {
+      getCellAttributeBuilder(attrName).addValue(Strings.nullToEmpty(attrValue));
+    }
+    return this;
+  }
+
+  @Override
   public AttributeBuilder addEmptyAttribute(String attrName) {
     checkNotNull(attrName);
     if (!attrName.isEmpty()) {
@@ -32,9 +41,8 @@ public class DefaultAttributeBuilder implements AttributeBuilder {
 
   @Override
   public AttributeBuilder addNonEmptyAttribute(String attrName, String attrValue) {
-    checkNotNull(attrName);
-    if (!attrName.isEmpty() && !Strings.isNullOrEmpty(attrValue)) {
-      getCellAttributeBuilder(attrName).addValue(attrValue);
+    if (!Strings.isNullOrEmpty(attrValue)) {
+      addAttribute(attrName, attrValue);
     }
     return this;
   }
