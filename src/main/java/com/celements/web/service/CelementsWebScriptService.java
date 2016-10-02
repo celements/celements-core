@@ -733,6 +733,30 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
+   * The context.isMainWiki method is broken for virtual usage. This is a replacement.
+   */
+  public boolean isMainWiki() {
+    return getContext() == null ? null : isMainWiki(getContext().getDatabase());
+  }
+
+  /**
+   * The context.isMainWiki method is broken for virtual usage. This is a replacement.
+   */
+  public boolean isMainWiki(String wikiName) {
+    return getContext() == null ? null
+        : (!getContext().getWiki().isVirtualMode() || (wikiName == null ? getMainWikiName() == null
+            : wikiName.equalsIgnoreCase(getMainWikiName())));
+  }
+
+  /**
+   * The context.getMainXWiki method is broken for virtual usage. This is a replacement.
+   * return schema = wiki.Param("xwiki.db");
+   */
+  public String getMainWikiName() {
+    return (getContext() != null ? getContext().getWiki().Param("xwiki.db") : null);
+  }
+
+  /**
    * Cache should maintain itself. Thus this flushMenuItemCache should not be called
    * anymore.
    *
