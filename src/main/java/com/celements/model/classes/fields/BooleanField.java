@@ -90,7 +90,7 @@ public final class BooleanField extends AbstractClassField<Boolean> implements
       return null;
     }
     Preconditions.checkArgument(obj.getClass().equals(Integer.class));
-    return ((Integer) obj).equals(1);
+    return !((Integer) obj).equals(0);
   }
 
 }

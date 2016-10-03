@@ -42,4 +42,19 @@ public class BooleanFieldTest extends AbstractComponentTest {
     assertEquals(displayType, xField.getDisplayType());
     assertEquals(defaultValue, (Integer) xField.getDefaultValue());
   }
+
+  @Test
+  public void test_serialize() throws Exception {
+    assertNull(field.serialize(null));
+    assertEquals(1, field.serialize(true));
+    assertEquals(0, field.serialize(false));
+  }
+
+  @Test
+  public void test_resolve() throws Exception {
+    assertNull(field.resolve(null));
+    assertEquals(true, field.resolve(1));
+    assertEquals(true, field.resolve(5));
+    assertEquals(false, field.resolve(0));
+  }
 }
