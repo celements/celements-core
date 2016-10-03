@@ -4,11 +4,13 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Preconditions;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 @Immutable
-public final class BooleanField extends AbstractClassField<Boolean> {
+public final class BooleanField extends AbstractClassField<Boolean> implements
+    CustomClassField<Boolean> {
 
   private final String displayType;
   private final Integer defaultValue;
@@ -72,6 +74,23 @@ public final class BooleanField extends AbstractClassField<Boolean> {
       element.setDefaultValue(defaultValue);
     }
     return element;
+  }
+
+  @Override
+  public Object serialize(Boolean value) {
+    if (value == null) {
+      return null;
+    }
+    return value ? 1 : 0;
+  }
+
+  @Override
+  public Boolean resolve(Object obj) {
+    if (obj == null) {
+      return null;
+    }
+    Preconditions.checkArgument(obj.getClass().equals(Integer.class));
+    return !((Integer) obj).equals(0);
   }
 
 }
