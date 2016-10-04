@@ -1156,11 +1156,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
       return create(docRef, IModelAccessFacade.DEFAULT_LANG);
     }
 
-    @Override
-    public XWikiDocument createWithoutDefaults(DocumentReference docRef) {
-      return createWithoutDefaults(docRef, IModelAccessFacade.DEFAULT_LANG);
-    }
-
   }
 
 }
