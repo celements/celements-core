@@ -27,6 +27,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @ComponentRole
 public interface IModelAccessFacade {
 
+  public static final String DEFAULT_LANG = "";
+
   @NotNull
   public XWikiDocument getDocument(@NotNull DocumentReference docRef)
       throws DocumentNotExistsException;

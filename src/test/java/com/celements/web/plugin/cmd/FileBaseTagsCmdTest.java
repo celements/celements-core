@@ -340,7 +340,8 @@ public class FileBaseTagsCmdTest extends AbstractComponentTest {
             0))).atLeastOnce();
     XWikiDocument existingTagDoc = new XWikiDocument(tagDocRef);
     existingTagDoc.setNew(false);
-    expect(getMock(XWikiDocumentCreator.class).create(eq(tagDocRef))).andReturn(existingTagDoc);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(tagDocRef), eq(""))).andReturn(
+        existingTagDoc);
     BaseClass menuItemBaseClass = createMockAndAddToDefault(BaseClass.class);
     expect(xwiki.getXClass(eq(navClassConfig.getMenuItemClassRef()), same(context))).andReturn(
         menuItemBaseClass).once();

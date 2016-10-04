@@ -405,7 +405,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
     defaultDoc.setXObjects(cdClassRef, cDobjects);
     DocumentReference doc1Ref = new DocumentReference(db, "Full", "Name");
     expect(xwiki.exists(eq(doc1Ref), same(context))).andReturn(false).atLeastOnce();
-    expect(getMock(XWikiDocumentCreator.class).create(eq(doc1Ref))).andReturn(defaultDoc).times(2);
+    expect(getMock(XWikiDocumentCreator.class).create(eq(doc1Ref), eq(""))).andReturn(
+        defaultDoc).times(2);
     XWikiDocument specificDoc = new XWikiDocument(specificDocRef);
     Vector<BaseObject> cDobjects2 = new Vector<>();
     cDobjects2.add(obj2);

@@ -143,3 +143,4 @@ com.celements.store.DocumentCacheStoreListener
 com.celements.model.context.DefaultModelContext
 com.celements.model.util.DefaultModelUtils
 com.celements.model.access.DefaultXWikiDocumentCreator
+com.celements.model.access.StoreModelAccessStrategy
