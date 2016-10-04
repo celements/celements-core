@@ -36,6 +36,13 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
       return this;
     }
 
+    public Builder version(@Nullable String val) {
+      if (!Strings.isNullOrEmpty(val)) {
+        version(new Version(val));
+      }
+      return this;
+    }
+
     public Builder version(@Nullable Version val) {
       version = val;
       return this;

@@ -20,6 +20,7 @@
  */
 package com.celements.store;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -34,7 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
@@ -862,10 +862,10 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
     try {
       Query query = buildDocumentMetaDataQuery(filterRef);
       for (Object[] docData : query.<Object[]>execute()) {
-        DocumentReference docRef = new DocumentReference(query.getWiki(), (String) docData[1],
-            (String) docData[0]);
-        ret.add(new ImmutableDocumentMetaData.Builder(docRef).language((String) docData[2]).version(
-            new Version((String) docData[3])).build());
+        Optional<ImmutableDocumentMetaData> metaData = getMetaData(docData, query.getWiki());
+        if (metaData.isPresent()) {
+          ret.add(metaData.get());
+        }
       }
       LOGGER.info("listDocumentMetaData: found {} docs with hql '{}' for filterRef '{}'",
           ret.size(), query.getStatement(), filterRef);
@@ -901,6 +901,19 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
       query.bindValue(bind.getKey(), bind.getValue());
     }
     return query;
+  }
+
+  private Optional<ImmutableDocumentMetaData> getMetaData(Object[] docData, String wiki) {
+    ImmutableDocumentMetaData metaData = null;
+    try {
+      DocumentReference docRef = new DocumentReference(wiki, (String) docData[1],
+          (String) docData[0]);
+      metaData = new ImmutableDocumentMetaData.Builder(docRef).language(
+          (String) docData[2]).version((String) docData[3]).build();
+    } catch (IllegalArgumentException iae) {
+      LOGGER.warn("getMetaData: illegal docData '{}'", Arrays.asList(docData), iae);
+    }
+    return Optional.fromNullable(metaData);
   }
 
 }
