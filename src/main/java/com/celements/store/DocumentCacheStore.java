@@ -860,9 +860,11 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   public Set<DocumentMetaData> listDocumentMetaData(EntityReference filterRef) {
     Set<DocumentMetaData> ret = new LinkedHashSet<>();
     try {
+      Map<String, SpaceReference> spaceRefMap = new HashMap<>();
       Query query = buildDocumentMetaDataQuery(filterRef);
+      WikiReference wiki = new WikiReference(query.getWiki());
       for (Object[] docData : query.<Object[]>execute()) {
-        Optional<ImmutableDocumentMetaData> metaData = getMetaData(docData, query.getWiki());
+        Optional<DocumentMetaData> metaData = getMetaData(wiki, docData, spaceRefMap);
         if (metaData.isPresent()) {
           ret.add(metaData.get());
         }
@@ -880,7 +882,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
 
   private Query buildDocumentMetaDataQuery(EntityReference filterRef) throws QueryException {
     StringBuilder sb = new StringBuilder();
-    sb.append("select distinct doc.name, doc.space, doc.language, doc.version "
+    sb.append("select distinct doc.space, doc.name, doc.language, doc.version "
         + "from XWikiDocument as doc");
     Map<String, String> bindValues = new HashMap<>();
     Optional<SpaceReference> spaceRef = References.extractRef(filterRef, SpaceReference.class);
@@ -903,13 +905,16 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
     return query;
   }
 
-  private Optional<ImmutableDocumentMetaData> getMetaData(Object[] docData, String wiki) {
-    ImmutableDocumentMetaData metaData = null;
+  private Optional<DocumentMetaData> getMetaData(WikiReference wikiRef, Object[] docData,
+      Map<String, SpaceReference> spaceRefMap) {
+    DocumentMetaData metaData = null;
     try {
-      DocumentReference docRef = new DocumentReference(wiki, (String) docData[1],
-          (String) docData[0]);
-      metaData = new ImmutableDocumentMetaData.Builder(docRef).language(
-          (String) docData[2]).version((String) docData[3]).build();
+      String spaceName = (String) docData[0];
+      if (!spaceRefMap.containsKey(spaceName)) {
+        spaceRefMap.put(spaceName, new SpaceReference(spaceName, wikiRef));
+      }
+      metaData = new ImmutableDocumentMetaData.Builder(spaceRefMap.get(spaceName),
+          (String) docData[1]).language((String) docData[2]).version((String) docData[3]).build();
     } catch (IllegalArgumentException iae) {
       LOGGER.warn("getMetaData: illegal docData '{}'", Arrays.asList(docData), iae);
     }
