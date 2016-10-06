@@ -18,21 +18,21 @@ import com.google.common.base.Strings;
 public final class ImmutableDocumentMetaData implements DocumentMetaData {
 
   private final SpaceReference spaceRef;
-  private final String name;
+  private final String docName;
   private final String lang;
   private final Version version;
 
   public static class Builder {
 
     private final SpaceReference spaceRef;
-    private final String name;
+    private final String docName;
     private String lang;
     private Version version;
 
-    public Builder(@NotNull SpaceReference spaceRef, @NotNull String name) {
+    public Builder(@NotNull SpaceReference spaceRef, @NotNull String docName) {
       this.spaceRef = Objects.requireNonNull(spaceRef);
-      this.name = Objects.requireNonNull(name);
-      Preconditions.checkArgument(!name.isEmpty());
+      this.docName = Objects.requireNonNull(docName);
+      Preconditions.checkArgument(!docName.isEmpty());
       this.lang = "";
     }
 
@@ -61,14 +61,14 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
 
   protected ImmutableDocumentMetaData(@NotNull Builder builder) {
     this.spaceRef = builder.spaceRef;
-    this.name = builder.name;
+    this.docName = builder.docName;
     this.lang = builder.lang;
     this.version = builder.version;
   }
 
   @Override
   public DocumentReference getDocRef() {
-    return new DocumentReference(name, References.cloneRef(spaceRef, SpaceReference.class));
+    return new DocumentReference(docName, References.cloneRef(spaceRef, SpaceReference.class));
   }
 
   @Override
@@ -83,7 +83,7 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
 
   @Override
   public int hashCode() {
-    return Objects.hash(spaceRef, name, lang, version);
+    return Objects.hash(spaceRef, docName, lang, version);
   }
 
   @Override
