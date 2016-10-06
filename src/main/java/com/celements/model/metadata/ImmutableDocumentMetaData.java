@@ -8,26 +8,31 @@ import javax.validation.constraints.NotNull;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.model.util.References;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 @Immutable
 public final class ImmutableDocumentMetaData implements DocumentMetaData {
 
-  private final DocumentReference docRef;
+  private final SpaceReference spaceRef;
+  private final String docName;
   private final String lang;
   private final Version version;
 
   public static class Builder {
 
-    private final DocumentReference docRef;
+    private final SpaceReference spaceRef;
+    private final String docName;
     private String lang;
     private Version version;
 
-    public Builder(@NotNull DocumentReference docRef) {
-      Objects.requireNonNull(docRef);
-      this.docRef = References.cloneRef(docRef, DocumentReference.class);
+    public Builder(@NotNull SpaceReference spaceRef, @NotNull String docName) {
+      this.spaceRef = Objects.requireNonNull(spaceRef);
+      this.docName = Objects.requireNonNull(docName);
+      Preconditions.checkArgument(!docName.isEmpty());
       this.lang = "";
     }
 
@@ -55,14 +60,15 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
   }
 
   protected ImmutableDocumentMetaData(@NotNull Builder builder) {
-    this.docRef = builder.docRef;
+    this.spaceRef = builder.spaceRef;
+    this.docName = builder.docName;
     this.lang = builder.lang;
     this.version = builder.version;
   }
 
   @Override
   public DocumentReference getDocRef() {
-    return References.cloneRef(docRef, DocumentReference.class);
+    return new DocumentReference(docName, References.cloneRef(spaceRef, SpaceReference.class));
   }
 
   @Override
@@ -77,7 +83,7 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
 
   @Override
   public int hashCode() {
-    return Objects.hash(docRef, lang, version);
+    return Objects.hash(spaceRef, docName, lang, version);
   }
 
   @Override
@@ -87,7 +93,7 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
       ret = true;
     } else if (obj instanceof DocumentMetaData) {
       DocumentMetaData other = (DocumentMetaData) obj;
-      ret = Objects.equals(this.docRef, other.getDocRef()) && Objects.equals(this.lang,
+      ret = Objects.equals(this.getDocRef(), other.getDocRef()) && Objects.equals(this.lang,
           other.getLanguage()) && Objects.equals(this.version, other.getVersion());
     }
     return ret;
@@ -96,7 +102,7 @@ public final class ImmutableDocumentMetaData implements DocumentMetaData {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("ImmutableDocumentMetaData [docRef=").append(docRef).append(", lang=").append(
+    sb.append("ImmutableDocumentMetaData [docRef=").append(getDocRef()).append(", lang=").append(
         lang).append(", version=").append(version).append("]");
     return sb.toString();
   }
