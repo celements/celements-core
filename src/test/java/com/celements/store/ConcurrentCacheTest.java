@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -54,6 +52,8 @@ import com.celements.navigation.INavigationClassConfig;
 import com.celements.pagetype.IPageTypeClassConfig;
 import com.celements.store.DocumentCacheStore.InvalidateState;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -77,7 +77,8 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
 
   private volatile XWikiCacheStore theCacheStore;
   private volatile DocumentCacheStore theCacheStoreFixed;
-  private volatile ConcurrentMap<DocumentReference, List<BaseObject>> baseObjMap = new ConcurrentHashMap<>();
+  private volatile Map<DocumentReference, List<BaseObject>> baseObjMap;
+  private volatile Map<Integer, List<String[]>> propertiesMap;
   private volatile DocumentReference testDocRef;
   private static volatile Collection<Object> defaultMocks;
   private static volatile XWikiContext defaultContext;
@@ -135,6 +136,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expect(getWikiMock().getXClass(isA(DocumentReference.class), isA(
         XWikiContext.class))).andStubDelegateTo(new TestXWiki());
     createBaseObjects();
+    createPropertiesMap();
   }
 
   @Test
@@ -430,20 +432,7 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
       @Override
       public List<String[]> list(String string, Map<String, Object> params)
           throws HibernateException {
-        Integer objId = (Integer) params.get("id");
-        List<String[]> propList = new ArrayList<>();
-        for (BaseObject templBaseObject : baseObjMap.get(testDocRef)) {
-          if (objId.equals(templBaseObject.getId())) {
-            for (Object theObj : templBaseObject.getFieldList()) {
-              PropertyInterface theField = (PropertyInterface) theObj;
-              String[] row = new String[2];
-              row[0] = theField.getName();
-              row[1] = theField.getClass().getCanonicalName();
-              propList.add(row);
-            }
-          }
-        }
-        return propList;
+        return propertiesMap.get(params.get("id"));
       }
 
     });
@@ -527,7 +516,26 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     bObj4.setDocumentReference(testDocRefClone);
     addStringField(bObj4, IPageTypeClassConfig.PAGE_TYPE_FIELD, "Performance");
     List<BaseObject> attList = new Vector<>(Arrays.asList(bObj1, bObj2, bObj3, bObj4));
-    baseObjMap.put(testDocRefClone, attList);
+    baseObjMap = ImmutableMap.of(testDocRefClone, attList);
+  }
+
+  private void createPropertiesMap() {
+    Map<Integer, List<String[]>> propertiesMap = new HashMap<>();
+    for (BaseObject templBaseObject : baseObjMap.get(testDocRef)) {
+      List<String[]> propList = new ArrayList<>();
+      for (Object theObj : templBaseObject.getFieldList()) {
+        PropertyInterface theField = (PropertyInterface) theObj;
+        String[] row = new String[2];
+        row[0] = theField.getName();
+        row[1] = theField.getClass().getCanonicalName();
+        propList.add(row);
+      }
+      if (propertiesMap.containsKey(templBaseObject.getId())) {
+        throw new IllegalStateException();
+      }
+      propertiesMap.put(templBaseObject.getId(), ImmutableList.copyOf(propList));
+    }
+    this.propertiesMap = ImmutableMap.copyOf(propertiesMap);
   }
 
   private void initStorePrepareMultiThreadMocks() throws XWikiException {
