@@ -274,11 +274,15 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     replayDefault();
     initStorePrepareMultiThreadMocks();
     List<Future<LoadDocCheckResult>> testResults = testScenario1(theCacheStore, cores, executeRuns);
+    boolean failed = false;
     try {
       assertSuccessFullRuns(testResults);
-      fail();
     } catch (AssertionError exp) {
       // expected
+      failed = true;
+    }
+    if (!failed) {
+      fail();
     }
     if (verifyDocLoads) {
       assertTrue("no synchronisation on loading must lead to concurrent loads."
