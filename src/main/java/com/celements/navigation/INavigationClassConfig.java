@@ -43,20 +43,28 @@ public interface INavigationClassConfig {
   public static final String PART_NAME_FIELD = "part_name";
   public static final String TARGET_FIELD = "link_target";
 
+  @Deprecated
   public DocumentReference getMenuNameClassRef(String wikiName);
+
+  public DocumentReference getMenuNameClassRef();
+
+  public DocumentReference getMenuNameClassRef(WikiReference wikiRef);
 
   public DocumentReference getNavigationConfigClassRef();
 
+  @Deprecated
   public DocumentReference getNavigationConfigClassRef(String wikiName);
 
   public DocumentReference getNavigationConfigClassRef(WikiReference wikiRef);
 
   public DocumentReference getMenuItemClassRef();
 
+  @Deprecated
   public DocumentReference getMenuItemClassRef(String wikiName);
 
   public DocumentReference getMenuItemClassRef(WikiReference wikiRef);
 
+  @Deprecated
   public DocumentReference getNewMenuItemClassRef(String wikiName);
 
 }
