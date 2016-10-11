@@ -13,6 +13,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.classes.fields.ClassField;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.web.Utils;
 
 public class AbstractClassDefinitionTest extends AbstractComponentTest {
@@ -68,6 +70,42 @@ public class AbstractClassDefinitionTest extends AbstractComponentTest {
     assertTrue(testClass.getFields().contains(TestClassDefinition.FIELD_MY_DOCREF));
     assertTrue(testClass.getFields().contains(TestClassDefinition.FIELD_MY_STRING));
     assertTrue(testClass.getFields().contains(TestClassDefinition.FIELD_MY_INT));
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getField() throws Exception {
+    replayDefault();
+    Optional<ClassField<?>> field = testClass.getField(TestClassDefinition.FIELD_MY_INT.getName());
+    verifyDefault();
+    assertTrue(field.isPresent());
+    assertSame(TestClassDefinition.FIELD_MY_INT, field.get());
+  }
+
+  @Test
+  public void test_getField_absent() throws Exception {
+    replayDefault();
+    Optional<ClassField<?>> field = testClass.getField("asdf");
+    verifyDefault();
+    assertFalse(field.isPresent());
+  }
+
+  @Test
+  public void test_getField_generic() throws Exception {
+    replayDefault();
+    Optional<ClassField<Integer>> field = testClass.getField(
+        TestClassDefinition.FIELD_MY_INT.getName(), Integer.class);
+    assertTrue(field.isPresent());
+    assertSame(TestClassDefinition.FIELD_MY_INT, field.get());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_getField_generic_wrongClass() throws Exception {
+    replayDefault();
+    Optional<ClassField<String>> field = testClass.getField(
+        TestClassDefinition.FIELD_MY_INT.getName(), String.class);
+    assertFalse(field.isPresent());
     verifyDefault();
   }
 

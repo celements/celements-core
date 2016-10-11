@@ -1,10 +1,12 @@
 package com.celements.model.classes;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,10 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public abstract class AbstractClassDefinition implements ClassDefinition {
 
@@ -33,7 +38,7 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
   @Requirement
   protected ConfigurationSource configSrc;
 
-  private volatile List<ClassField<?>> fields;
+  private volatile Map<String, ClassField<?>> fields;
 
   @Override
   public DocumentReference getClassRef() {
@@ -65,21 +70,48 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
     return ret;
   }
 
-  @Override
-  public List<ClassField<?>> getFields() {
+  private synchronized void loadFields() {
     if (fields == null) {
-      fields = new ArrayList<>();
-      for (Field field : this.getClass().getDeclaredFields()) {
+      Map<String, ClassField<?>> map = new LinkedHashMap<>();
+      for (Field declField : this.getClass().getDeclaredFields()) {
         try {
-          if (ClassField.class.isAssignableFrom(field.getType())) {
-            fields.add((ClassField<?>) field.get(this));
+          if (ClassField.class.isAssignableFrom(declField.getType())) {
+            ClassField<?> field = (ClassField<?>) declField.get(this);
+            map.put(field.getName(), field);
           }
         } catch (IllegalAccessException | IllegalArgumentException exc) {
-          LOGGER.error("failed to get field '{}", field, exc);
+          LOGGER.error("failed to get field '{}", declField, exc);
         }
       }
+      fields = ImmutableMap.copyOf(map);
     }
-    return Collections.unmodifiableList(fields);
+  }
+
+  private Map<String, ClassField<?>> getFieldMap() {
+    if (fields == null) {
+      loadFields();
+    }
+    return fields;
+  }
+
+  @Override
+  public List<ClassField<?>> getFields() {
+    return ImmutableList.copyOf(getFieldMap().values());
+  }
+
+  @Override
+  public Optional<ClassField<?>> getField(@NotNull String name) {
+    return Optional.<ClassField<?>>fromNullable(getFieldMap().get(name));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> Optional<ClassField<T>> getField(String name, Class<T> token) {
+    Optional<ClassField<?>> field = getField(name);
+    if (field.isPresent() && token.isAssignableFrom(field.get().getType())) {
+      return Optional.of((ClassField<T>) field.get());
+    }
+    return Optional.absent();
   }
 
   @Override

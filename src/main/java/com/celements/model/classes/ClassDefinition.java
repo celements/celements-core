@@ -9,6 +9,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.classes.fields.ClassField;
+import com.google.common.base.Optional;
 
 @ComponentRole
 public interface ClassDefinition {
@@ -46,6 +47,22 @@ public interface ClassDefinition {
   /**
    * @return a list of all fields defining this class
    */
+  @NotNull
   public List<ClassField<?>> getFields();
+
+  /**
+   * @param name
+   * @return the defined field for the given name
+   */
+  @NotNull
+  public Optional<ClassField<?>> getField(@NotNull String name);
+
+  /**
+   * @param name
+   * @param token
+   * @return the defined field for the given name
+   */
+  @NotNull
+  public <T> Optional<ClassField<T>> getField(@NotNull String name, @NotNull Class<T> token);
 
 }
