@@ -39,6 +39,7 @@ import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -512,6 +513,38 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       LOGGER.error("should not happen", exc);
     }
     return prop;
+  }
+
+  @Override
+  public <T> Optional<T> getFieldValue(XWikiDocument doc, ClassField<T> field) {
+    return Optional.fromNullable(getProperty(checkNotNull(doc), checkNotNull(field)));
+  }
+
+  @Override
+  public <T> Optional<T> getFieldValue(DocumentReference docRef, ClassField<T> field)
+      throws DocumentNotExistsException {
+    return Optional.fromNullable(getProperty(checkNotNull(docRef), checkNotNull(field)));
+  }
+
+  @Override
+  public <T> Optional<T> getFieldValue(XWikiDocument doc, ClassField<T> field, T ignoreValue) {
+    checkNotNull(ignoreValue);
+    Optional<T> property = getFieldValue(doc, field);
+    if (property.isPresent() && Objects.equal(property.get(), ignoreValue)) {
+      property = Optional.absent();
+    }
+    return property;
+  }
+
+  @Override
+  public <T> Optional<T> getFieldValue(DocumentReference docRef, ClassField<T> field, T ignoreValue)
+      throws DocumentNotExistsException {
+    checkNotNull(ignoreValue);
+    Optional<T> property = getFieldValue(docRef, field);
+    if (property.isPresent() && Objects.equal(property.get(), ignoreValue)) {
+      property = Optional.absent();
+    }
+    return property;
   }
 
   @Override

@@ -19,6 +19,7 @@ import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -317,6 +318,21 @@ public interface IModelAccessFacade {
 
   @Nullable
   public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
+
+  @NotNull
+  public <T> Optional<T> getFieldValue(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
+
+  @NotNull
+  public <T> Optional<T> getFieldValue(@NotNull DocumentReference docRef,
+      @NotNull ClassField<T> field) throws DocumentNotExistsException;
+
+  @NotNull
+  public <T> Optional<T> getFieldValue(@NotNull XWikiDocument doc, @NotNull ClassField<T> field,
+      T ignoreValue);
+
+  @NotNull
+  public <T> Optional<T> getFieldValue(@NotNull DocumentReference docRef,
+      @NotNull ClassField<T> field, T ignoreValue) throws DocumentNotExistsException;
 
   @NotNull
   public List<ClassFieldValue<?>> getProperties(@NotNull XWikiDocument doc,

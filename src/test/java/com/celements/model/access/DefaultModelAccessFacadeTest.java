@@ -31,6 +31,7 @@ import com.celements.model.classes.fields.StringField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -892,6 +893,116 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     verifyDefault();
 
     assertEquals(val, ret);
+  }
+
+  public void test_getFieldValue_doc() {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    String val = "val";
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc, field);
+    verifyDefault();
+    assertNotNull(ret);
+    assertTrue(ret.isPresent());
+    assertEquals(val, ret.get());
+  }
+
+  public void test_getFieldValue_doc_null() {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    addObj(field.getClassDef().getClassRef(), field.getName(), null);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc, field);
+    verifyDefault();
+    assertNotNull(ret);
+    assertFalse(ret.isPresent());
+  }
+
+  public void test_getFieldValue_docRef() throws Exception {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    String val = "val";
+    addObj(field.getClassDef().getClassRef(), field.getName(), null);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc.getDocumentReference(), field);
+    verifyDefault();
+    assertNotNull(ret);
+    assertTrue(ret.isPresent());
+    assertEquals(val, ret.get());
+  }
+
+  public void test_getFieldValue_docRef_null() throws Exception {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    addObj(field.getClassDef().getClassRef(), field.getName(), null);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc.getDocumentReference(), field);
+    verifyDefault();
+    assertNotNull(ret);
+    assertFalse(ret.isPresent());
+  }
+
+  public void test_getFieldValue_doc_ignore_hasValue() {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    String val = "val";
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc, field, "test");
+    verifyDefault();
+    assertNotNull(ret);
+    assertTrue(ret.isPresent());
+    assertEquals(val, ret.get());
+  }
+
+  public void test_getFieldValue_doc_ignore_noValue() {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    addObj(field.getClassDef().getClassRef(), field.getName(), null);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc, field, "test");
+    verifyDefault();
+    assertNotNull(ret);
+    assertFalse(ret.isPresent());
+  }
+
+  public void test_getFieldValue_doc_ignore_hasIgnoreValue() {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    String val = "test";
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc, field, "test");
+    verifyDefault();
+    assertNotNull(ret);
+    assertFalse(ret.isPresent());
+  }
+
+  public void test_getFieldValue_docRef_ignore_hasValue() throws Exception {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    String val = "val";
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc.getDocumentReference(), field, "test");
+    verifyDefault();
+    assertNotNull(ret);
+    assertTrue(ret.isPresent());
+    assertEquals(val, ret.get());
+  }
+
+  public void test_getFieldValue_docRef_ignore_noValue() throws Exception {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    addObj(field.getClassDef().getClassRef(), field.getName(), null);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc.getDocumentReference(), field, "test");
+    verifyDefault();
+    assertNotNull(ret);
+    assertFalse(ret.isPresent());
+  }
+
+  public void test_getFieldValue_docRef_ignore_hasIgnoreValue() throws Exception {
+    ClassField<String> field = new StringField.Builder(TestClassDefinition.NAME, "name").build();
+    String val = "test";
+    addObj(field.getClassDef().getClassRef(), field.getName(), val);
+    replayDefault();
+    Optional<String> ret = modelAccess.getFieldValue(doc.getDocumentReference(), field, "test");
+    verifyDefault();
+    assertNotNull(ret);
+    assertFalse(ret.isPresent());
   }
 
   @Test
