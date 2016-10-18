@@ -3,29 +3,40 @@ package com.celements.rights.access;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 public enum EAccessLevel {
 
-  VIEW("view"), COMMENT("comment"), EDIT("edit"), DELETE("delete"), UNDELETE("undelete"), REGISTER(
-      "register"), PROGRAMMING("programming");
+  VIEW("view"),
+  COMMENT("comment"),
+  EDIT("edit"),
+  DELETE("delete"),
+  UNDELETE("undelete"),
+  REGISTER("register"),
+  PROGRAMMING("programming");
+
+  private final static Map<String, EAccessLevel> ID_MAP = new HashMap<>();
 
   private final String identifier;
-  private final static Map<String, EAccessLevel> idMap = new HashMap<>();
 
   private EAccessLevel(String identifier) {
     this.identifier = identifier;
   }
 
+  @NotNull
   public String getIdentifier() {
     return identifier;
   }
 
-  public static EAccessLevel getAccessLevel(String identifier) {
-    if (idMap.isEmpty()) {
+  @Nullable
+  public static EAccessLevel getAccessLevel(@Nullable String identifier) {
+    if (ID_MAP.isEmpty()) {
       for (EAccessLevel accessLevel : values()) {
-        idMap.put(accessLevel.getIdentifier(), accessLevel);
+        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
       }
     }
-    return (idMap.get(identifier));
+    return ID_MAP.get(identifier);
   }
 
 }

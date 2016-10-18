@@ -60,7 +60,7 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
     } else if (entityRef instanceof AttachmentReference) {
       docRef = ((AttachmentReference) entityRef).getDocumentReference();
     }
-    if (docRef != null) {
+    if ((docRef != null) && (level != null)) {
       try {
         ret = getRightsService().hasAccessLevel(level.getIdentifier(), (user != null
             ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), webUtilsService.serializeRef(
