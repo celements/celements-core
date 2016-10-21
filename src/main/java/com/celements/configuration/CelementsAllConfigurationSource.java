@@ -37,14 +37,16 @@ import org.xwiki.configuration.internal.CompositeConfigurationSource;
  * </ul>
  * Should be used when a configuration can be overriden by the user in his/her profile.
  */
-@Component("all")
+@Component(CelementsAllConfigurationSource.NAME)
 public class CelementsAllConfigurationSource extends CompositeConfigurationSource implements
     Initializable {
+
+  public static final String NAME = "all";
 
   @Requirement("xwikiproperties")
   ConfigurationSource xwikiPropertiesSource;
 
-  @Requirement("celementsproperties")
+  @Requirement(CelementsPropertiesConfigurationSource.NAME)
   ConfigurationSource celementsPropertiesSource;
 
   @Requirement("wiki")

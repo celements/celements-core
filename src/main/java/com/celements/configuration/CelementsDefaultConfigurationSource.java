@@ -44,7 +44,7 @@ public class CelementsDefaultConfigurationSource extends CompositeConfigurationS
   @Requirement("xwikiproperties")
   ConfigurationSource xwikiPropertiesSource;
 
-  @Requirement("celementsproperties")
+  @Requirement(CelementsPropertiesConfigurationSource.NAME)
   ConfigurationSource celementsPropertiesSource;
 
   @Requirement("wiki")

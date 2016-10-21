@@ -36,11 +36,11 @@ import org.xwiki.configuration.internal.CompositeConfigurationSource;
  * Should be used when a configuration should not be overriden by space preferences (in which case
  * the {@link CelementsDefaultConfigurationSource} should be used.
  */
-@Component(CelementsFromWikiConfigurationSource.NAME)
-public class CelementsFromWikiConfigurationSource extends CompositeConfigurationSource implements
-    Initializable {
+@Component(CelementsAllPropertiesConfigurationSource.NAME)
+public class CelementsAllPropertiesConfigurationSource extends CompositeConfigurationSource
+    implements Initializable {
 
-  public static final String NAME = "fromwiki";
+  public static final String NAME = "allproperties";
 
   @Requirement("xwikiproperties")
   ConfigurationSource xwikiPropertiesSource;
@@ -48,13 +48,9 @@ public class CelementsFromWikiConfigurationSource extends CompositeConfiguration
   @Requirement(CelementsPropertiesConfigurationSource.NAME)
   ConfigurationSource celementsPropertiesSource;
 
-  @Requirement("wiki")
-  ConfigurationSource wikiPreferencesSource;
-
   @Override
   public void initialize() throws InitializationException {
     // first source is looked up first when a property value is requested.
-    addConfigurationSource(this.wikiPreferencesSource);
     addConfigurationSource(this.celementsPropertiesSource);
     addConfigurationSource(this.xwikiPropertiesSource);
   }

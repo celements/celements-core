@@ -129,6 +129,7 @@ com.celements.configuration.CelementsPropertiesConfigurationSource
 com.celements.configuration.CelementsDefaultConfigurationSource
 com.celements.configuration.CelementsAllConfigurationSource
 com.celements.configuration.CelementsFromWikiConfigurationSource
+com.celements.configuration.CelementsAllPropertiesConfigurationSource
 com.celements.pagetype.category.DefaultPageTypeCategory
 com.celements.cells.CellTypeCategory
 com.celements.common.classes.DefaultXClassCreator

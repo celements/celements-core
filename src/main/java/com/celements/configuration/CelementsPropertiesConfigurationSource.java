@@ -34,9 +34,11 @@ import org.xwiki.configuration.internal.CommonsConfigurationSource;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 
-@Component("celementsproperties")
+@Component(CelementsPropertiesConfigurationSource.NAME)
 public class CelementsPropertiesConfigurationSource extends CommonsConfigurationSource implements
     Initializable {
+
+  public static final String NAME = "celementsproperties";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
       CelementsPropertiesConfigurationSource.class);
