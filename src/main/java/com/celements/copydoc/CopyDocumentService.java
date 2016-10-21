@@ -16,6 +16,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.util.References;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
@@ -81,8 +82,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
     boolean hasChanged = false;
     hasChanged |= copyDocFields(srcDoc, trgDoc, set);
     hasChanged |= copyObjects(srcDoc, trgDoc, toIgnore, set);
-    LOGGER.info("for source '" + srcDoc + "', target '" + trgDoc + "', set '" + set
-        + "' has changed: " + hasChanged);
+    LOGGER.info("for source '{}', target '{}', set '{}' has changed: {}" + hasChanged, srcDoc,
+        trgDoc, set, hasChanged);
     return hasChanged;
   }
 
@@ -95,8 +96,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setLanguage(srcLang);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' language changed from '" + trgLang + "' to '" + srcLang
-          + "'");
+      LOGGER.trace("for doc '{}' language changed from '{}' to '{}'", trgDoc, trgLang, srcLang);
     }
     int srcTransl = srcDoc.getTranslation();
     int trgTransl = trgDoc.getTranslation();
@@ -105,8 +105,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setTranslation(srcTransl);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' translation changed from '" + trgTransl + "' to '"
-          + srcTransl + "'");
+      LOGGER.trace("for doc '{}' translation changed from '{}' to '{}'", trgDoc, trgTransl,
+          srcTransl);
     }
     String srcTitle = srcDoc.getTitle();
     String trgTitle = trgDoc.getTitle();
@@ -115,8 +115,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setTitle(srcTitle);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' title changed from '" + trgTitle + "' to '" + srcTitle
-          + "'");
+      LOGGER.trace("for doc '{}' title changed from '{}' to '{}'", trgDoc, trgTitle, srcTitle);
     }
     String srcContent = srcDoc.getContent();
     String trgContent = trgDoc.getContent();
@@ -125,8 +124,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
         trgDoc.setContent(srcContent);
       }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgDoc + "' content changed from '" + trgContent + "' to '"
-          + srcContent + "'");
+      LOGGER.trace("for doc '{}' content changed from '{}' to '{}'", trgDoc, trgContent,
+          srcContent);
     }
     return hasChanged;
   }
@@ -148,7 +147,8 @@ public class CopyDocumentService implements ICopyDocumentRole {
     Set<DocumentReference> ret = new HashSet<>();
     for (DocumentReference classRef : Iterables.concat(modelAccess.getXObjects(srcDoc).keySet(),
         modelAccess.getXObjects(trgDoc).keySet())) {
-      ret.add(webUtilsService.checkWikiRef(classRef, trgDoc));
+      ret.add(References.adjustRef(classRef, DocumentReference.class,
+          trgDoc.getDocumentReference().getWikiReference()));
     }
     return ret;
   }
@@ -176,7 +176,7 @@ public class CopyDocumentService implements ICopyDocumentRole {
           trgObj = modelAccess.newXObject(doc, classRef);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '" + doc + "' new object for '" + classRef + "'");
+        LOGGER.trace("for doc '{}' new object for '{}'", doc, classRef);
       }
       if (trgObj != null) {
         hasChanged |= copyObject(srcObj, trgObj, set);
@@ -207,16 +207,17 @@ public class CopyDocumentService implements ICopyDocumentRole {
           modelAccess.setProperty(trgObj, name, srcVal);
         }
         hasChanged = true;
-        LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name
-            + "' changed from '" + trgVal + "' to '" + srcVal + "'");
+        LOGGER.trace("for doc '{}' field '{}' changed from '{}' to '{}'",
+            trgObj.getDocumentReference(), name, trgVal, srcVal);
       }
       trgProps.remove(name);
     }
     for (String name : trgProps) {
-      trgObj.removeField(name);
+      if (set) {
+        trgObj.removeField(name);
+      }
       hasChanged = true;
-      LOGGER.trace("for doc '" + trgObj.getDocumentReference() + "' field '" + name
-          + "' set to null");
+      LOGGER.trace("for doc '{}' field '{}' set to null", trgObj.getDocumentReference(), name);
     }
     return hasChanged;
   }
