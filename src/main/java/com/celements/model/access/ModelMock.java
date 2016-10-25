@@ -43,9 +43,9 @@ public class ModelMock implements ModelAccessStrategy {
 
   public static ModelMock init() {
     try {
-      ModelMock modelAccess = (ModelMock) Utils.getComponent(ModelAccessStrategy.class, NAME);
-      registerComponentMock(ModelAccessStrategy.class, "default", modelAccess);
-      return modelAccess;
+      ModelMock modelMock = new ModelMock();
+      registerComponentMock(ModelAccessStrategy.class, "default", modelMock);
+      return modelMock;
     } catch (ComponentRepositoryException exc) {
       throw new RuntimeException("failed to register ModelAccessStub");
     }
