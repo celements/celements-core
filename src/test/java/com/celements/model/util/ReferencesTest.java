@@ -201,6 +201,61 @@ public class ReferencesTest extends AbstractComponentTest {
     assertNotSame(docRef, ret);
   }
 
+  @Test
+  public void test_adjustRef_childUnchanged() {
+    WikiReference toRef = new WikiReference("oWiki");
+    assertNull(toRef.getChild());
+    References.adjustRef(new EntityReference("doc", EntityType.DOCUMENT, new EntityReference("wiki",
+        EntityType.WIKI)), EntityReference.class, toRef);
+    // EntityReference.setParent overwrites child of param, ensure it is cloned
+    assertNull(toRef.getChild());
+  }
+
+  @Test
+  public void test_create_wiki() {
+    String name = "wiki";
+    WikiReference wikiRef = References.create(WikiReference.class, name);
+    assertNotNull(wikiRef);
+    assertEquals(name, wikiRef.getName());
+  }
+
+  @Test
+  public void test_create_space() {
+    String name = "space";
+    SpaceReference spaceRef = References.create(SpaceReference.class, name, wikiRef);
+    assertNotNull(spaceRef);
+    assertEquals(name, spaceRef.getName());
+    assertEquals(wikiRef, spaceRef.getParent());
+  }
+
+  @Test
+  public void test_create_doc() {
+    String name = "doc";
+    DocumentReference docRef = References.create(DocumentReference.class, name, spaceRef);
+    assertNotNull(docRef);
+    assertEquals(name, docRef.getName());
+    assertEquals(spaceRef, docRef.getParent());
+  }
+
+  @Test
+  public void test_create_entity() {
+    String name = "doc";
+    EntityReference docRef = References.create(EntityType.DOCUMENT, name, spaceRef);
+    assertNotNull(docRef);
+    assertEquals(name, docRef.getName());
+    assertEquals(spaceRef, docRef.getParent());
+  }
+
+  @Test
+  public void test_create_childparent() {
+    WikiReference wikiRef = new WikiReference("wiki");
+    SpaceReference spaceRef = References.create(SpaceReference.class, "space", wikiRef);
+    assertNotSame(wikiRef, spaceRef.getParent());
+    assertEquals(wikiRef, spaceRef.getParent());
+    assertSame(spaceRef, spaceRef.getParent().getChild());
+    assertNull(wikiRef.getChild());
+  }
+
   @SuppressWarnings("unchecked")
   private EntityReferenceResolver<String> getRelativeRefResolver() {
     return Utils.getComponent(EntityReferenceResolver.class, "relative");
