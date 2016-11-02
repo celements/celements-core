@@ -10,6 +10,7 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.context.ModelContext;
+import com.celements.model.util.References;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -118,7 +119,7 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
   }
 
   private XWikiDocument newDummyDoc(DocumentReference docRef, String lang) {
-    XWikiDocument doc = new XWikiDocument(docRef);
+    XWikiDocument doc = new XWikiDocument(References.cloneRef(docRef, DocumentReference.class));
     doc.setLanguage(lang);
     return doc;
   }
