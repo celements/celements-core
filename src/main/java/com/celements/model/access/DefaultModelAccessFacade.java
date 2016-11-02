@@ -241,14 +241,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       // fix missing docRef clone in XWikiDocument.clone()
       DocumentReference docRef = References.cloneRef(doc.getDocumentReference(),
           DocumentReference.class);
-      for (XWikiDocument setDoc : Arrays.asList(doc, doc.getOriginalDocument())) {
-        if (setDoc != null) {
-          // set invalid docRef first to circumvent equals check in setDocumentReference
-          setDoc.setDocumentReference(new DocumentReference("$", "$", "$"));
-          setDoc.setDocumentReference(docRef);
-          setDoc.setMetaDataDirty(false); // set true by setDocumentReference
-        }
-      }
+      // set invalid docRef first to circumvent equals check in setDocumentReference
+      doc.setDocumentReference(new DocumentReference("$", "$", "$"));
+      doc.setDocumentReference(docRef);
+      doc.setMetaDataDirty(false); // set true by setDocumentReference
       doc.setFromCache(false);
     }
     return doc;
