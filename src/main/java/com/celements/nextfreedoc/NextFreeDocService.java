@@ -85,7 +85,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   }
 
   private DocumentReference createDocRef(DocumentReference baseDocRef, long num) {
-    String name = baseDocRef.getName() + num;
+    String name = new StringBuilder(baseDocRef.getName()).append(num).toString();
     SpaceReference parent = References.extractRef(baseDocRef, SpaceReference.class).get();
     return References.create(DocumentReference.class, name, parent);
   }
