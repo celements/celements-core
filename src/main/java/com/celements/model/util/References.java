@@ -71,15 +71,11 @@ public class References {
     }
   }
 
-  private static EntityType getRootEntityType() {
-    return EntityType.values()[0]; // EntityType.WIKI
-  }
-
   /**
    * @return the class for the root entity type
    */
   public static Class<? extends EntityReference> getRootClass() {
-    return ENTITY_TYPE_MAP.inverse().get(getRootEntityType());
+    return ENTITY_TYPE_MAP.inverse().get(EntityType.values()[0]);
   }
 
   /**
@@ -113,8 +109,15 @@ public class References {
    * @return false if the given reference is relative
    */
   public static boolean isAbsoluteRef(@NotNull EntityReference ref) {
-    checkNotNull(ref);
-    return ref.extractReference(getRootEntityType()) != null;
+    int ordinal = checkNotNull(ref).getType().ordinal();
+    while (ref.getParent() != null) {
+      ref = ref.getParent();
+      ordinal -= ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1); // skip attachment type
+      if (ref.getType().ordinal() != ordinal) {
+        return false; // wrong type order
+      }
+    }
+    return ordinal == 0; // root has to be type root
   }
 
   /**
@@ -203,7 +206,7 @@ public class References {
         current = current.getParent();
       } else {
         if (current.getChild() != null) {
-          current.getChild().setParent(toRef);
+          current.getChild().setParent(cloneRef(toRef)); // set parent modifies child of param
         } else {
           adjustedRef = toRef;
         }
@@ -211,6 +214,36 @@ public class References {
       }
     }
     return cloneRef(adjustedRef, token); // effective immutability
+  }
+
+  public static EntityReference create(@NotNull EntityType type, @NotNull String name) {
+    return createInternal(EntityReference.class, type, name, null);
+  }
+
+  public static EntityReference create(@NotNull EntityType type, @NotNull String name,
+      @Nullable EntityReference parent) {
+    return createInternal(EntityReference.class, type, name, parent);
+  }
+
+  public static <T extends EntityReference> T create(@NotNull Class<T> token,
+      @NotNull String name) {
+    return create(token, name, null);
+  }
+
+  public static <T extends EntityReference> T create(@NotNull Class<T> token, @NotNull String name,
+      @Nullable EntityReference parent) {
+    return createInternal(token, getEntityTypeForClass(token), name, parent);
+  }
+
+  private static <T extends EntityReference> T createInternal(@NotNull Class<T> token,
+      @NotNull EntityType type, @NotNull String name, @Nullable EntityReference parent) {
+    checkNotNull(name);
+    checkNotNull(type);
+    checkNotNull(token);
+    if (parent != null) {
+      parent = cloneRef(parent);
+    }
+    return cloneRef(new EntityReference(name, type, parent), token);
   }
 
 }

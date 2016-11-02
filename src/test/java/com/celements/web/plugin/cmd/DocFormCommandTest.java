@@ -434,11 +434,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void testUpdateDocFromMap_content() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.isFromCache()).andReturn(true);
-    expect(docMock.clone()).andReturn(docMock).once();
-    docMock.setFromCache(eq(false));
-    expectLastCall().once();
+    XWikiDocument docMock = createDocMock(docRef);
+    expect(docMock.isFromCache()).andReturn(false).anyTimes();
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
@@ -462,11 +459,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void testUpdateDocFromMap_objWithContentField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.isFromCache()).andReturn(true).times(2);
-    expect(docMock.clone()).andReturn(docMock).times(2);
-    docMock.setFromCache(eq(false));
-    expectLastCall().times(2);
+    XWikiDocument docMock = createDocMock(docRef);
+    expect(docMock.isFromCache()).andReturn(false).anyTimes();
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
@@ -490,11 +484,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void testUpdateDocFromMap_title() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.isFromCache()).andReturn(true).once();
-    expect(docMock.clone()).andReturn(docMock).once();
-    docMock.setFromCache(eq(false));
-    expectLastCall().once();
+    XWikiDocument docMock = createDocMock(docRef);
+    expect(docMock.isFromCache()).andReturn(false).anyTimes();
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
@@ -518,11 +509,8 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void testUpdateDocFromMap_objWithTitleField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.isFromCache()).andReturn(true).times(2);
-    expect(docMock.clone()).andReturn(docMock).times(2);
-    docMock.setFromCache(eq(false));
-    expectLastCall().times(2);
+    XWikiDocument docMock = createDocMock(docRef);
+    expect(docMock.isFromCache()).andReturn(false).anyTimes();
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";

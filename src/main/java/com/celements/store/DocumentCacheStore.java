@@ -266,8 +266,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   }
 
   String getKey(DocumentReference docRef) {
-    DocumentReference cacheDocRef = new DocumentReference(context.getWikiRef().getName(),
-        docRef.getLastSpaceReference().getName(), docRef.getName());
+    DocumentReference cacheDocRef = References.adjustRef(docRef, DocumentReference.class,
+        context.getWikiRef());
     return modelUtils.serializeRef(cacheDocRef);
   }
 
