@@ -51,7 +51,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     context = getContext();
     xwiki = getWikiMock();
     contentInheritor = new ContentInheritor();
-    docList = new ArrayList<String>();
+    docList = new ArrayList<>();
     iteratorFactory = getTestIteratorFactory(docList);
   }
 
@@ -93,10 +93,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setTitle(title_de);
     XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
-    expect(testDoc1.clone()).andReturn(testDoc1).atLeastOnce();
-    expect(testDoc1.isFromCache()).andReturn(true).atLeastOnce();
-    testDoc1.setFromCache(eq(false));
-    expectLastCall().atLeastOnce();
+    expect(testDoc1.isFromCache()).andReturn(false).atLeastOnce();
     expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
@@ -134,10 +131,7 @@ public class ContentInheritorTest extends AbstractComponentTest {
     XWikiDocument translatedDoc1 = new XWikiDocument(docRef);
     translatedDoc1.setContent(content_de);
     XWikiDocument testDoc1 = createMockAndAddToDefault(XWikiDocument.class);
-    expect(testDoc1.clone()).andReturn(testDoc1).anyTimes();
-    expect(testDoc1.isFromCache()).andReturn(true).atLeastOnce();
-    testDoc1.setFromCache(eq(false));
-    expectLastCall().atLeastOnce();
+    expect(testDoc1.isFromCache()).andReturn(false).atLeastOnce();
     expect(testDoc1.getTranslatedDocument(eq("de"), same(context))).andReturn(
         translatedDoc1).anyTimes();
     expect(testDoc1.getDefaultLanguage()).andReturn("en").anyTimes();
