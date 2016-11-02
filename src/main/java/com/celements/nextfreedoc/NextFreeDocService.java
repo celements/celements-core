@@ -20,6 +20,7 @@ import org.xwiki.query.QueryManager;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.util.References;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -84,11 +85,9 @@ public class NextFreeDocService implements INextFreeDocRole {
   }
 
   private DocumentReference createDocRef(DocumentReference baseDocRef, long num) {
-    // IMPORTANT do no use setName on DocumentReference
-    // -> it does not exist on xwiki 4.5.4
-    DocumentReference ret = new DocumentReference(baseDocRef.getName() + num,
-        baseDocRef.getLastSpaceReference());
-    return ret;
+    String name = baseDocRef.getName() + num;
+    SpaceReference parent = References.extractRef(baseDocRef, SpaceReference.class).get();
+    return References.create(DocumentReference.class, name, parent);
   }
 
   /**
