@@ -112,7 +112,8 @@ public class References {
     int ordinal = checkNotNull(ref).getType().ordinal();
     while (ref.getParent() != null) {
       ref = ref.getParent();
-      if (ref.getType().ordinal() != --ordinal) {
+      ordinal -= ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1); // skip attachment type
+      if (ref.getType().ordinal() != ordinal) {
         return false; // wrong type order
       }
     }
