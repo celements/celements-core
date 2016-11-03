@@ -9,6 +9,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -40,9 +41,14 @@ public class ReferencesTest extends AbstractComponentTest {
 
   @Test
   public void test_isAbsoluteRef() {
-    assertTrue(References.isAbsoluteRef(docRef));
-    assertTrue(References.isAbsoluteRef(spaceRef));
     assertTrue(References.isAbsoluteRef(wikiRef));
+    assertTrue(References.isAbsoluteRef(spaceRef));
+    assertTrue(References.isAbsoluteRef(docRef));
+    assertTrue(References.isAbsoluteRef(attRef));
+    ObjectReference objRef = new ObjectReference("Class.Obj", docRef);
+    assertTrue(References.isAbsoluteRef(objRef));
+    // ObjectPropertyReference is buggy, always contains EntityType.OBJECT, see setType
+    // assertTrue(References.isAbsoluteRef(new ObjectPropertyReference("field", objRef)));
     assertFalse(References.isAbsoluteRef(getRelativeRefResolver().resolve(
         modelUtils.serializeRefLocal(docRef), EntityType.DOCUMENT)));
     assertTrue(References.isAbsoluteRef(getRelativeRefResolver().resolve(modelUtils.serializeRef(
