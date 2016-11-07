@@ -328,8 +328,6 @@ public class BuilderTest {
     assertEquals("String must be capselled in Quotes.", "\"aasdf38z6 ljb\"", builder.toJSONString(
         "aasdf38z6 ljb"));
     assertEquals("Double Quotes must be escaped.", "\"a\\\"b\"", builder.toJSONString("a\"b"));
-    assertEquals("Escaped double Quotes must be escaped.", "\"a\\\\\"b\"", builder.toJSONString(
-        "a\\\"b"));
   }
 
   @Test
@@ -348,6 +346,13 @@ public class BuilderTest {
   public void testToJSONString_EscapeTabs() {
     assertEquals("Tabs must be escaped with \\t.", "\"aasdf38z6\\t ljb\"", builder.toJSONString(
         "aasdf38z6\t ljb"));
+  }
+
+  @Test
+  public void testToJSONString_EscapeBackslashes() {
+    assertEquals("Backslashes must be escaped.", "\"a\\\\b\"", builder.toJSONString("a\\b"));
+    assertEquals("\"{\\\"...\\\" : \\\"<a href=\\\\\\\"...\\\\\\\">...\\\"}\"",
+        builder.toJSONString("{\"...\" : \"<a href=\\\"...\\\">...\"}"));
   }
 
   @Test

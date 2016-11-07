@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableMap;
 public class Builder {
 
   private static final Map<Pattern, String> JSON_REPLACEMENTS = ImmutableMap.of(Pattern.compile(
-      "\\\""), "\\\\\"", Pattern.compile("\""), "\\\"", Pattern.compile("\n"), "\\\\n",
+      "\\\\"), "\\\\\\\\", Pattern.compile("\""), "\\\\\"", Pattern.compile("\n"), "\\\\n",
       Pattern.compile("\r"), "\\\\r", Pattern.compile("\t"), "\\\\t");
 
   private Stack<ECommand> workerStack;
