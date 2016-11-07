@@ -20,23 +20,32 @@
 package com.celements.sajson;
 
 import java.io.StringWriter;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
+import java.util.regex.Pattern;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Simple Api for JSON The JSON Builder helps do generate a valid JSON expression based on
  * event handling.
- * 
+ *
  * @author fabian
  */
 
 public class Builder {
+
+  private static final Map<Pattern, String> JSON_REPLACEMENTS = ImmutableMap.of(Pattern.compile(
+      "\\\""), "\\\\\"", Pattern.compile("\""), "\\\"", Pattern.compile("\n"), "\\\\n",
+      Pattern.compile("\r"), "\\\\r", Pattern.compile("\t"), "\\\\t");
 
   private Stack<ECommand> workerStack;
   private StringWriter jsonOutput;
   private boolean onFirstElement;
 
   public Builder() {
-    workerStack = new Stack<ECommand>();
+    workerStack = new Stack<>();
     jsonOutput = new StringWriter();
     onFirstElement = true;
   }
@@ -197,8 +206,10 @@ public class Builder {
     if (outStr == null) {
       return "null";
     } else {
-      return "\"" + outStr.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n").replaceAll("\r",
-          "\\\\r").replaceAll("\t", "\\\\t") + "\"";
+      for (Entry<Pattern, String> entry : JSON_REPLACEMENTS.entrySet()) {
+        outStr = entry.getKey().matcher(outStr).replaceAll(entry.getValue());
+      }
+      return new StringBuilder("\"").append(outStr).append("\"").toString();
     }
   }
 

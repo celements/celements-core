@@ -328,6 +328,8 @@ public class BuilderTest {
     assertEquals("String must be capselled in Quotes.", "\"aasdf38z6 ljb\"", builder.toJSONString(
         "aasdf38z6 ljb"));
     assertEquals("Double Quotes must be escaped.", "\"a\\\"b\"", builder.toJSONString("a\"b"));
+    assertEquals("Escaped double Quotes must be escaped.", "\"a\\\\\"b\"", builder.toJSONString(
+        "a\\\"b"));
   }
 
   @Test
