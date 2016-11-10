@@ -166,6 +166,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (doc.isNew()) {
       doc.setCreator(username);
     }
+    LOGGER.debug("saveDocument: doc '{}, {}', comment '{}', isMinorEdit '{}'", doc,
+        doc.getLanguage(), comment, isMinorEdit);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("saveDocument: stacktrace", new Throwable());
+    }
     strategy.saveDocument(doc, comment, isMinorEdit);
   }
 
@@ -206,6 +211,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throws DocumentDeleteException {
     checkNotNull(doc);
     LOGGER.debug("deleteDocument: doc '{}, {}', totrash '{}'", doc, doc.getLanguage(), totrash);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("deleteDocument: stacktrace", new Throwable());
+    }
     strategy.deleteDocument(doc, totrash);
 
   }
