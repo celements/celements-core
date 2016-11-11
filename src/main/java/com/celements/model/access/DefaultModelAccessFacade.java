@@ -170,7 +170,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
         modelUtils.serializeRef(doc.getDocumentReference()), doc.getLanguage(), comment,
         isMinorEdit);
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("saveDocument: stacktrace", new Throwable());
+      LOGGER.trace("saveDocument: context db '{}' and StackTrace:", context.getWikiRef(),
+          new Throwable());
     }
     strategy.saveDocument(doc, comment, isMinorEdit);
   }
@@ -214,7 +215,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     LOGGER.debug("deleteDocument: doc '{}, {}', totrash '{}'", modelUtils.serializeRef(
         doc.getDocumentReference()), doc.getLanguage(), totrash);
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("deleteDocument: stacktrace", new Throwable());
+      LOGGER.trace("deleteDocument: context db '{}' and StackTrace:", context.getWikiRef(),
+          new Throwable());
     }
     strategy.deleteDocument(doc, totrash);
 
