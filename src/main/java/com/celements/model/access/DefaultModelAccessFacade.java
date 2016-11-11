@@ -92,11 +92,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   /**
-   * CAUTION: never ever change anything on the returned XWikiDocument, because it is the
-   * object in cache. Thus the same object will be returned for the following requests. If
-   * you change this object, concurrent request might get a partially modified object, or
-   * worse, if an error occurs during the save (or no save call happens), the cached
-   * object will not reflect the actual document at all.
+   * CAUTION: never ever change anything on the returned XWikiDocument, because it is the object in
+   * cache. Thus the same object will be returned for the following requests. If you change this
+   * object, concurrent request might get a partially modified object, or worse, if an error occurs
+   * during the save (or no save call happens), the cached object will not reflect the actual
+   * document at all.
    *
    * @param docRef
    * @param lang
@@ -243,10 +243,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   /**
-   * We need to clone this document first, since a cached storage would return the same
-   * object for the following requests, so concurrent request might get a partially
-   * modified object, or worse, if an error occurs during the save, the cached object will
-   * not reflect the actual document at all.
+   * We need to clone this document first, since a cached storage would return the same object for
+   * the following requests, so concurrent request might get a partially modified object, or worse,
+   * if an error occurs during the save, the cached object will not reflect the actual document at
+   * all.
    */
   private XWikiDocument cloneDoc(XWikiDocument doc) {
     if (doc.isFromCache()) {
