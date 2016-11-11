@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -393,8 +395,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public com.xpn.xwiki.api.Object getApiObjectWithoutRightCheck(BaseObject obj) {
-    return obj.newObjectApi(obj, context.getXWikiContext());
+  public com.xpn.xwiki.api.Object getApiObjectWithoutRightCheck(@Nullable BaseObject obj) {
+    if (obj != null) {
+      return obj.newObjectApi(obj, context.getXWikiContext());
+    }
+    return null;
   }
 
   @Override
