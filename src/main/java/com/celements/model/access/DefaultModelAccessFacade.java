@@ -166,6 +166,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     if (doc.isNew()) {
       doc.setCreator(username);
     }
+    LOGGER.debug("saveDocument: doc '{}, {}', comment '{}', isMinorEdit '{}'",
+        modelUtils.serializeRef(doc.getDocumentReference()), doc.getLanguage(), comment,
+        isMinorEdit);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("saveDocument: stacktrace", new Throwable());
+    }
     strategy.saveDocument(doc, comment, isMinorEdit);
   }
 
@@ -205,7 +211,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public void deleteDocumentWithoutTranslations(XWikiDocument doc, boolean totrash)
       throws DocumentDeleteException {
     checkNotNull(doc);
-    LOGGER.debug("deleteDocument: doc '{}, {}', totrash '{}'", doc, doc.getLanguage(), totrash);
+    LOGGER.debug("deleteDocument: doc '{}, {}', totrash '{}'", modelUtils.serializeRef(
+        doc.getDocumentReference()), doc.getLanguage(), totrash);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("deleteDocument: stacktrace", new Throwable());
+    }
     strategy.deleteDocument(doc, totrash);
 
   }
@@ -218,7 +228,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       try {
         transMap.put(lang, getDocument(docRef, lang));
       } catch (DocumentNotExistsException exc) {
-        LOGGER.error("failed to load existing translation '{}' for doc '{}'", lang, docRef, exc);
+        LOGGER.error("failed to load existing translation '{}' for doc '{}'", lang,
+            modelUtils.serializeRef(docRef), exc);
       }
     }
     return transMap;
@@ -647,15 +658,15 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
-  public XWikiAttachment getAttachmentNameEqual(XWikiDocument document, String filename)
+  public XWikiAttachment getAttachmentNameEqual(XWikiDocument doc, String filename)
       throws AttachmentNotExistsException {
-    for (XWikiAttachment attach : document.getAttachmentList()) {
+    for (XWikiAttachment attach : doc.getAttachmentList()) {
       if ((attach != null) && attach.getFilename().equals(filename)) {
         return attach;
       }
     }
-    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}], docref: [{}]", filename,
-        document, document.getDocumentReference());
+    LOGGER.debug("getAttachmentNameEqual: not found! file: [{}], doc: [{}]", filename,
+        modelUtils.serializeRef(doc.getDocumentReference()));
     // FIXME empty or null filename leads to exception:
     // java.lang.IllegalArgumentException: An Entity Reference name cannot be null or
     // empty
@@ -663,7 +674,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throw new AttachmentNotExistsException(null);
     } else {
       throw new AttachmentNotExistsException(new AttachmentReference(filename,
-          document.getDocumentReference()));
+          doc.getDocumentReference()));
     }
   }
 
