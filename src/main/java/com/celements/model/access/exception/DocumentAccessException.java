@@ -38,7 +38,7 @@ public class DocumentAccessException extends Exception {
   }
 
   public DocumentReference getDocumentReference() {
-    return References.cloneRef(docRef, DocumentReference.class);
+    return docRef != null ? References.cloneRef(docRef, DocumentReference.class) : null;
   }
 
 }
