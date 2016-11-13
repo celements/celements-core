@@ -79,25 +79,43 @@ public class StoreModelAccessStrategy implements ModelAccessStrategy {
     return docCreator.create(docRef, lang);
   }
 
-  // TODO access store directly
   @Override
   public void saveDocument(final XWikiDocument doc, final String comment, final boolean isMinorEdit)
       throws DocumentSaveException {
+    ContextExecutor<Void, XWikiException> exec = new ContextExecutor<Void, XWikiException>() {
+
+      @Override
+      protected Void call() throws XWikiException {
+        // TODO access store directly
+        getWiki().saveDocument(doc, comment, isMinorEdit, context.getXWikiContext());
+        return null;
+      }
+    };
+    DocumentReference docRef = doc.getDocumentReference();
     try {
-      getWiki().saveDocument(doc, comment, isMinorEdit, context.getXWikiContext());
+      exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
-      throw new DocumentSaveException(doc.getDocumentReference(), xwe);
+      throw new DocumentSaveException(docRef, xwe);
     }
   }
 
-  // TODO access store directly
   @Override
   public void deleteDocument(final XWikiDocument doc, final boolean totrash)
       throws DocumentDeleteException {
+    ContextExecutor<Void, XWikiException> exec = new ContextExecutor<Void, XWikiException>() {
+
+      @Override
+      protected Void call() throws XWikiException {
+        // TODO access store directly
+        getWiki().deleteDocument(doc, totrash, context.getXWikiContext());
+        return null;
+      }
+    };
+    DocumentReference docRef = doc.getDocumentReference();
     try {
-      getWiki().deleteDocument(doc, totrash, context.getXWikiContext());
+      exec.inWiki(docRef.getWikiReference()).execute();
     } catch (XWikiException xwe) {
-      throw new DocumentDeleteException(doc.getDocumentReference(), xwe);
+      throw new DocumentDeleteException(docRef, xwe);
     }
   }
 
