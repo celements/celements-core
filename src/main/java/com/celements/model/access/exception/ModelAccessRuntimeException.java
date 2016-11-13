@@ -21,7 +21,7 @@ public class ModelAccessRuntimeException extends RuntimeException {
   }
 
   public EntityReference getReference() {
-    return References.cloneRef(ref);
+    return ref != null ? References.cloneRef(ref) : null;
   }
 
 }
