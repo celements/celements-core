@@ -2,6 +2,8 @@ package com.celements.model.access.exception;
 
 import org.xwiki.model.reference.EntityReference;
 
+import com.celements.model.util.References;
+
 public class ModelAccessRuntimeException extends RuntimeException {
 
   private static final long serialVersionUID = 2808580562362027580L;
@@ -19,7 +21,7 @@ public class ModelAccessRuntimeException extends RuntimeException {
   }
 
   public EntityReference getReference() {
-    return ref;
+    return References.cloneRef(ref);
   }
 
 }

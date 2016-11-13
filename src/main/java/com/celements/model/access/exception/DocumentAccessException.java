@@ -2,6 +2,8 @@ package com.celements.model.access.exception;
 
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.util.References;
+
 public class DocumentAccessException extends Exception {
 
   private static final long serialVersionUID = -8302055770293965958L;
@@ -36,7 +38,7 @@ public class DocumentAccessException extends Exception {
   }
 
   public DocumentReference getDocumentReference() {
-    return docRef;
+    return References.cloneRef(docRef, DocumentReference.class);
   }
 
 }
