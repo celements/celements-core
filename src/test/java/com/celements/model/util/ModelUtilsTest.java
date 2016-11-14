@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -21,17 +20,17 @@ public class ModelUtilsTest extends AbstractComponentTest {
   DocumentReference docRef = new DocumentReference("doc", spaceRef);
   AttachmentReference attRef = new AttachmentReference("att.jpg", docRef);
 
-  DefaultModelUtils modelUtils;
+  ModelUtils modelUtils;
 
   @Before
   public void prepareTest() throws Exception {
-    modelUtils = (DefaultModelUtils) Utils.getComponent(ModelUtils.class);
+    Utils.getComponent(ModelContext.class).setWikiRef(wikiRef);
+    modelUtils = Utils.getComponent(ModelUtils.class);
   }
 
   @Test
   public void test_resolveRef() {
     WikiReference oWikiRef = new WikiReference("otherWiki");
-    Utils.getComponent(ModelContext.class).setWikiRef(wikiRef);
     assertEquals(wikiRef, modelUtils.resolveRef("wiki", WikiReference.class));
     // assertEquals(wikiRef, modelUtils.resolveRef("", WikiReference.class)); TODO
     assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class));
@@ -42,6 +41,13 @@ public class ModelUtilsTest extends AbstractComponentTest {
     assertEquals(docRef, modelUtils.resolveRef("wiki:space.doc", DocumentReference.class));
     assertEquals(docRef, modelUtils.resolveRef("space.doc", DocumentReference.class));
     assertEquals(docRef, modelUtils.resolveRef("doc", DocumentReference.class, spaceRef));
+  }
+
+  @Test
+  public void test_resolveRef_noParamChange() {
+    assertEquals(spaceRef, modelUtils.resolveRef("wiki:space", SpaceReference.class, wikiRef));
+    assertNotSame(wikiRef, spaceRef.getParent());
+    assertNull(wikiRef.getChild());
   }
 
   @Test
@@ -88,11 +94,6 @@ public class ModelUtilsTest extends AbstractComponentTest {
       fail("expecting failure for null value");
     } catch (NullPointerException npe) {
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private EntityReferenceResolver<String> getRelativeRefResolver() {
-    return Utils.getComponent(EntityReferenceResolver.class, "relative");
   }
 
 }
