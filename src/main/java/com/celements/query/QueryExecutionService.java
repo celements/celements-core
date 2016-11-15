@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -14,14 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
-import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.model.access.ContextExecutor;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -32,14 +33,10 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
   private static final Logger LOGGER = LoggerFactory.getLogger(QueryExecutionService.class);
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private ModelUtils modelUtils;
 
   @Requirement
-  private Execution execution;
-
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-  }
+  private ModelContext context;
 
   @Override
   public int executeWriteSQL(String sql) throws XWikiException {
@@ -48,7 +45,7 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
 
   @Override
   public List<Integer> executeWriteSQLs(List<String> sqls) throws XWikiException {
-    List<Integer> results = new ArrayList<Integer>();
+    List<Integer> results = new ArrayList<>();
     Session session = null;
     try {
       session = getNewHibSession();
@@ -65,7 +62,7 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
 
   private Session getNewHibSession() throws XWikiException {
     Session session = getHibStore().getSessionFactory().openSession();
-    getHibStore().setDatabase(session, getContext());
+    getHibStore().setDatabase(session, context.getXWikiContext());
     return session;
   }
 
@@ -83,8 +80,7 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
         transaction.rollback();
       }
     }
-    LOGGER.info("executing sql '{}' for db '{}' returned '{}'", sql, getContext().getDatabase(),
-        result);
+    LOGGER.info("executing sql '{}' for db '{}' returned '{}'", sql, context.getWikiRef(), result);
     return result;
   }
 
@@ -94,16 +90,16 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
   }
 
   @Override
-  public int executeWriteHQL(String hql, Map<String, Object> binds, WikiReference wikiRef)
-      throws XWikiException {
-    WikiReference curWikiRef = webUtilsService.getWikiRef();
-    try {
-      getContext().setDatabase(webUtilsService.getWikiRef(wikiRef).getName());
-      HibernateCallback<Integer> callback = new ExecuteWriteCallback(hql, binds);
-      return getHibStore().executeWrite(getContext(), true, callback);
-    } finally {
-      getContext().setDatabase(curWikiRef.getName());
-    }
+  public int executeWriteHQL(final String hql, final Map<String, Object> binds,
+      WikiReference wikiRef) throws XWikiException {
+    return new ContextExecutor<Integer, XWikiException>() {
+
+      @Override
+      protected Integer call() throws XWikiException {
+        HibernateCallback<Integer> callback = new ExecuteWriteCallback(hql, binds);
+        return getHibStore().executeWrite(context.getXWikiContext(), true, callback);
+      }
+    }.inWiki(Objects.firstNonNull(wikiRef, context.getWikiRef())).execute();
   }
 
   @Override
@@ -118,14 +114,14 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
 
   @Override
   public List<DocumentReference> executeAndGetDocRefs(Query query) throws QueryException {
-    List<DocumentReference> ret = new ArrayList<DocumentReference>();
-    WikiReference wikiRef = webUtilsService.getWikiRef();
-    if (StringUtils.isNotBlank(query.getWiki())) {
-      wikiRef = new WikiReference(query.getWiki());
+    List<DocumentReference> ret = new ArrayList<>();
+    WikiReference wikiRef = context.getWikiRef();
+    if (!Strings.isNullOrEmpty(query.getWiki())) {
+      wikiRef = modelUtils.resolveRef(query.getWiki(), WikiReference.class);
     }
     for (Object fullName : query.execute()) {
-      if ((fullName instanceof String) && StringUtils.isNotBlank((String) fullName)) {
-        ret.add(webUtilsService.resolveDocumentReference((String) fullName, wikiRef));
+      if ((fullName instanceof String) && !Strings.isNullOrEmpty((String) fullName)) {
+        ret.add(modelUtils.resolveRef((String) fullName, DocumentReference.class, wikiRef));
       } else {
         LOGGER.debug("executeAndGetDocRefs: received invalid fullName '{}'", fullName);
       }
@@ -136,7 +132,7 @@ public class QueryExecutionService implements IQueryExecutionServiceRole {
   }
 
   private XWikiHibernateStore getHibStore() {
-    return getContext().getWiki().getHibernateStore();
+    return context.getXWikiContext().getWiki().getHibernateStore();
   }
 
 }
