@@ -22,4 +22,6 @@ public interface IMailSenderRole {
 
   public String getEmailValidationRegex();
 
+  public String getEmailValidationRegexForClassDefinitions();
+
 }

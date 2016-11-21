@@ -63,7 +63,12 @@ public class CelMailSenderService implements IMailSenderRole {
   public String getEmailValidationRegex() {
     // chars - a-z A-Z 0-9 œ à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ø ù ú û ü ý þ ÿ
     String wordChars = "\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF";
-    return "^[" + wordChars + "\\.\\+]+[@][" + wordChars + "]+([.]([" + wordChars + "]+))+$";
+    return "^[" + wordChars + ".+]+[@][" + wordChars + "]+([.]([" + wordChars + "]+))+$";
+  }
+
+  @Override
+  public String getEmailValidationRegexForClassDefinitions() {
+    return "/" + getEmailValidationRegex() + "/";
   }
 
 }
