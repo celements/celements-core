@@ -135,6 +135,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
     assertTrue(mailSender.isValidEmail("a@abc.om"));
     assertTrue(mailSender.isValidEmail("abc.xyz457@abc.newdomain"));
     assertTrue(mailSender.isValidEmail("abc+xyz@abc-\u00E7äöü\u0153.com"));
+    assertTrue(mailSender.isValidEmail("givenname.surname+test@testdomain.com"));
   }
 
 }
