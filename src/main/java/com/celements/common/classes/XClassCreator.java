@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.ComponentRole;
 
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 @ComponentRole
 public interface XClassCreator {
@@ -50,5 +51,7 @@ public interface XClassCreator {
    * @throws XClassCreateException
    */
   public void createXClass(ClassDefinition classDefinition) throws XClassCreateException;
+
+  public BaseClass generateXClass(ClassDefinition classDef);
 
 }

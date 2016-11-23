@@ -84,29 +84,33 @@ public class DefaultXClassCreator implements XClassCreator {
   @Override
   public void createXClass(ClassDefinition classDef) throws XClassCreateException {
     LOGGER.debug("creating class '{}'", classDef.getName());
-    boolean created = !modelAccess.exists(classDef.getClassRef());
-    boolean needsSave = created;
     XWikiDocument classDoc = modelAccess.getOrCreateDocument(classDef.getClassRef());
-    BaseClass bClass = classDoc.getXClass();
+    BaseClass bClass = generateXClass(classDef);
+    if (!classDoc.getXClass().equals(bClass)) {
+      try {
+        classDoc.setXClass(bClass);
+        modelAccess.saveDocument(classDoc, "created/updated XClass");
+      } catch (DocumentSaveException exc) {
+        throw new XClassCreateException(exc);
+      }
+    }
+  }
+
+  @Override
+  public BaseClass generateXClass(ClassDefinition classDef) {
+    BaseClass bClass = new BaseClass();
+    bClass.setDocumentReference(classDef.getClassRef());
     if (classDef.isInternalMapping() && !bClass.hasInternalCustomMapping()) {
       bClass.setCustomMapping("internal");
-      needsSave = true;
     }
     for (ClassField<?> field : classDef.getFields()) {
       if (bClass.get(field.getName()) == null) {
         PropertyInterface xField = field.getXField();
         xField.setObject(bClass);
         bClass.addField(field.getName(), xField);
-        needsSave = true;
       }
     }
-    if (needsSave) {
-      try {
-        modelAccess.saveDocument(classDoc, (created ? "created" : "updated") + " XClass");
-      } catch (DocumentSaveException exc) {
-        throw new XClassCreateException(exc);
-      }
-    }
+    return bClass;
   }
 
 }
