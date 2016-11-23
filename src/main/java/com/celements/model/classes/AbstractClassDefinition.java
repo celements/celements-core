@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.classes.fields.ClassField;
@@ -21,7 +21,6 @@ import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -47,18 +46,19 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
 
   @Override
   public DocumentReference getClassRef(WikiReference wikiRef) {
-    EntityReference ref = References.cloneRef(getRelativeClassRef());
-    Preconditions.checkState(!References.extractRef(ref, WikiReference.class).isPresent(),
-        "wiki must be missing from relative class ref");
-    ref.getRoot().setParent(References.cloneRef(wikiRef));
-    Preconditions.checkState(References.isAbsoluteRef(ref), "class ref must be absolute");
-    return new DocumentReference(ref);
+    return References.create(DocumentReference.class, getClassDocName(), References.create(
+        SpaceReference.class, getClassSpaceName(), wikiRef));
   }
 
   /**
-   * @return relative class ref (without wiki) for this class definition.
+   * @return space name for this class definition.
    */
-  protected abstract EntityReference getRelativeClassRef();
+  protected abstract @NotNull String getClassSpaceName();
+
+  /**
+   * @return doc name for this class definition.
+   */
+  protected abstract @NotNull String getClassDocName();
 
   @Override
   public boolean isBlacklisted() {
@@ -131,7 +131,7 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
 
   @Override
   public String toString() {
-    return modelUtils.serializeRef(getRelativeClassRef());
+    return modelUtils.serializeRefLocal(getClassRef());
   }
 
 }
