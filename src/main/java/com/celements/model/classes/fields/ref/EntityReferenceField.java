@@ -1,69 +1,45 @@
 package com.celements.model.classes.fields.ref;
 
-import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
-
 
 import org.xwiki.model.reference.EntityReference;
 
-import com.celements.model.classes.fields.AbstractClassField;
-import com.celements.model.classes.fields.CustomClassField;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.StringClass;
+@Immutable
+public final class EntityReferenceField extends ReferenceField<EntityReference> {
 
-public abstract class EntityReferenceField<T extends EntityReference> extends AbstractClassField<T>
-    implements CustomClassField<T> {
-
-  private final Integer size;
-
-  public abstract static class Builder<B extends Builder<B, T>, T extends EntityReference> extends
-      AbstractClassField.Builder<B, T> {
-
-    private Integer size;
+  public static class Builder extends ReferenceField.Builder<Builder, EntityReference> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);
     }
 
-    public B size(@Nullable Integer val) {
-      size = val;
-      return getThis();
+    @Override
+    public Builder getThis() {
+      return this;
+    }
+
+    @Override
+    public EntityReferenceField build() {
+      return new EntityReferenceField(getThis());
     }
 
   }
 
-  protected EntityReferenceField(@NotNull Builder<?, T> builder) {
+  protected EntityReferenceField(@NotNull Builder builder) {
     super(builder);
-    this.size = builder.size;
-  }
-
-  public Integer getSize() {
-    return size;
   }
 
   @Override
-  protected PropertyClass getPropertyClass() {
-    StringClass element = new StringClass();
-    if (size != null) {
-      element.setSize(size);
-    }
-    return element;
+  public Class<EntityReference> getType() {
+    return EntityReference.class;
   }
 
   @Override
-  public Object serialize(T value) {
-    Object ret = null;
-    if (value != null) {
-      ret = getModelUtils().serializeRef(value);
-    }
-    return ret;
-  }
-
-  @Override
-  public T resolve(Object obj) {
-    T ret = null;
+  public EntityReference resolve(Object obj) {
+    EntityReference ret = null;
     if (obj != null) {
-      ret = getModelUtils().resolveRef(obj.toString(), getType());
+      ret = getModelUtils().resolveRef(obj.toString());
     }
     return ret;
   }

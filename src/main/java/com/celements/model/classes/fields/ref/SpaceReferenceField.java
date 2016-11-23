@@ -7,9 +7,9 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.SpaceReference;
 
 @Immutable
-public final class SpaceReferenceField extends EntityReferenceField<SpaceReference> {
+public final class SpaceReferenceField extends ReferenceField<SpaceReference> {
 
-  public static class Builder extends EntityReferenceField.Builder<Builder, SpaceReference> {
+  public static class Builder extends ReferenceField.Builder<Builder, SpaceReference> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);

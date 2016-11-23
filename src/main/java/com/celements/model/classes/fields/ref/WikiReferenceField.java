@@ -7,9 +7,9 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.WikiReference;
 
 @Immutable
-public final class WikiReferenceField extends EntityReferenceField<WikiReference> {
+public final class WikiReferenceField extends ReferenceField<WikiReference> {
 
-  public static class Builder extends EntityReferenceField.Builder<Builder, WikiReference> {
+  public static class Builder extends ReferenceField.Builder<Builder, WikiReference> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);

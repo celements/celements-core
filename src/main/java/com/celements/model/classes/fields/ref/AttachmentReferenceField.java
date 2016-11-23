@@ -7,9 +7,9 @@ import org.xwiki.model.reference.AttachmentReference;
 
 
 @Immutable
-public final class AttachmentReferenceField extends EntityReferenceField<AttachmentReference> {
+public final class AttachmentReferenceField extends ReferenceField<AttachmentReference> {
 
-  public static class Builder extends EntityReferenceField.Builder<Builder, AttachmentReference> {
+  public static class Builder extends ReferenceField.Builder<Builder, AttachmentReference> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);
