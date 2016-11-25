@@ -1,6 +1,6 @@
 package com.celements.model.classes;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +18,10 @@ public abstract class AbstractClassPackage implements ClassPackage {
   public boolean isActivated() {
     boolean ret = false;
     Object prop = configSrc.getProperty(CFG_SRC_KEY);
-    if (prop instanceof List) {
-      ret = ((List<?>) prop).contains(getName());
+    if (prop instanceof Collection) {
+      ret = ((Collection<?>) prop).contains(getName());
+    } else if (prop instanceof String) {
+      ret = prop.toString().trim().equals(getName());
     }
     LOGGER.debug("{}: isActivated '{}' for property value '{}'", getName(), ret, prop);
     return ret;
