@@ -13,8 +13,8 @@ import com.celements.model.classes.fields.list.AccessRightLevelsField;
 import com.celements.model.classes.fields.list.ListOfGroupsField;
 
 @Singleton
-@Component(XWikiRights.CLASS_DEF_HINT)
-public class XWikiRights extends AbstractClassDefinition implements IOldCoreClassDef {
+@Component(XWikiRightsClass.CLASS_DEF_HINT)
+public class XWikiRightsClass extends AbstractClassDefinition implements IOldCoreClassDef {
 
   public static final String CLASS_SPACE = "XWiki";
   public static final String CLASS_NAME = "XWikiRights";
