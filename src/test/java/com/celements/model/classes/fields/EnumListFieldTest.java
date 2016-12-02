@@ -2,7 +2,9 @@ package com.celements.model.classes.fields;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
+import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +39,7 @@ public class EnumListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
-    assertImmutable(EnumListField.class);
+    assertInstancesOf(EnumListField.class, areImmutable(), allowingForSubclassing());
   }
 
   @Test
