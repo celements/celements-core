@@ -4,7 +4,6 @@ import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.ListClass;
 
 @Immutable
 public final class ListOfGroupsField extends StringListField {
@@ -46,7 +45,7 @@ public final class ListOfGroupsField extends StringListField {
   }
 
   @Override
-  protected ListClass getListClass() {
+  protected GroupsClass getListClass() {
     GroupsClass element = new GroupsClass();
     if (usesList != null) {
       element.setUsesList(usesList);
