@@ -4,12 +4,11 @@ import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.ListClass;
 
 @Immutable
 public final class ListOfGroupsField extends StringListField {
 
-  private Boolean usesList;
+  private final Boolean usesList;
 
   public static class Builder extends ListField.Builder<Builder, String> {
 
@@ -26,12 +25,12 @@ public final class ListOfGroupsField extends StringListField {
 
     public Builder usesList(@NotNull Boolean usesList) {
       this.usesList = usesList;
-      return this;
+      return getThis();
     }
 
     @Override
     public ListOfGroupsField build() {
-      return new ListOfGroupsField(this);
+      return new ListOfGroupsField(getThis());
     }
 
   }
@@ -46,7 +45,7 @@ public final class ListOfGroupsField extends StringListField {
   }
 
   @Override
-  protected ListClass getListClass() {
+  protected GroupsClass getListClass() {
     GroupsClass element = new GroupsClass();
     if (usesList != null) {
       element.setUsesList(usesList);
