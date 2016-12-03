@@ -1,6 +1,7 @@
 package com.celements.model.classes.fields;
 
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,11 @@ public class ListOfGroupsFieldTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+  }
+
+  @Test
+  public void test_immutability() {
+    assertImmutable(ListOfGroupsField.class);
   }
 
   @Test

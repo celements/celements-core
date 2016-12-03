@@ -8,7 +8,7 @@ import com.xpn.xwiki.objects.classes.GroupsClass;
 @Immutable
 public final class ListOfGroupsField extends StringListField {
 
-  private Boolean usesList;
+  private final Boolean usesList;
 
   public static class Builder extends ListField.Builder<Builder, String> {
 
@@ -25,12 +25,12 @@ public final class ListOfGroupsField extends StringListField {
 
     public Builder usesList(@NotNull Boolean usesList) {
       this.usesList = usesList;
-      return this;
+      return getThis();
     }
 
     @Override
     public ListOfGroupsField build() {
-      return new ListOfGroupsField(this);
+      return new ListOfGroupsField(getThis());
     }
 
   }
