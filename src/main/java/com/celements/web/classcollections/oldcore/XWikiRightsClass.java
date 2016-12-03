@@ -11,6 +11,9 @@ import com.celements.model.classes.fields.BooleanField;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.list.AccessRightLevelsField;
 import com.celements.model.classes.fields.list.ListOfGroupsField;
+import com.celements.model.classes.fields.list.ListOfUsersField;
+import com.celements.rights.access.EAccessLevel;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 @Singleton
 @Component(XWikiRightsClass.CLASS_DEF_HINT)
@@ -36,12 +39,12 @@ public class XWikiRightsClass extends AbstractClassDefinition implements IOldCor
   public static final ClassField<List<String>> FIELD_GROUPS = new ListOfGroupsField.Builder(
       CLASS_FN, FIELD_GROUPS_NAME).prettyName(FIELD_GROUPS_PRETTY_NAME).displayType(
           "select").multiSelect(true).size(5).usesList(true).build();
-  public static final ClassField<List<String>> FIELD_LEVELS = new AccessRightLevelsField.Builder(
+  public static final ClassField<List<EAccessLevel>> FIELD_LEVELS = new AccessRightLevelsField.Builder(
       CLASS_FN, FIELD_ACCESSLVL_NAME).prettyName(FIELD_ACCESSLVL_PRETTY_NAME).displayType(
           "select").multiSelect(true).size(3).build();
-  public static final ClassField<List<String>> FIELD_USERS = new ListOfGroupsField.Builder(CLASS_FN,
-      FIELD_USERS_NAME).prettyName(FIELD_USERS_PRETTY_NAME).displayType("select").multiSelect(
-          true).size(5).usesList(true).build();
+  public static final ClassField<List<XWikiUser>> FIELD_USERS = new ListOfUsersField.Builder(
+      CLASS_FN, FIELD_USERS_NAME).prettyName(FIELD_USERS_PRETTY_NAME).displayType(
+          "select").multiSelect(true).size(5).usesList(true).build();
 
   @Override
   public String getName() {
