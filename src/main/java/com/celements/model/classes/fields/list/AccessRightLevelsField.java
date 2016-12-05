@@ -1,7 +1,6 @@
 package com.celements.model.classes.fields.list;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -11,8 +10,6 @@ import javax.validation.constraints.NotNull;
 
 import com.celements.rights.access.EAccessLevel;
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.objects.classes.LevelsClass;
 
 @Immutable
@@ -76,10 +73,7 @@ public final class AccessRightLevelsField extends EnumListField<EAccessLevel> {
 
   @Override
   protected LevelsClass getListClass() {
-    LevelsClass element = new LevelsClass();
-    element.fromString(Joiner.on(getSeparator()).join(FluentIterable.from(Arrays.asList(
-        enumType.getEnumConstants())).transform(GET_ACCESS_LEVEL_ENUM_IDENTIFIERS)));
-    return element;
+    return new LevelsClass();
   }
 
 }
