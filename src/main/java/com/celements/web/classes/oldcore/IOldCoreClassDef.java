@@ -1,4 +1,4 @@
-package com.celements.web.classcollections.oldcore;
+package com.celements.web.classes.oldcore;
 
 import org.xwiki.component.annotation.ComponentRole;
 
