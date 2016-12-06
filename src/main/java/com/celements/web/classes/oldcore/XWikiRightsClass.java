@@ -24,26 +24,26 @@ public class XWikiRightsClass extends AbstractClassDefinition implements IOldCor
   public static final String CLASS_FN = CLASS_SPACE + "." + CLASS_NAME;
   public static final String CLASS_DEF_HINT = CLASS_FN;
 
-  public static final String FIELD_ALLOW_NAME = "allow";
-  public static final String FIELD_ALLOW_PRETTY_NAME = "Allow/Deny";
-  public static final String FIELD_ACCESSLVL_NAME = "levels";
-  public static final String FIELD_ACCESSLVL_PRETTY_NAME = "Levels";
-  public static final String FIELD_USERS_NAME = "users";
-  public static final String FIELD_USERS_PRETTY_NAME = "Users";
-  public static final String FIELD_GROUPS_NAME = "groups";
-  public static final String FIELD_GROUPS_PRETTY_NAME = "Groups";
+  public static final String FIELD_NAME_ALLOW = "allow";
+  public static final String FIELD_PRETTY_NAME_ALLOW = "Allow/Deny";
+  public static final String FIELD_NAME_ACCESSLVL = "levels";
+  public static final String FIELD_PRETTY_NAME_ACCESSLVL = "Levels";
+  public static final String FIELD_NAME_USERS = "users";
+  public static final String FIELD_PRETTY_NAME_USERS = "Users";
+  public static final String FIELD_NAME_GROUPS = "groups";
+  public static final String FIELD_PRETTY_NAME_GROUPS = "Groups";
 
   public static final ClassField<Boolean> FIELD_ALLOW = new BooleanField.Builder(CLASS_FN,
-      FIELD_ALLOW_NAME).prettyName(FIELD_ALLOW_PRETTY_NAME).displayFormType("select").displayType(
-          FIELD_ALLOW_NAME).defaultValue(1).build();
+      FIELD_NAME_ALLOW).prettyName(FIELD_PRETTY_NAME_ALLOW).displayFormType("select").displayType(
+          FIELD_NAME_ALLOW).defaultValue(1).build();
   public static final ClassField<List<String>> FIELD_GROUPS = new ListOfGroupsField.Builder(
-      CLASS_FN, FIELD_GROUPS_NAME).prettyName(FIELD_GROUPS_PRETTY_NAME).displayType(
+      CLASS_FN, FIELD_NAME_GROUPS).prettyName(FIELD_PRETTY_NAME_GROUPS).displayType(
           "select").multiSelect(true).size(5).usesList(true).build();
   public static final ClassField<List<EAccessLevel>> FIELD_LEVELS = new AccessRightLevelsField.Builder(
-      CLASS_FN, FIELD_ACCESSLVL_NAME).prettyName(FIELD_ACCESSLVL_PRETTY_NAME).displayType(
+      CLASS_FN, FIELD_NAME_ACCESSLVL).prettyName(FIELD_PRETTY_NAME_ACCESSLVL).displayType(
           "select").multiSelect(true).size(3).build();
   public static final ClassField<List<XWikiUser>> FIELD_USERS = new ListOfUsersField.Builder(
-      CLASS_FN, FIELD_USERS_NAME).prettyName(FIELD_USERS_PRETTY_NAME).displayType(
+      CLASS_FN, FIELD_NAME_USERS).prettyName(FIELD_PRETTY_NAME_USERS).displayType(
           "select").multiSelect(true).size(5).usesList(true).build();
 
   @Override
