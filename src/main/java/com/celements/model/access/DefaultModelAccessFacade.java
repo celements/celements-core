@@ -636,17 +636,20 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value) {
-    try {
-      return setProperty(getOrCreateXObject(doc, field.getClassDef().getClassRef()),
-          field.getName(), serializePropertyValue(field, value));
-    } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("CelObjectField ill defined: " + field, ex);
-    }
+    return setProperty(getOrCreateXObject(doc, field.getClassDef().getClassRef()), field, value);
   }
 
   @Override
   public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue) {
     return setProperty(doc, fieldValue.getField(), fieldValue.getValue());
+  }
+
+  @Override
+  public <T> boolean setProperty(BaseObject obj, ClassField<T> field, T value) {
+    DocumentReference classRef = checkNotNull(obj).getXClassReference();
+    checkArgument(classRef.equals(checkNotNull(field).getClassDef().getClassRef(
+        classRef.getWikiReference())));
+    return setProperty(obj, field.getName(), serializePropertyValue(field, value));
   }
 
   private <T> Object serializePropertyValue(ClassField<T> field, T value) {
