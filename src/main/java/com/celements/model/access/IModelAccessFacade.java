@@ -348,6 +348,9 @@ public interface IModelAccessFacade {
 
   public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue);
 
+  public <T> boolean setProperty(@NotNull BaseObject obj, @NotNull ClassField<T> field,
+      @Nullable T value);
+
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use
    * getAttachmentNameEqual or methods on IAttachmentServiceRole
