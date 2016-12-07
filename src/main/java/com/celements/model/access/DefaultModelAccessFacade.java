@@ -542,14 +542,26 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public <T> Optional<T> getFieldValue(BaseObject obj, ClassField<T> field) {
+    checkClassRef(obj, field);
+    return Optional.fromNullable(resolvePropertyValue(field, getProperty(obj, field.getName())));
+  }
+
+  @Override
   public <T> Optional<T> getFieldValue(XWikiDocument doc, ClassField<T> field) {
-    return Optional.fromNullable(getProperty(checkNotNull(doc), checkNotNull(field)));
+    checkNotNull(doc);
+    checkNotNull(field);
+    return Optional.fromNullable(resolvePropertyValue(field, getProperty(doc,
+        field.getClassDef().getClassRef(), field.getName())));
   }
 
   @Override
   public <T> Optional<T> getFieldValue(DocumentReference docRef, ClassField<T> field)
       throws DocumentNotExistsException {
-    return Optional.fromNullable(getProperty(checkNotNull(docRef), checkNotNull(field)));
+    checkNotNull(docRef);
+    checkNotNull(field);
+    return Optional.fromNullable(resolvePropertyValue(field, getProperty(docRef,
+        field.getClassDef().getClassRef(), field.getName())));
   }
 
   @Override
@@ -574,16 +586,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public <T> T getProperty(DocumentReference docRef, ClassField<T> field)
       throws DocumentNotExistsException {
-    return resolvePropertyValue(field, getProperty(docRef, field.getClassDef().getClassRef(),
-        field.getName()));
+    return getFieldValue(docRef, field).orNull();
   }
 
   @Override
+  @Deprecated
   public <T> T getProperty(XWikiDocument doc, ClassField<T> field) {
-    return resolvePropertyValue(field, getProperty(doc, field.getClassDef().getClassRef(),
-        field.getName()));
+    return getFieldValue(doc, field).orNull();
   }
 
   private <T> T resolvePropertyValue(ClassField<T> field, Object value) {
@@ -646,9 +658,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public <T> boolean setProperty(BaseObject obj, ClassField<T> field, T value) {
-    DocumentReference classRef = checkNotNull(obj).getXClassReference();
-    checkArgument(classRef.equals(checkNotNull(field).getClassDef().getClassRef(
-        classRef.getWikiReference())));
+    checkClassRef(obj, field);
     return setProperty(obj, field.getName(), serializePropertyValue(field, value));
   }
 
@@ -662,6 +672,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     } catch (ClassCastException | IllegalArgumentException ex) {
       throw new IllegalArgumentException("Field '" + field + "' ill defined", ex);
     }
+  }
+
+  private void checkClassRef(BaseObject obj, ClassField<?> field) {
+    DocumentReference classRef = checkNotNull(obj).getXClassReference();
+    checkArgument(classRef.equals(checkNotNull(field).getClassDef().getClassRef(
+        classRef.getWikiReference())), "class refs from obj and field do not match");
   }
 
   @Override

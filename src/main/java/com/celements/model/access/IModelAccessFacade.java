@@ -312,12 +312,23 @@ public interface IModelAccessFacade {
    */
   public Object getProperty(BaseObject obj, String name);
 
+  /**
+   * @deprecated instead use {@link #getFieldValue(DocumentReference, ClassField)
+   */
   @Nullable
+  @Deprecated
   public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull ClassField<T> field)
       throws DocumentNotExistsException;
 
+  /**
+   * @deprecated instead use {@link #getFieldValue(XWikiDocument, ClassField)
+   */
   @Nullable
+  @Deprecated
   public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
+
+  @NotNull
+  public <T> Optional<T> getFieldValue(@NotNull BaseObject obj, @NotNull ClassField<T> field);
 
   @NotNull
   public <T> Optional<T> getFieldValue(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
