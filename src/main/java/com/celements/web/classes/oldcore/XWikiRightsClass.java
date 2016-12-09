@@ -24,14 +24,14 @@ public class XWikiRightsClass extends AbstractClassDefinition implements IOldCor
   public static final String CLASS_FN = CLASS_SPACE + "." + CLASS_NAME;
   public static final String CLASS_DEF_HINT = CLASS_FN;
 
-  public static final String FIELD_NAME_ALLOW = "allow";
-  public static final String FIELD_PRETTY_NAME_ALLOW = "Allow/Deny";
-  public static final String FIELD_NAME_ACCESSLVL = "levels";
-  public static final String FIELD_PRETTY_NAME_ACCESSLVL = "Levels";
-  public static final String FIELD_NAME_USERS = "users";
-  public static final String FIELD_PRETTY_NAME_USERS = "Users";
-  public static final String FIELD_NAME_GROUPS = "groups";
-  public static final String FIELD_PRETTY_NAME_GROUPS = "Groups";
+  private static final String FIELD_NAME_ALLOW = "allow";
+  private static final String FIELD_PRETTY_NAME_ALLOW = "Allow/Deny";
+  private static final String FIELD_NAME_ACCESSLVL = "levels";
+  private static final String FIELD_PRETTY_NAME_ACCESSLVL = "Levels";
+  private static final String FIELD_NAME_USERS = "users";
+  private static final String FIELD_PRETTY_NAME_USERS = "Users";
+  private static final String FIELD_NAME_GROUPS = "groups";
+  private static final String FIELD_PRETTY_NAME_GROUPS = "Groups";
 
   public static final ClassField<Boolean> FIELD_ALLOW = new BooleanField.Builder(CLASS_FN,
       FIELD_NAME_ALLOW).prettyName(FIELD_PRETTY_NAME_ALLOW).displayFormType("select").displayType(
