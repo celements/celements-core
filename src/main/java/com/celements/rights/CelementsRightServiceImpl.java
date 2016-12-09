@@ -1,7 +1,7 @@
 package com.celements.rights;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.rights.publication.IPublicationServiceRole;
 import com.xpn.xwiki.XWikiContext;
@@ -13,7 +13,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CelementsRightServiceImpl.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsRightServiceImpl.class);
 
   /*
    * Adds an optional check for publish and unpublish dates to determine whether or not a
