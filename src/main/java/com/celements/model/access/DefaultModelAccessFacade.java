@@ -633,7 +633,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       if (value instanceof Collection) {
         value = Joiner.on('|').join((Collection<?>) value);
       }
-      obj.set(name, value, context.getXWikiContext());
+      try {
+        obj.set(name, value, context.getXWikiContext());
+      } catch (ClassCastException ex) {
+        throw new IllegalArgumentException("Unable to set value '" + value + "' on field '"
+            + modelUtils.serializeRefLocal(obj.getXClassReference()) + "." + name + "'", ex);
+      }
     }
     return hasChange;
   }
