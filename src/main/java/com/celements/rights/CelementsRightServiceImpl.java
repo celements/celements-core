@@ -58,9 +58,9 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
     final boolean hasRights = super.hasProgrammingRights(doc, context);
     LOGGER.info("hasProgrammingRights for '{}' returning '{}'", (doc != null)
         ? doc.getDocumentReference() : "null", hasRights);
-    if (!hasRights) {
-      LOGGER.trace("hasProgrammingRights FALSE for '{}' with context '{}'", (doc != null)
-          ? doc.getDocumentReference() : "null", context);
+    if (!hasRights && (doc != null)) {
+      LOGGER.trace("hasProgrammingRights FALSE for '{}' with contentAuthor '{}' and context '{}'",
+          doc.getDocumentReference(), doc.getContentAuthor(), context);
     }
     return hasRights;
   }
