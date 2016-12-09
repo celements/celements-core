@@ -2,11 +2,10 @@ package com.celements.model.classes.fields;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
-import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
-import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -16,85 +15,88 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.fields.list.EnumListField;
+import com.celements.model.classes.fields.list.ListOfUsersField;
 import com.celements.model.util.ClassFieldValue;
+import com.google.common.base.Joiner;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.UsersClass;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
-public class EnumListFieldTest extends AbstractComponentTest {
+public class ListOfUsersFieldTest extends AbstractComponentTest {
 
-  private enum TestEnum {
-    A, B, C, D;
-  }
-
-  private EnumListField.Builder<TestEnum> fieldBuilder;
+  private ListOfUsersField.Builder fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {
-    fieldBuilder = new EnumListField.Builder<>(TestClassDefinition.NAME, "name", TestEnum.class);
+    fieldBuilder = new ListOfUsersField.Builder(TestClassDefinition.NAME, "name");
   }
 
   @Test
   public void test_immutability() {
-    assertInstancesOf(EnumListField.class, areImmutable(), allowingForSubclassing());
+    assertImmutable(ListOfUsersField.class);
   }
 
   @Test
   public void test_getXField() throws Exception {
-    EnumListField<TestEnum> field = fieldBuilder.build();
-    assertTrue(field.getXField() instanceof StaticListClass);
-    StaticListClass xField = (StaticListClass) field.getXField();
-    assertEquals("A|B|C|D", xField.getValues());
+    ListOfUsersField field = fieldBuilder.build();
+    assertTrue(field.getXField() instanceof UsersClass);
+    assertNull(field.getUsesList());
   }
 
   @Test
   public void test_resolve_serialize() throws Exception {
-    EnumListField<TestEnum> field = fieldBuilder.build();
+    ListOfUsersField field = fieldBuilder.build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
-    TestEnum value = TestEnum.B;
+    XWikiUser user1 = new XWikiUser("XWiki.User1");
+    List<XWikiUser> userList = Collections.unmodifiableList(Arrays.asList(user1));
 
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, Arrays.asList(value)));
-    List<TestEnum> ret = modelAccess.getProperty(doc, field);
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, userList));
+    List<XWikiUser> ret = modelAccess.getProperty(doc, field);
     verifyDefault();
 
-    assertEquals(Arrays.asList(value), ret);
-    assertEquals(value.name(), modelAccess.getXObject(doc, classRef).getStringValue(
+    assertEquals(userList.size(), ret.size());
+    assertEquals(userList.get(0).getUser(), ret.get(0).getUser());
+    assertEquals(user1.getUser(), modelAccess.getXObject(doc, classRef).getStringValue(
         field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
-    EnumListField<TestEnum> field = fieldBuilder.multiSelect(true).build();
+    ListOfUsersField field = fieldBuilder.multiSelect(true).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
-    List<TestEnum> value = Arrays.asList(TestEnum.B, TestEnum.D);
+    XWikiUser user1 = new XWikiUser("XWiki.User1");
+    XWikiUser user2 = new XWikiUser("XWiki.User2");
+    List<XWikiUser> userList = Collections.unmodifiableList(Arrays.asList(user1, user2));
 
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<TestEnum> ret = modelAccess.getProperty(doc, field);
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, userList));
+    List<XWikiUser> ret = modelAccess.getProperty(doc, field);
     verifyDefault();
 
-    assertEquals(value, ret);
-    assertEquals(Arrays.asList("B", "D"), modelAccess.getXObject(doc, classRef).getListValue(
-        field.getName()));
+    assertEquals(userList.size(), ret.size());
+    assertEquals(userList.get(0).getUser(), ret.get(0).getUser());
+    assertEquals(userList.get(1).getUser(), ret.get(1).getUser());
+    assertEquals(Joiner.on(field.getSeparator()).join(Arrays.asList(user1.getUser(),
+        user2.getUser())), modelAccess.getXObject(doc, classRef).getStringValue(field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
-    EnumListField<TestEnum> field = fieldBuilder.multiSelect(true).build();
+    ListOfUsersField field = fieldBuilder.multiSelect(true).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
@@ -103,9 +105,9 @@ public class EnumListFieldTest extends AbstractComponentTest {
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    List<TestEnum> ret1 = modelAccess.getProperty(doc, field);
+    List<XWikiUser> ret1 = modelAccess.getProperty(doc, field);
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
-    List<TestEnum> ret2 = modelAccess.getProperty(doc, field);
+    List<XWikiUser> ret2 = modelAccess.getProperty(doc, field);
     verifyDefault();
 
     assertNotNull(ret1);

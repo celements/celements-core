@@ -8,24 +8,21 @@ import java.util.List;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 @Immutable
-public final class EnumListField<E extends Enum<E>> extends ListField<E> {
+public class EnumListField<E extends Enum<E>> extends ListField<E> {
 
-  private final Class<E> enumType;
+  protected final Class<E> enumType;
 
   public static class Builder<E extends Enum<E>> extends ListField.Builder<Builder<E>, E> {
 
     private final Class<E> enumType;
 
-    public Builder(@NotNull String classDefName, @NotNull String name,
-        @NotNull Class<E> enumType) {
+    public Builder(@NotNull String classDefName, @NotNull String name, @NotNull Class<E> enumType) {
       super(classDefName, name);
       this.enumType = Preconditions.checkNotNull(enumType);
     }
@@ -75,7 +72,7 @@ public final class EnumListField<E extends Enum<E>> extends ListField<E> {
   @Override
   protected ListClass getListClass() {
     StaticListClass element = new StaticListClass();
-    element.setValues(Joiner.on('|').join(enumType.getEnumConstants()));
+    element.setValues(Joiner.on(getSeparator()).join(enumType.getEnumConstants()));
     return element;
   }
 
