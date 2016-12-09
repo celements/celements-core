@@ -312,12 +312,23 @@ public interface IModelAccessFacade {
    */
   public Object getProperty(BaseObject obj, String name);
 
+  /**
+   * @deprecated instead use {@link #getFieldValue(DocumentReference, ClassField)
+   */
   @Nullable
+  @Deprecated
   public <T> T getProperty(@NotNull DocumentReference docRef, @NotNull ClassField<T> field)
       throws DocumentNotExistsException;
 
+  /**
+   * @deprecated instead use {@link #getFieldValue(XWikiDocument, ClassField)
+   */
   @Nullable
+  @Deprecated
   public <T> T getProperty(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
+
+  @NotNull
+  public <T> Optional<T> getFieldValue(@NotNull BaseObject obj, @NotNull ClassField<T> field);
 
   @NotNull
   public <T> Optional<T> getFieldValue(@NotNull XWikiDocument doc, @NotNull ClassField<T> field);
@@ -347,6 +358,9 @@ public interface IModelAccessFacade {
       @Nullable T value);
 
   public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue);
+
+  public <T> boolean setProperty(@NotNull BaseObject obj, @NotNull ClassField<T> field,
+      @Nullable T value);
 
   /**
    * CAUTION: document.getAttachment returns "startWith" matches. Instead use
