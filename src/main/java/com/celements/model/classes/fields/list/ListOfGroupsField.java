@@ -16,6 +16,7 @@ public final class ListOfGroupsField extends StringListField {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);
+      separator(",");
     }
 
     @Override
