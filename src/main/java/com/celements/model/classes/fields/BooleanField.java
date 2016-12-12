@@ -12,11 +12,13 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public final class BooleanField extends AbstractClassField<Boolean> implements
     CustomClassField<Boolean> {
 
+  private final String displayFormType;
   private final String displayType;
   private final Integer defaultValue;
 
   public static class Builder extends AbstractClassField.Builder<Builder, Boolean> {
 
+    private String displayFormType;
     private String displayType;
     private Integer defaultValue;
 
@@ -27,6 +29,11 @@ public final class BooleanField extends AbstractClassField<Boolean> implements
     @Override
     public Builder getThis() {
       return this;
+    }
+
+    public Builder displayFormType(@Nullable String val) {
+      displayFormType = val;
+      return getThis();
     }
 
     public Builder displayType(@Nullable String val) {
@@ -47,6 +54,7 @@ public final class BooleanField extends AbstractClassField<Boolean> implements
 
   protected BooleanField(@NotNull Builder builder) {
     super(builder);
+    this.displayFormType = builder.displayFormType;
     this.displayType = builder.displayType;
     this.defaultValue = builder.defaultValue;
   }
@@ -54,6 +62,10 @@ public final class BooleanField extends AbstractClassField<Boolean> implements
   @Override
   public Class<Boolean> getType() {
     return Boolean.class;
+  }
+
+  public String getDisplayFormType() {
+    return displayFormType;
   }
 
   public String getDisplayType() {
@@ -67,6 +79,9 @@ public final class BooleanField extends AbstractClassField<Boolean> implements
   @Override
   protected PropertyClass getPropertyClass() {
     BooleanClass element = new BooleanClass();
+    if (displayFormType != null) {
+      element.setDisplayFormType(displayFormType);
+    }
     if (displayType != null) {
       element.setDisplayType(displayType);
     }
