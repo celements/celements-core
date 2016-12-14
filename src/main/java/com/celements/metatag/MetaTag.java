@@ -31,7 +31,7 @@ public class MetaTag implements IMetaTag {
   @Override
   public String displayAllMetaTags() {
     StringBuilder sb = new StringBuilder();
-    Object contextObj = modelContext.getXWikiContext().get(IMetaTag.META_CONTEXT_KEY);
+    Object contextObj = modelContext.getXWikiContext().remove(IMetaTag.META_CONTEXT_KEY);
     if (contextObj instanceof List) {
       @SuppressWarnings("unchecked")
       List<MetaTagApi> metaList = (List<MetaTagApi>) contextObj;
