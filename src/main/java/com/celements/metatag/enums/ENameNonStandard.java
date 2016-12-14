@@ -15,6 +15,8 @@ public enum ENameNonStandard {
   SLURP("slurp"),
   VIEWPORT("viewport");
 
+  public final static String ATTRIB_NAME = ENameStandard.ATTRIB_NAME;
+  public final static String ATTRIB_NAME_ALT = ENameStandard.ATTRIB_NAME_ALT;
   private final static Map<String, ENameNonStandard> ID_MAP = new HashMap<>();
 
   private final String identifier;

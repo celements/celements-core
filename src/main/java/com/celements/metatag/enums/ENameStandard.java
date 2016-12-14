@@ -14,6 +14,8 @@ public enum ENameStandard {
   KEYWORDS("keywords"),
   REFERRER("referrer");
 
+  public final static String ATTRIB_NAME = "name";
+  public final static String ATTRIB_NAME_ALT = "property";
   private final static Map<String, ENameStandard> ID_MAP = new HashMap<>();
 
   private final String identifier;

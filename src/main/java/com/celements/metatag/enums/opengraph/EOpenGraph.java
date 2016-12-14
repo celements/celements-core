@@ -1,4 +1,4 @@
-package com.celements.metatag.enums;
+package com.celements.metatag.enums.opengraph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,9 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum ESocialMedia {
+public enum EOpenGraph {
 
+  // There are a lot more properties in the open graph protocol (see http://ogp.me/) as well as in
   OPENGRAPH_TITLE("og:title"),
   OPENGRAPH_TYPE("og:type"),
   OPENGRAPH_IMAGE("og:image"),
@@ -18,30 +19,18 @@ public enum ESocialMedia {
   OPENGRAPH_OPTIONAL_LOCALE("og:locale "),
   OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE("og:locale:alternate"),
   OPENGRAPH_OPTIONAL_SITENAME("og:site_name"),
-  OPENGRAPH_OPTIONAL_VIDEO("og:video"),
-  FACEBOOK_(),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_(""),
-  TWITTER_("");
+  OPENGRAPH_OPTIONAL_VIDEO("og:video");
 
-  private final static Map<String, ESocialMedia> ID_MAP = new HashMap<>();
+  public final static String ATTRIB_NAME = "property";
+  private final static Map<String, EOpenGraph> ID_MAP = new HashMap<>();
 
   private final String identifier;
 
-  private ESocialMedia(String identifier) {
+  private EOpenGraph(String identifier) {
     this.identifier = identifier;
   }
 
-  private ESocialMedia(ESocialMedia identifier) {
+  private EOpenGraph(EOpenGraph identifier) {
     this.identifier = identifier.getIdentifier();
   }
 
@@ -51,9 +40,9 @@ public enum ESocialMedia {
   }
 
   @Nullable
-  public static ESocialMedia getAccessLevel(@Nullable String identifier) {
+  public static EOpenGraph getAccessLevel(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
-      for (ESocialMedia accessLevel : values()) {
+      for (EOpenGraph accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
       }
     }

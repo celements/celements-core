@@ -3,14 +3,12 @@ package com.celements.metatag;
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public abstract class IMetaTag {
+public interface IMetaTag {
 
-  public static MetaTagApi createMetaTag() {
-    return new MetaTagApi();
-  };
+  public static final String META_CONTEXT_KEY = "celements_meta_tags";
 
-  public abstract void addMetaTag(MetaTagApi tag);
+  public void addMetaTag(MetaTagApi tag);
 
-  public abstract String displayAllMetaTags();
+  public String displayAllMetaTags();
 
 }
