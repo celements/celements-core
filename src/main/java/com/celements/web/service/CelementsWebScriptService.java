@@ -56,6 +56,7 @@ import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.metatag.IMetaTag;
 import com.celements.metatag.MetaTagApi;
+import com.celements.metatag.enums.ECharset;
 import com.celements.model.access.ModelAccessScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
@@ -1074,6 +1075,14 @@ public class CelementsWebScriptService implements ScriptService {
       }
     }
     return this.versionMap.get(systemComponentName);
+  }
+
+  public MetaTagApi getCharsetMetaTag(String charsetStr) {
+    ECharset charset = ECharset.getCharset(charsetStr);
+    if (charset != null) {
+      return new MetaTagApi(charset);
+    }
+    return new MetaTagApi(ECharset.ATTRIB_NAME, charsetStr, null);
   }
 
   public void addMetaTag(@NotNull String attributeName, @NotNull String attributeValue,
