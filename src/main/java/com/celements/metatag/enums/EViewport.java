@@ -28,7 +28,7 @@ public enum EViewport {
   }
 
   @Nullable
-  public static EViewport getAccessLevel(@Nullable String identifier) {
+  public static EViewport getViewport(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (EViewport accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

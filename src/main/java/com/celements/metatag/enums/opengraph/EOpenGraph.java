@@ -40,7 +40,7 @@ public enum EOpenGraph {
   }
 
   @Nullable
-  public static EOpenGraph getAccessLevel(@Nullable String identifier) {
+  public static EOpenGraph getOpenGraph(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (EOpenGraph accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

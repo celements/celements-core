@@ -8,12 +8,9 @@ import javax.validation.constraints.NotNull;
 
 public enum EHttpEquiv {
 
-  CONTENT_LANGUAGE("content-language"),
   CONTENT_SECURITY_POLICY("Content-Security-Policy"),
-  CONTENT_TYPE("content-type"),
   DEFAULT_STYLE("default-style"),
-  REFRESH("refresh"),
-  SET_COOKIE("set-cookie");
+  REFRESH("refresh");
 
   public final static String ATTRIB_NAME = "http-equiv";
   private final static Map<String, EHttpEquiv> ID_MAP = new HashMap<>();
@@ -30,7 +27,7 @@ public enum EHttpEquiv {
   }
 
   @Nullable
-  public static EHttpEquiv getAccessLevel(@Nullable String identifier) {
+  public static EHttpEquiv getHttpEquiv(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (EHttpEquiv accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

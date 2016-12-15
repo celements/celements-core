@@ -30,7 +30,7 @@ public enum ENameStandard {
   }
 
   @Nullable
-  public static ENameStandard getAccessLevel(@Nullable String identifier) {
+  public static ENameStandard getName(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (ENameStandard accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

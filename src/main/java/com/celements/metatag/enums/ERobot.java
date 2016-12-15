@@ -32,7 +32,7 @@ public enum ERobot {
   }
 
   @Nullable
-  public static ERobot getAccessLevel(@Nullable String identifier) {
+  public static ERobot getRobot(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (ERobot accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

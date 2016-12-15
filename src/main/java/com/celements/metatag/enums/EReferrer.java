@@ -28,7 +28,7 @@ public enum EReferrer {
   }
 
   @Nullable
-  public static EReferrer getAccessLevel(@Nullable String identifier) {
+  public static EReferrer getReferrer(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (EReferrer accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

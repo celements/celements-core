@@ -33,7 +33,7 @@ public enum ECharset {
   }
 
   @Nullable
-  public static ECharset getAccessLevel(@Nullable String identifier) {
+  public static ECharset getCharset(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (ECharset accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

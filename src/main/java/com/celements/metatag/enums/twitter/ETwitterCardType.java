@@ -31,7 +31,7 @@ public enum ETwitterCardType {
   }
 
   @Nullable
-  public static ETwitterCardType getAccessLevel(@Nullable String identifier) {
+  public static ETwitterCardType getTwitterCardType(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (ETwitterCardType accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

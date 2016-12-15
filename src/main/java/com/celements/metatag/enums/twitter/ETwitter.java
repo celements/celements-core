@@ -38,7 +38,7 @@ public enum ETwitter {
   }
 
   @Nullable
-  public static ETwitter getAccessLevel(@Nullable String identifier) {
+  public static ETwitter getTwitter(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (ETwitter accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);

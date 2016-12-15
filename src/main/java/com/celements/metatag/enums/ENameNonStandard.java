@@ -31,7 +31,7 @@ public enum ENameNonStandard {
   }
 
   @Nullable
-  public static ENameNonStandard getAccessLevel(@Nullable String identifier) {
+  public static ENameNonStandard getName(@Nullable String identifier) {
     if (ID_MAP.isEmpty()) {
       for (ENameNonStandard accessLevel : values()) {
         ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
