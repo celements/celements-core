@@ -17,7 +17,7 @@ import com.celements.metatag.enums.twitter.ETwitterCardType;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-public class MetaTagApi {
+public final class MetaTagApi {
 
   private final Map<String, String> attribs;
   private final Optional<String> content;
