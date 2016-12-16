@@ -1,7 +1,7 @@
 package com.celements.rights;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.rights.publication.IPublicationServiceRole;
 import com.xpn.xwiki.XWikiContext;
@@ -13,7 +13,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(CelementsRightServiceImpl.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsRightServiceImpl.class);
 
   /*
    * Adds an optional check for publish and unpublish dates to determine whether or not a
@@ -49,6 +49,20 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
 
   IPublicationServiceRole getPubSrv() {
     return Utils.getComponent(IPublicationServiceRole.class);
+  }
+
+  @Override
+  public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context) {
+    LOGGER.debug("hasProgrammingRights checking for '{}'", (doc != null)
+        ? doc.getDocumentReference() : "null");
+    final boolean hasRights = super.hasProgrammingRights(doc, context);
+    LOGGER.info("hasProgrammingRights for '{}' returning '{}'", (doc != null)
+        ? doc.getDocumentReference() : "null", hasRights);
+    if (!hasRights && (doc != null)) {
+      LOGGER.trace("hasProgrammingRights FALSE for '{}' with contentAuthor '{}' and context '{}'",
+          doc.getDocumentReference(), doc.getContentAuthor(), context);
+    }
+    return hasRights;
   }
 
 }

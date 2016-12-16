@@ -14,13 +14,14 @@ public class BooleanFieldTest extends AbstractComponentTest {
 
   private BooleanField field;
 
+  String displayFormType = "select";
   String displayType = "displayType";
   Integer defaultValue = 5;
 
   @Before
   public void prepareTest() throws Exception {
     field = new BooleanField.Builder(TestClassDefinition.NAME, "name").displayType(
-        displayType).defaultValue(defaultValue).build();
+        displayType).defaultValue(defaultValue).displayFormType(displayFormType).build();
   }
 
   @Test
@@ -32,6 +33,7 @@ public class BooleanFieldTest extends AbstractComponentTest {
   public void test_getters() throws Exception {
     assertEquals(displayType, field.getDisplayType());
     assertEquals(defaultValue, field.getDefaultValue());
+    assertEquals(displayFormType, field.getDisplayFormType());
   }
 
   @Test
@@ -41,6 +43,7 @@ public class BooleanFieldTest extends AbstractComponentTest {
     assertEquals(field.getName(), xField.getName());
     assertEquals(displayType, xField.getDisplayType());
     assertEquals(defaultValue, (Integer) xField.getDefaultValue());
+    assertEquals(displayFormType, xField.getDisplayFormType());
   }
 
   @Test

@@ -542,14 +542,26 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public <T> Optional<T> getFieldValue(BaseObject obj, ClassField<T> field) {
+    checkClassRef(obj, field);
+    return Optional.fromNullable(resolvePropertyValue(field, getProperty(obj, field.getName())));
+  }
+
+  @Override
   public <T> Optional<T> getFieldValue(XWikiDocument doc, ClassField<T> field) {
-    return Optional.fromNullable(getProperty(checkNotNull(doc), checkNotNull(field)));
+    checkNotNull(doc);
+    checkNotNull(field);
+    return Optional.fromNullable(resolvePropertyValue(field, getProperty(doc,
+        field.getClassDef().getClassRef(), field.getName())));
   }
 
   @Override
   public <T> Optional<T> getFieldValue(DocumentReference docRef, ClassField<T> field)
       throws DocumentNotExistsException {
-    return Optional.fromNullable(getProperty(checkNotNull(docRef), checkNotNull(field)));
+    checkNotNull(docRef);
+    checkNotNull(field);
+    return Optional.fromNullable(resolvePropertyValue(field, getProperty(docRef,
+        field.getClassDef().getClassRef(), field.getName())));
   }
 
   @Override
@@ -574,16 +586,16 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public <T> T getProperty(DocumentReference docRef, ClassField<T> field)
       throws DocumentNotExistsException {
-    return resolvePropertyValue(field, getProperty(docRef, field.getClassDef().getClassRef(),
-        field.getName()));
+    return getFieldValue(docRef, field).orNull();
   }
 
   @Override
+  @Deprecated
   public <T> T getProperty(XWikiDocument doc, ClassField<T> field) {
-    return resolvePropertyValue(field, getProperty(doc, field.getClassDef().getClassRef(),
-        field.getName()));
+    return getFieldValue(doc, field).orNull();
   }
 
   private <T> T resolvePropertyValue(ClassField<T> field, Object value) {
@@ -621,7 +633,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       if (value instanceof Collection) {
         value = Joiner.on('|').join((Collection<?>) value);
       }
-      obj.set(name, value, context.getXWikiContext());
+      try {
+        obj.set(name, value, context.getXWikiContext());
+      } catch (ClassCastException ex) {
+        throw new IllegalArgumentException("Unable to set value '" + value + "' on field '"
+            + modelUtils.serializeRefLocal(obj.getXClassReference()) + "." + name + "'", ex);
+      }
     }
     return hasChange;
   }
@@ -636,17 +653,18 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
 
   @Override
   public <T> boolean setProperty(XWikiDocument doc, ClassField<T> field, T value) {
-    try {
-      return setProperty(getOrCreateXObject(doc, field.getClassDef().getClassRef()),
-          field.getName(), serializePropertyValue(field, value));
-    } catch (ClassCastException ex) {
-      throw new IllegalArgumentException("CelObjectField ill defined: " + field, ex);
-    }
+    return setProperty(getOrCreateXObject(doc, field.getClassDef().getClassRef()), field, value);
   }
 
   @Override
   public <T> boolean setProperty(XWikiDocument doc, ClassFieldValue<T> fieldValue) {
     return setProperty(doc, fieldValue.getField(), fieldValue.getValue());
+  }
+
+  @Override
+  public <T> boolean setProperty(BaseObject obj, ClassField<T> field, T value) {
+    checkClassRef(obj, field);
+    return setProperty(obj, field.getName(), serializePropertyValue(field, value));
   }
 
   private <T> Object serializePropertyValue(ClassField<T> field, T value) {
@@ -659,6 +677,12 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     } catch (ClassCastException | IllegalArgumentException ex) {
       throw new IllegalArgumentException("Field '" + field + "' ill defined", ex);
     }
+  }
+
+  private void checkClassRef(BaseObject obj, ClassField<?> field) {
+    DocumentReference classRef = checkNotNull(obj).getXClassReference();
+    checkArgument(classRef.equals(checkNotNull(field).getClassDef().getClassRef(
+        classRef.getWikiReference())), "class refs from obj and field do not match");
   }
 
   @Override
