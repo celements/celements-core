@@ -44,4 +44,6 @@ public interface IJavaPageTypeRole {
   public void collectAttributes(@NotNull AttributeBuilder attrBuilder,
       @NotNull DocumentReference cellDocRef);
 
+  public boolean useInlineEditorMode();
+
 }

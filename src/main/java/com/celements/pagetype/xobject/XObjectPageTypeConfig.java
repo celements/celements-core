@@ -128,6 +128,16 @@ public class XObjectPageTypeConfig implements IPageTypeConfig {
   }
 
   @Override
+  public boolean useInlineEditorMode() {
+    BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
+    if (pageTypePropertiesObj != null) {
+      return (pageTypePropertiesObj.getIntValue(
+          IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 0) > 0);
+    }
+    return false;
+  }
+
+  @Override
   public Optional<String> defaultTagName() {
     BaseObject pageTypePropertiesObj = pageType.getPageTypeProperties(getContext());
     if (pageTypePropertiesObj != null) {
