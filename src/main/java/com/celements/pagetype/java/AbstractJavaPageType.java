@@ -30,4 +30,9 @@ public abstract class AbstractJavaPageType implements IJavaPageTypeRole {
     // default implementation: do nothing
   }
 
+  @Override
+  public boolean useInlineEditorMode() {
+    return false;
+  }
+
 }

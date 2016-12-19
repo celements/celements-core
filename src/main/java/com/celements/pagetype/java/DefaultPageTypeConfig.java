@@ -87,6 +87,11 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
   }
 
   @Override
+  public boolean useInlineEditorMode() {
+    return pageTypeImpl.useInlineEditorMode();
+  }
+
+  @Override
   public Optional<String> defaultTagName() {
     return pageTypeImpl.defaultTagName();
   }

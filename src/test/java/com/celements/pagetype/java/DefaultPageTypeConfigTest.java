@@ -204,4 +204,20 @@ public class DefaultPageTypeConfigTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_InlineEditorMode_false() {
+    expect(pageTypeImplMock.useInlineEditorMode()).andReturn(false).anyTimes();
+    replayDefault();
+    assertFalse(testPageType.useInlineEditorMode());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_InlineEditorMode_true() {
+    expect(pageTypeImplMock.useInlineEditorMode()).andReturn(true).anyTimes();
+    replayDefault();
+    assertTrue(testPageType.useInlineEditorMode());
+    verifyDefault();
+  }
+
 }
