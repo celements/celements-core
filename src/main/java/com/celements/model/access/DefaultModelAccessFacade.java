@@ -2,11 +2,9 @@ package com.celements.model.access;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +21,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
-import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.ModelAccessRuntimeException;
+import com.celements.model.access.object.XObjectHandler;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
@@ -40,11 +38,9 @@ import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -53,6 +49,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 @Component
 public class DefaultModelAccessFacade implements IModelAccessFacade {
@@ -275,6 +272,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef)
       throws DocumentNotExistsException {
     return Iterables.getFirst(getXObjects(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef),
@@ -282,6 +280,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef, String key,
       Object value) throws DocumentNotExistsException {
     return Iterables.getFirst(getXObjects(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef, key,
@@ -289,91 +288,74 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef) {
-    return Iterables.getFirst(getXObjects(doc, classRef), null);
+    return Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(
+        classRef).fetchFirst().orNull();
   }
 
   @Override
+  @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef, String key,
       Object value) {
-    return Iterables.getFirst(getXObjects(doc, classRef, key, value), null);
+    XObjectHandler objHandler = Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(
+        classRef);
+    if (!Strings.isNullOrEmpty(key)) {
+      objHandler.filter(classRef, key, value);
+    }
+    return objHandler.fetchFirst().orNull();
   }
 
   @Override
+  @Deprecated
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef)
       throws DocumentNotExistsException {
     return getXObjects(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef);
   }
 
   @Override
+  @Deprecated
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws DocumentNotExistsException {
     return getXObjects(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef, key, value);
   }
 
   @Override
+  @Deprecated
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Collection<?> values) throws DocumentNotExistsException {
     return getXObjects(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef, key, values);
   }
 
   @Override
+  @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return getXObjects(doc, classRef, null, null);
+    return Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(classRef).fetchList();
   }
 
   @Override
+  @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Object value) {
     return getXObjects(doc, classRef, key, Arrays.asList(value));
   }
 
   @Override
+  @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values) {
-    checkNotNull(doc);
-    checkNotNull(classRef);
-    checkNotTranslation(doc);
-    classRef = adjustClassRef(classRef, doc);
-    List<BaseObject> ret = new ArrayList<>();
-    for (BaseObject obj : MoreObjects.firstNonNull(doc.getXObjects(classRef),
-        ImmutableList.<BaseObject>of())) {
-      if ((obj != null) && checkPropertyKeyValues(obj, key, values)) {
-        ret.add(obj);
-      }
+    XObjectHandler objHandler = Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(
+        classRef);
+    if (!Strings.isNullOrEmpty(key) && !values.isEmpty()) {
+      objHandler.filter(classRef, key, values);
     }
-    return Collections.unmodifiableList(ret);
+    return objHandler.fetchList();
   }
 
   @Override
+  @Deprecated
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
-    checkNotTranslation(doc);
-    Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
-    for (DocumentReference classRef : doc.getXObjects().keySet()) {
-      List<BaseObject> objs = getXObjects(doc, classRef);
-      if (!objs.isEmpty()) {
-        ret.put(classRef, objs);
-      }
-    }
-    return Collections.unmodifiableMap(ret);
-  }
-
-  private void checkNotTranslation(XWikiDocument doc) {
-    String msg = "Trying to access XObjects on translation '{0}' of doc '{1}";
-    checkState(!isTranslation(doc), MessageFormat.format(msg, doc.getLanguage(),
-        doc.getDocumentReference()));
-  }
-
-  private boolean checkPropertyKeyValues(BaseObject obj, String key, Collection<?> checkValues) {
-    boolean valid = (key == null);
-    if (!valid) {
-      checkValues = MoreObjects.firstNonNull(checkValues, Collections.emptyList());
-      Object val = getProperty(obj, key);
-      for (Object checkVal : checkValues) {
-        valid |= Objects.equal(val, checkVal);
-      }
-    }
-    return valid;
+    return Utils.getComponent(XObjectHandler.class).onDoc(doc).fetchMap();
   }
 
   @Override
@@ -435,33 +417,27 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef) {
-    checkNotNull(doc);
-    checkNotNull(classRef);
-    classRef = adjustClassRef(classRef, doc);
-    try {
-      return doc.newXObject(classRef, context.getXWikiContext());
-    } catch (XWikiException xwe) {
-      throw new ClassDocumentLoadException(classRef, xwe);
-    }
+    return Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(classRef).create().get(0);
   }
 
   @Override
+  @Deprecated
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef) {
     return getOrCreateXObject(doc, classRef, null, null);
   }
 
   @Override
+  @Deprecated
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef, String key,
       Object value) {
-    BaseObject obj = getXObject(doc, classRef, key, value);
-    if (obj == null) {
-      obj = newXObject(doc, classRef);
-      if (key != null) {
-        setProperty(obj, key, value);
-      }
+    XObjectHandler objHandler = Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(
+        classRef);
+    if (!Strings.isNullOrEmpty(key)) {
+      objHandler.filter(classRef, key, value);
     }
-    return obj;
+    return Iterables.getFirst(objHandler.createIfNotExists(), objHandler.fetchFirst().get());
   }
 
   @Override
@@ -482,20 +458,29 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return removeXObjects(doc, classRef, null, null);
+    return !Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(classRef).remove().isEmpty();
   }
 
   @Override
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Object value) {
-    return removeXObjects(doc, classRef, key, Arrays.asList(value));
+    return !Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(classRef, key,
+        value).remove().isEmpty();
   }
 
   @Override
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values) {
-    return removeXObjects(doc, getXObjects(doc, classRef, key, values));
+    XObjectHandler objHandler = Utils.getComponent(XObjectHandler.class).onDoc(doc).filter(
+        classRef);
+    if (!Strings.isNullOrEmpty(key) && !values.isEmpty()) {
+      objHandler.filter(classRef, key, values);
+    }
+    return !objHandler.remove().isEmpty();
   }
 
   @Override
