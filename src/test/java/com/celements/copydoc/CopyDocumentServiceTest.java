@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
-public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
+public class CopyDocumentServiceTest extends AbstractComponentTest {
 
   private CopyDocumentService copyDocService;
 
@@ -40,8 +40,8 @@ public class CopyDocumentServiceTest extends AbstractBridgedComponentTestCase {
     copyDocService = (CopyDocumentService) Utils.getComponent(ICopyDocumentRole.class);
     emptyList = new ArrayList<>();
     docRef = new DocumentReference("db", "Space", "SomeDoc");
-    docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.getDocumentReference()).andReturn(docRef).anyTimes();
+    docMock = createDocMock(docRef);
+    expect(docMock.getTranslation()).andReturn(0).anyTimes();
     classRef = new DocumentReference("db", "Classes", "SomeClass");
     // important for unstable-2.0 set database because class references are checked for db
     getContext().setDatabase("db");

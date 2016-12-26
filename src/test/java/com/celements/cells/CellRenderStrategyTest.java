@@ -221,17 +221,18 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
+    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String cssClasses = "classes two";
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
@@ -253,15 +254,16 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
+    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
@@ -283,15 +285,16 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
+    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
@@ -314,16 +317,17 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
+    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
-    DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
@@ -349,6 +353,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     DocumentReference cellClassRef = new DocumentReference("layoutDb",
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String cssClasses = "classes two";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
@@ -378,17 +383,18 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(docRef, null, 0);
     XWikiDocument doc = new XWikiDocument(docRef);
+    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String cssClasses = "classes two";
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
-    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).atLeastOnce();
@@ -411,17 +417,18 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     boolean isFirstItem = false;
     TreeNode node = new TreeNode(cellRef, null, 0);
     XWikiDocument doc = new XWikiDocument(cellRef);
+    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
+        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     BaseObject cellObj = new BaseObject();
+    cellObj.setXClassReference(cellClassRef);
     String cssClasses = "classes two";
     String idname = "myDivId";
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
-    DocumentReference cellClassRef = new DocumentReference(masterCellDb,
-        ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
     doc.setXObjects(cellClassRef, cellObjList);
     expect(xwiki.exists(eq(cellRef), same(context))).andReturn(true).atLeastOnce();
     expect(xwiki.getDocument(eq(cellRef), same(context))).andReturn(doc).atLeastOnce();
