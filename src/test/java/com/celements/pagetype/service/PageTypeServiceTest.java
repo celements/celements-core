@@ -24,6 +24,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,15 @@ public class PageTypeServiceTest extends AbstractComponentTest {
   public void testGetPageTypeConfig_NPE() {
     replayDefault();
     assertNull(ptService.getPageTypeConfig(null));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetPageTypeConfig_noPageType_NPE() {
+    expect(providerMock.getPageTypes()).andReturn(Collections.<PageTypeReference>emptyList());
+    replayDefault();
+    IPageTypeConfig ptConfig = ptService.getPageTypeConfig("TestPageType");
+    assertNull(ptConfig);
     verifyDefault();
   }
 
