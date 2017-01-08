@@ -28,6 +28,7 @@ public interface IPageTypeClassConfig {
   public static final String PAGETYPE_PROP_TYPE_NAME = "type_name";
   public static final String PAGETYPE_PROP_IS_UNCONNECTED_PARENT = "unconnected_parent";
   public static final String PAGETYPE_PROP_TAG_NAME = "tag_name";
+  public static final String PAGETYPE_PROP_INLINE_EDITOR_MODE = "inline_editor";
 
   public DocumentReference getPageTypePropertiesClassRef(WikiReference wikiRef);
 

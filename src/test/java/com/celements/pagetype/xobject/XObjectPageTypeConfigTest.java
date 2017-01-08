@@ -167,7 +167,7 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPrettyName_absent() {
+  public void test_getTagName_absent() {
     BaseObject testPageTypePropObj = new BaseObject();
     EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
         IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
@@ -180,7 +180,7 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPrettyName_present() {
+  public void test_getTagName_present() {
     String tagName = "abstract";
     BaseObject testPageTypePropObj = new BaseObject();
     EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
@@ -201,6 +201,49 @@ public class XObjectPageTypeConfigTest extends AbstractComponentTest {
     expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(null);
     replayDefault();
     assertFalse(xObjPTconfig.isVisible());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_InlineEditorMode_absent() {
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(testPageTypePropObj);
+    replayDefault();
+    assertFalse(xObjPTconfig.useInlineEditorMode());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_InlineEditorMode_present_false() {
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    testPageTypePropObj.setIntValue(IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 0);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
+        testPageTypePropObj).atLeastOnce();
+    replayDefault();
+    assertFalse(xObjPTconfig.useInlineEditorMode());
+    verifyDefault();
+  }
+
+  @Test
+  public void test_InlineEditorMode_present_true() {
+    BaseObject testPageTypePropObj = new BaseObject();
+    EntityReference pageTypePropClassRef = new DocumentReference(context.getDatabase(),
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_SPACE,
+        IPageTypeClassConfig.PAGE_TYPE_PROPERTIES_CLASS_DOC);
+    testPageTypePropObj.setXClassReference(pageTypePropClassRef);
+    testPageTypePropObj.setIntValue(IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE, 1);
+    expect(pageTypeMock.getPageTypeProperties(same(context))).andReturn(
+        testPageTypePropObj).atLeastOnce();
+    replayDefault();
+    assertTrue(xObjPTconfig.useInlineEditorMode());
     verifyDefault();
   }
 

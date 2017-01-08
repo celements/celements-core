@@ -128,6 +128,8 @@ public class PageTypeClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_IS_UNCONNECTED_PARENT,
         "Is Unconnected Parent", "yesno");
     needsUpdate |= bclass.addTextField(IPageTypeClassConfig.PAGETYPE_PROP_TAG_NAME, "Tag Name", 30);
+    needsUpdate |= bclass.addBooleanField(IPageTypeClassConfig.PAGETYPE_PROP_INLINE_EDITOR_MODE,
+        "Use Inline Editor Mode", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;

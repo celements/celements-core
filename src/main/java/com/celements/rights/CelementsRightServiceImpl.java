@@ -56,11 +56,12 @@ public class CelementsRightServiceImpl extends XWikiRightServiceImpl {
     LOGGER.debug("hasProgrammingRights checking for '{}'", (doc != null)
         ? doc.getDocumentReference() : "null");
     final boolean hasRights = super.hasProgrammingRights(doc, context);
-    LOGGER.info("hasProgrammingRights for '{}' returning '{}'", (doc != null)
-        ? doc.getDocumentReference() : "null", hasRights);
-    if (!hasRights && (doc != null)) {
-      LOGGER.trace("hasProgrammingRights FALSE for '{}' with contentAuthor '{}' and context '{}'",
-          doc.getDocumentReference(), doc.getContentAuthor(), context);
+    if (doc != null) {
+      LOGGER.trace("hasProgrammingRights '{}' for '{}' with contentAuthor '{}', sysID '{}'"
+          + " and context '{}'", hasRights, doc.getDocumentReference(), doc.getContentAuthor(),
+          System.identityHashCode(doc), context);
+    } else {
+      LOGGER.info("hasProgrammingRights for 'null' returning '{}'", hasRights);
     }
     return hasRights;
   }

@@ -53,6 +53,8 @@ public interface IPageTypeConfig {
 
   public boolean isUnconnectedParent();
 
+  public boolean useInlineEditorMode();
+
   @NotNull
   public Optional<String> defaultTagName();
 
