@@ -35,6 +35,7 @@ public class PageTypeClassDefinition extends AbstractClassDefinition {
 
   @Override
   protected String getClassDocName() {
+
     return DOC_NAME;
   }
 }
