@@ -1,4 +1,4 @@
-package classes;
+package com.celements.pagetype.classes;
 
 import static org.junit.Assert.*;
 

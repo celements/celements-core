@@ -1,4 +1,4 @@
-package classes;
+package com.celements.pagetype.classes;
 
 import org.xwiki.component.annotation.Component;
 
