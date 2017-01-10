@@ -13,10 +13,10 @@ public class PageTypeClass extends AbstractClassDefinition {
   public static final String DOC_NAME = "PageType";
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
 
-  public static final ClassField<String> PAGE_TYPE_FIELD = new StringField.Builder(CLASS_DEF_HINT,
+  public static final ClassField<String> FIELD_PAGE_TYPE = new StringField.Builder(CLASS_DEF_HINT,
       "page_type").size(30).prettyName("Page Type").build();
-  public static final ClassField<String> page_layout = new StringField.Builder(CLASS_DEF_HINT,
-      "Page Layout").size(30).prettyName("Page Layout").build();
+  public static final ClassField<String> PAGE_LAYOUT = new StringField.Builder(CLASS_DEF_HINT,
+      "page_layout").size(30).prettyName("Page Layout").build();
 
   @Override
   public String getName() {
@@ -25,7 +25,7 @@ public class PageTypeClass extends AbstractClassDefinition {
 
   @Override
   public boolean isInternalMapping() {
-    return true;
+    return false;
   }
 
   @Override
@@ -35,7 +35,6 @@ public class PageTypeClass extends AbstractClassDefinition {
 
   @Override
   protected String getClassDocName() {
-
     return DOC_NAME;
   }
 }

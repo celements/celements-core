@@ -97,7 +97,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     return "celPageTypeClasses";
   }
 
-  private BaseClass getPageTypePropertiesClass() throws XWikiException {
+  public BaseClass getPageTypePropertiesClass() throws XWikiException {
     boolean needsUpdate = false;
 
     DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig.getPageTypePropertiesClassRef(
@@ -135,7 +135,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     return bclass;
   }
 
-  private BaseClass getPageTypeClass() throws XWikiException {
+  public BaseClass getPageTypeClass() throws XWikiException {
     boolean needsUpdate = false;
 
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(
