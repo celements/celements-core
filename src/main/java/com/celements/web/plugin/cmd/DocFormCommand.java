@@ -41,7 +41,8 @@ import com.celements.docform.DocFormRequestKeyParser;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.celements.web.service.IWebUtilsService;
+import com.celements.model.util.ModelUtils;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -63,8 +64,8 @@ public class DocFormCommand {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DocFormCommand.class);
 
-  private final Map<String, BaseObject> changedObjects = new HashMap<String, BaseObject>();
-  private final Map<String, XWikiDocument> changedDocs = new HashMap<String, XWikiDocument>();
+  private final Map<String, BaseObject> changedObjects = new HashMap<>();
+  private final Map<String, XWikiDocument> changedDocs = new HashMap<>();
 
   /**
    * @Deprecated: since 2.59 instead use variable in
@@ -73,21 +74,22 @@ public class DocFormCommand {
   @Deprecated
   public Set<XWikiDocument> updateDocFromMap(String fullname, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
-    return updateDocFromMap(getWebUtilsService().resolveDocumentReference(fullname), data, context);
+    return updateDocFromMap(getModelUtils().resolveRef(fullname, DocumentReference.class), data,
+        context);
   }
 
   public Set<XWikiDocument> updateDocFromMap(DocumentReference docRef, Map<String, String[]> data,
       XWikiContext context) throws XWikiException {
     XWikiDocument doc = getUpdateDoc(docRef, context);
-    String template = context.getRequest().getParameter("template");
+    String template = Strings.nullToEmpty(context.getRequest().getParameter("template")).trim();
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("updateDocFromMap: updating doc '{}' with template '{}' and request " + "'{}'",
           doc, template, context.getRequest().getParameterMap());
     } else {
       LOGGER.debug("updateDocFromMap: updating doc '{}' with template '{}'", doc, template);
     }
-    if (doc.isNew() && !"".equals(template.trim())) {
-      DocumentReference templRef = getWebUtilsService().resolveDocumentReference(template);
+    if (doc.isNew() && !template.isEmpty()) {
+      DocumentReference templRef = getModelUtils().resolveRef(template, DocumentReference.class);
       try {
         doc.readFromTemplate(templRef, context);
       } catch (XWikiException e) {
@@ -115,11 +117,11 @@ public class DocFormCommand {
         setOrRemoveObj(saveDoc, key, value, context);
       }
     }
-    return new HashSet<XWikiDocument>(changedDocs.values());
+    return new HashSet<>(changedDocs.values());
   }
 
   public Map<String, String[]> prepareMapForDocUpdate(Map<String, ?> map) {
-    Map<String, String[]> recompMap = new HashMap<String, String[]>();
+    Map<String, String[]> recompMap = new HashMap<>();
     for (String key : map.keySet()) {
       if (map.get(key) instanceof String[]) {
         recompMap.put(key, (String[]) map.get(key));
@@ -135,12 +137,12 @@ public class DocFormCommand {
 
   public Map<String, Set<DocumentReference>> saveXWikiDocCollection(
       Collection<XWikiDocument> xdocs) {
-    Set<DocumentReference> savedSuccessfully = new HashSet<DocumentReference>();
-    Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
+    Set<DocumentReference> savedSuccessfully = new HashSet<>();
+    Set<DocumentReference> saveFailed = new HashSet<>();
     for (XWikiDocument xdoc : xdocs) {
       if (notNewOrCreateAllowed(xdoc)) {
         try {
-          getModelAccessFacade().saveDocument(xdoc, "updateAndSaveDocFromRequest");
+          getModelAccess().saveDocument(xdoc, "updateAndSaveDocFromRequest");
           savedSuccessfully.add(xdoc.getDocumentReference());
         } catch (DocumentSaveException dse) {
           LOGGER.error("Exception saving document {}.", xdoc, dse);
@@ -150,7 +152,7 @@ public class DocFormCommand {
         saveFailed.add(xdoc.getDocumentReference());
       }
     }
-    Map<String, Set<DocumentReference>> docs = new HashMap<String, Set<DocumentReference>>();
+    Map<String, Set<DocumentReference>> docs = new HashMap<>();
     docs.put("successful", savedSuccessfully);
     docs.put("failed", saveFailed);
     return docs;
@@ -161,7 +163,7 @@ public class DocFormCommand {
   }
 
   XWikiDocument getUpdateDoc(DocumentReference docRef, XWikiContext context) throws XWikiException {
-    XWikiDocument doc = getModelAccessFacade().getOrCreateDocument(docRef);
+    XWikiDocument doc = getModelAccess().getOrCreateDocument(docRef);
     if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
       doc.setDefaultLanguage(context.getLanguage());
     }
@@ -233,7 +235,7 @@ public class DocFormCommand {
   @Deprecated
   public Map<String, String> validateRequest(XWikiContext context) {
     XWikiRequest request = context.getRequest();
-    Map<String, String> result = new HashMap<String, String>();
+    Map<String, String> result = new HashMap<>();
     for (Object paramObj : request.getParameterMap().keySet()) {
       String param = paramObj.toString();
 
@@ -319,24 +321,28 @@ public class DocFormCommand {
 
   private BaseClass getBaseClass(String className, XWikiContext context) {
     BaseClass bclass = null;
-    DocumentReference bclassDocRef = getWebUtilsService().resolveDocumentReference(className);
-    try {
-      bclass = getModelAccessFacade().getDocument(bclassDocRef).getXClass();
-    } catch (DocumentNotExistsException exp) {
-      LOGGER.error("Cannot get document class [" + className + "].", exp);
+    className = Strings.nullToEmpty(className);
+    if (!className.isEmpty()) {
+      DocumentReference bclassDocRef = getModelUtils().resolveRef(className,
+          DocumentReference.class);
+      try {
+        bclass = getModelAccess().getDocument(bclassDocRef).getXClass();
+      } catch (DocumentNotExistsException exp) {
+        LOGGER.error("Cannot get document class [" + className + "].", exp);
+      }
     }
     return bclass;
   }
 
   String collapse(String[] value) {
-    List<String> valueList = new ArrayList<String>(Arrays.asList(value));
+    List<String> valueList = new ArrayList<>(Arrays.asList(value));
     valueList.removeAll(Arrays.asList((String) null));
     valueList.removeAll(Arrays.asList(""));
     return StringUtils.join(valueList.toArray(), "|");
   }
 
   private String serialize(DocumentReference docRef) {
-    return getWebUtilsService().getRefDefaultSerializer().serialize(docRef);
+    return getModelUtils().serializeRef(docRef);
   }
 
   Map<String, BaseObject> getChangedObjects() {
@@ -347,11 +353,11 @@ public class DocFormCommand {
     return changedDocs;
   }
 
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
-  private IModelAccessFacade getModelAccessFacade() {
+  private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
   }
 
