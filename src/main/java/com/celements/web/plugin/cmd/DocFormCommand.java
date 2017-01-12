@@ -284,7 +284,7 @@ public class DocFormCommand {
   public String validateField(String className, String fieldName, String value,
       XWikiContext context) {
     String isValidResult = null;
-    BaseClass bclass = getBaseClass(className, context);
+    BaseClass bclass = getBaseClass(className);
 
     if (bclass != null) {
       PropertyClass propclass = (PropertyClass) bclass.getField(fieldName);
@@ -319,7 +319,7 @@ public class DocFormCommand {
     return "";
   }
 
-  private BaseClass getBaseClass(String className, XWikiContext context) {
+  private BaseClass getBaseClass(String className) {
     BaseClass bclass = null;
     className = Strings.nullToEmpty(className);
     if (!className.isEmpty()) {
