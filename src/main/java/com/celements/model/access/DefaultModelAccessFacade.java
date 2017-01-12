@@ -2,6 +2,7 @@ package com.celements.model.access;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -357,11 +358,10 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     return Collections.unmodifiableMap(ret);
   }
 
-  private void checkNotTranslation(XWikiDocument doc) {
-    if (isTranslation(doc)) {
-      throw new IllegalStateException("Trying to access XObjects on translation '"
-          + doc.getLanguage() + "' of doc '" + doc.getDocumentReference() + "'");
-    }
+  void checkNotTranslation(XWikiDocument doc) {
+    String msg = "Trying to access XObjects on translation ''{0}'' of doc ''{1}''";
+    checkState(!isTranslation(doc), MessageFormat.format(msg, doc.getLanguage(),
+        doc.getDocumentReference()));
   }
 
   private boolean checkPropertyKeyValues(BaseObject obj, String key, Collection<?> checkValues) {

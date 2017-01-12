@@ -1229,6 +1229,21 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     verifyDefault();
   }
 
+  @Test
+  public void test_checkNotTranslation() throws Exception {
+    modelAccess.checkNotTranslation(doc);
+    doc.setLanguage("en");
+    doc.setTranslation(1);
+    try {
+      modelAccess.checkNotTranslation(doc);
+      fail("expecting IllegalStateException");
+    } catch (IllegalStateException ise) {
+      assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
+      assertTrue("format not replacing placeholder 1", ise.getMessage().contains("'"
+          + doc.getDocumentReference() + "'"));
+    }
+  }
+
   private BaseObject addObj(DocumentReference classRef, String key, String value) {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
