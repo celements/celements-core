@@ -413,9 +413,13 @@ public interface IWebUtilsService {
   public String getTranslatedDiscTemplateContent(String renderTemplatePath, String lang,
       String defLang);
 
-  public boolean existsInheritableDocument(DocumentReference docRef, String lang);
+  public boolean existsInheritableDocument(@NotNull DocumentReference docRef);
 
-  public boolean existsInheritableDocument(DocumentReference docRef, String lang, String defLang);
+  public boolean existsInheritableDocument(@NotNull DocumentReference docRef,
+      @Nullable String lang);
+
+  public boolean existsInheritableDocument(@NotNull DocumentReference docRef, @Nullable String lang,
+      @Nullable String defLang);
 
   /**
    * used to send an email if result of <param>jobMailName</param> is not empty
