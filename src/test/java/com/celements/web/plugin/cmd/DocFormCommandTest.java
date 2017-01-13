@@ -434,44 +434,36 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void testUpdateDocFromMap_content() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createDocMock(docRef);
-    expect(docMock.isFromCache()).andReturn(false).anyTimes();
+    XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<>();
     data.put("content", new String[] { value });
 
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
-    expect(docMock.isNew()).andReturn(false).times(3);
-    expect(docMock.getLanguage()).andReturn(context.getLanguage()).anyTimes();
-    docMock.setContent(eq(value));
-    expectLastCall().once();
 
     replayDefault();
     docFormCmd.updateDocFromMap(docRef, data, context);
     verifyDefault();
+
+    assertEquals(value, doc.getContent());
   }
 
   @Test
   public void testUpdateDocFromMap_objWithContentField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createDocMock(docRef);
-    expect(docMock.isFromCache()).andReturn(false).anyTimes();
+    XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<>();
     data.put("A.B_0_content", new String[] { value });
 
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).times(2);
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(docMock.isNew()).andReturn(false).times(4);
-    expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
-    expect(docMock.getLanguage()).andReturn(context.getLanguage()).anyTimes();
     objMock.set(eq("content"), eq(value), same(context));
     expectLastCall().once();
 
@@ -484,44 +476,36 @@ public class DocFormCommandTest extends AbstractComponentTest {
   public void testUpdateDocFromMap_title() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createDocMock(docRef);
-    expect(docMock.isFromCache()).andReturn(false).anyTimes();
+    XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<>();
     data.put("title", new String[] { value });
 
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(docMock.isNew()).andReturn(false).times(3);
-    expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
-    expect(docMock.getLanguage()).andReturn(context.getLanguage()).anyTimes();
-    docMock.setTitle(eq(value));
-    expectLastCall().once();
 
     replayDefault();
     docFormCmd.updateDocFromMap(docRef, data, context);
     verifyDefault();
+
+    assertEquals(value, doc.getTitle());
   }
 
   @Test
   public void testUpdateDocFromMap_objWithTitleField() throws XWikiException {
     context.setRequest(new XWikiServletRequestStub());
     DocumentReference docRef = new DocumentReference(db, "Sp", "Doc");
-    XWikiDocument docMock = createDocMock(docRef);
-    expect(docMock.isFromCache()).andReturn(false).anyTimes();
+    XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject objMock = createMockAndAddToDefault(BaseObject.class);
     docFormCmd.getChangedObjects().put("db:Sp.Doc_db:A.B_0", objMock);
     String value = "value";
     Map<String, String[]> data = new HashMap<>();
     data.put("A.B_0_title", new String[] { value });
 
-    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).times(2);
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).anyTimes();
     expect(xwiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
-    expect(docMock.isNew()).andReturn(false).times(4);
-    expect(docMock.getDefaultLanguage()).andReturn(context.getLanguage()).anyTimes();
-    expect(docMock.getLanguage()).andReturn(context.getLanguage()).anyTimes();
     objMock.set(eq("title"), eq(value), same(context));
     expectLastCall().once();
 
