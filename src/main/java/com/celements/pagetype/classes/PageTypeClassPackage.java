@@ -10,7 +10,7 @@ import com.celements.model.classes.AbstractClassPackage;
 import com.celements.model.classes.ClassDefinition;
 
 @Component(PageTypeClassPackage.NAME)
-class PageTypeClassPackage extends AbstractClassPackage {
+public class PageTypeClassPackage extends AbstractClassPackage {
 
   public static final String NAME = "pagetype";
 
