@@ -148,3 +148,4 @@ com.celements.model.access.DefaultXWikiDocumentCreator
 com.celements.model.access.StoreModelAccessStrategy
 com.celements.pagetype.classes.PageTypeClass
 com.celements.pagetype.classes.PageTypePropertiesClass
+com.celements.pagetype.classes.PageTypeClassPackage

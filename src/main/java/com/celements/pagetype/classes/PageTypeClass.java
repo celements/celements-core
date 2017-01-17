@@ -7,7 +7,7 @@ import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.StringField;
 
 @Component(PageTypeClass.CLASS_DEF_HINT)
-public class PageTypeClass extends AbstractClassDefinition {
+public class PageTypeClass extends AbstractClassDefinition implements PageTypeClassDefinition {
 
   public static final String SPACE_NAME = "Celements2";
   public static final String DOC_NAME = "PageType";

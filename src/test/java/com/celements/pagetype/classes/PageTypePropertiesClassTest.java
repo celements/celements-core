@@ -26,7 +26,7 @@ public class PageTypePropertiesClassTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    modelAccessMock = registerMockComponent(IModelAccessFacade.class);
+    modelAccessMock = registerComponentMock(IModelAccessFacade.class);
     pageTypePropertiesClass = (PageTypePropertiesClass) Utils.getComponent(ClassDefinition.class,
         PageTypePropertiesClass.CLASS_DEF_HINT);
     pageTypeClassConfig = (PageTypeClasses) Utils.getComponent(IClassCollectionRole.class,
@@ -36,7 +36,7 @@ public class PageTypePropertiesClassTest extends AbstractComponentTest {
 
   @Test
   public void testGetName() {
-    String expectedStr = "Celements2.PageTypePropertiesClass";
+    String expectedStr = "Celements2.PageTypeProperties" + "";
     assertEquals(expectedStr, pageTypePropertiesClass.getName());
   }
 
@@ -48,7 +48,7 @@ public class PageTypePropertiesClassTest extends AbstractComponentTest {
 
   @Test
   public void testGetClassDocName() {
-    String expectedStr = "PageTypePropertiesClass";
+    String expectedStr = "PageTypeProperties";
     assertEquals(expectedStr, pageTypePropertiesClass.getClassDocName());
   }
 
@@ -68,6 +68,6 @@ public class PageTypePropertiesClassTest extends AbstractComponentTest {
     pageTypeClassConfig.getPageTypePropertiesClass();
     verifyDefault();
 
-    assertEquals(doc.getClass(), xClassCreator.generateXClass(pageTypePropertiesClass));
+    assertEquals(doc.getXClass(), xClassCreator.generateXClass(pageTypePropertiesClass));
   }
 }
