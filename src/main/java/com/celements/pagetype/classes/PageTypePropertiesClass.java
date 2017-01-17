@@ -12,7 +12,7 @@ import com.celements.model.classes.fields.number.IntField;
 public class PageTypePropertiesClass extends AbstractClassDefinition {
 
   public static final String SPACE_NAME = "Celements2";
-  public static final String DOC_NAME = "PageType";
+  public static final String DOC_NAME = "PageTypePropertiesClass";
   public static final String CLASS_DEF_HINT = SPACE_NAME + "." + DOC_NAME;
 
   public static final ClassField<String> PAGETYPE_PROP_TYPE_NAME = new StringField.Builder(
@@ -53,7 +53,7 @@ public class PageTypePropertiesClass extends AbstractClassDefinition {
 
   @Override
   public boolean isInternalMapping() {
-    return true;
+    return false;
   }
 
   @Override
