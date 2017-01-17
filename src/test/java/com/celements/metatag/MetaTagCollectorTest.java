@@ -11,13 +11,13 @@ import com.celements.metatag.enums.ENameStandard;
 import com.celements.metatag.enums.twitter.ETwitterCardType;
 import com.xpn.xwiki.web.Utils;
 
-public class MetaTagTest extends AbstractComponentTest {
+public class MetaTagCollectorTest extends AbstractComponentTest {
 
-  private IMetaTag metaTag;
+  private MetaTagCollectorRole metaTag;
 
   @Before
   public void prepareTest() throws Exception {
-    metaTag = Utils.getComponent(IMetaTag.class);
+    metaTag = Utils.getComponent(MetaTagCollectorRole.class);
   }
 
   @Test

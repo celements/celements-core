@@ -54,7 +54,7 @@ import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
-import com.celements.metatag.IMetaTag;
+import com.celements.metatag.MetaTagCollectorRole;
 import com.celements.metatag.MetaTagApi;
 import com.celements.metatag.enums.ECharset;
 import com.celements.model.access.ModelAccessScriptService;
@@ -141,7 +141,7 @@ public class CelementsWebScriptService implements ScriptService {
   LastStartupTimeStampRole lastStartupTimeStamp;
 
   @Requirement
-  IMetaTag metaTag;
+  MetaTagCollectorRole metaTag;
 
   @Requirement
   Execution execution;
