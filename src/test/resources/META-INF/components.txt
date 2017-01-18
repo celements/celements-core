@@ -1,4 +1,3 @@
-com.celements.metatag.MetaTag
 com.celements.model.classes.TestClassDefinition
 com.celements.model.classes.TestClassPackage
 com.celements.model.access.LegacyModelAccessStrategy
