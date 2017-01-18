@@ -18,19 +18,19 @@ public class MetaTagApiTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
-    assertImmutable(MetaTagApi.class);
+    assertImmutable(MetaTag.class);
   }
 
   @Test
   public void testDisplay_oneAttribute() {
-    MetaTagApi tag = new MetaTagApi(ETwitterCardType.SUMMARY);
+    MetaTag tag = new MetaTag(ETwitterCardType.SUMMARY);
     assertEquals("<meta name=\"twitter:card\" content=\"summary\" />", tag.display());
   }
 
   @Test
   public void testDisplay_multipleAttributes() {
     String keywords = "test,junit,keyword";
-    MetaTagApi tag = new MetaTagApi(ENameStandard.KEYWORDS, keywords);
+    MetaTag tag = new MetaTag(ENameStandard.KEYWORDS, keywords);
     assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />",
         tag.display());
   }

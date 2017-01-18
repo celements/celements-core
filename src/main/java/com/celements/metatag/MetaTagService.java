@@ -9,30 +9,30 @@ import org.xwiki.component.annotation.Requirement;
 import com.celements.model.context.ModelContext;
 
 @Component
-public class MetaTagCollector implements MetaTagCollectorRole {
+public class MetaTagService implements MetaTagSerivceRole {
 
   @Requirement
   ModelContext modelContext;
 
   @Override
-  public void addMetaTag(MetaTagApi tag) {
-    Object contextObj = modelContext.getXWikiContext().get(MetaTagCollectorRole.META_CONTEXT_KEY);
-    List<MetaTagApi> metaList = getMetaTags(contextObj);
+  public void addMetaTagToCollector(MetaTag tag) {
+    Object contextObj = modelContext.getXWikiContext().get(MetaTagSerivceRole.META_CONTEXT_KEY);
+    List<MetaTag> metaList = getMetaTags(contextObj);
     if (metaList == null) {
       metaList = new ArrayList<>();
-      modelContext.getXWikiContext().put(MetaTagCollectorRole.META_CONTEXT_KEY, metaList);
+      modelContext.getXWikiContext().put(MetaTagSerivceRole.META_CONTEXT_KEY, metaList);
     }
     metaList.add(tag);
   }
 
   @Override
-  public String displayAllMetaTags() {
+  public String displayCollectedMetaTags() {
     StringBuilder sb = new StringBuilder();
     Object contextObj = modelContext.getXWikiContext().remove(
-        MetaTagCollectorRole.META_CONTEXT_KEY);
-    List<MetaTagApi> metaTags = getMetaTags(contextObj);
+        MetaTagSerivceRole.META_CONTEXT_KEY);
+    List<MetaTag> metaTags = getMetaTags(contextObj);
     if (metaTags != null) {
-      for (MetaTagApi metaTag : metaTags) {
+      for (MetaTag metaTag : metaTags) {
         sb.append(metaTag.display()).append("\n");
       }
     }
@@ -40,9 +40,9 @@ public class MetaTagCollector implements MetaTagCollectorRole {
   }
 
   @SuppressWarnings("unchecked")
-  List<MetaTagApi> getMetaTags(Object contextObj) {
+  List<MetaTag> getMetaTags(Object contextObj) {
     if (contextObj instanceof List) {
-      return (List<MetaTagApi>) contextObj;
+      return (List<MetaTag>) contextObj;
     }
     return null;
   }

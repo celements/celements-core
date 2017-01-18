@@ -17,65 +17,65 @@ import com.celements.metatag.enums.twitter.ETwitterCardType;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-public final class MetaTagApi {
+public final class MetaTag {
 
   private final Map<String, String> attribs;
   private final Optional<String> content;
 
-  public MetaTagApi(@NotNull String attrib, @NotNull String attribValue, @NotNull String content) {
+  public MetaTag(@NotNull String attrib, @NotNull String attribValue, @NotNull String content) {
     this.attribs = ImmutableMap.of(attrib, attribValue);
     this.content = Optional.of(content);
   }
 
-  public MetaTagApi(@NotNull Map<String, String> attribs, @NotNull String content) {
+  public MetaTag(@NotNull Map<String, String> attribs, @NotNull String content) {
     this.attribs = ImmutableMap.copyOf(attribs);
     this.content = Optional.of(content);
   }
 
-  public MetaTagApi(@NotNull ECharset charset) {
+  public MetaTag(@NotNull ECharset charset) {
     this.attribs = ImmutableMap.of(ECharset.ATTRIB_NAME, charset.getIdentifier());
     this.content = Optional.absent();
   }
 
-  public MetaTagApi(@NotNull EHttpEquiv httpEquiv, @NotNull String content) {
+  public MetaTag(@NotNull EHttpEquiv httpEquiv, @NotNull String content) {
     this(EHttpEquiv.ATTRIB_NAME, httpEquiv.getIdentifier(), content);
   }
 
-  public MetaTagApi(@NotNull ENameStandard name, String content) {
+  public MetaTag(@NotNull ENameStandard name, String content) {
     this(ImmutableMap.of(ENameStandard.ATTRIB_NAME, name.getIdentifier(),
         ENameStandard.ATTRIB_NAME_ALT, name.getIdentifier()), content);
   }
 
-  public MetaTagApi(@NotNull ENameNonStandard name, String content) {
+  public MetaTag(@NotNull ENameNonStandard name, String content) {
     this(ImmutableMap.of(ENameNonStandard.ATTRIB_NAME, name.getIdentifier(),
         ENameNonStandard.ATTRIB_NAME_ALT, name.getIdentifier()), content);
   }
 
-  public MetaTagApi(@NotNull EReferrer referrer) {
+  public MetaTag(@NotNull EReferrer referrer) {
     this(ENameStandard.REFERRER, referrer.getIdentifier());
   }
 
-  public MetaTagApi(@NotNull ERobot robot) {
+  public MetaTag(@NotNull ERobot robot) {
     this(robot, ENameNonStandard.ROBOTS);
   }
 
-  public MetaTagApi(@NotNull ERobot robot, @NotNull ENameNonStandard robotname) {
+  public MetaTag(@NotNull ERobot robot, @NotNull ENameNonStandard robotname) {
     this(robotname, robot.getIdentifier());
   }
 
-  public MetaTagApi(@NotNull EViewport viewport) {
+  public MetaTag(@NotNull EViewport viewport) {
     this(ENameNonStandard.VIEWPORT, viewport.getIdentifier());
   }
 
-  public MetaTagApi(@NotNull EOpenGraph openGraph, @NotNull String content) {
+  public MetaTag(@NotNull EOpenGraph openGraph, @NotNull String content) {
     this(EOpenGraph.ATTRIB_NAME, openGraph.getIdentifier(), content);
   }
 
-  public MetaTagApi(@NotNull ETwitter twitter, @NotNull String content) {
+  public MetaTag(@NotNull ETwitter twitter, @NotNull String content) {
     this(ETwitter.ATTRIB_NAME, twitter.getIdentifier(), content);
   }
 
-  public MetaTagApi(@NotNull ETwitterCardType twitterCardType) {
+  public MetaTag(@NotNull ETwitterCardType twitterCardType) {
     this(ETwitter.TWITTER_CARD, twitterCardType.getIdentifier());
   }
 

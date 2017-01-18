@@ -54,8 +54,8 @@ import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
-import com.celements.metatag.MetaTagCollectorRole;
-import com.celements.metatag.MetaTagApi;
+import com.celements.metatag.MetaTag;
+import com.celements.metatag.MetaTagSerivceRole;
 import com.celements.metatag.enums.ECharset;
 import com.celements.model.access.ModelAccessScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
@@ -141,7 +141,7 @@ public class CelementsWebScriptService implements ScriptService {
   LastStartupTimeStampRole lastStartupTimeStamp;
 
   @Requirement
-  MetaTagCollectorRole metaTag;
+  MetaTagSerivceRole metaTag;
 
   @Requirement
   Execution execution;
@@ -1077,25 +1077,26 @@ public class CelementsWebScriptService implements ScriptService {
     return this.versionMap.get(systemComponentName);
   }
 
-  public MetaTagApi getCharsetMetaTag(String charsetStr) {
+  public MetaTag getCharsetMetaTag(String charsetStr) {
     ECharset charset = ECharset.getCharset(charsetStr);
     if (charset != null) {
-      return new MetaTagApi(charset);
+      return new MetaTag(charset);
     }
-    return new MetaTagApi(ECharset.ATTRIB_NAME, charsetStr, null);
+    return new MetaTag(ECharset.ATTRIB_NAME, charsetStr, null);
   }
 
-  public void addMetaTag(@NotNull String attributeName, @NotNull String attributeValue,
+  public void addMetaTagToCollector(@NotNull String attributeName, @NotNull String attributeValue,
       @NotNull String content) {
-    metaTag.addMetaTag(new MetaTagApi(attributeName, attributeValue, content));
+    metaTag.addMetaTagToCollector(new MetaTag(attributeName, attributeValue, content));
   }
 
-  public void addMetaTag(@NotNull Map<String, String> attributes, @NotNull String content) {
-    metaTag.addMetaTag(new MetaTagApi(attributes, content));
+  public void addMetaTagToCollector(@NotNull Map<String, String> attributes,
+      @NotNull String content) {
+    metaTag.addMetaTagToCollector(new MetaTag(attributes, content));
   }
 
-  public String displayAllMetaTags() {
-    return metaTag.displayAllMetaTags();
+  public String displayCollectedMetaTags() {
+    return metaTag.displayCollectedMetaTags();
   }
 
 }
