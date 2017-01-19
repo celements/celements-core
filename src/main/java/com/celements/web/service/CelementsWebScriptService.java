@@ -32,8 +32,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +52,6 @@ import com.celements.common.classes.IClassesCompositorComponent;
 import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
-import com.celements.metatag.MetaTag;
-import com.celements.metatag.MetaTagServiceRole;
-import com.celements.metatag.enums.ECharset;
 import com.celements.model.access.ModelAccessScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
 import com.celements.navigation.service.ITreeNodeCache;
@@ -139,9 +134,6 @@ public class CelementsWebScriptService implements ScriptService {
 
   @Requirement
   LastStartupTimeStampRole lastStartupTimeStamp;
-
-  @Requirement
-  MetaTagServiceRole metaTag;
 
   @Requirement
   Execution execution;
@@ -1075,28 +1067,6 @@ public class CelementsWebScriptService implements ScriptService {
       }
     }
     return this.versionMap.get(systemComponentName);
-  }
-
-  public MetaTag getCharsetMetaTag(String charsetStr) {
-    ECharset charset = ECharset.getCharset(charsetStr);
-    if (charset != null) {
-      return new MetaTag(charset);
-    }
-    return new MetaTag(ECharset.ATTRIB_NAME, charsetStr, null);
-  }
-
-  public void addMetaTagToCollector(@NotNull String attributeName, @NotNull String attributeValue,
-      @NotNull String content) {
-    metaTag.addMetaTagToCollector(new MetaTag(attributeName, attributeValue, content));
-  }
-
-  public void addMetaTagToCollector(@NotNull Map<String, String> attributes,
-      @NotNull String content) {
-    metaTag.addMetaTagToCollector(new MetaTag(attributes, content));
-  }
-
-  public String displayCollectedMetaTags() {
-    return metaTag.displayCollectedMetaTags();
   }
 
 }

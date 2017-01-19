@@ -147,3 +147,4 @@ com.celements.model.util.DefaultModelUtils
 com.celements.model.access.DefaultXWikiDocumentCreator
 com.celements.model.access.StoreModelAccessStrategy
 com.celements.metatag.MetaTagService
+com.celements.metatag.MetaTagScriptService
