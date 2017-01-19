@@ -55,7 +55,7 @@ import com.celements.filebase.FileBaseScriptService;
 import com.celements.lastChanged.ILastChangedRole;
 import com.celements.mandatory.IMandatoryDocumentCompositorRole;
 import com.celements.metatag.MetaTag;
-import com.celements.metatag.MetaTagSerivceRole;
+import com.celements.metatag.MetaTagServiceRole;
 import com.celements.metatag.enums.ECharset;
 import com.celements.model.access.ModelAccessScriptService;
 import com.celements.navigation.cmd.DeleteMenuItemCommand;
@@ -141,7 +141,7 @@ public class CelementsWebScriptService implements ScriptService {
   LastStartupTimeStampRole lastStartupTimeStamp;
 
   @Requirement
-  MetaTagSerivceRole metaTag;
+  MetaTagServiceRole metaTag;
 
   @Requirement
   Execution execution;

@@ -13,11 +13,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class MetaTagServiceTest extends AbstractComponentTest {
 
-  private MetaTagSerivceRole metaTag;
+  private MetaTagServiceRole metaTag;
 
   @Before
   public void prepareTest() throws Exception {
-    metaTag = Utils.getComponent(MetaTagSerivceRole.class);
+    metaTag = Utils.getComponent(MetaTagServiceRole.class);
   }
 
   @Test

@@ -9,18 +9,18 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 
 @Component
-public class MetaTagService implements MetaTagSerivceRole {
+public class MetaTagService implements MetaTagServiceRole {
 
   @Requirement
   private Execution execution;
 
   @Override
   public void addMetaTagToCollector(MetaTag tag) {
-    Object contextObj = getExecutionContext().getProperty(MetaTagSerivceRole.META_CONTEXT_KEY);
+    Object contextObj = getExecutionContext().getProperty(MetaTagServiceRole.META_CONTEXT_KEY);
     List<MetaTag> metaList = getMetaTags(contextObj);
     if (metaList == null) {
       metaList = new ArrayList<>();
-      getExecutionContext().setProperty(MetaTagSerivceRole.META_CONTEXT_KEY, metaList);
+      getExecutionContext().setProperty(MetaTagServiceRole.META_CONTEXT_KEY, metaList);
     }
     metaList.add(tag);
   }
@@ -28,8 +28,8 @@ public class MetaTagService implements MetaTagSerivceRole {
   @Override
   public String displayCollectedMetaTags() {
     StringBuilder sb = new StringBuilder();
-    Object contextObj = getExecutionContext().getProperty(MetaTagSerivceRole.META_CONTEXT_KEY);
-    getExecutionContext().removeProperty(MetaTagSerivceRole.META_CONTEXT_KEY);
+    Object contextObj = getExecutionContext().getProperty(MetaTagServiceRole.META_CONTEXT_KEY);
+    getExecutionContext().removeProperty(MetaTagServiceRole.META_CONTEXT_KEY);
     List<MetaTag> metaTags = getMetaTags(contextObj);
     if (metaTags != null) {
       for (MetaTag metaTag : metaTags) {
