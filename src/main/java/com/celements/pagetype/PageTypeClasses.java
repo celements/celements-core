@@ -35,9 +35,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @Deprecated PageTypeClasses
  *             Please use PageTypePropertiesClass and PageTypeClass instead of PageTypeClasses
  */
-@Component("celements.celPageTypeClasses")
-
 @Deprecated
+@Component("celements.celPageTypeClasses")
 public class PageTypeClasses extends AbstractClassCollection {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(PageTypeClasses.class);
