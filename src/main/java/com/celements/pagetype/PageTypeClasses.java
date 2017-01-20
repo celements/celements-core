@@ -31,6 +31,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+/**
+ * @Deprecated PageTypeClasses
+ *             Please use PageTypePropertiesClass and PageTypeClass instead of PageTypeClasses
+ */
+@Deprecated
 @Component("celements.celPageTypeClasses")
 public class PageTypeClasses extends AbstractClassCollection {
 
@@ -83,8 +88,6 @@ public class PageTypeClasses extends AbstractClassCollection {
   @Override
   protected void initClasses() throws XWikiException {
     LOGGER.debug("entering initClasses for database: " + getContext().getDatabase());
-    getPageTypePropertiesClass();
-    getPageTypeClass();
   }
 
   @Override
@@ -97,7 +100,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     return "celPageTypeClasses";
   }
 
-  private BaseClass getPageTypePropertiesClass() throws XWikiException {
+  public BaseClass getPageTypePropertiesClass() throws XWikiException {
     boolean needsUpdate = false;
 
     DocumentReference pageTypePropertiesClassRef = pageTypeClassConfig.getPageTypePropertiesClassRef(
@@ -135,7 +138,7 @@ public class PageTypeClasses extends AbstractClassCollection {
     return bclass;
   }
 
-  private BaseClass getPageTypeClass() throws XWikiException {
+  public BaseClass getPageTypeClass() throws XWikiException {
     boolean needsUpdate = false;
 
     DocumentReference pageTypeClassRef = pageTypeClassConfig.getPageTypeClassRef(

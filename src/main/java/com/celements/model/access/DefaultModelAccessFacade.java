@@ -358,9 +358,9 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     return Collections.unmodifiableMap(ret);
   }
 
-  private void checkNotTranslation(XWikiDocument doc) {
-    String msg = "Trying to access XObjects on translation '{0}' of doc '{1}";
-    checkState(!isTranslation(doc), MessageFormat.format(msg, doc.getLanguage(),
+  void checkNotTranslation(XWikiDocument doc) {
+    checkState(!isTranslation(doc), MessageFormat.format(
+        "Trying to access XObjects on translation ''{0}'' of doc ''{1}''", doc.getLanguage(),
         doc.getDocumentReference()));
   }
 

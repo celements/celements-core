@@ -1302,6 +1302,11 @@ public class WebUtilsService implements IWebUtilsService {
   }
 
   @Override
+  public boolean existsInheritableDocument(DocumentReference docRef) {
+    return existsInheritableDocument(docRef, null, null);
+  }
+
+  @Override
   public boolean existsInheritableDocument(DocumentReference docRef, String lang) {
     return existsInheritableDocument(docRef, lang, null);
   }
