@@ -199,6 +199,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "oldCoreClasses";
   }
@@ -467,6 +468,7 @@ public class OldCoreClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addNumberField("initialdelay", "initialdelay", 30, "long");
     needsUpdate |= bclass.addNumberField("frequency", "frequency", 30, "long");
     needsUpdate |= bclass.addBooleanField("thumbDescription", "Thumbnail Description", "yesno");
+    needsUpdate |= addBooleanField(bclass, "showDescription", "is description shown", "yesno", 1);
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
