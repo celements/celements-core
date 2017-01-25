@@ -6,11 +6,12 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.script.service.ScriptService;
 
 import com.celements.metatag.enums.ECharset;
 
 @Component(MetaTagScriptService.COMPONENT_HINT)
-public class MetaTagScriptService {
+public class MetaTagScriptService implements ScriptService {
 
   public static final String COMPONENT_HINT = "metatag";
 
