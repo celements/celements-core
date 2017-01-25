@@ -17,7 +17,7 @@ public class MetaTagScriptService {
   @Requirement
   MetaTagServiceRole metaTag;
 
-  public MetaTag getCharsetMetaTag(String charsetStr) {
+  public @NotNull MetaTag getCharsetMetaTag(@NotNull String charsetStr) {
     ECharset charset = ECharset.getCharset(charsetStr);
     if (charset != null) {
       return new MetaTag(charset);
@@ -35,7 +35,7 @@ public class MetaTagScriptService {
     metaTag.addMetaTagToCollector(new MetaTag(attributes, content));
   }
 
-  public String displayCollectedMetaTags() {
+  public @NotNull String displayCollectedMetaTags() {
     return metaTag.displayCollectedMetaTags();
   }
 }

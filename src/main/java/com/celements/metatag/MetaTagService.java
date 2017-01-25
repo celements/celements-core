@@ -3,6 +3,9 @@ package com.celements.metatag;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -15,7 +18,7 @@ public class MetaTagService implements MetaTagServiceRole {
   private Execution execution;
 
   @Override
-  public void addMetaTagToCollector(MetaTag tag) {
+  public void addMetaTagToCollector(@NotNull MetaTag tag) {
     Object contextObj = getExecutionContext().getProperty(MetaTagServiceRole.META_CONTEXT_KEY);
     List<MetaTag> metaList = getMetaTags(contextObj);
     if (metaList == null) {
@@ -26,7 +29,7 @@ public class MetaTagService implements MetaTagServiceRole {
   }
 
   @Override
-  public String displayCollectedMetaTags() {
+  public @NotNull String displayCollectedMetaTags() {
     StringBuilder sb = new StringBuilder();
     Object contextObj = getExecutionContext().getProperty(MetaTagServiceRole.META_CONTEXT_KEY);
     getExecutionContext().removeProperty(MetaTagServiceRole.META_CONTEXT_KEY);
@@ -40,14 +43,15 @@ public class MetaTagService implements MetaTagServiceRole {
   }
 
   @SuppressWarnings("unchecked")
-  List<MetaTag> getMetaTags(Object contextObj) {
+  @Nullable
+  List<MetaTag> getMetaTags(@Nullable Object contextObj) {
     if (contextObj instanceof List) {
       return (List<MetaTag>) contextObj;
     }
     return null;
   }
 
-  private ExecutionContext getExecutionContext() {
+  private @NotNull ExecutionContext getExecutionContext() {
     return execution.getContext();
   }
 

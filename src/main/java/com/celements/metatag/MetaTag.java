@@ -79,7 +79,7 @@ public final class MetaTag {
     this(ETwitter.TWITTER_CARD, twitterCardType.getIdentifier());
   }
 
-  public String display() {
+  public @NotNull String display() {
     StringBuilder sb = new StringBuilder();
     sb.append("<meta ");
     for (String attrib : attribs.keySet()) {
