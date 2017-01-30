@@ -59,7 +59,6 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
         bClass).anyTimes();
     expect(modelAccessMock.getDocument(eq(docRef))).andReturn(doc);
     expect(modelAccessMock.getXObjects(doc, rightsClass.getClassRef())).andReturn(twoObj);
-
     modelAccessMock.saveDocument(same(doc), (String) anyObject());
     expectLastCall();
     replayDefault();

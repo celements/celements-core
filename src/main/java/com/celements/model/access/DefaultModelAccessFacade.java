@@ -54,7 +54,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.util.Util;
 
-
 @Component
 public class DefaultModelAccessFacade implements IModelAccessFacade {
 
