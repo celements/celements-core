@@ -20,8 +20,10 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentLoadException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.classes.ClassDefinition;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.UserCreateException;
+import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.celements.web.plugin.cmd.PasswordRecoveryAndEmailValidationCommand;
 import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -45,7 +47,10 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   private IWebUtilsService webUtilsService;
 
   @Requirement
-  IModelAccessFacade modelAccess;
+  private IModelAccessFacade modelAccess;
+
+  @Requirement(XWikiRightsClass.CLASS_DEF_HINT)
+  private ClassDefinition xWikiRightsClass;
 
   @Requirement
   private Execution execution;
@@ -170,23 +175,22 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   void setRightsOnUserDoc(@NotNull String accountFullName) throws UserCreateException {
     try {
       XWikiDocument doc = modelAccess.getDocument(webUtilsService.resolveDocumentReference(
-          accountFullName));
-      List<BaseObject> rightsObjs = doc.getXObjects(webUtilsService.resolveDocumentReference(
-          "XWiki.XWikiRights"));
-      for (BaseObject rightObj : rightsObjs) {
-        if (rightObj.getStringValue("groups").equals("")) {
-          rightObj.setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
-              doc.getDocumentReference()));
-          rightObj.set("allow", "1", getContext());
-          rightObj.set("levels", "view,edit,delete", getContext());
-          rightObj.set("groups", "", getContext());
-        } else {
-          rightObj.set("users", "", getContext());
-          rightObj.set("allow", "1", getContext());
-          rightObj.set("levels", "view,edit,delete", getContext());
-          rightObj.set("groups", "XWiki.XWikiAdminGroup", getContext());
-        }
+          accountFullName)); // accountFullName
+      List<BaseObject> rightsObjs = modelAccess.getXObjects(doc, xWikiRightsClass.getClassRef());
+      if (rightsObjs.size() > 0) {
+        rightsObjs.get(0).setStringValue("users", webUtilsService.getRefLocalSerializer().serialize(
+            doc.getDocumentReference()));
+        rightsObjs.get(0).set("allow", "1", getContext());
+        rightsObjs.get(0).set("levels", "view,edit,delete", getContext());
+        rightsObjs.get(0).set("groups", "", getContext());
       }
+      if (rightsObjs.size() > 1) {
+        rightsObjs.get(1).set("users", "", getContext());
+        rightsObjs.get(1).set("allow", "1", getContext());
+        rightsObjs.get(1).set("levels", "view,edit,delete", getContext());
+        rightsObjs.get(1).set("groups", "XWiki.XWikiAdminGroup", getContext());
+      }
+
       modelAccess.saveDocument(doc, "added rights objects to created user");
     } catch (DocumentLoadException | DocumentNotExistsException | DocumentSaveException excp) {
       _LOGGER.error("Exception while trying to add rights to newly created user", excp);

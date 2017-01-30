@@ -4,6 +4,9 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,6 +38,7 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     String docName = "Space.Doc";
     String defaultLevels = "view,edit,delete";
     String adminGroup = "XWiki.XWikiAdminGroup";
+    List<BaseObject> twoObj = new ArrayList<>();
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject obj0 = new BaseObject();
@@ -44,6 +48,8 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     obj1.setStringValue(XWikiRightsClass.FIELD_GROUPS.getName(), "XWiki.XWikiAllGroup");
     doc.addXObject(obj0);
     doc.addXObject(obj1);
+    twoObj.add(obj0);
+    twoObj.add(obj1);
     BaseClass bClass = new BaseClass();
     bClass.addBooleanField(XWikiRightsClass.FIELD_ALLOW.getName(), "Allow", "yesno");
     bClass.addLevelsField(XWikiRightsClass.FIELD_LEVELS.getName(), "Levels");
@@ -52,6 +58,8 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     expect(getWikiMock().getXClass(eq(rightsClass.getClassRef()), same(getContext()))).andReturn(
         bClass).anyTimes();
     expect(modelAccessMock.getDocument(eq(docRef))).andReturn(doc);
+    expect(modelAccessMock.getXObjects(doc, rightsClass.getClassRef())).andReturn(twoObj);
+
     modelAccessMock.saveDocument(same(doc), (String) anyObject());
     expectLastCall();
     replayDefault();
@@ -75,6 +83,7 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     String otherUsers = "XWiki.OtherUser,XWiki.ThirdUser";
     String otherLevels = "view,delete";
     String otherGroups = "XWiki.XWikiAllGroup";
+    List<BaseObject> objListe = new ArrayList<>();
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject obj0 = new BaseObject();
@@ -101,6 +110,11 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     doc.addXObject(obj2);
     doc.addXObject(obj3);
     doc.addXObject(obj4);
+    objListe.add(obj0);
+    objListe.add(obj1);
+    objListe.add(obj2);
+    objListe.add(obj3);
+    objListe.add(obj4);
     BaseClass bClass = new BaseClass();
     bClass.addBooleanField(XWikiRightsClass.FIELD_ALLOW.getName(), "Allow", "yesno");
     bClass.addLevelsField(XWikiRightsClass.FIELD_LEVELS.getName(), "Levels");
@@ -109,6 +123,7 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     expect(getWikiMock().getXClass(eq(rightsClass.getClassRef()), same(getContext()))).andReturn(
         bClass).anyTimes();
     expect(modelAccessMock.getDocument(eq(docRef))).andReturn(doc);
+    expect(modelAccessMock.getXObjects(doc, rightsClass.getClassRef())).andReturn(objListe);
     modelAccessMock.saveDocument(same(doc), (String) anyObject());
     expectLastCall();
     replayDefault();
