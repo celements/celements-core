@@ -132,7 +132,7 @@ public interface IModelAccessFacade {
    * @return the xobject in a Optional
    */
   public Optional<BaseObject> getXObject(DocumentReference docRef, DocumentReference classRef,
-      int ObjectNumber) throws DocumentNotExistsException;
+      int objectNumber) throws DocumentNotExistsException;
 
   /**
    * @param doc

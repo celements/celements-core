@@ -313,6 +313,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     for (BaseObject baseObject : objs) {
       if (baseObject.getNumber() == objectNumber) {
         bObj = baseObject;
+        break;
       }
     }
     return Optional.fromNullable(bObj);
