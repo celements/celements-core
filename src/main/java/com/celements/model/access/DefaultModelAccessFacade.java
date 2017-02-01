@@ -300,6 +300,26 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  public Optional<BaseObject> getXObject(DocumentReference docRef, DocumentReference classRef,
+      int objectNumber) throws DocumentNotExistsException {
+    return getXObject(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef, objectNumber);
+  }
+
+  @Override
+  public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
+      int objectNumber) {
+    BaseObject bObj = null;
+    List<BaseObject> objs = getXObjects(doc, classRef);
+    for (BaseObject baseObject : objs) {
+      if (baseObject.getNumber() == objectNumber) {
+        bObj = baseObject;
+        break;
+      }
+    }
+    return Optional.fromNullable(bObj);
+  }
+
+  @Override
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef)
       throws DocumentNotExistsException {
     return getXObjects(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef);
