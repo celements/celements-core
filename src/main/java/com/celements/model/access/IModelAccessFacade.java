@@ -122,6 +122,9 @@ public interface IModelAccessFacade {
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef, String key,
       Object value);
 
+  public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef,
+      int ObjectNumber) throws DocumentNotExistsException;
+
   /**
    * @param docRef
    *          to get xobjects on (may not be null)
