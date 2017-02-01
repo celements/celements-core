@@ -22,6 +22,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
 
 @Component
 public class DefaultModelContext implements ModelContext {
@@ -90,6 +92,16 @@ public class DefaultModelContext implements ModelContext {
   @Override
   public String getUserName() {
     return getXWikiContext().getUser();
+  }
+
+  @Override
+  public Optional<XWikiRequest> getRequest() {
+    return Optional.fromNullable(getXWikiContext().getRequest());
+  }
+
+  @Override
+  public Optional<XWikiResponse> getResponse() {
+    return Optional.fromNullable(getXWikiContext().getResponse());
   }
 
   @Override
