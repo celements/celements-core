@@ -74,7 +74,7 @@ public class PageTypeService implements IPageTypeRole {
     typeNameToCatCacheDeprecated.clear();
   }
 
-  private void loadTypeNameToCategoryMap() {
+  private void loadTypeNameCategoryMaps() {
     if (typeNameToCatCache.isEmpty()) {
       synchronized (typeNameToCatCache) {
         if (typeNameToCatCache.isEmpty()) {
@@ -86,7 +86,7 @@ public class PageTypeService implements IPageTypeRole {
                   + " category '{}' is shadowed by '{}'.", typeCategory.getTypeName(),
                   typeCategory.getClass(), beforeRegCat.getClass());
             }
-            for (String deprecateName : typeCategory.getDeprecatedNames()) {
+            for (String deprecateName : typeCategory.getAllTypeNames()) {
               beforeRegCat = typeNameToCatCacheDeprecated.putIfAbsent(deprecateName, typeCategory);
               if (beforeRegCat != null) {
                 LOGGER.warn("Page type category collision on deprecated category name '{}' the "
@@ -101,20 +101,17 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
-    loadTypeNameToCategoryMap();
+    loadTypeNameCategoryMaps();
     return Collections.unmodifiableMap(typeNameToCatCache);
   }
 
   private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMapIncludeDeprecated() {
-    loadTypeNameToCategoryMap();
-    ConcurrentMap<String, IPageTypeCategoryRole> completeMap = typeNameToCatCacheDeprecated;
-    completeMap.putAll(typeNameToCatCache);
-    return Collections.unmodifiableMap(completeMap);
+    loadTypeNameCategoryMaps();
+    return Collections.unmodifiableMap(typeNameToCatCacheDeprecated);
   }
 
   @Override
   public Optional<IPageTypeCategoryRole> getTypeCategoryForCatName(String categoryName) {
-    loadTypeNameToCategoryMap();
     return Optional.fromNullable(getTypeNameToCategoryMapIncludeDeprecated().get(categoryName));
   }
 
