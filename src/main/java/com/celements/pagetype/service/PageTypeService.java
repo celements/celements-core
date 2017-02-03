@@ -74,7 +74,7 @@ public class PageTypeService implements IPageTypeRole {
     typeNameToCatCacheDeprecated.clear();
   }
 
-  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMap(boolean deprecated) {
+  private void loadTypeNameToCategoryMap() {
     if (typeNameToCatCache.isEmpty()) {
       synchronized (typeNameToCatCache) {
         if (typeNameToCatCache.isEmpty()) {
@@ -98,24 +98,24 @@ public class PageTypeService implements IPageTypeRole {
         }
       }
     }
-    if (deprecated) {
-      return Collections.unmodifiableMap(typeNameToCatCacheDeprecated);
-    } else {
-      return Collections.unmodifiableMap(typeNameToCatCache);
-    }
+  }
+
+  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
+    loadTypeNameToCategoryMap();
+    return Collections.unmodifiableMap(typeNameToCatCache);
+  }
+
+  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMapIncludeDeprecated() {
+    loadTypeNameToCategoryMap();
+    ConcurrentMap<String, IPageTypeCategoryRole> completeMap = typeNameToCatCacheDeprecated;
+    completeMap.putAll(typeNameToCatCache);
+    return Collections.unmodifiableMap(completeMap);
   }
 
   @Override
   public Optional<IPageTypeCategoryRole> getTypeCategoryForCatName(String categoryName) {
-    IPageTypeCategoryRole ptCat = getTypeNameToCategoryMap(false).get(categoryName);
-    if (ptCat == null) {
-      ptCat = getTypeNameToCategoryMap(true).get(categoryName);
-      if (ptCat != null) {
-        LOGGER.warn("Deprecated page type category lookup for name [{}] found category [{}]",
-            categoryName, ptCat.getClass());
-      }
-    }
-    return Optional.fromNullable(ptCat);
+    loadTypeNameToCategoryMap();
+    return Optional.fromNullable(getTypeNameToCategoryMapIncludeDeprecated().get(categoryName));
   }
 
   @Override
