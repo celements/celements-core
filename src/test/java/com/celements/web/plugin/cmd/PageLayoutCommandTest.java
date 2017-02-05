@@ -39,6 +39,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
+import com.celements.cells.ICellsClassConfig;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.inheritor.FieldInheritor;
 import com.celements.inheritor.InheritorFactory;
@@ -593,6 +594,112 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expect(xwiki.exists(eq(centralLayoutEditorPropDocRef), same(context))).andReturn(false).once();
     replayDefault();
     assertFalse(plCmd.layoutEditorAvailable());
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetHTMLType_XHTML_default() throws Exception {
+    SpaceReference layoutRef = new SpaceReference("MyPageLayout", new WikiReference(
+        context.getDatabase()));
+    DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
+        layoutPropDoc).atLeastOnce();
+    replayDefault();
+    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetHTMLType_XHTML_default_empty() throws Exception {
+    SpaceReference layoutRef = new SpaceReference("MyPageLayout", new WikiReference(
+        context.getDatabase()));
+    DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, "");
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
+        layoutPropDoc).atLeastOnce();
+    replayDefault();
+    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetHTMLType_XHTML_default_null() throws Exception {
+    SpaceReference layoutRef = new SpaceReference("MyPageLayout", new WikiReference(
+        context.getDatabase()));
+    DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, null);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
+        layoutPropDoc).atLeastOnce();
+    replayDefault();
+    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetHTMLType_HTML5() throws Exception {
+    SpaceReference layoutRef = new SpaceReference("MyPageLayout", new WikiReference(
+        context.getDatabase()));
+    DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD,
+        ICellsClassConfig.DOCTYPE_HTML_5_VALUE);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
+        layoutPropDoc).atLeastOnce();
+    replayDefault();
+    assertEquals(ICellsClassConfig.DOCTYPE_HTML_5_VALUE, plCmd.getHTMLType(layoutRef));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetHTMLType_XHTML() throws Exception {
+    SpaceReference layoutRef = new SpaceReference("MyPageLayout", new WikiReference(
+        context.getDatabase()));
+    DocumentReference webHomeDocRef = new DocumentReference("WebHome", layoutRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).atLeastOnce();
+    XWikiDocument layoutPropDoc = new XWikiDocument(webHomeDocRef);
+    BaseObject layoutPropObj = new BaseObject();
+    DocumentReference pagePropClassRef = new DocumentReference(context.getDatabase(),
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_SPACE,
+        PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
+    layoutPropObj.setXClassReference(pagePropClassRef);
+    layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD,
+        ICellsClassConfig.DOCTYPE_XHTML_VALUE);
+    layoutPropDoc.addXObject(layoutPropObj);
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
+        layoutPropDoc).atLeastOnce();
+    replayDefault();
+    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
     verifyDefault();
   }
 

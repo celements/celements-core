@@ -67,6 +67,14 @@ public class PageLayoutApi extends Api {
     return pageLayoutCmd.getLayoutType(layoutSpaceRef);
   }
 
+  /**
+   * @return 'HTML 5' or 'XHTML 1.1' see ICellsClassConfig for DOCTYPE_HTML_5_VALUE and
+   *         DOCTYPE_HTML_5_VALUE
+   */
+  public String getHTMLType() {
+    return pageLayoutCmd.getHTMLType(layoutSpaceRef);
+  }
+
   public boolean isPageLayoutType() {
     return ICellsClassConfig.PAGE_LAYOUT_VALUE.equals(getLayoutType());
   }

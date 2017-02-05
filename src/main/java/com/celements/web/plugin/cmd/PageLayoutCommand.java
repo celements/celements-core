@@ -49,6 +49,8 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -137,7 +139,7 @@ public class PageLayoutCommand {
               getPageLayoutPropertiesClassRef(
                   propXdoc.getDocumentReference().getWikiReference().getName()));
           layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
-          layoutPropObj.setStringValue("doctype", getDocType());
+          layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, getDocType());
           getModelAccess().saveDocument(propXdoc, "Creating page layout", false);
           return "cel_layout_create_successful";
         } catch (DocumentSaveException exp) {
@@ -150,7 +152,7 @@ public class PageLayoutCommand {
 
   private String getDocType() {
     return Utils.getComponent(ConfigurationSource.class).getProperty("celements.layout.docType",
-        "HTML 5");
+        ICellsClassConfig.DOCTYPE_HTML_5_VALUE);
   }
 
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {
@@ -459,6 +461,19 @@ public class PageLayoutCommand {
       return layoutPropertyObj.getStringValue(ICellsClassConfig.LAYOUT_TYPE_FIELD);
     }
     return ICellsClassConfig.PAGE_LAYOUT_VALUE;
+  }
+
+  public String getHTMLType(SpaceReference layoutSpaceRef) {
+    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
+    Optional<String> stringValue = Optional.absent();
+    if (layoutPropertyObj != null) {
+      stringValue = getStringValue(layoutPropertyObj, ICellsClassConfig.LAYOUT_DOCTYPE_FIELD);
+    }
+    return stringValue.or(ICellsClassConfig.DOCTYPE_XHTML_VALUE);
+  }
+
+  private Optional<String> getStringValue(BaseObject layoutPropertyObj, String fieldName) {
+    return Optional.fromNullable(Strings.emptyToNull(layoutPropertyObj.getStringValue(fieldName)));
   }
 
   public String getVersion(SpaceReference layoutSpaceRef) {
