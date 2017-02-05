@@ -21,8 +21,8 @@ package com.celements.web.plugin.api;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.SpaceReference;
 
 import com.celements.cells.ICellsClassConfig;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.api.Api;
 
 public class PageLayoutApi extends Api {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(PageLayoutApi.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
 
   private PageLayoutCommand pageLayoutCmd;
   private SpaceReference layoutSpaceRef;
@@ -84,9 +84,9 @@ public class PageLayoutApi extends Api {
       pageLayoutCmd.exportLayoutXAR(layoutSpaceRef, withDocHistory);
       return true;
     } catch (XWikiException exp) {
-      mLogger.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
+      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
     } catch (IOException exp) {
-      mLogger.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
+      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
     }
     return false;
   }
