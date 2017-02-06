@@ -21,6 +21,8 @@ package com.celements.web.plugin.api;
 
 import java.io.IOException;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.SpaceReference;
@@ -72,6 +74,7 @@ public class PageLayoutApi extends Api {
    * @return 'HTML 5' or 'XHTML 1.1' see ICellsClassConfig for DOCTYPE_HTML_5_VALUE and
    *         DOCTYPE_HTML_5_VALUE
    */
+  @NotNull
   public HtmlDoctype getHTMLType() {
     return pageLayoutCmd.getHTMLType(layoutSpaceRef);
   }
