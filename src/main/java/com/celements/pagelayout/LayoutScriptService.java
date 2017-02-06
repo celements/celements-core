@@ -88,7 +88,7 @@ public class LayoutScriptService implements ScriptService {
    *
    * @return PageLayoutApi for the layoutSpaceRef computed
    */
-  public PageLayoutApi getPageLayouApiForDocRef(DocumentReference docRef) {
+  public PageLayoutApi getPageLayoutApiForDocRef(DocumentReference docRef) {
     SpaceReference pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(docRef);
     if (pageLayoutForDoc != null) {
       return new PageLayoutApi(pageLayoutForDoc, getContext());
@@ -97,8 +97,8 @@ public class LayoutScriptService implements ScriptService {
   }
 
   /**
-   * @deprecated since 2.82 instead use getPageLayoutApiForRef(SpaceReference)
-   *             since 2.86 : or getPageLayouApitForDocRef(DocumentReference)
+   * @deprecated since 2.82 instead use {@link #getPageLayoutApiForRef(SpaceReference)}
+   *             since 2.86 : or {@link #getPageLayoutApiForDocRef(DocumentReference)}
    */
   @Deprecated
   public PageLayoutApi getPageLayoutApiForName(String layoutSpaceName) {
