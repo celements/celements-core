@@ -19,8 +19,8 @@ public class ReverseMap<K extends ValueGetter<V>, V> {
   }
 
   @NotNull
-  public Optional<K> get(@Nullable V strValue) {
-    return Optional.fromNullable(reverseMap.get(strValue));
+  public Optional<K> get(@Nullable V value) {
+    return Optional.fromNullable(reverseMap.get(value));
   }
 
 }
