@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.classes.AbstractClassCollection;
-import com.google.common.base.Joiner;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -134,7 +133,7 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextAreaField("license", "License", 15, 30);
     needsUpdate |= bclass.addTextField("version", "Version", 30);
     needsUpdate |= bclass.addStaticListField(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, "Doctype", 1,
-        false, Joiner.on("|").join(HtmlDoctype.values()), "select");
+        false, HtmlDoctype.XHTML + "|" + HtmlDoctype.HTML5, "select");
     needsUpdate |= bclass.addStaticListField(ICellsClassConfig.LAYOUT_TYPE_FIELD, "Layout Type", 1,
         false, ICellsClassConfig.PAGE_LAYOUT_VALUE + "|" + ICellsClassConfig.EDITOR_LAYOUT_VALUE,
         "select");
