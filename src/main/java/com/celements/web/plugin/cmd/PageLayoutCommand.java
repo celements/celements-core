@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.cells.CellRenderStrategy;
 import com.celements.cells.DivWriter;
+import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
@@ -152,7 +155,7 @@ public class PageLayoutCommand {
 
   private String getDocType() {
     return Utils.getComponent(ConfigurationSource.class).getProperty("celements.layout.docType",
-        ICellsClassConfig.DOCTYPE_HTML_5_VALUE);
+        HtmlDoctype.HTML5.getValue());
   }
 
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {
@@ -463,17 +466,19 @@ public class PageLayoutCommand {
     return ICellsClassConfig.PAGE_LAYOUT_VALUE;
   }
 
-  public String getHTMLType(SpaceReference layoutSpaceRef) {
+  @NotNull
+  public HtmlDoctype getHTMLType(@NotNull SpaceReference layoutSpaceRef) {
     BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
-    Optional<String> stringValue = Optional.absent();
+    Optional<HtmlDoctype> stringValue = Optional.absent();
     if (layoutPropertyObj != null) {
-      stringValue = getStringValue(layoutPropertyObj, ICellsClassConfig.LAYOUT_DOCTYPE_FIELD);
+      stringValue = getHtmlDoctype(layoutPropertyObj, ICellsClassConfig.LAYOUT_DOCTYPE_FIELD);
     }
-    return stringValue.or(ICellsClassConfig.DOCTYPE_XHTML_VALUE);
+    return stringValue.or(HtmlDoctype.XHTML);
   }
 
-  private Optional<String> getStringValue(BaseObject layoutPropertyObj, String fieldName) {
-    return Optional.fromNullable(Strings.emptyToNull(layoutPropertyObj.getStringValue(fieldName)));
+  private Optional<HtmlDoctype> getHtmlDoctype(BaseObject layoutPropertyObj, String fieldName) {
+    return HtmlDoctype.getHtmlDoctype(Strings.emptyToNull(layoutPropertyObj.getStringValue(
+        fieldName)));
   }
 
   public String getVersion(SpaceReference layoutSpaceRef) {

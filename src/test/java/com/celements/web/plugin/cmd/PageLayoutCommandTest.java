@@ -39,6 +39,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 
+import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.inheritor.FieldInheritor;
@@ -613,7 +614,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
         layoutPropDoc).atLeastOnce();
     replayDefault();
-    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    assertEquals(HtmlDoctype.XHTML, plCmd.getHTMLType(layoutRef));
     verifyDefault();
   }
 
@@ -634,7 +635,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
         layoutPropDoc).atLeastOnce();
     replayDefault();
-    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    assertEquals(HtmlDoctype.XHTML, plCmd.getHTMLType(layoutRef));
     verifyDefault();
   }
 
@@ -655,7 +656,7 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
         layoutPropDoc).atLeastOnce();
     replayDefault();
-    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    assertEquals(HtmlDoctype.XHTML, plCmd.getHTMLType(layoutRef));
     verifyDefault();
   }
 
@@ -672,12 +673,12 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
     layoutPropObj.setXClassReference(pagePropClassRef);
     layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD,
-        ICellsClassConfig.DOCTYPE_HTML_5_VALUE);
+        HtmlDoctype.HTML5.getValue());
     layoutPropDoc.addXObject(layoutPropObj);
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
         layoutPropDoc).atLeastOnce();
     replayDefault();
-    assertEquals(ICellsClassConfig.DOCTYPE_HTML_5_VALUE, plCmd.getHTMLType(layoutRef));
+    assertEquals(HtmlDoctype.HTML5, plCmd.getHTMLType(layoutRef));
     verifyDefault();
   }
 
@@ -694,12 +695,12 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
         PageLayoutCommand.PAGE_LAYOUT_PROPERTIES_CLASS_DOC);
     layoutPropObj.setXClassReference(pagePropClassRef);
     layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD,
-        ICellsClassConfig.DOCTYPE_XHTML_VALUE);
+        HtmlDoctype.XHTML.getValue());
     layoutPropDoc.addXObject(layoutPropObj);
     expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(
         layoutPropDoc).atLeastOnce();
     replayDefault();
-    assertEquals(ICellsClassConfig.DOCTYPE_XHTML_VALUE, plCmd.getHTMLType(layoutRef));
+    assertEquals(HtmlDoctype.XHTML, plCmd.getHTMLType(layoutRef));
     verifyDefault();
   }
 

@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -71,7 +72,7 @@ public class PageLayoutApi extends Api {
    * @return 'HTML 5' or 'XHTML 1.1' see ICellsClassConfig for DOCTYPE_HTML_5_VALUE and
    *         DOCTYPE_HTML_5_VALUE
    */
-  public String getHTMLType() {
+  public HtmlDoctype getHTMLType() {
     return pageLayoutCmd.getHTMLType(layoutSpaceRef);
   }
 
