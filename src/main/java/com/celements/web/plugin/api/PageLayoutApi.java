@@ -21,10 +21,13 @@ package com.celements.web.plugin.api;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.validation.constraints.NotNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.xpn.xwiki.XWikiContext;
@@ -33,7 +36,7 @@ import com.xpn.xwiki.api.Api;
 
 public class PageLayoutApi extends Api {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(PageLayoutApi.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(PageLayoutApi.class);
 
   private PageLayoutCommand pageLayoutCmd;
   private SpaceReference layoutSpaceRef;
@@ -67,6 +70,15 @@ public class PageLayoutApi extends Api {
     return pageLayoutCmd.getLayoutType(layoutSpaceRef);
   }
 
+  /**
+   * @return 'HTML 5' or 'XHTML 1.1' see ICellsClassConfig for DOCTYPE_HTML_5_VALUE and
+   *         DOCTYPE_HTML_5_VALUE
+   */
+  @NotNull
+  public HtmlDoctype getHTMLType() {
+    return pageLayoutCmd.getHTMLType(layoutSpaceRef);
+  }
+
   public boolean isPageLayoutType() {
     return ICellsClassConfig.PAGE_LAYOUT_VALUE.equals(getLayoutType());
   }
@@ -84,9 +96,9 @@ public class PageLayoutApi extends Api {
       pageLayoutCmd.exportLayoutXAR(layoutSpaceRef, withDocHistory);
       return true;
     } catch (XWikiException exp) {
-      mLogger.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
+      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
     } catch (IOException exp) {
-      mLogger.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
+      LOGGER.error("Failed to export page layout [" + layoutSpaceRef + "].", exp);
     }
     return false;
   }

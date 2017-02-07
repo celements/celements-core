@@ -132,8 +132,8 @@ public class CellsClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("authors", "Authors", 30);
     needsUpdate |= bclass.addTextAreaField("license", "License", 15, 30);
     needsUpdate |= bclass.addTextField("version", "Version", 30);
-    needsUpdate |= bclass.addStaticListField("doctype", "Doctype", 1, false, "XHTML 1.1|HTML 5",
-        "select");
+    needsUpdate |= bclass.addStaticListField(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, "Doctype", 1,
+        false, HtmlDoctype.XHTML + "|" + HtmlDoctype.HTML5, "select");
     needsUpdate |= bclass.addStaticListField(ICellsClassConfig.LAYOUT_TYPE_FIELD, "Layout Type", 1,
         false, ICellsClassConfig.PAGE_LAYOUT_VALUE + "|" + ICellsClassConfig.EDITOR_LAYOUT_VALUE,
         "select");
