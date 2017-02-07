@@ -1,19 +1,20 @@
 package com.celements.metatag.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum EHttpEquiv {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
 
-  CONTENT_SECURITY_POLICY("Content-Security-Policy"),
-  DEFAULT_STYLE("default-style"),
-  REFRESH("refresh");
+public enum EHttpEquiv implements ValueGetter<String> {
+
+  CONTENT_SECURITY_POLICY("Content-Security-Policy"), DEFAULT_STYLE("default-style"), REFRESH(
+      "refresh");
 
   public final static String ATTRIB_NAME = "http-equiv";
-  private final static Map<String, EHttpEquiv> ID_MAP = new HashMap<>();
+  private final static ReverseMap<EHttpEquiv, String> ID_MAP = new ReverseMap<>(
+      EHttpEquiv.values());
 
   private final String identifier;
 
@@ -27,12 +28,12 @@ public enum EHttpEquiv {
   }
 
   @Nullable
-  public static EHttpEquiv getHttpEquiv(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (EHttpEquiv accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  public static Optional<EHttpEquiv> getHttpEquiv(@Nullable String identifier) {
     return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return identifier;
   }
 }

@@ -6,7 +6,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum ERobot {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
+
+public enum ERobot implements ValueGetter<String>{
 
   INDEX("index"),
   NOINDEX("noindex"),
@@ -18,8 +22,8 @@ public enum ERobot {
   NOIMAGEINDEX("noimageindex"),
   NOCACHE("nocache");
 
-  private final static Map<String, ERobot> ID_MAP = new HashMap<>();
-
+  private final static ReverseMap<ERobot, String> ID_MAP = new ReverseMap<>(ERobot.values());
+  
   private final String identifier;
 
   private ERobot(String identifier) {
@@ -31,13 +35,13 @@ public enum ERobot {
     return identifier;
   }
 
-  @Nullable
-  public static ERobot getRobot(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (ERobot accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
-    return ID_MAP.get(identifier);
+  @NotNull
+  public static Optional<ERobot> getRobot(@Nullable String identifier) {
+   return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return identifier;
   }
 }

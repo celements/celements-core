@@ -6,7 +6,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum ENameNonStandard {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
+
+public enum ENameNonStandard implements ValueGetter<String> {
 
   CREATOR("creator"),
   GOOGLEBOT("googlebot"),
@@ -17,7 +21,8 @@ public enum ENameNonStandard {
 
   public final static String ATTRIB_NAME = ENameStandard.ATTRIB_NAME;
   public final static String ATTRIB_NAME_ALT = ENameStandard.ATTRIB_NAME_ALT;
-  private final static Map<String, ENameNonStandard> ID_MAP = new HashMap<>();
+  private final static ReverseMap<ENameNonStandard,String> ID_MAP = new ReverseMap<>(
+      ENameNonStandard.values());
 
   private final String identifier;
 
@@ -30,13 +35,13 @@ public enum ENameNonStandard {
     return identifier;
   }
 
-  @Nullable
-  public static ENameNonStandard getName(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (ENameNonStandard accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  @NotNull
+  public static Optional<ENameNonStandard> getName(@Nullable String identifier) {
     return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return identifier;
   }
 }

@@ -6,8 +6,12 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum ETwitter {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
 
+public enum ETwitter implements ValueGetter<String>{
+  
   // the Twitter (https://dev.twitter.com/cards/markup). Add more if needed.
   TWITTER_CARD("twitter:card"),
   TWITTER_SITE("twitter:site"),
@@ -20,7 +24,8 @@ public enum ETwitter {
   TWITTER_IMAGE_ALT("twitter:image:alt");
 
   public final static String ATTRIB_NAME = "name";
-  private final static Map<String, ETwitter> ID_MAP = new HashMap<>();
+  
+  private final static ReverseMap<ETwitter, String> ID_MAP = new ReverseMap<>(ETwitter.values());
 
   private final String identifier;
 
@@ -37,13 +42,13 @@ public enum ETwitter {
     return identifier;
   }
 
-  @Nullable
-  public static ETwitter getTwitter(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (ETwitter accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  @NotNull
+  public static Optional<ETwitter> getTwitter(@Nullable String identifier) {
     return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return identifier;
   }
 }

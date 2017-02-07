@@ -6,7 +6,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum EReferrer {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
+
+public enum EReferrer implements ValueGetter<String> {
 
   NO_REFFERER("no-referrer"),
   ORIGIN("origin"),
@@ -14,7 +18,7 @@ public enum EReferrer {
   ORIGIN_WHEN_CROSSORIGIN("origin-when-crossorigin"),
   UNSAVE_URL("unsafe-URL");
 
-  private final static Map<String, EReferrer> ID_MAP = new HashMap<>();
+  private final static ReverseMap<EReferrer, String> ID_MAP = new ReverseMap<>(EReferrer.values());
 
   private final String identifier;
 
@@ -28,12 +32,12 @@ public enum EReferrer {
   }
 
   @Nullable
-  public static EReferrer getReferrer(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (EReferrer accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  public static Optional<EReferrer> getReferrer(@Nullable String identifier) {
     return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return identifier;
   }
 }

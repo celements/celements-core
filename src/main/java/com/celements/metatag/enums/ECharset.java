@@ -1,21 +1,18 @@
 package com.celements.metatag.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum ECharset {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
 
-  UTF8("UTF-8"),
-  LATIN1("ISO-8859-1"),
-  ISO8859_1(LATIN1),
-  USASCII("US-ASCII"),
-  DEFAULT(UTF8);
+public enum ECharset implements ValueGetter<String> {
+
+  UTF8("UTF-8"), LATIN1("ISO-8859-1"), ISO8859_1(LATIN1), USASCII("US-ASCII"), DEFAULT(UTF8);
 
   public final static String ATTRIB_NAME = "charset";
-  private final static Map<String, ECharset> ID_MAP = new HashMap<>();
+  private final static ReverseMap<ECharset, String> ID_MAP = new ReverseMap<>(ECharset.values());
 
   private final String identifier;
 
@@ -32,13 +29,14 @@ public enum ECharset {
     return identifier;
   }
 
-  @Nullable
-  public static ECharset getCharset(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (ECharset accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  @NotNull
+  public static Optional<ECharset> getCharset(@Nullable String identifier) {
     return ID_MAP.get(identifier);
   }
+
+  @Override
+  public String getValue() {
+    return identifier;
+  }
+
 }

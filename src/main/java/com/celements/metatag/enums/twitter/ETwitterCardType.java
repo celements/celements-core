@@ -1,19 +1,18 @@
 package com.celements.metatag.enums.twitter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum ETwitterCardType {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
 
-  SUMMARY("summary"),
-  SUMMARY_LARGE_IMAGE("summary_large_image"),
-  PLAYER("player"),
-  APP("app");
+public enum ETwitterCardType implements ValueGetter<String> {
 
-  private final static Map<String, ETwitterCardType> ID_MAP = new HashMap<>();
+  SUMMARY("summary"), SUMMARY_LARGE_IMAGE("summary_large_image"), PLAYER("player"), APP("app");
+
+  private final static ReverseMap<ETwitterCardType, String> ID_MAP = new ReverseMap<>(
+      ETwitterCardType.values());
 
   private final String identifier;
 
@@ -30,13 +29,13 @@ public enum ETwitterCardType {
     return identifier;
   }
 
-  @Nullable
-  public static ETwitterCardType getTwitterCardType(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (ETwitterCardType accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  @NotNull
+  public static Optional<ETwitterCardType> getTwitterCardType(@Nullable String identifier) {
     return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return identifier;
   }
 }

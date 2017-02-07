@@ -19,7 +19,7 @@ public class MetaTagScriptService implements ScriptService {
   MetaTagServiceRole metaTag;
 
   public @NotNull MetaTag getCharsetMetaTag(@NotNull String charsetStr) {
-    ECharset charset = ECharset.getCharset(charsetStr);
+    ECharset charset = ECharset.getCharset(charsetStr).get();
     if (charset != null) {
       return new MetaTag(charset);
     }
