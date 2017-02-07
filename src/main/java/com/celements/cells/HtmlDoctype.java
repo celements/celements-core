@@ -20,13 +20,12 @@ public enum HtmlDoctype implements ValueGetter<String> {
     this.dbName = dbName;
   }
 
-  @Nullable
+  @NotNull
   public static Optional<HtmlDoctype> getHtmlDoctype(@Nullable String dbName) {
     return DB_NAME_MAP.get(dbName);
   }
 
   @Override
-  @NotNull
   public String getValue() {
     return dbName;
   }
