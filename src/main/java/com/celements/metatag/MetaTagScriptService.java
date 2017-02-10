@@ -2,6 +2,7 @@ package com.celements.metatag;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.Component;
@@ -9,6 +10,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.metatag.enums.ECharset;
+import com.google.common.base.Strings;
 
 @Component(MetaTagScriptService.COMPONENT_HINT)
 public class MetaTagScriptService implements ScriptService {
@@ -27,13 +29,14 @@ public class MetaTagScriptService implements ScriptService {
   }
 
   public void addMetaTagToCollector(@NotNull String attributeName, @NotNull String attributeValue,
-      @NotNull String content) {
-    metaTag.addMetaTagToCollector(new MetaTag(attributeName, attributeValue, content));
+      @Nullable String content) {
+    metaTag.addMetaTagToCollector(new MetaTag(attributeName, attributeValue, Strings.nullToEmpty(
+        content)));
   }
 
   public void addMetaTagToCollector(@NotNull Map<String, String> attributes,
-      @NotNull String content) {
-    metaTag.addMetaTagToCollector(new MetaTag(attributes, content));
+      @Nullable String content) {
+    metaTag.addMetaTagToCollector(new MetaTag(attributes, Strings.nullToEmpty(content)));
   }
 
   public @NotNull String displayCollectedMetaTags() {
