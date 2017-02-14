@@ -33,13 +33,13 @@ public enum ENameStandard implements ValueGetter<String>{
     return identifier;
   }
 
-  @Nullable
+  @NotNull
   public static Optional<ENameStandard> getName(@Nullable String identifier) {
     return ID_MAP.get(identifier);
   }
 
   @Override
   public String getValue() {
-    return identifier;
+    return getIdentifier();
   }
 }

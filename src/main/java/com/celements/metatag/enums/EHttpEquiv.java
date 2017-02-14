@@ -27,13 +27,13 @@ public enum EHttpEquiv implements ValueGetter<String> {
     return identifier;
   }
 
-  @Nullable
+  @NotNull
   public static Optional<EHttpEquiv> getHttpEquiv(@Nullable String identifier) {
     return ID_MAP.get(identifier);
   }
 
   @Override
   public String getValue() {
-    return identifier;
+    return getIdentifier();
   }
 }

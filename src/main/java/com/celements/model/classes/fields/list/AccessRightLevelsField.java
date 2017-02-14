@@ -66,7 +66,9 @@ public final class AccessRightLevelsField extends EnumListField<EAccessLevel> {
   protected List<EAccessLevel> resolveList(List<?> list) {
     List<EAccessLevel> ret = new ArrayList<>();
     for (Object elem : (Collection<?>) list) {
-      ret.add(EAccessLevel.getAccessLevel(elem.toString()).get());
+      if (EAccessLevel.getAccessLevel(elem.toString()).isPresent()) {
+        ret.add(EAccessLevel.getAccessLevel(elem.toString()).get());
+      }
     }
     return Collections.unmodifiableList(ret);
   }

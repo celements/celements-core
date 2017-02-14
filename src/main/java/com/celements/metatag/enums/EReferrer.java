@@ -31,13 +31,13 @@ public enum EReferrer implements ValueGetter<String> {
     return identifier;
   }
 
-  @Nullable
+  @NotNull
   public static Optional<EReferrer> getReferrer(@Nullable String identifier) {
     return ID_MAP.get(identifier);
   }
 
   @Override
   public String getValue() {
-    return identifier;
+    return getIdentifier();
   }
 }

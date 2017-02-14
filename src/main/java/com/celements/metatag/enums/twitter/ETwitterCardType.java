@@ -36,6 +36,6 @@ public enum ETwitterCardType implements ValueGetter<String> {
 
   @Override
   public String getValue() {
-    return identifier;
+    return getIdentifier();
   }
 }

@@ -42,7 +42,10 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
   @Override
   @Deprecated
   public boolean hasAccessLevel(String right, XWikiUser user, EntityReference entityRef) {
-    return hasAccessLevel(entityRef, EAccessLevel.getAccessLevel(right).get(), user);
+    if (EAccessLevel.getAccessLevel(right).isPresent()) {
+      return hasAccessLevel(entityRef, EAccessLevel.getAccessLevel(right).get(), user);
+    }
+    return false;
   }
 
   @Override

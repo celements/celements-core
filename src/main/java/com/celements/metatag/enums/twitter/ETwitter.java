@@ -49,6 +49,6 @@ public enum ETwitter implements ValueGetter<String>{
 
   @Override
   public String getValue() {
-    return identifier;
+    return getIdentifier();
   }
 }

@@ -42,6 +42,6 @@ public enum ERobot implements ValueGetter<String>{
 
   @Override
   public String getValue() {
-    return identifier;
+    return getIdentifier();
   }
 }
