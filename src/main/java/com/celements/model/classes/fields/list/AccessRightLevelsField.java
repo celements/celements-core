@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import com.celements.rights.access.EAccessLevel;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.objects.classes.LevelsClass;
 
 @Immutable
@@ -65,9 +66,11 @@ public final class AccessRightLevelsField extends EnumListField<EAccessLevel> {
   @Override
   protected List<EAccessLevel> resolveList(List<?> list) {
     List<EAccessLevel> ret = new ArrayList<>();
+    Optional<EAccessLevel> eAccessLevel;
     for (Object elem : (Collection<?>) list) {
-      if (EAccessLevel.getAccessLevel(elem.toString()).isPresent()) {
-        ret.add(EAccessLevel.getAccessLevel(elem.toString()).get());
+      eAccessLevel = EAccessLevel.getAccessLevel(elem.toString());
+      if (eAccessLevel.isPresent()) {
+        ret.add(eAccessLevel.get());
       }
     }
     return Collections.unmodifiableList(ret);

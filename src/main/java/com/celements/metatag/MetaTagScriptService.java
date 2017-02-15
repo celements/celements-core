@@ -9,6 +9,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.metatag.enums.ECharset;
+import com.google.common.base.Optional;
 
 @Component(MetaTagScriptService.COMPONENT_HINT)
 public class MetaTagScriptService implements ScriptService {
@@ -19,11 +20,9 @@ public class MetaTagScriptService implements ScriptService {
   MetaTagServiceRole metaTag;
 
   public @NotNull MetaTag getCharsetMetaTag(@NotNull String charsetStr) {
-    if (ECharset.getCharset(charsetStr).isPresent()) {
-      ECharset charset = ECharset.getCharset(charsetStr).get();
-      if (charset != null) {
-        return new MetaTag(charset);
-      }
+    Optional<ECharset> charset = ECharset.getCharset(charsetStr);
+    if (charset.isPresent()) {
+      return new MetaTag(charset.get());
     }
     return new MetaTag(ECharset.ATTRIB_NAME, charsetStr, null);
   }
