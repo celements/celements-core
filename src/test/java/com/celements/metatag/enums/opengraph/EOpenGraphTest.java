@@ -17,6 +17,8 @@ public class EOpenGraphTest {
   private static String FIELDS_OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE = "og:locale:alternate";
   private static String FIELDS_OPENGRAPH_OPTIONAL_SITENAME = "og:site_name";
   private static String FIELDS_OPENGRAPH_OPTIONAL_VIDEO = "og:video";
+  private static String FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH = "og:image:width";
+  private static String FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT = "og:image:height";
 
   @Test
   public void testAttribs() {
@@ -43,6 +45,10 @@ public class EOpenGraphTest {
         FIELDS_OPENGRAPH_OPTIONAL_SITENAME));
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_VIDEO, EOpenGraph.getOpenGraph(
         FIELDS_OPENGRAPH_OPTIONAL_VIDEO));
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, EOpenGraph.getOpenGraph(
+        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH));
+    assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, EOpenGraph.getOpenGraph(
+        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT));
   }
 
   @Test
@@ -65,5 +71,9 @@ public class EOpenGraphTest {
         EOpenGraph.OPENGRAPH_OPTIONAL_SITENAME.getIdentifier());
     assertEquals(FIELDS_OPENGRAPH_OPTIONAL_VIDEO,
         EOpenGraph.OPENGRAPH_OPTIONAL_VIDEO.getIdentifier());
+    assertEquals(FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH,
+        EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH.getIdentifier());
+    assertEquals(FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT,
+        EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT.getIdentifier());
   }
 }
