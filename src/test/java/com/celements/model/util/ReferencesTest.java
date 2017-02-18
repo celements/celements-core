@@ -53,6 +53,8 @@ public class ReferencesTest extends AbstractComponentTest {
         modelUtils.serializeRefLocal(docRef), EntityType.DOCUMENT)));
     assertTrue(References.isAbsoluteRef(getRelativeRefResolver().resolve(modelUtils.serializeRef(
         docRef), EntityType.DOCUMENT)));
+    assertFalse(References.isAbsoluteRef(new EntityReference("wiki", EntityType.WIKI,
+        new EntityReference("superwiki", EntityType.WIKI))));
   }
 
   @Test
@@ -163,6 +165,7 @@ public class ReferencesTest extends AbstractComponentTest {
   @Test
   public void test_extractRef() {
     assertEquals(wikiRef, References.extractRef(docRef, WikiReference.class).get());
+    assertNull(References.extractRef(docRef, WikiReference.class).get().getChild());
     assertEquals(spaceRef, References.extractRef(docRef, SpaceReference.class).get());
     assertEquals(docRef, References.extractRef(docRef, DocumentReference.class).get());
     assertFalse(References.extractRef(docRef, AttachmentReference.class).isPresent());
@@ -203,7 +206,7 @@ public class ReferencesTest extends AbstractComponentTest {
     EntityReference toRef = new AttachmentReference("oAtt", new DocumentReference("oWiki", "oSpace",
         "oDoc"));
     DocumentReference ret = References.adjustRef(docRef, DocumentReference.class, toRef);
-    assertEquals("expecting docRef if lower level entity", docRef, ret);
+    assertEquals("expecting docRef of lower level entity", toRef.getParent(), ret);
     assertNotSame(docRef, ret);
   }
 

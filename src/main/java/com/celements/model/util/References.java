@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -109,15 +111,14 @@ public class References {
    * @return false if the given reference is relative
    */
   public static boolean isAbsoluteRef(@NotNull EntityReference ref) {
-    int ordinal = checkNotNull(ref).getType().ordinal();
+    EntityTypeIterator iter = new EntityTypeIterator(checkNotNull(ref).getType());
     while (ref.getParent() != null) {
       ref = ref.getParent();
-      ordinal -= ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1); // skip attachment type
-      if (ref.getType().ordinal() != ordinal) {
+      if (!iter.hasNext() || (ref.getType() != iter.next())) {
         return false; // wrong type order
       }
     }
-    return ordinal == 0; // root has to be type root
+    return !iter.hasNext(); // root has to be type root
   }
 
   /**
@@ -185,7 +186,8 @@ public class References {
   }
 
   /**
-   * adjust a reference to another one of higher order, e.g. a docRef to another wikiRef.
+   * adjust a relative or absolute reference to another one of higher order, e.g. a docRef to
+   * another wikiRef.
    *
    * @param ref
    *          to be adjusted
@@ -193,27 +195,85 @@ public class References {
    *          for the reference type
    * @param toRef
    *          it is adjusted to
-   * @return a new instance of the adjusted reference or ref if toRef was of lower order
+   * @return a new instance of the adjusted reference
    */
   @NotNull
   public static <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
       @Nullable EntityReference toRef) {
-    checkNotNull(toRef);
-    EntityReference adjustedRef = cloneRef(ref); // avoid modifying argument
-    EntityReference current = adjustedRef;
-    while (current != null) {
-      if (current.getType() != toRef.getType()) {
-        current = current.getParent();
+    EntityType type = (token != EntityReference.class) ? getEntityTypeForClass(token) : null;
+    return cloneRef(combineRef(type, toRef, checkNotNull(ref)).get(), token);
+  }
+
+  /**
+   * builds an absolute reference of the given class with the provided references
+   *
+   * @param token
+   *          for the reference type
+   * @param refs
+   * @return a new instance of the combined references
+   */
+  /**
+   * @param token
+   * @param refs
+   * @return
+   */
+  @NotNull
+  public static <T extends EntityReference> Optional<T> completeRef(@NotNull Class<T> token,
+      EntityReference... refs) {
+    // TODO use combineRef and check for absolute
+    EntityType retType = getEntityTypeForClass(token);
+    Optional<? extends EntityReference> ret = extractSimpleRef(retType, refs);
+    for (EntityTypeIterator iter = new EntityTypeIterator(retType); ret.isPresent()
+        && iter.hasNext();) {
+      Optional<? extends EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
+      if (extrRef.isPresent()) {
+        ret.get().getRoot().setParent(extrRef.get());
       } else {
-        if (current.getChild() != null) {
-          current.getChild().setParent(cloneRef(toRef)); // set parent modifies child of param
-        } else {
-          adjustedRef = toRef;
-        }
-        break;
+        ret = Optional.absent();
       }
     }
-    return cloneRef(adjustedRef, token); // effective immutability
+    if (ret.isPresent()) {
+      return Optional.of(cloneRef(ret.get(), token)); // effective immutability
+    } else {
+      return Optional.absent();
+    }
+  }
+
+  @NotNull
+  public static Optional<EntityReference> combineRef(EntityReference... refs) {
+    return combineRef(null, refs);
+  }
+
+  @NotNull
+  public static Optional<EntityReference> combineRef(@Nullable EntityType type,
+      EntityReference... refs) {
+    EntityReference ret = null;
+    for (EntityTypeIterator iter = new EntityTypeIterator(type); iter.hasNext();) {
+      Optional<? extends EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
+      if (extrRef.isPresent()) {
+        if (ret == null) {
+          ret = extrRef.get();
+        } else {
+          ret.getRoot().setParent(extrRef.get());
+        }
+      }
+    }
+    if (ret != null) {
+      return Optional.of(cloneRef(ret)); // effective immutability
+    } else {
+      return Optional.absent();
+    }
+  }
+
+  private static Optional<? extends EntityReference> extractSimpleRef(EntityType type,
+      EntityReference... fromRefs) {
+    for (EntityReference fromRef : fromRefs) {
+      Optional<? extends EntityReference> ref = extractRef(fromRef, getClassForEntityType(type));
+      if (ref.isPresent()) {
+        return Optional.of(create(type, ref.get().getName()));
+      }
+    }
+    return Optional.absent();
   }
 
   public static EntityReference create(@NotNull EntityType type, @NotNull String name) {
@@ -244,6 +304,31 @@ public class References {
       parent = cloneRef(parent);
     }
     return cloneRef(new EntityReference(name, type, parent), token);
+  }
+
+}
+
+class EntityTypeIterator implements Iterator<EntityType> {
+
+  private EntityType type;
+
+  EntityTypeIterator(@Nullable EntityType type) {
+    this.type = MoreObjects.firstNonNull(type, getTopEntityType());
+  }
+
+  private static EntityType getTopEntityType() {
+    return EntityType.values()[EntityType.values().length - 1];
+  }
+
+  @Override
+  public boolean hasNext() {
+    return type.ordinal() > 0;
+  }
+
+  @Override
+  public EntityType next() {
+    int ordinal = type.ordinal() - ((type == EntityType.OBJECT) ? 2 : 1); // skip attachment type
+    return type = EntityType.values()[ordinal];
   }
 
 }
