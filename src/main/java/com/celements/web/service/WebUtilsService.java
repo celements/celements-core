@@ -62,8 +62,8 @@ import com.celements.inheritor.TemplatePathTransformationConfiguration;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.context.ModelContext;
+import com.celements.model.util.EntityTypeUtil;
 import com.celements.model.util.ModelUtils;
-import com.celements.model.util.References;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.pagelayout.LayoutScriptService;
 import com.celements.pagetype.PageTypeReference;
@@ -79,6 +79,7 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -514,7 +515,7 @@ public class WebUtilsService implements IWebUtilsService {
   @Override
   public EntityReference resolveEntityReference(String name, EntityType type,
       WikiReference wikiRef) {
-    return resolveReference(name, References.getClassForEntityType(type), wikiRef);
+    return resolveReference(name, EntityTypeUtil.getClassForEntityType(type), wikiRef);
   }
 
   @Deprecated
@@ -537,13 +538,13 @@ public class WebUtilsService implements IWebUtilsService {
       EntityReference baseRef) {
     baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
     EntityReference reference;
-    EntityType type = References.getEntityTypeForClass(token);
-    if (type == null) {
+    Optional<EntityType> type = EntityTypeUtil.getEntityTypeForClass(token);
+    if (!type.isPresent()) {
       throw new IllegalArgumentException("Unsupported entity class: " + token);
-    } else if (type == EntityType.WIKI) {
+    } else if (type.get() == EntityType.WIKI) {
       reference = resolveWikiReference(name, getWikiRef(baseRef));
     } else {
-      reference = refResolver.resolve(name, type, baseRef);
+      reference = refResolver.resolve(name, type.get(), baseRef);
     }
     T ret = modelUtils.cloneRef(reference, token);
     LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
@@ -1466,13 +1467,13 @@ public class WebUtilsService implements IWebUtilsService {
   public EntityType resolveEntityTypeForFullName(String fullName, EntityType defaultNameType) {
     EntityType ret = null;
     if (StringUtils.isNotBlank(fullName)) {
-      if (fullName.matches(References.REGEX_WIKINAME)) {
+      if (fullName.matches(EntityTypeUtil.REGEX_WIKINAME)) {
         ret = defaultNameType != null ? defaultNameType : EntityType.WIKI;
-      } else if (fullName.matches(References.REGEX_SPACE)) {
+      } else if (fullName.matches(EntityTypeUtil.REGEX_SPACE)) {
         ret = EntityType.SPACE;
-      } else if (fullName.matches(References.REGEX_DOC)) {
+      } else if (fullName.matches(EntityTypeUtil.REGEX_DOC)) {
         ret = EntityType.DOCUMENT;
-      } else if (fullName.matches(References.REGEX_ATT)) {
+      } else if (fullName.matches(EntityTypeUtil.REGEX_ATT)) {
         ret = EntityType.ATTACHMENT;
       }
     }

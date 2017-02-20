@@ -65,20 +65,6 @@ public interface ModelUtils {
       @Nullable EntityReference toRef);
 
   /**
-   * identifies the reference class for the given absolute name (root type may be missing).<br>
-   * <br>
-   * simple names default to the root entity type.
-   *
-   * @param name
-   *          the string representation
-   * @return the identified reference class
-   * @throws IllegalArgumentException
-   *           for illegal strings
-   */
-  @NotNull
-  public Class<? extends EntityReference> identifyClassFromName(@NotNull String name);
-
-  /**
    * resolves an absolute reference from the given name
    *
    * @param name
