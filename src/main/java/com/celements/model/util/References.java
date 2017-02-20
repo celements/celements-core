@@ -3,13 +3,7 @@ package com.celements.model.util;
 import static com.celements.model.util.EntityTypeUtil.*;
 import static com.google.common.base.Preconditions.*;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -17,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 
 public class References {
@@ -27,7 +20,7 @@ public class References {
    * @return false if the given reference is relative
    */
   public static boolean isAbsoluteRef(@NotNull EntityReference ref) {
-    EntityTypeIterator iter = new EntityTypeIterator(checkNotNull(ref).getType());
+    Iterator<EntityType> iter = createIterator(checkNotNull(ref).getType());
     while (ref.getParent() != null) {
       ref = ref.getParent();
       if (!iter.hasNext() || (ref.getType() != iter.next())) {
@@ -115,7 +108,7 @@ public class References {
   @NotNull
   public static <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
       @Nullable EntityReference toRef) {
-    EntityType type = (token != EntityReference.class) ? getEntityTypeForClass(token) : null;
+    EntityType type = getEntityTypeForClass(token).orNull();
     return cloneRef(combineRef(type, toRef, checkNotNull(ref)).get(), token);
   }
 
@@ -136,10 +129,9 @@ public class References {
   public static <T extends EntityReference> Optional<T> completeRef(@NotNull Class<T> token,
       EntityReference... refs) {
     // TODO use combineRef and check for absolute
-    EntityType retType = getEntityTypeForClass(token);
+    EntityType retType = getEntityTypeForClass(token).get();
     Optional<? extends EntityReference> ret = extractSimpleRef(retType, refs);
-    for (EntityTypeIterator iter = new EntityTypeIterator(retType); ret.isPresent()
-        && iter.hasNext();) {
+    for (Iterator<EntityType> iter = createIterator(retType); ret.isPresent() && iter.hasNext();) {
       Optional<? extends EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
       if (extrRef.isPresent()) {
         ret.get().getRoot().setParent(extrRef.get());
@@ -163,7 +155,7 @@ public class References {
   public static Optional<EntityReference> combineRef(@Nullable EntityType type,
       EntityReference... refs) {
     EntityReference ret = null;
-    for (EntityTypeIterator iter = new EntityTypeIterator(type); iter.hasNext();) {
+    for (Iterator<EntityType> iter = createIterator(type); iter.hasNext();) {
       Optional<? extends EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
       if (extrRef.isPresent()) {
         if (ret == null) {
@@ -224,31 +216,6 @@ public class References {
       parent = cloneRef(parent);
     }
     return cloneRef(new EntityReference(name, type, parent), token);
-  }
-
-}
-
-class EntityTypeIterator implements Iterator<EntityType> {
-
-  private EntityType type;
-
-  EntityTypeIterator(@Nullable EntityType type) {
-    this.type = MoreObjects.firstNonNull(type, getTopEntityType());
-  }
-
-  private static EntityType getTopEntityType() {
-    return EntityType.values()[EntityType.values().length - 1];
-  }
-
-  @Override
-  public boolean hasNext() {
-    return type.ordinal() > 0;
-  }
-
-  @Override
-  public EntityType next() {
-    int ordinal = type.ordinal() - ((type == EntityType.OBJECT) ? 2 : 1); // skip attachment type
-    return type = EntityType.values()[ordinal];
   }
 
 }

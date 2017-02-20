@@ -4,9 +4,11 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.EntityType;
@@ -18,6 +20,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -100,6 +103,31 @@ public class EntityTypeUtil {
       }
     }
     return Optional.absent();
+  }
+
+  @NotNull
+  public static Iterator<EntityType> createIterator() {
+    return createIterator(null);
+  }
+
+  @NotNull
+  public static Iterator<EntityType> createIterator(@Nullable final EntityType entityType) {
+    return new Iterator<EntityType>() {
+
+      private EntityType type = MoreObjects.firstNonNull(entityType, getRootEntityType());
+
+      @Override
+      public boolean hasNext() {
+        return type.ordinal() > 0;
+      }
+
+      @Override
+      public EntityType next() {
+        // skip attachment type if at object type
+        int ordinal = type.ordinal() - ((type == EntityType.OBJECT) ? 2 : 1);
+        return type = EntityType.values()[ordinal];
+      }
+    };
   }
 
 }
