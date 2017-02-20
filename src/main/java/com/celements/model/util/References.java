@@ -20,14 +20,15 @@ public class References {
    * @return false if the given reference is relative
    */
   public static boolean isAbsoluteRef(@NotNull EntityReference ref) {
-    Iterator<EntityType> iter = createIterator(checkNotNull(ref).getType());
-    while (ref.getParent() != null) {
+    Iterator<EntityType> iter = createIteratorFrom(checkNotNull(ref).getType());
+    while (iter.hasNext()) {
       ref = ref.getParent();
-      if (!iter.hasNext() || (ref.getType() != iter.next())) {
-        return false; // wrong type order
+      if ((ref == null) || (ref.getType() != iter.next())) {
+        // incomplete or wrong type order
+        return false;
       }
     }
-    return !iter.hasNext(); // root has to be type root
+    return ref.getParent() == null; // has to be iterated to root level
   }
 
   /**
@@ -73,6 +74,15 @@ public class References {
     }
   }
 
+  private static <T extends EntityReference> Optional<T> castRef(EntityReference ref,
+      Class<T> token) {
+    if ((ref != null) && ((checkNotNull(token) == EntityReference.class) || isAbsoluteRef(ref))) {
+      return Optional.of(token.cast(ref));
+    } else {
+      return Optional.absent();
+    }
+  }
+
   /**
    * @param fromRef
    *          the reference to extract from
@@ -82,13 +92,21 @@ public class References {
    */
   public static <T extends EntityReference> Optional<T> extractRef(
       @Nullable EntityReference fromRef, @NotNull Class<T> token) {
-    EntityReference extractedRef = null;
     Optional<EntityType> type = getEntityTypeForClass(token);
-    if ((fromRef != null) && type.isPresent()) {
-      extractedRef = fromRef.extractReference(type.get());
+    if (type.isPresent()) {
+      return castRef(extractRef(fromRef, type.get()).orNull(), token);
+    }
+    return Optional.absent();
+  }
+
+  public static Optional<EntityReference> extractRef(@Nullable EntityReference fromRef,
+      @NotNull EntityType type) {
+    EntityReference extractedRef = null;
+    if (fromRef != null) {
+      extractedRef = fromRef.extractReference(checkNotNull(type));
     }
     if (extractedRef != null) {
-      return Optional.of(cloneRef(extractedRef, token));
+      return Optional.of(cloneRef(extractedRef));
     }
     return Optional.absent();
   }
@@ -109,7 +127,7 @@ public class References {
   public static <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
       @Nullable EntityReference toRef) {
     EntityType type = getEntityTypeForClass(token).orNull();
-    return cloneRef(combineRef(type, toRef, checkNotNull(ref)).get(), token);
+    return castRef(combineRef(type, toRef, checkNotNull(ref)).orNull(), token).get();
   }
 
   /**
@@ -128,22 +146,7 @@ public class References {
   @NotNull
   public static <T extends EntityReference> Optional<T> completeRef(@NotNull Class<T> token,
       EntityReference... refs) {
-    // TODO use combineRef and check for absolute
-    EntityType retType = getEntityTypeForClass(token).get();
-    Optional<? extends EntityReference> ret = extractSimpleRef(retType, refs);
-    for (Iterator<EntityType> iter = createIterator(retType); ret.isPresent() && iter.hasNext();) {
-      Optional<? extends EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
-      if (extrRef.isPresent()) {
-        ret.get().getRoot().setParent(extrRef.get());
-      } else {
-        ret = Optional.absent();
-      }
-    }
-    if (ret.isPresent()) {
-      return Optional.of(cloneRef(ret.get(), token)); // effective immutability
-    } else {
-      return Optional.absent();
-    }
+    return castRef(combineRef(getEntityTypeForClass(token).orNull(), refs).orNull(), token);
   }
 
   @NotNull
@@ -155,8 +158,8 @@ public class References {
   public static Optional<EntityReference> combineRef(@Nullable EntityType type,
       EntityReference... refs) {
     EntityReference ret = null;
-    for (Iterator<EntityType> iter = createIterator(type); iter.hasNext();) {
-      Optional<? extends EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
+    for (Iterator<EntityType> iter = createIteratorAt(type); iter.hasNext();) {
+      Optional<EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
       if (extrRef.isPresent()) {
         if (ret == null) {
           ret = extrRef.get();
@@ -172,12 +175,12 @@ public class References {
     }
   }
 
-  private static Optional<? extends EntityReference> extractSimpleRef(EntityType type,
+  private static Optional<EntityReference> extractSimpleRef(EntityType type,
       EntityReference... fromRefs) {
     for (EntityReference fromRef : fromRefs) {
-      Optional<? extends EntityReference> ref = extractRef(fromRef, getClassForEntityType(type));
+      Optional<EntityReference> ref = extractRef(fromRef, type);
       if (ref.isPresent()) {
-        return Optional.of(create(type, ref.get().getName()));
+        return Optional.of(create(type, ref.get().getName())); // strip parent
       }
     }
     return Optional.absent();

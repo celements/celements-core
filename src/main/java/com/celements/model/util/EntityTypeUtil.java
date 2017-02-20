@@ -74,6 +74,11 @@ public class EntityTypeUtil {
     return EntityType.values()[0];
   }
 
+  @NotNull
+  public static EntityType getLastEntityType() {
+    return EntityType.values()[EntityType.values().length - 1];
+  }
+
   /**
    * @return the class for the root entity type
    */
@@ -107,25 +112,40 @@ public class EntityTypeUtil {
 
   @NotNull
   public static Iterator<EntityType> createIterator() {
-    return createIterator(null);
+    return createIteratorAt(null);
   }
 
   @NotNull
-  public static Iterator<EntityType> createIterator(@Nullable final EntityType entityType) {
+  public static Iterator<EntityType> createIteratorFrom(@Nullable final EntityType startType) {
+    Iterator<EntityType> ret = createIteratorAt(checkNotNull(startType));
+    if ((startType != null) && ret.hasNext()) {
+      ret.next();
+    }
+    return ret;
+  }
+
+  @NotNull
+  public static Iterator<EntityType> createIteratorAt(@Nullable final EntityType startType) {
     return new Iterator<EntityType>() {
 
-      private EntityType type = MoreObjects.firstNonNull(entityType, getRootEntityType());
+      private EntityType type = MoreObjects.firstNonNull(startType, getLastEntityType());
 
       @Override
       public boolean hasNext() {
-        return type.ordinal() > 0;
+        return type != null;
       }
 
       @Override
       public EntityType next() {
-        // skip attachment type if at object type
-        int ordinal = type.ordinal() - ((type == EntityType.OBJECT) ? 2 : 1);
-        return type = EntityType.values()[ordinal];
+        EntityType ret = type;
+        int ordinal = decrease(type.ordinal());
+        type = (ordinal >= 0) ? EntityType.values()[ordinal] : null;
+        return ret;
+      }
+
+      private int decrease(int ordinal) {
+        // skip type attachment coming from type object
+        return ordinal - ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1);
       }
     };
   }
