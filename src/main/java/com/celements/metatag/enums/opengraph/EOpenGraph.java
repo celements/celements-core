@@ -23,7 +23,9 @@ public enum EOpenGraph implements ValueGetter<String>{
   OPENGRAPH_OPTIONAL_LOCALE("og:locale "),
   OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE("og:locale:alternate"),
   OPENGRAPH_OPTIONAL_SITENAME("og:site_name"),
-  OPENGRAPH_OPTIONAL_VIDEO("og:video");
+  OPENGRAPH_OPTIONAL_VIDEO("og:video"),
+  OPENGRAPH_OPTIONAL_IMAGE_WIDTH("og:image:width"),
+  OPENGRAPH_OPTIONAL_IMAGE_HEIGHT("og:image:height");
 
   public final static String ATTRIB_NAME = "property";
   

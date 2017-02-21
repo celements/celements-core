@@ -1,5 +1,6 @@
 package com.celements.model.util;
 
+import static com.celements.model.util.EntityTypeUtil.*;
 import static com.google.common.base.Preconditions.*;
 
 import org.xwiki.component.annotation.Component;
@@ -56,18 +57,18 @@ public class DefaultModelUtils implements ModelUtils {
   }
 
   @Override
-  public Class<? extends EntityReference> identifyClassFromName(String name) {
-    return References.identifyClassFromName(name);
-  }
-
-  @Override
   public EntityReference resolveRef(String name) {
     return resolveRef(name, (EntityReference) null);
   }
 
   @Override
   public EntityReference resolveRef(String name, EntityReference baseRef) {
-    return resolveRef(name, identifyClassFromName(name), baseRef);
+    Optional<EntityType> type = identifyEntityTypeFromName(name);
+    if (type.isPresent()) {
+      return resolveRef(name, getClassForEntityType(type.get()), baseRef);
+    } else {
+      throw new IllegalArgumentException("No valid reference class found for '" + name + "'");
+    }
   }
 
   @Override
@@ -78,17 +79,18 @@ public class DefaultModelUtils implements ModelUtils {
   @Override
   public <T extends EntityReference> T resolveRef(String name, Class<T> token,
       EntityReference baseRef) {
+    EntityReference resolvedRef;
+    Optional<EntityType> type = getEntityTypeForClass(token);
     if (checkNotNull(name).isEmpty()) {
       throw new IllegalArgumentException("name may not be empty");
-    }
-    EntityType type = References.getEntityTypeForClass(token);
-    baseRef = MoreObjects.firstNonNull(baseRef, context.getWikiRef());
-    EntityReference resolvedRef;
-    if (type.ordinal() == 0) {
+    } else if (!type.isPresent()) {
+      throw new IllegalArgumentException("No entity type for class: " + token);
+    } else if (type.get() == getRootEntityType()) {
       // resolver cannot handle root reference
       resolvedRef = new WikiReference(name);
     } else {
-      resolvedRef = resolver.resolve(name, type, baseRef);
+      baseRef = MoreObjects.firstNonNull(baseRef, context.getWikiRef());
+      resolvedRef = resolver.resolve(name, type.get(), baseRef);
     }
     return cloneRef(resolvedRef, token); // effective immutability
   }
