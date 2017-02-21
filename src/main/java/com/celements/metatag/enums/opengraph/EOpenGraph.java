@@ -6,7 +6,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum EOpenGraph {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
+
+public enum EOpenGraph implements ValueGetter<String>{
 
   // There are a lot more properties in the open graph protocol (see http://ogp.me/) as well as in
   OPENGRAPH_TITLE("og:title"),
@@ -24,7 +28,8 @@ public enum EOpenGraph {
   OPENGRAPH_OPTIONAL_IMAGE_HEIGHT("og:image:height");
 
   public final static String ATTRIB_NAME = "property";
-  private final static Map<String, EOpenGraph> ID_MAP = new HashMap<>();
+  
+  private final static ReverseMap<EOpenGraph, String> ID_MAP = new ReverseMap<>(EOpenGraph.values());
 
   private final String identifier;
 
@@ -41,13 +46,13 @@ public enum EOpenGraph {
     return identifier;
   }
 
-  @Nullable
-  public static EOpenGraph getOpenGraph(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (EOpenGraph accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  @NotNull
+  public static Optional<EOpenGraph> getOpenGraph(@Nullable String identifier) {
     return ID_MAP.get(identifier);
+  }
+
+  @Override
+  public String getValue() {
+    return getIdentifier();
   }
 }

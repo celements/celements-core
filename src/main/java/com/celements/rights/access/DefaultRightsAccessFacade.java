@@ -11,6 +11,7 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -42,7 +43,11 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
   @Override
   @Deprecated
   public boolean hasAccessLevel(String right, XWikiUser user, EntityReference entityRef) {
-    return hasAccessLevel(entityRef, EAccessLevel.getAccessLevel(right), user);
+    Optional<EAccessLevel> eAccessLevel = EAccessLevel.getAccessLevel(right);
+    if (eAccessLevel.isPresent()) {
+      return hasAccessLevel(entityRef, eAccessLevel.get(), user);
+    }
+    return false;
   }
 
   @Override

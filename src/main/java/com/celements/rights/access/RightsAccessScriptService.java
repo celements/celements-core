@@ -27,7 +27,7 @@ public class RightsAccessScriptService implements ScriptService {
   }
 
   public EAccessLevel getEAccessLevel(String xwikiRight) {
-    return EAccessLevel.getAccessLevel(xwikiRight);
+    return EAccessLevel.getAccessLevel(xwikiRight).orNull();
   }
 
   public XWikiUser getGuestUser() {
