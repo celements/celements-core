@@ -11,6 +11,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.metatag.enums.ECharset;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 
 @Component(MetaTagScriptService.COMPONENT_HINT)
 public class MetaTagScriptService implements ScriptService {
