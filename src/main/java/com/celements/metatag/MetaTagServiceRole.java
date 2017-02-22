@@ -13,4 +13,6 @@ public interface MetaTagServiceRole {
 
   public @NotNull String displayCollectedMetaTags();
 
+  public void loadHeaderTags();
+
 }

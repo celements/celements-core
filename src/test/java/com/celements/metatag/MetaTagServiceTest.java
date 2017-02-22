@@ -1,6 +1,11 @@
 package com.celements.metatag;
 
+import static com.celements.common.test.CelementsTestUtils.*;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,9 +19,11 @@ import com.xpn.xwiki.web.Utils;
 public class MetaTagServiceTest extends AbstractComponentTest {
 
   private MetaTagServiceRole metaTag;
+  private MetaTagHeaderRole headerTag;
 
   @Before
   public void prepareTest() throws Exception {
+    headerTag = registerComponentMock(MetaTagHeaderRole.class);
     metaTag = Utils.getComponent(MetaTagServiceRole.class);
   }
 
@@ -46,6 +53,20 @@ public class MetaTagServiceTest extends AbstractComponentTest {
     assertEquals("", metaTag.displayCollectedMetaTags());
     metaTag.addMetaTagToCollector(new MetaTag(ECharset.UTF8));
     assertEquals("<meta charset=\"UTF-8\" />\n", metaTag.displayCollectedMetaTags());
+  }
+
+  @Test
+  public void testLoadHeaderTags() {
+    String keywords = "test,junit,keyword";
+    List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
+        ETwitterCardType.SUMMARY));
+    expect(headerTag.getHeaderMetaTags()).andReturn(tags);
+    replayDefault();
+    metaTag.loadHeaderTags();
+    verifyDefault();
+    assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
+        + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
+        metaTag.displayCollectedMetaTags());
   }
 
 }
