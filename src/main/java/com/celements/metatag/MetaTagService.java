@@ -18,7 +18,7 @@ public class MetaTagService implements MetaTagServiceRole {
   private Execution execution;
 
   @Requirement
-  private List<MetaTagHeaderRole> headerTagImpls;
+  private List<MetaTagProviderRole> headerTagImpls;
 
   @Override
   public void addMetaTagToCollector(@NotNull MetaTag tag) {
@@ -46,9 +46,18 @@ public class MetaTagService implements MetaTagServiceRole {
   }
 
   @Override
-  public void loadHeaderTags() {
-    for (MetaTagHeaderRole headerTagImpl : headerTagImpls) {
+  public void collectHeaderTags() {
+    for (MetaTagProviderRole headerTagImpl : headerTagImpls) {
       for (MetaTag tag : headerTagImpl.getHeaderMetaTags()) {
+        addMetaTagToCollector(tag);
+      }
+    }
+  }
+
+  @Override
+  public void collectBodyTags() {
+    for (MetaTagProviderRole headerTagImpl : headerTagImpls) {
+      for (MetaTag tag : headerTagImpl.getBodyMetaTags()) {
         addMetaTagToCollector(tag);
       }
     }

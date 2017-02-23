@@ -19,11 +19,11 @@ import com.xpn.xwiki.web.Utils;
 public class MetaTagServiceTest extends AbstractComponentTest {
 
   private MetaTagServiceRole metaTag;
-  private MetaTagHeaderRole headerTag;
+  private MetaTagProviderRole headerTag;
 
   @Before
   public void prepareTest() throws Exception {
-    headerTag = registerComponentMock(MetaTagHeaderRole.class);
+    headerTag = registerComponentMock(MetaTagProviderRole.class);
     metaTag = Utils.getComponent(MetaTagServiceRole.class);
   }
 
@@ -62,7 +62,21 @@ public class MetaTagServiceTest extends AbstractComponentTest {
         ETwitterCardType.SUMMARY));
     expect(headerTag.getHeaderMetaTags()).andReturn(tags);
     replayDefault();
-    metaTag.loadHeaderTags();
+    metaTag.collectHeaderTags();
+    verifyDefault();
+    assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
+        + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",
+        metaTag.displayCollectedMetaTags());
+  }
+
+  @Test
+  public void testLoadBodyTags() {
+    String keywords = "test,junit,keyword";
+    List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
+        ETwitterCardType.SUMMARY));
+    expect(headerTag.getBodyMetaTags()).andReturn(tags);
+    replayDefault();
+    metaTag.collectBodyTags();
     verifyDefault();
     assertEquals("<meta name=\"keywords\" property=\"keywords\" content=\"" + keywords + "\" />"
         + "\n<meta name=\"twitter:card\" content=\"summary\" />\n",

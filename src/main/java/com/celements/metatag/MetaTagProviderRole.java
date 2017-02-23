@@ -7,7 +7,9 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.component.annotation.ComponentRole;
 
 @ComponentRole
-public interface MetaTagHeaderRole {
+public interface MetaTagProviderRole {
 
   public @NotNull List<MetaTag> getHeaderMetaTags();
+
+  public @NotNull List<MetaTag> getBodyMetaTags();
 }
