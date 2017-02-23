@@ -56,7 +56,7 @@ public class MetaTagServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testLoadHeaderTags() {
+  public void testCollectHeaderTags() {
     String keywords = "test,junit,keyword";
     List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
         ETwitterCardType.SUMMARY));
@@ -70,7 +70,7 @@ public class MetaTagServiceTest extends AbstractComponentTest {
   }
 
   @Test
-  public void testLoadBodyTags() {
+  public void testCollectBodyTags() {
     String keywords = "test,junit,keyword";
     List<MetaTag> tags = Arrays.asList(new MetaTag(ENameStandard.KEYWORDS, keywords), new MetaTag(
         ETwitterCardType.SUMMARY));
