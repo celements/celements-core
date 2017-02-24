@@ -31,6 +31,11 @@ public class References {
     return ref.getParent() == null; // has to be iterated to root level
   }
 
+  @NotNull
+  public static Class<? extends EntityReference> determineClass(@NotNull EntityReference ref) {
+    return isAbsoluteRef(ref) ? getClassForEntityType(ref.getType()) : EntityReference.class;
+  }
+
   /**
    * @param ref
    *          the reference to be cloned
@@ -38,9 +43,7 @@ public class References {
    */
   @NotNull
   public static EntityReference cloneRef(@NotNull EntityReference ref) {
-    Class<? extends EntityReference> token = isAbsoluteRef(ref) ? getClassForEntityType(
-        ref.getType()) : EntityReference.class;
-    return cloneRef(ref, token);
+    return cloneRef(ref, determineClass(ref));
   }
 
   /**
@@ -74,15 +77,6 @@ public class References {
     }
   }
 
-  private static <T extends EntityReference> Optional<T> castRef(EntityReference ref,
-      Class<T> token) {
-    if ((ref != null) && ((checkNotNull(token) == EntityReference.class) || isAbsoluteRef(ref))) {
-      return Optional.of(token.cast(ref));
-    } else {
-      return Optional.absent();
-    }
-  }
-
   /**
    * @param fromRef
    *          the reference to extract from
@@ -92,27 +86,25 @@ public class References {
    */
   public static <T extends EntityReference> Optional<T> extractRef(
       @Nullable EntityReference fromRef, @NotNull Class<T> token) {
+    EntityReference ret = null;
     Optional<EntityType> type = getEntityTypeForClass(token);
     if (type.isPresent()) {
-      return castRef(extractRef(fromRef, type.get()).orNull(), token);
+      ret = extractRef(fromRef, type.get()).orNull();
     }
-    return Optional.absent();
+    return castOrAbsent(ret, token);
   }
 
   public static Optional<EntityReference> extractRef(@Nullable EntityReference fromRef,
       @NotNull EntityType type) {
-    EntityReference extractedRef = null;
+    EntityReference ret = null;
     if (fromRef != null) {
-      extractedRef = fromRef.extractReference(checkNotNull(type));
+      ret = fromRef.extractReference(checkNotNull(type));
     }
-    if (extractedRef != null) {
-      return Optional.of(cloneRef(extractedRef));
-    }
-    return Optional.absent();
+    return cloneOrAbsent(ret);
   }
 
   /**
-   * adjust a relative or absolute reference to another one of higher order, e.g. a docRef to
+   * adjusts a relative or absolute reference to another one of higher order, e.g. a docRef to
    * another wikiRef.
    *
    * @param ref
@@ -127,36 +119,59 @@ public class References {
   public static <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
       @Nullable EntityReference toRef) {
     EntityType type = getEntityTypeForClass(token).orNull();
-    return castRef(combineRef(type, toRef, checkNotNull(ref)).orNull(), token).get();
+    // combinedRef cannot be absent since ref is not null
+    EntityReference combinedRef = combineRef(token, type, toRef, checkNotNull(ref)).get();
+    // return value cannot be absent since ref is enforced to be of token class by signature
+    return castOrAbsent(combinedRef, token).get();
   }
 
   /**
-   * builds an absolute reference of the given class with the provided references
+   * builds an absolute reference of the given token with the provided references (FIFO)
    *
    * @param token
    *          for the reference type
    * @param refs
-   * @return a new instance of the combined references
-   */
-  /**
-   * @param token
-   * @param refs
-   * @return
+   * @return a new, absolute instance of the combined references
+   * @throws IllegalArgumentException
+   *           if token is {@link EntityReference}, instead use
+   *           {@link #combineRef(EntityReference...)} for relative references
    */
   @NotNull
   public static <T extends EntityReference> Optional<T> completeRef(@NotNull Class<T> token,
       EntityReference... refs) {
-    return castRef(combineRef(getEntityTypeForClass(token).orNull(), refs).orNull(), token);
+    EntityReference combinedRef = combineRef(token, getEntityTypeForClassOrThrow(token),
+        refs).orNull();
+    return castOrAbsent(combinedRef, token);
   }
 
+  /**
+   * builds a relative reference with the provided references (FIFO)
+   *
+   * @param refs
+   * @return a new, relative instance of the combined references
+   */
   @NotNull
   public static Optional<EntityReference> combineRef(EntityReference... refs) {
-    return combineRef(null, refs);
+    return combineRef(EntityReference.class, null, refs);
   }
 
+  /**
+   * builds a relative reference from the given type (bottom-up) with the provided references (FIFO)
+   *
+   * @param type
+   *          for the reference type
+   * @param refs
+   * @return a new, relative instance of the combined references
+   */
   @NotNull
   public static Optional<EntityReference> combineRef(@Nullable EntityType type,
       EntityReference... refs) {
+    return combineRef(EntityReference.class, type, refs);
+  }
+
+  @NotNull
+  private static <T extends EntityReference> Optional<T> combineRef(@NotNull Class<T> token,
+      @Nullable EntityType type, EntityReference... refs) {
     EntityReference ret = null;
     for (Iterator<EntityType> iter = createIteratorAt(type); iter.hasNext();) {
       Optional<EntityReference> extrRef = extractSimpleRef(iter.next(), refs);
@@ -168,19 +183,17 @@ public class References {
         }
       }
     }
-    if (ret != null) {
-      return Optional.of(cloneRef(ret)); // effective immutability
-    } else {
-      return Optional.absent();
-    }
+    return cloneOrAbsent(ret, token); // clone for effective immutability
   }
 
   private static Optional<EntityReference> extractSimpleRef(EntityType type,
       EntityReference... fromRefs) {
-    for (EntityReference fromRef : fromRefs) {
-      Optional<EntityReference> ref = extractRef(fromRef, type);
-      if (ref.isPresent()) {
-        return Optional.of(create(type, ref.get().getName())); // strip parent
+    if (fromRefs != null) {
+      for (EntityReference fromRef : fromRefs) {
+        Optional<? extends EntityReference> ref = extractRef(fromRef, type);
+        if (ref.isPresent()) {
+          return Optional.of(create(type, ref.get().getName())); // strip parent
+        }
       }
     }
     return Optional.absent();
@@ -202,12 +215,7 @@ public class References {
 
   public static <T extends EntityReference> T create(@NotNull Class<T> token, @NotNull String name,
       @Nullable EntityReference parent) {
-    Optional<EntityType> type = getEntityTypeForClass(token);
-    if (type.isPresent()) {
-      return createInternal(token, type.get(), name, parent);
-    } else {
-      throw new IllegalArgumentException("No entity type for class: " + token);
-    }
+    return createInternal(token, getEntityTypeForClassOrThrow(token), name, parent);
   }
 
   private static <T extends EntityReference> T createInternal(@NotNull Class<T> token,
@@ -219,6 +227,32 @@ public class References {
       parent = cloneRef(parent);
     }
     return cloneRef(new EntityReference(name, type, parent), token);
+  }
+
+  private static <T extends EntityReference> Optional<T> castOrAbsent(EntityReference ref,
+      Class<T> token) {
+    if ((ref != null) && (checkNotNull(token).isAssignableFrom(ref.getClass()))) {
+      return Optional.of(token.cast(ref));
+    } else {
+      return Optional.absent();
+    }
+  }
+
+  private static <T extends EntityReference> Optional<T> cloneOrAbsent(EntityReference ref,
+      Class<T> token) {
+    if ((ref != null) && checkNotNull(token).isAssignableFrom(determineClass(ref))) {
+      return Optional.of(cloneRef(ref, token));
+    } else {
+      return Optional.absent();
+    }
+  }
+
+  private static Optional<EntityReference> cloneOrAbsent(EntityReference ref) {
+    if (ref != null) {
+      return Optional.of(cloneRef(ref));
+    } else {
+      return Optional.absent();
+    }
   }
 
 }
