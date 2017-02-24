@@ -138,24 +138,23 @@ public class EntityTypeUtil {
   public static Iterator<EntityType> createIteratorAt(@Nullable final EntityType startType) {
     return new Iterator<EntityType>() {
 
-      private EntityType type = MoreObjects.firstNonNull(startType, getLastEntityType());
+      private int ordinal = MoreObjects.firstNonNull(startType, getLastEntityType()).ordinal();
 
       @Override
       public boolean hasNext() {
-        return type != null;
+        return ordinal >= 0;
       }
 
       @Override
       public EntityType next() {
-        EntityType ret = type;
-        int ordinal = decrease(type.ordinal());
-        type = (ordinal >= 0) ? EntityType.values()[ordinal] : null;
+        EntityType ret = EntityType.values()[ordinal];
+        decrease();
         return ret;
       }
 
-      private int decrease(int ordinal) {
-        // skip type attachment coming from type object
-        return ordinal - ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1);
+      private int decrease() {
+        // skip type attachment for type OBJECT or OBJECT_PROPERTY
+        return ordinal -= ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1);
       }
     };
   }
