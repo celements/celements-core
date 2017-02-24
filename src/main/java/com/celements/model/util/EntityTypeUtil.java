@@ -60,6 +60,16 @@ public class EntityTypeUtil {
   }
 
   @NotNull
+  public static EntityType getEntityTypeForClassOrThrow(
+      @NotNull Class<? extends EntityReference> token) {
+    Optional<EntityType> type = getEntityTypeForClass(token);
+    if (!type.isPresent()) {
+      throw new IllegalArgumentException("No entity type for class: " + token);
+    }
+    return type.get();
+  }
+
+  @NotNull
   public static Class<? extends EntityReference> getClassForEntityType(@NotNull EntityType type) {
     Class<? extends EntityReference> token = ENTITY_TYPE_MAP.inverse().get(checkNotNull(type));
     if (token != null) {

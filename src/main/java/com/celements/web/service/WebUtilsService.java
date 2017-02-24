@@ -79,7 +79,6 @@ import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
@@ -538,13 +537,11 @@ public class WebUtilsService implements IWebUtilsService {
       EntityReference baseRef) {
     baseRef = MoreObjects.firstNonNull(baseRef, getWikiRef());
     EntityReference reference;
-    Optional<EntityType> type = EntityTypeUtil.getEntityTypeForClass(token);
-    if (!type.isPresent()) {
-      throw new IllegalArgumentException("Unsupported entity class: " + token);
-    } else if (type.get() == EntityType.WIKI) {
+    EntityType type = EntityTypeUtil.getEntityTypeForClassOrThrow(token);
+    if (type == EntityType.WIKI) {
       reference = resolveWikiReference(name, getWikiRef(baseRef));
     } else {
-      reference = refResolver.resolve(name, type.get(), baseRef);
+      reference = refResolver.resolve(name, type, baseRef);
     }
     T ret = modelUtils.cloneRef(reference, token);
     LOGGER.debug("resolveReference: for '{}' got ref '{}'", name, ret);
