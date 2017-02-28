@@ -1,8 +1,5 @@
 package com.celements.metatag.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -12,16 +9,12 @@ import com.google.common.base.Optional;
 
 public enum ENameNonStandard implements ValueGetter<String> {
 
-  CREATOR("creator"),
-  GOOGLEBOT("googlebot"),
-  PUBLISHER("publisher"),
-  ROBOTS("robots"),
-  SLURP("slurp"),
-  VIEWPORT("viewport");
+  CREATOR("creator"), GOOGLEBOT("googlebot"), PUBLISHER("publisher"), ROBOTS("robots"), SLURP(
+      "slurp"), VIEWPORT("viewport");
 
   public final static String ATTRIB_NAME = ENameStandard.ATTRIB_NAME;
   public final static String ATTRIB_NAME_ALT = ENameStandard.ATTRIB_NAME_ALT;
-  private final static ReverseMap<ENameNonStandard,String> ID_MAP = new ReverseMap<>(
+  private final static ReverseMap<ENameNonStandard, String> ID_MAP = new ReverseMap<>(
       ENameNonStandard.values());
 
   private final String identifier;

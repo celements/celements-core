@@ -21,12 +21,13 @@ public class ENameStandardTest {
 
   @Test
   public void testGetName() {
-    assertEquals(ENameStandard.APPLICATION_NAME, ENameStandard.getName(FIELDS_APPLICATION_NAME));
-    assertEquals(ENameStandard.AUTHOR, ENameStandard.getName(FIELDS_AUTHOR));
-    assertEquals(ENameStandard.DESCRIPTION, ENameStandard.getName(FIELDS_DESCRIPTION));
-    assertEquals(ENameStandard.GENERATOR, ENameStandard.getName(FIELDS_GENERATOR));
-    assertEquals(ENameStandard.KEYWORDS, ENameStandard.getName(FIELDS_KEYWORDS));
-    assertEquals(ENameStandard.REFERRER, ENameStandard.getName(FIELDS_REFERRER));
+    assertEquals(ENameStandard.APPLICATION_NAME, ENameStandard.getName(
+        FIELDS_APPLICATION_NAME).get());
+    assertEquals(ENameStandard.AUTHOR, ENameStandard.getName(FIELDS_AUTHOR).get());
+    assertEquals(ENameStandard.DESCRIPTION, ENameStandard.getName(FIELDS_DESCRIPTION).get());
+    assertEquals(ENameStandard.GENERATOR, ENameStandard.getName(FIELDS_GENERATOR).get());
+    assertEquals(ENameStandard.KEYWORDS, ENameStandard.getName(FIELDS_KEYWORDS).get());
+    assertEquals(ENameStandard.REFERRER, ENameStandard.getName(FIELDS_REFERRER).get());
   }
 
   @Test

@@ -21,12 +21,12 @@ public class ENameNonStandardTest {
 
   @Test
   public void testGetName() {
-    assertEquals(ENameNonStandard.CREATOR, ENameNonStandard.getName(FIELDS_CREATOR));
-    assertEquals(ENameNonStandard.GOOGLEBOT, ENameNonStandard.getName(FIELDS_GOOGLEBOT));
-    assertEquals(ENameNonStandard.PUBLISHER, ENameNonStandard.getName(FIELDS_PUBLISHER));
-    assertEquals(ENameNonStandard.ROBOTS, ENameNonStandard.getName(FIELDS_ROBOTS));
-    assertEquals(ENameNonStandard.SLURP, ENameNonStandard.getName(FIELDS_SLURP));
-    assertEquals(ENameNonStandard.VIEWPORT, ENameNonStandard.getName(FIELDS_VIEWPORT));
+    assertEquals(ENameNonStandard.CREATOR, ENameNonStandard.getName(FIELDS_CREATOR).get());
+    assertEquals(ENameNonStandard.GOOGLEBOT, ENameNonStandard.getName(FIELDS_GOOGLEBOT).get());
+    assertEquals(ENameNonStandard.PUBLISHER, ENameNonStandard.getName(FIELDS_PUBLISHER).get());
+    assertEquals(ENameNonStandard.ROBOTS, ENameNonStandard.getName(FIELDS_ROBOTS).get());
+    assertEquals(ENameNonStandard.SLURP, ENameNonStandard.getName(FIELDS_SLURP).get());
+    assertEquals(ENameNonStandard.VIEWPORT, ENameNonStandard.getName(FIELDS_VIEWPORT).get());
   }
 
   @Test

@@ -27,28 +27,28 @@ public class EOpenGraphTest {
 
   @Test
   public void testGetOpenGraph() {
-    assertEquals(EOpenGraph.OPENGRAPH_TITLE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_TITLE));
-    assertEquals(EOpenGraph.OPENGRAPH_TYPE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_TYPE));
-    assertEquals(EOpenGraph.OPENGRAPH_IMAGE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_IMAGE));
-    assertEquals(EOpenGraph.OPENGRAPH_URL, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_URL));
+    assertEquals(EOpenGraph.OPENGRAPH_TITLE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_TITLE).get());
+    assertEquals(EOpenGraph.OPENGRAPH_TYPE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_TYPE).get());
+    assertEquals(EOpenGraph.OPENGRAPH_IMAGE, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_IMAGE).get());
+    assertEquals(EOpenGraph.OPENGRAPH_URL, EOpenGraph.getOpenGraph(FIELDS_OPENGRAPH_URL).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_AUDIO, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_AUDIO));
+        FIELDS_OPENGRAPH_OPTIONAL_AUDIO).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_DESCRIPTION));
+        FIELDS_OPENGRAPH_OPTIONAL_DESCRIPTION).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_DETERMINER, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_DETERMINER));
+        FIELDS_OPENGRAPH_OPTIONAL_DETERMINER).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_LOCALE, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_LOCALE));
+        FIELDS_OPENGRAPH_OPTIONAL_LOCALE).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE));
+        FIELDS_OPENGRAPH_OPTIONAL_LOCALE_ALTERNATE).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_SITENAME, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_SITENAME));
+        FIELDS_OPENGRAPH_OPTIONAL_SITENAME).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_VIDEO, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_VIDEO));
+        FIELDS_OPENGRAPH_OPTIONAL_VIDEO).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH));
+        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_WIDTH).get());
     assertEquals(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, EOpenGraph.getOpenGraph(
-        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT));
+        FIELDS_OPENGRAPH_OPTIONAL_IMAGE_HEIGHT).get());
   }
 
   @Test

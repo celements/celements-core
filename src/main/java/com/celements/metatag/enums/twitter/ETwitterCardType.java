@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 
 import com.celements.common.ReverseMap;
 import com.celements.common.ValueGetter;
-import com.google.common.base.Optional;
 
 public enum ETwitterCardType implements ValueGetter<String> {
 
@@ -30,8 +29,8 @@ public enum ETwitterCardType implements ValueGetter<String> {
   }
 
   @NotNull
-  public static Optional<ETwitterCardType> getTwitterCardType(@Nullable String identifier) {
-    return ID_MAP.get(identifier);
+  public static ETwitterCardType getTwitterCardType(@Nullable String identifier) {
+    return ID_MAP.get(identifier).get();
   }
 
   @Override

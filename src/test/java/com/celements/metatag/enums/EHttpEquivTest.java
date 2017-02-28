@@ -20,9 +20,9 @@ public class EHttpEquivTest {
   @Test
   public void testGetHttpEquiv() {
     assertEquals(EHttpEquiv.CONTENT_SECURITY_POLICY, EHttpEquiv.getHttpEquiv(
-        FIELDS_CONTENT_SECURITY_POLICY));
-    assertEquals(EHttpEquiv.DEFAULT_STYLE, EHttpEquiv.getHttpEquiv(FIELDS_DEFAULT_STYLE));
-    assertEquals(EHttpEquiv.REFRESH, EHttpEquiv.getHttpEquiv(FIELDS_REFRESH));
+        FIELDS_CONTENT_SECURITY_POLICY).get());
+    assertEquals(EHttpEquiv.DEFAULT_STYLE, EHttpEquiv.getHttpEquiv(FIELDS_DEFAULT_STYLE).get());
+    assertEquals(EHttpEquiv.REFRESH, EHttpEquiv.getHttpEquiv(FIELDS_REFRESH).get());
   }
 
   @Test

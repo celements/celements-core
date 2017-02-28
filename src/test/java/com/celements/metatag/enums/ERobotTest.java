@@ -18,15 +18,15 @@ public class ERobotTest {
 
   @Test
   public void testGetRobot() {
-    assertEquals(ERobot.INDEX, ERobot.getRobot(FIELDS_INDEX));
-    assertEquals(ERobot.NOINDEX, ERobot.getRobot(FIELDS_NOINDEX));
-    assertEquals(ERobot.FOLLOW, ERobot.getRobot(FIELDS_FOLLOW));
-    assertEquals(ERobot.NOFOLLOW, ERobot.getRobot(FIELDS_NOFOLLOW));
-    assertEquals(ERobot.NOODP, ERobot.getRobot(FIELDS_NOODP));
-    assertEquals(ERobot.NOARCHIVE, ERobot.getRobot(FIELDS_NOARCHIVE));
-    assertEquals(ERobot.NOSNIPPET, ERobot.getRobot(FIELDS_NOSNIPPET));
-    assertEquals(ERobot.NOIMAGEINDEX, ERobot.getRobot(FIELDS_NOIMAGEINDEX));
-    assertEquals(ERobot.NOCACHE, ERobot.getRobot(FIELDS_NOCACHE));
+    assertEquals(ERobot.INDEX, ERobot.getRobot(FIELDS_INDEX).get());
+    assertEquals(ERobot.NOINDEX, ERobot.getRobot(FIELDS_NOINDEX).get());
+    assertEquals(ERobot.FOLLOW, ERobot.getRobot(FIELDS_FOLLOW).get());
+    assertEquals(ERobot.NOFOLLOW, ERobot.getRobot(FIELDS_NOFOLLOW).get());
+    assertEquals(ERobot.NOODP, ERobot.getRobot(FIELDS_NOODP).get());
+    assertEquals(ERobot.NOARCHIVE, ERobot.getRobot(FIELDS_NOARCHIVE).get());
+    assertEquals(ERobot.NOSNIPPET, ERobot.getRobot(FIELDS_NOSNIPPET).get());
+    assertEquals(ERobot.NOIMAGEINDEX, ERobot.getRobot(FIELDS_NOIMAGEINDEX).get());
+    assertEquals(ERobot.NOCACHE, ERobot.getRobot(FIELDS_NOCACHE).get());
   }
 
   @Test
