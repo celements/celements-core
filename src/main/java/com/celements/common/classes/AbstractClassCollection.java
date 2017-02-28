@@ -113,11 +113,11 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       String displayType, int defaultValue) {
     if (bclass.get(name) == null) {
       BooleanClass element = new BooleanClass();
+      element.setObject(bclass);
       element.setName(name);
       element.setPrettyName(prettyName);
       element.setDisplayType(displayType);
       element.setDefaultValue(defaultValue);
-      element.setObject(bclass);
       bclass.addField(name, element);
       return true;
     }
@@ -128,12 +128,12 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       StringClass element = new StringClass();
+      element.setObject(bclass);
       element.setName(name);
       element.setPrettyName(prettyName);
       element.setSize(size);
       element.setValidationRegExp(validationRegExp);
       element.setValidationMessage(validationMessage);
-      element.setObject(bclass);
       bclass.addField(name, element);
       return true;
     }
@@ -144,13 +144,13 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       int cols, int rows, String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       TextAreaClass element = new TextAreaClass();
+      element.setObject(bclass);
       element.setName(name);
       element.setPrettyName(prettyName);
       element.setSize(cols);
       element.setRows(rows);
       element.setValidationRegExp(validationRegExp);
       element.setValidationMessage(validationMessage);
-      element.setObject(bclass);
       bclass.addField(name, element);
       return true;
     }
@@ -161,6 +161,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       String ntype, String validationRegExp, String validationMessage) {
     if (bclass.get(name) == null) {
       NumberClass element = new NumberClass();
+      element.setObject(bclass);
       element.setName(name);
       element.setPrettyName(prettyName);
       element.setSize(size);
@@ -177,6 +178,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       String validationMessage) {
     if (bclass.get(name) == null) {
       DateClass element = new DateClass();
+      element.setObject(bclass);
       element.setName(name);
       element.setPrettyName(prettyName);
       if (dateFormat != null) {
@@ -187,7 +189,6 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       element.setDateFormat(dateFormat);
       element.setValidationRegExp(validationRegExp);
       element.setValidationMessage(validationMessage);
-      element.setObject(bclass);
       bclass.addField(name, element);
       return true;
     }
@@ -199,6 +200,7 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       String validationMessage) {
     if (bclass.get(name) == null) {
       DBListClass element = new DBListClass();
+      element.setObject(bclass);
       element.setName(name);
       element.setPrettyName(prettyName);
       element.setSize(size);
@@ -208,7 +210,6 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
       element.setSql(sql);
       element.setValidationRegExp(validationRegExp);
       element.setValidationMessage(validationMessage);
-      element.setObject(bclass);
       bclass.addField(name, element);
       return true;
     }
