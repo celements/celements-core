@@ -36,6 +36,7 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
     delegator.parse(in, this, Boolean.TRUE);
   }
 
+  @Override
   public void handleText(char[] text, int pos) {
     if (s.length() > 0) {
       s.append("\r\n");

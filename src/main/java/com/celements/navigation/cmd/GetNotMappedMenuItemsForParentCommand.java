@@ -60,7 +60,7 @@ public class GetNotMappedMenuItemsForParentCommand {
      * which may lead to Thread A reading an old version from its memory cache. Details
      * see JSR133
      */
-    menuItems = new ConcurrentHashMap<String, Map<String, List<TreeNode>>>();
+    menuItems = new ConcurrentHashMap<>();
   }
 
   /**
@@ -98,7 +98,7 @@ public class GetNotMappedMenuItemsForParentCommand {
   synchronized Map<String, List<TreeNode>> loadMenuForWiki(String wikiName) {
     if (!menuItems.containsKey(wikiName)) {
       LOGGER.debug("loadMenuForWiki: loading for wikiName [{}].", wikiName);
-      Map<String, List<TreeNode>> wikiMenuItemsMap = new HashMap<String, List<TreeNode>>();
+      Map<String, List<TreeNode>> wikiMenuItemsMap = new HashMap<>();
       final MenuItemObjectPartNameGetter strategy = new MenuItemObjectPartNameGetter();
       queryCount = queryCount + 1;
       List<TreeNode> menu = null;
@@ -254,7 +254,7 @@ public class GetNotMappedMenuItemsForParentCommand {
     if (wikiMenuItemsMap.containsKey(parentKey)) {
       return wikiMenuItemsMap.get(parentKey);
     } else {
-      return new ArrayList<TreeNode>(20);
+      return new ArrayList<>(20);
     }
   }
 

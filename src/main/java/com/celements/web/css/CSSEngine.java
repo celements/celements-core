@@ -69,7 +69,7 @@ public class CSSEngine implements ICSSEngine {
       if (vcontext.containsKey(field)) {
         cssList = (List<CSS>) vcontext.get(field);
       } else {
-        cssList = new ArrayList<CSS>();
+        cssList = new ArrayList<>();
         if (baseCSSList != null) {
           for (BaseObject cssObj : baseCSSList) {
             if (cssObj != null) {

@@ -19,10 +19,12 @@ public class SitemapPresentationType extends DefaultPresentationType {
 
   private static final String _CEL_CM_SM_TREENODE_DEFAULT_CSSCLASS = "cel_cm_sitemap_treenode";
 
+  @Override
   public String getDefaultCssClass() {
     return _CEL_CM_SM_TREENODE_DEFAULT_CSSCLASS;
   }
 
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
     try {

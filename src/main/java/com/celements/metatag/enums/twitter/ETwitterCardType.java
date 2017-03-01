@@ -9,7 +9,10 @@ import com.google.common.base.Optional;
 
 public enum ETwitterCardType implements ValueGetter<String> {
 
-  SUMMARY("summary"), SUMMARY_LARGE_IMAGE("summary_large_image"), PLAYER("player"), APP("app");
+  SUMMARY("summary"),
+  SUMMARY_LARGE_IMAGE("summary_large_image"),
+  PLAYER("player"),
+  APP("app");
 
   private final static ReverseMap<ETwitterCardType, String> ID_MAP = new ReverseMap<>(
       ETwitterCardType.values());

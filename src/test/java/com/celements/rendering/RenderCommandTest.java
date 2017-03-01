@@ -528,7 +528,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
   /**
    * if the sdoc passed to renderText is null a NPE will occur.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -570,7 +570,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
   /**
    * if the sdoc passed to renderText is null a NPE will occur.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -610,7 +610,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
   /**
    * if the sdoc passed to renderText is null a NPE will occur.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -811,7 +811,7 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
 
   /**
    * try to read _en file only once!
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -978,10 +978,12 @@ public class RenderCommandTest extends AbstractBridgedComponentTestCase {
     final VelocityContext initVcontext = (VelocityContext) contextValue.get("vcontext");
     reportMatcher(new IArgumentMatcher() {
 
+      @Override
       public void appendTo(StringBuffer buffer) {
         buffer.append("notSameVcontext(" + contextValue + ")");
       }
 
+      @Override
       public boolean matches(Object argument) {
         if (argument instanceof XWikiContext) {
           XWikiContext theContext = (XWikiContext) argument;

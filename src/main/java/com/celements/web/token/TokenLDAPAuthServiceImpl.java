@@ -94,7 +94,7 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       hql += "and token.validuntil>=? ";
       hql += "and obj.id=token.id ";
 
-      List<Object> parameterList = new Vector<Object>();
+      List<Object> parameterList = new Vector<>();
       parameterList.add(hashedCode);
       parameterList.add(new Date());
 
@@ -102,13 +102,13 @@ public class TokenLDAPAuthServiceImpl extends XWikiLDAPAuthServiceImpl {
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
       LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found " + users.size()
           + " with parameters " + Arrays.deepToString(parameterList.toArray()));
-      if (users == null || users.size() == 0) {
+      if ((users == null) || (users.size() == 0)) {
         String db = context.getDatabase();
         context.setDatabase("xwiki");
         users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
         LOGGER.debug("searching token in db [" + context.getDatabase() + "] and found "
             + users.size() + " with parameters " + Arrays.deepToString(parameterList.toArray()));
-        if (users != null && users.size() == 1) {
+        if ((users != null) && (users.size() == 1)) {
           users.add("xwiki:" + users.remove(0));
         }
         context.setDatabase(db);

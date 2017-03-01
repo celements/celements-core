@@ -7,8 +7,6 @@ import java.util.List;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-
-
 import com.google.common.base.Joiner;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;

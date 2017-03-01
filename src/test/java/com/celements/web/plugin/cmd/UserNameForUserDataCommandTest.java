@@ -82,7 +82,7 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     List<String> emptyList = Collections.emptyList();
     expect(store.searchDocumentsNames((String) anyObject(), eq(0), eq(0), same(
         getContext()))).andReturn(emptyList).once();
-    List<XWikiDocument> list = new ArrayList<XWikiDocument>();
+    List<XWikiDocument> list = new ArrayList<>();
     list.add(new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", login)));
     expect(store.searchDocuments(eq("where lower(doc.name)=?"), (List<String>) anyObject(), same(
         getContext()))).andReturn(list).once();
@@ -106,7 +106,7 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
   public void testGetUsernameForUserData_email_correctCase() throws XWikiException {
     String login = "abc@ucme.com";
     String docName = "XWiki.abc";
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     list.add(docName);
     expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), same(
         getContext()))).andReturn(list).once();
@@ -120,7 +120,7 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
     String login = "abc@ucme.com";
     String loginCased = "ABC@ucme.com";
     String docName = "XWiki.abc";
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     list.add(docName);
     expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), same(
         getContext()))).andReturn(list).once();
@@ -133,7 +133,7 @@ public class UserNameForUserDataCommandTest extends AbstractBridgedComponentTest
   public void testGetUsernameForUserData_email_multiple() throws XWikiException {
     String login = "abc@ucme.com";
     String docName = "XWiki.abc";
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     list.add(docName);
     list.add(docName);
     expect(store.searchDocumentsNames(eq(getDBQuery(login)), eq(0), eq(0), same(

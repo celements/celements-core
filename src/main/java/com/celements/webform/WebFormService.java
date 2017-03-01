@@ -25,7 +25,7 @@ public class WebFormService implements IWebFormServiceRole {
   }
 
   short getIsFilledModifier(Map<String, String[]> parameterMap, Set<String> additionalFields) {
-    List<String> standardParams = new ArrayList<String>();
+    List<String> standardParams = new ArrayList<>();
     standardParams.add(PARAM_XPAGE);
     standardParams.add(PARAM_CONF);
     standardParams.add(PARAM_AJAX_MODE);
@@ -53,7 +53,7 @@ public class WebFormService implements IWebFormServiceRole {
     if (parameterMap.containsKey(PARAM_LANGUAGE)) {
       modifier += 1;
     }
-    if ((additionalFields != null) && additionalFields.size() > 0) {
+    if ((additionalFields != null) && (additionalFields.size() > 0)) {
       for (String param : additionalFields) {
         if (!standardParams.contains(param) && parameterMap.containsKey(param)) {
           modifier += 1;

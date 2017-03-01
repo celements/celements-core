@@ -23,6 +23,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class DefaultEmptyDocumentChecker implements IEmptyDocumentChecker {
 
+  @Override
   public boolean isEmpty(XWikiDocument doc) {
     if (doc != null) {
       return (isEmptyContent(doc) && isEmptyTitle(doc));
@@ -30,6 +31,7 @@ public class DefaultEmptyDocumentChecker implements IEmptyDocumentChecker {
     return true;
   }
 
+  @Override
   public boolean isEmptyContent(XWikiDocument doc) {
     if (doc != null) {
       return doc.getContent().equals("");
@@ -37,6 +39,7 @@ public class DefaultEmptyDocumentChecker implements IEmptyDocumentChecker {
     return true;
   }
 
+  @Override
   public boolean isEmptyTitle(XWikiDocument doc) {
     if (doc != null) {
       return doc.getTitle().equals("");

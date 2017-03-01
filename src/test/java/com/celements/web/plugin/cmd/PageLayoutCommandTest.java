@@ -104,13 +104,13 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetAllPageLayouts() throws Exception {
-    List<Object> resultList = new ArrayList<Object>();
+    List<Object> resultList = new ArrayList<>();
     resultList.add(new Object[] { "layout1Space", "Layout 1 pretty name" });
     resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
-    Capture<String> capturedHQL = new Capture<String>();
+    Capture<String> capturedHQL = new Capture<>();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
     replayDefault();
-    Map<String, String> expectedPLmap = new HashMap<String, String>();
+    Map<String, String> expectedPLmap = new HashMap<>();
     expectedPLmap.put("layout1Space", "Layout 1 pretty name");
     expectedPLmap.put("layout2Space", "Layout 2 pretty name");
     assertEquals(expectedPLmap, plCmd.getAllPageLayouts());
@@ -121,13 +121,13 @@ public class PageLayoutCommandTest extends AbstractComponentTest {
 
   @Test
   public void testGetActivePageLyouts() throws Exception {
-    List<Object> resultList = new ArrayList<Object>();
+    List<Object> resultList = new ArrayList<>();
     resultList.add(new Object[] { "layout1Space", "Layout 1 pretty name" });
     resultList.add(new Object[] { "layout2Space", "Layout 2 pretty name" });
-    Capture<String> capturedHQL = new Capture<String>();
+    Capture<String> capturedHQL = new Capture<>();
     expect(xwiki.search(capture(capturedHQL), same(context))).andReturn(resultList);
     replayDefault();
-    Map<String, String> expectedPLmap = new HashMap<String, String>();
+    Map<String, String> expectedPLmap = new HashMap<>();
     expectedPLmap.put("layout1Space", "Layout 1 pretty name");
     expectedPLmap.put("layout2Space", "Layout 2 pretty name");
     assertEquals(expectedPLmap, plCmd.getActivePageLyouts());

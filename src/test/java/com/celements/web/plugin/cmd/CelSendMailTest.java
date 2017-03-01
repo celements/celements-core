@@ -150,7 +150,7 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
     Attachment att1 = createMock(Attachment.class);
     Attachment att2 = createMock(Attachment.class);
     Attachment att3 = createMock(Attachment.class);
-    List<Attachment> list = new ArrayList<Attachment>();
+    List<Attachment> list = new ArrayList<>();
     list.add(att1);
     list.add(att2);
     list.add(att3);
@@ -162,7 +162,7 @@ public class CelSendMailTest extends AbstractBridgedComponentTestCase {
   public void testSetOthers() {
     String replyTo = "test@synventis.com";
     String addInfo = "something else";
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("reply-to", replyTo);
     map.put("added-info", addInfo);
     sendMail.setOthers(map);

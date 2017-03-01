@@ -21,7 +21,7 @@ public interface IDocumentReferenceCache<K> {
   /**
    * Tries to determine the wiki itself via given key or context. If this behaviour is not
    * desired, use {@link #getCachedDocRefs(WikiReference, Object)}
-   * 
+   *
    * @param key
    *          the cache key
    * @return all cached doc refs for the given key

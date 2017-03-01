@@ -23,41 +23,49 @@ public class Date implements IDataField {
 
   // TODO als Number (Long) behandeln
 
+  @Override
   public String getColumnId() throws IllegalStateException {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public String getColumnPrettyName() throws IllegalStateException {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public String getType() throws IllegalStateException {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public String getValue() throws IllegalStateException {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void setColumnId() {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void setColumnPrettyName() {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void setType() {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void setValue() {
     // TODO Auto-generated method stub
 

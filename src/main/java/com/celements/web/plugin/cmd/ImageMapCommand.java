@@ -46,7 +46,7 @@ public class ImageMapCommand {
 
   public ImageMapCommand(XWikiContext context) {
     this.context = context;
-    imageMapSet = new HashSet<String>();
+    imageMapSet = new HashSet<>();
   }
 
   public void addMapConfig(String mapId) {
@@ -88,7 +88,7 @@ public class ImageMapCommand {
   }
 
   public List<String> getImageUseMaps(String rteContent) {
-    List<String> useMaps = new ArrayList<String>();
+    List<String> useMaps = new ArrayList<>();
     if (rteContent != null) {
       Matcher theMatcher = useMapsPattern.matcher(rteContent);
       while (theMatcher.find()) {

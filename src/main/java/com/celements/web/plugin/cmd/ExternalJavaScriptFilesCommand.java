@@ -64,10 +64,10 @@ public class ExternalJavaScriptFilesCommand {
 
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
-    extJSfileSet = new HashSet<String>();
-    extJSAttUrlSet = new HashSet<String>();
-    extJSfileList = new Vector<String>();
-    extJSnotFoundList = new Vector<String>();
+    extJSfileSet = new HashSet<>();
+    extJSAttUrlSet = new HashSet<>();
+    extJSfileList = new Vector<>();
+    extJSnotFoundList = new Vector<>();
   }
 
   public String addLazyExtJSfile(String jsFile) {
@@ -257,7 +257,7 @@ public class ExternalJavaScriptFilesCommand {
   private List<String> getJavaScriptExternalFilePaths(XWikiDocument doc) {
     List<BaseObject> javaScriptFiles = doc.getXObjects(new DocumentReference(context.getDatabase(),
         JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE, JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC));
-    Vector<String> jsFiles = new Vector<String>();
+    Vector<String> jsFiles = new Vector<>();
     if (javaScriptFiles != null) {
       for (Object filepath : javaScriptFiles) {
         if ((filepath != null) && (filepath instanceof BaseObject)) {

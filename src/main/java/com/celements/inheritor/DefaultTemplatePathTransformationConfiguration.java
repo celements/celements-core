@@ -53,9 +53,10 @@ public class DefaultTemplatePathTransformationConfiguration implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.xwiki.component.phase.Initializable#initialize()
    */
+  @Override
   public void initialize() throws InitializationException {
     // Default Mappings
     this.defaultMappings.setProperty("Templates", "celTemplates");
@@ -66,9 +67,10 @@ public class DefaultTemplatePathTransformationConfiguration implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see com.celements.inheritor.TemplatePathTransformationConfiguration#getMappings()
    */
+  @Override
   public Properties getMappings() {
     // Merge default properties and properties defined in the configuration
     Properties props = new Properties();

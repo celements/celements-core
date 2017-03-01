@@ -79,7 +79,7 @@ public class FileBaseScriptService implements ScriptService {
   public List<Attachment> getFilesNameMatch(IAttachmentMatcher attMatcher)
       throws FileBaseLoadException {
     List<XWikiAttachment> xwikiAttList = filebaseService.getFilesNameMatch(attMatcher);
-    List<Attachment> attList = new ArrayList<Attachment>();
+    List<Attachment> attList = new ArrayList<>();
     for (XWikiAttachment xwikiAtt : xwikiAttList) {
       try {
         attList.add(attachmentService.getApiAttachment(xwikiAtt));

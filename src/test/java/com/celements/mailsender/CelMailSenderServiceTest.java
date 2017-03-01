@@ -45,7 +45,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
     String textContent = "testTextContent";
     Attachment mockAttachment = createMockAndAddToDefault(Attachment.class);
     List<Attachment> attachments = Arrays.asList(mockAttachment);
-    Map<String, String> others = new HashMap<String, String>();
+    Map<String, String> others = new HashMap<>();
     mockMailObject.setFrom(eq(from));
     expectLastCall().once();
     mockMailObject.setReplyTo(eq(replyTo));
@@ -87,7 +87,7 @@ public class CelMailSenderServiceTest extends AbstractBridgedComponentTestCase {
     String textContent = "testTextContent";
     Attachment mockAttachment = createMockAndAddToDefault(Attachment.class);
     List<Attachment> attachments = Arrays.asList(mockAttachment);
-    Map<String, String> others = new HashMap<String, String>();
+    Map<String, String> others = new HashMap<>();
     mockMailObject.setFrom(eq(from));
     expectLastCall().once();
     mockMailObject.setReplyTo(eq(replyTo));

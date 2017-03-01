@@ -80,11 +80,11 @@ public class GetMappedMenuItemsForParentCommand {
       if (parentKey.indexOf(':') < 0) {
         parentKey = getContext().getDatabase() + ":" + parentKey;
       }
-      List<Object> parameterList = new Vector<Object>();
+      List<Object> parameterList = new Vector<>();
       parameterList.add(parentKey.split(":")[1]);
       String saveDatabase = getContext().getDatabase();
       getContext().setDatabase(parentKey.split(":")[0]);
-      List<TreeNode> menu = new ArrayList<TreeNode>();
+      List<TreeNode> menu = new ArrayList<>();
       try {
         List<Object[]> results = getContext().getWiki().getStore().search(getHQL(), 0, 0,
             getContext());

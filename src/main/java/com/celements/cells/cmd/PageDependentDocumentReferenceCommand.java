@@ -137,7 +137,7 @@ public class PageDependentDocumentReferenceCommand {
   List<String> getDependentDocList(DocumentReference docRef, String depDocSpace) {
     List<DocumentReference> docParentList = getWebUtilsService().getDocumentParentsList(docRef,
         true);
-    List<String> depDocList = new ArrayList<String>(docParentList.size());
+    List<String> depDocList = new ArrayList<>(docParentList.size());
     for (DocumentReference parentRef : docParentList) {
       depDocList.add(depDocSpace + "." + parentRef.getName());
     }
@@ -204,7 +204,7 @@ public class PageDependentDocumentReferenceCommand {
   public DocumentReference getDependentDefaultDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef) {
     DocumentReference spaceDefault = getSpaceDefaultDocRef(docRef, cellDocRef);
-    List<String> depDefaultDocList = new ArrayList<String>();
+    List<String> depDefaultDocList = new ArrayList<>();
     depDefaultDocList.add(getRefSerializer().serialize(spaceDefault));
     depDefaultDocList.add(getRefSerializer().serialize(getWikiDefaultDocRef(docRef, cellDocRef)));
     if (getCurrentLayoutRef() != null) {

@@ -28,33 +28,34 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * instead use an ExecutorService implementation e.g. ThreadPoolExecutor
- * 
- * @author pichlerf
  *
+ * @author pichlerf
  */
 @Deprecated
 public class DocumentCreationWorkerControl {
+
   private static DocumentCreationWorkerControl workerControl;
   private List<DocumentCreationWorker> workers;
   private int maxId = 0;
   private Map<Integer, Long[]> stats;
-  
+
   private DocumentCreationWorkerControl() {
-    workers = new ArrayList<DocumentCreationWorker>();
-    stats = new HashMap<Integer, Long[]>();
+    workers = new ArrayList<>();
+    stats = new HashMap<>();
   }
-  
+
   /**
    * Class is Singleton to be able to add or remove workers using Velocity
+   *
    * @return
    */
   public static DocumentCreationWorkerControl getWorkerControl() {
-    if(workerControl == null) {
+    if (workerControl == null) {
       workerControl = new DocumentCreationWorkerControl();
     }
     return workerControl;
   }
-  
+
   public void startThread(String space, int numberOfThreads, XWikiContext context) {
     clearFinishedWorkers(null);
     for (int i = 0; i < numberOfThreads; i++) {
@@ -64,29 +65,29 @@ public class DocumentCreationWorkerControl {
       maxId++;
     }
   }
-  
+
   public void stopAllWorkers() {
     stopWorker(workers.size());
   }
-  
+
   public void stopWorker(int number) {
     number = Math.min(number, workers.size());
     int i = 0;
     for (DocumentCreationWorker worker : workers) {
-      if(i < number) {
+      if (i < number) {
         worker.stopThread();
         i++;
       }
     }
     clearFinishedWorkers(null);
   }
-  
+
   public String getStats() {
     clearFinishedWorkers(null);
     long total = 0;
     long maxTime = 0;
-    String statsHTML = "<table><thead><tr><th>Thread</th><th>Created</th><th>Time</th>" +
-        "<th>Average</th></tr></thead><tbody><tr><td>Stopped</td></tr>";
+    String statsHTML = "<table><thead><tr><th>Thread</th><th>Created</th><th>Time</th>"
+        + "<th>Average</th></tr></thead><tbody><tr><td>Stopped</td></tr>";
     for (Integer key : stats.keySet()) {
       long nrDocs = stats.get(key)[0];
       long time = stats.get(key)[1];
@@ -102,17 +103,16 @@ public class DocumentCreationWorkerControl {
       total += nrDocs;
       statsHTML += addStatRow(statsHTML, worker.getCelId(), nrDocs, time);
     }
-    statsHTML += "<tr><td>Total</td><td>" + total + "</td><td>" + formatTime(maxTime) + 
-        "</td><td>" + ((double)total / ((double)maxTime / 1000)) + "</td></tr>" +
-        "</tbody></table>";
+    statsHTML += "<tr><td>Total</td><td>" + total + "</td><td>" + formatTime(maxTime) + "</td><td>"
+        + (total / ((double) maxTime / 1000)) + "</td></tr>" + "</tbody></table>";
     return statsHTML;
   }
 
   private String addStatRow(String statsHTML, int id, long nrDocs, long time) {
-    return "<tr><td>" + id + "</td><td>" + nrDocs + "</td><td>" + formatTime(time) + 
-        "</td><td>" + ((double)nrDocs / ((double)time / 1000)) + "</td></tr>";
+    return "<tr><td>" + id + "</td><td>" + nrDocs + "</td><td>" + formatTime(time) + "</td><td>"
+        + (nrDocs / ((double) time / 1000)) + "</td></tr>";
   }
-  
+
   private String formatTime(long time) {
     String timeString = "." + (time % 1000);
     timeString = ":" + ((time / 1000) % 60) + timeString;
@@ -126,9 +126,9 @@ public class DocumentCreationWorkerControl {
   }
 
   private void clearFinishedWorkers(Object object) {
-    List<Integer> finishedList = new ArrayList<Integer>();
+    List<Integer> finishedList = new ArrayList<>();
     for (DocumentCreationWorker worker : workers) {
-      if(!worker.isRunning()) {
+      if (!worker.isRunning()) {
         addStats(worker);
         finishedList.add(workers.indexOf(worker));
       }

@@ -51,6 +51,7 @@ public class ContextMenuBuilder {
       this.contextMenus = outputCMmap;
     }
 
+    @Override
     public void closeEvent(ERequestLiteral literal) {
       switch (literal) {
         case CSS_CLASS:
@@ -62,6 +63,7 @@ public class ContextMenuBuilder {
       currentLiteral = null;
     }
 
+    @Override
     public void openEvent(ERequestLiteral literal) {
       switch (literal) {
         case REQUEST_ARRAY:
@@ -72,9 +74,11 @@ public class ContextMenuBuilder {
       currentLiteral = literal;
     }
 
+    @Override
     public void readPropertyKey(String key) {
     }
 
+    @Override
     public void stringEvent(String value) {
       LOGGER.debug("stringEvent: " + currentLiteral + ", " + value);
       switch (currentLiteral) {
@@ -115,11 +119,11 @@ public class ContextMenuBuilder {
    */
   private static Log LOGGER = LogFactory.getFactory().getInstance(ContextMenuBuilder.class);
 
-  private Map<String, List<ContextMenuItem>> contextMenus = new HashMap<String, List<ContextMenuItem>>();
+  private Map<String, List<ContextMenuItem>> contextMenus = new HashMap<>();
 
   List<ContextMenuItem> getCMItemsForClassAndId(String className, String elemId,
       XWikiContext context) {
-    ArrayList<ContextMenuItem> contextMenuItemList = new ArrayList<ContextMenuItem>();
+    ArrayList<ContextMenuItem> contextMenuItemList = new ArrayList<>();
     try {
       for (Object theobj : getCMIobjects(className, context)) {
         if (theobj instanceof BaseObject) {

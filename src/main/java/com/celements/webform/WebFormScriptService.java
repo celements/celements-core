@@ -32,7 +32,7 @@ public class WebFormScriptService implements ScriptService {
 
   @SuppressWarnings("unchecked")
   public boolean isFormFilled(String excludeFields) {
-    Set<String> excludeSet = new HashSet<String>();
+    Set<String> excludeSet = new HashSet<>();
     for (String field : excludeFields.split(",")) {
       if (!"".equals(field.trim()) && (field.trim().length() > 0)) {
         excludeSet.add(field);

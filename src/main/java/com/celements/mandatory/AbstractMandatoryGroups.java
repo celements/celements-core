@@ -36,6 +36,7 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
   @Requirement
   Execution execution;
 
+  @Override
   public abstract void checkDocuments() throws XWikiException;
 
   public AbstractMandatoryGroups() {
@@ -48,6 +49,7 @@ public abstract class AbstractMandatoryGroups implements IMandatoryDocumentRole 
 
   protected abstract String commitName();
 
+  @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Collections.emptyList();
   }

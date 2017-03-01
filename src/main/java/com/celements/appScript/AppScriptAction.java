@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.XWikiAction;
  * Action called when the request URL has the "/app/" string in its path (this is
  * configured in <code>struts-config.xml</code>. It means the request is to execute an
  * application script and display its result in view mode.
- * 
+ *
  * @version $Id$
  */
 public class AppScriptAction extends XWikiAction {
@@ -43,16 +43,17 @@ public class AppScriptAction extends XWikiAction {
 
   /**
    * The identifier of the view action.
-   * 
+   *
    * @todo need an enumerated class for actions.
    */
   public static final String VIEW_ACTION = "view";
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
    */
+  @Override
   public boolean action(XWikiContext context) throws XWikiException {
     boolean shouldRender = true;
     context.put("action", VIEW_ACTION);
@@ -70,9 +71,10 @@ public class AppScriptAction extends XWikiAction {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
    */
+  @Override
   public String render(XWikiContext context) throws XWikiException {
     String page = Utils.getPage(context.getRequest(), IAppScriptService.APP_SCRIPT_XPAGE);
     Utils.parseTemplate(page, !page.equals("direct"), context);

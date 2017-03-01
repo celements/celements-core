@@ -3,7 +3,6 @@ package com.celements.rights.publication;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class PublicationService implements IPublicationServiceRole {
   @Override
   public boolean isPubUnpubOverride() {
     EPubUnpub val = getPubUnpubFromContext();
-    return EPubUnpub.PUBLISHED == val || EPubUnpub.UNPUBLISHED == val;
+    return (EPubUnpub.PUBLISHED == val) || (EPubUnpub.UNPUBLISHED == val);
   }
 
   @Override
@@ -139,13 +138,13 @@ public class PublicationService implements IPublicationServiceRole {
   }
 
   boolean isAfterStart(BaseObject obj) {
-    Calendar cal = GregorianCalendar.getInstance();
+    Calendar cal = Calendar.getInstance();
     Date pubDate = obj.getDateValue(DocumentDetailsClasses.PUBLISH_DATE_FIELD);
     return (pubDate == null) || cal.getTime().after(pubDate);
   }
 
   boolean isBeforeEnd(BaseObject obj) {
-    Calendar cal = GregorianCalendar.getInstance();
+    Calendar cal = Calendar.getInstance();
     Date unpubDate = obj.getDateValue(DocumentDetailsClasses.UNPUBLISH_DATE_FIELD);
     return (unpubDate == null) || cal.getTime().before(unpubDate);
   }

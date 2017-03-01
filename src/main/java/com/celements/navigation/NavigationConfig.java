@@ -256,7 +256,7 @@ public final class NavigationConfig {
 
   @NotNull
   public Set<String> getMainUlCSSClasses() {
-    return new LinkedHashSet<String>(mainUlCSSClasses);
+    return new LinkedHashSet<>(mainUlCSSClasses);
   }
 
   private static ModelUtils getModelUtils() {

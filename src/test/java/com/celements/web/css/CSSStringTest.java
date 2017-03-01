@@ -114,7 +114,7 @@ public class CSSStringTest extends AbstractBridgedComponentTestCase {
     expect(attURLcmd.getAttachmentName(eq(link))).andReturn("myAttachment.css");
     cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(docRef);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);

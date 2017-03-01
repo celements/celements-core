@@ -60,16 +60,19 @@ public class XObjectPageTypeDocumentUpdatedListener extends AbstractXObjectPageT
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public String getName() {
     LOGGER.trace("XObjectPageTypeDocumentUpdatedListener getName");
     return NAME;
   }
 
+  @Override
   public List<Event> getEvents() {
     LOGGER.trace("XObjectPageTypeDocumentUpdatedListener getEvents");
     return Arrays.asList((Event) new DocumentUpdatedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     LOGGER.trace("XObjectPageTypeDocumentUpdatedListener onEvent: start.");
     XWikiDocument document = (XWikiDocument) source;

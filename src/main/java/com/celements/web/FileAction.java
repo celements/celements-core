@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.XWikiResponse;
  * <p>
  * This action indicates that the results should be publicly cacheable for 30 days.
  * </p>
- * 
+ *
  * @version $Id: FileAction.java 28858 2010-05-13 20:43:41Z sdumitriu $
  * @since 1.0
  */
@@ -170,7 +170,7 @@ public class FileAction extends SkinAction {
    * current document (in case the URL was actually pointing to
    * <tt>/skins/directory/file</tt>).</li>
    * </ol>
-   * 
+   *
    * @param filename
    *          The name of the skin file that should be rendered.
    * @param doc
@@ -211,7 +211,7 @@ public class FileAction extends SkinAction {
 
   /**
    * Tries to serve a file from the filesystem.
-   * 
+   *
    * @param path
    *          Path of the file that should be rendered.
    * @param context
@@ -228,7 +228,7 @@ public class FileAction extends SkinAction {
     XWikiResponse response = context.getResponse();
     try {
       byte[] data = context.getWiki().getResourceContentAsBytes(path);
-      if (data != null && data.length > 0) {
+      if ((data != null) && (data.length > 0)) {
         String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
         String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
         Date modified = context.getWiki().getResourceLastModificationDate(path);
@@ -253,7 +253,7 @@ public class FileAction extends SkinAction {
 
   /**
    * Tries to serve the content of an XWikiSkins object field as a skin file.
-   * 
+   *
    * @param filename
    *          The name of the skin file that should be rendered.
    * @param doc
@@ -295,7 +295,7 @@ public class FileAction extends SkinAction {
 
   /**
    * Tries to serve the content of an attachment as a skin file.
-   * 
+   *
    * @param filename
    *          The name of the skin file that should be rendered.
    * @param doc

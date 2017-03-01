@@ -49,6 +49,7 @@ public class InheritorFactory {
     FieldInheritor inheritor = new FieldInheritor();
     inheritor.setIteratorFactory(new IIteratorFactory<XObjectIterator>() {
 
+      @Override
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(localContext);
         iterator.setClassName(className);
@@ -64,6 +65,7 @@ public class InheritorFactory {
     ContentInheritor inheritor = new ContentInheritor();
     inheritor.setIteratorFactory(new IIteratorFactory<DocumentIterator>() {
 
+      @Override
       public DocumentIterator createIterator() {
         DocumentIterator iterator = new DocumentIterator(localContext);
         iterator.setDocList(docList);
@@ -81,7 +83,7 @@ public class InheritorFactory {
 
   public FieldInheritor getConfigDocFieldInheritor(String className, String fullName,
       XWikiContext context) {
-    List<String> inheritanceList = new ArrayList<String>();
+    List<String> inheritanceList = new ArrayList<>();
     inheritanceList.add(fullName.split("\\.")[0] + ".WebPreferences");
     inheritanceList.add("XWiki.XWikiPreferences");
     String pageLayoutForDoc = getPageLayoutCmd().getPageLayoutForDoc(fullName, context);
@@ -115,7 +117,7 @@ public class InheritorFactory {
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param injectedWebUtils
    */
   void inject_TEST_WebUtils(IWebUtils injectedWebUtils) {

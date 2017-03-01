@@ -53,6 +53,7 @@ public class PageTypeClassCollection extends AbstractClassCollection {
 
   }
 
+  @Override
   public String getConfigName() {
     return "celPageType";
   }

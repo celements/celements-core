@@ -45,7 +45,7 @@ public class MenuScriptService implements ScriptService {
   }
 
   public List<com.xpn.xwiki.api.Object> getMenuHeaders() {
-    ArrayList<Object> menuHeaders = new ArrayList<com.xpn.xwiki.api.Object>();
+    ArrayList<Object> menuHeaders = new ArrayList<>();
     for (BaseObject bobj : menuService.getMenuHeaders()) {
       if (bobj != null) {
         menuHeaders.add(bobj.newObjectApi(bobj, getContext()));
@@ -55,7 +55,7 @@ public class MenuScriptService implements ScriptService {
   }
 
   public List<com.xpn.xwiki.api.Object> getSubMenuItems(Integer headerId) {
-    ArrayList<Object> menuItems = new ArrayList<com.xpn.xwiki.api.Object>();
+    ArrayList<Object> menuItems = new ArrayList<>();
     for (BaseObject bobj : menuService.getSubMenuItems(headerId)) {
       if (bobj != null) {
         menuItems.add(bobj.newObjectApi(bobj, getContext()));

@@ -58,10 +58,12 @@ public class HTMLWebPreferences implements IMandatoryDocumentRole {
     return (PageTypeClasses) pageTypeClasses;
   }
 
+  @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Collections.emptyList();
   }
 
+  @Override
   public void checkDocuments() throws XWikiException {
     LOGGER.trace("Start checkDocuments in HTMLwebPreferences for database ["
         + getContext().getDatabase() + "].");

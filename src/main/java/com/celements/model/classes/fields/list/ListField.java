@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 
 import org.python.google.common.base.Objects;
 
-
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
 import com.google.common.base.Splitter;

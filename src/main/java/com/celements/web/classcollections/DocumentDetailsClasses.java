@@ -118,6 +118,7 @@ public class DocumentDetailsClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  @Override
   public String getConfigName() {
     return "documentDetails";
   }

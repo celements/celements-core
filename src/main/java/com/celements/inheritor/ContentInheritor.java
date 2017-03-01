@@ -65,10 +65,11 @@ public class ContentInheritor {
   }
 
   public String getTitle(String defaultValue) {
-    if (getDocument() != null)
+    if (getDocument() != null) {
       return getDocument().getTitle();
-    else
+    } else {
       return defaultValue;
+    }
   }
 
   public String getTranslatedTitle(XWikiContext context) {
@@ -76,10 +77,11 @@ public class ContentInheritor {
   }
 
   public String getTranslatedTitle(XWikiContext context, String defaultValue) {
-    if (getTranslatedDocument(context) != null)
+    if (getTranslatedDocument(context) != null) {
       return getTranslatedDocument(context).getTitle();
-    else
+    } else {
       return defaultValue;
+    }
   }
 
   public String getContent() {
@@ -87,10 +89,11 @@ public class ContentInheritor {
   }
 
   public String getContent(String defaultValue) {
-    if (getDocument() != null)
+    if (getDocument() != null) {
       return getDocument().getContent();
-    else
+    } else {
       return defaultValue;
+    }
   }
 
   public String getTranslatedContent(XWikiContext context) {
@@ -98,10 +101,11 @@ public class ContentInheritor {
   }
 
   public String getTranslatedContent(XWikiContext context, String defaultValue) {
-    if (getTranslatedDocument(context) != null)
+    if (getTranslatedDocument(context) != null) {
       return getTranslatedDocument(context).getContent();
-    else
+    } else {
       return defaultValue;
+    }
   }
 
   public XWikiDocument getDocument() {

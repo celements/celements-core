@@ -66,14 +66,17 @@ public class TreeNodeDocumentCreatedListener extends AbstractTreeNodeDocumentLis
     return (NavigationClasses) navClasses;
   }
 
+  @Override
   public String getName() {
     return "TreeNodeDocumentCreatedListener";
   }
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.asList((Event) new DocumentCreatedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument document = (XWikiDocument) source;
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {

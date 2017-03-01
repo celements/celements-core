@@ -50,7 +50,8 @@ public class FileBaseTagsCmd {
   public final static String FILEBASE_TAG_CLASS = "Classes.FilebaseTag";
   private final ITreeNodeService treeNodeSrv = Utils.getComponent(ITreeNodeService.class);
   private final IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
-  private final INavigationClassConfig navClassConfig = Utils.getComponent(INavigationClassConfig.class);
+  private final INavigationClassConfig navClassConfig = Utils.getComponent(
+      INavigationClassConfig.class);
   private final ModelConfiguration modelConfig = Utils.getComponent(ModelConfiguration.class);
   private final Execution execution = Utils.getComponent(Execution.class);
 

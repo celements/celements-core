@@ -139,60 +139,73 @@ public class RenderedContentPresentationTypeTest extends AbstractBridgedComponen
       return mockRenderEngine;
     }
 
+    @Override
     public void addRenderer(String name, XWikiRenderer renderer) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String convertMultiLine(String macroname, String params, String data, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String convertSingleLine(String macroname, String params, String allcontent,
         XWikiVirtualMacro macro, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void flushCache() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public XWikiRenderer getRenderer(String name) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public List<XWikiRenderer> getRendererList() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public List<String> getRendererNames() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String interpretText(String text, XWikiDocument includingdoc, XWikiContext context) {
       VelocityContext velocityContext = (VelocityContext) context.get("vcontext");
       storedVelocityContext.add((VelocityContext) velocityContext.clone());
       return mockRenderEngine.interpretText(text, includingdoc, context);
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String renderDocument(XWikiDocument doc, XWikiDocument includingdoc,
         XWikiContext context) throws XWikiException {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String renderText(String text, XWikiDocument includingdoc, XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
         XWikiContext context) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void virtualInit(XWikiContext context) {
       throw new UnsupportedOperationException();
     }

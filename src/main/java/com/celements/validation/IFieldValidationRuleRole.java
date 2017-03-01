@@ -29,7 +29,7 @@ public interface IFieldValidationRuleRole {
 
   /**
    * validates the given class name, field name and value
-   * 
+   *
    * @param className
    * @param fieldName
    * @param value

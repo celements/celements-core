@@ -59,10 +59,12 @@ public class Robots_TXT implements IMandatoryDocumentRole {
     return (PageTypeClasses) pageTypeClasses;
   }
 
+  @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Collections.emptyList();
   }
 
+  @Override
   public void checkDocuments() throws XWikiException {
     LOGGER.trace("Start checkDocuments in robots_txt for database [" + getContext().getDatabase()
         + "].");

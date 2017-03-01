@@ -4,7 +4,6 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -79,15 +78,15 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
         "Doc"));
     BaseObject obj1 = new BaseObject();
-    Calendar gc = GregorianCalendar.getInstance();
-    gc.add(GregorianCalendar.HOUR, 1);
+    Calendar gc = Calendar.getInstance();
+    gc.add(Calendar.HOUR, 1);
     obj1.setDateValue("publishDate", gc.getTime());
     obj1.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj1);
     BaseObject obj2 = new BaseObject();
-    gc.add(GregorianCalendar.HOUR, -2);
+    gc.add(Calendar.HOUR, -2);
     obj2.setDateValue("unpublishDate", gc.getTime());
-    gc.add(GregorianCalendar.HOUR, -2);
+    gc.add(Calendar.HOUR, -2);
     obj2.setDateValue("publishDate", gc.getTime());
     obj2.setXClassReference(pubService.getPublicationClassReference());
     doc.addXObject(obj2);
@@ -103,16 +102,16 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
     obj1.setXClassReference(pubService.getPublicationClassReference());
     BaseObject obj3 = new BaseObject();
     obj3.setXClassReference(pubService.getPublicationClassReference());
-    Calendar gc = GregorianCalendar.getInstance();
-    gc.add(GregorianCalendar.HOUR, 1);
+    Calendar gc = Calendar.getInstance();
+    gc.add(Calendar.HOUR, 1);
     obj3.setDateValue("unpublishDate", gc.getTime());
     obj1.setDateValue("publishDate", gc.getTime());
     BaseObject obj2 = new BaseObject();
     obj2.setXClassReference(pubService.getPublicationClassReference());
-    gc.add(GregorianCalendar.HOUR, -2);
+    gc.add(Calendar.HOUR, -2);
     obj2.setDateValue("unpublishDate", gc.getTime());
     obj3.setDateValue("publishDate", gc.getTime());
-    gc.add(GregorianCalendar.HOUR, -2);
+    gc.add(Calendar.HOUR, -2);
     obj2.setDateValue("publishDate", gc.getTime());
     doc.addXObject(obj1);
     doc.addXObject(obj2);
@@ -193,8 +192,8 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsAfterStart_beforeStart() {
     BaseObject obj = new BaseObject();
-    Calendar gc = GregorianCalendar.getInstance();
-    gc.add(GregorianCalendar.HOUR, 1);
+    Calendar gc = Calendar.getInstance();
+    gc.add(Calendar.HOUR, 1);
     obj.setDateValue("publishDate", gc.getTime());
     assertFalse(pubService.isAfterStart(obj));
   }
@@ -202,8 +201,8 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsAfterStart_afterStart() {
     BaseObject obj = new BaseObject();
-    Calendar gc = GregorianCalendar.getInstance();
-    gc.add(GregorianCalendar.HOUR, -1);
+    Calendar gc = Calendar.getInstance();
+    gc.add(Calendar.HOUR, -1);
     obj.setDateValue("publishDate", gc.getTime());
     assertTrue(pubService.isAfterStart(obj));
   }
@@ -216,8 +215,8 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsBeforeEnd_beforeEnd() {
     BaseObject obj = new BaseObject();
-    Calendar gc = GregorianCalendar.getInstance();
-    gc.add(GregorianCalendar.HOUR, 1);
+    Calendar gc = Calendar.getInstance();
+    gc.add(Calendar.HOUR, 1);
     obj.setDateValue("unpublishDate", gc.getTime());
     assertTrue(pubService.isBeforeEnd(obj));
   }
@@ -225,8 +224,8 @@ public class PublicationServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testIsBeforeEnd_afterEnd() {
     BaseObject obj = new BaseObject();
-    Calendar gc = GregorianCalendar.getInstance();
-    gc.add(GregorianCalendar.HOUR, -1);
+    Calendar gc = Calendar.getInstance();
+    gc.add(Calendar.HOUR, -1);
     obj.setDateValue("unpublishDate", gc.getTime());
     assertFalse(pubService.isBeforeEnd(obj));
   }

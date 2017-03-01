@@ -1,8 +1,5 @@
 package com.celements.metatag.enums.twitter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -10,8 +7,8 @@ import com.celements.common.ReverseMap;
 import com.celements.common.ValueGetter;
 import com.google.common.base.Optional;
 
-public enum ETwitter implements ValueGetter<String>{
-  
+public enum ETwitter implements ValueGetter<String> {
+
   // the Twitter (https://dev.twitter.com/cards/markup). Add more if needed.
   TWITTER_CARD("twitter:card"),
   TWITTER_SITE("twitter:site"),
@@ -24,7 +21,7 @@ public enum ETwitter implements ValueGetter<String>{
   TWITTER_IMAGE_ALT("twitter:image:alt");
 
   public final static String ATTRIB_NAME = "name";
-  
+
   private final static ReverseMap<ETwitter, String> ID_MAP = new ReverseMap<>(ETwitter.values());
 
   private final String identifier;

@@ -43,6 +43,7 @@ public class MetaTagClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "metaTag";
   }

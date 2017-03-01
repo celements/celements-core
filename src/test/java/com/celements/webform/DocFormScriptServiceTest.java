@@ -39,7 +39,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
     xwiki = getWikiMock();
     docFormService = (DocFormScriptService) Utils.getComponent(ScriptService.class, "docform");
     modelAccessFacade = createMockAndAddToDefault(IModelAccessFacade.class);
-    DefaultComponentDescriptor<IModelAccessFacade> descriptor = new DefaultComponentDescriptor<IModelAccessFacade>();
+    DefaultComponentDescriptor<IModelAccessFacade> descriptor = new DefaultComponentDescriptor<>();
     descriptor.setRole(IModelAccessFacade.class);
     descriptor.setRoleHint("default");
     Utils.getComponentManager().registerComponent(descriptor, modelAccessFacade);
@@ -57,7 +57,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCheckRightsAndSaveXWikiDocCollection_saveDoc() throws XWikiException,
       DocumentSaveException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
+    Collection<XWikiDocument> xdocs = new ArrayList<>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
     doc.setNew(false);
     xdocs.add(doc);
@@ -82,7 +82,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCheckRightsAndSaveXWikiDocCollection_newWithoutCreateIfNotExists()
       throws XWikiException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
+    Collection<XWikiDocument> xdocs = new ArrayList<>();
     XWikiDocument doc = new XWikiDocument(new DocumentReference("w", "S", "D"));
     xdocs.add(doc);
     XWikiRequest request = createMockAndAddToDefault(XWikiRequest.class);
@@ -100,7 +100,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_notRightsOnAll()
       throws XWikiException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
+    Collection<XWikiDocument> xdocs = new ArrayList<>();
     String docName1 = "HasRight";
     String docName2 = "NoRight";
     XWikiDocument doc1 = new XWikiDocument(new DocumentReference("w", "S", docName1));
@@ -133,7 +133,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll()
       throws XWikiException, DocumentSaveException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
+    Collection<XWikiDocument> xdocs = new ArrayList<>();
     String docName1 = "HasRight1";
     String docName2 = "HasRight2";
     XWikiDocument doc1 = new XWikiDocument(new DocumentReference("w", "S", docName1));
@@ -169,7 +169,7 @@ public class DocFormScriptServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testCheckRightsAndSaveXWikiDocCollection_saveDoc_multiple_rightsOnAll_exception()
       throws XWikiException, DocumentSaveException {
-    Collection<XWikiDocument> xdocs = new ArrayList<XWikiDocument>();
+    Collection<XWikiDocument> xdocs = new ArrayList<>();
     String docName1 = "HasRight1";
     String docName2 = "HasRight2";
     DocumentReference doc2Ref = new DocumentReference("w", "S", docName2);

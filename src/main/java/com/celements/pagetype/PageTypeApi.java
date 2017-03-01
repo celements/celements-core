@@ -48,9 +48,10 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.plugin.IPageType#getTemplateDocument()
    */
+  @Override
   public Document getTemplateDocument() throws XWikiException {
     return getPageTypeObjForCurrentDoc().getTemplateDocument(context).newDocument(context);
   }
@@ -61,18 +62,20 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.plugin.IPageType#getPageType()
    */
+  @Override
   public String getPageType() {
     return PageTypeCommand.getInstance().getPageType(doc, context);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.plugin.IPageType#getPageTypeObject()
    */
+  @Override
   public com.xpn.xwiki.api.Object getPageTypeObject() {
     BaseObject pageTypeObject = PageTypeCommand.getInstance().getPageTypeObject(doc, context);
     if (pageTypeObject != null) {
@@ -84,18 +87,20 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.plugin.IPageType#showFrame()
    */
+  @Override
   public boolean showFrame() throws XWikiException {
     return getPageTypeObjForCurrentDoc().showFrame(context);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.plugin.IPageType#getPageTypeProperties()
    */
+  @Override
   public com.xpn.xwiki.api.Object getPageTypeProperties() throws XWikiException {
     BaseObject pageTypePropObj = getPageTypeObjForCurrentDoc().getPageTypeProperties(context);
     if (pageTypePropObj != null) {
@@ -107,33 +112,40 @@ public class PageTypeApi implements IPageType {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.plugin.IPageType#getRenderTemplate(java.lang.String)
    */
+  @Override
   public String getRenderTemplate(String renderMode) throws XWikiException {
     return getPageTypeObjForCurrentDoc().getRenderTemplate(renderMode, context);
   }
 
+  @Override
   public boolean hasPageTitle() {
     return getPageTypeObjForCurrentDoc().hasPageTitle(context);
   }
 
+  @Override
   public List<String> getCategories() {
     return getPageTypeObjForCurrentDoc().getCategories(context);
   }
 
+  @Override
   public String getCategoryString() {
     return getPageTypeObjForCurrentDoc().getCategoryString(context);
   }
 
+  @Override
   public String getPrettyName() {
     return PageTypeCommand.getInstance().getPrettyName(doc, context);
   }
 
+  @Override
   public boolean isVisible() {
     return PageTypeCommand.getInstance().isVisible(doc, context);
   }
 
+  @Override
   public String getPageTypeClassFullName() {
     return PageTypeCommand.PAGE_TYPE_CLASSNAME;
   }

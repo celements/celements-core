@@ -182,66 +182,79 @@ public class ContextMenuItemTest extends AbstractBridgedComponentTestCase {
 
   private class TestRenderingEngine implements XWikiRenderingEngine {
 
-    List<VelocityContext> recordedVcontextList = new ArrayList<VelocityContext>();
+    List<VelocityContext> recordedVcontextList = new ArrayList<>();
     private XWikiRenderingEngine renderingEngine;
 
     public TestRenderingEngine(XWikiRenderingEngine renderingEngine) {
       this.renderingEngine = renderingEngine;
     }
 
+    @Override
     public void addRenderer(String arg0, XWikiRenderer arg1) {
       renderingEngine.addRenderer(arg0, arg1);
     }
 
+    @Override
     public String convertMultiLine(String arg0, String arg1, String arg2, String arg3,
         XWikiVirtualMacro arg4, XWikiContext arg5) {
       return renderingEngine.convertMultiLine(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
+    @Override
     public String convertSingleLine(String arg0, String arg1, String arg2, XWikiVirtualMacro arg3,
         XWikiContext arg4) {
       return renderingEngine.convertSingleLine(arg0, arg1, arg2, arg3, arg4);
     }
 
+    @Override
     public void flushCache() {
       renderingEngine.flushCache();
     }
 
+    @Override
     public XWikiRenderer getRenderer(String arg0) {
       return renderingEngine.getRenderer(arg0);
     }
 
+    @Override
     public List<XWikiRenderer> getRendererList() {
       return renderingEngine.getRendererList();
     }
 
+    @Override
     public List<String> getRendererNames() {
       return renderingEngine.getRendererNames();
     }
 
+    @Override
     public String interpretText(String arg0, XWikiDocument arg1, XWikiContext context) {
       recordedVcontextList.add((VelocityContext) context.get("vcontext"));
       return renderingEngine.interpretText(arg0, arg1, context);
     }
 
+    @Override
     public String renderDocument(XWikiDocument arg0, XWikiContext arg1) throws XWikiException {
       return renderingEngine.renderDocument(arg0, arg1);
     }
 
+    @Override
     public String renderDocument(XWikiDocument arg0, XWikiDocument arg1, XWikiContext arg2)
         throws XWikiException {
       return renderingEngine.renderDocument(arg0, arg1, arg2);
     }
 
+    @Override
     public String renderText(String arg0, XWikiDocument arg1, XWikiContext arg2) {
       return renderingEngine.renderText(arg0, arg1, arg2);
     }
 
+    @Override
     public String renderText(String arg0, XWikiDocument arg1, XWikiDocument arg2,
         XWikiContext arg3) {
       return renderingEngine.renderText(arg0, arg1, arg2, arg3);
     }
 
+    @Override
     public void virtualInit(XWikiContext arg0) {
       renderingEngine.virtualInit(arg0);
     }

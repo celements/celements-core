@@ -47,8 +47,8 @@ public abstract class AbstractDocumentDeleteListener extends AbstractDocumentLis
         try {
           origDoc = modelAccess.getOrCreateDocument(docRef);
         } catch (DocumentLoadException docLoadExp) {
-          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", 
-              doc, event, docLoadExp);
+          getLogger().error("getNotifyEvent: Unable to load doc '{}' for event '{}'", doc, event,
+              docLoadExp);
         }
         doc.setOriginalDocument(origDoc);
       }

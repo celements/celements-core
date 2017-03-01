@@ -41,15 +41,18 @@ public class AppScriptService implements IAppScriptService {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public int getStartIndex(String path) {
     String actionName = getAppActionName();
     return path.indexOf("/" + actionName + "/") + actionName.length() + 2;
   }
 
+  @Override
   public String getAppActionName() {
     return getContext().getWiki().Param(APP_SCRIPT_ACTION_NAME_CONF_PROPERTY, APP_SCRIPT_XPAGE);
   }
 
+  @Override
   public boolean hasDocAppScript(String scriptName) {
     boolean hasDocAppScript = hasLocalAppScript(scriptName) || hasCentralAppScript(scriptName);
     LOGGER.debug("hasDocAppScript: scriptName [" + scriptName + "] hasDocAppScript ["
@@ -57,6 +60,7 @@ public class AppScriptService implements IAppScriptService {
     return hasDocAppScript;
   }
 
+  @Override
   public boolean hasLocalAppScript(String scriptName) {
     return !"".equals(scriptName) && docAppScriptExists(getLocalAppScriptDocRef(scriptName));
   }
@@ -69,10 +73,12 @@ public class AppScriptService implements IAppScriptService {
     return (existsAppScriptDoc && isNotEmptyAppScriptDoc);
   }
 
+  @Override
   public boolean hasCentralAppScript(String scriptName) {
     return !"".equals(scriptName) && docAppScriptExists(getCentralAppScriptDocRef(scriptName));
   }
 
+  @Override
   public DocumentReference getAppScriptDocRef(String scriptName) {
     if (hasLocalAppScript(scriptName)) {
       return getLocalAppScriptDocRef(scriptName);
@@ -81,18 +87,22 @@ public class AppScriptService implements IAppScriptService {
     }
   }
 
+  @Override
   public DocumentReference getLocalAppScriptDocRef(String scriptName) {
     return new DocumentReference(getContext().getDatabase(), APP_SCRIPT_SPACE_NAME, scriptName);
   }
 
+  @Override
   public DocumentReference getCentralAppScriptDocRef(String scriptName) {
     return new DocumentReference("celements2web", APP_SCRIPT_SPACE_NAME, scriptName);
   }
 
+  @Override
   public String getAppScriptTemplatePath(String scriptName) {
     return "celAppScripts/" + scriptName + ".vm";
   }
 
+  @Override
   public boolean isAppScriptAvailable(String scriptName) {
     try {
       String path = "/templates/" + getAppScriptTemplatePath(scriptName);
@@ -106,15 +116,17 @@ public class AppScriptService implements IAppScriptService {
     }
   }
 
+  @Override
   public String getAppScriptURL(String scriptName) {
     return getAppScriptURL(scriptName, "");
   }
 
+  @Override
   public String getAppScriptURL(String scriptName, String queryString) {
     if (queryString == null) {
       queryString = "";
     }
-    if (queryString.length() > 0 && !queryString.startsWith("/&")) {
+    if ((queryString.length() > 0) && !queryString.startsWith("/&")) {
       queryString = "&" + queryString;
     }
     queryString = "xpage=" + IAppScriptService.APP_SCRIPT_XPAGE + "&s=" + scriptName + queryString;
@@ -126,11 +138,13 @@ public class AppScriptService implements IAppScriptService {
     }
   }
 
+  @Override
   public boolean isAppScriptCurrentPage(String scriptName) {
     String scriptStr = getScriptNameFromURL();
     return (!"".equals(scriptStr) && (scriptStr.equals(scriptName)));
   }
 
+  @Override
   public String getScriptNameFromDocRef(DocumentReference docRef) {
     String spaceName = docRef.getLastSpaceReference().getName();
     if (spaceName.equals(defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE))) {
@@ -140,6 +154,7 @@ public class AppScriptService implements IAppScriptService {
     }
   }
 
+  @Override
   public String getScriptNameFromURL() {
     String scriptStr = "";
     if (isAppScriptRequest()) {
@@ -150,16 +165,18 @@ public class AppScriptService implements IAppScriptService {
     return scriptStr;
   }
 
+  @Override
   public boolean isAppScriptRequest() {
     // TODO exclude isOverlayRequest
     return isAppScriptXpageRequest() || isAppScriptActionRequest() || isAppScriptSpaceRequest()
         || isAppScriptOverwriteDocRef(getContext().getDoc().getDocumentReference());
   }
 
+  @Override
   public boolean isAppScriptOverwriteDocRef(DocumentReference docRef) {
     String overwriteAppDocs = getContext().getWiki().getXWikiPreference(
         APP_SCRIPT_XWPREF_OVERW_DOCS, APP_SCRIPT_CONF_OVERW_DOCS, "-", getContext());
-    List<DocumentReference> overwAppDocList = new Vector<DocumentReference>();
+    List<DocumentReference> overwAppDocList = new Vector<>();
     if (!"-".equals(overwriteAppDocs)) {
       for (String overwAppDocFN : overwriteAppDocs.split("[, ]")) {
         try {

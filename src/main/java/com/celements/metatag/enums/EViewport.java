@@ -1,8 +1,5 @@
 package com.celements.metatag.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -10,7 +7,7 @@ import com.celements.common.ReverseMap;
 import com.celements.common.ValueGetter;
 import com.google.common.base.Optional;
 
-public enum EViewport implements ValueGetter<String>{
+public enum EViewport implements ValueGetter<String> {
   WIDTH("width"),
   HEIGHT("height"),
   INITIAL_SCALE("initial-scale"),
