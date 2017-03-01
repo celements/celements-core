@@ -10,11 +10,12 @@ import com.google.common.base.Optional;
 public enum ETwitter implements ValueGetter<String> {
 
   // the Twitter (https://dev.twitter.com/cards/markup). Add more if needed.
-  TWITTER_CARD("twitter:card"), TWITTER_SITE("twitter:site"), TWITTER_SITE_ID(
-      "twitter:site:id"), TWITTER_CREATOR("twitter:creator"), TWITTER_CREATOR_ID(
-          "twitter:creator:id"), TWITTER_DESCRIPTION("twitter:description"), // If missing, Twitter
-                                                                             // falls back to
-                                                                             // og:description
+  TWITTER_CARD("twitter:card"),
+  TWITTER_SITE("twitter:site"),
+  TWITTER_SITE_ID("twitter:site:id"),
+  TWITTER_CREATOR("twitter:creator"),
+  TWITTER_CREATOR_ID("twitter:creator:id"),
+  TWITTER_DESCRIPTION("twitter:description"), // If missing, Twitter falls back to og:description
   TWITTER_TITLE("twitter:title"), // If missing, Twitter falls back to og:title
   TWITTER_IMAGE("twitter:image"), // If missing, Twitter falls back to og:image
   TWITTER_IMAGE_ALT("twitter:image:alt");
