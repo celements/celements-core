@@ -40,9 +40,10 @@ public class RTEConfigTemplateService implements IRTEConfigTemplateRole {
     return (RTEConfigClasses) rteConfigClasses;
   }
 
+  @Override
   public List<BaseObject> getRTETemplateList() throws XWikiException {
     XWikiDocument doc = getContext().getDoc();
-    List<BaseObject> templateList = new ArrayList<BaseObject>();
+    List<BaseObject> templateList = new ArrayList<>();
 
     // Doc
     templateList = getTemplateListFromDoc(doc.getDocumentReference());

@@ -43,7 +43,7 @@ public class RenameCommand {
    * @return renamed pages
    */
   public List<String> renameSpace(String spaceName, String newSpaceName, XWikiContext context) {
-    ArrayList<String> renamedPages = new ArrayList<String>();
+    ArrayList<String> renamedPages = new ArrayList<>();
     try {
       for (String docName : context.getWiki().getSpaceDocsName(spaceName, context)) {
         String fullname = spaceName + "." + docName;
@@ -74,7 +74,7 @@ public class RenameCommand {
 
   /**
    * FOR TEST ONLY!!!!
-   * 
+   *
    * @param mockWebUtils
    */
   void inject_webUtils(IWebUtils mockWebUtils) {

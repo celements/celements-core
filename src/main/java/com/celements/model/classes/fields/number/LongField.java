@@ -3,8 +3,6 @@ package com.celements.model.classes.fields.number;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-
-
 @Immutable
 public final class LongField extends NumberField<Long> {
 

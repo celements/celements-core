@@ -32,6 +32,7 @@ public class EmptyCheckService implements IEmptyCheckRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public DocumentReference getNextNonEmptyChildren(DocumentReference documentRef) {
     DocumentReference nonEmptyChildRef = new NextNonEmptyChildrenCommand().getNextNonEmptyChildren(
         documentRef);
@@ -41,6 +42,7 @@ public class EmptyCheckService implements IEmptyCheckRole {
     return documentRef;
   }
 
+  @Override
   public boolean isEmptyRTEDocument(DocumentReference docRef) {
     boolean isEmptyRTEdoc = true;
     for (String checkImplName : getCheckImplNamesConfig()) {
@@ -56,6 +58,7 @@ public class EmptyCheckService implements IEmptyCheckRole {
     return isEmptyRTEdoc;
   }
 
+  @Override
   public boolean isEmptyDocument(DocumentReference docRef) {
     boolean isEmptyRTEdoc = true;
     for (String checkImplName : getCheckImplNamesConfig()) {

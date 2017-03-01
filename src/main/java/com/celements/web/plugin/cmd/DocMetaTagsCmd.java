@@ -34,7 +34,7 @@ public class DocMetaTagsCmd {
     Map<String, Map<String, String>> metaTagsLangMap = getObjectsMappedByLanguage("Classes.MetaTag",
         context);
     mergeMetaTagClassObjs(metaTagsLangMap, context);
-    Map<String, String> metaTags = new HashMap<String, String>();
+    Map<String, String> metaTags = new HashMap<>();
     if (metaTagsLangMap.get(defaultLanguage) != null) {
       // get default language meta keys
       metaTags.putAll(metaTagsLangMap.get(defaultLanguage));
@@ -58,7 +58,7 @@ public class DocMetaTagsCmd {
 
   private Map<String, Map<String, String>> getObjectsMappedByLanguage(String className,
       XWikiContext context) {
-    Map<String, Map<String, String>> metaTagsLangMap = new HashMap<String, Map<String, String>>();
+    Map<String, Map<String, String>> metaTagsLangMap = new HashMap<>();
     Vector metaTagObjects = context.getDoc().getObjects(className);
     if (metaTagObjects != null) {
       for (java.lang.Object entry : metaTagObjects) {

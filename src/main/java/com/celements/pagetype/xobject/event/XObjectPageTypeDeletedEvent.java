@@ -43,7 +43,7 @@ public class XObjectPageTypeDeletedEvent extends AbstractDocumentEvent {
    * Constructor initializing the event filter with a
    * {@link org.xwiki.observation.event.filter.FixedNameEventFilter}, meaning that this
    * event will match only delete events affecting the same document.
-   * 
+   *
    * @param documentReference
    *          the reference of the document to match
    */
@@ -53,7 +53,7 @@ public class XObjectPageTypeDeletedEvent extends AbstractDocumentEvent {
 
   /**
    * Constructor using a custom {@link EventFilter}.
-   * 
+   *
    * @param eventFilter
    *          the filter to use for matching events
    */

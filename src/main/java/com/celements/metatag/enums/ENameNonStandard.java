@@ -9,8 +9,12 @@ import com.google.common.base.Optional;
 
 public enum ENameNonStandard implements ValueGetter<String> {
 
-  CREATOR("creator"), GOOGLEBOT("googlebot"), PUBLISHER("publisher"), ROBOTS("robots"), SLURP(
-      "slurp"), VIEWPORT("viewport");
+  CREATOR("creator"),
+  GOOGLEBOT("googlebot"),
+  PUBLISHER("publisher"),
+  ROBOTS("robots"),
+  SLURP("slurp"),
+  VIEWPORT("viewport");
 
   public final static String ATTRIB_NAME = ENameStandard.ATTRIB_NAME;
   public final static String ATTRIB_NAME_ALT = ENameStandard.ATTRIB_NAME_ALT;

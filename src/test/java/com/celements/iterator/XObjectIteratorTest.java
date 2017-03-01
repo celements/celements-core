@@ -62,7 +62,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _testDoc = new XWikiDocument(_docRef);
     _docRef2 = new DocumentReference(_context.getDatabase(), "Test", "Doc2");
     _testDoc2 = new XWikiDocument(_docRef2);
-    _docList = new ArrayList<String>();
+    _docList = new ArrayList<>();
   }
 
   @Test
@@ -221,7 +221,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   public void testHasNext_true() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -243,7 +243,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   public void testHasNext_false() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -261,7 +261,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _iterator.setClassName(null);
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -282,7 +282,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   public void testNext_allObjOneDoc() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -304,7 +304,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname);
     String fullname2 = "Test.Doc2";
     _docList.add(fullname2);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -313,7 +313,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
     expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
-    Vector<BaseObject> testObjs2 = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs2 = new Vector<>();
     BaseObject firstObj2 = new BaseObject();
     firstObj2.setXClassReference(_testClassRef);
     testObjs2.add(firstObj2);
@@ -340,7 +340,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname);
     String fullname2 = "Test.Doc2";
     _docList.add(fullname2);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -387,7 +387,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _iterator.setClassName(null);
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -423,7 +423,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _docList.add(fullname);
     String fullname2 = "Test.Doc2";
     _docList.add(fullname2);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -433,7 +433,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     testObjs.add(secondObj);
     _testDoc.setXObjects(_testClassRef, testObjs);
     expect(_xwiki.getDocument(eq(_docRef), same(_context))).andReturn(_testDoc).anyTimes();
-    Vector<BaseObject> testObjs2 = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs2 = new Vector<>();
     BaseObject firstObj2 = new BaseObject();
     firstObj2.setXClassReference(_testClassRef);
     testObjs.add(firstObj2);
@@ -474,7 +474,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
   public void testIterator_foreach() throws Exception {
     String fullname = "Test.Doc";
     _docList.add(fullname);
-    Vector<BaseObject> testObjs = new Vector<BaseObject>();
+    Vector<BaseObject> testObjs = new Vector<>();
     BaseObject firstObj = new BaseObject();
     firstObj.setXClassReference(_testClassRef);
     testObjs.add(firstObj);
@@ -489,7 +489,7 @@ public class XObjectIteratorTest extends AbstractBridgedComponentTestCase {
     _iterator.setDocList(_docList);
     replay(_xwiki);
     int count = 0;
-    Vector<BaseObject> resultObjs = new Vector<BaseObject>();
+    Vector<BaseObject> resultObjs = new Vector<>();
     for (BaseObject obj : _iterator) {
       resultObjs.add(obj);
       count++;

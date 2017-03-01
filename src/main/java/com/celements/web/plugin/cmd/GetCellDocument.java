@@ -45,7 +45,7 @@ public class GetCellDocument {
   public XWikiDocument getCellDoc(String layoutSpace, String className, String field, String value,
       XWikiContext context) {
     String hql = getHql();
-    List<String> argsList = new ArrayList<String>();
+    List<String> argsList = new ArrayList<>();
     argsList.add(layoutSpace);
     argsList.add(className);
     argsList.add(field);

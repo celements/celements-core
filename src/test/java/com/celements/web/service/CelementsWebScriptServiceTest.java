@@ -3,7 +3,7 @@ package com.celements.web.service;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -80,19 +80,19 @@ public class CelementsWebScriptServiceTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetLocal() {
-    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal("de"));
+    java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("de"));
     assertEquals("12.312.312", formater.format(12312312L));
   }
 
   @Test
   public void testGetLocal_country() {
-    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal("de", "ch"));
+    java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("de", "ch"));
     assertEquals("12'312'312", formater.format(12312312L));
   }
 
   @Test
   public void testGetLocal_country_illegal_combination() {
-    java.text.NumberFormat formater = DecimalFormat.getInstance(celWebService.getLocal("en", "ch"));
+    java.text.NumberFormat formater = NumberFormat.getInstance(celWebService.getLocal("en", "ch"));
     assertEquals("12,312,312", formater.format(12312312L));
   }
 

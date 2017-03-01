@@ -68,6 +68,7 @@ public class OldCoreLegacyClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "oldCoreLegacyClasses";
   }

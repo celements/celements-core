@@ -46,9 +46,10 @@ public class ActionFilterFBHack implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see Filter#init(FilterConfig)
    */
+  @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     LOG.debug("init ActionFilterFBHack");
     this.servletContext = filterConfig.getServletContext();
@@ -56,15 +57,16 @@ public class ActionFilterFBHack implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
    */
+  @Override
   @SuppressWarnings("unchecked")
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     // Only HTTP requests can be dispatched.
     LOG.debug("starting doFilter in ActionFilterFBHack");
-    if (request instanceof HttpServletRequest && !Boolean.valueOf((String) request.getAttribute(
+    if ((request instanceof HttpServletRequest) && !Boolean.valueOf((String) request.getAttribute(
         ATTRIBUTE_ACTION_DISPATCHED))) {
       HttpServletRequest hrequest = (HttpServletRequest) request;
       Enumeration<String> parameterNames = hrequest.getParameterNames();
@@ -103,9 +105,10 @@ public class ActionFilterFBHack implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see Filter#destroy()
    */
+  @Override
   public void destroy() {
     // No finalization needed.
   }
@@ -116,7 +119,7 @@ public class ActionFilterFBHack implements Filter {
    * {@link HttpServletRequest#getRequestDispatcher(String)}. For example, calling this
    * method with a request for <tt>/xwiki/bin/edit/Some/Document</tt> and
    * <tt>action_save</tt>, the result is <tt>/bin/save/Some/Document</tt>.
-   * 
+   *
    * @param request
    *          the original request
    * @param action

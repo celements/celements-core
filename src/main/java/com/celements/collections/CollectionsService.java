@@ -14,6 +14,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class CollectionsService implements ICollectionsService {
 
+  @Override
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField, boolean asc) {
     return getObjectsOrdered(doc, classRef, orderField, asc, null, false);
@@ -21,7 +22,7 @@ public class CollectionsService implements ICollectionsService {
 
   /**
    * Get a list of Objects for a Document sorted by one or two fields.
-   * 
+   *
    * @param doc
    *          The Document where the Objects are attached.
    * @param classRef
@@ -36,9 +37,10 @@ public class CollectionsService implements ICollectionsService {
    *          Order second priority ascending or descending.
    * @return List of objects ordered as specified
    */
+  @Override
   public List<BaseObject> getObjectsOrdered(XWikiDocument doc, DocumentReference classRef,
       String orderField1, boolean asc1, String orderField2, boolean asc2) {
-    List<BaseObject> resultList = new ArrayList<BaseObject>();
+    List<BaseObject> resultList = new ArrayList<>();
     if (doc != null) {
       List<BaseObject> allObjects = doc.getXObjects(classRef);
       if (allObjects != null) {

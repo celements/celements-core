@@ -27,9 +27,10 @@ public class AttachmentAscendingChangeDateComparator implements Comparator<Attac
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
+  @Override
   public int compare(Attachment attachmentOne, Attachment attachmentTwo) {
     return attachmentOne.getDate().compareTo(attachmentTwo.getDate());
   }

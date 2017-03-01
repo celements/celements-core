@@ -34,10 +34,10 @@ public class QueryExecutionServiceTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testExecuteWriteHQL() throws Exception {
     String hql = "someHQL";
-    Map<String, Object> binds = new HashMap<String, Object>();
+    Map<String, Object> binds = new HashMap<>();
     binds.put("key", "someVal");
     int ret = 5;
-    Capture<HibernateCallback<Integer>> hibCallbackCapture = new Capture<HibernateCallback<Integer>>();
+    Capture<HibernateCallback<Integer>> hibCallbackCapture = new Capture<>();
 
     expect(storeMock.executeWrite(same(getContext()), eq(true), capture(
         hibCallbackCapture))).andReturn(ret).once();
@@ -57,7 +57,7 @@ public class QueryExecutionServiceTest extends AbstractBridgedComponentTestCase 
   @SuppressWarnings("unchecked")
   public void testExecuteWriteHQL_otherWiki() throws Exception {
     String hql = "someHQL";
-    Map<String, Object> binds = new HashMap<String, Object>();
+    Map<String, Object> binds = new HashMap<>();
     binds.put("key", "someVal");
     WikiReference wikiRef = new WikiReference("otherdb");
     int ret = 5;
@@ -81,7 +81,7 @@ public class QueryExecutionServiceTest extends AbstractBridgedComponentTestCase 
   @SuppressWarnings("unchecked")
   public void testExecuteWriteHQL_XWE() throws Exception {
     String hql = "someHQL";
-    Map<String, Object> binds = new HashMap<String, Object>();
+    Map<String, Object> binds = new HashMap<>();
     WikiReference wikiRef = new WikiReference("otherdb");
     Throwable cause = new XWikiException();
 

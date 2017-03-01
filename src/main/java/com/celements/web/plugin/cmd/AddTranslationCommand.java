@@ -40,7 +40,7 @@ public class AddTranslationCommand {
    * Adds a Translation document in given language if it does not already exist. The
    * document must already be created in the default language. If the Translation already
    * exists, the Translation flag is forced to 1 anyhow.
-   * 
+   *
    * @param docRef
    * @param language
    * @return isNew for translation document
@@ -77,7 +77,7 @@ public class AddTranslationCommand {
    * Adds a Translation document in given language if it does not already exist. The
    * document must already be created in the default language. If the Translation already
    * exists, the Translation flag is forced to 1 anyhow.
-   * 
+   *
    * @param fullName
    * @param language
    * @param context
@@ -92,7 +92,7 @@ public class AddTranslationCommand {
 
   /**
    * Details of this methods are taken from XWiki's SaveAction
-   * 
+   *
    * @param mainDoc
    * @param language
    * @return

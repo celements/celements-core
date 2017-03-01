@@ -27,6 +27,7 @@ public class MenuAccessService implements IMenuAccessServiceRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public boolean hasview(DocumentReference menuBarDocRef) {
     if (accessProviderMap != null) {
       boolean hasview = false;

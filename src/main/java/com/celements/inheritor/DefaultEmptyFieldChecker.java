@@ -27,6 +27,7 @@ import com.xpn.xwiki.objects.NumberProperty;
 
 public class DefaultEmptyFieldChecker implements IEmptyFieldChecker {
 
+  @Override
   final public boolean isEmpty(BaseProperty property) {
     if ((property != null) && (property.getValue() != null)) {
       if (property instanceof BaseStringProperty) {
@@ -45,19 +46,23 @@ public class DefaultEmptyFieldChecker implements IEmptyFieldChecker {
     return true;
   }
 
+  @Override
   public boolean isEmptyString(BaseStringProperty property) {
     return property.getValue().equals("");
   }
 
+  @Override
   public boolean isEmptyNumber(NumberProperty property) {
     return (property.getValue().toString().equals("0") || property.getValue().toString().equals(
         "0.0"));
   }
 
+  @Override
   public boolean isEmptyDate(DateProperty property) {
     return (property.getValue() == null);
   }
 
+  @Override
   public boolean isEmptyList(ListProperty property) {
     return (property.getList().size() == 0);
   }

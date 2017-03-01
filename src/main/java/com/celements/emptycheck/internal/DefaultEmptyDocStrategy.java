@@ -28,10 +28,12 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public boolean isEmptyRTEDocument(DocumentReference docRef) {
     return isEmptyRTEDocumentDefault(docRef) && isEmptyRTEDocumentTranslated(docRef);
   }
 
+  @Override
   public boolean isEmptyDocument(DocumentReference docRef) {
     return isEmptyDocumentDefault(docRef) && isEmptyDocumentTranslated(docRef);
   }
@@ -39,6 +41,7 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
   /**
    * check if content of default language version for docRef is empty
    */
+  @Override
   public boolean isEmptyRTEDocumentDefault(DocumentReference docRef) {
     try {
       return isEmptyRTEDocument(getContext().getWiki().getDocument(docRef, getContext()));
@@ -52,6 +55,7 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
   /**
    * check if content of translated (context.language) version for docRef is empty
    */
+  @Override
   public boolean isEmptyRTEDocumentTranslated(DocumentReference docRef) {
     try {
       return isEmptyRTEDocument(getContext().getWiki().getDocument(docRef,
@@ -62,15 +66,18 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     return true;
   }
 
+  @Override
   public boolean isEmptyRTEDocument(XWikiDocument localdoc) {
     return isEmptyRTEString(localdoc.getContent());
   }
 
+  @Override
   public boolean isEmptyRTEString(String rteContent) {
     return "".equals(rteContent.replaceAll(
         "(<p>)?(<span.*?>)?(\\s*(&nbsp;|<br\\s*/>))*\\s*(</span>)?(</p>)?", "").trim());
   }
 
+  @Override
   public boolean isEmptyDocumentDefault(DocumentReference docRef) {
     try {
       return isEmptyDocument(getContext().getWiki().getDocument(docRef, getContext()));
@@ -80,6 +87,7 @@ public class DefaultEmptyDocStrategy implements IEmptyDocStrategyRole,
     return true;
   }
 
+  @Override
   public boolean isEmptyDocumentTranslated(DocumentReference docRef) {
     try {
       return isEmptyDocument(getContext().getWiki().getDocument(docRef,

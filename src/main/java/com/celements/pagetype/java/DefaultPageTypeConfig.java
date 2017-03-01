@@ -62,7 +62,7 @@ public class DefaultPageTypeConfig implements IPageTypeConfig {
 
   @Override
   public List<String> getCategories() {
-    return new ArrayList<String>(pageTypeImpl.getCategoryNames());
+    return new ArrayList<>(pageTypeImpl.getCategoryNames());
   }
 
   @Override

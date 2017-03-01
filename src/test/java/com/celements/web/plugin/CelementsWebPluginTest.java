@@ -62,11 +62,11 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     context.setWiki(xwiki);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<String>();
+    List<String> userDocs = new Vector<>();
     userDocs.add("Doc.Fullname");
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<String>();
-    Capture<List<?>> captParams = new Capture<List<?>>();
+    Capture<String> captHQL = new Capture<>();
+    Capture<List<?>> captParams = new Capture<>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).once();
     replay(xwiki, store);
@@ -84,12 +84,12 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     context.setWiki(xwiki);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<String>();
+    List<String> userDocs = new Vector<>();
     userDocs.add("Doc.Fullname");
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<String>();
-    Capture<String> captHQL2 = new Capture<String>();
-    Capture<List<?>> captParams = new Capture<List<?>>();
+    Capture<String> captHQL = new Capture<>();
+    Capture<String> captHQL2 = new Capture<>();
+    Capture<List<?>> captParams = new Capture<>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(new ArrayList<String>()).once();
     expect(store.searchDocumentsNames(capture(captHQL2), eq(0), eq(0), capture(captParams), same(
@@ -109,10 +109,10 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
     context.setWiki(xwiki);
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<String>();
+    List<String> userDocs = new Vector<>();
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<String>();
-    Capture<List<?>> captParams = new Capture<List<?>>();
+    Capture<String> captHQL = new Capture<>();
+    Capture<List<?>> captParams = new Capture<>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).times(2);
     replay(xwiki, store);
@@ -123,11 +123,11 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
   public void testCheckAuthByToken() throws XWikiException {
     XWikiStoreInterface store = createMock(XWikiStoreInterface.class);
     String userToken = "123456789012345678901234";
-    List<String> userDocs = new Vector<String>();
+    List<String> userDocs = new Vector<>();
     userDocs.add("Doc.Fullname");
     expect(xwiki.getStore()).andReturn(store).once();
-    Capture<String> captHQL = new Capture<String>();
-    Capture<List<?>> captParams = new Capture<List<?>>();
+    Capture<String> captHQL = new Capture<>();
+    Capture<List<?>> captParams = new Capture<>();
     expect(store.searchDocumentsNames(capture(captHQL), eq(0), eq(0), capture(captParams), same(
         context))).andReturn(userDocs).once();
     replay(xwiki, store);
@@ -166,7 +166,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsFormFilled_false() {
-    Map<String, String[]> map = new HashMap<String, String[]>();
+    Map<String, String[]> map = new HashMap<>();
     map.put("xpage", new String[] { "celements_ajax", "underlay", "overlay" });
     map.put("conf", new String[] { "OverlayConfig" });
     map.put("language", new String[] { "de" });
@@ -175,7 +175,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsFormFilled_true() {
-    Map<String, String[]> map = new HashMap<String, String[]>();
+    Map<String, String[]> map = new HashMap<>();
     map.put("name", new String[] { "My Name" });
     map.put("xpage", new String[] { "celements_ajax", "underlay", "overlay" });
     map.put("conf", new String[] { "OverlayConfig" });
@@ -185,7 +185,7 @@ public class CelementsWebPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIsFormFilled_true_oneParam() {
-    Map<String, String[]> map = new HashMap<String, String[]>();
+    Map<String, String[]> map = new HashMap<>();
     map.put("search", new String[] { "Search Term" });
     assertTrue(plugin.isFormFilled(map, null));
   }

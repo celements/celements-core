@@ -27,7 +27,10 @@ import com.xpn.xwiki.web.Utils;
 public class EnumListFieldTest extends AbstractComponentTest {
 
   private enum TestEnum {
-    A, B, C, D;
+    A,
+    B,
+    C,
+    D;
   }
 
   private EnumListField.Builder<TestEnum> fieldBuilder;

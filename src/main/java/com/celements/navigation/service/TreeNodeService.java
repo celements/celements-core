@@ -184,7 +184,7 @@ public class TreeNodeService implements ITreeNodeService {
   @Override
   public <T> List<TreeNode> getSubNodesForParent(EntityReference entRef, INavFilter<T> filter) {
     LOGGER.trace("getSubNodesForParent: entRef {}] filter class [{}].", entRef, filter.getClass());
-    ArrayList<TreeNode> menuArray = new ArrayList<TreeNode>();
+    ArrayList<TreeNode> menuArray = new ArrayList<>();
     for (TreeNode node : fetchNodesForParentKey(entRef)) {
       if ((node != null) && filter.includeTreeNode(node, getContext())) {
         // show only Menuitems of pages accessible to the current user
@@ -232,7 +232,7 @@ public class TreeNodeService implements ITreeNodeService {
     long start = System.currentTimeMillis();
     List<TreeNode> nodes = fetchNodesForParentKey_internal(parentKey, starttotal, start);
     if ((nodeProviders != null) && (nodeProviders.values().size() > 0)) {
-      TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<Integer, TreeNode>();
+      TreeMap<Integer, TreeNode> treeNodesMergedMap = new TreeMap<>();
       for (TreeNode node : nodes) {
         treeNodesMergedMap.put(node.getPosition(), node);
       }
@@ -246,7 +246,7 @@ public class TreeNodeService implements ITreeNodeService {
               tnProvider.getClass(), parentKey, exp);
         }
       }
-      nodes = new ArrayList<TreeNode>(treeNodesMergedMap.values());
+      nodes = new ArrayList<>(treeNodesMergedMap.values());
       long end = System.currentTimeMillis();
       LOGGER.info("fetchNodesForParentKey: [{}] totaltime for list of [{}]: {}", parentKey,
           nodes.size(), (end - starttotal));
@@ -282,7 +282,7 @@ public class TreeNodeService implements ITreeNodeService {
     } else {
       // TODO refactor GetNotMappedMenuItemsForParentCommand and
       // TODO GetMappedMenuItemsForParentCommandas to ITreeNodeProvider
-      menuItemsMergedMap = new TreeMap<Integer, TreeNode>();
+      menuItemsMergedMap = new TreeMap<>();
       for (TreeNode node : notMappedmenuItems) {
         menuItemsMergedMap.put(node.getPosition(), node);
       }
@@ -292,7 +292,7 @@ public class TreeNodeService implements ITreeNodeService {
       end = System.currentTimeMillis();
       LOGGER.debug("fetchNodesForParentKey_internal: time for merging menu items: {}", (end
           - start));
-      ArrayList<TreeNode> menuItems = new ArrayList<TreeNode>(menuItemsMergedMap.values());
+      ArrayList<TreeNode> menuItems = new ArrayList<>(menuItemsMergedMap.values());
       LOGGER.info("fetchNodesForParentKey_internal: [{}] totaltime for list of [{}]: {}", parentKey,
           menuItems.size(), (end - starttotal));
       return menuItems;
@@ -308,7 +308,7 @@ public class TreeNodeService implements ITreeNodeService {
   @Deprecated
   List<BaseObject> fetchMenuItemsForXWiki(String parentKey) {
     long starttotal = System.currentTimeMillis();
-    List<BaseObject> menuItemList = new ArrayList<BaseObject>();
+    List<BaseObject> menuItemList = new ArrayList<>();
     EntityReference refParent = resolveEntityReference(parentKey);
     for (TreeNode node : fetchNodesForParentKey(refParent)) {
       try {
@@ -377,7 +377,7 @@ public class TreeNodeService implements ITreeNodeService {
       menuSpace = getContext().getDoc().getSpace();
     }
     String parentKey = getParentKey(parent, menuSpace);
-    ArrayList<T> menuArray = new ArrayList<T>();
+    ArrayList<T> menuArray = new ArrayList<>();
     for (BaseObject baseObj : fetchMenuItemsForXWiki(parentKey)) {
       if (filter.includeMenuItem(baseObj, getContext())) {
         // show only Menuitems of pages accessible to the current user
@@ -389,7 +389,7 @@ public class TreeNodeService implements ITreeNodeService {
 
   @Override
   public Integer getMaxConfiguredNavigationLevel() {
-    List<BaseObject> navConfigObjects = new Vector<BaseObject>();
+    List<BaseObject> navConfigObjects = new Vector<>();
     List<BaseObject> navConfigDocsObjs = getNavObjectsOnConfigDocs();
     if (navConfigDocsObjs != null) {
       navConfigObjects.addAll(navConfigDocsObjs);
@@ -412,14 +412,14 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   List<BaseObject> getNavObjectsFromLayout() {
-    List<BaseObject> navObjects = new Vector<BaseObject>();
+    List<BaseObject> navObjects = new Vector<>();
     SpaceReference layoutRef = getPageLayoutCmd().getPageLayoutForCurrentDoc();
     if (layoutRef != null) {
       XObjectIterator objectIterator = new XObjectIterator(getContext());
-      List<String> layoutCellList = new Vector<String>();
+      List<String> layoutCellList = new Vector<>();
       List<TreeNode> subNodesForParent = getSubNodesForParent(layoutRef, "");
       while (!subNodesForParent.isEmpty()) {
-        List<TreeNode> newSubNodes = new Vector<TreeNode>();
+        List<TreeNode> newSubNodes = new Vector<>();
         for (TreeNode node : subNodesForParent) {
           List<TreeNode> subNodes = getSubNodesForParent(node.getDocumentReference(), "");
           newSubNodes.addAll(subNodes);
@@ -508,7 +508,7 @@ public class TreeNodeService implements ITreeNodeService {
       return submenuItems;
     }
     LOGGER.debug("parent is null");
-    return new ArrayList<TreeNode>();
+    return new ArrayList<>();
   }
 
   @Override
@@ -585,10 +585,10 @@ public class TreeNodeService implements ITreeNodeService {
   }
 
   ArrayList<TreeNode> moveTreeNodeAfter(TreeNode moveTreeNode, TreeNode insertAfterTreeNode) {
-    List<TreeNode> treeNodes = new ArrayList<TreeNode>(fetchNodesForParentKey(
+    List<TreeNode> treeNodes = new ArrayList<>(fetchNodesForParentKey(
         moveTreeNode.getParentRef()));
     treeNodes.remove(moveTreeNode);
-    ArrayList<TreeNode> newTreeNodes = new ArrayList<TreeNode>();
+    ArrayList<TreeNode> newTreeNodes = new ArrayList<>();
     int splitPos = 0;
     int maxPos = treeNodes.size();
     if (insertAfterTreeNode != null) {

@@ -1246,7 +1246,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public Map<String, String> validateRequest() {
-    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, String> ret = new HashMap<>();
     Map<String, Map<ValidationType, Set<String>>> validateMap = getScriptService().validateRequest();
     for (String key : validateMap.keySet()) {
       Set<String> set = validateMap.get(key).get(ValidationType.ERROR);
@@ -1587,7 +1587,7 @@ public class CelementsWebPluginApi extends Api {
    */
   @Deprecated
   public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible) {
-    return new GetPageTypesCommand().getPageTypesForCategories(new HashSet<String>(catList),
+    return new GetPageTypesCommand().getPageTypesForCategories(new HashSet<>(catList),
         onlyVisible, context);
   }
 

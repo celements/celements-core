@@ -10,6 +10,7 @@ import org.xwiki.component.annotation.Component;
 @Deprecated
 public class XHTMLtoHTML5cleanup implements IXHTMLtoHTML5cleanup {
 
+  @Override
   @Deprecated
   public String cleanAll(String xhtml) {
     String html5 = removeSelfclosingTags(xhtml);

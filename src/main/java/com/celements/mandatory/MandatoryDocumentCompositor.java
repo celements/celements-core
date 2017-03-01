@@ -66,8 +66,8 @@ public class MandatoryDocumentCompositor implements IMandatoryDocumentCompositor
   }
 
   List<String> getMandatoryDocumentsList() {
-    Collection<String> mandatoryDocElemKeys = new ArrayList<String>(mandatoryDocumentsMap.keySet());
-    List<String> mandatoryDocExecList = new Vector<String>();
+    Collection<String> mandatoryDocElemKeys = new ArrayList<>(mandatoryDocumentsMap.keySet());
+    List<String> mandatoryDocExecList = new Vector<>();
     do {
       for (String mandatoryDocElemKey : mandatoryDocElemKeys) {
         if (mandatoryDocExecList.containsAll(mandatoryDocumentsMap.get(

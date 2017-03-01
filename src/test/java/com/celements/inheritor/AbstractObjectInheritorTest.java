@@ -173,7 +173,7 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
 
   @Test
   public void testGetListValue_isNull() {
-    List<String> mylist = new ArrayList<String>();
+    List<String> mylist = new ArrayList<>();
     assertEquals(null, _testInheritor.getListValue("myField"));
     assertEquals(mylist, _testInheritor.getListValue("myField", mylist));
   }
@@ -181,7 +181,7 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
   @Test
   public void testGetListValue() {
     BaseCollection testColl = createMock(BaseCollection.class);
-    List<String> mylist = new ArrayList<String>();
+    List<String> mylist = new ArrayList<>();
     expect(testColl.getListValue(eq("myField"))).andReturn(mylist).anyTimes();
     _testInheritor.injectBaseColl(testColl);
     replay(testColl);
@@ -211,6 +211,7 @@ public class AbstractObjectInheritorTest extends AbstractBridgedComponentTestCas
   private IIteratorFactory<XObjectIterator> getTestIteratorFactory(final List<String> docList) {
     return new IIteratorFactory<XObjectIterator>() {
 
+      @Override
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(getContext());
         iterator.setClassName("myTestClass");

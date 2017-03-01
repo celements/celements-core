@@ -40,13 +40,13 @@ public class ListUtilsTest {
 
   @Test
   public void testImplode_empty() {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     assertEquals("", ListUtils.implode(list, ", "));
   }
 
   @Test
   public void testImplode() {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     list.add("String 1");
     list.add("String 2");
     list.add("String 3");

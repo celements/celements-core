@@ -38,7 +38,7 @@ public class ListBuilder implements INavigationBuilder {
   @Override
   @Deprecated
   public void openLevel(String mainUlCSSClasses) {
-    openLevel(new LinkedHashSet<String>(Arrays.asList(StringUtils.split(mainUlCSSClasses, ' '))));
+    openLevel(new LinkedHashSet<>(Arrays.asList(StringUtils.split(mainUlCSSClasses, ' '))));
   }
 
   @Override
@@ -106,7 +106,7 @@ public class ListBuilder implements INavigationBuilder {
   public void appendMenuItemLink(String menuItemName, String hrefLink, String multilingualName,
       boolean isActive, boolean isLastItem, String cssClasses) {
     appendMenuItemLink(menuItemName, hrefLink, multilingualName, isActive, isLastItem,
-        new LinkedHashSet<String>(Arrays.asList(StringUtils.split(cssClasses, ' '))));
+        new LinkedHashSet<>(Arrays.asList(StringUtils.split(cssClasses, ' '))));
   }
 
   @Override

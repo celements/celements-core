@@ -33,6 +33,7 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation navigation) {
     try {
@@ -72,14 +73,17 @@ public class DefaultPresentationType implements IPresentationTypeRole {
     outStream.append(menuItemHTML);
   }
 
+  @Override
   public String getDefaultCssClass() {
     return _CEL_CM_NAV_MI_DEFAULT_CSSCLASS;
   }
 
+  @Override
   public String getEmptyDictionaryKey() {
     return "cel_nav_nomenuitems";
   }
 
+  @Override
   public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
     return null;
   }

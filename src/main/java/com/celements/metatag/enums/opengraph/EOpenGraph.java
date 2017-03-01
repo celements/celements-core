@@ -1,8 +1,5 @@
 package com.celements.metatag.enums.opengraph;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -10,7 +7,7 @@ import com.celements.common.ReverseMap;
 import com.celements.common.ValueGetter;
 import com.google.common.base.Optional;
 
-public enum EOpenGraph implements ValueGetter<String>{
+public enum EOpenGraph implements ValueGetter<String> {
 
   // There are a lot more properties in the open graph protocol (see http://ogp.me/) as well as in
   OPENGRAPH_TITLE("og:title"),
@@ -28,8 +25,9 @@ public enum EOpenGraph implements ValueGetter<String>{
   OPENGRAPH_OPTIONAL_IMAGE_HEIGHT("og:image:height");
 
   public final static String ATTRIB_NAME = "property";
-  
-  private final static ReverseMap<EOpenGraph, String> ID_MAP = new ReverseMap<>(EOpenGraph.values());
+
+  private final static ReverseMap<EOpenGraph, String> ID_MAP = new ReverseMap<>(
+      EOpenGraph.values());
 
   private final String identifier;
 

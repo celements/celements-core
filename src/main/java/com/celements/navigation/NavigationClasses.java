@@ -103,6 +103,7 @@ public class NavigationClasses extends AbstractClassCollection {
   @Requirement
   INavigationClassConfig navClassCfg;
 
+  @Override
   public String getConfigName() {
     return "celNavigationClasses";
   }

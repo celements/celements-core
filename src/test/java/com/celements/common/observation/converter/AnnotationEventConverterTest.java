@@ -184,7 +184,7 @@ public class AnnotationEventConverterTest extends AbstractComponentTest {
   @Test
   public void test_unserializeSource_XWikiDocument() {
     DocumentReference docRef = new DocumentReference("wiki", "space", "doc");
-    Map<String, Serializable> docMap = new HashMap<String, Serializable>();
+    Map<String, Serializable> docMap = new HashMap<>();
     docMap.put(AnnotationEventConverter.DOC_NAME, docRef);
     RemoteEventData remoteEvent = new RemoteEventData();
     remoteEvent.setSource((Serializable) docMap);

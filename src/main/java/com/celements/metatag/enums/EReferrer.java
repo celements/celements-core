@@ -1,8 +1,5 @@
 package com.celements.metatag.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 

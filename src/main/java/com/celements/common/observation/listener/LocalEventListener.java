@@ -24,6 +24,7 @@ public class LocalEventListener extends org.xwiki.observation.remote.internal.Lo
     return NAME;
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     if (event.getClass().isAnnotationPresent(Local.class)) {
       LOGGER.info("skipping local event '{}'", event.getClass());

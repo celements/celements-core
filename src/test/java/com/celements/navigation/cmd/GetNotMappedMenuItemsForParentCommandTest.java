@@ -158,7 +158,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     context.setDatabase("mydatabase");
     String searchParentKey = "mydatabase:MySpace.";
     String cacheKey = notMappedItemsCmd.getWikiCacheKey(searchParentKey);
-    HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
+    HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<>();
     List<TreeNode> expectedList = Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), null, 1), new TreeNode(new DocumentReference(
             context.getDatabase(), "MySpace", "MyDoc2"), null, 2));
@@ -189,7 +189,7 @@ public class GetNotMappedMenuItemsForParentCommandTest extends AbstractComponent
     context.setDatabase("mydatabase");
     String searchParentKey = "mydatabase:MySpace.MyDoc1";
     String cacheKey = notMappedItemsCmd.getWikiCacheKey(searchParentKey);
-    HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<String, List<TreeNode>>();
+    HashMap<String, List<TreeNode>> mySpaceMap = new HashMap<>();
     mySpaceMap.put("mydatabase:MySpace.", Arrays.asList(new TreeNode(new DocumentReference(
         context.getDatabase(), "MySpace", "MyDoc1"), null, 1), new TreeNode(new DocumentReference(
             context.getDatabase(), "MySpace", "MyDoc2"), null, 2)));

@@ -141,7 +141,7 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expect(mainDoc.getStore()).andReturn(mockStore).anyTimes();
     expect(mainDoc.getDefaultLanguage()).andReturn("de").anyTimes();
     expect(mainDoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(mainDoc);
-    Capture<XWikiDocument> transDocCapture = new Capture<XWikiDocument>();
+    Capture<XWikiDocument> transDocCapture = new Capture<>();
     xwiki.saveDocument(capture(transDocCapture), same(context));
     expectLastCall();
     context.setWiki(xwiki);
@@ -176,7 +176,7 @@ public class AddTranslationCommandTest extends AbstractBridgedComponentTestCase 
     expect(mainDoc.getStore()).andReturn(mockStore).anyTimes();
     expect(mainDoc.getDefaultLanguage()).andReturn("de").anyTimes();
     expect(mainDoc.getTranslatedDocument(eq("fr"), same(context))).andReturn(mainDoc);
-    Capture<XWikiDocument> transDocCapture = new Capture<XWikiDocument>();
+    Capture<XWikiDocument> transDocCapture = new Capture<>();
     xwiki.saveDocument(capture(transDocCapture), same(context));
     expectLastCall();
     context.setWiki(xwiki);

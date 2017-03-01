@@ -46,15 +46,18 @@ public class XObjectPageTypeCacheListener implements EventListener {
   @Requirement
   IWebUtilsService webUtilsService;
 
+  @Override
   public String getName() {
     return "XObjectPageTypeCacheListener";
   }
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.asList((Event) new XObjectPageTypeCreatedEvent(),
         (Event) new XObjectPageTypeDeletedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument document = (XWikiDocument) source;
     if (document != null) {

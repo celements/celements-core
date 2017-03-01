@@ -21,7 +21,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * <br>
  * Found top parents are repeatedly checked for it's own connected and unconnected parents
  * until no parent whatsoever is to be found.
- * 
+ *
  * @author Fabian Pichler
  * @author Marc Sladek
  */

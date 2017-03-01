@@ -28,7 +28,7 @@ public class ListUtils {
 
   /**
    * Provides a type safe substract for Lists.
-   * 
+   *
    * @param <T>
    * @param list1
    * @param list2

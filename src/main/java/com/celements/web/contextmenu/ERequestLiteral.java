@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /**
- * 
+ *
  */
 package com.celements.web.contextmenu;
 
@@ -26,11 +26,13 @@ import com.celements.sajson.ECommand;
 import com.celements.sajson.IGenericLiteral;
 
 public enum ERequestLiteral implements IGenericLiteral {
-  ELEMENT_ID(ECommand.VALUE_COMMAND), ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND,
-      ELEMENT_ID), ELEM_ID_KEY(ECommand.PROPERTY_COMMAND, ELEM_IDS_ARRAY), CSS_CLASS_NAME_VALUE(
-          ECommand.VALUE_COMMAND), CSS_CLASS_NAME(ECommand.PROPERTY_COMMAND,
-              CSS_CLASS_NAME_VALUE), CSS_CLASS(ECommand.DICTIONARY_COMMAND, CSS_CLASS_NAME,
-                  ELEM_ID_KEY), REQUEST_ARRAY(ECommand.ARRAY_COMMAND, CSS_CLASS);
+  ELEMENT_ID(ECommand.VALUE_COMMAND),
+  ELEM_IDS_ARRAY(ECommand.ARRAY_COMMAND, ELEMENT_ID),
+  ELEM_ID_KEY(ECommand.PROPERTY_COMMAND, ELEM_IDS_ARRAY),
+  CSS_CLASS_NAME_VALUE(ECommand.VALUE_COMMAND),
+  CSS_CLASS_NAME(ECommand.PROPERTY_COMMAND, CSS_CLASS_NAME_VALUE),
+  CSS_CLASS(ECommand.DICTIONARY_COMMAND, CSS_CLASS_NAME, ELEM_ID_KEY),
+  REQUEST_ARRAY(ECommand.ARRAY_COMMAND, CSS_CLASS);
 
   private ERequestLiteral[] literals;
   private ECommand command;
@@ -41,10 +43,12 @@ public enum ERequestLiteral implements IGenericLiteral {
     this.command = command;
   }
 
+  @Override
   public ECommand getCommand() {
     return command;
   }
 
+  @Override
   public IGenericLiteral getNextLiteral() {
     nextLiteral = nextLiteral + 1;
     if (nextLiteral > literals.length) {
@@ -53,11 +57,13 @@ public enum ERequestLiteral implements IGenericLiteral {
     return literals[nextLiteral - 1];
   }
 
+  @Override
   public IGenericLiteral getFirstLiteral() {
     nextLiteral = 1;
     return literals[0];
   }
 
+  @Override
   public IGenericLiteral getPropertyLiteralForKey(String key, IGenericLiteral placeholder) {
     return placeholder;
   }

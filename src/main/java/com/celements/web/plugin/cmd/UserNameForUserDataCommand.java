@@ -81,7 +81,7 @@ public class UserNameForUserDataCommand {
         if (context.getWiki().exists(login, context)) {
           userDoc = login;
         } else {
-          List<String> argsList = new ArrayList<String>();
+          List<String> argsList = new ArrayList<>();
           argsList.add(login.replaceAll("XWiki.", ""));
           List<XWikiDocument> docs = storage.searchDocuments("where lower(doc.name)=?", argsList,
               context);

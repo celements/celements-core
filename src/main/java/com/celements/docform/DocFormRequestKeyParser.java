@@ -25,7 +25,7 @@ public class DocFormRequestKeyParser {
 
   /**
    * Parses a given key string to {@link DocFormRequestKey} object
-   * 
+   *
    * @param key
    *          syntax: "[{fullName}_]{className}_[-|^]{objNb}_{fieldName}" whereas fullName
    *          is optional and objNb can be preceded by "-" to create or "^" to delete the
@@ -35,7 +35,7 @@ public class DocFormRequestKeyParser {
    * @return key or null
    */
   public DocFormRequestKey parse(String key, DocumentReference defaultDocRef) {
-    List<String> keyParts = new ArrayList<String>(Arrays.asList(key.split(KEY_DELIM)));
+    List<String> keyParts = new ArrayList<>(Arrays.asList(key.split(KEY_DELIM)));
     DocFormRequestKey ret;
     DocumentReference docRef = parseDocRef(keyParts, defaultDocRef);
     if (isWhiteListKey(keyParts)) {
@@ -136,14 +136,14 @@ public class DocFormRequestKeyParser {
   /**
    * Parses given key strings to {@link DocFormRequestKey} objects. See
    * {@link #parse(String, DocumentReference)}
-   * 
+   *
    * @param keys
    * @param defaultDocRef
    * @return list of keys with no null elements
    */
   public Collection<DocFormRequestKey> parse(Collection<String> keys,
       DocumentReference defaultDocRef) {
-    Collection<DocFormRequestKey> ret = new ArrayList<DocFormRequestKey>();
+    Collection<DocFormRequestKey> ret = new ArrayList<>();
     for (String keyString : keys) {
       if (StringUtils.isNotBlank(keyString)) {
         DocFormRequestKey key = parse(keyString, defaultDocRef);

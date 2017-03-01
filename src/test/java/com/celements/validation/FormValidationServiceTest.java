@@ -39,8 +39,8 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     requestValidationRuleMock2 = createMock(IRequestValidationRuleRole.class);
     fieldValidationRuleMock1 = createMock(IFieldValidationRuleRole.class);
     fieldValidationRuleMock2 = createMock(IFieldValidationRuleRole.class);
-    Map<String, IRequestValidationRuleRole> requestValidationRules = new HashMap<String, IRequestValidationRuleRole>();
-    Map<String, IFieldValidationRuleRole> fieldValidationRules = new HashMap<String, IFieldValidationRuleRole>();
+    Map<String, IRequestValidationRuleRole> requestValidationRules = new HashMap<>();
+    Map<String, IFieldValidationRuleRole> fieldValidationRules = new HashMap<>();
     requestValidationRules.put("mock1", requestValidationRuleMock1);
     requestValidationRules.put("mock2", requestValidationRuleMock2);
     fieldValidationRules.put("mock1", fieldValidationRuleMock1);
@@ -50,7 +50,7 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testValidateMap_valid() {
-    Map<String, String[]> requestMap = new HashMap<String, String[]>();
+    Map<String, String[]> requestMap = new HashMap<>();
     requestMap.put("asdf", new String[] { "1" });
     requestMap.put("qwer", new String[] { "2", "3" });
 
@@ -69,12 +69,12 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testValidateMap_invalid() {
-    Map<String, String[]> requestMap = new HashMap<String, String[]>();
+    Map<String, String[]> requestMap = new HashMap<>();
     requestMap.put("asdf", new String[] { "1" });
     requestMap.put("qwer", new String[] { "2", "3" });
     Map<String, Map<ValidationType, Set<String>>> map = getEmptyRetMap();
-    Map<ValidationType, Set<String>> innerMap = new HashMap<ValidationType, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<ValidationType, Set<String>> innerMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("invalid");
     innerMap.put(ValidationType.ERROR, set);
     map.put("asdf", innerMap);
@@ -102,25 +102,25 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testValidateMap_invalid_both() {
-    Map<String, String[]> requestMap = new HashMap<String, String[]>();
+    Map<String, String[]> requestMap = new HashMap<>();
     requestMap.put("asdf", new String[] { "1" });
     requestMap.put("qwer", new String[] { "2", "3" });
 
     Map<String, Map<ValidationType, Set<String>>> map1 = getEmptyRetMap();
-    Map<ValidationType, Set<String>> innerMap = new HashMap<ValidationType, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<ValidationType, Set<String>> innerMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("invalid1");
     innerMap.put(ValidationType.ERROR, set);
     map1.put("asdf", innerMap);
-    innerMap = new HashMap<ValidationType, Set<String>>();
-    set = new HashSet<String>();
+    innerMap = new HashMap<>();
+    set = new HashSet<>();
     set.add("invalid2");
     innerMap.put(ValidationType.ERROR, set);
     map1.put("qwer", innerMap);
 
     Map<String, Map<ValidationType, Set<String>>> map2 = getEmptyRetMap();
-    innerMap = new HashMap<ValidationType, Set<String>>();
-    set = new HashSet<String>();
+    innerMap = new HashMap<>();
+    set = new HashSet<>();
     set.add("invalid3");
     innerMap.put(ValidationType.ERROR, set);
     map2.put("qwer", innerMap);
@@ -178,8 +178,8 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     String className = "myClassName";
     String fieldName = "myFieldName";
     String value = "myValue";
-    Map<ValidationType, Set<String>> map = new HashMap<ValidationType, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<ValidationType, Set<String>> map = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("invalid");
     map.put(ValidationType.ERROR, set);
 
@@ -205,12 +205,12 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
     String className = "myClassName";
     String fieldName = "myFieldName";
     String value = "myValue";
-    Map<ValidationType, Set<String>> map1 = new HashMap<ValidationType, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<ValidationType, Set<String>> map1 = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("invalid1");
     map1.put(ValidationType.ERROR, set);
-    Map<ValidationType, Set<String>> map2 = new HashMap<ValidationType, Set<String>>();
-    set = new HashSet<String>();
+    Map<ValidationType, Set<String>> map2 = new HashMap<>();
+    set = new HashSet<>();
     set.add("invalid2");
     set.add("invalid3");
     map2.put(ValidationType.ERROR, set);
@@ -235,7 +235,7 @@ public class FormValidationServiceTest extends AbstractBridgedComponentTestCase 
   }
 
   private Map<String, Map<ValidationType, Set<String>>> getEmptyRetMap() {
-    return new HashMap<String, Map<ValidationType, Set<String>>>();
+    return new HashMap<>();
   }
 
   private void replayAll(Object... mocks) {

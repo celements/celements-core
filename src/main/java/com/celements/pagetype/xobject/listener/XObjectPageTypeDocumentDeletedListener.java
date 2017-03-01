@@ -56,14 +56,17 @@ public class XObjectPageTypeDocumentDeletedListener extends AbstractXObjectPageT
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public String getName() {
     return NAME;
   }
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.asList((Event) new DocumentDeletedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument document = getOrginialDocument(source);
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {

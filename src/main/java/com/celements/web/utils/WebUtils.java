@@ -125,6 +125,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeCache
    */
+  @Override
   @Deprecated
   public int queryCount() {
     return getTreeNodeCache().queryCount();
@@ -133,6 +134,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeCache
    */
+  @Override
   @Deprecated
   public void flushMenuItemCache(XWikiContext context) {
     LOGGER.info("flushMenuItemCache called. Do not call flushMenuItemCache for MenuItem "
@@ -143,10 +145,11 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public List<String> getDocumentParentsList(String fullName, boolean includeDoc,
       XWikiContext context) {
-    ArrayList<String> docParents = new ArrayList<String>();
+    ArrayList<String> docParents = new ArrayList<>();
     try {
       String nextParent;
       if (includeDoc) {
@@ -173,6 +176,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use EmptyCheckCommand
    */
+  @Override
   @Deprecated
   public boolean isEmptyRTEDocument(XWikiDocument localdoc) {
     return isEmptyRTEString(localdoc.getContent());
@@ -181,6 +185,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use EmptyCheckCommand
    */
+  @Override
   @Deprecated
   public boolean isEmptyRTEString(String rteContent) {
     return new EmptyCheckCommand().isEmptyRTEString(rteContent);
@@ -189,6 +194,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
+  @Override
   @Deprecated
   public int getActiveMenuItemPos(int menuLevel, String menuPart, XWikiContext context) {
     return getTreeNodeService().getActiveMenuItemPos(menuLevel, menuPart);
@@ -197,6 +203,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
+  @Override
   @Deprecated
   public int getMenuItemPos(String fullName, String menuPart, XWikiContext context) {
     return getTreeNodeService().getMenuItemPos(getRef(fullName), menuPart);
@@ -205,6 +212,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService.getSubNodesForParent
    */
+  @Override
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getSubMenuItemsForParent(String parent, String menuSpace,
       String menuPart, XWikiContext context) {
@@ -216,6 +224,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
+  @Override
   @Deprecated
   public List<BaseObject> getSubMenuItemsForParent_internal(String parent, String menuSpace,
       String menuPart, XWikiContext context) {
@@ -227,6 +236,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
+  @Override
   @Deprecated
   public List<TreeNode> getSubNodesForParent(String parent, String menuSpace, String menuPart,
       XWikiContext context) {
@@ -236,6 +246,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 use getSubNodesForParent instead
    */
+  @Override
   @Deprecated
   public <T> List<T> getSubMenuItemsForParent(String parent, String menuSpace, INavFilter<T> filter,
       XWikiContext context) {
@@ -245,6 +256,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use TreeNodeService directly
    */
+  @Override
   @Deprecated
   public <T> List<TreeNode> getSubNodesForParent(String parent, String menuSpace,
       INavFilter<T> filter, XWikiContext context) {
@@ -254,6 +266,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
+  @Override
   @Deprecated
   public List<com.xpn.xwiki.api.Object> getMenuItemsForHierarchyLevel(int menuLevel,
       String menuPart, XWikiContext context) {
@@ -265,12 +278,13 @@ public class WebUtils implements IWebUtils {
       return submenuItems;
     }
     LOGGER.debug("parent is null");
-    return new ArrayList<com.xpn.xwiki.api.Object>();
+    return new ArrayList<>();
   }
 
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getParentForLevel(int menuLevel, XWikiContext context) {
     String parent = null;
@@ -279,7 +293,7 @@ public class WebUtils implements IWebUtils {
     } else {
       List<String> parentList = getDocumentParentsList(context.getDoc().getFullName(), true,
           context);
-      int startAtItem = parentList.size() - menuLevel + 1;
+      int startAtItem = (parentList.size() - menuLevel) + 1;
       if (startAtItem >= 0) {
         parent = parentList.get(startAtItem);
       }
@@ -290,6 +304,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
+  @Override
   @Deprecated
   public BaseObject getPrevMenuItem(String fullName, XWikiContext context) throws XWikiException {
     TreeNode prevTreeNode = getTreeNodeService().getPrevMenuItem(getRef(fullName));
@@ -304,6 +319,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
+  @Override
   @Deprecated
   public BaseObject getNextMenuItem(String fullName, XWikiContext context) throws XWikiException {
     TreeNode nextTreeNode = getTreeNodeService().getNextMenuItem(getRef(fullName));
@@ -317,10 +333,11 @@ public class WebUtils implements IWebUtils {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.utils.IWebUtils#getConfigDocByInheritance(com.xpn.xwiki.doc.
    * XWikiDocument, java.lang.String, com.xpn.xwiki.XWikiContext)
    */
+  @Override
   @Deprecated
   public XWikiDocument getConfigDocByInheritance(XWikiDocument doc, String className,
       XWikiContext context) throws XWikiException {
@@ -341,6 +358,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getDocSectionAsJSON(String regex, String fullName, int section,
       XWikiContext context) throws XWikiException {
@@ -359,6 +377,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public int countSections(String regex, String fullName, XWikiContext context)
       throws XWikiException {
@@ -368,6 +387,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public IPageType getPageTypeApi(String fullName, XWikiContext context) throws XWikiException {
     return new PageTypeApi(fullName, context);
@@ -376,6 +396,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public List<String> getAllowedLanguages(XWikiContext context) {
     return getWebUtilsService().getAllowedLanguages();
@@ -384,6 +405,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public Date parseDate(String date, String format) {
     return getWebUtilsService().parseDate(date, format);
@@ -392,6 +414,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
+  @Override
   @Deprecated
   public XWikiMessageTool getMessageTool(String adminLanguage, XWikiContext context) {
     return getWebUtilsService().getMessageTool(adminLanguage);
@@ -400,6 +423,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
+  @Override
   @Deprecated
   public XWikiMessageTool getAdminMessageTool(XWikiContext context) {
     return getWebUtilsService().getAdminMessageTool();
@@ -408,6 +432,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
+  @Override
   @Deprecated
   public String getAdminLanguage(XWikiContext context) {
     return getWebUtilsService().getAdminLanguage();
@@ -416,6 +441,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use WebUtilsService directly
    */
+  @Override
   @Deprecated
   public String getAdminLanguage(String userFullName, XWikiContext context) {
     return getWebUtilsService().getAdminLanguage(userFullName);
@@ -424,6 +450,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public boolean hasParentSpace(XWikiContext context) {
     return getWebUtilsService().hasParentSpace();
@@ -432,6 +459,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getParentSpace(XWikiContext context) {
     return getWebUtilsService().getParentSpace();
@@ -440,6 +468,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use TreeNodeService
    */
+  @Override
   @Deprecated
   public Integer getMaxConfiguredNavigationLevel(XWikiContext context) {
     return getTreeNodeService().getMaxConfiguredNavigationLevel();
@@ -448,6 +477,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator)
       throws ClassNotFoundException {
@@ -457,6 +487,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService directly
    */
+  @Override
   @Deprecated
   public List<Attachment> getAttachmentListSorted(Document doc, String comparator,
       boolean imagesOnly, int start, int nb) throws ClassNotFoundException {
@@ -467,6 +498,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly) {
     return this.getWebUtilsService().getAttachmentListSortedAsJSON(doc, comparator, imagesOnly);
@@ -475,6 +507,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getAttachmentListSortedAsJSON(Document doc, String comparator, boolean imagesOnly,
       int start, int nb) {
@@ -485,6 +518,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use ImageService
    */
+  @Override
   @Deprecated
   public List<Attachment> getRandomImages(String fullName, int num, XWikiContext context) {
     try {
@@ -493,7 +527,7 @@ public class WebUtils implements IWebUtils {
           "AttachmentAscendingNameComparator", true);
       if (allImagesList.size() > 0) {
         List<Attachment> preSetImgList = prepareMaxCoverSet(num, allImagesList);
-        List<Attachment> imgList = new ArrayList<Attachment>(num);
+        List<Attachment> imgList = new ArrayList<>(num);
         Random rand = new Random();
         for (int i = 1; i <= num; i++) {
           int nextimg = rand.nextInt(preSetImgList.size());
@@ -508,7 +542,7 @@ public class WebUtils implements IWebUtils {
   }
 
   <T> List<T> prepareMaxCoverSet(int num, List<T> allImagesList) {
-    List<T> preSetImgList = new Vector<T>(num);
+    List<T> preSetImgList = new Vector<>(num);
     preSetImgList.addAll(allImagesList);
     for (int i = 2; i <= coveredQuotient(allImagesList.size(), num); i++) {
       preSetImgList.addAll(allImagesList);
@@ -518,7 +552,7 @@ public class WebUtils implements IWebUtils {
 
   int coveredQuotient(int divisor, int dividend) {
     if (dividend >= 0) {
-      return ((dividend + divisor - 1) / divisor);
+      return (((dividend + divisor) - 1) / divisor);
     } else {
       return (dividend / divisor);
     }
@@ -527,6 +561,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.11.6 instead use WebUtilsService directly
    */
+  @Override
   @Deprecated
   public boolean isAdminUser(XWikiContext context) {
     return getWebUtilsService().isAdminUser();
@@ -535,6 +570,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getJSONContent(XWikiDocument cdoc, XWikiContext context) {
     return getWebUtilsService().getJSONContent(cdoc);
@@ -543,6 +579,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
+  @Override
   @Deprecated
   public String getAttachmentURL(String link, XWikiContext context) {
     return getAttachmentUrlCmd().getAttachmentURL(link, context);
@@ -551,6 +588,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
+  @Override
   @Deprecated
   public String getAttachmentName(String link) {
     return getAttachmentUrlCmd().getAttachmentName(link);
@@ -559,6 +597,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
+  @Override
   @Deprecated
   public String getPageFullName(String link) {
     return getAttachmentUrlCmd().getPageFullName(link);
@@ -567,6 +606,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.14.0 instead use AttachmentURLCommand directly
    */
+  @Override
   @Deprecated
   public boolean isAttachmentLink(String link) {
     return getAttachmentUrlCmd().isAttachmentLink(link);
@@ -575,6 +615,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getUserNameForDocName(String authorDocName, XWikiContext context)
       throws XWikiException {
@@ -584,6 +625,7 @@ public class WebUtils implements IWebUtils {
   /**
    * @deprecated since 2.17.0 instead use WebUtilsService
    */
+  @Override
   @Deprecated
   public String getMajorVersion(XWikiDocument doc) {
     return getWebUtilsService().getMajorVersion(doc);

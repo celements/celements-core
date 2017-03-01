@@ -82,7 +82,7 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
 
   @Test
   public void testGetEvents() {
-    Set<Class<? extends Event>> eventClasses = new HashSet<Class<? extends Event>>();
+    Set<Class<? extends Event>> eventClasses = new HashSet<>();
     for (Event theEvent : listener.getEvents()) {
       eventClasses.add(theEvent.getClass());
     }

@@ -39,7 +39,7 @@ public class JSScriptService implements ScriptService {
 
   /**
    * addExtJSfileOnce
-   * 
+   *
    * @param jsFile
    * @param action
    *          use empty string for default action
@@ -60,7 +60,7 @@ public class JSScriptService implements ScriptService {
 
   /**
    * addLazyExtJSfile
-   * 
+   *
    * @param jsFile
    * @param action
    *          use empty string for default action

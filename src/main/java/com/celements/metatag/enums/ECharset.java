@@ -9,7 +9,11 @@ import com.google.common.base.Optional;
 
 public enum ECharset implements ValueGetter<String> {
 
-  UTF8("UTF-8"), LATIN1("ISO-8859-1"), ISO8859_1(LATIN1), USASCII("US-ASCII"), DEFAULT(UTF8);
+  UTF8("UTF-8"),
+  LATIN1("ISO-8859-1"),
+  ISO8859_1(LATIN1),
+  USASCII("US-ASCII"),
+  DEFAULT(UTF8);
 
   public final static String ATTRIB_NAME = "charset";
   private final static ReverseMap<ECharset, String> ID_MAP = new ReverseMap<>(ECharset.values());

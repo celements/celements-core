@@ -8,8 +8,13 @@ import com.celements.common.ValueGetter;
 import com.google.common.base.Optional;
 
 public enum ENameStandard implements ValueGetter<String> {
-  APPLICATION_NAME("application-name"), AUTHOR("author"), DESCRIPTION("description"), GENERATOR(
-      "generator"), KEYWORDS("keywords"), REFERRER("referrer");
+
+  APPLICATION_NAME("application-name"),
+  AUTHOR("author"),
+  DESCRIPTION("description"),
+  GENERATOR("generator"),
+  KEYWORDS("keywords"),
+  REFERRER("referrer");
 
   public final static String ATTRIB_NAME = "name";
   public final static String ATTRIB_NAME_ALT = "property";

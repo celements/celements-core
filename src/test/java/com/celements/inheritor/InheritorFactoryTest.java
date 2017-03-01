@@ -57,7 +57,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetFieldInheritor() {
     String className = "TestClassName";
-    List<String> docList = new ArrayList<String>();
+    List<String> docList = new ArrayList<>();
     docList.add("my.Doc");
     docList.add("my.Doc2");
     FieldInheritor inheritor = _factory.getFieldInheritor(className, docList, _context);
@@ -68,7 +68,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetContentInheritor() {
-    List<String> docList = new ArrayList<String>();
+    List<String> docList = new ArrayList<>();
     docList.add("my.Doc");
     docList.add("my.Doc2");
     ContentInheritor inheritor = _factory.getContentInheritor(docList, _context);
@@ -80,7 +80,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
   public void testGetNavigationFieldInheritor() {
     String className = "Tools.Banner";
     String fullName = "mySpace.myDoc";
-    List<String> docList = new ArrayList<String>();
+    List<String> docList = new ArrayList<>();
     docList.add(fullName);
     docList.add("myparent.Doc");
     docList.add("myparent.Doc2");
@@ -104,7 +104,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
   public void testGetPageLayoutInheritor() {
     String className = "Celements2.PageType";
     String fullName = "mySpace.myDoc";
-    List<String> docList = new ArrayList<String>();
+    List<String> docList = new ArrayList<>();
     docList.add(fullName);
     docList.add("mySpace.WebPreferences");
     docList.add("XWiki.XWikiPreferences");
@@ -120,7 +120,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
     _factory.injectPageLayoutCmd(mockPageLayoutCmd);
     String className = "mySpace.myClassName";
     String fullName = "mySpace.myDocName";
-    List<String> docList = new ArrayList<String>();
+    List<String> docList = new ArrayList<>();
     docList.add("mySpace.WebPreferences");
     docList.add("XWiki.XWikiPreferences");
     DocumentReference webHomeDocRef = new DocumentReference(_context.getDatabase(), "mySpace",
@@ -147,7 +147,7 @@ public class InheritorFactoryTest extends AbstractBridgedComponentTestCase {
         "myDocName");
     DocumentReference classDocRef = new DocumentReference(_context.getDatabase(), "mySpace",
         "myClassName");
-    List<String> docList = new ArrayList<String>();
+    List<String> docList = new ArrayList<>();
     docList.add("xwikidb:" + fullName);
     docList.add("xwikidb:mySpace.WebPreferences");
     docList.add("xwikidb:XWiki.XWikiPreferences");

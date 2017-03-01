@@ -81,7 +81,7 @@ public interface IWebUtils {
 
   /**
    * get all submenu items of given parent document (by fullname).
-   * 
+   *
    * @param parent
    * @param menuSpace
    *          (default: $doc.space)
@@ -119,7 +119,7 @@ public interface IWebUtils {
 
   /**
    * getSubNodesForParent get all subnodes of a given parent document (by fullname).
-   * 
+   *
    * @param parent
    * @param menuSpace
    *          (default: $doc.space)

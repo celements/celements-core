@@ -33,7 +33,7 @@ public class NavigationParents implements IDocParentProviderRole {
     List<DocumentReference> ret;
     String spaceName = docRef.getLastSpaceReference().getName();
     try {
-      ret = new ArrayList<DocumentReference>();
+      ret = new ArrayList<>();
       ret.addAll(navCache.getCachedDocRefs(webUtils.getWikiRef(docRef), spaceName));
       ret.addAll(navCache.getCachedDocRefs(webUtils.getCentralWikiRef(), spaceName));
       // TODO get potential parents located in other wikis ?

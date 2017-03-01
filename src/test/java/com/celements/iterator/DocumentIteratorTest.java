@@ -64,7 +64,7 @@ public class DocumentIteratorTest extends AbstractComponentTest {
     _iterator = new DocumentIterator();
     _testDoc1 = new XWikiDocument(docRef1);
     _testDoc2 = new XWikiDocument(docRef2);
-    _docList = new ArrayList<String>();
+    _docList = new ArrayList<>();
   }
 
   @Test
@@ -242,7 +242,7 @@ public class DocumentIteratorTest extends AbstractComponentTest {
     expect(webUtilsMock.resolveDocumentReference(eq(fullname2))).andReturn(docRef2).once();
     replayDefault();
     int count = 0;
-    List<String> resultList = new ArrayList<String>();
+    List<String> resultList = new ArrayList<>();
     for (XWikiDocument doc : _iterator) {
       resultList.add(doc.getFullName());
       count++;

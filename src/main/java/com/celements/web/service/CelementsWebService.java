@@ -202,7 +202,7 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   @Override
   public Map<String, String> getUniqueNameValueRequestMap() {
     Map<String, String[]> params = getContext().getRequest().getParameterMap();
-    Map<String, String> resultMap = new HashMap<String, String>();
+    Map<String, String> resultMap = new HashMap<>();
     for (String key : params.keySet()) {
       if ((params.get(key) != null) && (params.get(key).length > 0)) {
         resultMap.put(key, params.get(key)[0]);

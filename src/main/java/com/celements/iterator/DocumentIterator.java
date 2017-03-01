@@ -188,7 +188,7 @@ public class DocumentIterator implements Iterator<XWikiDocument>, Iterable<XWiki
    * @return document list
    */
   public List<String> getDocListCopy() {
-    return new ArrayList<String>(_docList);
+    return new ArrayList<>(_docList);
   }
 
   @Override

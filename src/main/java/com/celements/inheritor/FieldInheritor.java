@@ -33,6 +33,7 @@ public class FieldInheritor extends AbstractObjectInheritor {
 
   private IEmptyFieldChecker _emptyFieldChecker;
 
+  @Override
   public BaseCollection getObject(String key) {
     if (getIteratorFactory() == null) {
       throw new IllegalStateException("No IteratorFactory given.");
