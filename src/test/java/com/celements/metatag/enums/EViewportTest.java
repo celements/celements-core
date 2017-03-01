@@ -15,12 +15,12 @@ public class EViewportTest {
 
   @Test
   public void testGetViewport() {
-    assertEquals(EViewport.HEIGHT, EViewport.getViewport(FIELDS_HEIGHT));
-    assertEquals(EViewport.WIDTH, EViewport.getViewport(FIELDS_WIDTH));
-    assertEquals(EViewport.INITIAL_SCALE, EViewport.getViewport(FIELDS_INITIAL_SCALE));
-    assertEquals(EViewport.MINIMUM_SCALE, EViewport.getViewport(FIELDS_MINIMUM_SCALE));
-    assertEquals(EViewport.MAXIMUM_SCALE, EViewport.getViewport(FIELDS_MAXIMUM_SCALE));
-    assertEquals(EViewport.USER_SCALABLE, EViewport.getViewport(FIELDS_USER_SCALABLE));
+    assertEquals(EViewport.HEIGHT, EViewport.getViewport(FIELDS_HEIGHT).get());
+    assertEquals(EViewport.WIDTH, EViewport.getViewport(FIELDS_WIDTH).get());
+    assertEquals(EViewport.INITIAL_SCALE, EViewport.getViewport(FIELDS_INITIAL_SCALE).get());
+    assertEquals(EViewport.MINIMUM_SCALE, EViewport.getViewport(FIELDS_MINIMUM_SCALE).get());
+    assertEquals(EViewport.MAXIMUM_SCALE, EViewport.getViewport(FIELDS_MAXIMUM_SCALE).get());
+    assertEquals(EViewport.USER_SCALABLE, EViewport.getViewport(FIELDS_USER_SCALABLE).get());
   }
 
   @Test

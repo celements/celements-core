@@ -8,6 +8,7 @@ import com.celements.common.ValueGetter;
 import com.google.common.base.Optional;
 
 public enum EViewport implements ValueGetter<String> {
+
   WIDTH("width"),
   HEIGHT("height"),
   INITIAL_SCALE("initial-scale"),

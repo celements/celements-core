@@ -8,6 +8,7 @@ import com.celements.common.ValueGetter;
 import com.google.common.base.Optional;
 
 public enum ENameStandard implements ValueGetter<String> {
+
   APPLICATION_NAME("application-name"),
   AUTHOR("author"),
   DESCRIPTION("description"),

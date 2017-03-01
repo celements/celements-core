@@ -25,15 +25,16 @@ public class ETwitterTest {
 
   @Test
   public void testGetTwitter() {
-    assertEquals(ETwitter.TWITTER_CARD, ETwitter.getTwitter(FIELDS_TWITTER_CARD));
-    assertEquals(ETwitter.TWITTER_SITE, ETwitter.getTwitter(FIELDS_TWITTER_SITE));
-    assertEquals(ETwitter.TWITTER_SITE_ID, ETwitter.getTwitter(FIELDS_TWITTER_SITE_ID));
-    assertEquals(ETwitter.TWITTER_CREATOR, ETwitter.getTwitter(FIELDS_TWITTER_CREATOR));
-    assertEquals(ETwitter.TWITTER_CREATOR_ID, ETwitter.getTwitter(FIELDS_TWITTER_CREATOR_ID));
-    assertEquals(ETwitter.TWITTER_DESCRIPTION, ETwitter.getTwitter(FIELDS_TWITTER_DESCRIPTION));
-    assertEquals(ETwitter.TWITTER_TITLE, ETwitter.getTwitter(FIELDS_TWITTER_TITLE));
-    assertEquals(ETwitter.TWITTER_IMAGE, ETwitter.getTwitter(FIELDS_TWITTER_IMAGE));
-    assertEquals(ETwitter.TWITTER_IMAGE_ALT, ETwitter.getTwitter(FIELDS_TWITTER_IMAGE_ALT));
+    assertEquals(ETwitter.TWITTER_CARD, ETwitter.getTwitter(FIELDS_TWITTER_CARD).get());
+    assertEquals(ETwitter.TWITTER_SITE, ETwitter.getTwitter(FIELDS_TWITTER_SITE).get());
+    assertEquals(ETwitter.TWITTER_SITE_ID, ETwitter.getTwitter(FIELDS_TWITTER_SITE_ID).get());
+    assertEquals(ETwitter.TWITTER_CREATOR, ETwitter.getTwitter(FIELDS_TWITTER_CREATOR).get());
+    assertEquals(ETwitter.TWITTER_CREATOR_ID, ETwitter.getTwitter(FIELDS_TWITTER_CREATOR_ID).get());
+    assertEquals(ETwitter.TWITTER_DESCRIPTION, ETwitter.getTwitter(
+        FIELDS_TWITTER_DESCRIPTION).get());
+    assertEquals(ETwitter.TWITTER_TITLE, ETwitter.getTwitter(FIELDS_TWITTER_TITLE).get());
+    assertEquals(ETwitter.TWITTER_IMAGE, ETwitter.getTwitter(FIELDS_TWITTER_IMAGE).get());
+    assertEquals(ETwitter.TWITTER_IMAGE_ALT, ETwitter.getTwitter(FIELDS_TWITTER_IMAGE_ALT).get());
   }
 
   @Test
