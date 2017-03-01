@@ -104,7 +104,7 @@ public class PageLayoutCommand {
   }
 
   private Map<String, String> getPageLayoutMap(boolean onlyActive) {
-    Map<String, String> plMap = new HashMap<String, String>();
+    Map<String, String> plMap = new HashMap<>();
     try {
       for (Object resultRowObj : getContext().getWiki().search(getPageLayoutHQL(onlyActive),
           getContext())) {
@@ -310,7 +310,7 @@ public class PageLayoutCommand {
   private Deque<SpaceReference> getRenderingLayoutStack() {
     ExecutionContext execContext = getExecution().getContext();
     if (execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY) == null) {
-      Deque<SpaceReference> layoutStack = new LinkedList<SpaceReference>();
+      Deque<SpaceReference> layoutStack = new LinkedList<>();
       execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY, layoutStack);
     }
     return (Deque<SpaceReference>) execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY);

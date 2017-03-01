@@ -26,7 +26,7 @@ public interface ICopyDocumentRole {
 
   /**
    * Copies given source doc to given target doc and saves target if it has changed
-   * 
+   *
    * @param srcDoc
    *          source doc, may not be null
    * @param trgDoc
@@ -42,7 +42,7 @@ public interface ICopyDocumentRole {
 
   /**
    * Copies given source doc to given target doc
-   * 
+   *
    * @param srcDoc
    *          source doc, may not be null
    * @param trgDoc

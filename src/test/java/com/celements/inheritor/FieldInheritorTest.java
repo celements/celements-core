@@ -59,7 +59,7 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
     _fullname = "Test.Doc";
     _docRef = new DocumentReference(_context.getDatabase(), "Test", "Doc");
     _testDoc = new XWikiDocument(_docRef);
-    _docList = new ArrayList<String>();
+    _docList = new ArrayList<>();
     _iteratorFactory = getTestIteratorFactory(_docList);
   }
 
@@ -118,6 +118,7 @@ public class FieldInheritorTest extends AbstractBridgedComponentTestCase {
   private IIteratorFactory<XObjectIterator> getTestIteratorFactory(final List<String> docList) {
     return new IIteratorFactory<XObjectIterator>() {
 
+      @Override
       public XObjectIterator createIterator() {
         XObjectIterator iterator = new XObjectIterator(_context);
         iterator.setClassName(_testClassRef.getLastSpaceReference().getName() + "."

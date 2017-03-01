@@ -40,7 +40,7 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.xwiki.configuration.internal.AbstractDocumentConfigurationSource#getClassReference()
    */
   @Override
@@ -61,7 +61,7 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see AbstractDocumentConfigurationSource#getDocumentReference()
    */
   @Override

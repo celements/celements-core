@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.AttachmentReference;
 
-
 @Immutable
 public final class AttachmentReferenceField extends ReferenceField<AttachmentReference> {
 

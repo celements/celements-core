@@ -234,7 +234,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     cmd.injectCelementsWeb(celementsweb);
     expect(celementsweb.getUsernameForUserData(eq("blabla@mail.com"), eq("email,loginname"), same(
         context))).andReturn("XWiki.7sh2lya35").anyTimes();
-    List<String> retGroup = new ArrayList<String>();
+    List<String> retGroup = new ArrayList<>();
     retGroup.add("XWiki.TestGroup1");
     retGroup.add("XWiki.TestGroup2");
     retGroup.add("XWiki.TestGroup3");
@@ -339,7 +339,7 @@ public class RemoteUserValidatorTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.getUser(eq("XWiki.7sh2lya35"), same(context))).andReturn(user).atLeastOnce();
     expect(user.isUserInGroup(eq("XWiki.TestGroup1"))).andReturn(true).atLeastOnce();
     expect(user.isUserInGroup(eq("XWiki.TestGroup2"))).andReturn(false).atLeastOnce();
-    List<String> returnGroups = new ArrayList<String>();
+    List<String> returnGroups = new ArrayList<>();
     returnGroups.add("XWiki.TestGroup1");
     XWikiMessageTool messageTool = createMock(XWikiMessageTool.class);
     expect(context.getMessageTool()).andReturn(messageTool).anyTimes();

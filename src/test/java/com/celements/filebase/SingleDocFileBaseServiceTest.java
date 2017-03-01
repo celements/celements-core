@@ -41,7 +41,7 @@ public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCa
   public void test_getFileBaseDoc_configMinus() {
     fbService.configuration = createMockAndAddToDefault(ConfigurationSource.class);
     expect(fbService.configuration.getProperty(eq(
-        SingleDocFileBaseService.FILEBASE_CONFIG_FIELD))).andReturn("-");
+        IFileBaseServiceRole.FILEBASE_CONFIG_FIELD))).andReturn("-");
     replayDefault();
     try {
       fbService.getFileBaseDoc();
@@ -60,7 +60,7 @@ public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCa
         docName);
     fbService.configuration = createMockAndAddToDefault(ConfigurationSource.class);
     expect(fbService.configuration.getProperty(eq(
-        SingleDocFileBaseService.FILEBASE_CONFIG_FIELD))).andReturn(spcName + "." + docName);
+        IFileBaseServiceRole.FILEBASE_CONFIG_FIELD))).andReturn(spcName + "." + docName);
     fbService.modelAccess = createMockAndAddToDefault(IModelAccessFacade.class);
     expect(fbService.modelAccess.getOrCreateDocument(eq(fileBaseDocRef))).andThrow(
         new DocumentLoadException(fileBaseDocRef));
@@ -83,7 +83,7 @@ public class SingleDocFileBaseServiceTest extends AbstractBridgedComponentTestCa
     XWikiDocument doc = new XWikiDocument(fileBaseDocRef);
     fbService.configuration = createMockAndAddToDefault(ConfigurationSource.class);
     expect(fbService.configuration.getProperty(eq(
-        SingleDocFileBaseService.FILEBASE_CONFIG_FIELD))).andReturn(spcName + "." + docName);
+        IFileBaseServiceRole.FILEBASE_CONFIG_FIELD))).andReturn(spcName + "." + docName);
     fbService.modelAccess = createMockAndAddToDefault(IModelAccessFacade.class);
     expect(fbService.modelAccess.getOrCreateDocument(eq(fileBaseDocRef))).andReturn(doc);
     replayDefault();

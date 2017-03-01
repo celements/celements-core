@@ -66,7 +66,7 @@ public class RTEConfig {
   public static final String PROP_CLASS_NAME = RTE_CONFIG_TYPE_PROP_CLASS_SPACE + "."
       + RTE_CONFIG_TYPE_PROP_CLASS_NAME;
 
-  private final static Map<String, String> rteConfigFieldDefaults = new HashMap<String, String>();
+  private final static Map<String, String> rteConfigFieldDefaults = new HashMap<>();
 
   static {
     rteConfigFieldDefaults.put("blockformats", "rte_heading1=h1,rte_text=p");
@@ -173,7 +173,7 @@ public class RTEConfig {
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param test_Instance
    */
   public void injectPageTypeInstance(PageTypeCommand test_Instance) {
@@ -188,7 +188,7 @@ public class RTEConfig {
   }
 
   public List<DocumentReference> getRTEConfigsList() {
-    List<DocumentReference> rteConfigsList = new ArrayList<DocumentReference>();
+    List<DocumentReference> rteConfigsList = new ArrayList<>();
     try {
       List<String> resultList = getQueryManager().createQuery(getRteConfigsXWQL(),
           Query.XWQL).execute();

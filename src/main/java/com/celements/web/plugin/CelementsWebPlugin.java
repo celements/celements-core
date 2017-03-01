@@ -87,14 +87,17 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     super(name, className, context);
   }
 
+  @Override
   public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
     return new CelementsWebPluginApi((CelementsWebPlugin) plugin, context);
   }
 
+  @Override
   public String getName() {
     return getPrepareVelocityContextService().getVelocityName();
   }
 
+  @Override
   public void init(XWikiContext context) {
     // TODO move to ApplicationReadyEvent listener after migration to xwiki 4
     LOGGER.trace("init called database [" + context.getDatabase() + "]");
@@ -107,6 +110,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
     super.init(context);
   }
 
+  @Override
   public void virtualInit(XWikiContext context) {
     // TODO move to ApplicationReadyEvent listener after migration to xwiki 4
     LOGGER.trace("virtualInit called database [" + context.getDatabase() + "]");
@@ -126,7 +130,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
   /**
    * getSubMenuItemsForParent
    * get all submenu items of given parent document (by fullname).
-   * 
+   *
    * @param parent
    * @param menuSpace
    *          (default: $doc.space)
@@ -152,7 +156,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   /**
    * getUsernameForUserData
-   * 
+   *
    * @param login
    * @param possibleLogins
    * @param context
@@ -188,7 +192,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       hql += "and token.validuntil>=? ";
       hql += "and obj.id=token.id ";
 
-      List<Object> parameterList = new Vector<Object>();
+      List<Object> parameterList = new Vector<>();
       parameterList.add(hashedCode);
       parameterList.add(new Date());
 
@@ -196,11 +200,11 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
       List<String> users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
       LOGGER.info("searching token and found " + users.size() + " with parameters "
           + Arrays.deepToString(parameterList.toArray()));
-      if (users == null || users.size() == 0) {
+      if ((users == null) || (users.size() == 0)) {
         String db = context.getDatabase();
         context.setDatabase("xwiki");
         users = storage.searchDocumentsNames(hql, 0, 0, parameterList, context);
-        if (users != null && users.size() == 1) {
+        if ((users != null) && (users.size() == 1)) {
           users.add("xwiki:" + users.remove(0));
         }
         context.setDatabase(db);
@@ -390,7 +394,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   /**
    * getUniqueValidationKey
-   * 
+   *
    * @param context
    * @return
    * @throws XWikiException
@@ -539,7 +543,7 @@ public class CelementsWebPlugin extends XWikiDefaultPlugin {
 
   /**
    * addTranslation
-   * 
+   *
    * @param fullName
    * @param language
    * @param context

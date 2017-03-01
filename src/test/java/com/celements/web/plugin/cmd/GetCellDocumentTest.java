@@ -56,9 +56,9 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
   public void testGetCellDoc_FromContext() throws XWikiException {
     PageLayoutCommand plc = createMock(PageLayoutCommand.class);
     XWikiDocument doc = createMock(XWikiDocument.class);
-    List<XWikiDocument> docList = new ArrayList<XWikiDocument>();
+    List<XWikiDocument> docList = new ArrayList<>();
     docList.add(doc);
-    List<String> paramList = new ArrayList<String>();
+    List<String> paramList = new ArrayList<>();
     paramList.add("Space");
     paramList.add("Class.Name");
     paramList.add("field");
@@ -78,9 +78,9 @@ public class GetCellDocumentTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetCellDoc() throws XWikiException {
     XWikiDocument doc = createMock(XWikiDocument.class);
-    List<XWikiDocument> docList = new ArrayList<XWikiDocument>();
+    List<XWikiDocument> docList = new ArrayList<>();
     docList.add(doc);
-    List<String> paramList = new ArrayList<String>();
+    List<String> paramList = new ArrayList<>();
     paramList.add("Space");
     paramList.add("Class.Name");
     paramList.add("field");

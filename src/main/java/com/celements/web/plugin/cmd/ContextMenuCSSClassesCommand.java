@@ -33,7 +33,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * TODO Unit Tests!!!
- * 
+ *
  * @author fabian
  */
 public class ContextMenuCSSClassesCommand {
@@ -52,7 +52,7 @@ public class ContextMenuCSSClassesCommand {
   }
 
   public List<String> getCM_CSSclasses(XWikiContext context) {
-    Set<String> cmCSSclassesSet = new HashSet<String>();
+    Set<String> cmCSSclassesSet = new HashSet<>();
     if ("view".equals(context.getAction())) {
       cmCSSclassesSet.addAll(getCMcssClassesOneDB(context));
       if (!"celements2web".equals(context.getDatabase())) {
@@ -65,11 +65,11 @@ public class ContextMenuCSSClassesCommand {
         }
       }
     }
-    return new ArrayList<String>(cmCSSclassesSet);
+    return new ArrayList<>(cmCSSclassesSet);
   }
 
   Set<String> getCMcssClassesOneDB(XWikiContext context) {
-    Set<String> cmCSSclasses = new HashSet<String>();
+    Set<String> cmCSSclasses = new HashSet<>();
     try {
       List<Object> resultList = context.getWiki().search(getCMhql(), context);
       for (Object classNameObject : resultList) {

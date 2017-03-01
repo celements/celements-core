@@ -46,6 +46,7 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
     return (DocumentDetailsClasses) docDetailsClasses;
   }
 
+  @Override
   public void writeNodeContent(StringBuilder outStream, boolean isFirstItem, boolean isLastItem,
       DocumentReference docRef, boolean isLeaf, int numItem, INavigation nav) {
     LOGGER.debug("writeNodeContent for [" + docRef + "].");
@@ -106,14 +107,17 @@ public class RenderedExtractPresentationType implements IPresentationTypeRole {
     return renderCmd;
   }
 
+  @Override
   public String getDefaultCssClass() {
     return _CEL_CM_CPT_TREENODE_DEFAULT_CSSCLASS;
   }
 
+  @Override
   public String getEmptyDictionaryKey() {
     return "cel_nav_empty_presentation";
   }
 
+  @Override
   public SpaceReference getPageLayoutForDoc(DocumentReference docRef) {
     return null;
   }

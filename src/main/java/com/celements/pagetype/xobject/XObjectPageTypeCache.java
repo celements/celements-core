@@ -98,7 +98,7 @@ public class XObjectPageTypeCache implements IXObjectPageTypeCacheRole {
     List<PageTypeReference> pageTypeList = pageTypeRefCache.get(wikiRef);
     if (pageTypeList == null) {
       LOGGER.info("compute XObjectPageTypeCache for wiki '{}'", wikiRef);
-      List<PageTypeReference> newPageTypeList = new ArrayList<PageTypeReference>();
+      List<PageTypeReference> newPageTypeList = new ArrayList<>();
       Set<String> pageTypeSet = getGetPageTypeCmd().getAllXObjectPageTypes(getContext());
       for (String pageTypeFN : pageTypeSet) {
         XObjectPageTypeConfig xObjPT = getXObjectPTConfigForFN(pageTypeFN);

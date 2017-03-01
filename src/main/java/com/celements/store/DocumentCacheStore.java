@@ -736,7 +736,11 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
 
   static enum InvalidateState {
 
-    CACHE_MISS, REMOVED, LOADING_CANCELED, LOADING_MULTI_CANCELED, LOADING_CANCEL_FAILED
+    CACHE_MISS,
+    REMOVED,
+    LOADING_CANCELED,
+    LOADING_MULTI_CANCELED,
+    LOADING_CANCEL_FAILED
 
   }
 

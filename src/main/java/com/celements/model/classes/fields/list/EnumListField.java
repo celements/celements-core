@@ -34,7 +34,7 @@ public class EnumListField<E extends Enum<E>> extends ListField<E> {
 
     @Override
     public EnumListField<E> build() {
-      return new EnumListField<E>(getThis());
+      return new EnumListField<>(getThis());
     }
 
   }

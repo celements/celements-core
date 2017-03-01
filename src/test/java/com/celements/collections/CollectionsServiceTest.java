@@ -132,7 +132,7 @@ public class CollectionsServiceTest extends AbstractBridgedComponentTestCase {
   }
 
   private List<BaseObject> getSortTestBaseObjects() {
-    List<BaseObject> objs = new ArrayList<BaseObject>();
+    List<BaseObject> objs = new ArrayList<>();
     BaseObject obj = new BaseObject();
     obj.setXClassReference(getBOClassRef());
     obj.setStringValue("s1", "c");

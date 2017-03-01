@@ -48,8 +48,9 @@ public class CelementsRightsCommand {
             mLogger.debug("isCelementsRights: for doc [" + fullName + "], objNr ["
                 + right.getNumber() + "] results: " + validGroups + ", " + validUsers + ", "
                 + validLevels);
-            if (!(validGroups && validUsers && validLevels))
+            if (!(validGroups && validUsers && validLevels)) {
               return false;
+            }
           }
         }
       }
@@ -90,8 +91,9 @@ public class CelementsRightsCommand {
   private List<String> getPropertyList(BaseObject right, String key) {
     mLogger.trace("getPropertyList: key [" + key + "] value [" + right.getLargeStringValue(key)
         + "] ");
-    if ((right.getLargeStringValue(key) == null) || "".equals(right.getLargeStringValue(key)))
+    if ((right.getLargeStringValue(key) == null) || "".equals(right.getLargeStringValue(key))) {
       return Collections.emptyList();
+    }
     return Arrays.asList(right.getLargeStringValue(key).split(","));
   }
 }

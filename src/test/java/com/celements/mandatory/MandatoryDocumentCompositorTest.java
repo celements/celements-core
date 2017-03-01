@@ -25,7 +25,7 @@ public class MandatoryDocumentCompositorTest extends AbstractBridgedComponentTes
   public void setUp_MandatoryDocumentCompositorTest() throws Exception {
     mdCompositor = new MandatoryDocumentCompositor();
     mdCompositor.execution = Utils.getComponent(Execution.class);
-    mdCompositor.mandatoryDocumentsMap = new HashMap<String, IMandatoryDocumentRole>();
+    mdCompositor.mandatoryDocumentsMap = new HashMap<>();
   }
 
   @Test
@@ -38,7 +38,7 @@ public class MandatoryDocumentCompositorTest extends AbstractBridgedComponentTes
   @Test
   public void testGetMandatoryDocumentsList() {
     // use LinkedHashMap to preserve inserting order.
-    mdCompositor.mandatoryDocumentsMap = new LinkedHashMap<String, IMandatoryDocumentRole>();
+    mdCompositor.mandatoryDocumentsMap = new LinkedHashMap<>();
     IMandatoryDocumentRole mockA_mandDoc = createMockAndAddToDefault(IMandatoryDocumentRole.class);
     expect(mockA_mandDoc.dependsOnMandatoryDocuments()).andReturn(
         Collections.<String>emptyList()).atLeastOnce();
@@ -50,7 +50,7 @@ public class MandatoryDocumentCompositorTest extends AbstractBridgedComponentTes
     mdCompositor.mandatoryDocumentsMap.put("A_mandDoc", mockA_mandDoc);
     replayDefault();
     List<String> expectedExedList = Arrays.asList("A_mandDoc", "B_mandDocDepA");
-    assertFalse("check precondition", expectedExedList.equals(new ArrayList<String>(
+    assertFalse("check precondition", expectedExedList.equals(new ArrayList<>(
         mdCompositor.mandatoryDocumentsMap.keySet())));
     assertEquals(expectedExedList, mdCompositor.getMandatoryDocumentsList());
     verifyDefault();

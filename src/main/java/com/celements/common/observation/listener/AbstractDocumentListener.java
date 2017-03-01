@@ -81,7 +81,7 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   /**
    * Returns a new instance of the associated creating event or null of if listening on
    * {@link DocumentCreatingEvent}s is not required
-   * 
+   *
    * @param docRef
    * @return
    */
@@ -90,7 +90,7 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   /**
    * Returns a new instance of the associated created event or null of if listening on
    * {@link DocumentCreatedEvent}s is not required
-   * 
+   *
    * @param docRef
    * @return
    */
@@ -109,7 +109,7 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   /**
    * Returns a new instance of the associated updating event or null of if listening on
    * {@link DocumentUpdatingEvent}s is not required
-   * 
+   *
    * @param docRef
    * @return
    */
@@ -118,7 +118,7 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   /**
    * Returns a new instance of the associated updated event or null of if listening on
    * {@link DocumentUpdatedEvent}s is not required
-   * 
+   *
    * @param docRef
    * @return
    */
@@ -137,7 +137,7 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   /**
    * Returns a new instance of the associated deleting event or null of if listening on
    * {@link DocumentDeletingEvent}s is not required
-   * 
+   *
    * @param docRef
    * @return
    */
@@ -146,7 +146,7 @@ public abstract class AbstractDocumentListener extends AbstractEventListener {
   /**
    * Returns a new instance of the associated deleted event or null of if listening on
    * {@link DocumentDeletedEvent}s is not required
-   * 
+   *
    * @param docRef
    * @return
    */

@@ -661,7 +661,7 @@ public class PrepareVelocityContextService implements IPrepareVelocityContext {
    */
   @SuppressWarnings("unchecked")
   private List<String> getAcceptedLanguages(XWikiRequest request) {
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     Enumeration<Locale> e = request.getLocales();
     while (e.hasMoreElements()) {
       String language = e.nextElement().getLanguage().toLowerCase();

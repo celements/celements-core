@@ -49,7 +49,7 @@ public class DocFormScriptService implements ScriptService {
       throws XWikiException {
     Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
         getDocFormCommand().prepareMapForDocUpdate(map), getContext());
-    Set<Document> docs = new HashSet<Document>();
+    Set<Document> docs = new HashSet<>();
     for (XWikiDocument xdoc : xdocs) {
       docs.add(xdoc.newDocument(getContext()));
     }
@@ -85,7 +85,7 @@ public class DocFormScriptService implements ScriptService {
    */
   @SuppressWarnings("unchecked")
   public Set<Document> updateDocFromRequest(DocumentReference docRef) throws XWikiException {
-    Set<Document> docs = new HashSet<Document>();
+    Set<Document> docs = new HashSet<>();
     Collection<XWikiDocument> xdocs = getDocFormCommand().updateDocFromMap(docRef,
         getContext().getRequest().getParameterMap(), getContext());
     for (XWikiDocument xdoc : xdocs) {
@@ -125,11 +125,11 @@ public class DocFormScriptService implements ScriptService {
     if (hasEditOnAllDocs) {
       docs = getDocFormCommand().saveXWikiDocCollection(xdocs);
     } else {
-      Set<DocumentReference> saveFailed = new HashSet<DocumentReference>();
+      Set<DocumentReference> saveFailed = new HashSet<>();
       for (XWikiDocument xdoc : xdocs) {
         saveFailed.add(xdoc.getDocumentReference());
       }
-      docs = new HashMap<String, Set<DocumentReference>>();
+      docs = new HashMap<>();
       docs.put("successful", new HashSet<DocumentReference>());
       docs.put("failed", saveFailed);
     }

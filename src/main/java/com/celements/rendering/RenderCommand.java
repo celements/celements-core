@@ -93,7 +93,7 @@ public class RenderCommand {
 
   /**
    * renderCelementsCell
-   * 
+   *
    * @param elementFullName
    * @return
    * @throws XWikiException

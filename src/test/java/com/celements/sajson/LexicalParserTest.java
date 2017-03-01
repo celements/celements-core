@@ -36,7 +36,7 @@ public class LexicalParserTest {
   @Before
   public void prepareTest() throws Exception {
     mockEventHandler = createStrictMock(IEventHandler.class);
-    lexicalParser = new LexicalParser<IGenericLiteral>(ERulesLiteral.RULES_ARRAY, mockEventHandler);
+    lexicalParser = new LexicalParser<>(ERulesLiteral.RULES_ARRAY, mockEventHandler);
   }
 
   @Test
@@ -290,13 +290,14 @@ public class LexicalParserTest {
   }
 
   private enum ERulesLiteral implements IGenericLiteral {
-    OBJECT_VALUE(ECommand.VALUE_COMMAND), RULE_ATTRIBUTE(OBJECT_VALUE, "name",
-        "*"), CON_OR_ACT_ATTRIBUTE(OBJECT_VALUE, "type"), CONDITION_OR_ACTION_DICT(
-            ECommand.DICTIONARY_COMMAND, CON_OR_ACT_ATTRIBUTE), CONDITIONS_OR_ACTIONS_ARRAY(
-                ECommand.ARRAY_COMMAND, CONDITION_OR_ACTION_DICT), CONDITION_OR_ACTION_PROPERTY(
-                    CONDITIONS_OR_ACTIONS_ARRAY, "conditions", "actions"), RULE_DICT(
-                        ECommand.DICTIONARY_COMMAND, CONDITION_OR_ACTION_PROPERTY,
-                        RULE_ATTRIBUTE), RULES_ARRAY(ECommand.ARRAY_COMMAND, RULE_DICT);
+    OBJECT_VALUE(ECommand.VALUE_COMMAND),
+    RULE_ATTRIBUTE(OBJECT_VALUE, "name", "*"),
+    CON_OR_ACT_ATTRIBUTE(OBJECT_VALUE, "type"),
+    CONDITION_OR_ACTION_DICT(ECommand.DICTIONARY_COMMAND, CON_OR_ACT_ATTRIBUTE),
+    CONDITIONS_OR_ACTIONS_ARRAY(ECommand.ARRAY_COMMAND, CONDITION_OR_ACTION_DICT),
+    CONDITION_OR_ACTION_PROPERTY(CONDITIONS_OR_ACTIONS_ARRAY, "conditions", "actions"),
+    RULE_DICT(ECommand.DICTIONARY_COMMAND, CONDITION_OR_ACTION_PROPERTY, RULE_ATTRIBUTE),
+    RULES_ARRAY(ECommand.ARRAY_COMMAND, RULE_DICT);
 
     private ERulesLiteral[] literals;
     private ECommand command;
@@ -315,6 +316,7 @@ public class LexicalParserTest {
       this.names = names;
     }
 
+    @Override
     public ECommand getCommand() {
       return command;
     }
@@ -323,6 +325,7 @@ public class LexicalParserTest {
       return names;
     }
 
+    @Override
     public IGenericLiteral getNextLiteral() {
       nextLiteral = nextLiteral + 1;
       if (nextLiteral > literals.length) {
@@ -331,11 +334,13 @@ public class LexicalParserTest {
       return literals[nextLiteral - 1];
     }
 
+    @Override
     public IGenericLiteral getFirstLiteral() {
       nextLiteral = 1;
       return literals[0];
     }
 
+    @Override
     public IGenericLiteral getPropertyLiteralForKey(String key, IGenericLiteral placeholder) {
       nextLiteral = 0; // properties in dictionary may occur multiple times
                        // (once for each name) and are optional
@@ -348,7 +353,7 @@ public class LexicalParserTest {
 
     private Map<String, ERulesLiteral> getPropertyNameMap() {
       if (propertyNameMap == null) {
-        propertyNameMap = new HashMap<String, ERulesLiteral>();
+        propertyNameMap = new HashMap<>();
         for (ERulesLiteral literal : literals) {
           checkPropertyLiteral(literal);
           for (String key : literal.getNames()) {

@@ -40,7 +40,7 @@ public class DocumentParentsListerTest extends AbstractBridgedComponentTestCase 
     xwiki = getWikiMock();
     docParentsLister = (DocumentParentsLister) Utils.getComponent(IDocumentParentsListerRole.class);
     docParentProviderMapBackup = docParentsLister.docParentProviderMap;
-    docParentsLister.docParentProviderMap = new HashMap<String, IDocParentProviderRole>();
+    docParentsLister.docParentProviderMap = new HashMap<>();
     docParentsLister.docParentProviderMap.put(XDocParents.DOC_PROVIDER_NAME,
         docParentProviderMapBackup.get(XDocParents.DOC_PROVIDER_NAME));
     docParentsLister.pageTypeResolver = createMockAndAddToDefault(IPageTypeResolverRole.class);

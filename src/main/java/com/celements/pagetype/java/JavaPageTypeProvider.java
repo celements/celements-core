@@ -25,7 +25,7 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
 
   @Override
   public List<PageTypeReference> getPageTypes() {
-    return new ArrayList<PageTypeReference>(getPageTypeRefsMap().keySet());
+    return new ArrayList<>(getPageTypeRefsMap().keySet());
   }
 
   private Map<PageTypeReference, IJavaPageTypeRole> getPageTypeRefsMap() {
@@ -40,7 +40,7 @@ public class JavaPageTypeProvider implements IPageTypeProviderRole {
       Map<PageTypeReference, IJavaPageTypeRole> theNewMap = new HashMap<>();
       for (IJavaPageTypeRole javaPageType : javaPageTypesMap.values()) {
         PageTypeReference thePageTypeRef = new PageTypeReference(javaPageType.getName(),
-            PROVIDER_HINT, new ArrayList<String>(javaPageType.getCategoryNames()));
+            PROVIDER_HINT, new ArrayList<>(javaPageType.getCategoryNames()));
         theNewMap.put(thePageTypeRef, javaPageType);
       }
       javaPageTypeRefsMap = Collections.unmodifiableMap(theNewMap);

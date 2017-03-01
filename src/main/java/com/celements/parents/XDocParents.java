@@ -29,7 +29,7 @@ public class XDocParents implements IDocParentProviderRole {
 
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef) {
-    ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
+    ArrayList<DocumentReference> docParents = new ArrayList<>();
     try {
       DocumentReference nextParent = getParentRef(docRef);
       while ((nextParent != null) && getContext().getWiki().exists(nextParent, getContext())

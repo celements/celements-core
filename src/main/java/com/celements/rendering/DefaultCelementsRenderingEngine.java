@@ -32,7 +32,7 @@ public class DefaultCelementsRenderingEngine extends DefaultXWikiRenderingEngine
   public DefaultCelementsRenderingEngine(List<String> rendererList, XWikiContext context)
       throws XWikiException {
     super(context.getWiki(), context);
-    Set<String> rendererSet = new HashSet<String>(rendererList);
+    Set<String> rendererSet = new HashSet<>(rendererList);
     for (String rendererName : getRendererNames()) {
       if (!rendererSet.contains(rendererName)) {
         removeRenderer(rendererName);

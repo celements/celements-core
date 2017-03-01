@@ -30,19 +30,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
-public class DocumentCreationWorker extends AbstractXWikiRunnable{
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      DocumentCreationWorker.class);
-  
+public class DocumentCreationWorker extends AbstractXWikiRunnable {
+
+  private static Log mLogger = LogFactory.getFactory().getInstance(DocumentCreationWorker.class);
+
   private String space;
   private int docsCreated;
   private long startTime;
   private int workerId;
   private boolean isRunning;
   private XWikiContext context;
-  
+
   public DocumentCreationWorker(String space, int workerId, XWikiContext context) {
-    this((XWikiContext)context.clone());
+    this((XWikiContext) context.clone());
     this.space = space;
     this.workerId = workerId;
   }
@@ -57,40 +57,39 @@ public class DocumentCreationWorker extends AbstractXWikiRunnable{
     docsCreated = 0;
     startTime = (new Date()).getTime();
     isRunning = true;
-    while(isRunning) {
+    while (isRunning) {
       String docFullName = space + "." + startTime + "_" + workerId + "_" + docsCreated;
       boolean even = false;
-      if((docsCreated + 1) % 2 == 0) {
+      if (((docsCreated + 1) % 2) == 0) {
         even = true;
       }
       boolean third = false;
-      if((docsCreated + 1) % 3 == 0) {
+      if (((docsCreated + 1) % 3) == 0) {
         third = true;
       }
       boolean fifth = false;
-      if((docsCreated + 1) % 5 == 0) {
+      if (((docsCreated + 1) % 5) == 0) {
         fifth = true;
       }
-      if((docsCreated +1) % 20000 == 0) {
+      if (((docsCreated + 1) % 20000) == 0) {
         context.getWiki().flushCache(context);
       }
       try {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        doc.setContent("{pre}\nThe amazing content of " + docFullName + ". As number "
-            + docsCreated + " this is a [" + (even?"even ":"") + (third?"third ":"") +
-            (fifth?"fifeht ":"") + "] document.{/pre}");
-        BaseObject mappedObj = doc.newObject("Classes.RTEConfigTypePropertiesClass", 
-            context);
-        long rnd1 = Math.round(Math.random()*99);
-        long rnd2 = Math.round(Math.random()*999);
+        doc.setContent("{pre}\nThe amazing content of " + docFullName + ". As number " + docsCreated
+            + " this is a [" + (even ? "even " : "") + (third ? "third " : "") + (fifth ? "fifeht "
+                : "") + "] document.{/pre}");
+        BaseObject mappedObj = doc.newObject("Classes.RTEConfigTypePropertiesClass", context);
+        long rnd1 = Math.round(Math.random() * 99);
+        long rnd2 = Math.round(Math.random() * 999);
         String styles = "dividableBy1.css";
-        if(even) {
+        if (even) {
           styles += " 'dividableBy2.css'";
         }
-        if(third) {
+        if (third) {
           styles += " 'dividableBy3.css'";
         }
-        if(fifth) {
+        if (fifth) {
           styles += " 'dividableBy5.css'";
         }
         mappedObj.setStringValue("styles", styles);
@@ -101,19 +100,17 @@ public class DocumentCreationWorker extends AbstractXWikiRunnable{
         mappedObj.setStringValue("blockformats", rnd1 + " - " + rnd2);
         mappedObj.setStringValue("valid_elements", "Lorem " + rnd2 + " ipsum " + rnd1);
         mappedObj.setStringValue("invalid_elements", "dolor " + rnd2 + " sim " + rnd1);
-        BaseObject mappedInnoDB = doc.newObject("Celements.NewsletterReceiverClass", 
-            context);
+        BaseObject mappedInnoDB = doc.newObject("Celements.NewsletterReceiverClass", context);
         mappedInnoDB.setStringValue("email", "is even = " + even);
         int thirdNr = 0;
-        if(third) {
+        if (third) {
           thirdNr = 1;
         }
         mappedInnoDB.setIntValue("isactive", thirdNr);
-        mappedInnoDB.setStringValue("subscribed", "blabla " + rnd1 + " " + rnd2 + " is " +
-            "third = " + third);
+        mappedInnoDB.setStringValue("subscribed", "blabla " + rnd1 + " " + rnd2 + " is "
+            + "third = " + third);
         BaseObject unmappedObj = doc.newObject("Classes.FilebaseTag", context);
-        unmappedObj.setStringValue("attachment", styles + " - dolor " + rnd2 + " sim " + 
-            rnd1);
+        unmappedObj.setStringValue("attachment", styles + " - dolor " + rnd2 + " sim " + rnd1);
         context.getWiki().saveDocument(doc, context);
         docsCreated++;
       } catch (XWikiException e) {
@@ -124,21 +121,22 @@ public class DocumentCreationWorker extends AbstractXWikiRunnable{
     }
     mLogger.error("thread " + getCelId() + " stopped! isRunning=" + isRunning);
   }
-  
+
   public synchronized boolean isRunning() {
     return isRunning;
   }
-  
+
   public synchronized void stopThread() {
-    isRunning = false;;
+    isRunning = false;
+    ;
   }
-  
+
   public int getCelId() {
     return workerId;
   }
 
   public Long[] getStats() {
     long time = (new Date()).getTime() - startTime;
-    return new Long[] {(long)docsCreated, time};
+    return new Long[] { (long) docsCreated, time };
   }
 }

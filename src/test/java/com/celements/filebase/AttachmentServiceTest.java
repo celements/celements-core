@@ -99,7 +99,7 @@ public class AttachmentServiceTest extends AbstractComponentTest {
     String name3 = "file3.png";
     String names = name1 + ", " + name2 + ", " + name3;
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
-    ArrayList<AttachmentReference> attList = new ArrayList<AttachmentReference>();
+    ArrayList<AttachmentReference> attList = new ArrayList<>();
     attList.add(new AttachmentReference(name1, docRef));
     attList.add(new AttachmentReference(name2, docRef));
     attList.add(new AttachmentReference(name3, docRef));
@@ -154,7 +154,7 @@ public class AttachmentServiceTest extends AbstractComponentTest {
     String names2 = name2 + ", " + name4;
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     DocumentReference docRef2 = new DocumentReference(getContext().getDatabase(), "Space", "Doc2");
-    ArrayList<AttachmentReference> attList = new ArrayList<AttachmentReference>();
+    ArrayList<AttachmentReference> attList = new ArrayList<>();
     attList.add(new AttachmentReference(name1, docRef));
     attList.add(new AttachmentReference(name2, docRef2));
     attList.add(new AttachmentReference(name3, docRef));
@@ -228,7 +228,7 @@ public class AttachmentServiceTest extends AbstractComponentTest {
   public void testBuildAttachmentsToDeleteMap() {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     DocumentReference docRef2 = new DocumentReference(getContext().getDatabase(), "Space", "Doc2");
-    ArrayList<AttachmentReference> attList = new ArrayList<AttachmentReference>();
+    ArrayList<AttachmentReference> attList = new ArrayList<>();
     attList.add(new AttachmentReference("file1.jpg", docRef));
     attList.add(new AttachmentReference("file2.txt", docRef2));
     attList.add(new AttachmentReference("file3.png", docRef));
@@ -290,7 +290,7 @@ public class AttachmentServiceTest extends AbstractComponentTest {
             getContext()))).andReturn(url);
     expect(URLFactory.getURL(eq(url), same(getContext()))).andReturn("");
     getContext().setURLFactory(URLFactory);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     XWikiAttachment att = new XWikiAttachment();
     att.setFilename(filename + ".zip");
     attList.add(att);

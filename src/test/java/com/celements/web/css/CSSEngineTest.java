@@ -46,7 +46,7 @@ public class CSSEngineTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testIncludeCSS_nullObject() {
-    List<BaseObject> baseCSSList = new ArrayList<BaseObject>();
+    List<BaseObject> baseCSSList = new ArrayList<>();
     BaseObject cssObj = new BaseObject();
     baseCSSList.add(cssObj);
     baseCSSList.add(null);

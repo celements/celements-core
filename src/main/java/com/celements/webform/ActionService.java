@@ -80,7 +80,7 @@ public class ActionService implements IActionServiceRole {
   // map, since it expects a request. Multiple values with the same name get lost
   // in this "quick and dirty" fix
   private Object getApiUsableMap(Map<String, String[]> request) {
-    Map<String, String> apiConform = new HashMap<String, String>();
+    Map<String, String> apiConform = new HashMap<>();
     for (String key : request.keySet()) {
       if ((request.get(key) != null) && (request.get(key).length > 0)) {
         apiConform.put(key, request.get(key)[0]);

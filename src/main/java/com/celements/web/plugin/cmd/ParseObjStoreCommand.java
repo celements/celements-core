@@ -36,7 +36,7 @@ public class ParseObjStoreCommand {
   /**
    * Get the options (checkbox and radio buttons) saved using the ObjectSorage Action as a
    * Map.
-   * 
+   *
    * @param options
    *          The String saved in the store object
    * @return Map containing all the
@@ -45,7 +45,7 @@ public class ParseObjStoreCommand {
     String optHash = getHash(options);
     Map<String, String> optMap = (Map<String, String>) context.get(optHash);
     if (optMap == null) {
-      optMap = new HashMap<String, String>();
+      optMap = new HashMap<>();
       if (options != null) {
         for (String line : options.split("\n")) {
           line = line.trim();

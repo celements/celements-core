@@ -71,8 +71,10 @@ public class CelementsClassCollectionTest extends AbstractComponentTest {
 
   @Test
   public void testRunUpdate_activated_Param() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn("mycol,testcol").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn(
+        "mycol,testcol").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);
@@ -81,8 +83,10 @@ public class CelementsClassCollectionTest extends AbstractComponentTest {
 
   @Test
   public void testRunUpdate_deactivated_Param() throws Exception {
-    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn("").anyTimes();
-    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn("othercol,andcol").anyTimes();
+    expect(xwiki.getXWikiPreference(eq("activated_classcollections"), same(context))).andReturn(
+        "").anyTimes();
+    expect(xwiki.Param(eq("celements.classcollections"), eq(""))).andReturn(
+        "othercol,andcol").anyTimes();
     replay(xwiki);
     testClassColl.runUpdate(context);
     verify(xwiki);

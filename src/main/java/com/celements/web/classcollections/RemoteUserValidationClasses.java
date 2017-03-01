@@ -36,6 +36,7 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
   private static Log mLogger = LogFactory.getFactory().getInstance(
       RemoteUserValidationClasses.class);
 
+  @Override
   public void initClasses(XWikiContext context) throws XWikiException {
     getRemoteUserValidationClass(context);
   }
@@ -66,6 +67,7 @@ public class RemoteUserValidationClasses extends CelementsClassCollection {
     return bclass;
   }
 
+  @Override
   public String getConfigName() {
     return "remoteValidator";
   }

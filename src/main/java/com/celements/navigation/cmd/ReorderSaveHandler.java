@@ -51,15 +51,18 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
     this.context = context;
   }
 
+  @Override
   public void closeEvent(EReorderLiteral literal) {
     LOGGER.debug("close event: " + literal.name());
   }
 
+  @Override
   public void openEvent(EReorderLiteral literal) {
     LOGGER.debug("open event: " + literal.name());
     currentCommand = literal;
   }
 
+  @Override
   public void readPropertyKey(String key) {
     LOGGER.debug("read property key: " + key);
     if (currentCommand == EReorderLiteral.PARENT_CHILDREN_PROPERTY) {
@@ -113,7 +116,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param object
    */
   void inject_ParentRef(DocumentReference newParent) {
@@ -122,13 +125,14 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param object
    */
   void inject_current(EReorderLiteral newCurrentCommand) {
     currentCommand = newCurrentCommand;
   }
 
+  @Override
   public void stringEvent(String value) {
     LOGGER.debug("string event: " + value + " with parent " + getParentFN());
     if (currentCommand == EReorderLiteral.ELEMENT_ID) {
@@ -188,7 +192,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
   public Set<EntityReference> getDirtyParents() {
     if (dirtyParents == null) {
-      dirtyParents = new HashSet<EntityReference>();
+      dirtyParents = new HashSet<>();
     }
     return dirtyParents;
   }

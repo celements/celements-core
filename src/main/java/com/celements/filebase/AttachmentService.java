@@ -65,7 +65,7 @@ import com.xpn.xwiki.web.XWikiResponse;
  * This Service makes the methods in the XWiki UploadAction-Class accessible
  * by other means. In celements we especially need them for the TokenBasedUpload because
  * the addAttachment on the Document class is buggy.
- * 
+ *
  * @author fabian
  *         since 2.28.0
  */
@@ -109,7 +109,7 @@ public class AttachmentService implements IAttachmentServiceRole {
       AddingAttachmentContentFailedException, DocumentSaveException {
     // We do not want to change the document in xwiki cache in case an exception happens
     // those not saved changes would be left in memory
-    XWikiDocument theDoc = (XWikiDocument) doc.clone();
+    XWikiDocument theDoc = doc.clone();
     // Read XWikiAttachment
     XWikiAttachment attachment = null;
     try {
@@ -140,7 +140,7 @@ public class AttachmentService implements IAttachmentServiceRole {
 
     // Adding a comment with a link to the download URL
     String nextRev = attachment.getNextVersion();
-    ArrayList<String> params = new ArrayList<String>();
+    ArrayList<String> params = new ArrayList<>();
     params.add(filename);
     params.add(theDoc.getAttachmentRevisionURL(filename, nextRev, getContext()));
     if (comment == null) {
@@ -170,7 +170,7 @@ public class AttachmentService implements IAttachmentServiceRole {
 
   /**
    * Attach a file to the current document.
-   * 
+   *
    * @param fieldName
    *          the target file field
    * @param filename
@@ -225,9 +225,9 @@ public class AttachmentService implements IAttachmentServiceRole {
     // The document is saved for each attachment in the group.
     FileUploadPlugin fileupload = (FileUploadPlugin) getContext().getWiki().getPlugin("fileupload",
         getContext());
-    Map<String, String> fileNames = new HashMap<String, String>();
-    List<String> wrongFileNames = new ArrayList<String>();
-    List<String> failedFiles = new ArrayList<String>();
+    Map<String, String> fileNames = new HashMap<>();
+    List<String> wrongFileNames = new ArrayList<>();
+    List<String> failedFiles = new ArrayList<>();
     for (String fieldName : fileupload.getFileItemNames(getContext())) {
       try {
         if (fieldName.startsWith(fieldNamePrefix)) {
@@ -265,7 +265,7 @@ public class AttachmentService implements IAttachmentServiceRole {
    * Extract the corresponding attachment name for a given file field. It can
    * either be specified in a separate form input field, or it is extracted from
    * the original filename.
-   * 
+   *
    * @param fieldName
    *          the target file field
    * @param fieldNamePrefix
@@ -286,8 +286,8 @@ public class AttachmentService implements IAttachmentServiceRole {
     filename = fileupload.getFileItemAsString(filenameField, getContext());
     if (!StringUtils.isBlank(filename)) {
       // TODO These should be supported, the URL should just contain escapes.
-      if (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(
-          ";") != -1) {
+      if ((filename.indexOf("/") != -1) || (filename.indexOf("\\") != -1) || (filename.indexOf(
+          ";") != -1)) {
         throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
             XWikiException.ERROR_XWIKI_APP_INVALID_CHARS, "Invalid filename: " + filename);
       }
@@ -397,6 +397,7 @@ public class AttachmentService implements IAttachmentServiceRole {
     return fileName;
   }
 
+  @Override
   public int deleteAttachmentList(List<AttachmentReference> attachmentRefList) {
     int nrDeleted = 0;
     if (attachmentRefList != null) {
@@ -407,7 +408,7 @@ public class AttachmentService implements IAttachmentServiceRole {
 
   Map<DocumentReference, List<String>> buildAttachmentsToDeleteMap(
       List<AttachmentReference> attachmentRefList) {
-    Map<DocumentReference, List<String>> attachmentMap = new HashMap<DocumentReference, List<String>>();
+    Map<DocumentReference, List<String>> attachmentMap = new HashMap<>();
     for (AttachmentReference attRef : attachmentRefList) {
       DocumentReference docRef = attRef.getDocumentReference();
       if (attachmentMap.containsKey(docRef)) {
@@ -415,7 +416,7 @@ public class AttachmentService implements IAttachmentServiceRole {
         attList.add(attRef.getName());
         attachmentMap.put(docRef, attList);
       } else {
-        List<String> attList = new ArrayList<String>();
+        List<String> attList = new ArrayList<>();
         attList.add(attRef.getName());
         attachmentMap.put(docRef, attList);
       }

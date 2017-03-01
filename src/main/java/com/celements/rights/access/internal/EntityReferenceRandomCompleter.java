@@ -15,6 +15,7 @@ public class EntityReferenceRandomCompleter implements IEntityReferenceRandomCom
   @Requirement
   private DocumentAccessBridge documentAccessBridge;
 
+  @Override
   public EntityReference randomCompleteSpaceRef(EntityReference entityRef) {
     if ((entityRef != null) && (entityRef.getType() == EntityType.SPACE)) {
       SpaceReference spaceRef = new SpaceReference(entityRef);

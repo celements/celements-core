@@ -228,7 +228,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
@@ -258,7 +258,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
@@ -288,7 +288,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     String cssStyles = "width:100px;\nheight:10px;\n";
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
@@ -320,7 +320,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", "");
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(context.getDatabase(),
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
@@ -385,7 +385,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(masterCellDb,
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);
@@ -418,7 +418,7 @@ public class CellRenderStrategyTest extends AbstractComponentTest {
     cellObj.setStringValue("css_classes", cssClasses);
     cellObj.setStringValue("idname", idname);
     cellObj.setStringValue("css_styles", cssStyles);
-    Vector<BaseObject> cellObjList = new Vector<BaseObject>();
+    Vector<BaseObject> cellObjList = new Vector<>();
     cellObjList.add(cellObj);
     DocumentReference cellClassRef = new DocumentReference(masterCellDb,
         ICellsClassConfig.CELEMENTS_CELL_CLASS_SPACE, ICellsClassConfig.CELEMENTS_CELL_CLASS_NAME);

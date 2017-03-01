@@ -29,10 +29,10 @@ public class ActionScriptService implements ScriptService {
   }
 
   public boolean executeAction(Document actionDoc, Map<String, List<Object>> fakeRequestMap) {
-    Map<String, String[]> requestMap = new HashMap<String, String[]>();
+    Map<String, String[]> requestMap = new HashMap<>();
     for (String key : fakeRequestMap.keySet()) {
       if (fakeRequestMap.get(key) != null) {
-        ArrayList<String> stringArray = new ArrayList<String>(fakeRequestMap.get(key).size());
+        ArrayList<String> stringArray = new ArrayList<>(fakeRequestMap.get(key).size());
         for (Object value : fakeRequestMap.get(key)) {
           stringArray.add(value.toString());
         }

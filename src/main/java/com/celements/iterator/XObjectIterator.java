@@ -40,7 +40,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Iterator class
- * 
+ *
  * @author Philipp Buser
  */
 public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObject> {
@@ -62,7 +62,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Constructor
-   * 
+   *
    * @param XWiki
    *          context
    */
@@ -74,11 +74,12 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
   /**
    * Checks if iterator has a next object
    */
+  @Override
   public boolean hasNext() {
     while ((_nextObject == null) && (getDocIterator().hasNext() || getObjectIterator().hasNext())) {
       if (getObjectIterator().hasNext()) {
         _nextObject = getObjectIterator().next();
-        if (_key != null && _value != null) {
+        if ((_key != null) && (_value != null)) {
           if (!isValidObject()) {
             _nextObject = null;
           }
@@ -112,6 +113,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
    * @exception NoSuchElementException
    *              iteration has no more elements.
    */
+  @Override
   public BaseObject next() {
     if (hasNext()) {
       BaseObject theNextObject = _nextObject;
@@ -141,7 +143,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the object iterator
-   * 
+   *
    * @return XObjectIterator
    */
   Iterator<BaseObject> getObjectIterator() {
@@ -153,7 +155,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the document iterator
-   * 
+   *
    * @return XObjectIterator
    */
   Iterator<String> getDocIterator() {
@@ -168,7 +170,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Get the objects for the current document
-   * 
+   *
    * @return
    */
   List<BaseObject> getObjectsForCurrentDoc() {
@@ -189,7 +191,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the current document
-   * 
+   *
    * @return current document
    */
   XWikiDocument getCurrentDoc() {
@@ -198,7 +200,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param testCurrentDoc
    */
   void inject_CurrentDoc(XWikiDocument testCurrentDoc) {
@@ -207,7 +209,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * FOR TESTS ONLY!!!
-   * 
+   *
    * @param nextObject
    */
   void inject_NextObject(BaseObject nextObject) {
@@ -216,16 +218,17 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Remove is not supported
-   * 
+   *
    * @throws UnsupportedOperationException
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }
 
   /**
    * Set the document list
-   * 
+   *
    * @param document
    *          list
    */
@@ -238,7 +241,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the document list
-   * 
+   *
    * @return document list
    */
   List<String> getDocList() {
@@ -247,16 +250,16 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Get a copy of the document list
-   * 
+   *
    * @return document list
    */
   public List<String> getDocListCopy() {
-    return new ArrayList<String>(_docList);
+    return new ArrayList<>(_docList);
   }
 
   /**
    * Sets the class name
-   * 
+   *
    * @param class
    *          name
    */
@@ -266,7 +269,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Gets the class name
-   * 
+   *
    * @return class name
    */
   public String getClassName() {
@@ -275,7 +278,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
 
   /**
    * Sets the filter
-   * 
+   *
    * @param filter
    */
   public void setFilter(String key, Object value) {
@@ -291,6 +294,7 @@ public class XObjectIterator implements Iterator<BaseObject>, Iterable<BaseObjec
     return _value;
   }
 
+  @Override
   public Iterator<BaseObject> iterator() {
     return this;
   }

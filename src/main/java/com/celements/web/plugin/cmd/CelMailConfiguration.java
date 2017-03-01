@@ -22,7 +22,7 @@ import com.xpn.xwiki.web.Utils;
  * smtp-host config is overwritten to some special server tracking username and passwords.
  * Mixing the configuration leads to the server default username and password would be
  * sent to this unfriendly server.
- * 
+ *
  * @author fabian
  * @since 2.34.0
  */

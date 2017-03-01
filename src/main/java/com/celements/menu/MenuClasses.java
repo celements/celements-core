@@ -50,6 +50,7 @@ public class MenuClasses extends CelementsClassCollection {
     return mLogger;
   }
 
+  @Override
   public String getConfigName() {
     return "celMenuClasses";
   }

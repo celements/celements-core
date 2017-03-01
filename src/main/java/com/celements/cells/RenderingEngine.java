@@ -45,10 +45,11 @@ public class RenderingEngine implements IRenderingEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.cells.IRenderingEngine#renderCell(
    * com.xpn.xwiki.objects.BaseObject)
    */
+  @Override
   public void renderCell(TreeNode node) {
     renderStrategy.startRendering();
     // isFirst AND isLast because only this item and its children is
@@ -59,9 +60,10 @@ public class RenderingEngine implements IRenderingEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.cells.IRenderingEngine#renderSubCells(java.lang.String)
    */
+  @Override
   @Deprecated
   public void renderPageLayout(String spaceName) {
     SpaceReference spaceRef = getWebUtilsService().resolveSpaceReference(spaceName);
@@ -70,10 +72,11 @@ public class RenderingEngine implements IRenderingEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see com.celements.web.cells.IRenderingEngine#renderSubCells(
    * org.xwiki.model.reference.SpaceReference)
    */
+  @Override
   public void renderPageLayout(SpaceReference spaceRef) {
     LOGGER.debug("renderPageLayout: start rendering [" + spaceRef + "].");
     renderStrategy.startRendering();

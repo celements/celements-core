@@ -52,7 +52,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
       throws AccountActivationFailedException {
     _LOGGER.debug("activateAccount: for code " + activationCode);
     try {
-      Map<String, String> userAccount = new HashMap<String, String>();
+      Map<String, String> userAccount = new HashMap<>();
       String hashedCode = getPasswordHash("hash:SHA-512:", activationCode);
       String username = new UserNameForUserDataCommand().getUsernameForUserData(hashedCode,
           "validkey", getContext());
@@ -104,7 +104,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
 
   /**
    * API to check rights on a document for a given user or group
-   * 
+   *
    * @param level
    *          right to check (view, edit, comment, delete)
    * @param user
@@ -115,6 +115,7 @@ public class AuthenticationService implements IAuthenticationServiceRole {
    *          document on which to check the rights
    * @return true if right is granted/false if not
    */
+  @Override
   public boolean hasAccessLevel(String level, String user, boolean isUser, DocumentReference docRef)
       throws XWikiException {
     return ((XWikiRightServiceImpl) getContext().getWiki().getRightService()).hasAccessLevel(level,

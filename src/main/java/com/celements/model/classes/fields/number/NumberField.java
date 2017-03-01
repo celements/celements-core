@@ -3,8 +3,6 @@ package com.celements.model.classes.fields.number;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-
-
 import com.celements.model.classes.fields.AbstractClassField;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;

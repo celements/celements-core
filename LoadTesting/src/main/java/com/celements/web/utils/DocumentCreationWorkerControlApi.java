@@ -24,35 +24,35 @@ import com.xpn.xwiki.api.Api;
 
 /**
  * TODO change to ScriptService using an ExecuterService implementation
- * e.g.     ExecutorService executor = Executors.newFixedThreadPool(2);
+ * e.g. ExecutorService executor = Executors.newFixedThreadPool(2);
  * Create the DocumentCreationWorker and wrap in a FutureTask. After that add the
- * futureTask to the executor:    executor.execute(futureTask1);
+ * futureTask to the executor: executor.execute(futureTask1);
  * The FutureTask allows to cancel the Worker and can check if it isDone.
- * 
- * @author pichlerf
  *
+ * @author pichlerf
  */
 @Deprecated
 public class DocumentCreationWorkerControlApi extends Api {
+
   DocumentCreationWorkerControl workerControl;
-  
+
   public DocumentCreationWorkerControlApi(XWikiContext context) {
     super(context);
     workerControl = DocumentCreationWorkerControl.getWorkerControl();
   }
-  
+
   public void startThread(String space, int numberOfThreads) {
     workerControl.startThread(space, numberOfThreads, context);
   }
-  
+
   public void stopAllWorkers() {
     workerControl.stopAllWorkers();
   }
-  
+
   public void stopWorker(int number) {
     workerControl.stopWorker(number);
   }
-  
+
   public String getStats() {
     return workerControl.getStats();
   }

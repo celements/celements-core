@@ -35,7 +35,7 @@ public class Parser {
   private ILexicalParser<? extends IGenericLiteral> lexParser;
   private JsonParser parser;
   private static JsonFactory factory = new JsonFactory();
-  private Stack<ECommand> workerStack = new Stack<ECommand>();
+  private Stack<ECommand> workerStack = new Stack<>();
   private String lastKey = "";
   private String lastValue = "";
 
@@ -43,7 +43,7 @@ public class Parser {
 
   public static <T extends IGenericLiteral> Parser createLexicalParser(T initLiteral,
       IEventHandler<T> eventHandler) {
-    return new Parser(initLiteral, new LexicalParser<T>(initLiteral, eventHandler));
+    return new Parser(initLiteral, new LexicalParser<>(initLiteral, eventHandler));
   }
 
   <T extends IGenericLiteral> Parser(T initLiteral, ILexicalParser<T> lexParser) {
@@ -113,20 +113,20 @@ public class Parser {
   }
 
   private void checkIllegalStackState(ECommand illegalCommand, JsonToken token) {
-    if (!workerStack.isEmpty() && workerStack.peek() == illegalCommand) {
+    if (!workerStack.isEmpty() && (workerStack.peek() == illegalCommand)) {
       throw new IllegalStateException("Found illegal " + token + " inside " + illegalCommand);
     }
   }
 
   private void checkStackState(ECommand expectedCommand) {
-    if (workerStack.isEmpty() || workerStack.peek() != expectedCommand) {
+    if (workerStack.isEmpty() || (workerStack.peek() != expectedCommand)) {
       throw new IllegalStateException("Expecting " + expectedCommand + " but found "
           + workerStack.peek() + " Last key [" + lastKey + "] last value [" + lastValue + "]");
     }
   }
 
   private void impliciteCloseProperty() {
-    if (!workerStack.isEmpty() && workerStack.peek() == ECommand.PROPERTY_COMMAND) {
+    if (!workerStack.isEmpty() && (workerStack.peek() == ECommand.PROPERTY_COMMAND)) {
       lexParser.closePropertyEvent();
       workerStack.pop();
     }

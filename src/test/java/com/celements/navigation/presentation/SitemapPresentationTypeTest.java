@@ -77,11 +77,11 @@ public class SitemapPresentationTypeTest extends AbstractBridgedComponentTestCas
   public void testAddLanguageLinks() throws Exception {
     StringBuilder outStream = new StringBuilder();
     expect(xwiki.getDocument(eq(currentDocRef), same(context))).andReturn(currentDoc).atLeastOnce();
-    List<String> allowedLangs = new ArrayList<String>();
+    List<String> allowedLangs = new ArrayList<>();
     allowedLangs.add("de");
     allowedLangs.add("fr");
     allowedLangs.add("en");
-    List<String> docTransList = new ArrayList<String>();
+    List<String> docTransList = new ArrayList<>();
     // docTransList.add("de"); <-- defaultLanguage DOES NOT show up in translist!!!
     docTransList.add("en");
     expect(mockXWikiStore.getTranslationList(same(currentDoc), same(context))).andReturn(

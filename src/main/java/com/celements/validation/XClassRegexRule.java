@@ -47,7 +47,7 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
   private static final String PROPERTY_FIELD_VAL_REGEX = "validationRegExp";
   private static final String PROPERTY_FIELD_VAL_MSG = "validationMessage";
 
-  private static final MapHandler<String, ValidationType, String> mapHandler = new MapHandler<String, ValidationType, String>();
+  private static final MapHandler<String, ValidationType, String> mapHandler = new MapHandler<>();
 
   @Requirement
   ConfigurationSource configSrc;
@@ -62,9 +62,10 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public Map<String, Map<ValidationType, Set<String>>> validateRequest(
       Map<RequestParameter, String[]> requestMap) {
-    Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<String, Map<ValidationType, Set<String>>>();
+    Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<>();
     for (RequestParameter param : requestMap.keySet()) {
       for (String value : requestMap.get(param)) {
         mapHandler.put(param.getParameterName(), validateField(param.getClassName(),
@@ -75,6 +76,7 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
     return ret;
   }
 
+  @Override
   public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
       String value) {
     Map<ValidationType, Set<String>> ret = null;
@@ -139,8 +141,8 @@ public class XClassRegexRule implements IRequestValidationRuleRole, IFieldValida
   }
 
   private Map<ValidationType, Set<String>> getErrorStringInMap(String str) {
-    Map<ValidationType, Set<String>> map = new HashMap<ValidationType, Set<String>>();
-    Set<String> validationSet = new HashSet<String>();
+    Map<ValidationType, Set<String>> map = new HashMap<>();
+    Set<String> validationSet = new HashSet<>();
     validationSet.add(str);
     map.put(ValidationType.ERROR, validationSet);
     return map;

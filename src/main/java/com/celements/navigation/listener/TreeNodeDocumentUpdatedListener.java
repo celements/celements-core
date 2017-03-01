@@ -70,16 +70,19 @@ public class TreeNodeDocumentUpdatedListener extends AbstractTreeNodeDocumentLis
     return (NavigationClasses) navClasses;
   }
 
+  @Override
   public String getName() {
     LOGGER.trace("TreeNodeDocumentUpdatedListener getName");
     return "TreeNodeDocumentUpdatedListener";
   }
 
+  @Override
   public List<Event> getEvents() {
     LOGGER.trace("TreeNodeDocumentUpdatedListener getEvents");
     return Arrays.asList((Event) new DocumentUpdatedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     LOGGER.trace("TreeNodeDocumentUpdatedListener onEvent: start.");
     XWikiDocument document = (XWikiDocument) source;
