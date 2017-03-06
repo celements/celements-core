@@ -156,6 +156,11 @@ public class EntityTypeUtil {
         // skip type attachment for type OBJECT or OBJECT_PROPERTY
         return ordinal -= ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1);
       }
+
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
     };
   }
 
