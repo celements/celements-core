@@ -17,6 +17,9 @@ public class MetaTagService implements MetaTagServiceRole {
   @Requirement
   private Execution execution;
 
+  @Requirement
+  private List<MetaTagProviderRole> headerTagImpls;
+
   @Override
   public void addMetaTagToCollector(@NotNull MetaTag tag) {
     Object contextObj = getExecutionContext().getProperty(MetaTagServiceRole.META_CONTEXT_KEY);
@@ -40,6 +43,24 @@ public class MetaTagService implements MetaTagServiceRole {
       }
     }
     return sb.toString();
+  }
+
+  @Override
+  public void collectHeaderTags() {
+    for (MetaTagProviderRole headerTagImpl : headerTagImpls) {
+      for (MetaTag tag : headerTagImpl.getHeaderMetaTags()) {
+        addMetaTagToCollector(tag);
+      }
+    }
+  }
+
+  @Override
+  public void collectBodyTags() {
+    for (MetaTagProviderRole headerTagImpl : headerTagImpls) {
+      for (MetaTag tag : headerTagImpl.getBodyMetaTags()) {
+        addMetaTagToCollector(tag);
+      }
+    }
   }
 
   @SuppressWarnings("unchecked")

@@ -43,4 +43,12 @@ public class MetaTagScriptService implements ScriptService {
   public @NotNull String displayCollectedMetaTags() {
     return metaTag.displayCollectedMetaTags();
   }
+
+  public void collectHeaderTags() {
+    metaTag.collectHeaderTags();
+  }
+
+  public void collectBodyTags() {
+    metaTag.collectBodyTags();
+  }
 }
