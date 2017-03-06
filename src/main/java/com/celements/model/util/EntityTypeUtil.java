@@ -4,9 +4,11 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.EntityType;
@@ -18,6 +20,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -57,6 +60,16 @@ public class EntityTypeUtil {
   }
 
   @NotNull
+  public static EntityType getEntityTypeForClassOrThrow(
+      @NotNull Class<? extends EntityReference> token) {
+    Optional<EntityType> type = getEntityTypeForClass(token);
+    if (!type.isPresent()) {
+      throw new IllegalArgumentException("No entity type for class: " + token);
+    }
+    return type.get();
+  }
+
+  @NotNull
   public static Class<? extends EntityReference> getClassForEntityType(@NotNull EntityType type) {
     Class<? extends EntityReference> token = ENTITY_TYPE_MAP.inverse().get(checkNotNull(type));
     if (token != null) {
@@ -69,6 +82,11 @@ public class EntityTypeUtil {
   @NotNull
   public static EntityType getRootEntityType() {
     return EntityType.values()[0];
+  }
+
+  @NotNull
+  public static EntityType getLastEntityType() {
+    return EntityType.values()[EntityType.values().length - 1];
   }
 
   /**
@@ -100,6 +118,45 @@ public class EntityTypeUtil {
       }
     }
     return Optional.absent();
+  }
+
+  @NotNull
+  public static Iterator<EntityType> createIterator() {
+    return createIteratorAt(null);
+  }
+
+  @NotNull
+  public static Iterator<EntityType> createIteratorFrom(@Nullable final EntityType startType) {
+    Iterator<EntityType> ret = createIteratorAt(checkNotNull(startType));
+    if ((startType != null) && ret.hasNext()) {
+      ret.next();
+    }
+    return ret;
+  }
+
+  @NotNull
+  public static Iterator<EntityType> createIteratorAt(@Nullable final EntityType startType) {
+    return new Iterator<EntityType>() {
+
+      private int ordinal = MoreObjects.firstNonNull(startType, getLastEntityType()).ordinal();
+
+      @Override
+      public boolean hasNext() {
+        return ordinal >= 0;
+      }
+
+      @Override
+      public EntityType next() {
+        EntityType ret = EntityType.values()[ordinal];
+        decrease();
+        return ret;
+      }
+
+      private int decrease() {
+        // skip type attachment for type OBJECT or OBJECT_PROPERTY
+        return ordinal -= ((ordinal == EntityType.OBJECT.ordinal()) ? 2 : 1);
+      }
+    };
   }
 
 }

@@ -80,17 +80,15 @@ public class DefaultModelUtils implements ModelUtils {
   public <T extends EntityReference> T resolveRef(String name, Class<T> token,
       EntityReference baseRef) {
     EntityReference resolvedRef;
-    Optional<EntityType> type = getEntityTypeForClass(token);
+    EntityType type = getEntityTypeForClassOrThrow(token);
     if (checkNotNull(name).isEmpty()) {
       throw new IllegalArgumentException("name may not be empty");
-    } else if (!type.isPresent()) {
-      throw new IllegalArgumentException("No entity type for class: " + token);
-    } else if (type.get() == getRootEntityType()) {
+    } else if (type == getRootEntityType()) {
       // resolver cannot handle root reference
       resolvedRef = new WikiReference(name);
     } else {
       baseRef = MoreObjects.firstNonNull(baseRef, context.getWikiRef());
-      resolvedRef = resolver.resolve(name, type.get(), baseRef);
+      resolvedRef = resolver.resolve(name, type, baseRef);
     }
     return cloneRef(resolvedRef, token); // effective immutability
   }
