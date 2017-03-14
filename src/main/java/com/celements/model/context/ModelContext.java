@@ -21,6 +21,12 @@ public interface ModelContext {
   public static final String CFG_KEY_DEFAULT_LANG = "default_language";
   public static final String FALLBACK_DEFAULT_LANG = "en";
 
+  /**
+   * WARNING: This call is discouraged, use other methods of this service. It will be deprecated
+   * once we'll have a replacement for all of them.
+   *
+   * @return the old, discouraged {@link XWikiContext}
+   */
   public XWikiContext getXWikiContext();
 
   /**
