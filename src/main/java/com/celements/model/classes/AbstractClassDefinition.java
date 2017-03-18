@@ -122,21 +122,21 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
 
   @Override
   public int hashCode() {
-    return Objects.hash(getClassRef());
+    return Objects.hash(getClassReference());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ClassDefinition) {
       ClassDefinition other = (ClassDefinition) obj;
-      return Objects.equals(this.getClassRef(), other.getClassRef());
+      return Objects.equals(this.getClassReference(), other.getClassReference());
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return modelUtils.serializeRefLocal(getClassRef());
+    return modelUtils.serializeRef(getClassReference());
   }
 
 }
