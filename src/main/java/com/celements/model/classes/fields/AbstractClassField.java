@@ -6,9 +6,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.celements.model.classes.ClassDefinition;
-import com.celements.model.util.ModelUtils;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -16,28 +14,25 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Subclasses are expected to be immutable
  */
-public abstract class AbstractClassField<T> implements ClassField<T> {
+public abstract class AbstractClassField<T> extends AbstractParentClassField<T> {
 
   private final String classDefName;
-  private final String name;
   private final String prettyName;
   private final String validationRegExp;
   private final String validationMessage;
 
-  public abstract static class Builder<B extends Builder<B, T>, T> {
+  public abstract static class Builder<B extends Builder<B, T>, T> extends
+      AbstractParentClassField.Builder<B, T> {
 
     private final String classDefName;
-    private final String name;
     private String prettyName;
     private String validationRegExp;
     private String validationMessage;
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(name);
       this.classDefName = Objects.requireNonNull(classDefName);
-      this.name = Objects.requireNonNull(Strings.emptyToNull(name));
     }
-
-    public abstract B getThis();
 
     public B prettyName(@Nullable String val) {
       prettyName = val;
@@ -54,14 +49,12 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
       return getThis();
     }
 
-    public abstract AbstractClassField<T> build();
-
   }
 
   protected AbstractClassField(@NotNull Builder<?, T> builder) {
+    super(builder);
     this.classDefName = builder.classDefName;
-    this.name = builder.name;
-    this.prettyName = MoreObjects.firstNonNull(builder.prettyName, builder.name);
+    this.prettyName = MoreObjects.firstNonNull(builder.prettyName, getName());
     this.validationRegExp = builder.validationRegExp;
     this.validationMessage = builder.validationMessage;
   }
@@ -69,11 +62,6 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   @Override
   public ClassDefinition getClassDef() {
     return Utils.getComponent(ClassDefinition.class, classDefName);
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 
   public String getPrettyName() {
@@ -91,7 +79,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   @Override
   public PropertyInterface getXField() {
     PropertyClass element = getPropertyClass();
-    element.setName(name);
+    element.setName(getName());
     if (prettyName != null) {
       element.setPrettyName(prettyName);
     }
@@ -105,29 +93,5 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   }
 
   protected abstract PropertyClass getPropertyClass();
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(classDefName, name);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof AbstractClassField) {
-      AbstractClassField<?> other = (AbstractClassField<?>) obj;
-      return Objects.equals(this.classDefName, other.classDefName) && Objects.equals(this.name,
-          other.name);
-    }
-    return false;
-  }
-
-  @Override
-  public String toString() {
-    return new StringBuilder().append(getClassDef()).append(".").append(name).toString();
-  }
-
-  protected static ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
-  }
 
 }
