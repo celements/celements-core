@@ -159,7 +159,7 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     expect(attURLcmd.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
     cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(xwikiPrefDocRef);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);
@@ -185,7 +185,7 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     expect(attURLcmd.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
     cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(xwikiPrefDocRef);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     doc.setAttachmentList(attList);
     expect(xwiki.getDocument(eq(xwikiPrefDocRef), same(context))).andReturn(doc);
     replayDefault();
@@ -209,7 +209,7 @@ public class CSSBaseObjectTest extends AbstractBridgedComponentTestCase {
     expect(attURLcmd.isAttachmentLink(eq(link))).andReturn(true).anyTimes();
     cssFile.testInjectAttURLcmd(attURLcmd);
     XWikiDocument doc = new XWikiDocument(xwikiPrefDocRef);
-    List<XWikiAttachment> attList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attList = new ArrayList<>();
     XWikiAttachment att = new XWikiAttachment(doc, "myAttachment.css");
     attList.add(att);
     doc.setAttachmentList(attList);

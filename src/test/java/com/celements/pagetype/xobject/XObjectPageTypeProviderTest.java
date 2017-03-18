@@ -77,7 +77,7 @@ public class XObjectPageTypeProviderTest extends AbstractComponentTest {
 
   @Test
   public void testGetPageTypes() throws Exception {
-    Set<String> allPageTypeNames = new HashSet<String>(Arrays.asList("PageTypes.RichText"));
+    Set<String> allPageTypeNames = new HashSet<>(Arrays.asList("PageTypes.RichText"));
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(false).anyTimes();
     DocumentReference centralRichTextPTdocRef = new DocumentReference("celements2web", "PageTypes",
         "RichText");

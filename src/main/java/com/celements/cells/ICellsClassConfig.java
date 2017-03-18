@@ -20,6 +20,7 @@ public interface ICellsClassConfig {
   public static final String LAYOUT_TYPE_FIELD = "layout_type";
   public static final String EDITOR_LAYOUT_VALUE = "editorLayout";
   public static final String PAGE_LAYOUT_VALUE = "pageLayout";
+  public static final String LAYOUT_DOCTYPE_FIELD = "doctype";
 
   public DocumentReference getCellClassRef(String wikiName);
 

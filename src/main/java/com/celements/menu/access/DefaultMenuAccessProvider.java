@@ -27,6 +27,7 @@ public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public boolean hasview(DocumentReference menuBarDocRef) throws NoAccessDefinedException,
       XWikiException {
     String database = getContext().getDatabase();
@@ -50,6 +51,7 @@ public class DefaultMenuAccessProvider implements IMenuAccessProviderRole {
     }
   }
 
+  @Override
   public boolean denyView(DocumentReference menuBarDocRef) {
     return false;
   }

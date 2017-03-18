@@ -624,8 +624,8 @@ public class CelementsWebScriptService implements ScriptService {
 
   /**
    * @deprecated since 2.59 instead use {@link EditorSupportScriptService #validateRequest()}
-   * @return empty map means the validation has been successful. Otherwise validation
-   *         messages are returned for invalid fields.
+   * @return empty map means the validation has been successful. Otherwise validation messages are
+   *         returned for invalid fields.
    */
   @Deprecated
   public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
@@ -633,8 +633,7 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
-   * getLastStartupTimeStamp to solve browser caching issues with files on disk e.g.
-   * tinymce
+   * getLastStartupTimeStamp to solve browser caching issues with files on disk e.g. tinymce
    *
    * @return
    */
@@ -692,8 +691,7 @@ public class CelementsWebScriptService implements ScriptService {
     try {
       XWikiDocument tagDoc = getContext().getWiki().getDocument(tagDocRef, getContext());
       if (/*
-           * (tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) !=
-           * null) &&
+           * (tagDoc.getXObject(pageTypeDocRef, "page_type", "FileBaseTag", false) != null) &&
            */(tagDoc.getXObject(tagClassDocRef, "attachment", tagValue, false) == null)) {
         BaseObject obj = tagDoc.newXObject(tagClassDocRef, getContext());
         obj.setStringValue("attachment", tagValue);
@@ -749,16 +747,15 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /**
-   * The context.getMainXWiki method is broken for virtual usage. This is a replacement.
-   * return schema = wiki.Param("xwiki.db");
+   * The context.getMainXWiki method is broken for virtual usage. This is a replacement. return
+   * schema = wiki.Param("xwiki.db");
    */
   public String getMainWikiName() {
     return (getContext() != null ? getContext().getWiki().Param("xwiki.db") : null);
   }
 
   /**
-   * Cache should maintain itself. Thus this flushMenuItemCache should not be called
-   * anymore.
+   * Cache should maintain itself. Thus this flushMenuItemCache should not be called anymore.
    *
    * @deprecated
    */
@@ -889,8 +886,8 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and write the
+   * exception in a log-file
    */
   public int getNextObjPageId(SpaceReference spaceRef, DocumentReference classRef,
       String propertyName) throws XWikiException {
@@ -923,16 +920,16 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and write the
+   * exception in a log-file
    */
   public int createUser() throws XWikiException {
     return getCelementsWebService().createUser(true);
   }
 
   /*
-   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and
-   * write the exception in a log-file
+   * TODO: Please get rid of throwing an exception to the view (client), use try/catch and write the
+   * exception in a log-file
    */
   public int createUser(boolean validate) throws XWikiException {
     return getCelementsWebService().createUser(validate);

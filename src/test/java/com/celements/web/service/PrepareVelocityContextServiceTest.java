@@ -218,7 +218,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         "0").atLeastOnce();
     expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
     expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("en,de").atLeastOnce();
-    Enumeration<Locale> testEnum = new Vector<Locale>(Arrays.asList(new Locale("en"), new Locale(
+    Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("en"), new Locale(
         "de"))).elements();
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1").atLeastOnce();
@@ -253,7 +253,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         "0").atLeastOnce();
     expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
     expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("de").atLeastOnce();
-    Enumeration<Locale> testEnum = new Vector<Locale>(Arrays.asList(new Locale("de"))).elements();
+    Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("de"))).elements();
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1").atLeastOnce();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(
@@ -287,7 +287,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
         "0").atLeastOnce();
     expect(requestMock.getParameter(eq("language"))).andReturn("").atLeastOnce();
     expect(requestMock.getHeader(eq("Accept-Language"))).andReturn("de").atLeastOnce();
-    Enumeration<Locale> testEnum = new Vector<Locale>(Arrays.asList(new Locale("de"))).elements();
+    Enumeration<Locale> testEnum = new Vector<>(Arrays.asList(new Locale("de"))).elements();
     expect(requestMock.getLocales()).andReturn(testEnum).atLeastOnce();
     expect(xwiki.Param(eq("xwiki.language.forceSupported"), eq("0"))).andReturn("1").atLeastOnce();
     expect(xwiki.getSpacePreference(eq("languages"), eq("mySpace"), eq(""), same(
@@ -329,7 +329,7 @@ public class PrepareVelocityContextServiceTest extends AbstractBridgedComponentT
     prepVeloContextService.fixLanguagePreference(vContext);
     ExecutionContext execContext = prepVeloContextService.execution.getContext();
     Object addCookieBefore = execContext.getProperty(
-        PrepareVelocityContextService.ADD_LANGUAGE_COOKIE_DONE);
+        IPrepareVelocityContext.ADD_LANGUAGE_COOKIE_DONE);
     assertNotNull(addCookieBefore);
     assertTrue((Boolean) addCookieBefore);
     // check addCookie is only called once

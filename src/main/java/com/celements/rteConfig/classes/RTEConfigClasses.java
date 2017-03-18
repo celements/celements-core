@@ -41,6 +41,7 @@ public class RTEConfigClasses extends AbstractClassCollection {
     return LOGGER;
   }
 
+  @Override
   public String getConfigName() {
     return "rteConfigClasses";
   }

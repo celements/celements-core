@@ -3,7 +3,6 @@ package com.celements.model.classes.fields.ref;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-
 import org.xwiki.model.reference.WikiReference;
 
 @Immutable

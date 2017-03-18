@@ -83,7 +83,7 @@ public class SuggestBaseClass {
   /**
    * isPicker represents the class editor field 'Use Suggest'. Only ListClass and
    * StringClass have the possibility of suggest.
-   * 
+   *
    * @return if the edit view of the specified field should use suggest. Returns null for
    *         fields with no suggest possibility.
    */

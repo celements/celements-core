@@ -41,7 +41,7 @@ public class PageTypeReference {
   public PageTypeReference(String configName, String providerHint, List<String> categories) {
     this.configName = configName;
     this.providerHint = providerHint;
-    this.categories = new ArrayList<String>(categories);
+    this.categories = new ArrayList<>(categories);
   }
 
   public String getConfigName() {
@@ -49,7 +49,7 @@ public class PageTypeReference {
   }
 
   public List<String> getCategories() {
-    return new ArrayList<String>(categories);
+    return new ArrayList<>(categories);
   }
 
   public String getProviderHint() {

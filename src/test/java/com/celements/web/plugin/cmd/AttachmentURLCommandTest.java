@@ -94,7 +94,7 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     XWikiDocument abdoc = new XWikiDocument();
     abdoc.setFullName("A.B");
     abdoc.setDatabase("celements2web");
-    List<XWikiAttachment> attachList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attachList = new ArrayList<>();
     XWikiAttachment blaAtt = new XWikiAttachment();
     blaAtt.setFilename("bla.txt");
     blaAtt.setDoc(abdoc);
@@ -122,7 +122,7 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
     expect(mockURLFactory.getURL(eq(tstURL), same(context))).andReturn(resultURL);
     XWikiDocument abdoc = new XWikiDocument();
     abdoc.setFullName("A.B");
-    List<XWikiAttachment> attachList = new ArrayList<XWikiAttachment>();
+    List<XWikiAttachment> attachList = new ArrayList<>();
     XWikiAttachment blaAtt = new XWikiAttachment();
     blaAtt.setFilename("bla.txt");
     blaAtt.setDoc(abdoc);

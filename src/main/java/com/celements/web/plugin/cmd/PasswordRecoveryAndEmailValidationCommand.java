@@ -74,14 +74,14 @@ public class PasswordRecoveryAndEmailValidationCommand {
         LOGGER.error("Exception getting userdoc for email '" + email + "'", e);
       }
     }
-    List<String> params = new ArrayList<String>();
+    List<String> params = new ArrayList<>();
     params.add(email);
     return getContext().getMessageTool().get(CEL_PASSWORD_RECOVERY_FAILED, params);
   }
 
   // Allow recovery exclusively for email input
   public String recoverPassword(String account, String input) {
-    List<String> params = new ArrayList<String>();
+    List<String> params = new ArrayList<>();
     params.add(input);
     String resultMsgKey = CEL_PASSWORD_RECOVERY_FAILED;
     if ((account != null) && (!"".equals(account.trim()))) {

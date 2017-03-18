@@ -42,15 +42,18 @@ public class TreeNodeCacheListener implements EventListener {
   @Requirement
   ITreeNodeCache treeNodeCache;
 
+  @Override
   public String getName() {
     return "TreeNodeCacheListener";
   }
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.asList((Event) new TreeNodeCreatedEvent(), (Event) new TreeNodeUpdatedEvent(),
         (Event) new TreeNodeDeletedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument document = (XWikiDocument) source;
     if (document != null) {

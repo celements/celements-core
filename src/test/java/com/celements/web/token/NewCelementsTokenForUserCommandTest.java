@@ -135,7 +135,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     expect(query.bindValue((String) anyObject(), (String) anyObject())).andReturn(query).anyTimes();
     expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))).andReturn(
         query).anyTimes();
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     list.add("0");
     expect(query.execute()).andReturn(list);
     replay(query, queryManager);
@@ -177,7 +177,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     expect(query.bindValue((String) anyObject(), (String) anyObject())).andReturn(query).anyTimes();
     expect(query.setWiki(eq(dRef.getLastSpaceReference().getParent().getName()))).andReturn(
         query).anyTimes();
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     list.add("1");
     list.add(2);
     expect(query.execute()).andReturn(list);
@@ -205,10 +205,10 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     expect(doc.newObject(eq("Classes.TokenClass"), same(context))).andReturn(baseObject).once();
     baseObject.set(eq("tokenvalue"), eq(randomString), same(context));
     expectLastCall().once();
-    Capture<Date> captDate = new Capture<Date>();
+    Capture<Date> captDate = new Capture<>();
     baseObject.set(eq("validuntil"), capture(captDate), same(context));
     expectLastCall().once();
-    Vector<BaseObject> userObjects = new Vector<BaseObject>();
+    Vector<BaseObject> userObjects = new Vector<>();
     userObjects.add(baseObject);
     String hql = "select str.value from BaseObject as obj, StringProperty as str ";
     hql += "where obj.className='XWiki.XWikiUsers' ";
@@ -216,7 +216,7 @@ public class NewCelementsTokenForUserCommandTest extends AbstractBridgedComponen
     hql += "and str.id.name='validkey' ";
     hql += "and str.value<>''";
     expect(store.search(eq(hql), eq(0), eq(0), same(context))).andReturn(
-        new ArrayList<Object>()).once();
+        new ArrayList<>()).once();
     expect(xwiki.generateRandomString(eq(24))).andReturn(randomString).once();
     expect(xwiki.getStore()).andReturn(store).once();
     expect(xwiki.exists(eq("XWiki.XWikiGuestPlus"), same(context))).andReturn(true).once();

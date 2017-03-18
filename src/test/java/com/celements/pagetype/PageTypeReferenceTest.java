@@ -54,7 +54,7 @@ public class PageTypeReferenceTest {
 
   @Test
   public void testGetCategories_unmodifiable_input() {
-    List<String> categories = new ArrayList<String>();
+    List<String> categories = new ArrayList<>();
     categories.add("cat1");
     PageTypeReference pageTypeRef2 = new PageTypeReference(CONFIG_NAME, PROVIDER_HIND, categories);
     categories.add("cat2");
@@ -64,7 +64,7 @@ public class PageTypeReferenceTest {
 
   @Test
   public void testGetCategories_unmodifiable_output() {
-    List<String> categories = new ArrayList<String>();
+    List<String> categories = new ArrayList<>();
     categories.add("cat1");
     PageTypeReference pageTypeRef2 = new PageTypeReference(CONFIG_NAME, PROVIDER_HIND, categories);
     categories = pageTypeRef2.getCategories();

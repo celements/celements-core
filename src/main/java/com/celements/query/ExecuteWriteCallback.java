@@ -17,7 +17,7 @@ public class ExecuteWriteCallback implements HibernateCallback<Integer> {
 
   public ExecuteWriteCallback(String hql, Map<String, Object> binds) {
     this.hql = hql;
-    this.binds = new HashMap<String, Object>(binds);
+    this.binds = new HashMap<>(binds);
   }
 
   public String getHQL() {
@@ -25,7 +25,7 @@ public class ExecuteWriteCallback implements HibernateCallback<Integer> {
   }
 
   public Map<String, Object> getBinds() {
-    return new HashMap<String, Object>(binds);
+    return new HashMap<>(binds);
   }
 
   @Override

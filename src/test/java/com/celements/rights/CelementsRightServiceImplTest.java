@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
   public void testCheckRight_publishNotActive() throws XWikiRightNotFoundException, XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
-    Collection<DocumentReference> groupsList = new ArrayList<DocumentReference>();
+    Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
@@ -71,7 +70,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
       XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
-    Collection<DocumentReference> groupsList = new ArrayList<DocumentReference>();
+    Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
@@ -102,7 +101,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
       XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
-    Collection<DocumentReference> groupsList = new ArrayList<DocumentReference>();
+    Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
@@ -123,9 +122,9 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
     rightObj.setStringValue("levels", "view");
     rightObj.setIntValue("allow", 1);
     doc.addXObject(rightObj);
-    Calendar gc = GregorianCalendar.getInstance();
+    Calendar gc = Calendar.getInstance();
     BaseObject obj = new BaseObject();
-    gc.add(GregorianCalendar.HOUR, 1);
+    gc.add(Calendar.HOUR, 1);
     obj.setDateValue("publishDate", gc.getTime());
     obj.setXClassReference(getPublicationClassReference());
     doc.addXObject(obj);
@@ -140,7 +139,7 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
       XWikiException {
     XWikiGroupService gs = createMock(XWikiGroupService.class);
     expect(xwiki.getGroupService(same(getContext()))).andReturn(gs).anyTimes();
-    Collection<DocumentReference> groupsList = new ArrayList<DocumentReference>();
+    Collection<DocumentReference> groupsList = new ArrayList<>();
     groupsList.add(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiAllGroup"));
     expect(gs.getAllGroupsReferencesForMember(eq(new DocumentReference(getContext().getDatabase(),
         "XWiki", "user")), eq(0), eq(0), same(getContext()))).andReturn(groupsList).anyTimes();
@@ -161,12 +160,12 @@ public class CelementsRightServiceImplTest extends AbstractBridgedComponentTestC
     rightObj.setStringValue("levels", "view");
     rightObj.setIntValue("allow", 1);
     doc.addXObject(rightObj);
-    Calendar gc = GregorianCalendar.getInstance();
+    Calendar gc = Calendar.getInstance();
     BaseObject obj = new BaseObject();
-    gc.add(GregorianCalendar.HOUR, -1);
+    gc.add(Calendar.HOUR, -1);
     obj.setDateValue("publishDate", gc.getTime());
-    gc.add(GregorianCalendar.HOUR, 1);
-    gc.add(GregorianCalendar.HOUR, 1);
+    gc.add(Calendar.HOUR, 1);
+    gc.add(Calendar.HOUR, 1);
     obj.setDateValue("unpublishDate", gc.getTime());
     obj.setXClassReference(getPublicationClassReference());
     doc.addXObject(obj);

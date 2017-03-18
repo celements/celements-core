@@ -66,13 +66,15 @@ public class PageTypeService implements IPageTypeRole {
   private List<IPageTypeCategoryRole> pageTypeCategoryList;
 
   private final ConcurrentMap<String, IPageTypeCategoryRole> typeNameToCatCache = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, IPageTypeCategoryRole> typeNameToCatCacheDeprecated = new ConcurrentHashMap<>();
 
   @Override
   public void resetTypeNameToCatCache() {
     typeNameToCatCache.clear();
+    typeNameToCatCacheDeprecated.clear();
   }
 
-  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
+  private void loadTypeNameCategoryMaps() {
     if (typeNameToCatCache.isEmpty()) {
       synchronized (typeNameToCatCache) {
         if (typeNameToCatCache.isEmpty()) {
@@ -84,23 +86,41 @@ public class PageTypeService implements IPageTypeRole {
                   + " category '{}' is shadowed by '{}'.", typeCategory.getTypeName(),
                   typeCategory.getClass(), beforeRegCat.getClass());
             }
+            for (String deprecateName : typeCategory.getAllTypeNames()) {
+              beforeRegCat = typeNameToCatCacheDeprecated.putIfAbsent(deprecateName, typeCategory);
+              if (beforeRegCat != null) {
+                LOGGER.warn("Page type category collision on deprecated category name '{}' the "
+                    + "colliding category '{}' is shadowed by '{}'.", deprecateName,
+                    typeCategory.getClass(), beforeRegCat.getClass());
+              }
+            }
           }
         }
       }
     }
+  }
+
+  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMap() {
+    loadTypeNameCategoryMaps();
     return Collections.unmodifiableMap(typeNameToCatCache);
+  }
+
+  private Map<String, IPageTypeCategoryRole> getTypeNameToCategoryMapIncludeDeprecated() {
+    loadTypeNameCategoryMaps();
+    return Collections.unmodifiableMap(typeNameToCatCacheDeprecated);
   }
 
   @Override
   public Optional<IPageTypeCategoryRole> getTypeCategoryForCatName(String categoryName) {
-    return Optional.fromNullable(getTypeNameToCategoryMap().get(categoryName));
+    return Optional.fromNullable(getTypeNameToCategoryMapIncludeDeprecated().get(categoryName));
   }
 
   @Override
   public List<String> getTypesForCategory(String categoryName, boolean onlyVisible) {
     Optional<IPageTypeCategoryRole> typeCategory = getTypeCategoryForCatName(categoryName);
     if (typeCategory.isPresent()) {
-      return getPageTypesConfigNamesForCategories(typeCategory.get().getAllTypeNames(), onlyVisible);
+      return getPageTypesConfigNamesForCategories(typeCategory.get().getAllTypeNames(),
+          onlyVisible);
     } else {
       LOGGER.warn("cannot find types category name ''", categoryName);
     }
@@ -111,7 +131,9 @@ public class PageTypeService implements IPageTypeRole {
   public IPageTypeConfig getPageTypeConfig(String pageTypeName) {
     if (pageTypeName != null) {
       PageTypeReference pageTypeRef = getPageTypeRefByConfigName(pageTypeName);
-      return getPageTypeConfigForPageTypeRef(pageTypeRef);
+      if (pageTypeRef != null) {
+        return getPageTypeConfigForPageTypeRef(pageTypeRef);
+      }
     }
     return null;
   }
@@ -131,13 +153,14 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   @Override
-  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList, boolean onlyVisible) {
-    List<String> pageTypeConfigNameList = new ArrayList<String>();
+  public List<String> getPageTypesConfigNamesForCategories(Set<String> catList,
+      boolean onlyVisible) {
+    List<String> pageTypeConfigNameList = new ArrayList<>();
     for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList, onlyVisible)) {
       pageTypeConfigNameList.add(pageTypeRef.getConfigName());
     }
-    LOGGER.debug("getPageTypesConfigNamesForCategories: return "
-        + Arrays.deepToString(pageTypeConfigNameList.toArray()));
+    LOGGER.debug("getPageTypesConfigNamesForCategories: return " + Arrays.deepToString(
+        pageTypeConfigNameList.toArray()));
     return pageTypeConfigNameList;
   }
 
@@ -145,23 +168,23 @@ public class PageTypeService implements IPageTypeRole {
   public List<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList,
       boolean onlyVisible) {
     if (onlyVisible) {
-      Set<PageTypeReference> visiblePTSet = new HashSet<PageTypeReference>();
+      Set<PageTypeReference> visiblePTSet = new HashSet<>();
       for (PageTypeReference pageTypeRef : getPageTypeRefsForCategories(catList)) {
         if (getPageTypeConfigForPageTypeRef(pageTypeRef).isVisible()) {
           visiblePTSet.add(pageTypeRef);
         }
       }
-      LOGGER.debug("getPageTypeRefsForCategories: for catList ["
-          + Arrays.deepToString(catList.toArray()) + "] and onlyVisible [" + onlyVisible
-          + "] return " + Arrays.deepToString(visiblePTSet.toArray()));
-      return new ArrayList<PageTypeReference>(visiblePTSet);
+      LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
+          catList.toArray()) + "] and onlyVisible [" + onlyVisible + "] return "
+          + Arrays.deepToString(visiblePTSet.toArray()));
+      return new ArrayList<>(visiblePTSet);
     } else {
-      return new ArrayList<PageTypeReference>(getPageTypeRefsForCategories(catList));
+      return new ArrayList<>(getPageTypeRefsForCategories(catList));
     }
   }
 
   Map<String, PageTypeReference> getPageTypeRefsByConfigNames() {
-    Map<String, PageTypeReference> pageTypeRefsMap = new HashMap<String, PageTypeReference>();
+    Map<String, PageTypeReference> pageTypeRefsMap = new HashMap<>();
     for (PageTypeReference pageTypeRef : getAllPageTypeRefs()) {
       pageTypeRefsMap.put(pageTypeRef.getConfigName(), pageTypeRef);
     }
@@ -169,7 +192,7 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   private Set<PageTypeReference> getAllPageTypeRefs() {
-    HashSet<PageTypeReference> pageTypeRefSet = new HashSet<PageTypeReference>();
+    HashSet<PageTypeReference> pageTypeRefSet = new HashSet<>();
     for (IPageTypeProviderRole pageTypeProvider : pageTypeProviders.values()) {
       for (PageTypeReference pageTypeRef : pageTypeProvider.getPageTypes()) {
         pageTypeRefSet.add(pageTypeRef);
@@ -180,8 +203,8 @@ public class PageTypeService implements IPageTypeRole {
   }
 
   Set<PageTypeReference> getPageTypeRefsForCategories(Set<String> catList) {
-    catList = new HashSet<String>(catList);
-    Set<PageTypeReference> filteredPTset = new HashSet<PageTypeReference>();
+    catList = new HashSet<>(catList);
+    Set<PageTypeReference> filteredPTset = new HashSet<>();
     for (PageTypeReference pageTypeRef : getAllPageTypeRefs()) {
       List<String> categories = pageTypeRef.getCategories();
       if (categories.isEmpty()) {
@@ -202,9 +225,8 @@ public class PageTypeService implements IPageTypeRole {
         }
       }
     }
-    LOGGER.debug("getPageTypeRefsForCategories: for catList ["
-        + Arrays.deepToString(catList.toArray()) + "] return "
-        + Arrays.deepToString(filteredPTset.toArray()));
+    LOGGER.debug("getPageTypeRefsForCategories: for catList [" + Arrays.deepToString(
+        catList.toArray()) + "] return " + Arrays.deepToString(filteredPTset.toArray()));
     return filteredPTset;
   }
 
@@ -214,8 +236,8 @@ public class PageTypeService implements IPageTypeRole {
     checkNotNull(ref);
     try {
       BaseObject obj = modelAccess.getOrCreateXObject(doc, pageTypeClassConf.getPageTypeClassRef());
-      boolean hasChanged = !ref.getConfigName().equals(
-          modelAccess.getProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD));
+      boolean hasChanged = !ref.getConfigName().equals(modelAccess.getProperty(obj,
+          IPageTypeClassConfig.PAGE_TYPE_FIELD));
       if (hasChanged) {
         modelAccess.setProperty(obj, IPageTypeClassConfig.PAGE_TYPE_FIELD, ref.getConfigName());
       }

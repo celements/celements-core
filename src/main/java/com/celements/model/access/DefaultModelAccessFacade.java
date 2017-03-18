@@ -18,7 +18,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.exception.AttachmentNotExistsException;
 import com.celements.model.access.exception.DocumentAlreadyExistsException;
@@ -304,6 +303,28 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       objHandler.filter(classRef, key, value);
     }
     return objHandler.fetchFirst().orNull();
+  }
+
+  @Override
+  @Deprecated
+  public Optional<BaseObject> getXObject(DocumentReference docRef, DocumentReference classRef,
+      int objectNumber) throws DocumentNotExistsException {
+    return getXObject(getDocumentReadOnly(docRef, DEFAULT_LANG), classRef, objectNumber);
+  }
+
+  @Override
+  @Deprecated
+  public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
+      int objectNumber) {
+    BaseObject bObj = null;
+    List<BaseObject> objs = getXObjects(doc, classRef);
+    for (BaseObject baseObject : objs) {
+      if (baseObject.getNumber() == objectNumber) {
+        bObj = baseObject;
+        break;
+      }
+    }
+    return Optional.fromNullable(bObj);
   }
 
   @Override
@@ -689,14 +710,6 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
       throw new AttachmentNotExistsException(new AttachmentReference(filename,
           doc.getDocumentReference()));
     }
-  }
-
-  /**
-   * forces same wikiRef to classRef as for onDoc
-   */
-  private DocumentReference adjustClassRef(DocumentReference classRef, XWikiDocument onDoc) {
-    return modelUtils.adjustRef(classRef, DocumentReference.class, modelUtils.extractRef(
-        onDoc.getDocumentReference(), WikiReference.class).or(context.getWikiRef()));
   }
 
 }

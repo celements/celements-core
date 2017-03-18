@@ -16,14 +16,14 @@ public class MapHandlerTest {
 
   @Before
   public void setUp_MapHandlerTest() throws Exception {
-    mapHandler = new MapHandler<String, Integer, String>();
+    mapHandler = new MapHandler<>();
   }
 
   @Test
   public void testPut_Value() {
     int key = 0;
-    Map<Integer, Set<String>> toMap = new HashMap<Integer, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<Integer, Set<String>> toMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("old");
     toMap.put(key, set);
 
@@ -42,12 +42,12 @@ public class MapHandlerTest {
   @Test
   public void testPut_Set() {
     int key = 0;
-    Map<Integer, Set<String>> toMap = new HashMap<Integer, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<Integer, Set<String>> toMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("old");
     toMap.put(key, set);
 
-    Set<String> putSet = new HashSet<String>();
+    Set<String> putSet = new HashSet<>();
     putSet.add("new1");
     putSet.add("new2");
 
@@ -65,16 +65,16 @@ public class MapHandlerTest {
   @Test
   public void testMergeMaps() {
     int key = 0;
-    Map<Integer, Set<String>> toMap = new HashMap<Integer, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<Integer, Set<String>> toMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("old");
     toMap.put(key, set);
 
-    Map<Integer, Set<String>> mergeMap = new HashMap<Integer, Set<String>>();
-    set = new HashSet<String>();
+    Map<Integer, Set<String>> mergeMap = new HashMap<>();
+    set = new HashSet<>();
     set.add("new1");
     mergeMap.put(key, set);
-    set = new HashSet<String>();
+    set = new HashSet<>();
     set.add("new2");
     mergeMap.put(key + 1, set);
     mergeMap.put(key + 2, new HashSet<String>());
@@ -97,9 +97,9 @@ public class MapHandlerTest {
   public void testPut_Value_2() {
     String key1 = "asdf";
     String key2 = "fdsa";
-    Map<String, Map<Integer, Set<String>>> toMap = new HashMap<String, Map<Integer, Set<String>>>();
-    Map<Integer, Set<String>> innerMap = new HashMap<Integer, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<String, Map<Integer, Set<String>>> toMap = new HashMap<>();
+    Map<Integer, Set<String>> innerMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("old");
     innerMap.put(0, set);
     toMap.put(key1, innerMap);
@@ -129,19 +129,19 @@ public class MapHandlerTest {
   public void testPut_Map() {
     String key1 = "asdf";
     String key2 = "fdsa";
-    Map<String, Map<Integer, Set<String>>> toMap = new HashMap<String, Map<Integer, Set<String>>>();
-    Map<Integer, Set<String>> innerMap = new HashMap<Integer, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<String, Map<Integer, Set<String>>> toMap = new HashMap<>();
+    Map<Integer, Set<String>> innerMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("old");
     innerMap.put(0, set);
     toMap.put(key1, innerMap);
 
-    Map<Integer, Set<String>> putMap1 = new HashMap<Integer, Set<String>>();
-    set = new HashSet<String>();
+    Map<Integer, Set<String>> putMap1 = new HashMap<>();
+    set = new HashSet<>();
     set.add("new1");
     putMap1.put(1, set);
-    Map<Integer, Set<String>> putMap2 = new HashMap<Integer, Set<String>>();
-    set = new HashSet<String>();
+    Map<Integer, Set<String>> putMap2 = new HashMap<>();
+    set = new HashSet<>();
     set.add("new2");
     putMap2.put(0, set);
 
@@ -170,21 +170,21 @@ public class MapHandlerTest {
   public void testMergeMultiMaps() {
     String key1 = "asdf";
     String key2 = "fdsa";
-    Map<String, Map<Integer, Set<String>>> toMap = new HashMap<String, Map<Integer, Set<String>>>();
-    Map<Integer, Set<String>> innerMap = new HashMap<Integer, Set<String>>();
-    Set<String> set = new HashSet<String>();
+    Map<String, Map<Integer, Set<String>>> toMap = new HashMap<>();
+    Map<Integer, Set<String>> innerMap = new HashMap<>();
+    Set<String> set = new HashSet<>();
     set.add("old");
     innerMap.put(0, set);
     toMap.put(key1, innerMap);
 
-    Map<String, Map<Integer, Set<String>>> mergeMap = new HashMap<String, Map<Integer, Set<String>>>();
-    innerMap = new HashMap<Integer, Set<String>>();
-    set = new HashSet<String>();
+    Map<String, Map<Integer, Set<String>>> mergeMap = new HashMap<>();
+    innerMap = new HashMap<>();
+    set = new HashSet<>();
     set.add("new1");
     innerMap.put(1, set);
     mergeMap.put(key1, innerMap);
-    innerMap = new HashMap<Integer, Set<String>>();
-    set = new HashSet<String>();
+    innerMap = new HashMap<>();
+    set = new HashSet<>();
     set.add("new2");
     innerMap.put(0, set);
     mergeMap.put(key2, innerMap);

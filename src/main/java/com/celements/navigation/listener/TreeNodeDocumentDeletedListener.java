@@ -66,14 +66,17 @@ public class TreeNodeDocumentDeletedListener extends AbstractTreeNodeDocumentLis
     return (NavigationClasses) navClasses;
   }
 
+  @Override
   public String getName() {
     return "TreeNodeDocumentDeletedListener";
   }
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.asList((Event) new DocumentDeletedEvent());
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument document = getOrginialDocument(source);
     if ((document != null) && !remoteObservationManagerContext.isRemoteState()) {

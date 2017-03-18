@@ -35,11 +35,13 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
       connect(host);
     }
     int reply = getReplyCode();
-    if (FTPReply.isPositiveCompletion(reply))
+    if (FTPReply.isPositiveCompletion(reply)) {
       enterLocalPassiveMode();
+    }
     success = login(userName, password);
-    if (!success)
+    if (!success) {
       disconnect();
+    }
     return success;
   }
 
@@ -58,10 +60,11 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
    */
   @Override
   public void setPassiveMode(boolean setPassive) {
-    if (setPassive)
+    if (setPassive) {
       enterLocalPassiveMode();
-    else
+    } else {
       enterLocalActiveMode();
+    }
   }
 
   /** Use ASCII mode for file transfers */
@@ -103,10 +106,11 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
   @Override
   public List<String> listFileNames() throws IOException, FTPConnectionClosedException {
     FTPFile[] files = listFiles();
-    Vector<String> v = new Vector<String>();
+    Vector<String> v = new Vector<>();
     for (int i = 0; i < files.length; i++) {
-      if (!files[i].isDirectory())
+      if (!files[i].isDirectory()) {
         v.addElement(files[i].getName());
+      }
     }
     return v;
   }
@@ -118,10 +122,11 @@ public class CelFTPClient extends FTPClient implements ICelFTPClient {
   @Override
   public List<String> listSubdirNames() throws IOException, FTPConnectionClosedException {
     FTPFile[] files = listFiles();
-    Vector<String> v = new Vector<String>();
+    Vector<String> v = new Vector<>();
     for (int i = 0; i < files.length; i++) {
-      if (files[i].isDirectory())
+      if (files[i].isDirectory()) {
         v.addElement(files[i].getName());
+      }
     }
     return v;
   }

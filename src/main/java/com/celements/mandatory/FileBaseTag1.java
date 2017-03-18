@@ -70,10 +70,12 @@ public class FileBaseTag1 implements IMandatoryDocumentRole {
     return (NavigationClasses) navigationClasses;
   }
 
+  @Override
   public List<String> dependsOnMandatoryDocuments() {
     return Collections.emptyList();
   }
 
+  @Override
   public void checkDocuments() throws XWikiException {
     LOGGER.trace("Start checkDocuments in FileBaseTag1 for database [" + getContext().getDatabase()
         + "].");

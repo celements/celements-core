@@ -49,6 +49,7 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
     this.asc2 = asc2;
   }
 
+  @Override
   public int compare(BaseObject obj1, BaseObject obj2) {
     Object val1 = getValue(obj1, orderField1);
     Object val2 = getValue(obj2, orderField1);
@@ -95,7 +96,7 @@ public class BaseObjectComparator implements Comparator<BaseObject> {
   }
 
   int compareField(StringProperty value, StringProperty value2) {
-    return ((String) value.getValue()).compareTo((String) value2.getValue());
+    return value.getValue().compareTo(value2.getValue());
   }
 
   short compareField(IntegerProperty value, IntegerProperty value2) {

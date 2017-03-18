@@ -140,7 +140,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
     expect(renderStrategyMock.isRenderSubCells(eq(masterPageLayoutRef))).andReturn(true).once();
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart((TreeNode) isNull())).andReturn(menuPart);
-    List<TreeNode> subCellList = new ArrayList<TreeNode>();
+    List<TreeNode> subCellList = new ArrayList<>();
     expect(mockTreeNodeService.getSubNodesForParent(eq(masterPageLayoutRef), eq(
         menuPart))).andReturn(subCellList);
     expectLastCall().once();
@@ -163,7 +163,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
     expectLastCall().once();
     expect(renderStrategyMock.isRenderSubCells(eq(layoutRef))).andReturn(true).once();
     expect(renderStrategyMock.getMenuPart((TreeNode) isNull())).andReturn("");
-    List<TreeNode> subCellList = new ArrayList<TreeNode>();
+    List<TreeNode> subCellList = new ArrayList<>();
     expect(mockTreeNodeService.getSubNodesForParent(eq(layoutRef), eq(""))).andReturn(subCellList);
     expect(renderStrategyMock.getSpaceReference()).andReturn(layoutRef).anyTimes();
     expect(renderStrategyMock.isRenderCell((TreeNode) isNull())).andReturn(false);
@@ -216,7 +216,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
     expect(renderStrategyMock.isRenderSubCells(eq(docRef))).andReturn(true).once();
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart(eq(node))).andReturn(menuPart);
-    List<TreeNode> subCellList = new ArrayList<TreeNode>();
+    List<TreeNode> subCellList = new ArrayList<>();
     expect(mockTreeNodeService.getSubNodesForParent(eq(docRef), eq(menuPart))).andReturn(
         subCellList);
     expect(renderStrategyMock.isRenderCell(eq(node))).andReturn(true);
@@ -235,7 +235,7 @@ public class RenderingEngineTest extends AbstractComponentTest {
     String menuSpace = "MyCellSpace";
     String menuPart = "mainPart";
     expect(renderStrategyMock.getMenuPart(eq(cellNode))).andReturn(menuPart).once();
-    List<TreeNode> subCellList = new ArrayList<TreeNode>();
+    List<TreeNode> subCellList = new ArrayList<>();
     TreeNode subCell1 = new TreeNode(new DocumentReference(context.getDatabase(), menuSpace,
         "subCell1"), null, 1);
     subCellList.add(subCell1);

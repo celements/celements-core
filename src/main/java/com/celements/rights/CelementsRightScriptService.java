@@ -89,6 +89,6 @@ public class CelementsRightScriptService implements ScriptService {
   }
 
   private IWebUtilsService getWebUtils() {
-    return (IWebUtilsService) Utils.getComponent(IWebUtilsService.class);
+    return Utils.getComponent(IWebUtilsService.class);
   }
 }

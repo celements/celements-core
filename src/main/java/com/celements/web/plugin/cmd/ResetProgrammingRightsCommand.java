@@ -19,19 +19,18 @@
  */
 package com.celements.web.plugin.cmd;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 public class ResetProgrammingRightsCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
-      ResetProgrammingRightsCommand.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ResetProgrammingRightsCommand.class);
 
   public boolean resetCelements2webRigths(XWikiContext context) {
     int result = 0;
@@ -45,11 +44,11 @@ public class ResetProgrammingRightsCommand {
             + " set contentAuthor = :username");
         query.setParameter("username", context.getUser());
         result = query.executeUpdate();
-        mLogger.info("updated [" + result + "] documents. Set to content author ["
-            + context.getUser() + "] in database [" + context.getDatabase() + "].");
+        LOGGER.info("updated [{}] documents. Set to content author [{}] in database [{}].", result,
+            context.getUser(), context.getDatabase());
         transaction.commit();
       } catch (XWikiException exp) {
-        mLogger.error("resetCelements2webRights: failed to get a hibernate session: ", exp);
+        LOGGER.error("resetCelements2webRights: failed to get a hibernate session. ", exp);
       } finally {
         context.setDatabase(tenantDbName);
       }

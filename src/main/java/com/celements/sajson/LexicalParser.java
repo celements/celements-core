@@ -28,7 +28,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
 
   private static Log mLogger = LogFactory.getFactory().getInstance(LexicalParser.class);
 
-  private Stack<T> workerStack = new Stack<T>();
+  private Stack<T> workerStack = new Stack<>();
   private T startLiteral;
   private IEventHandler<T> eventHandler;
 
@@ -37,17 +37,20 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     this.eventHandler = eventHandler;
   }
 
+  @Override
   final public void initEvent() {
     workerStack.clear();
     workerStack.push(startLiteral);
     mLogger.debug("init " + startLiteral + " ; " + startLiteral.getCommand());
   }
 
+  @Override
   final public void openArrayEvent() {
     checkStackState(ECommand.ARRAY_COMMAND);
     openLiteral();
   }
 
+  @Override
   final public void closeArrayEvent() {
     if (workerStack.peek().getCommand() != ECommand.ARRAY_COMMAND) {
       T lastLiteral = workerStack.pop();
@@ -57,11 +60,13 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     closeLiteral();
   }
 
+  @Override
   final public void openDictionaryEvent() {
     checkStackState(ECommand.DICTIONARY_COMMAND);
     openLiteral();
   }
 
+  @Override
   public void closeDictionaryEvent() {
     if (workerStack.peek().getCommand() == ECommand.PROPERTY_COMMAND) {
       workerStack.pop(); // remove optional property command
@@ -70,6 +75,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     closeLiteral();
   }
 
+  @Override
   public void closePropertyEvent() {
     checkStackState(ECommand.PROPERTY_COMMAND);
     closeLiteral(); // close PROPERTY_COMMAND
@@ -77,6 +83,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     advanceToNextDictionaryProperty();
   }
 
+  @Override
   public void openPropertyEvent(String key) {
     checkStackState(ECommand.PROPERTY_COMMAND);
     mLogger.debug("key: " + key + " ");
@@ -89,7 +96,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
   /**
    * important to allow unordered property lists in dictionaries / objects (see
    * www.json.org : An object is an unordered set of name/value pairs. )
-   * 
+   *
    * @param key
    */
   @SuppressWarnings("unchecked")
@@ -107,6 +114,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     }
   }
 
+  @Override
   public void stringEvent(String value) {
     checkStackState(ECommand.VALUE_COMMAND);
     eventHandler.openEvent(workerStack.peek());
@@ -115,6 +123,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     closeLiteral(); // close VALUE_COMMAND
   }
 
+  @Override
   public void booleanEvent(boolean value) {
     checkStackState(ECommand.VALUE_COMMAND);
     eventHandler.openEvent(workerStack.peek());
@@ -123,6 +132,7 @@ public class LexicalParser<T extends IGenericLiteral> implements ILexicalParser<
     closeLiteral(); // close VALUE_COMMAND
   }
 
+  @Override
   final public void finishEvent() {
     if (!workerStack.isEmpty()) {
       throw new IllegalStateException("SyntaxError: finishEvent on nonempty" + " stack:"

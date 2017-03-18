@@ -35,7 +35,7 @@ public class FormValidationService implements IFormValidationServiceRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(FormValidationService.class);
 
-  private static final MapHandler<String, ValidationType, String> MAPHANDLER = new MapHandler<String, ValidationType, String>();
+  private static final MapHandler<String, ValidationType, String> MAPHANDLER = new MapHandler<>();
 
   @Requirement
   private IWebUtilsService webUtils;
@@ -52,6 +52,7 @@ public class FormValidationService implements IFormValidationServiceRole {
     this.fieldValidationRules = fieldValidationRules;
   }
 
+  @Override
   public Map<String, Map<ValidationType, Set<String>>> validateRequest() {
     LOGGER.trace("validateRequest called");
     Map<String, String[]> requestMap = webUtils.getRequestParameterMap();
@@ -61,9 +62,10 @@ public class FormValidationService implements IFormValidationServiceRole {
     return validatedMap;
   }
 
+  @Override
   public Map<String, Map<ValidationType, Set<String>>> validateMap(
       Map<String, String[]> requestMap) {
-    Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<String, Map<ValidationType, Set<String>>>();
+    Map<String, Map<ValidationType, Set<String>>> ret = new HashMap<>();
     Map<RequestParameter, String[]> convertedRequestMap = convertMapKeys(requestMap);
     for (IRequestValidationRuleRole validationRule : requestValidationRules.values()) {
       LOGGER.trace("Calling validateRequest() for rule '" + validationRule + "'");
@@ -73,7 +75,7 @@ public class FormValidationService implements IFormValidationServiceRole {
   }
 
   Map<RequestParameter, String[]> convertMapKeys(Map<String, String[]> requestMap) {
-    Map<RequestParameter, String[]> convMap = new HashMap<RequestParameter, String[]>();
+    Map<RequestParameter, String[]> convMap = new HashMap<>();
     for (String key : requestMap.keySet()) {
       RequestParameter requestparam = RequestParameter.create(key);
       if (requestparam != null) {
@@ -83,9 +85,10 @@ public class FormValidationService implements IFormValidationServiceRole {
     return convMap;
   }
 
+  @Override
   public Map<ValidationType, Set<String>> validateField(String className, String fieldName,
       String value) {
-    Map<ValidationType, Set<String>> ret = new HashMap<ValidationType, Set<String>>();
+    Map<ValidationType, Set<String>> ret = new HashMap<>();
     for (IFieldValidationRuleRole validationRule : fieldValidationRules.values()) {
       LOGGER.trace("Calling validateField() for rule '" + validationRule + "'");
       MAPHANDLER.mergeMaps(validationRule.validateField(className, fieldName, value), ret);

@@ -35,7 +35,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testValidate_empty() throws XWikiException {
-    Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
+    Map<RequestParameter, String[]> requestMap = new HashMap<>();
 
     replayDefault();
     Map<String, Map<ValidationType, Set<String>>> result = xClassRegexRule.validateRequest(
@@ -58,7 +58,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     doc1.setXClass(bclass);
     doc2.setXClass(bclass);
 
-    Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
+    Map<RequestParameter, String[]> requestMap = new HashMap<>();
     String param1 = "Test.TestClass1_0_testField";
     String param2 = "Test.TestClass2_0_testField";
     requestMap.put(RequestParameter.create(param1), new String[] { "value1" });
@@ -89,7 +89,7 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     doc1.setXClass(bclass);
     doc2.setXClass(bclass);
 
-    Map<RequestParameter, String[]> requestMap = new HashMap<RequestParameter, String[]>();
+    Map<RequestParameter, String[]> requestMap = new HashMap<>();
     String param1 = "Test.TestClass1_0_testField";
     String param2 = "Test.TestClass2_0_testField";
     requestMap.put(RequestParameter.create(param1), new String[] { "" });
@@ -211,12 +211,12 @@ public class XClassRegexRuleTest extends AbstractBridgedComponentTestCase {
     regexProp.setValue("/.+/");
     BaseProperty msgProp = new StringProperty();
     msgProp.setValue("testValMsg");
-    Map<String, BaseProperty> propfields = new HashMap<String, BaseProperty>();
+    Map<String, BaseProperty> propfields = new HashMap<>();
     PropertyClass property = new PropertyClass();
     propfields.put("validationRegExp", regexProp);
     propfields.put("validationMessage", msgProp);
     property.setFields(propfields);
-    Map<String, PropertyClass> fields = new HashMap<String, PropertyClass>();
+    Map<String, PropertyClass> fields = new HashMap<>();
     fields.put(fieldName, property);
     BaseClass bclass = new BaseClass();
     bclass.setFields(fields);

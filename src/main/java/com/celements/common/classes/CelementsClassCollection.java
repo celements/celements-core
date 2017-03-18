@@ -29,13 +29,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Extend CelementsClassCollection and make the implementor a named component. Celements
  * then will call your initClasses method on system start once or if it is explicitly
  * asked for.
- * 
+ *
  * @author fabian pichler since 2.11.0
  * @deprecated since 2.18.0 instead use AbstractClassCollection
  */
 @Deprecated
 public abstract class CelementsClassCollection implements ICelementsClassCollection {
 
+  @Override
   final public void runUpdate(XWikiContext context) throws XWikiException {
     if (isActivated(context)) {
       getLogger().debug("calling initClasses for database: " + context.getDatabase());

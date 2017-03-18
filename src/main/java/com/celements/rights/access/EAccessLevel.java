@@ -1,12 +1,13 @@
 package com.celements.rights.access;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-public enum EAccessLevel {
+import com.celements.common.ReverseMap;
+import com.celements.common.ValueGetter;
+import com.google.common.base.Optional;
+
+public enum EAccessLevel implements ValueGetter<String> {
 
   VIEW("view"),
   COMMENT("comment"),
@@ -16,7 +17,7 @@ public enum EAccessLevel {
   REGISTER("register"),
   PROGRAMMING("programming");
 
-  private final static Map<String, EAccessLevel> ID_MAP = new HashMap<>();
+  private static ReverseMap<EAccessLevel, String> ID_MAP = new ReverseMap<>(EAccessLevel.values());
 
   private final String identifier;
 
@@ -29,14 +30,13 @@ public enum EAccessLevel {
     return identifier;
   }
 
-  @Nullable
-  public static EAccessLevel getAccessLevel(@Nullable String identifier) {
-    if (ID_MAP.isEmpty()) {
-      for (EAccessLevel accessLevel : values()) {
-        ID_MAP.put(accessLevel.getIdentifier(), accessLevel);
-      }
-    }
+  @NotNull
+  public static Optional<EAccessLevel> getAccessLevel(@Nullable String identifier) {
     return ID_MAP.get(identifier);
   }
 
+  @Override
+  public String getValue() {
+    return getIdentifier();
+  }
 }

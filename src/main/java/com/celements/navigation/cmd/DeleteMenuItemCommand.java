@@ -44,7 +44,7 @@ public class DeleteMenuItemCommand {
       LOGGER.error("Failed to get document by reference [" + docRef + "].", exp);
       return false;
     }
-    if ((doc != null) && doc.getXObject(menuItemClassRef) != null) {
+    if ((doc != null) && (doc.getXObject(menuItemClassRef) != null)) {
       try {
         boolean result = doc.removeXObjects(menuItemClassRef);
         getContext().getWiki().saveDocument(doc, "remove menu item", getContext());

@@ -46,8 +46,8 @@ final class MenuItemObjectPartNameGetter implements PartNameGetter {
   @Override
   public String getPartName(DocumentReference docRef) {
     try {
-      BaseObject cobj = modelAccess.getXObject(docRef,
-          navConfigClass.getMenuItemClassRef(docRef.getWikiReference()));
+      BaseObject cobj = modelAccess.getXObject(docRef, navConfigClass.getMenuItemClassRef(
+          docRef.getWikiReference()));
       if (cobj != null) {
         return cobj.getStringValue(INavigationClassConfig.PART_NAME_FIELD);
       }

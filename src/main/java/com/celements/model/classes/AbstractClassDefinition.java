@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableMap;
 
 public abstract class AbstractClassDefinition implements ClassDefinition {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractClassDefinition.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassDefinition.class);
 
   @Requirement
   protected ModelContext context;

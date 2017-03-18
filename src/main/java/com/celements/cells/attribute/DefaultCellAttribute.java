@@ -6,13 +6,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-
-import groovy.lang.Immutable;
 
 @Immutable
 public class DefaultCellAttribute implements CellAttribute {

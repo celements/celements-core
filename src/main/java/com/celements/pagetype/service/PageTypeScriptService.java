@@ -67,7 +67,7 @@ public class PageTypeScriptService implements ScriptService {
   }
 
   public List<String> getPageTypesByCategories(List<String> catList, boolean onlyVisible) {
-    return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<String>(catList),
+    return pageTypeService.getPageTypesConfigNamesForCategories(new HashSet<>(catList),
         onlyVisible);
   }
 
@@ -111,7 +111,10 @@ public class PageTypeScriptService implements ScriptService {
   }
 
   public PageTypeReference getPageTypeRef(DocumentReference docRef) {
-    return pageTypeResolver.getPageTypeRefForDocWithDefault(docRef);
+    if (docRef != null) {
+      return pageTypeResolver.getPageTypeRefForDocWithDefault(docRef);
+    }
+    return null;
   }
 
 }

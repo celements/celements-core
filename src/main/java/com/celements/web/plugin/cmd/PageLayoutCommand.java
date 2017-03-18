@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.cells.CellRenderStrategy;
 import com.celements.cells.DivWriter;
+import com.celements.cells.HtmlDoctype;
 import com.celements.cells.ICellsClassConfig;
 import com.celements.cells.IRenderStrategy;
 import com.celements.cells.RenderingEngine;
@@ -49,6 +52,8 @@ import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -99,7 +104,7 @@ public class PageLayoutCommand {
   }
 
   private Map<String, String> getPageLayoutMap(boolean onlyActive) {
-    Map<String, String> plMap = new HashMap<String, String>();
+    Map<String, String> plMap = new HashMap<>();
     try {
       for (Object resultRowObj : getContext().getWiki().search(getPageLayoutHQL(onlyActive),
           getContext())) {
@@ -137,7 +142,7 @@ public class PageLayoutCommand {
               getPageLayoutPropertiesClassRef(
                   propXdoc.getDocumentReference().getWikiReference().getName()));
           layoutPropObj.setStringValue("prettyname", layoutSpaceRef.getName() + " Layout");
-          layoutPropObj.setStringValue("doctype", getDocType());
+          layoutPropObj.setStringValue(ICellsClassConfig.LAYOUT_DOCTYPE_FIELD, getDocType());
           getModelAccess().saveDocument(propXdoc, "Creating page layout", false);
           return "cel_layout_create_successful";
         } catch (DocumentSaveException exp) {
@@ -150,7 +155,7 @@ public class PageLayoutCommand {
 
   private String getDocType() {
     return Utils.getComponent(ConfigurationSource.class).getProperty("celements.layout.docType",
-        "HTML 5");
+        HtmlDoctype.HTML5.getValue());
   }
 
   public boolean deleteLayout(SpaceReference layoutSpaceRef) {
@@ -305,7 +310,7 @@ public class PageLayoutCommand {
   private Deque<SpaceReference> getRenderingLayoutStack() {
     ExecutionContext execContext = getExecution().getContext();
     if (execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY) == null) {
-      Deque<SpaceReference> layoutStack = new LinkedList<SpaceReference>();
+      Deque<SpaceReference> layoutStack = new LinkedList<>();
       execContext.setProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY, layoutStack);
     }
     return (Deque<SpaceReference>) execContext.getProperty(CEL_RENDERING_LAYOUT_STACK_PROPERTY);
@@ -459,6 +464,21 @@ public class PageLayoutCommand {
       return layoutPropertyObj.getStringValue(ICellsClassConfig.LAYOUT_TYPE_FIELD);
     }
     return ICellsClassConfig.PAGE_LAYOUT_VALUE;
+  }
+
+  @NotNull
+  public HtmlDoctype getHTMLType(@NotNull SpaceReference layoutSpaceRef) {
+    BaseObject layoutPropertyObj = getLayoutPropertyObj(layoutSpaceRef);
+    Optional<HtmlDoctype> stringValue = Optional.absent();
+    if (layoutPropertyObj != null) {
+      stringValue = getHtmlDoctype(layoutPropertyObj, ICellsClassConfig.LAYOUT_DOCTYPE_FIELD);
+    }
+    return stringValue.or(HtmlDoctype.XHTML);
+  }
+
+  private Optional<HtmlDoctype> getHtmlDoctype(BaseObject layoutPropertyObj, String fieldName) {
+    return HtmlDoctype.getHtmlDoctype(Strings.emptyToNull(layoutPropertyObj.getStringValue(
+        fieldName)));
   }
 
   public String getVersion(SpaceReference layoutSpaceRef) {

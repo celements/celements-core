@@ -30,8 +30,10 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
 
   private IIteratorFactory<XObjectIterator> _iteratorFactory;
 
+  @Override
   public abstract BaseCollection getObject(String key);
 
+  @Override
   public void setIteratorFactory(IIteratorFactory<XObjectIterator> iteratorFactory) {
     _iteratorFactory = iteratorFactory;
   }
@@ -40,91 +42,115 @@ public abstract class AbstractObjectInheritor implements IObjectInheritor {
     return _iteratorFactory;
   }
 
+  @Override
   public String getStringValue(String key) {
     return getStringValue(key, "");
   }
 
+  @Override
   public String getStringValue(String key, String defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getStringValue(key);
+    }
   }
 
+  @Override
   public String getLargeStringValue(String key) {
     return getLargeStringValue(key, "");
   }
 
+  @Override
   public String getLargeStringValue(String key, String defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getLargeStringValue(key);
+    }
   }
 
+  @Override
   public int getIntValue(String key) {
     return getIntValue(key, 0);
   }
 
+  @Override
   public int getIntValue(String key, int defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getIntValue(key);
+    }
   }
 
+  @Override
   public long getLongValue(String key) {
     return getLongValue(key, 0);
   }
 
+  @Override
   public long getLongValue(String key, long defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getLongValue(key);
+    }
   }
 
+  @Override
   public float getFloatValue(String key) {
     return getFloatValue(key, 0);
   }
 
+  @Override
   public float getFloatValue(String key, float defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getFloatValue(key);
+    }
   }
 
+  @Override
   public double getDoubleValue(String key) {
     return getDoubleValue(key, 0);
   }
 
+  @Override
   public double getDoubleValue(String key, double defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getDoubleValue(key);
+    }
   }
 
+  @Override
   public Date getDateValue(String key) {
     return getDateValue(key, null);
   }
 
+  @Override
   public Date getDateValue(String key, Date defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getDateValue(key);
+    }
   }
 
+  @Override
   public List getListValue(String key) {
     return getListValue(key, null);
   }
 
+  @Override
   public List getListValue(String key, List defaultValue) {
-    if (getObject(key) == null)
+    if (getObject(key) == null) {
       return defaultValue;
-    else
+    } else {
       return getObject(key).getListValue(key);
+    }
   }
 }

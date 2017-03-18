@@ -59,7 +59,7 @@ public class GetPageTypesCommand {
     if (doesContainEmptyCategory(catList)) {
       pageTypeSet = inMemoryFilterList(catList, pageTypeSet, context);
     }
-    return new ArrayList<String>(pageTypeSet);
+    return new ArrayList<>(pageTypeSet);
   }
 
   public Set<String> getAllXObjectPageTypes(XWikiContext context) {
@@ -68,7 +68,7 @@ public class GetPageTypesCommand {
 
   private Set<String> getXObjectPageTypes(Set<String> catList, boolean onlyVisible,
       XWikiContext context) {
-    Set<String> pageTypeSet = new HashSet<String>();
+    Set<String> pageTypeSet = new HashSet<>();
     String currentDatabase = context.getDatabase();
     Integer count = 0;
     if (getExecContext().getProperty(_CEL_GETXOBJ_PAGETYPES_COUNTER) != null) {
@@ -112,8 +112,8 @@ public class GetPageTypesCommand {
 
   private Set<String> inMemoryFilterList(Set<String> catList, Set<String> pageTypeSet,
       XWikiContext context) {
-    catList = new HashSet<String>(catList);
-    Set<String> filteredPTset = new HashSet<String>();
+    catList = new HashSet<>(catList);
+    Set<String> filteredPTset = new HashSet<>();
     for (String pageTypeFN : pageTypeSet) {
       String category = new PageType(pageTypeFN).getCategoryString(context);
       if (catList.contains(category)) {

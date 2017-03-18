@@ -33,7 +33,7 @@ import org.xwiki.model.reference.WikiReference;
 /**
  * Common features for all Document sources (ie configuration data coming from wiki
  * pages).
- * 
+ *
  * @version $Id$
  * @since 2.0M2
  */
@@ -97,7 +97,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     // the given key we check that the
     // value is both not-null and not empty.
     Object value = getPropertyObject(key);
-    return value != null && !"".equals(value);
+    return (value != null) && !"".equals(value);
   }
 
   @Override
@@ -144,7 +144,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     DocumentReference documentReference = getFailsafeDocumentReference();
     DocumentReference classReference = getFailsafeClassReference();
-    if (documentReference != null && classReference != null) {
+    if ((documentReference != null) && (classReference != null)) {
       result = getDocumentAccessBridge().getProperty(documentReference, classReference, key);
     } else {
       result = null;

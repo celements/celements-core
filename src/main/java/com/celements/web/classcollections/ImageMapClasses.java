@@ -99,6 +99,7 @@ public class ImageMapClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  @Override
   public String getConfigName() {
     return "imageMap";
   }

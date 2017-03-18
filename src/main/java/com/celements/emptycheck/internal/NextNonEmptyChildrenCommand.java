@@ -43,7 +43,7 @@ public class NextNonEmptyChildrenCommand {
 
   Set<DocumentReference> getVisitedDocRefs() {
     if (visitedDocRefs == null) {
-      visitedDocRefs = new HashSet<DocumentReference>();
+      visitedDocRefs = new HashSet<>();
     }
     return visitedDocRefs;
   }

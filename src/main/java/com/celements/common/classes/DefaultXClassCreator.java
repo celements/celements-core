@@ -100,6 +100,7 @@ public class DefaultXClassCreator implements XClassCreator {
   public BaseClass generateXClass(ClassDefinition classDef) {
     BaseClass bClass = new BaseClass();
     bClass.setDocumentReference(classDef.getClassRef());
+    bClass.setXClassReference(classDef.getClassRef());
     if (classDef.isInternalMapping() && !bClass.hasInternalCustomMapping()) {
       bClass.setCustomMapping("internal");
     }

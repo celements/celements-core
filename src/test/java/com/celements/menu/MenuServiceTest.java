@@ -77,7 +77,7 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name1", 10, 3, doc);
     addMenuHeaderObject("mm_menu_name2", 20, 2, doc);
     expect(xwiki.getDocument(eq(menuBarDocRef), same(context))).andReturn(doc).once();
-    List<Object> fullNames = new ArrayList<Object>();
+    List<Object> fullNames = new ArrayList<>();
     fullNames.add("Celements.MenuBar");
     Query mockQuery = createMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq(Query.XWQL))).andReturn(
@@ -88,9 +88,9 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
         "xwikidb:Celements.MenuBar"), same(context))).andReturn(true).anyTimes();
 
     replayAll(mockQuery);
-    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
+    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<>();
     menuService.addMenuHeaders(menuHeadersMap);
-    ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
+    ArrayList<BaseObject> menuHeaders = new ArrayList<>();
     menuHeaders.addAll(menuHeadersMap.values());
 
     assertEquals("Expecting sorted headers", 2, menuHeaders.get(0).getIntValue("pos"));
@@ -113,7 +113,7 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
     // object number 2 is deleted
     addMenuHeaderObject(3, "mm_menu_name2", 20, 2, doc);
     expect(xwiki.getDocument(eq(menuBarDocRef), same(context))).andReturn(doc).once();
-    List<Object> fullNames = new ArrayList<Object>();
+    List<Object> fullNames = new ArrayList<>();
     fullNames.add("Celements.MenuBar");
     Query mockQuery = createMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq(Query.XWQL))).andReturn(
@@ -124,9 +124,9 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
         "xwikidb:Celements.MenuBar"), same(context))).andReturn(true).anyTimes();
 
     replayAll(mockQuery);
-    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
+    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<>();
     menuService.addMenuHeaders(menuHeadersMap);
-    ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
+    ArrayList<BaseObject> menuHeaders = new ArrayList<>();
     menuHeaders.addAll(menuHeadersMap.values());
 
     assertEquals("Expecting sorted headers", 2, menuHeaders.get(0).getIntValue("pos"));
@@ -156,7 +156,7 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name2", 32, 4, doc2);
     expect(xwiki.getDocument(eq(menuBarDocRef), same(context))).andReturn(doc).once();
     expect(xwiki.getDocument(eq(menuBar2DocRef), same(context))).andReturn(doc2).once();
-    List<Object> fullNames = new ArrayList<Object>();
+    List<Object> fullNames = new ArrayList<>();
     fullNames.add("Celements.MenuBar");
     fullNames.add("Celements.MenuBar2");
     Query mockQuery = createMock(Query.class);
@@ -171,9 +171,9 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
         "xwikidb:Celements.MenuBar2"), same(context))).andReturn(true).anyTimes();
 
     replayAll(mockQuery);
-    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
+    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<>();
     menuService.addMenuHeaders(menuHeadersMap);
-    ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
+    ArrayList<BaseObject> menuHeaders = new ArrayList<>();
 
     menuHeaders.addAll(menuHeadersMap.values());
     assertEquals("Expecting sorted headers", 1, menuHeaders.get(0).getIntValue("pos"));
@@ -207,7 +207,7 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name2", 32, 4, doc2);
     expect(xwiki.getDocument(eq(menuBarDocRef), same(context))).andReturn(doc).anyTimes();
     expect(xwiki.getDocument(eq(menuBar2DocRef), same(context))).andReturn(doc2).anyTimes();
-    List<Object> fullNames = new ArrayList<Object>();
+    List<Object> fullNames = new ArrayList<>();
     fullNames.add("Celements.MenuBar");
     fullNames.add("Celements.MenuBar2");
     Query mockQuery = createMock(Query.class);
@@ -222,9 +222,9 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
         "xwikidb:Celements.MenuBar2"), same(context))).andReturn(false).anyTimes();
 
     replayAll(mockQuery);
-    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
+    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<>();
     menuService.addMenuHeaders(menuHeadersMap);
-    ArrayList<BaseObject> menuHeaders = new ArrayList<BaseObject>();
+    ArrayList<BaseObject> menuHeaders = new ArrayList<>();
 
     menuHeaders.addAll(menuHeadersMap.values());
     assertEquals("Expecting sorted headers", 2, menuHeaders.get(0).getIntValue("pos"));
@@ -253,13 +253,13 @@ public class MenuServiceTest extends AbstractBridgedComponentTestCase {
     addMenuHeaderObject("mm_menu_name1", 43, 1, doc2);
     addMenuHeaderObject("mm_menu_name2", 33, 4, doc2);
     expect(xwiki.getDocument(eq(menuBarDocRef), same(context))).andReturn(doc).once();
-    List<Object> fullNames = new ArrayList<Object>();
+    List<Object> fullNames = new ArrayList<>();
     fullNames.add("Celements.MenuBar");
     Query mockQuery = createMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq(Query.XWQL))).andReturn(
         mockQuery).once();
     expect(mockQuery.execute()).andReturn(fullNames).once();
-    List<Object> fullNamesCentral = new ArrayList<Object>();
+    List<Object> fullNamesCentral = new ArrayList<>();
     fullNamesCentral.add("Celements.MenuBar2");
     Query mockQuery2 = createMock(Query.class);
     expect(queryManagerMock.createQuery(isA(String.class), eq(Query.XWQL))).andReturn(

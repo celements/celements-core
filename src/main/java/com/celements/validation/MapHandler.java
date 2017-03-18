@@ -38,7 +38,7 @@ public class MapHandler<K, L, E> {
     if ((putMap != null) && !putMap.isEmpty()) {
       Map<L, Set<E>> map = toMap.get(key);
       if (map == null) {
-        map = new HashMap<L, Set<E>>();
+        map = new HashMap<>();
         toMap.put(key, map);
       }
       mergeMaps(putMap, map);
@@ -48,7 +48,7 @@ public class MapHandler<K, L, E> {
   public void put(K key, L key2, E value, Map<K, Map<L, Set<E>>> toMap) {
     Map<L, Set<E>> map = toMap.get(key);
     if (map == null) {
-      map = new HashMap<L, Set<E>>();
+      map = new HashMap<>();
       toMap.put(key, map);
     }
     put(key2, value, map);
@@ -66,7 +66,7 @@ public class MapHandler<K, L, E> {
     if ((putSet != null) && !putSet.isEmpty()) {
       Set<E> set = toMap.get(key);
       if (set == null) {
-        set = new HashSet<E>();
+        set = new HashSet<>();
         toMap.put(key, set);
       }
       set.addAll(putSet);
@@ -77,7 +77,7 @@ public class MapHandler<K, L, E> {
     if (value != null) {
       Set<E> set = toMap.get(key);
       if (set == null) {
-        set = new HashSet<E>();
+        set = new HashSet<>();
         toMap.put(key, set);
       }
       set.add(value);

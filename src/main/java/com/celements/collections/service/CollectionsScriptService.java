@@ -51,7 +51,7 @@ public class CollectionsScriptService implements ScriptService {
 
   /**
    * Get a list of Objects for a Document sorted by one or two fields.
-   * 
+   *
    * @param doc
    *          The Document where the Objects are attached.
    * @param classRef
@@ -77,7 +77,7 @@ public class CollectionsScriptService implements ScriptService {
     }
     List<BaseObject> bObjs = collectionsService.getObjectsOrdered(xdoc, classRef, orderField1, asc1,
         orderField2, asc2);
-    List<com.xpn.xwiki.api.Object> objs = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> objs = new ArrayList<>();
     for (BaseObject bObj : bObjs) {
       com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, getContext());
       if (obj != null) {

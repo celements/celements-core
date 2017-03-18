@@ -55,7 +55,7 @@ public interface ITreeNodeService {
    * since 2.17.0 use getSubNodesForParent(EntityReference, INavFilter) or
    * getSubNodesForParent(EntityReference, String) instead get all subnodes of a given
    * parent document (by fullname).
-   * 
+   *
    * @param parent
    * @param menuSpace
    *          (default: $doc.space)

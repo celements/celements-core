@@ -58,12 +58,12 @@ public class CssCommand {
   }
 
   public List<CSS> getAllCSS(XWikiContext context) throws XWikiException {
-    List<CSS> cssResultList = new ArrayList<CSS>();
+    List<CSS> cssResultList = new ArrayList<>();
     List<CSS> cssList = collectAllCSS(context);
 
     LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
 
-    Set<CSS> includedCSS = new HashSet<CSS>();
+    Set<CSS> includedCSS = new HashSet<>();
     for (CSS css2 : cssList) {
       CSS css = css2;
       if (!includedCSS.contains(css) && (css != null)) {
@@ -77,7 +77,7 @@ public class CssCommand {
   }
 
   private List<CSS> collectAllCSS(XWikiContext context) throws XWikiException {
-    List<CSS> cssList = new ArrayList<CSS>();
+    List<CSS> cssList = new ArrayList<>();
     cssList.addAll(includeApplicationDefaultCSS());
     cssList.addAll(includeCSSAfterSkin("", context));
     cssList.addAll(includeCSSAfterPreferences("", context));
@@ -100,12 +100,12 @@ public class CssCommand {
   }
 
   public List<CSS> getRTEContentCSS(XWikiContext context) throws XWikiException {
-    List<CSS> cssResultList = new ArrayList<CSS>();
+    List<CSS> cssResultList = new ArrayList<>();
     List<CSS> cssList = collectAllCSS(context);
 
     LOGGER.debug("List of CSS files built. There are " + cssList.size() + " CSS files to include.");
 
-    Set<CSS> includedCSS = new HashSet<CSS>();
+    Set<CSS> includedCSS = new HashSet<>();
     for (CSS css2 : cssList) {
       CSS css = css2;
       if ((css != null) && !includedCSS.contains(css) && css.isContentCSS()) {
@@ -148,7 +148,7 @@ public class CssCommand {
 
       LOGGER.debug("CSS Prefs: has '" + baseCSS + "' as CSS to add.");
 
-      List<BaseObject> baseList = new ArrayList<BaseObject>();
+      List<BaseObject> baseList = new ArrayList<>();
       DocumentReference xwikiPrefDocRef = new DocumentReference(context.getDatabase(), "XWiki",
           "XWikiPreferences");
       if (context.getWiki().exists(xwikiPrefDocRef, context)) {
@@ -183,7 +183,7 @@ public class CssCommand {
     List<CSS> cssList = Collections.emptyList();
 
     if (vcontext != null) {
-      List<BaseObject> baseList = new ArrayList<BaseObject>();
+      List<BaseObject> baseList = new ArrayList<>();
       baseList.addAll(addUserSkinCss((Document) vcontext.get("skin_doc")));
       baseList.addAll(addUserSkinCss((Document) vcontext.get("after_skin_cssdoc")));
       cssList = includeCSS(css, "cel_css_list_skin", baseList, context);
@@ -203,7 +203,7 @@ public class CssCommand {
     List<CSS> cssList = Collections.emptyList();
 
     if ((pageTypeDoc != null) && (vcontext != null)) {
-      List<BaseObject> baseList = new ArrayList<BaseObject>();
+      List<BaseObject> baseList = new ArrayList<>();
       baseList.addAll(addUserSkinCss(pageTypeDoc));
       baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagetype_cssdoc")));
       cssList = includeCSS(css, "cel_css_list_pagetype", baseList, context);
@@ -218,7 +218,7 @@ public class CssCommand {
     List<CSS> cssList = Collections.emptyList();
 
     if ((pageLayoutDoc != null) && (vcontext != null)) {
-      List<BaseObject> baseList = new ArrayList<BaseObject>();
+      List<BaseObject> baseList = new ArrayList<>();
       baseList.addAll(addUserSkinCss(pageLayoutDoc));
       baseList.addAll(addUserSkinCss((Document) vcontext.get("after_pagelayout_cssdoc")));
       baseList.addAll(addUserSkinCss((DocumentReference) vcontext.get(

@@ -63,14 +63,15 @@ public class MenuService implements IMenuService {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
+  @Override
   public List<BaseObject> getMenuHeaders() {
     LOGGER.trace("getMenuHeaders_internal start");
-    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<Integer, BaseObject>();
+    TreeMap<Integer, BaseObject> menuHeadersMap = new TreeMap<>();
     addMenuHeaders(menuHeadersMap);
     getContext().setDatabase("celements2web");
     addMenuHeaders(menuHeadersMap);
     getContext().setDatabase(getContext().getOriginalDatabase());
-    ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
+    ArrayList<BaseObject> resultList = new ArrayList<>();
     resultList.addAll(menuHeadersMap.values());
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("getMenuHeaders_internal returning: " + Arrays.deepToString(
@@ -87,7 +88,7 @@ public class MenuService implements IMenuService {
         LOGGER.trace("addMenuHeaders received for " + getContext().getDatabase() + ": "
             + Arrays.deepToString(result.toArray()));
       }
-      for (String fullName : new HashSet<String>(result)) {
+      for (String fullName : new HashSet<>(result)) {
         DocumentReference menuBarDocRef = webUtilsService.resolveDocumentReference(fullName);
         if (accessService.hasview(menuBarDocRef)) {
           List<BaseObject> headerObjList = getContext().getWiki().getDocument(menuBarDocRef,
@@ -116,18 +117,22 @@ public class MenuService implements IMenuService {
     }
   }
 
+  @Override
   public DocumentReference getMenuBarHeaderClassRef() {
     return getMenuBarHeaderClassRef(getContext().getDatabase());
   }
 
+  @Override
   public DocumentReference getMenuBarHeaderClassRef(String database) {
     return new DocumentReference(database, "Celements", "MenuBarHeaderItemClass");
   }
 
+  @Override
   public DocumentReference getMenuBarSubItemClassRef() {
     return getMenuBarSubItemClassRef(getContext().getDatabase());
   }
 
+  @Override
   public DocumentReference getMenuBarSubItemClassRef(String database) {
     return new DocumentReference(database, "Celements", "MenuBarSubItemClass");
   }
@@ -137,13 +142,14 @@ public class MenuService implements IMenuService {
         + " group by doc.fullName";
   }
 
+  @Override
   public List<BaseObject> getSubMenuItems(Integer headerId) {
-    TreeMap<Integer, BaseObject> menuItemsMap = new TreeMap<Integer, BaseObject>();
+    TreeMap<Integer, BaseObject> menuItemsMap = new TreeMap<>();
     addMenuItems(menuItemsMap, headerId);
     getContext().setDatabase("celements2web");
     addMenuItems(menuItemsMap, headerId);
     getContext().setDatabase(getContext().getOriginalDatabase());
-    ArrayList<BaseObject> resultList = new ArrayList<BaseObject>();
+    ArrayList<BaseObject> resultList = new ArrayList<>();
     resultList.addAll(menuItemsMap.values());
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("getSubMenuItems_internal returning: " + Arrays.deepToString(

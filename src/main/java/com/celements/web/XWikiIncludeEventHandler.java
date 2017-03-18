@@ -29,6 +29,7 @@ public class XWikiIncludeEventHandler implements IncludeEventHandler {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(XWikiIncludeEventHandler.class);
 
+  @Override
   public String includeEvent(String includeResourcePath, String currentResourcePath,
       String directiveName) {
     mLogger.trace("velocity include event: [" + includeResourcePath + "], [" + currentResourcePath

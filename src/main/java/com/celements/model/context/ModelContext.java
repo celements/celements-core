@@ -7,9 +7,12 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
 
 @ComponentRole
 public interface ModelContext {
@@ -18,6 +21,12 @@ public interface ModelContext {
   public static final String CFG_KEY_DEFAULT_LANG = "default_language";
   public static final String FALLBACK_DEFAULT_LANG = "en";
 
+  /**
+   * WARNING: This call is discouraged, use other methods of this service. It will be deprecated
+   * once we'll have a replacement for all of them.
+   *
+   * @return the old, discouraged {@link XWikiContext}
+   */
   public XWikiContext getXWikiContext();
 
   /**
@@ -59,6 +68,12 @@ public interface ModelContext {
 
   @NotNull
   public String getUserName();
+
+  @NotNull
+  public Optional<XWikiRequest> getRequest();
+
+  @NotNull
+  public Optional<XWikiResponse> getResponse();
 
   /**
    * @return the default language for the current wiki

@@ -55,7 +55,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("myCat", "pageTypeCat",
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("myCat", "pageTypeCat",
         "CelCat")), false);
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
@@ -79,7 +79,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql_secondList() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("pageTypeCat")), false);
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("pageTypeCat")), false);
     assertTrue(pThql.contains("('pageTypeCat')"));
   }
 
@@ -103,7 +103,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql_onlyVisible() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("myCat", "pageTypeCat",
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("myCat", "pageTypeCat",
         "CelCat")), true);
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
@@ -148,7 +148,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPThql_emptyCategory() {
-    String pThql = gptCmd.getPThql(new HashSet<String>(Arrays.asList("", "pageTypeCat")), false)
+    String pThql = gptCmd.getPThql(new HashSet<>(Arrays.asList("", "pageTypeCat")), false)
         + " ";
     assertTrue(pThql.startsWith("select doc.fullName "));
     assertTrue(pThql.contains(" from XWikiDocument as doc"));
@@ -172,7 +172,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
   @SuppressWarnings("unchecked")
   public void testGetPageTypesForCategories() throws XWikiException {
     List expectedList = Arrays.asList("PageTypes.RichText", "PageTypes.Code");
-    Set<String> catList = new HashSet<String>(Arrays.asList("pageTypeCat"));
+    Set<String> catList = new HashSet<>(Arrays.asList("pageTypeCat"));
     expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
         expectedList).times(2);
     replay(xwiki);
@@ -185,7 +185,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
   @SuppressWarnings("unchecked")
   public void testGetPageTypesForCategories_emptyCategory() throws XWikiException {
     List allPTList = Arrays.asList("PageTypes.RichText", "PageTypes.Code");
-    Set<String> catList = new HashSet<String>(Arrays.asList(""));
+    Set<String> catList = new HashSet<>(Arrays.asList(""));
     expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
         allPTList).times(2);
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).anyTimes();
@@ -213,7 +213,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
   @SuppressWarnings("unchecked")
   public void testGetPageTypesForCategories_emptyCategory_nullValue() throws XWikiException {
     List allPTList = Arrays.asList("PageTypes.RichText", "PageTypes.Code");
-    Set<String> catList = new HashSet<String>(Arrays.asList(""));
+    Set<String> catList = new HashSet<>(Arrays.asList(""));
     expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andReturn(
         allPTList).times(2);
     expect(xwiki.exists(eq("PageTypes.RichText"), same(context))).andReturn(true).anyTimes();
@@ -239,7 +239,7 @@ public class GetPageTypesCommandTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testGetPageTypesForCategories_Exception() throws XWikiException {
-    Set<String> catList = new HashSet<String>(Arrays.asList("pageTypeCat"));
+    Set<String> catList = new HashSet<>(Arrays.asList("pageTypeCat"));
     expect(xwiki.search(eq(gptCmd.getPThql(catList, false)), same(context))).andThrow(
         new XWikiException()).atLeastOnce();
     replay(xwiki);
