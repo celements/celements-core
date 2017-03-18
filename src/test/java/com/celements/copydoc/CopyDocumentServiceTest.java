@@ -42,6 +42,7 @@ public class CopyDocumentServiceTest extends AbstractComponentTest {
     docRef = new DocumentReference("db", "Space", "SomeDoc");
     docMock = createDocMock(docRef);
     expect(docMock.getTranslation()).andReturn(0).anyTimes();
+    expect(docMock.getLanguage()).andReturn("").anyTimes();
     classRef = new DocumentReference("db", "Classes", "SomeClass");
     // important for unstable-2.0 set database because class references are checked for db
     getContext().setDatabase("db");

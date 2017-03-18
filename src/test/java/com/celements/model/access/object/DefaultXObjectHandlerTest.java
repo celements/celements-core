@@ -59,11 +59,14 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_onDoc_isTranslation() throws Exception {
     try {
+      doc.setLanguage("en");
       doc.setTranslation(1);
       getXObjHandler();
       fail("expecting IllegalStateException");
-    } catch (IllegalStateException exc) {
-      // expected
+    } catch (IllegalStateException ise) {
+      assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
+      assertTrue("format not replacing placeholder 1", ise.getMessage().contains("'"
+          + doc.getDocumentReference() + "'"));
     }
   }
 

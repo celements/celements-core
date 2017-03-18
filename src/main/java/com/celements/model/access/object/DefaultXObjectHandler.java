@@ -2,6 +2,7 @@ package com.celements.model.access.object;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,8 +64,9 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
   @Override
   public XObjectHandler onDoc(XWikiDocument doc) {
-    checkState(!modelAccess.isTranslation(doc),
-        "XObjectHandler cannot be used on translation of doc: " + doc.getDocumentReference());
+    checkState(!modelAccess.isTranslation(doc), MessageFormat.format(
+        "XObjectHandler cannot be used on translation ''{0}'' of doc ''{1}''", doc.getLanguage(),
+        doc.getDocumentReference()));
     this.doc = doc;
     return this;
   }

@@ -135,6 +135,7 @@ public interface IModelAccessFacade {
    *          ObjectNumber of the desired XObject
    * @return the xobject in a Optional
    */
+  @Deprecated
   public Optional<BaseObject> getXObject(DocumentReference docRef, DocumentReference classRef,
       int objectNumber) throws DocumentNotExistsException;
 
@@ -147,6 +148,7 @@ public interface IModelAccessFacade {
    *          ObjectNumber of the desired XObject
    * @return the xobject in a Optional
    */
+  @Deprecated
   public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
       int objectNumber);
 
