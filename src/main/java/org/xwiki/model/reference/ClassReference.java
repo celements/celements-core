@@ -1,5 +1,7 @@
 package org.xwiki.model.reference;
 
+import javax.annotation.concurrent.Immutable;
+
 import org.xwiki.model.EntityType;
 
 import com.celements.model.context.ModelContext;
@@ -7,6 +9,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.xpn.xwiki.web.Utils;
 
+@Immutable
 public class ClassReference extends EntityReference {
 
   private static final long serialVersionUID = -8664491352611685779L;
