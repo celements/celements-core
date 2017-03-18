@@ -4,10 +4,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +18,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.AdjustWikiFunction;
-import com.celements.model.util.References;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -56,7 +51,8 @@ public class DefaultXObjectHandler implements XObjectHandler {
   private ModelContext context;
 
   private XWikiDocument doc;
-  private final Map<DocumentReference, Map<String, Set<Object>>> filterMap = new LinkedHashMap<>();
+
+  private final ClassFieldValues filter = new ClassFieldValues();
 
   private XWikiDocument getDoc() {
     return checkNotNull(doc);
@@ -71,63 +67,30 @@ public class DefaultXObjectHandler implements XObjectHandler {
     return this;
   }
 
-  private List<DocumentReference> getClassRefs() {
-    if (filterMap.isEmpty()) {
-      return ImmutableList.copyOf(getDoc().getXObjects().keySet());
-    } else {
-      final WikiReference wikiRef = References.extractRef(getDoc().getDocumentReference(),
-          WikiReference.class).get();
-      return FluentIterable.from(filterMap.keySet()).transform(new AdjustWikiFunction<>(
-          DocumentReference.class, wikiRef)).toList();
-    }
+  private List<ClassReference> getClassRefs() {
+    return filter.isEmpty() ? getClassRefsFromDoc() : filter.getClassRefs();
   }
 
-  private Map<String, Set<Object>> getValueMap(DocumentReference classRef, boolean add) {
-    classRef = References.adjustRef(checkNotNull(classRef), DocumentReference.class,
-        context.getWikiRef());
-    Map<String, Set<Object>> ret;
-    if (filterMap.containsKey(classRef)) {
-      ret = filterMap.get(classRef);
-    } else {
-      ret = new HashMap<>();
-      if (add) {
-        filterMap.put(classRef, ret);
-      }
-    }
-    return ret;
+  private List<ClassReference> getClassRefsFromDoc() {
+    Set<DocumentReference> docRefs = getDoc().getXObjects().keySet();
+    return FluentIterable.from(docRefs).transform(ClassReference.FUNC_DOC_TO_CLASS_REF).toList();
   }
 
   @Override
-  public XObjectHandler filter(DocumentReference classRef) {
-    getValueMap(classRef, true);
+  public XObjectHandler filter(ClassReference classRef) {
+    filter.add(classRef);
     return this;
   }
 
   @Override
   public <T> XObjectHandler filter(ClassField<T> field, T value) {
-    return filter(field, Arrays.asList(value));
+    filter.add(field, value);
+    return this;
   }
 
   @Override
   public <T> XObjectHandler filter(ClassField<T> field, Collection<T> values) {
-    return filter(checkNotNull(field).getClassDef().getClassRef(), field.getName(), values);
-  }
-
-  @Override
-  public XObjectHandler filter(DocumentReference classRef, String key, Object value) {
-    return filter(classRef, key, Arrays.asList(value));
-  }
-
-  @Override
-  public XObjectHandler filter(DocumentReference classRef, String key, Collection<?> values) {
-    checkArgument(!checkNotNull(key).isEmpty(), "cannot filter for empty field");
-    checkArgument(!checkNotNull(values).isEmpty(), "cannot filter for empty value list");
-    Map<String, Set<Object>> map = getValueMap(classRef, true);
-    Set<Object> valueSet = map.get(key);
-    if (valueSet == null) {
-      map.put(key, valueSet = new HashSet<>());
-    }
-    valueSet.addAll(values);
+    filter.add(field, values);
     return this;
   }
 
@@ -150,16 +113,16 @@ public class DefaultXObjectHandler implements XObjectHandler {
   @Override
   public List<BaseObject> fetchList() {
     List<BaseObject> ret = new ArrayList<>();
-    for (DocumentReference classRef : getClassRefs()) {
+    for (ClassReference classRef : getClassRefs()) {
       ret.addAll(getXObjects(classRef));
     }
     return FluentIterable.from(ret).filter(new ObjectFetchingPredicate()).toList();
   }
 
   @Override
-  public Map<DocumentReference, List<BaseObject>> fetchMap() {
-    Map<DocumentReference, List<BaseObject>> ret = new LinkedHashMap<>();
-    for (DocumentReference classRef : getClassRefs()) {
+  public Map<ClassReference, List<BaseObject>> fetchMap() {
+    Map<ClassReference, List<BaseObject>> ret = new LinkedHashMap<>();
+    for (ClassReference classRef : getClassRefs()) {
       List<BaseObject> objs = FluentIterable.from(getXObjects(classRef)).filter(
           new ObjectFetchingPredicate()).toList();
       if (!objs.isEmpty()) {
@@ -172,16 +135,25 @@ public class DefaultXObjectHandler implements XObjectHandler {
   private class ObjectFetchingPredicate implements Predicate<BaseObject> {
 
     @Override
-    public boolean apply(final BaseObject obj) {
-      final Map<String, Set<Object>> valueMap = getValueMap(obj.getXClassReference(), false);
-      return valueMap.isEmpty() || FluentIterable.from(valueMap.keySet()).anyMatch(
-          new Predicate<String>() {
+    public boolean apply(BaseObject obj) {
+      ClassReference classRef = new ClassReference(obj.getXClassReference());
+      return !filter.hasFields(classRef) || FluentIterable.from(filter.getFields(
+          classRef)).anyMatch(getClassFieldPrediate(obj));
+    }
 
-            @Override
-            public boolean apply(String key) {
-              return valueMap.get(key).contains(modelAccess.getProperty(obj, key));
-            }
-          });
+    private Predicate<ClassField<?>> getClassFieldPrediate(final BaseObject obj) {
+      return new Predicate<ClassField<?>>() {
+
+        @Override
+        public boolean apply(ClassField<?> field) {
+          return hasValue(field);
+        }
+
+        private <T> boolean hasValue(ClassField<T> field) {
+          Optional<T> fieldValue = modelAccess.getFieldValue(obj, field);
+          return fieldValue.isPresent() && filter.hasValue(field, fieldValue.get());
+        }
+      };
     }
   }
 
@@ -197,7 +169,7 @@ public class DefaultXObjectHandler implements XObjectHandler {
         Predicates.notNull()).toList();
   }
 
-  private class ObjectCreateFunction implements Function<DocumentReference, BaseObject> {
+  private class ObjectCreateFunction implements Function<ClassReference, BaseObject> {
 
     private final boolean ifNotExists;
 
@@ -206,21 +178,26 @@ public class DefaultXObjectHandler implements XObjectHandler {
     }
 
     @Override
-    public BaseObject apply(DocumentReference classRef) {
+    public BaseObject apply(ClassReference classRef) {
       if (!ifNotExists || getXObjects(classRef).isEmpty()) {
         try {
-          BaseObject obj = getDoc().newXObject(classRef, context.getXWikiContext());
-          Map<String, Set<Object>> valueMap = getValueMap(classRef, false);
-          for (String key : valueMap.keySet()) {
-            Object value = FluentIterable.from(valueMap.get(key)).first().get();
-            modelAccess.setProperty(obj, key, value);
+          BaseObject obj = getDoc().newXObject(getClassDocRef(classRef), context.getXWikiContext());
+          for (ClassField<?> field : filter.getFields(classRef)) {
+            setFirstValueFromFilter(obj, field);
           }
           return obj;
         } catch (XWikiException xwe) {
-          throw new ClassDocumentLoadException(classRef, xwe);
+          throw new ClassDocumentLoadException(getClassDocRef(classRef), xwe);
         }
       } else {
         return null;
+      }
+    }
+
+    private <T> void setFirstValueFromFilter(BaseObject obj, ClassField<T> field) {
+      Optional<T> value = FluentIterable.from(filter.getValues(field)).first();
+      if (value.isPresent()) {
+        modelAccess.setProperty(obj, field, value.get());
       }
     }
   }
@@ -236,14 +213,18 @@ public class DefaultXObjectHandler implements XObjectHandler {
     }).toList();
   }
 
-  private List<BaseObject> getXObjects(DocumentReference classRef) {
-    List<BaseObject> ret = getDoc().getXObjects(classRef);
+  private List<BaseObject> getXObjects(ClassReference classRef) {
+    List<BaseObject> ret = getDoc().getXObjects(getClassDocRef(classRef));
     if (ret != null) {
       ret = FluentIterable.from(ret).filter(Predicates.notNull()).toList();
     } else {
       ret = ImmutableList.of();
     }
     return ret;
+  }
+
+  private DocumentReference getClassDocRef(ClassReference classRef) {
+    return classRef.getDocumentReference(getDoc().getDocumentReference().getWikiReference());
   }
 
 }

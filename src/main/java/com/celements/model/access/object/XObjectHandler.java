@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
@@ -20,26 +20,12 @@ public interface XObjectHandler {
 
   public @NotNull XObjectHandler onDoc(@NotNull XWikiDocument doc);
 
-  public @NotNull XObjectHandler filter(@NotNull DocumentReference classRef);
+  public @NotNull XObjectHandler filter(@NotNull ClassReference classRef);
 
   public @NotNull <T> XObjectHandler filter(@NotNull ClassField<T> field, @Nullable T value);
 
   public @NotNull <T> XObjectHandler filter(@NotNull ClassField<T> field,
       @NotNull Collection<T> values);
-
-  /**
-   * @deprecated instead use {{@link #filter(ClassField, Object)}
-   */
-  @Deprecated
-  public @NotNull XObjectHandler filter(@NotNull DocumentReference classRef, @NotNull String key,
-      @Nullable Object value);
-
-  /**
-   * @deprecated instead use {{@link #filter(ClassField, Collection)
-   */
-  @Deprecated
-  public @NotNull XObjectHandler filter(@NotNull DocumentReference classRef, @NotNull String key,
-      @NotNull Collection<?> values);
 
   public @NotNull Optional<BaseObject> fetchFirst();
 
@@ -47,7 +33,7 @@ public interface XObjectHandler {
 
   public @NotNull List<BaseObject> fetchList();
 
-  public @NotNull Map<DocumentReference, List<BaseObject>> fetchMap();
+  public @NotNull Map<ClassReference, List<BaseObject>> fetchMap();
 
   public @NotNull List<BaseObject> create();
 
