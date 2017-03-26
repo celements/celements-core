@@ -192,9 +192,11 @@ public class PageDependentDocumentReferenceCommand {
       if (pageDepDoc != null) {
         return pageDepDoc.getDocumentReference();
       } else {
+        final DocumentReference defaultDPCdocRef = getDependentDefaultDocumentReference(docRef,
+            cellDocRef);
         LOGGER.debug("getDependentDocumentReference: inheritable result was null."
-            + " Fallback to [" + depDocSpaceRef.getName() + "." + PDC_DEFAULT_CONTENT_NAME + "]");
-        return getDependentDefaultDocumentReference(docRef, cellDocRef);
+            + " Fallback to default '" + defaultDPCdocRef + "'");
+        return defaultDPCdocRef;
       }
     } else {
       return new DocumentReference(docRef.getName(), depDocSpaceRef);
