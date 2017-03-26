@@ -177,15 +177,15 @@ public class PageDependentDocumentReferenceCommand {
   DocumentReference getDependentDocumentReference(DocumentReference docRef,
       DocumentReference cellDocRef, boolean isInheritable) {
     SpaceReference depDocSpaceRef = getDependentDocumentSpaceRef(docRef, cellDocRef);
-    LOGGER.debug("getDependentDocumentReference: docRef [" + docRef + "] cellDocRef [" + cellDocRef
-        + "] isInheritable [" + isInheritable + "] depDocSpaceRef [" + depDocSpaceRef + "].");
+    LOGGER.debug("getDependentDocumentReference: docRef '{}' cellDocRef '{}' isInheritable '{}'"
+        + " depDocSpaceRef '{}'.", docRef, cellDocRef, isInheritable, depDocSpaceRef);
     if (isInheritable) {
       List<String> depDocList = getDependentDocList(docRef, depDocSpaceRef.getName());
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("getDependentDocumentReference: inheritable for [" + docRef + "]"
-            + " depDocList [" + Arrays.deepToString(depDocList.toArray(new String[0])) + "]. ");
+        LOGGER.debug("getDependentDocumentReference: inheritable for '{}' depDocList '{}'. ",
+            docRef, Arrays.deepToString(depDocList.toArray(new String[0])));
       } else {
-        LOGGER.info("getDependentDocumentReference: inheritable for [" + docRef + "]. ");
+        LOGGER.info("getDependentDocumentReference: inheritable for '{}'. ", docRef);
       }
       XWikiDocument pageDepDoc = new InheritorFactory().getContentInheritor(depDocList,
           getContext()).getDocument();
@@ -195,7 +195,7 @@ public class PageDependentDocumentReferenceCommand {
         final DocumentReference defaultDPCdocRef = getDependentDefaultDocumentReference(docRef,
             cellDocRef);
         LOGGER.debug("getDependentDocumentReference: inheritable result was null."
-            + " Fallback to default '" + defaultDPCdocRef + "'");
+            + " Fallback to default '{}'", defaultDPCdocRef);
         return defaultDPCdocRef;
       }
     } else {
