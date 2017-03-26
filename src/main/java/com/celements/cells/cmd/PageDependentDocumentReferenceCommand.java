@@ -193,7 +193,7 @@ public class PageDependentDocumentReferenceCommand {
         return pageDepDoc.getDocumentReference();
       } else {
         LOGGER.debug("getDependentDocumentReference: inheritable result was null."
-            + " Fallback to [" + depDocSpaceRef + "." + PDC_DEFAULT_CONTENT_NAME + "]");
+            + " Fallback to [" + depDocSpaceRef.getName() + "." + PDC_DEFAULT_CONTENT_NAME + "]");
         return getDependentDefaultDocumentReference(docRef, cellDocRef);
       }
     } else {
