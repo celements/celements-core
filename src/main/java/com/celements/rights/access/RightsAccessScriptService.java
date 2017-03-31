@@ -61,9 +61,6 @@ public class RightsAccessScriptService implements ScriptService {
   }
 
   public boolean isLoggedIn() {
-    if (!"XWiki.XWikiGuest".equals(xWikiContext.getUser())) {
-      return true;
-    }
-    return false;
+    return rightsAccess.isLoggedIn();
   }
 }
