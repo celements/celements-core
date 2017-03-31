@@ -8,6 +8,7 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.rights.publication.EPubUnpub;
 import com.celements.rights.publication.IPublicationServiceRole;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
@@ -21,6 +22,9 @@ public class RightsAccessScriptService implements ScriptService {
 
   @Requirement
   IRightsAccessFacadeRole rightsAccess;
+
+  @Requirement
+  XWikiContext xWikiContext;
 
   public EPubUnpub getEPubUnpub(String name) {
     return EPubUnpub.valueOf(name);
@@ -56,4 +60,10 @@ public class RightsAccessScriptService implements ScriptService {
     return hasAccessLevel(docRef, level, user);
   }
 
+  public boolean isLoggedIn() {
+    if ("XWiki.XWikiGuest".equals(xWikiContext.getUser())) {
+      return true;
+    }
+    return false;
+  }
 }
