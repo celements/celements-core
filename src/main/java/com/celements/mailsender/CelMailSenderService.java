@@ -14,6 +14,12 @@ public class CelMailSenderService implements IMailSenderRole {
 
   private IMailObjectRole injectedMailObject;
 
+  public static final String EMAIL_VALIDATION_REGEX = "^[\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF.+]+[@][\\w\\-\""
+      + "\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+([.]([\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+))+$";
+
+  public static final String EMAIL_VALIDATION_REGEX_CLASS_DEFINITIONS = "/^[\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF.+]+[@][\\w\\-\""
+      + "\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+([.]([\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+))+$/";
+
   @Override
   public int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
       String htmlContent, String textContent, List<Attachment> attachments,
@@ -61,14 +67,11 @@ public class CelMailSenderService implements IMailSenderRole {
 
   @Override
   public String getEmailValidationRegex() {
-    // chars - a-z A-Z 0-9 œ à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ø ù ú û ü ý þ ÿ
-    String wordChars = "\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF";
-    return "^[" + wordChars + ".+]+[@][" + wordChars + "]+([.]([" + wordChars + "]+))+$";
+    return EMAIL_VALIDATION_REGEX;
   }
 
   @Override
   public String getEmailValidationRegexForClassDefinitions() {
-    return "/" + getEmailValidationRegex() + "/";
+    return EMAIL_VALIDATION_REGEX_CLASS_DEFINITIONS;
   }
-
 }
