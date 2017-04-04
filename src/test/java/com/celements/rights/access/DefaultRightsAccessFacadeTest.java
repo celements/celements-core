@@ -271,7 +271,7 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testIsLoggedIn_false() {
-    context.setUser("XWiki.XWikiGuest");
+    context.setUser(XWikiRightService.GUEST_USER_FULLNAME);
     assertFalse(rightsAccess.isLoggedIn());
   }
 
