@@ -82,13 +82,12 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
 
   @Override
   public boolean isLoggedIn() {
-    boolean ret;
+    boolean ret = false;
     if (!"XWiki.XWikiGuest".equals(getContext().getUser())) {
-      LOGGER.info("User is logged in");
       ret = true;
+      LOGGER.info("User is logged in", ret);
     } else {
-      ret = false;
-      LOGGER.info("User is not logged in");
+      LOGGER.info("User is not logged in", ret);
     }
     return ret;
   }
