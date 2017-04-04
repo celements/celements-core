@@ -269,4 +269,15 @@ public class DefaultRightsAccessFacadeTest extends AbstractBridgedComponentTestC
         0).anyTimes();
   }
 
+  @Test
+  public void testIsLoggedIn_false() {
+    context.setUser("XWiki.XWikiGuest");
+    assertFalse(rightsAccess.isLoggedIn());
+  }
+
+  @Test
+  public void testIsLoggedIn_true() {
+    context.setUser("XWiki.XWikiTest");
+    assertTrue(rightsAccess.isLoggedIn());
+  }
 }
