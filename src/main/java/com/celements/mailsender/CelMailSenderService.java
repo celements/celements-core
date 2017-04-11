@@ -17,8 +17,8 @@ public class CelMailSenderService implements IMailSenderRole {
   public static final String EMAIL_VALIDATION_REGEX = "^[\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF.+]+[@][\\w\\-\""
       + "\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+([.]([\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+))+$";
 
-  public static final String EMAIL_VALIDATION_REGEX_CLASS_DEFINITIONS = "/^[\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF.+]+[@][\\w\\-\""
-      + "\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+([.]([\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+))+$/";
+  public static final String EMAIL_VALIDATION_REGEX_CLASS_DEFINITIONS = "/" + EMAIL_VALIDATION_REGEX
+      + "/";
 
   @Override
   public int sendMail(String from, String replyTo, String to, String cc, String bcc, String subject,
