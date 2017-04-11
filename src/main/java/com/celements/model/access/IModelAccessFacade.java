@@ -80,6 +80,7 @@ public interface IModelAccessFacade {
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
+  @Deprecated
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef)
       throws DocumentNotExistsException;
 
@@ -96,6 +97,7 @@ public interface IModelAccessFacade {
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
+  @Deprecated
   public BaseObject getXObject(DocumentReference docRef, DocumentReference classRef, String key,
       Object value) throws DocumentNotExistsException;
 
@@ -106,6 +108,7 @@ public interface IModelAccessFacade {
    *          type of xobject to get (may not be null)
    * @return the xobject or null
    */
+  @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
@@ -119,6 +122,7 @@ public interface IModelAccessFacade {
    *          for field specific xobject filtering
    * @return the xobject or null
    */
+  @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef, String key,
       Object value);
 
@@ -131,6 +135,7 @@ public interface IModelAccessFacade {
    *          ObjectNumber of the desired XObject
    * @return the xobject in a Optional
    */
+  @Deprecated
   public Optional<BaseObject> getXObject(DocumentReference docRef, DocumentReference classRef,
       int objectNumber) throws DocumentNotExistsException;
 
@@ -143,6 +148,7 @@ public interface IModelAccessFacade {
    *          ObjectNumber of the desired XObject
    * @return the xobject in a Optional
    */
+  @Deprecated
   public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
       int objectNumber);
 
@@ -155,6 +161,7 @@ public interface IModelAccessFacade {
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
+  @Deprecated
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef)
       throws DocumentNotExistsException;
 
@@ -171,6 +178,7 @@ public interface IModelAccessFacade {
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
+  @Deprecated
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Object value) throws DocumentNotExistsException;
 
@@ -187,6 +195,7 @@ public interface IModelAccessFacade {
    * @throws DocumentNotExistsException
    *           if the document does not exist
    */
+  @Deprecated
   public List<BaseObject> getXObjects(DocumentReference docRef, DocumentReference classRef,
       String key, Collection<?> values) throws DocumentNotExistsException;
 
@@ -197,6 +206,7 @@ public interface IModelAccessFacade {
    *          type of xobjects to get (may not be null)
    * @return an unmodifiable list of xobjects (without null values) or empty list
    */
+  @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef);
 
   /**
@@ -210,6 +220,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering
    * @return an unmodifiable list of xobjects (without null values) or empty list
    */
+  @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Object value);
 
@@ -224,6 +235,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering
    * @return an unmodifiable list of xobjects (without null values) or empty list
    */
+  @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values);
 
@@ -233,6 +245,7 @@ public interface IModelAccessFacade {
    * @return
    * @return an unmodifiable map of all xobjects list
    */
+  @Deprecated
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc);
 
   /**
@@ -246,6 +259,7 @@ public interface IModelAccessFacade {
    *          for field specific xobject filtering
    * @return newly created xobject with set key - value
    */
+  @Deprecated
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
@@ -255,6 +269,7 @@ public interface IModelAccessFacade {
    *          type of xobjects to create (may not be null)
    * @return already existing or newly created xobject
    */
+  @Deprecated
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
@@ -264,6 +279,7 @@ public interface IModelAccessFacade {
    *          type of xobjects to create (may not be null)
    * @return already existing or newly created xobject
    */
+  @Deprecated
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef, String key,
       Object value);
 
@@ -292,6 +308,7 @@ public interface IModelAccessFacade {
    *          type of xobjects to remove
    * @return true if doc has changed
    */
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef);
 
   /**
@@ -305,6 +322,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering
    * @return true if doc has changed
    */
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Object value);
 
@@ -319,6 +337,7 @@ public interface IModelAccessFacade {
    *          for field specific xobjects filtering
    * @return true if doc has changed
    */
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values);
 

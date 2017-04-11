@@ -12,14 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ModelUtils;
-import com.celements.model.util.References;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -40,14 +39,20 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
   private volatile Map<String, ClassField<?>> fields;
 
   @Override
-  public DocumentReference getClassRef() {
-    return getClassRef(context.getWikiRef());
+  public ClassReference getClassReference() {
+    return new ClassReference(getClassSpaceName(), getClassDocName());
   }
 
+  @Deprecated
+  @Override
+  public DocumentReference getClassRef() {
+    return getClassReference().getDocumentReference();
+  }
+
+  @Deprecated
   @Override
   public DocumentReference getClassRef(WikiReference wikiRef) {
-    return References.create(DocumentReference.class, getClassDocName(), References.create(
-        SpaceReference.class, getClassSpaceName(), wikiRef));
+    return getClassReference().getDocumentReference(wikiRef);
   }
 
   /**
