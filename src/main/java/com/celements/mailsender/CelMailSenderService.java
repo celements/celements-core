@@ -14,6 +14,7 @@ public class CelMailSenderService implements IMailSenderRole {
 
   private IMailObjectRole injectedMailObject;
 
+  // chars - a-z A-Z 0-9 œ à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ø ù ú û ü ý þ ÿ
   public static final String EMAIL_VALIDATION_REGEX = "^[\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF.+]+[@][\\w\\-\""
       + "\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+([.]([\\w\\-\\u0153\\u00E0-\\u00F6\\u00F8-\\u00FF]+))+$";
 
@@ -67,7 +68,6 @@ public class CelMailSenderService implements IMailSenderRole {
 
   @Override
   public String getEmailValidationRegex() {
-    // chars - a-z A-Z 0-9 œ à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ø ù ú û ü ý þ ÿ
     return EMAIL_VALIDATION_REGEX;
   }
 
