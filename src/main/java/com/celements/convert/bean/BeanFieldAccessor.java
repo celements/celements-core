@@ -12,8 +12,8 @@ import com.celements.model.classes.fields.ClassField;
 import com.google.common.collect.Lists;
 
 /**
- * simple {@link FieldAccessor} using {@link PropertyUtils} to call getters/setters of a simple
- * bean. see {{@link #getBeanMethodName(ClassField)} to check expected naming.
+ * {@link FieldAccessor} using {@link PropertyUtils} to call getters/setters of a simple bean. see
+ * {{@link #getBeanMethodName(ClassField)} to check expected naming.
  */
 @Component(BeanFieldAccessor.NAME)
 public class BeanFieldAccessor<T> implements FieldAccessor<T> {
