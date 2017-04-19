@@ -22,7 +22,7 @@ public class BeanXObjectConverter<T> extends XObjectDeconverter<T> implements
   private ClassDefinition classDef;
 
   @Requirement(BeanFieldAccessor.NAME)
-  private FieldAccessor<T> beanFieldConverter;
+  private FieldAccessor<T> accessor;
 
   @Override
   public String getName() {
@@ -43,8 +43,8 @@ public class BeanXObjectConverter<T> extends XObjectDeconverter<T> implements
   }
 
   @Override
-  protected FieldAccessor<T> getFromFieldConverter() {
-    return beanFieldConverter;
+  protected FieldAccessor<T> getFromFieldAccessor() {
+    return accessor;
   }
 
 }

@@ -25,9 +25,9 @@ public abstract class ClassDefConverter<A, B> implements Converter<A, B> {
 
   protected abstract @NotNull B createInstance();
 
-  protected abstract @NotNull FieldAccessor<A> getFromFieldConverter();
+  protected abstract @NotNull FieldAccessor<A> getFromFieldAccessor();
 
-  protected abstract @NotNull FieldAccessor<B> getToFieldConverter();
+  protected abstract @NotNull FieldAccessor<B> getToFieldAccessor();
 
   @Override
   public B apply(A data) throws ConversionException {
@@ -35,7 +35,7 @@ public abstract class ClassDefConverter<A, B> implements Converter<A, B> {
     if (data != null) {
       for (ClassField<?> field : getClassDef().getFields()) {
         try {
-          convertField(field, getToFieldConverter(), instance, getFromFieldConverter(), data);
+          convertField(field, getToFieldAccessor(), instance, getFromFieldAccessor(), data);
         } catch (FieldAccessException exc) {
           handle(exc);
         }
@@ -44,9 +44,9 @@ public abstract class ClassDefConverter<A, B> implements Converter<A, B> {
     return instance;
   }
 
-  private static <V, A, B> void convertField(ClassField<V> field, FieldAccessor<A> toConverter,
-      A to, FieldAccessor<B> fromConverter, B from) throws FieldAccessException {
-    toConverter.setValue(to, field, fromConverter.getValue(from, field));
+  private static <V, A, B> void convertField(ClassField<V> field, FieldAccessor<A> toAccessor, A to,
+      FieldAccessor<B> fromAccessor, B from) throws FieldAccessException {
+    toAccessor.setValue(to, field, fromAccessor.getValue(from, field));
   }
 
   private void handle(FieldAccessException exc) throws ConversionException {

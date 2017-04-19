@@ -9,11 +9,11 @@ import com.xpn.xwiki.objects.BaseObject;
 public abstract class XObjectConverter<T> extends ClassDefConverter<BaseObject, T> {
 
   @Requirement(XObjectFieldAccessor.NAME)
-  private FieldAccessor<BaseObject> fieldConverter;
+  private FieldAccessor<BaseObject> accessor;
 
   @Override
-  public FieldAccessor<BaseObject> getFromFieldConverter() {
-    return fieldConverter;
+  public FieldAccessor<BaseObject> getFromFieldAccessor() {
+    return accessor;
   }
 
 }
