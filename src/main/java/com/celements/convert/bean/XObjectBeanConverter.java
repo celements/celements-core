@@ -3,7 +3,9 @@ package com.celements.convert.bean;
 import static com.google.common.base.Preconditions.*;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 import com.celements.convert.classes.XObjectConverter;
 import com.celements.model.access.field.FieldAccessor;
@@ -12,6 +14,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 @Component(XObjectBeanConverter.NAME)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XObjectBeanConverter<T> extends XObjectConverter<T> implements
     BeanConverter<BaseObject, T> {
 
