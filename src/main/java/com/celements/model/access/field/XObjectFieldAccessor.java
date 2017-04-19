@@ -1,5 +1,7 @@
 package com.celements.model.access.field;
 
+import static com.google.common.base.Preconditions.*;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,8 +40,10 @@ public class XObjectFieldAccessor implements FieldAccessor<BaseObject> {
   }
 
   private void checkClassRef(BaseObject obj, ClassField<?> field) throws FieldAccessException {
-    DocumentReference classRef = obj.getXClassReference();
-    if (!classRef.equals(field.getClassDef().getClassRef(classRef.getWikiReference()))) {
+    DocumentReference classRef = checkNotNull(obj).getXClassReference();
+    DocumentReference expClassRef = checkNotNull(field).getClassDef().getClassRef(
+        classRef.getWikiReference());
+    if (!expClassRef.equals(classRef)) {
       throw new FieldAccessException("BaseObject uneligible for '" + field + "', it's of class '"
           + classRef + "'");
     }
