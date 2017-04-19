@@ -24,7 +24,7 @@ public class XObjectBeanConverter<T> extends XObjectConverter<T> implements
   private Class<T> token;
 
   @Requirement(BeanFieldAccessor.NAME)
-  private FieldAccessor<T> accessor;
+  private FieldAccessor<T> beanAccessor;
 
   @Override
   public String getName() {
@@ -53,7 +53,7 @@ public class XObjectBeanConverter<T> extends XObjectConverter<T> implements
 
   @Override
   protected FieldAccessor<T> getToFieldAccessor() {
-    return accessor;
+    return beanAccessor;
   }
 
 }
