@@ -41,9 +41,8 @@ public class XObjectFieldAccessor implements FieldAccessor<BaseObject> {
 
   private void checkClassRef(BaseObject obj, ClassField<?> field) throws FieldAccessException {
     DocumentReference classRef = checkNotNull(obj).getXClassReference();
-    DocumentReference expClassRef = checkNotNull(field).getClassDef().getClassRef(
-        classRef.getWikiReference());
-    if (!expClassRef.equals(classRef)) {
+    if ((classRef == null) || !classRef.equals(checkNotNull(field).getClassDef().getClassRef(
+        classRef.getWikiReference()))) {
       throw new FieldAccessException("BaseObject uneligible for '" + field + "', it's of class '"
           + classRef + "'");
     }
