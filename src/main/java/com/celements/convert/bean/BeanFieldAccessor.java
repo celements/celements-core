@@ -1,6 +1,7 @@
 package com.celements.convert.bean;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.xwiki.component.annotation.Component;
@@ -9,6 +10,8 @@ import com.celements.model.access.field.FieldAccessException;
 import com.celements.model.access.field.FieldAccessor;
 import com.celements.model.access.field.FieldMissingException;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.classes.fields.list.ListField;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -39,12 +42,24 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
   @Override
   public <V> void setValue(T obj, ClassField<V> field, V value) throws FieldAccessException {
     try {
-      PropertyUtils.setProperty(obj, getBeanMethodName(field), value);
+      PropertyUtils.setProperty(obj, getBeanMethodName(field), resolveSetValue(field, value));
     } catch (NoSuchMethodException exc) {
       throw new FieldMissingException(exc);
     } catch (ReflectiveOperationException exc) {
       throw new FieldAccessException(exc);
     }
+  }
+
+  private Object resolveSetValue(ClassField<?> field, Object value) {
+    try {
+      // set first value for single select list fields
+      if ((value != null) && !((ListField<?>) field).isMultiSelect()) {
+        value = Iterables.getFirst((List<?>) value, null);
+      }
+    } catch (ClassCastException exc) {
+      // expected to happen for all non list fields
+    }
+    return value;
   }
 
   /**

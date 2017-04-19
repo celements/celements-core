@@ -50,19 +50,11 @@ public abstract class ClassDefConverter<A, B> implements Converter<A, B> {
   }
 
   private void handle(FieldAccessException exc) throws ConversionException {
-    if ((exc instanceof FieldMissingException) && omitIncompletness()) {
-      LOGGER.info("omitting incompleteness for '{}'", this.getClass().getSimpleName(), exc);
+    if (exc instanceof FieldMissingException) {
+      LOGGER.warn("incompleteness detected for '{}'", this.getClass().getSimpleName(), exc);
     } else {
       throw new ConversionException(exc);
     }
-  }
-
-  /**
-   * allows the implementation to omit incompleteness if a {@link FieldAccessor} throws a
-   * {@link FieldMissingException}
-   */
-  protected boolean omitIncompletness() {
-    return false;
   }
 
 }
