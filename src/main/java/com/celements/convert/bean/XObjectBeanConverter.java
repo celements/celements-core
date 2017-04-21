@@ -6,6 +6,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
 
 import com.celements.convert.classes.XObjectConverter;
 import com.celements.model.access.field.FieldAccessor;
@@ -18,7 +19,8 @@ import com.xpn.xwiki.web.Utils;
  * Converts an XObject to a Bean
  * </p>
  * IMPORTANT: call {@link #initialize(ClassDefinition, Class)} exactly once per component
- * instantiation, otherwise {@link #apply(BaseObject)} will throw an {@link IllegalStateException}
+ * instantiation, otherwise {@link #apply(BaseObject)} will throw an {@link IllegalStateException}.
+ * When used as a {@link Requirement}, using {@link Initializable} is suitable.
  */
 @Component(XObjectBeanConverter.NAME)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
