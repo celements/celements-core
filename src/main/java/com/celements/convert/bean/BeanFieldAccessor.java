@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.celements.model.access.field.FieldAccessException;
@@ -21,6 +23,8 @@ import com.google.common.collect.Lists;
 @Component(BeanFieldAccessor.NAME)
 public class BeanFieldAccessor<T> implements FieldAccessor<T> {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(BeanFieldAccessor.class);
+
   public static final String NAME = "bean";
 
   @Override
@@ -30,13 +34,16 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
 
   @Override
   public <V> V getValue(T obj, ClassField<V> field) throws FieldAccessException {
+    V ret;
     try {
-      return field.getType().cast(PropertyUtils.getProperty(obj, getBeanMethodName(field)));
+      ret = field.getType().cast(PropertyUtils.getProperty(obj, getBeanMethodName(field)));
     } catch (NoSuchMethodException exc) {
       throw new FieldMissingException(exc);
     } catch (ReflectiveOperationException | ClassCastException exc) {
       throw new FieldAccessException(exc);
     }
+    LOGGER.info("getValue: '{}' for '{}' from '{}'", ret, field, obj);
+    return ret;
   }
 
   @Override
@@ -48,16 +55,21 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
     } catch (ReflectiveOperationException exc) {
       throw new FieldAccessException(exc);
     }
+    LOGGER.info("setValue: '{}' for '{}' from '{}'", value, field, obj);
   }
 
+  /**
+   * resolves the correct value for single select fields so that the bean can have a
+   */
   private Object resolveSetValue(ClassField<?> field, Object value) {
     try {
       // set first value for single select list fields
       if ((value != null) && !((ListField<?>) field).isMultiSelect()) {
+        LOGGER.debug("resolveSetValue: for '{}' with value '{}'", field, value);
         value = Iterables.getFirst((List<?>) value, null);
       }
     } catch (ClassCastException exc) {
-      // expected to happen for all non list fields
+      LOGGER.trace("resolveSetValue: expected for non-list field '{}'", field, exc);
     }
     return value;
   }
@@ -81,6 +93,7 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
         toUpperCase = sb.length() > 0;
       }
     }
+    LOGGER.debug("getBeanMethodName: '{}' for '{}'", sb, field);
     return sb.toString();
   }
 
