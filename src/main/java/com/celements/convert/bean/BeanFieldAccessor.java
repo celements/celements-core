@@ -59,7 +59,8 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
   }
 
   /**
-   * resolves the correct value for single select fields so that the bean can have a
+   * resolves the correct value for single select fields so that the bean can have a a non-list
+   * getter/setter
    */
   private Object resolveSetValue(ClassField<?> field, Object value) {
     try {
