@@ -13,6 +13,13 @@ import com.celements.model.classes.ClassDefinition;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * <p>
+ * Converts an XObject to a Bean
+ * </p>
+ * IMPORTANT: call {@link #initialize(ClassDefinition, Class)} exactly once per component
+ * instantiation, otherwise {@link #apply(BaseObject)} will throw an {@link IllegalStateException}
+ */
 @Component(XObjectBeanConverter.NAME)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XObjectBeanConverter<T> extends XObjectConverter<T> implements

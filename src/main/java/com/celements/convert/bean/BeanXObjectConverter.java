@@ -12,6 +12,13 @@ import com.celements.model.access.field.FieldAccessor;
 import com.celements.model.classes.ClassDefinition;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * <p>
+ * Converts a Bean to an XObject
+ * </p>
+ * IMPORTANT: call {@link #initialize(ClassDefinition, Class)} exactly once per component
+ * instantiation, otherwise {@link #apply(T)} will throw an {@link IllegalStateException}
+ */
 @Component(BeanXObjectConverter.NAME)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class BeanXObjectConverter<T> extends XObjectDeconverter<T> implements
