@@ -1,5 +1,7 @@
 package com.celements.model.classes.fields.list;
 
+import static com.google.common.base.MoreObjects.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +96,10 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   @NotNull
   protected abstract List<T> resolveList(@NotNull List<?> list);
+
+  public boolean isMultiSelect() {
+    return firstNonNull(multiSelect, false);
+  }
 
   public Boolean getMultiSelect() {
     return multiSelect;
