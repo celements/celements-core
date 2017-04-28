@@ -11,13 +11,14 @@ import org.xwiki.configuration.ConfigurationSource;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * this pattern suppresses the stack trace for all levels below the one configured. defaults to
- * {@link Level#ERROR}
+ * this pattern suppresses the stack trace for all levels below the one configured (defaults to
+ * {@link #DEFAULT_LEVEL})
  */
 @NotThreadSafe
 public class NoStackTracePatternLayout extends PatternLayout {
 
   private static final String CFG_SRC_KEY_LEVEL = "celements.logging.noStackTrace.level";
+  private static final Level DEFAULT_LEVEL = Level.WARN;
 
   /**
    * sadly, {@link #ignoresThrowable()} does not give us the {@link LoggingEvent}, so we have to
@@ -42,12 +43,8 @@ public class NoStackTracePatternLayout extends PatternLayout {
   }
 
   private Level getNoStackTraceLevel() {
-    String levelName = getCfgSrc().getProperty(CFG_SRC_KEY_LEVEL);
-    return Level.toLevel(levelName, Level.ERROR);
-  }
-
-  private ConfigurationSource getCfgSrc() {
-    return Utils.getComponent(ConfigurationSource.class);
+    String levelName = Utils.getComponent(ConfigurationSource.class).getProperty(CFG_SRC_KEY_LEVEL);
+    return Level.toLevel(levelName, DEFAULT_LEVEL);
   }
 
 }
