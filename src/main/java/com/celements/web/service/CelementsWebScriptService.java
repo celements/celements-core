@@ -76,6 +76,9 @@ import com.celements.web.plugin.cmd.PossibleLoginsCommand;
 import com.celements.web.plugin.cmd.RenameCommand;
 import com.celements.web.plugin.cmd.ResetProgrammingRightsCommand;
 import com.celements.web.plugin.cmd.SkinConfigObjCommand;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -1067,6 +1070,14 @@ public class CelementsWebScriptService implements ScriptService {
       }
     }
     return this.versionMap.get(systemComponentName);
+  }
+
+  public Joiner getJoiner(String separator) {
+    return Joiner.on(Strings.nullToEmpty(separator));
+  }
+
+  public Splitter getSplitter(String separator) {
+    return Splitter.on(Strings.nullToEmpty(separator));
   }
 
 }
