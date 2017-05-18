@@ -1,4 +1,4 @@
-package com.celements.model.classes.fields;
+package com.celements.model.classes.fields.list;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;

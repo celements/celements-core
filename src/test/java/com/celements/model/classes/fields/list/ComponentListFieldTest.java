@@ -1,11 +1,12 @@
-package com.celements.model.classes.fields;
+package com.celements.model.classes.fields.list;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
+import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
+import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -14,89 +15,84 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.fields.list.ListOfUsersField;
 import com.celements.model.util.ClassFieldValue;
-import com.google.common.base.Joiner;
+import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
-public class ListOfUsersFieldTest extends AbstractComponentTest {
+public class ComponentListFieldTest extends AbstractComponentTest {
 
-  private ListOfUsersField.Builder fieldBuilder;
+  private ComponentListField.Builder<ClassDefinition> fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {
-    fieldBuilder = new ListOfUsersField.Builder(TestClassDefinition.NAME, "name");
+    fieldBuilder = new ComponentListField.Builder<>(TestClassDefinition.NAME, "name",
+        ClassDefinition.class);
   }
 
   @Test
   public void test_immutability() {
-    assertImmutable(ListOfUsersField.class);
+    assertInstancesOf(ComponentListField.class, areImmutable(), allowingForSubclassing());
   }
 
   @Test
-  public void test_getXField() throws Exception {
-    ListOfUsersField field = fieldBuilder.build();
-    assertTrue(field.getXField() instanceof UsersClass);
-    assertNull(field.getUsesList());
+  public void test_getPossibleValues() throws Exception {
+    ComponentListField<ClassDefinition> field = fieldBuilder.build();
+    assertEquals(Utils.getComponentList(ClassDefinition.class), field.getPossibleValues());
   }
 
   @Test
   public void test_resolve_serialize() throws Exception {
-    ListOfUsersField field = fieldBuilder.build();
+    ComponentListField<ClassDefinition> field = fieldBuilder.build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
-    XWikiUser user1 = new XWikiUser("XWiki.User1");
-    List<XWikiUser> userList = Collections.unmodifiableList(Arrays.asList(user1));
+    ClassDefinition value = getClassDef(TestClassDefinition.NAME);
 
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, userList));
-    List<XWikiUser> ret = modelAccess.getProperty(doc, field);
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, Arrays.asList(value)));
+    List<ClassDefinition> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
-    assertEquals(userList.size(), ret.size());
-    assertEquals(userList.get(0).getUser(), ret.get(0).getUser());
-    assertEquals(user1.getUser(), modelAccess.getXObject(doc, classRef).getStringValue(
+    assertEquals(Arrays.asList(value), ret);
+    assertEquals(value.getName(), modelAccess.getXObject(doc, classRef).getStringValue(
         field.getName()));
   }
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
-    ListOfUsersField field = fieldBuilder.multiSelect(true).build();
+    ComponentListField<ClassDefinition> field = fieldBuilder.multiSelect(true).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
-    XWikiUser user1 = new XWikiUser("XWiki.User1");
-    XWikiUser user2 = new XWikiUser("XWiki.User2");
-    List<XWikiUser> userList = Collections.unmodifiableList(Arrays.asList(user1, user2));
+    List<ClassDefinition> value = Arrays.asList(getClassDef(TestClassDefinition.NAME), getClassDef(
+        XWikiRightsClass.CLASS_DEF_HINT));
 
     BaseClass bClass = expectNewBaseObject(classRef);
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    modelAccess.setProperty(doc, new ClassFieldValue<>(field, userList));
-    List<XWikiUser> ret = modelAccess.getProperty(doc, field);
+    modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
+    List<ClassDefinition> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
-    assertEquals(userList.size(), ret.size());
-    assertEquals(userList.get(0).getUser(), ret.get(0).getUser());
-    assertEquals(userList.get(1).getUser(), ret.get(1).getUser());
-    assertEquals(Joiner.on(field.getSeparator()).join(Arrays.asList(user1.getUser(),
-        user2.getUser())), modelAccess.getXObject(doc, classRef).getStringValue(field.getName()));
+    assertEquals(value, ret);
+    assertEquals(TestClassDefinition.NAME, modelAccess.getXObject(doc, classRef).getListValue(
+        field.getName()).get(0));
+    assertEquals(XWikiRightsClass.CLASS_DEF_HINT, modelAccess.getXObject(doc,
+        classRef).getListValue(field.getName()).get(1));
   }
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
-    ListOfUsersField field = fieldBuilder.multiSelect(true).build();
+    ComponentListField<ClassDefinition> field = fieldBuilder.multiSelect(true).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
@@ -105,9 +101,9 @@ public class ListOfUsersFieldTest extends AbstractComponentTest {
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    List<XWikiUser> ret1 = modelAccess.getProperty(doc, field);
+    List<ClassDefinition> ret1 = modelAccess.getFieldValue(doc, field).orNull();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
-    List<XWikiUser> ret2 = modelAccess.getProperty(doc, field);
+    List<ClassDefinition> ret2 = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertNotNull(ret1);
@@ -115,6 +111,10 @@ public class ListOfUsersFieldTest extends AbstractComponentTest {
     assertNotNull(ret2);
     assertTrue(ret2.isEmpty());
     assertTrue(modelAccess.getXObject(doc, classRef).getListValue(field.getName()).isEmpty());
+  }
+
+  private ClassDefinition getClassDef(String hint) {
+    return Utils.getComponent(ClassDefinition.class, hint);
   }
 
 }

@@ -1,4 +1,4 @@
-package com.celements.model.classes.fields;
+package com.celements.model.classes.fields.list;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
@@ -66,7 +66,7 @@ public class EnumListFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, Arrays.asList(value)));
-    List<TestEnum> ret = modelAccess.getProperty(doc, field);
+    List<TestEnum> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(Arrays.asList(value), ret);
@@ -87,7 +87,7 @@ public class EnumListFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<TestEnum> ret = modelAccess.getProperty(doc, field);
+    List<TestEnum> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(value, ret);
@@ -106,9 +106,9 @@ public class EnumListFieldTest extends AbstractComponentTest {
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    List<TestEnum> ret1 = modelAccess.getProperty(doc, field);
+    List<TestEnum> ret1 = modelAccess.getFieldValue(doc, field).orNull();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
-    List<TestEnum> ret2 = modelAccess.getProperty(doc, field);
+    List<TestEnum> ret2 = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertNotNull(ret1);
