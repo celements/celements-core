@@ -1,10 +1,12 @@
 package com.celements.marshalling;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Function;
 
+@Immutable
 public interface Marshaller<T> {
 
   public @NotNull Class<T> getToken();

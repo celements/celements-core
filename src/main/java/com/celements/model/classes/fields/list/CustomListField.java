@@ -2,6 +2,7 @@ package com.celements.model.classes.fields.list;
 
 import java.util.List;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import com.celements.marshalling.Marshaller;
@@ -9,11 +10,12 @@ import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
+@Immutable
 public class CustomListField<T> extends ListField<T> {
 
   protected final List<T> values;
 
-  public static class Builder<T> extends ListField.Builder<Builder<T>, T> {
+  public static class Builder<B extends Builder<B, T>, T> extends ListField.Builder<B, T> {
 
     private List<T> values;
 
@@ -23,11 +25,12 @@ public class CustomListField<T> extends ListField<T> {
     }
 
     @Override
-    public Builder<T> getThis() {
-      return this;
+    @SuppressWarnings("unchecked")
+    public B getThis() {
+      return (B) this;
     }
 
-    public Builder<T> values(List<T> values) {
+    public B values(List<T> values) {
       this.values = values;
       return getThis();
     }
@@ -39,7 +42,7 @@ public class CustomListField<T> extends ListField<T> {
 
   }
 
-  protected CustomListField(CustomListField.Builder<T> builder) {
+  protected CustomListField(@NotNull Builder<?, T> builder) {
     super(builder);
     this.values = builder.values != null ? ImmutableList.copyOf(builder.values)
         : ImmutableList.<T>of();

@@ -16,10 +16,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.fields.list.DBListField;
-import com.celements.model.classes.fields.list.ListField;
-import com.celements.model.classes.fields.list.StaticListField;
-import com.celements.model.classes.fields.list.StringListField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -46,7 +42,7 @@ public class ListFieldTest extends AbstractComponentTest {
   @Test
   public void test_immutability() {
     assertInstancesOf(ListField.class, areImmutable(), allowingForSubclassing());
-    assertInstancesOf(StringListField.class, areImmutable(), allowingForSubclassing());
+    assertInstancesOf(CustomListField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(StaticListField.class);
     assertImmutable(DBListField.class);
   }
@@ -89,7 +85,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<String> ret = modelAccess.getProperty(doc, field);
+    List<String> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(value, ret);
@@ -110,7 +106,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<String> ret = modelAccess.getProperty(doc, field);
+    List<String> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(value, ret);
@@ -129,9 +125,9 @@ public class ListFieldTest extends AbstractComponentTest {
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    List<String> ret1 = modelAccess.getProperty(doc, field);
+    List<String> ret1 = modelAccess.getFieldValue(doc, field).orNull();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
-    List<String> ret2 = modelAccess.getProperty(doc, field);
+    List<String> ret2 = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertNotNull(ret1);

@@ -40,9 +40,9 @@ public class ComponentListFieldTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_getPossibleValues() throws Exception {
+  public void test_getValues() throws Exception {
     ComponentListField<ClassDefinition> field = fieldBuilder.build();
-    assertEquals(Utils.getComponentList(ClassDefinition.class), field.getPossibleValues());
+    assertEquals(Utils.getComponentList(ClassDefinition.class), field.getValues());
   }
 
   @Test

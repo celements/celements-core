@@ -9,7 +9,7 @@ import com.xpn.xwiki.web.Utils;
 @Immutable
 public final class ComponentListField<T> extends CustomListField<T> {
 
-  public static class Builder<T> extends CustomListField.Builder<T> {
+  public static class Builder<T> extends CustomListField.Builder<Builder<T>, T> {
 
     public Builder(@NotNull String classDefName, @NotNull String name, @NotNull Class<T> role) {
       super(classDefName, name, new ComponentMarshaller<>(role));

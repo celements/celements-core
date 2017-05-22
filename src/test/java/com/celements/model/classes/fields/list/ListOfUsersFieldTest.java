@@ -15,7 +15,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.fields.list.ListOfUsersField;
 import com.celements.model.util.ClassFieldValue;
 import com.google.common.base.Joiner;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -60,7 +59,7 @@ public class ListOfUsersFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, userList));
-    List<XWikiUser> ret = modelAccess.getProperty(doc, field);
+    List<XWikiUser> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(userList.size(), ret.size());
@@ -84,7 +83,7 @@ public class ListOfUsersFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, userList));
-    List<XWikiUser> ret = modelAccess.getProperty(doc, field);
+    List<XWikiUser> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(userList.size(), ret.size());
@@ -105,9 +104,9 @@ public class ListOfUsersFieldTest extends AbstractComponentTest {
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    List<XWikiUser> ret1 = modelAccess.getProperty(doc, field);
+    List<XWikiUser> ret1 = modelAccess.getFieldValue(doc, field).orNull();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
-    List<XWikiUser> ret2 = modelAccess.getProperty(doc, field);
+    List<XWikiUser> ret2 = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertNotNull(ret1);

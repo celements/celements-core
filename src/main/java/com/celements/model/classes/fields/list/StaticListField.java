@@ -8,7 +8,7 @@ import com.celements.marshalling.DefaultMarshaller;
 @Immutable
 public final class StaticListField extends CustomListField<String> {
 
-  public static class Builder extends CustomListField.Builder<String> {
+  public static class Builder extends CustomListField.Builder<Builder, String> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name, new DefaultMarshaller());

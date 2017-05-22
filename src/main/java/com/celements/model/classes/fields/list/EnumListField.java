@@ -10,7 +10,7 @@ import com.celements.marshalling.EnumMarshaller;
 @Immutable
 public class EnumListField<E extends Enum<E>> extends CustomListField<E> {
 
-  public static class Builder<E extends Enum<E>> extends CustomListField.Builder<E> {
+  public static class Builder<E extends Enum<E>> extends CustomListField.Builder<Builder<E>, E> {
 
     public Builder(@NotNull String classDefName, @NotNull String name, @NotNull Class<E> enumType) {
       this(classDefName, name, new EnumMarshaller<>(enumType));
