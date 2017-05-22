@@ -1,38 +1,17 @@
 package com.celements.model.classes.fields.list;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Joiner;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.celements.marshalling.DefaultMarshaller;
 
 @Immutable
-public final class StaticListField extends StringListField {
+public final class StaticListField extends CustomListField<String> {
 
-  private final List<String> values;
-
-  public static class Builder extends ListField.Builder<Builder, String> {
-
-    private List<String> values;
+  public static class Builder extends CustomListField.Builder<String> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
-      super(classDefName, name);
-      values = new ArrayList<>();
-    }
-
-    @Override
-    public Builder getThis() {
-      return this;
-    }
-
-    public Builder values(@NotNull List<String> val) {
-      values = val;
-      return this;
+      super(classDefName, name, new DefaultMarshaller());
     }
 
     @Override
@@ -44,20 +23,6 @@ public final class StaticListField extends StringListField {
 
   protected StaticListField(@NotNull Builder builder) {
     super(builder);
-    this.values = Collections.unmodifiableList(new ArrayList<>(builder.values));
-  }
-
-  public List<String> getValues() {
-    return values;
-  }
-
-  @Override
-  protected ListClass getListClass() {
-    StaticListClass element = new StaticListClass();
-    if (values != null) {
-      element.setValues(Joiner.on('|').join(values));
-    }
-    return element;
   }
 
 }

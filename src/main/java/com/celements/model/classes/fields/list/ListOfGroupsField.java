@@ -3,10 +3,11 @@ package com.celements.model.classes.fields.list;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
+import com.celements.marshalling.DefaultMarshaller;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 
 @Immutable
-public final class ListOfGroupsField extends StringListField {
+public final class ListOfGroupsField extends ListField<String> {
 
   private final Boolean usesList;
 
@@ -15,7 +16,7 @@ public final class ListOfGroupsField extends StringListField {
     private Boolean usesList;
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
-      super(classDefName, name);
+      super(classDefName, name, new DefaultMarshaller());
       separator(",");
     }
 

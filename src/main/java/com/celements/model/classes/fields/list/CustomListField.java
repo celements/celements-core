@@ -1,48 +1,59 @@
 package com.celements.model.classes.fields.list;
 
-import static com.google.common.base.MoreObjects.*;
-
-import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
+import javax.validation.constraints.NotNull;
+
+import com.celements.marshalling.Marshaller;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
-public abstract class CustomListField<T> extends ListField<T> {
+public class CustomListField<T> extends ListField<T> {
 
-  protected CustomListField(ListField.Builder<?, T> builder) {
+  protected final List<T> values;
+
+  public static class Builder<T> extends ListField.Builder<Builder<T>, T> {
+
+    private List<T> values;
+
+    public Builder(@NotNull String classDefName, @NotNull String name,
+        @NotNull Marshaller<T> marshaller) {
+      super(classDefName, name, marshaller);
+    }
+
+    @Override
+    public Builder<T> getThis() {
+      return this;
+    }
+
+    public Builder<T> values(List<T> values) {
+      this.values = values;
+      return getThis();
+    }
+
+    @Override
+    public CustomListField<T> build() {
+      return new CustomListField<>(getThis());
+    }
+
+  }
+
+  protected CustomListField(CustomListField.Builder<T> builder) {
     super(builder);
+    this.values = builder.values != null ? ImmutableList.copyOf(builder.values)
+        : ImmutableList.<T>of();
   }
-
-  @Override
-  public Object serialize(List<T> value) {
-    value = firstNonNull(value, Collections.<T>emptyList());
-    return FluentIterable.from(value).transform(getSerializeFunction()).filter(
-        Predicates.notNull()).join(Joiner.on(getSeparator()));
-  }
-
-  protected abstract Function<T, Object> getSerializeFunction();
-
-  @Override
-  protected List<T> resolveList(List<?> list) {
-    list = firstNonNull(list, Collections.emptyList());
-    return FluentIterable.from(list).transform(getResolveFunction()).filter(
-        Predicates.notNull()).toList();
-  }
-
-  protected abstract Function<Object, T> getResolveFunction();
 
   @Override
   protected ListClass getListClass() {
     StaticListClass element = new StaticListClass();
-    element.setValues((String) serialize(getPossibleValues()));
+    element.setValues(serialize(getValues()));
     return element;
   }
 
-  protected abstract List<T> getPossibleValues();
+  public List<T> getValues() {
+    return values;
+  }
 
 }

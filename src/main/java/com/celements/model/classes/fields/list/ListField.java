@@ -1,8 +1,9 @@
 package com.celements.model.classes.fields.list;
 
 import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.Preconditions.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -10,16 +11,21 @@ import javax.validation.constraints.NotNull;
 
 import org.python.google.common.base.Objects;
 
+import com.celements.marshalling.Marshaller;
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public abstract class ListField<T> extends AbstractClassField<List<T>> implements
     CustomClassField<List<T>> {
 
+  protected final Marshaller<T> marshaller;
   private final Boolean multiSelect;
   private final Integer size;
   private final String displayType;
@@ -29,14 +35,17 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
   public abstract static class Builder<B extends Builder<B, T>, T> extends
       AbstractClassField.Builder<B, List<T>> {
 
+    private final Marshaller<T> marshaller;
     private Boolean multiSelect;
     private Integer size;
     private String displayType;
     private Boolean picker;
     private String separator;
 
-    public Builder(@NotNull String classDefName, @NotNull String name) {
+    public Builder(@NotNull String classDefName, @NotNull String name,
+        @NotNull Marshaller<T> marshaller) {
       super(classDefName, name);
+      this.marshaller = checkNotNull(marshaller);
     }
 
     public B multiSelect(@Nullable Boolean val) {
@@ -68,6 +77,7 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   protected ListField(@NotNull Builder<?, T> builder) {
     super(builder);
+    this.marshaller = builder.marshaller;
     this.multiSelect = builder.multiSelect;
     this.size = builder.size;
     this.displayType = builder.displayType;
@@ -82,20 +92,25 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
   }
 
   @Override
-  public List<T> resolve(Object obj) {
-    List<?> list;
-    if (obj instanceof String) {
-      list = Splitter.on(getSeparator()).splitToList((String) obj);
-    } else if (obj != null) {
-      list = getType().cast(obj);
-    } else {
-      list = new ArrayList<>();
-    }
-    return resolveList(list);
+  public String serialize(List<T> values) {
+    values = firstNonNull(values, Collections.<T>emptyList());
+    return FluentIterable.from(values).transform(marshaller.getSerializer()).filter(
+        Predicates.notNull()).join(Joiner.on(getSeparator()));
   }
 
-  @NotNull
-  protected abstract List<T> resolveList(@NotNull List<?> list);
+  @Override
+  public List<T> resolve(Object obj) {
+    List<?> list = Collections.emptyList();
+    if (obj instanceof String) {
+      list = Splitter.on(getSeparator()).splitToList((String) obj);
+    } else if (obj instanceof List) {
+      list = getType().cast(obj);
+    } else if (obj != null) {
+      // TODO log
+    }
+    return FluentIterable.from(list).transform(marshaller.getResolver()).filter(
+        Predicates.notNull()).toList();
+  }
 
   public boolean isMultiSelect() {
     return firstNonNull(multiSelect, false);
