@@ -581,7 +581,7 @@ public class CelementsWebScriptService implements ScriptService {
     Date delBeforeDate = beforeWaiteDaysCal.getTime();
     if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
       int countDeleted = 0;
-      for (String fullName : getDeletedDocuments()) {
+      for (String fullName : getDeletedDocuments("", false)) {
         try {
           for (XWikiDeletedDocument delDoc : getContext().getWiki().getDeletedDocuments(fullName,
               "", getContext())) {
