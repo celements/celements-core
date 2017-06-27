@@ -1,6 +1,7 @@
 package com.celements.marshalling;
 
 import com.celements.rights.access.EAccessLevel;
+import com.google.common.base.Optional;
 
 public class AccessLevelMarshaller extends EnumMarshaller<EAccessLevel> {
 
@@ -14,8 +15,8 @@ public class AccessLevelMarshaller extends EnumMarshaller<EAccessLevel> {
   }
 
   @Override
-  public EAccessLevel resolve(Object val) {
-    return EAccessLevel.getAccessLevel(val.toString()).orNull();
+  public Optional<EAccessLevel> resolve(Object val) {
+    return EAccessLevel.getAccessLevel(val.toString());
   }
 
 }

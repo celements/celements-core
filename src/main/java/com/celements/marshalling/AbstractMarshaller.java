@@ -4,9 +4,14 @@ import static com.google.common.base.Preconditions.*;
 
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Function;
 
 public abstract class AbstractMarshaller<T> implements Marshaller<T> {
+
+  protected static final Logger LOGGER = LoggerFactory.getLogger(Marshaller.class);
 
   private final Class<T> token;
 
@@ -41,7 +46,7 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
 
     @Override
     public T apply(Object val) {
-      return resolve(val);
+      return resolve(val).orNull();
     }
   };
 

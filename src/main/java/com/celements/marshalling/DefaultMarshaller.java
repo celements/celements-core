@@ -1,5 +1,9 @@
 package com.celements.marshalling;
 
+import static com.google.common.base.Preconditions.*;
+
+import com.google.common.base.Optional;
+
 public class DefaultMarshaller extends AbstractMarshaller<String> {
 
   public DefaultMarshaller() {
@@ -8,12 +12,12 @@ public class DefaultMarshaller extends AbstractMarshaller<String> {
 
   @Override
   public Object serialize(String val) {
-    return val;
+    return checkNotNull(val);
   }
 
   @Override
-  public String resolve(Object val) {
-    return val.toString();
+  public Optional<String> resolve(Object val) {
+    return Optional.of(val.toString());
   }
 
 }
