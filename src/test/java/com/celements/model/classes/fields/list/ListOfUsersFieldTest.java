@@ -15,6 +15,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.google.common.base.Joiner;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -26,10 +27,15 @@ import com.xpn.xwiki.web.Utils;
 
 public class ListOfUsersFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<List<XWikiUser>> STATIC_DEFINITION = new ListOfUsersField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private ListOfUsersField.Builder fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     fieldBuilder = new ListOfUsersField.Builder(TestClassDefinition.NAME, "name");
   }
 

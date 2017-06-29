@@ -13,7 +13,8 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.classes.fields.list.ListOfGroupsField;
+import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.google.common.base.Joiner;
@@ -27,10 +28,15 @@ import com.xpn.xwiki.web.Utils;
 
 public class ListOfGroupsFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<List<String>> STATIC_DEFINITION = new ListOfGroupsField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private ListOfGroupsField.Builder builder;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     builder = new ListOfGroupsField.Builder(XWikiRightsClass.CLASS_FN,
         XWikiRightsClass.FIELD_GROUPS.getName());
   }

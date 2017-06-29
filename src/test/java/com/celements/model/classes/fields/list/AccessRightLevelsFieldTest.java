@@ -16,6 +16,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.rights.access.EAccessLevel;
 import com.google.common.base.Joiner;
@@ -27,6 +28,10 @@ import com.xpn.xwiki.web.Utils;
 
 public class AccessRightLevelsFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<List<EAccessLevel>> STATIC_DEFINITION = new AccessRightLevelsField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private AccessRightLevelsField.Builder fieldBuilder;
 
   @Before
@@ -36,6 +41,7 @@ public class AccessRightLevelsFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
+    assertNotNull(STATIC_DEFINITION);
     assertInstancesOf(EnumListField.class, areImmutable(), allowingForSubclassing());
   }
 

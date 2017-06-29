@@ -15,10 +15,15 @@ import com.celements.model.classes.fields.ref.ReferenceField;
 
 public class EntityReferenceFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<EntityReference> STATIC_DEFINITION = new EntityReferenceField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private ReferenceField<EntityReference> field;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new EntityReferenceField.Builder(TestClassDefinition.NAME, "name").build();
   }
 

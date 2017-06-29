@@ -16,6 +16,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -26,13 +27,21 @@ import com.xpn.xwiki.web.Utils;
 public class EnumListFieldTest extends AbstractComponentTest {
 
   private enum TestEnum {
-    A, B, C, D;
+    A,
+    B,
+    C,
+    D;
   }
+
+  // test static definition
+  private static final ClassField<List<TestEnum>> STATIC_DEFINITION = new EnumListField.Builder<>(
+      TestClassDefinition.NAME, "name", TestEnum.class).build();
 
   private EnumListField.Builder<?, TestEnum> fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     fieldBuilder = new EnumListField.Builder<>(TestClassDefinition.NAME, "name", TestEnum.class);
   }
 

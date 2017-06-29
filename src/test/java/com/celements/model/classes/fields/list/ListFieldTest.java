@@ -18,6 +18,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.marshalling.Marshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -26,6 +27,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
 public class ListFieldTest extends AbstractComponentTest {
+
+  // test static definition
+  private static final ClassField<List<String>> STATIC_DEFINITION = new StringListField.Builder(
+      TestClassDefinition.NAME, "name").build();
 
   private StringListField.Builder fieldBuilder;
 
@@ -37,6 +42,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     fieldBuilder = new StringListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
         multiSelect).size(size).displayType(displayType).picker(picker).separator(separator);
   }
@@ -47,7 +53,6 @@ public class ListFieldTest extends AbstractComponentTest {
         AllowedReason.provided(Marshaller.class).isAlsoImmutable());
     assertInstancesOf(CustomListField.class, areImmutable(), allowingForSubclassing(),
         assumingFields("values").areSafelyCopiedUnmodifiableCollectionsWithImmutableElements());
-    assertImmutable(ComponentListField.class);
     assertInstancesOf(StringListField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(StaticListField.class);
     assertImmutable(DBListField.class);
