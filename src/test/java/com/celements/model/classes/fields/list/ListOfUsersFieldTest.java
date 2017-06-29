@@ -113,7 +113,7 @@ public class ListOfUsersFieldTest extends AbstractComponentTest {
     assertTrue(ret1.isEmpty());
     assertNotNull(ret2);
     assertTrue(ret2.isEmpty());
-    assertTrue(modelAccess.getXObject(doc, classRef).getListValue(field.getName()).isEmpty());
+    assertTrue(modelAccess.getXObject(doc, classRef).getStringValue(field.getName()).isEmpty());
   }
 
 }

@@ -29,7 +29,7 @@ public class EnumListFieldTest extends AbstractComponentTest {
     A, B, C, D;
   }
 
-  private EnumListField.Builder<TestEnum> fieldBuilder;
+  private EnumListField.Builder<?, TestEnum> fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {
