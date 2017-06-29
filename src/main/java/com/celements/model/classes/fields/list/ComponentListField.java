@@ -1,5 +1,7 @@
 package com.celements.model.classes.fields.list;
 
+import java.util.List;
+
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
@@ -13,7 +15,6 @@ public final class ComponentListField<T> extends CustomListField<T> {
 
     public Builder(@NotNull String classDefName, @NotNull String name, @NotNull Class<T> role) {
       super(classDefName, name, new ComponentMarshaller<>(role));
-      values(Utils.getComponentList(role));
     }
 
     @Override
@@ -30,6 +31,12 @@ public final class ComponentListField<T> extends CustomListField<T> {
 
   protected ComponentListField(@NotNull Builder<T> builder) {
     super(builder);
+  }
+
+  @Override
+  public List<T> getValues() {
+    // override to lookup components lazily, otherwise breaks static definitions of ClassFields
+    return Utils.getComponentList(marshaller.getToken());
   }
 
 }

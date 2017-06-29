@@ -17,6 +17,7 @@ public final class ComponentMarshaller<T> extends AbstractMarshaller<T> {
 
   public ComponentMarshaller(@NotNull Class<T> role) {
     super(role);
+    checkArgument(role.isInterface());
     checkArgument(role.isAnnotationPresent(ComponentRole.class));
   }
 
