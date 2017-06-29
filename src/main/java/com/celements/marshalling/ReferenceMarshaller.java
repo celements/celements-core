@@ -1,5 +1,7 @@
 package com.celements.marshalling;
 
+import static com.google.common.base.Preconditions.*;
+
 import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.util.ModelUtils;
@@ -13,18 +15,19 @@ public class ReferenceMarshaller<T extends EntityReference> extends AbstractMars
   }
 
   @Override
-  public Object serialize(T val) {
+  public String serialize(T val) {
     return getModelUtils().serializeRef(val);
   }
 
   @Override
-  public Optional<T> resolve(Object val) {
+  public Optional<T> resolve(String val) {
+    checkNotNull(val);
     T reference = null;
     try {
       if (getToken() == EntityReference.class) {
-        reference = getToken().cast(getModelUtils().resolveRef(val.toString()));
+        reference = getToken().cast(getModelUtils().resolveRef(val));
       } else {
-        reference = getModelUtils().resolveRef(val.toString(), getToken());
+        reference = getModelUtils().resolveRef(val, getToken());
       }
     } catch (IllegalArgumentException exc) {
       LOGGER.info("failed to resolve '{}' for '{}'", val, getToken(), exc);

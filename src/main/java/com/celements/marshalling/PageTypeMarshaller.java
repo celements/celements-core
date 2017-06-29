@@ -14,13 +14,14 @@ public class PageTypeMarshaller extends AbstractMarshaller<PageTypeReference> {
   }
 
   @Override
-  public Object serialize(PageTypeReference val) {
+  public String serialize(PageTypeReference val) {
     return checkNotNull(val.getConfigName());
   }
 
   @Override
-  public Optional<PageTypeReference> resolve(Object val) {
-    PageTypeReference pageTypeRef = getPageTypeService().getPageTypeRefByConfigName(val.toString());
+  public Optional<PageTypeReference> resolve(String val) {
+    checkNotNull(val);
+    PageTypeReference pageTypeRef = getPageTypeService().getPageTypeRefByConfigName(val);
     return Optional.fromNullable(pageTypeRef);
   }
 

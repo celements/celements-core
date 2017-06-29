@@ -10,13 +10,13 @@ public class AccessLevelMarshaller extends EnumMarshaller<EAccessLevel> {
   }
 
   @Override
-  public Object serialize(EAccessLevel val) {
+  public String serialize(EAccessLevel val) {
     return val.getIdentifier();
   }
 
   @Override
-  public Optional<EAccessLevel> resolve(Object val) {
-    return EAccessLevel.getAccessLevel(val.toString());
+  public Optional<EAccessLevel> resolve(String val) {
+    return EAccessLevel.getAccessLevel(val);
   }
 
 }

@@ -11,13 +11,13 @@ public class DefaultMarshaller extends AbstractMarshaller<String> {
   }
 
   @Override
-  public Object serialize(String val) {
+  public String serialize(String val) {
     return checkNotNull(val);
   }
 
   @Override
-  public Optional<String> resolve(Object val) {
-    return Optional.of(val.toString());
+  public Optional<String> resolve(String val) {
+    return Optional.of(val);
   }
 
 }

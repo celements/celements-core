@@ -25,27 +25,27 @@ public abstract class AbstractMarshaller<T> implements Marshaller<T> {
   }
 
   @Override
-  public Function<T, Object> getSerializer() {
+  public Function<T, String> getSerializer() {
     return SERIALIZER;
   }
 
-  private final Function<T, Object> SERIALIZER = new Function<T, Object>() {
+  private final Function<T, String> SERIALIZER = new Function<T, String>() {
 
     @Override
-    public Object apply(T val) {
+    public String apply(T val) {
       return serialize(val);
     }
   };
 
   @Override
-  public Function<Object, T> getResolver() {
+  public Function<String, T> getResolver() {
     return RESOLVER;
   }
 
-  private final Function<Object, T> RESOLVER = new Function<Object, T>() {
+  private final Function<String, T> RESOLVER = new Function<String, T>() {
 
     @Override
-    public T apply(Object val) {
+    public T apply(String val) {
       return resolve(val).orNull();
     }
   };

@@ -3,27 +3,32 @@ package com.celements.model.classes.fields.list;
 import static com.google.common.base.MoreObjects.*;
 import static com.google.common.base.Preconditions.*;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.python.google.common.base.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.marshalling.Marshaller;
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
+import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public abstract class ListField<T> extends AbstractClassField<List<T>> implements
     CustomClassField<List<T>> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ListField.class);
 
   protected final Marshaller<T> marshaller;
   private final Boolean multiSelect;
@@ -93,23 +98,28 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   @Override
   public String serialize(List<T> values) {
-    values = firstNonNull(values, Collections.<T>emptyList());
+    values = firstNonNull(values, ImmutableList.<T>of());
     return FluentIterable.from(values).transform(marshaller.getSerializer()).filter(
         Predicates.notNull()).join(Joiner.on(getSeparator()));
   }
 
   @Override
   public List<T> resolve(Object obj) {
-    List<?> list = Collections.emptyList();
+    return FluentIterable.from(asStringList(obj)).transform(marshaller.getResolver()).filter(
+        Predicates.notNull()).toList();
+  }
+
+  private List<String> asStringList(Object obj) {
+    List<String> list = ImmutableList.of();
     if (obj instanceof String) {
       list = Splitter.on(getSeparator()).splitToList((String) obj);
     } else if (obj instanceof List) {
-      list = getType().cast(obj);
+      list = FluentIterable.from((List<?>) obj).filter(Predicates.notNull()).transform(
+          Functions.toStringFunction()).toList();
     } else if (obj != null) {
-      // TODO log
+      LOGGER.warn("unable to resolve value '{}' for '{}'", obj, this);
     }
-    return FluentIterable.from(list).transform(marshaller.getResolver()).filter(
-        Predicates.notNull()).toList();
+    return list;
   }
 
   public boolean isMultiSelect() {

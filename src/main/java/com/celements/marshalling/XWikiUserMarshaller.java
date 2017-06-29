@@ -12,14 +12,14 @@ public class XWikiUserMarshaller extends AbstractMarshaller<XWikiUser> {
   }
 
   @Override
-  public Object serialize(XWikiUser val) {
+  public String serialize(XWikiUser val) {
     return checkNotNull(val.getUser());
   }
 
   @Override
-  public Optional<XWikiUser> resolve(Object val) {
-    if (!val.toString().isEmpty()) {
-      return Optional.of(new XWikiUser(val.toString()));
+  public Optional<XWikiUser> resolve(String val) {
+    if (!checkNotNull(val).isEmpty()) {
+      return Optional.of(new XWikiUser(val));
     } else {
       return Optional.absent();
     }

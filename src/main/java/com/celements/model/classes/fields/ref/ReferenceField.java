@@ -65,7 +65,7 @@ public abstract class ReferenceField<T extends EntityReference> extends Abstract
   public T resolve(Object obj) {
     T ret = null;
     if (obj != null) {
-      ret = marshaller.resolve(obj).orNull();
+      ret = marshaller.resolve(obj.toString()).orNull();
     }
     return ret;
   }

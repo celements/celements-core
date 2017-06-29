@@ -11,12 +11,12 @@ public interface Marshaller<T> {
 
   public @NotNull Class<T> getToken();
 
-  public @NotNull Object serialize(@NotNull T val);
+  public @NotNull String serialize(@NotNull T val);
 
-  public @NotNull Function<T, Object> getSerializer();
+  public @NotNull Function<T, String> getSerializer();
 
-  public @NotNull Optional<T> resolve(@NotNull Object val);
+  public @NotNull Optional<T> resolve(@NotNull String val);
 
-  public @NotNull Function<Object, T> getResolver();
+  public @NotNull Function<String, T> getResolver();
 
 }
