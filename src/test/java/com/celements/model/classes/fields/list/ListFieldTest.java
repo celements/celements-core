@@ -11,9 +11,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mutabilitydetector.unittesting.AllowedReason;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.marshalling.Marshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.util.ClassFieldValue;
@@ -41,9 +43,12 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
-    assertInstancesOf(ListField.class, areImmutable(), allowingForSubclassing());
-    assertInstancesOf(CustomListField.class, areImmutable(), allowingForSubclassing());
-    assertImmutable(StringListField.class);
+    assertInstancesOf(ListField.class, areImmutable(), allowingForSubclassing(),
+        AllowedReason.provided(Marshaller.class).isAlsoImmutable());
+    assertInstancesOf(CustomListField.class, areImmutable(), allowingForSubclassing(),
+        assumingFields("values").areSafelyCopiedUnmodifiableCollectionsWithImmutableElements());
+    assertImmutable(ComponentListField.class);
+    assertInstancesOf(StringListField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(StaticListField.class);
     assertImmutable(DBListField.class);
   }
