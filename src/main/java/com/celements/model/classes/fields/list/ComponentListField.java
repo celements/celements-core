@@ -36,7 +36,7 @@ public final class ComponentListField<T> extends CustomListField<T> {
   @Override
   public List<T> getValues() {
     // override to lookup components lazily, otherwise breaks static definitions of ClassFields
-    return Utils.getComponentList(marshaller.getToken());
+    return Utils.getComponentList(getMarshaller().getToken());
   }
 
 }

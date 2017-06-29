@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.python.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,10 +83,10 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
     super(builder);
     this.marshaller = builder.marshaller;
     this.multiSelect = builder.multiSelect;
-    this.size = builder.size;
+    this.size = firstNonNull(builder.size, 2);
     this.displayType = builder.displayType;
     this.picker = builder.picker;
-    this.separator = Objects.firstNonNull(Strings.emptyToNull(builder.separator), "|");
+    this.separator = firstNonNull(Strings.emptyToNull(builder.separator), "|");
   }
 
   @Override
@@ -120,6 +119,10 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
       LOGGER.warn("unable to resolve value '{}' for '{}'", obj, this);
     }
     return list;
+  }
+
+  public Marshaller<T> getMarshaller() {
+    return marshaller;
   }
 
   public boolean isMultiSelect() {
