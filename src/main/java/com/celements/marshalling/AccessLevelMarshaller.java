@@ -1,9 +1,12 @@
 package com.celements.marshalling;
 
+import javax.annotation.concurrent.Immutable;
+
 import com.celements.rights.access.EAccessLevel;
 import com.google.common.base.Optional;
 
-public class AccessLevelMarshaller extends EnumMarshaller<EAccessLevel> {
+@Immutable
+public final class AccessLevelMarshaller extends EnumMarshaller<EAccessLevel> {
 
   public AccessLevelMarshaller() {
     super(EAccessLevel.class);

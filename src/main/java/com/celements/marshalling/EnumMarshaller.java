@@ -2,8 +2,11 @@ package com.celements.marshalling;
 
 import static com.google.common.base.Preconditions.*;
 
+import javax.annotation.concurrent.Immutable;
+
 import com.google.common.base.Optional;
 
+@Immutable
 public class EnumMarshaller<E extends Enum<E>> extends AbstractMarshaller<E> {
 
   public EnumMarshaller(Class<E> token) {

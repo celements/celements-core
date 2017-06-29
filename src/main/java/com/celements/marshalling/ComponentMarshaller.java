@@ -2,6 +2,7 @@ package com.celements.marshalling;
 
 import static com.google.common.base.Preconditions.*;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.Component;
@@ -11,7 +12,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.web.Utils;
 
-public class ComponentMarshaller<T> extends AbstractMarshaller<T> {
+@Immutable
+public final class ComponentMarshaller<T> extends AbstractMarshaller<T> {
 
   public ComponentMarshaller(@NotNull Class<T> role) {
     super(role);

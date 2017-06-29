@@ -2,10 +2,13 @@ package com.celements.marshalling;
 
 import static com.google.common.base.Preconditions.*;
 
+import javax.annotation.concurrent.Immutable;
+
 import com.google.common.base.Optional;
 import com.xpn.xwiki.user.api.XWikiUser;
 
-public class XWikiUserMarshaller extends AbstractMarshaller<XWikiUser> {
+@Immutable
+public final class XWikiUserMarshaller extends AbstractMarshaller<XWikiUser> {
 
   public XWikiUserMarshaller() {
     super(XWikiUser.class);

@@ -2,12 +2,15 @@ package com.celements.marshalling;
 
 import static com.google.common.base.Preconditions.*;
 
+import javax.annotation.concurrent.Immutable;
+
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeRole;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.web.Utils;
 
-public class PageTypeMarshaller extends AbstractMarshaller<PageTypeReference> {
+@Immutable
+public final class PageTypeMarshaller extends AbstractMarshaller<PageTypeReference> {
 
   public PageTypeMarshaller() {
     super(PageTypeReference.class);

@@ -2,9 +2,12 @@ package com.celements.marshalling;
 
 import static com.google.common.base.Preconditions.*;
 
+import javax.annotation.concurrent.Immutable;
+
 import com.google.common.base.Optional;
 
-public class DefaultMarshaller extends AbstractMarshaller<String> {
+@Immutable
+public final class DefaultMarshaller extends AbstractMarshaller<String> {
 
   public DefaultMarshaller() {
     super(String.class);
