@@ -21,12 +21,17 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 
 public class NumberFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<Integer> STATIC_DEFINITION = new IntField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private NumberField<Integer> field;
 
   Integer size = 5;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new IntField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 

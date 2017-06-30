@@ -3,6 +3,8 @@ package com.celements.model.classes.fields;
 import static org.junit.Assert.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
 
+import java.util.Date;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,6 +14,10 @@ import com.xpn.xwiki.objects.classes.DateClass;
 
 public class DateFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<Date> STATIC_DEFINITION = new DateField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private DateField field;
 
   Integer size = 5;
@@ -20,6 +26,7 @@ public class DateFieldTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new DateField.Builder(TestClassDefinition.NAME, "name").size(size).emptyIsToday(
         emptyIsToday).dateFormat(dateFormat).build();
   }

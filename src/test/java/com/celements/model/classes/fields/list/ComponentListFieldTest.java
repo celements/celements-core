@@ -2,9 +2,7 @@ package com.celements.model.classes.fields.list;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static org.junit.Assert.*;
-import static org.mutabilitydetector.unittesting.AllowedReason.*;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.*;
-import static org.mutabilitydetector.unittesting.MutabilityMatchers.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +15,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.TestClassDefinition;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.web.classes.oldcore.XWikiRightsClass;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -26,23 +25,28 @@ import com.xpn.xwiki.web.Utils;
 
 public class ComponentListFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<List<ClassDefinition>> STATIC_DEFINITION = new ComponentListField.Builder<>(
+      TestClassDefinition.NAME, "name", ClassDefinition.class).build();
+
   private ComponentListField.Builder<ClassDefinition> fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     fieldBuilder = new ComponentListField.Builder<>(TestClassDefinition.NAME, "name",
         ClassDefinition.class);
   }
 
   @Test
   public void test_immutability() {
-    assertInstancesOf(ComponentListField.class, areImmutable(), allowingForSubclassing());
+    assertImmutable(ComponentListField.class);
   }
 
   @Test
-  public void test_getPossibleValues() throws Exception {
+  public void test_getValues() throws Exception {
     ComponentListField<ClassDefinition> field = fieldBuilder.build();
-    assertEquals(Utils.getComponentList(ClassDefinition.class), field.getPossibleValues());
+    assertEquals(Utils.getComponentList(ClassDefinition.class), field.getValues());
   }
 
   @Test

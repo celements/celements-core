@@ -1,32 +1,32 @@
 package com.celements.model.classes.fields.list;
 
-import static com.google.common.base.Preconditions.*;
-
 import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Function;
+import com.celements.marshalling.EnumMarshaller;
 
 @Immutable
 public class EnumListField<E extends Enum<E>> extends CustomListField<E> {
 
-  protected final Class<E> enumType;
-
-  public static class Builder<E extends Enum<E>> extends CustomListField.Builder<Builder<E>, E> {
-
-    private final Class<E> enumType;
+  public static class Builder<B extends Builder<B, E>, E extends Enum<E>> extends
+      CustomListField.Builder<B, E> {
 
     public Builder(@NotNull String classDefName, @NotNull String name, @NotNull Class<E> enumType) {
-      super(classDefName, name);
-      this.enumType = checkNotNull(enumType);
+      this(classDefName, name, new EnumMarshaller<>(enumType));
+    }
+
+    public Builder(@NotNull String classDefName, @NotNull String name,
+        @NotNull EnumMarshaller<E> marshaller) {
+      super(classDefName, name, marshaller);
+      values(Arrays.asList(marshaller.getToken().getEnumConstants()));
     }
 
     @Override
-    public Builder<E> getThis() {
-      return this;
+    @SuppressWarnings("unchecked")
+    public B getThis() {
+      return (B) this;
     }
 
     @Override
@@ -36,36 +36,8 @@ public class EnumListField<E extends Enum<E>> extends CustomListField<E> {
 
   }
 
-  protected EnumListField(@NotNull Builder<E> builder) {
+  protected EnumListField(@NotNull Builder<?, E> builder) {
     super(builder);
-    this.enumType = builder.enumType;
-  }
-
-  @Override
-  protected Function<E, Object> getSerializeFunction() {
-    return new Function<E, Object>() {
-
-      @Override
-      public Object apply(E val) {
-        return val.name();
-      }
-    };
-  }
-
-  @Override
-  protected Function<Object, E> getResolveFunction() {
-    return new Function<Object, E>() {
-
-      @Override
-      public E apply(Object elem) {
-        return Enum.valueOf(enumType, elem.toString());
-      }
-    };
-  }
-
-  @Override
-  protected List<E> getPossibleValues() {
-    return Arrays.asList(enumType.getEnumConstants());
   }
 
 }

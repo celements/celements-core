@@ -1,29 +1,28 @@
 package com.celements.model.classes.fields.list;
 
-import java.util.List;
-
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Joiner;
+import com.celements.marshalling.DefaultMarshaller;
 
-public abstract class StringListField extends ListField<String> {
+@Immutable
+public class StringListField extends CustomListField<String> {
 
-  protected StringListField(@NotNull Builder<?, String> builder) {
-    super(builder);
-  }
+  public static class Builder extends CustomListField.Builder<Builder, String> {
 
-  @Override
-  public Object serialize(List<String> value) {
-    Object ret = null;
-    if (value != null) {
-      ret = Joiner.on(getSeparator()).join(value);
+    public Builder(@NotNull String classDefName, @NotNull String name) {
+      super(classDefName, name, new DefaultMarshaller());
     }
-    return ret;
+
+    @Override
+    public StringListField build() {
+      return new StringListField(this);
+    }
+
   }
 
-  @Override
-  protected List<String> resolveList(List<?> list) {
-    return getType().cast(list);
+  protected StringListField(@NotNull Builder builder) {
+    super(builder);
   }
 
 }

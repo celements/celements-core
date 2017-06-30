@@ -11,15 +11,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mutabilitydetector.unittesting.AllowedReason;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.marshalling.Marshaller;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
-import com.celements.model.classes.fields.list.DBListField;
-import com.celements.model.classes.fields.list.ListField;
-import com.celements.model.classes.fields.list.StaticListField;
-import com.celements.model.classes.fields.list.StringListField;
+import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -29,7 +28,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class ListFieldTest extends AbstractComponentTest {
 
-  private StaticListField.Builder fieldBuilder;
+  // test static definition
+  private static final ClassField<List<String>> STATIC_DEFINITION = new StringListField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
+  private StringListField.Builder fieldBuilder;
 
   private boolean multiSelect = true;
   private Integer size = 5;
@@ -39,13 +42,17 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
-    fieldBuilder = new StaticListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
+    assertNotNull(STATIC_DEFINITION);
+    fieldBuilder = new StringListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
         multiSelect).size(size).displayType(displayType).picker(picker).separator(separator);
   }
 
   @Test
   public void test_immutability() {
-    assertInstancesOf(ListField.class, areImmutable(), allowingForSubclassing());
+    assertInstancesOf(ListField.class, areImmutable(), allowingForSubclassing(),
+        AllowedReason.provided(Marshaller.class).isAlsoImmutable());
+    assertInstancesOf(CustomListField.class, areImmutable(), allowingForSubclassing(),
+        assumingFields("values").areSafelyCopiedUnmodifiableCollectionsWithImmutableElements());
     assertInstancesOf(StringListField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(StaticListField.class);
     assertImmutable(DBListField.class);
@@ -53,19 +60,19 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_getters() throws Exception {
-    StaticListField field = fieldBuilder.build();
+    StringListField field = fieldBuilder.build();
     assertEquals(multiSelect, field.getMultiSelect());
     assertEquals(size, field.getSize());
     assertEquals(displayType, field.getDisplayType());
     assertEquals(picker, field.getPicker());
     assertEquals(separator, field.getSeparator());
-    assertEquals("|", new StaticListField.Builder(TestClassDefinition.NAME,
+    assertEquals("|", new StringListField.Builder(TestClassDefinition.NAME,
         field.getName()).build().getSeparator());
   }
 
   @Test
   public void test_getXField() throws Exception {
-    StaticListField field = fieldBuilder.build();
+    StringListField field = fieldBuilder.build();
     assertTrue(field.getXField() instanceof ListClass);
     ListClass xField = (ListClass) field.getXField();
     assertEquals(multiSelect, xField.isMultiSelect());
@@ -78,7 +85,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize() throws Exception {
-    StaticListField field = fieldBuilder.values(Arrays.asList("A", "B", "C", "D")).build();
+    StringListField field = fieldBuilder.values(Arrays.asList("A", "B", "C", "D")).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
@@ -89,7 +96,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<String> ret = modelAccess.getProperty(doc, field);
+    List<String> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(value, ret);
@@ -98,7 +105,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
-    StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
+    StringListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
         "D")).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -110,7 +117,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
     replayDefault();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, value));
-    List<String> ret = modelAccess.getProperty(doc, field);
+    List<String> ret = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertEquals(value, ret);
@@ -119,7 +126,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
-    StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
+    StringListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
         "D")).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -129,9 +136,9 @@ public class ListFieldTest extends AbstractComponentTest {
     expectPropertyClass(bClass, field.getName(), (PropertyClass) field.getXField());
 
     replayDefault();
-    List<String> ret1 = modelAccess.getProperty(doc, field);
+    List<String> ret1 = modelAccess.getFieldValue(doc, field).orNull();
     modelAccess.setProperty(doc, new ClassFieldValue<>(field, null));
-    List<String> ret2 = modelAccess.getProperty(doc, field);
+    List<String> ret2 = modelAccess.getFieldValue(doc, field).orNull();
     verifyDefault();
 
     assertNotNull(ret1);
