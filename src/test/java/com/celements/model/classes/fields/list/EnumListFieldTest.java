@@ -37,7 +37,7 @@ public class EnumListFieldTest extends AbstractComponentTest {
   private static final ClassField<List<TestEnum>> STATIC_DEFINITION = new EnumListField.Builder<>(
       TestClassDefinition.NAME, "name", TestEnum.class).build();
 
-  private EnumListField.Builder<?, TestEnum> fieldBuilder;
+  private EnumListField.Builder<TestEnum> fieldBuilder;
 
   @Before
   public void prepareTest() throws Exception {

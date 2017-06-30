@@ -10,7 +10,7 @@ import com.xpn.xwiki.objects.classes.LevelsClass;
 @Immutable
 public final class AccessRightLevelsField extends EnumListField<EAccessLevel> {
 
-  public static class Builder extends EnumListField.Builder<Builder, EAccessLevel> {
+  public static class Builder extends EnumListField.Builder<EAccessLevel> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name, new AccessLevelMarshaller());

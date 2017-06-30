@@ -47,14 +47,14 @@ public class AccessRightLevelsFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_getXField() throws Exception {
-    AccessRightLevelsField field = fieldBuilder.build();
+    ClassField<List<EAccessLevel>> field = fieldBuilder.build();
     System.out.println(field.getXField());
     assertTrue(field.getXField() instanceof LevelsClass);
   }
 
   @Test
   public void test_resolve_serialize() throws Exception {
-    AccessRightLevelsField field = fieldBuilder.build();
+    ClassField<List<EAccessLevel>> field = fieldBuilder.build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
@@ -75,7 +75,7 @@ public class AccessRightLevelsFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
-    AccessRightLevelsField field = fieldBuilder.multiSelect(true).separator(",").build();
+    ClassField<List<EAccessLevel>> field = fieldBuilder.multiSelect(true).separator(",").build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
@@ -97,7 +97,7 @@ public class AccessRightLevelsFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
-    AccessRightLevelsField field = fieldBuilder.multiSelect(true).build();
+    ClassField<List<EAccessLevel>> field = fieldBuilder.multiSelect(true).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
