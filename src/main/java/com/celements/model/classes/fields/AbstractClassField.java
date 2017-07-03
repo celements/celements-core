@@ -63,7 +63,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   protected AbstractClassField(@NotNull Builder<?, T> builder) {
     this.classDefName = builder.classDefName;
     this.name = builder.name;
-    this.prettyName = firstNonNull(builder.prettyName, getName());
+    this.prettyName = firstNonNull(builder.prettyName, builder.name);
     this.validationRegExp = builder.validationRegExp;
     this.validationMessage = builder.validationMessage;
   }
@@ -125,7 +125,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public String toString() {
-    return getClassDef() + "." + getName();
+    return getClassDef() + "." + name;
   }
 
   protected static ModelUtils getModelUtils() {
