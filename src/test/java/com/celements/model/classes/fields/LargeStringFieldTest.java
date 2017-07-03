@@ -13,12 +13,17 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 public class LargeStringFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<String> STATIC_DEFINITION = new LargeStringField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private LargeStringField field;
 
   Integer rows = 10;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new LargeStringField.Builder(TestClassDefinition.NAME, "name").rows(rows).build();
   }
 

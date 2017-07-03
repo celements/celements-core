@@ -1,23 +1,35 @@
 package com.celements.model.classes.fields.list;
 
-import java.util.ArrayList;
+import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.Preconditions.*;
+
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.python.google.common.base.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.celements.marshalling.Marshaller;
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
+import com.google.common.base.Functions;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public abstract class ListField<T> extends AbstractClassField<List<T>> implements
     CustomClassField<List<T>> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ListField.class);
+
+  protected final Marshaller<T> marshaller;
   private final Boolean multiSelect;
   private final Integer size;
   private final String displayType;
@@ -27,14 +39,17 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
   public abstract static class Builder<B extends Builder<B, T>, T> extends
       AbstractClassField.Builder<B, List<T>> {
 
+    private final Marshaller<T> marshaller;
     private Boolean multiSelect;
     private Integer size;
     private String displayType;
     private Boolean picker;
     private String separator;
 
-    public Builder(@NotNull String classDefName, @NotNull String name) {
+    public Builder(@NotNull String classDefName, @NotNull String name,
+        @NotNull Marshaller<T> marshaller) {
       super(classDefName, name);
+      this.marshaller = checkNotNull(marshaller);
     }
 
     public B multiSelect(@Nullable Boolean val) {
@@ -66,11 +81,12 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   protected ListField(@NotNull Builder<?, T> builder) {
     super(builder);
+    this.marshaller = builder.marshaller;
     this.multiSelect = builder.multiSelect;
-    this.size = builder.size;
+    this.size = firstNonNull(builder.size, 2);
     this.displayType = builder.displayType;
     this.picker = builder.picker;
-    this.separator = Objects.firstNonNull(Strings.emptyToNull(builder.separator), "|");
+    this.separator = firstNonNull(Strings.emptyToNull(builder.separator), "|");
   }
 
   @Override
@@ -80,20 +96,38 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
   }
 
   @Override
-  public List<T> resolve(Object obj) {
-    List<?> list;
-    if (obj instanceof String) {
-      list = Splitter.on(getSeparator()).splitToList((String) obj);
-    } else if (obj != null) {
-      list = getType().cast(obj);
-    } else {
-      list = new ArrayList<>();
-    }
-    return resolveList(list);
+  public String serialize(List<T> values) {
+    values = firstNonNull(values, ImmutableList.<T>of());
+    return FluentIterable.from(values).transform(marshaller.getSerializer()).filter(
+        Predicates.notNull()).join(Joiner.on(getSeparator()));
   }
 
-  @NotNull
-  protected abstract List<T> resolveList(@NotNull List<?> list);
+  @Override
+  public List<T> resolve(Object obj) {
+    return FluentIterable.from(asStringList(obj)).transform(marshaller.getResolver()).filter(
+        Predicates.notNull()).toList();
+  }
+
+  private List<String> asStringList(Object obj) {
+    List<String> list = ImmutableList.of();
+    if (obj instanceof String) {
+      list = Splitter.on(getSeparator()).splitToList((String) obj);
+    } else if (obj instanceof List) {
+      list = FluentIterable.from((List<?>) obj).filter(Predicates.notNull()).transform(
+          Functions.toStringFunction()).toList();
+    } else if (obj != null) {
+      LOGGER.warn("unable to resolve value '{}' for '{}'", obj, this);
+    }
+    return list;
+  }
+
+  public Marshaller<T> getMarshaller() {
+    return marshaller;
+  }
+
+  public boolean isMultiSelect() {
+    return firstNonNull(multiSelect, false);
+  }
 
   public Boolean getMultiSelect() {
     return multiSelect;

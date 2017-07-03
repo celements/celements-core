@@ -21,4 +21,6 @@ public interface IRightsAccessFacadeRole {
 
   public boolean hasAccessLevel(EntityReference ref, EAccessLevel level, XWikiUser user);
 
+  public boolean isLoggedIn();
+
 }

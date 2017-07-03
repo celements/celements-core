@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.EntityReference;
 
+import com.celements.marshalling.ReferenceMarshaller;
 import com.celements.model.classes.fields.AbstractClassField;
 import com.celements.model.classes.fields.CustomClassField;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -14,6 +15,7 @@ public abstract class ReferenceField<T extends EntityReference> extends Abstract
     implements CustomClassField<T> {
 
   private final Integer size;
+  private final ReferenceMarshaller<T> marshaller;
 
   public abstract static class Builder<B extends Builder<B, T>, T extends EntityReference> extends
       AbstractClassField.Builder<B, T> {
@@ -34,6 +36,7 @@ public abstract class ReferenceField<T extends EntityReference> extends Abstract
   protected ReferenceField(@NotNull Builder<?, T> builder) {
     super(builder);
     this.size = builder.size;
+    marshaller = new ReferenceMarshaller<>(getType());
   }
 
   public Integer getSize() {
@@ -53,7 +56,7 @@ public abstract class ReferenceField<T extends EntityReference> extends Abstract
   public Object serialize(T value) {
     Object ret = null;
     if (value != null) {
-      ret = getModelUtils().serializeRef(value);
+      ret = marshaller.serialize(value);
     }
     return ret;
   }
@@ -62,7 +65,7 @@ public abstract class ReferenceField<T extends EntityReference> extends Abstract
   public T resolve(Object obj) {
     T ret = null;
     if (obj != null) {
-      ret = getModelUtils().resolveRef(obj.toString(), getType());
+      ret = marshaller.resolve(obj.toString()).orNull();
     }
     return ret;
   }

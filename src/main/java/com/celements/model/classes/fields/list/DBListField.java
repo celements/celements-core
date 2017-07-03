@@ -4,11 +4,12 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
+import com.celements.marshalling.DefaultMarshaller;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 @Immutable
-public final class DBListField extends StringListField {
+public final class DBListField extends ListField<String> {
 
   private final String sql;
 
@@ -17,7 +18,7 @@ public final class DBListField extends StringListField {
     private String sql;
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
-      super(classDefName, name);
+      super(classDefName, name, new DefaultMarshaller());
     }
 
     @Override

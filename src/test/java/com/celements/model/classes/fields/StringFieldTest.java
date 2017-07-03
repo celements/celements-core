@@ -11,12 +11,17 @@ import com.xpn.xwiki.objects.classes.StringClass;
 
 public class StringFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<String> STATIC_DEFINITION = new StringField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private StringField field;
 
   Integer size = 5;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new StringField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 

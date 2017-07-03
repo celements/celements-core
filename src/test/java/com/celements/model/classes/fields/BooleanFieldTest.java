@@ -12,6 +12,10 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 
 public class BooleanFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<Boolean> STATIC_DEFINITION = new BooleanField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private BooleanField field;
 
   String displayFormType = "select";
@@ -20,6 +24,7 @@ public class BooleanFieldTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new BooleanField.Builder(TestClassDefinition.NAME, "name").displayType(
         displayType).defaultValue(defaultValue).displayFormType(displayFormType).build();
   }
