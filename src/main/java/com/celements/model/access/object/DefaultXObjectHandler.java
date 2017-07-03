@@ -59,7 +59,7 @@ public class DefaultXObjectHandler implements XObjectHandler {
   }
 
   @Override
-  public XObjectHandler onDoc(XWikiDocument doc) {
+  public DefaultXObjectHandler onDoc(XWikiDocument doc) {
     checkState(!modelAccess.isTranslation(doc), MessageFormat.format(
         "XObjectHandler cannot be used on translation ''{0}'' of doc ''{1}''", doc.getLanguage(),
         doc.getDocumentReference()));
@@ -77,19 +77,19 @@ public class DefaultXObjectHandler implements XObjectHandler {
   }
 
   @Override
-  public XObjectHandler filter(ClassReference classRef) {
+  public DefaultXObjectHandler filter(ClassReference classRef) {
     filter.add(classRef);
     return this;
   }
 
   @Override
-  public <T> XObjectHandler filter(ClassField<T> field, T value) {
+  public <T> DefaultXObjectHandler filter(ClassField<T> field, T value) {
     filter.add(field, value);
     return this;
   }
 
   @Override
-  public <T> XObjectHandler filter(ClassField<T> field, Collection<T> values) {
+  public <T> DefaultXObjectHandler filter(ClassField<T> field, Collection<T> values) {
     filter.add(field, values);
     return this;
   }

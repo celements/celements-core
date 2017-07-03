@@ -15,6 +15,11 @@ import com.google.common.base.Optional;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+//TODO make generic XObjectHandler, we need different implementations in the future:
+//XObjectHandler<XWikiDocument, BaseObject>
+//XObjectHandler<Document, Object>
+//XObjectHandler<CelDocument, CelObject>
+
 @ComponentRole
 public interface XObjectHandler {
 
