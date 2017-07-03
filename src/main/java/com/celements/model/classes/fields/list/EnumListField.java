@@ -1,30 +1,25 @@
 package com.celements.model.classes.fields.list;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.celements.marshalling.EnumMarshaller;
 
 @Immutable
-public class EnumListField<E extends Enum<E>> extends ListField<E> {
+public class EnumListField<E extends Enum<E>> extends CustomListField<E> {
 
-  protected final Class<E> enumType;
-
-  public static class Builder<E extends Enum<E>> extends ListField.Builder<Builder<E>, E> {
-
-    private final Class<E> enumType;
+  public static class Builder<E extends Enum<E>> extends CustomListField.Builder<Builder<E>, E> {
 
     public Builder(@NotNull String classDefName, @NotNull String name, @NotNull Class<E> enumType) {
-      super(classDefName, name);
-      this.enumType = Preconditions.checkNotNull(enumType);
+      this(classDefName, name, new EnumMarshaller<>(enumType));
+    }
+
+    public Builder(@NotNull String classDefName, @NotNull String name,
+        @NotNull EnumMarshaller<E> marshaller) {
+      super(classDefName, name, marshaller);
+      values(Arrays.asList(marshaller.getToken().getEnumConstants()));
     }
 
     @Override
@@ -41,39 +36,6 @@ public class EnumListField<E extends Enum<E>> extends ListField<E> {
 
   protected EnumListField(@NotNull Builder<E> builder) {
     super(builder);
-    this.enumType = builder.enumType;
-  }
-
-  @Override
-  public Object serialize(List<E> value) {
-    Object ret = null;
-    if (value != null) {
-      StringBuilder sb = new StringBuilder();
-      for (E val : value) {
-        if (sb.length() > 0) {
-          sb.append(getSeparator());
-        }
-        sb.append(val.name());
-      }
-      ret = sb.toString();
-    }
-    return ret;
-  }
-
-  @Override
-  protected List<E> resolveList(List<?> list) {
-    List<E> ret = new ArrayList<>();
-    for (Object elem : (Collection<?>) list) {
-      ret.add(Enum.valueOf(enumType, elem.toString()));
-    }
-    return Collections.unmodifiableList(ret);
-  }
-
-  @Override
-  protected ListClass getListClass() {
-    StaticListClass element = new StaticListClass();
-    element.setValues(Joiner.on(getSeparator()).join(enumType.getEnumConstants()));
-    return element;
   }
 
 }

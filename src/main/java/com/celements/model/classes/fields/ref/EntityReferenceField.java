@@ -35,13 +35,4 @@ public final class EntityReferenceField extends ReferenceField<EntityReference> 
     return EntityReference.class;
   }
 
-  @Override
-  public EntityReference resolve(Object obj) {
-    EntityReference ret = null;
-    if (obj != null) {
-      ret = getModelUtils().resolveRef(obj.toString());
-    }
-    return ret;
-  }
-
 }

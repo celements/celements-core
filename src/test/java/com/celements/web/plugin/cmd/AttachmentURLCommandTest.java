@@ -186,6 +186,11 @@ public class AttachmentURLCommandTest extends AbstractBridgedComponentTestCase {
   }
 
   @Test
+  public void isAttachmentLink_isSpecialChars() {
+    assertTrue(attUrlCmd.isAttachmentLink("Teilnehmer.f8Nx9vyPOX8O2;Hans-002-Bearbeitet-2.jpg"));
+  }
+
+  @Test
   public void isAttachmentLink_isWithDb() {
     assertTrue(attUrlCmd.isAttachmentLink("db:Space.Page;attachment.jpg"));
   }

@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-core</artifactId>
-  <version>1.165-SNAPSHOT</version>
+  <version>1.168-SNAPSHOT</version>
   <description>Celements Core</description>
   <dependencies>
     <!-- Add here all your dependencies -->
@@ -40,6 +40,12 @@
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

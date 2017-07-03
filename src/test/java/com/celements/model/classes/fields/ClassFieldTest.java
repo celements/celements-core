@@ -34,8 +34,7 @@ public class ClassFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_immutability() {
-    assertInstancesOf(AbstractClassField.class, areImmutable(), allowingForSubclassing(),
-        assumingFields("classRef").areNotModifiedAndDoNotEscape());
+    assertInstancesOf(AbstractClassField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(TestClassField.class);
   }
 

@@ -21,12 +21,17 @@ import com.xpn.xwiki.objects.classes.StringClass;
 
 public class ReferenceFieldTest extends AbstractComponentTest {
 
+  // test static definition
+  private static final ClassField<DocumentReference> STATIC_DEFINITION = new DocumentReferenceField.Builder(
+      TestClassDefinition.NAME, "name").build();
+
   private ReferenceField<DocumentReference> field;
 
   Integer size = 5;
 
   @Before
   public void prepareTest() throws Exception {
+    assertNotNull(STATIC_DEFINITION);
     field = new DocumentReferenceField.Builder(TestClassDefinition.NAME, "name").size(size).build();
   }
 

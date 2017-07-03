@@ -56,4 +56,7 @@ public class RightsAccessScriptService implements ScriptService {
     return hasAccessLevel(docRef, level, user);
   }
 
+  public boolean isLoggedIn() {
+    return rightsAccess.isLoggedIn();
+  }
 }
