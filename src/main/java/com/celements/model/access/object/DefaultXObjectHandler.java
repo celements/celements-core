@@ -1,5 +1,6 @@
 package com.celements.model.access.object;
 
+import static com.google.common.base.MoreObjects.*;
 import static com.google.common.base.Preconditions.*;
 
 import java.text.MessageFormat;
@@ -32,7 +33,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,6 +42,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultXObjectHandler implements XObjectHandler {
 
+  // TODO logging
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultXObjectHandler.class);
 
   // do not use for XObject operations, could lead to endless loops
@@ -124,23 +125,22 @@ public class DefaultXObjectHandler implements XObjectHandler {
   @Override
   public List<BaseObject> fetchList() {
     List<BaseObject> ret = new ArrayList<>();
-    for (ClassReference classRef : getClassRefs()) {
-      ret.addAll(getXObjects(classRef));
-    }
-    return FluentIterable.from(ret).filter(new ObjectFetchingPredicate()).toList();
+    return FluentIterable.from(getClassRefs()).transformAndConcat(getXObjectsFunction()).filter(
+        new ObjectFetchingPredicate()).copyInto(ret);
   }
 
   @Override
   public Map<ClassReference, List<BaseObject>> fetchMap() {
     Map<ClassReference, List<BaseObject>> ret = new LinkedHashMap<>();
+    Predicate<BaseObject> predicate = new ObjectFetchingPredicate();
     for (ClassReference classRef : getClassRefs()) {
-      List<BaseObject> objs = FluentIterable.from(getXObjects(classRef)).filter(
-          new ObjectFetchingPredicate()).toList();
+      List<BaseObject> objs = new ArrayList<>();
+      FluentIterable.from(getXObjects(classRef)).filter(predicate).copyInto(objs);
       if (!objs.isEmpty()) {
         ret.put(classRef, objs);
       }
     }
-    return ImmutableMap.copyOf(ret);
+    return ret;
   }
 
   private class ObjectFetchingPredicate implements Predicate<BaseObject> {
@@ -149,7 +149,7 @@ public class DefaultXObjectHandler implements XObjectHandler {
     public boolean apply(BaseObject obj) {
       ClassReference classRef = new ClassReference(obj.getXClassReference());
       return !filter.hasFields(classRef) || FluentIterable.from(filter.getFields(
-          classRef)).anyMatch(getClassFieldPrediate(obj));
+          classRef)).allMatch(getClassFieldPrediate(obj));
     }
 
     private Predicate<ClassField<?>> getClassFieldPrediate(final BaseObject obj) {
@@ -174,14 +174,16 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
   @Override
   public List<BaseObject> create() {
+    List<BaseObject> ret = new ArrayList<>();
     return FluentIterable.from(getClassRefs()).transform(new ObjectCreateFunction(false)).filter(
-        Predicates.notNull()).toList();
+        Predicates.notNull()).copyInto(ret);
   }
 
   @Override
   public List<BaseObject> createIfNotExists() {
+    List<BaseObject> ret = new ArrayList<>();
     return FluentIterable.from(getClassRefs()).transform(new ObjectCreateFunction(true)).filter(
-        Predicates.notNull()).toList();
+        Predicates.notNull()).copyInto(ret);
   }
 
   private class ObjectCreateFunction implements Function<ClassReference, BaseObject> {
@@ -219,23 +221,34 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
   @Override
   public List<BaseObject> remove() {
-    return FluentIterable.from(fetchList()).filter(new Predicate<BaseObject>() {
+    List<BaseObject> ret = new ArrayList<>();
+    return FluentIterable.from(fetchList()).filter(new ObjectRemovePredicate()).copyInto(ret);
+  }
 
-      @Override
-      public boolean apply(BaseObject obj) {
-        return getDoc().removeXObject(obj);
-      }
-    }).toList();
+  private class ObjectRemovePredicate implements Predicate<BaseObject> {
+
+    @Override
+    public boolean apply(BaseObject obj) {
+      return getDoc().removeXObject(obj);
+    }
+
   }
 
   private List<BaseObject> getXObjects(ClassReference classRef) {
-    List<BaseObject> ret = getDoc().getXObjects(getClassDocRef(classRef));
-    if (ret != null) {
-      ret = FluentIterable.from(ret).filter(Predicates.notNull()).toList();
-    } else {
-      ret = ImmutableList.of();
-    }
-    return ret;
+    List<BaseObject> ret = new ArrayList<>();
+    List<BaseObject> objs = firstNonNull(getDoc().getXObjects(getClassDocRef(classRef)),
+        ImmutableList.<BaseObject>of());
+    return FluentIterable.from(objs).filter(Predicates.notNull()).copyInto(ret);
+  }
+
+  private Function<ClassReference, List<BaseObject>> getXObjectsFunction() {
+    return new Function<ClassReference, List<BaseObject>>() {
+
+      @Override
+      public List<BaseObject> apply(ClassReference classRef) {
+        return getXObjects(classRef);
+      }
+    };
   }
 
   private DocumentReference getClassDocRef(ClassReference classRef) {

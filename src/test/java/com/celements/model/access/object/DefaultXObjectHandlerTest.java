@@ -204,13 +204,31 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     assertObjs(getXObjHandler().filter(field, val1).filter(field, val2), obj3, obj6);
     assertObjs(getXObjHandler().filter(field, "other"));
     assertObjs(getXObjHandler().filter(classRef2), obj2);
+    assertObjs(getXObjHandler().filter(field, val1).filter(classRef2), obj3, obj2);
+    assertObjs(getXObjHandler().filter(classRef).filter(classRef2), obj1, obj3, obj4, obj5, obj6,
+        obj2);
+  }
 
+  @Test
+  public void test_fetch_mutlipleFields() throws Exception {
+    ClassField<String> field1 = TestClassDefinition.FIELD_MY_STRING;
+    String val1 = "val";
     ClassField<Integer> field2 = TestClassDefinition.FIELD_MY_INT;
-    obj3.setIntValue(field2.getName(), 5);
-    assertObjs(getXObjHandler().filter(field, val1).filter(field2, 5), obj3);
-    obj4.setIntValue(field2.getName(), 5);
-    assertObjs(getXObjHandler().filter(field, val1).filter(field2, 5), obj3, obj4);
-    assertObjs(getXObjHandler().filter(field, val1).filterAbsent(field2), obj1, obj3, obj5, obj6);
+    Integer val2 = 5;
+
+    BaseObject obj1 = addObj(classRef, field1.getName(), val1);
+    BaseObject obj2 = addObj(classRef, null, null);
+    obj2.setIntValue(field2.getName(), val2);
+    BaseObject obj3 = addObj(classRef, field1.getName(), val1);
+    obj3.setIntValue(field2.getName(), val2);
+
+    assertObjs(getXObjHandler().filter(field1, val1), obj1, obj3);
+    assertObjs(getXObjHandler().filter(field2, val2), obj2, obj3);
+    assertObjs(getXObjHandler().filter(field1, val1).filter(field2, val2), obj3);
+    assertObjs(getXObjHandler().filterAbsent(field1), obj2);
+    assertObjs(getXObjHandler().filterAbsent(field1).filter(field2, val2), obj2);
+    assertObjs(getXObjHandler().filterAbsent(field2), obj1);
+    assertObjs(getXObjHandler().filterAbsent(field2).filter(field1, val1), obj1);
   }
 
   @Test
@@ -295,14 +313,9 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetchList_unmodifiable() throws Exception {
-    addObj(classRef, null, null);
-    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        getXObjHandler().fetchList().remove(0);
-      }
-    }.evaluate();
+    BaseObject obj = addObj(classRef, null, null);
+    getXObjHandler().fetchList().remove(0); // may not remove obj from doc
+    assertObjs(getXObjHandler(), obj);
   }
 
   @Test
@@ -333,21 +346,11 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetchMap_unmodifiable() throws Exception {
-    addObj(classRef, null, null);
-    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        getXObjHandler().fetchMap().remove(classRef);
-      }
-    }.evaluate();
-    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        getXObjHandler().fetchMap().get(classRef).remove(0);
-      }
-    }.evaluate();
+    BaseObject obj = addObj(classRef, null, null);
+    getXObjHandler().fetchMap().remove(classRef); // may not remove obj from doc
+    assertObjs(getXObjHandler(), obj);
+    getXObjHandler().fetchMap().get(classRef).remove(0); // may not remove obj from doc
+    assertObjs(getXObjHandler(), obj);
   }
 
   @Test
