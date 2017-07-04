@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -27,10 +26,12 @@ public interface XObjectHandler {
 
   public @NotNull XObjectHandler filter(@NotNull ClassReference classRef);
 
-  public @NotNull <T> XObjectHandler filter(@NotNull ClassField<T> field, @Nullable T value);
+  public @NotNull <T> XObjectHandler filter(@NotNull ClassField<T> field, @NotNull T value);
 
   public @NotNull <T> XObjectHandler filter(@NotNull ClassField<T> field,
       @NotNull Collection<T> values);
+
+  public @NotNull XObjectHandler filterAbsent(@NotNull ClassField<?> field);
 
   public @NotNull Optional<BaseObject> fetchFirst();
 

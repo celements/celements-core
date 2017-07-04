@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
   private XWikiDocument doc;
 
-  private final ClassFieldValues filter = new ClassFieldValues();
+  private final FilterMap filter = new FilterMap();
 
   private XWikiDocument getDoc() {
     return checkNotNull(doc);
@@ -78,19 +79,29 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
   @Override
   public DefaultXObjectHandler filter(ClassReference classRef) {
-    filter.add(classRef);
+    filter.add(checkNotNull(classRef));
     return this;
   }
 
   @Override
   public <T> DefaultXObjectHandler filter(ClassField<T> field, T value) {
-    filter.add(field, value);
+    filter.add(checkNotNull(field), checkNotNull(value));
     return this;
   }
 
   @Override
   public <T> DefaultXObjectHandler filter(ClassField<T> field, Collection<T> values) {
-    filter.add(field, values);
+    checkNotNull(field);
+    checkArgument(!checkNotNull(values).isEmpty(), "cannot filter for empty value list");
+    for (T value : values) {
+      filter.add(field, value);
+    }
+    return this;
+  }
+
+  @Override
+  public @NotNull XObjectHandler filterAbsent(@NotNull ClassField<?> field) {
+    filter.addAbsent(checkNotNull(field));
     return this;
   }
 
@@ -146,12 +157,16 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
         @Override
         public boolean apply(ClassField<?> field) {
-          return hasValue(field);
+          return applyFilter(field);
         }
 
-        private <T> boolean hasValue(ClassField<T> field) {
+        private <T> boolean applyFilter(ClassField<T> field) {
           Optional<T> fieldValue = modelAccess.getFieldValue(obj, field);
-          return fieldValue.isPresent() && filter.hasValue(field, fieldValue.get());
+          if (fieldValue.isPresent()) {
+            return filter.hasValue(field, fieldValue.get());
+          } else {
+            return filter.isAbsent(field);
+          }
         }
       };
     }
