@@ -16,6 +16,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.TestClassDefinition;
@@ -49,84 +50,120 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_onDoc_null() throws Exception {
-    try {
-      getXObjHandler().onDoc(null);
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().onDoc(null);
+      }
+    }.evaluate();
   }
 
   @Test
   public void test_onDoc_isTranslation() throws Exception {
-    try {
-      doc.setLanguage("en");
-      doc.setTranslation(1);
-      getXObjHandler();
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException ise) {
-      assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
-      assertTrue("format not replacing placeholder 1", ise.getMessage().contains("'"
-          + doc.getDocumentReference() + "'"));
-    }
+    Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        doc.setLanguage("en");
+        doc.setTranslation(1);
+        getXObjHandler();
+      }
+    }.evaluate();
+    assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
+    assertTrue("format not replacing placeholder 1", ise.getMessage().contains("'"
+        + doc.getDocumentReference() + "'"));
   }
 
   @Test
   public void test_filter_classRef_null() throws Exception {
-    try {
-      getXObjHandler().filter(null);
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filter(null);
+      }
+    }.evaluate();
   }
 
   @Test
   public void test_filter_field_null() throws Exception {
-    try {
-      getXObjHandler().filter((ClassField<String>) null, (String) null);
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filter((ClassField<String>) null, null);
+      }
+    }.evaluate();
   }
 
   @Test
   public void test_filter_values_null() throws Exception {
-    try {
-      getXObjHandler().filter(TestClassDefinition.FIELD_MY_STRING, (List<String>) null);
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filter(TestClassDefinition.FIELD_MY_STRING, (List<String>) null);
+      }
+    }.evaluate();
   }
 
   @Test
   public void test_filter_values_empty() throws Exception {
-    try {
-      getXObjHandler().filter(TestClassDefinition.FIELD_MY_STRING, Collections.<String>emptyList());
-      fail("expecting IllegalArgumentException");
-    } catch (IllegalArgumentException exc) {
-      // expected
-    }
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filter(TestClassDefinition.FIELD_MY_STRING,
+            Collections.<String>emptyList());
+
+      }
+    }.evaluate();
   }
 
   @Test
-  public void test_filter_key_null() throws Exception {
-    ClassField<?> field = null;
-    try {
-      getXObjHandler().filter(field, null);
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
-  }
-
-  @Test
-  public void test_filter_value_null() throws Exception {
+  public void test_filterAbsent() throws Exception {
     ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
     BaseObject obj = addObj(classRef, field.getName(), null);
-    assertObjs(getXObjHandler().filter(field, (String) null), obj);
+    assertObjs(getXObjHandler().filterAbsent(field), obj);
+    assertObjs(getXObjHandler().filter(classRef).filterAbsent(field), obj);
+  }
+
+  @Test
+  public void test_filterAbsent_null() throws Exception {
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filterAbsent(null);
+      }
+    }.evaluate();
+  }
+
+  @Test
+  public void test_filterAbsent_afterFilter() throws Exception {
+    final ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filter(field, "val").filterAbsent(field);
+      }
+    }.evaluate();
+    assertEquals("filter field already present", ise.getMessage());
+  }
+
+  @Test
+  public void test_filterAbsent_beforeFilter() throws Exception {
+    final ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().filterAbsent(field).filter(field, "val");
+      }
+    }.evaluate();
+    assertEquals("filter field already absent", ise.getMessage());
   }
 
   @Test
@@ -144,27 +181,36 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     assertObjs(getXObjHandler().filter(classRef), obj);
     assertObjs(getXObjHandler().filter(field, val), obj);
     assertObjs(getXObjHandler().filter(field, Arrays.asList("", val)), obj);
-    assertObjs(getXObjHandler().filter(field, (String) null));
+    assertObjs(getXObjHandler().filterAbsent(field));
   }
 
   @Test
   public void test_fetch_mutlipleObj() throws Exception {
     ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
-    List<String> vals = Arrays.asList("val1", "val2");
+    String val1 = "val1";
+    String val2 = "val2";
     BaseObject obj1 = addObj(classRef, null, null);
-    BaseObject obj2 = addObj(classRef2, field.getName(), vals.get(0));
-    BaseObject obj3 = addObj(classRef, field.getName(), vals.get(0));
+    BaseObject obj2 = addObj(classRef2, field.getName(), val1);
+    BaseObject obj3 = addObj(classRef, field.getName(), val1);
     BaseObject obj4 = addObj(classRef, "other", null);
     BaseObject obj5 = addObj(classRef, field.getName(), null);
-    BaseObject obj6 = addObj(classRef, field.getName(), vals.get(1));
+    BaseObject obj6 = addObj(classRef, field.getName(), val2);
     assertObjs(getXObjHandler(), obj1, obj3, obj4, obj5, obj6, obj2);
     assertObjs(getXObjHandler().filter(classRef), obj1, obj3, obj4, obj5, obj6);
-    assertObjs(getXObjHandler().filter(field, (String) null), obj1, obj4, obj5);
-    assertObjs(getXObjHandler().filter(field, vals), obj3, obj6);
-    assertObjs(getXObjHandler().filter(field, vals.get(0)), obj3);
-    assertObjs(getXObjHandler().filter(field, vals.get(1)), obj6);
+    assertObjs(getXObjHandler().filterAbsent(field), obj1, obj4, obj5);
+    assertObjs(getXObjHandler().filter(field, val1), obj3);
+    assertObjs(getXObjHandler().filter(field, val2), obj6);
+    assertObjs(getXObjHandler().filter(field, Arrays.asList(val1, val2)), obj3, obj6);
+    assertObjs(getXObjHandler().filter(field, val1).filter(field, val2), obj3, obj6);
     assertObjs(getXObjHandler().filter(field, "other"));
     assertObjs(getXObjHandler().filter(classRef2), obj2);
+
+    ClassField<Integer> field2 = TestClassDefinition.FIELD_MY_INT;
+    obj3.setIntValue(field2.getName(), 5);
+    assertObjs(getXObjHandler().filter(field, val1).filter(field2, 5), obj3);
+
+    // TODO combining filter/Absent doesnt work like AND but OR: obj1, obj3, obj4, obj5, obj6
+    assertObjs(getXObjHandler().filter(field, val1).filterAbsent(field2), obj2);
   }
 
   @Test
@@ -186,12 +232,13 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_fetchFirst_noDoc() throws Exception {
     doc = null;
-    try {
-      getXObjHandler().fetchFirst();
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchFirst();
+      }
+    }.evaluate();
   }
 
   @Test
@@ -213,12 +260,13 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_fetchNumber_noDoc() throws Exception {
     doc = null;
-    try {
-      getXObjHandler().fetchNumber(0);
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchNumber(0);
+      }
+    }.evaluate();
   }
 
   @Test
@@ -236,23 +284,25 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_fetchList_noDoc() throws Exception {
     doc = null;
-    try {
-      getXObjHandler().fetchList();
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchList();
+      }
+    }.evaluate();
   }
 
   @Test
   public void test_fetchList_unmodifiable() throws Exception {
     addObj(classRef, null, null);
-    try {
-      getXObjHandler().fetchList().remove(0);
-      fail("expecting UnsupportedOperationException");
-    } catch (UnsupportedOperationException exc) {
-      // expected
-    }
+    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchList().remove(0);
+      }
+    }.evaluate();
   }
 
   @Test
@@ -272,29 +322,32 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_fetchMap_noDoc() throws Exception {
     doc = null;
-    try {
-      getXObjHandler().fetchMap();
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchMap();
+      }
+    }.evaluate();
   }
 
   @Test
   public void test_fetchMap_unmodifiable() throws Exception {
     addObj(classRef, null, null);
-    try {
-      getXObjHandler().fetchMap().remove(classRef);
-      fail("expecting UnsupportedOperationException");
-    } catch (UnsupportedOperationException exc) {
-      // expected
-    }
-    try {
-      getXObjHandler().fetchMap().get(classRef).remove(0);
-      fail("expecting UnsupportedOperationException");
-    } catch (UnsupportedOperationException exc) {
-      // expected
-    }
+    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchMap().remove(classRef);
+      }
+    }.evaluate();
+    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().fetchMap().get(classRef).remove(0);
+      }
+    }.evaluate();
   }
 
   @Test
@@ -354,12 +407,13 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_create_noDoc() throws Exception {
     doc = null;
-    try {
-      getXObjHandler().create();
-      fail("expecting NullPointerException");
-    } catch (NullPointerException exc) {
-      // expected
-    }
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getXObjHandler().create();
+      }
+    }.evaluate();
   }
 
   @Test
