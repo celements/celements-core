@@ -61,16 +61,16 @@ class FilterMap {
     return ret;
   }
 
-  public boolean isAbsent(ClassField<?> field) {
-    return getFieldValues(field).absent;
-  }
-
   public <T> boolean hasValue(ClassField<T> field, T value) {
     return getFieldValues(field).values.contains(value);
   }
 
   public <T> Set<T> getValues(ClassField<T> field) {
     return ImmutableSet.copyOf(getFieldValues(field).values);
+  }
+
+  public boolean isAbsent(ClassField<?> field) {
+    return getFieldValues(field).absent;
   }
 
   @SuppressWarnings("unchecked")

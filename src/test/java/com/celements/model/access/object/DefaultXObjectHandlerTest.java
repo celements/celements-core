@@ -208,9 +208,9 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     ClassField<Integer> field2 = TestClassDefinition.FIELD_MY_INT;
     obj3.setIntValue(field2.getName(), 5);
     assertObjs(getXObjHandler().filter(field, val1).filter(field2, 5), obj3);
-
-    // TODO combining filter/Absent doesnt work like AND but OR: obj1, obj3, obj4, obj5, obj6
-    assertObjs(getXObjHandler().filter(field, val1).filterAbsent(field2), obj2);
+    obj4.setIntValue(field2.getName(), 5);
+    assertObjs(getXObjHandler().filter(field, val1).filter(field2, 5), obj3, obj4);
+    assertObjs(getXObjHandler().filter(field, val1).filterAbsent(field2), obj1, obj3, obj5, obj6);
   }
 
   @Test
