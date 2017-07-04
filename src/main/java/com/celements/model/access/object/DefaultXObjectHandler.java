@@ -9,10 +9,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,25 +55,27 @@ public class DefaultXObjectHandler implements XObjectHandler {
   private final FilterMap filter = new FilterMap();
 
   private XWikiDocument getDoc() {
-    return checkNotNull(doc);
+    checkState(doc != null, "doc not initialised");
+    return doc;
   }
 
   @Override
   public DefaultXObjectHandler onDoc(XWikiDocument doc) {
-    checkState(!modelAccess.isTranslation(doc), MessageFormat.format(
-        "XObjectHandler cannot be used on translation ''{0}'' of doc ''{1}''", doc.getLanguage(),
-        doc.getDocumentReference()));
+    checkState(!modelAccess.isTranslation(doc), MessageFormat.format("XObjectHandler cannot be used"
+        + " on translation ''{0}'' of doc ''{1}''", doc.getLanguage(), doc.getDocumentReference()));
     this.doc = doc;
     return this;
   }
 
   private List<ClassReference> getClassRefs() {
-    return filter.isEmpty() ? getClassRefsFromDoc() : filter.getClassRefs();
-  }
-
-  private List<ClassReference> getClassRefsFromDoc() {
-    Set<DocumentReference> docRefs = getDoc().getXObjects().keySet();
-    return FluentIterable.from(docRefs).transform(ClassReference.FUNC_DOC_TO_CLASS_REF).toList();
+    List<ClassReference> ret = new ArrayList<>();
+    if (!filter.isEmpty()) {
+      ret.addAll(filter.getClassRefs());
+    } else {
+      FluentIterable.from(getDoc().getXObjects().keySet()).transform(
+          ClassReference.FUNC_DOC_TO_CLASS_REF).copyInto(ret);
+    }
+    return ret;
   }
 
   @Override
@@ -101,7 +101,7 @@ public class DefaultXObjectHandler implements XObjectHandler {
   }
 
   @Override
-  public @NotNull XObjectHandler filterAbsent(@NotNull ClassField<?> field) {
+  public XObjectHandler filterAbsent(ClassField<?> field) {
     filter.addAbsent(checkNotNull(field));
     return this;
   }
@@ -174,16 +174,19 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
   @Override
   public List<BaseObject> create() {
-    List<BaseObject> ret = new ArrayList<>();
-    return FluentIterable.from(getClassRefs()).transform(new ObjectCreateFunction(false)).filter(
-        Predicates.notNull()).copyInto(ret);
+    return createInternal(false);
   }
 
   @Override
   public List<BaseObject> createIfNotExists() {
+    return createInternal(true);
+  }
+
+  private List<BaseObject> createInternal(boolean ifNotExists) {
     List<BaseObject> ret = new ArrayList<>();
-    return FluentIterable.from(getClassRefs()).transform(new ObjectCreateFunction(true)).filter(
-        Predicates.notNull()).copyInto(ret);
+    return FluentIterable.from(getClassRefs()).transform(new ObjectCreateFunction(
+        ifNotExists)).filter(Predicates.notNull()).copyInto(ret);
+
   }
 
   private class ObjectCreateFunction implements Function<ClassReference, BaseObject> {
@@ -196,27 +199,32 @@ public class DefaultXObjectHandler implements XObjectHandler {
 
     @Override
     public BaseObject apply(ClassReference classRef) {
-      if (!ifNotExists || getXObjects(classRef).isEmpty()) {
+      BaseObject obj = null;
+      if (!ifNotExists || hasObj(classRef)) {
         try {
-          BaseObject obj = getDoc().newXObject(getClassDocRef(classRef), context.getXWikiContext());
+          obj = getDoc().newXObject(getClassDocRef(classRef), context.getXWikiContext());
           for (ClassField<?> field : filter.getFields(classRef)) {
-            setFirstValueFromFilter(obj, field);
+            setFirstValue(obj, field);
           }
-          return obj;
         } catch (XWikiException xwe) {
           throw new ClassDocumentLoadException(getClassDocRef(classRef), xwe);
         }
-      } else {
-        return null;
       }
+      return obj;
     }
 
-    private <T> void setFirstValueFromFilter(BaseObject obj, ClassField<T> field) {
+    private boolean hasObj(ClassReference classRef) {
+      List<BaseObject> objs = fetchMap().get(classRef);
+      return (objs == null) || objs.isEmpty();
+    }
+
+    private <T> void setFirstValue(BaseObject obj, ClassField<T> field) {
       Optional<T> value = FluentIterable.from(filter.getValues(field)).first();
       if (value.isPresent()) {
         modelAccess.setProperty(obj, field, value.get());
       }
     }
+
   }
 
   @Override

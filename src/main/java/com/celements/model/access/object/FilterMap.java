@@ -2,18 +2,16 @@ package com.celements.model.access.object;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.fields.ClassField;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Type Safe Heterogenous Container for ClassField values
@@ -27,8 +25,8 @@ class FilterMap {
     return map.isEmpty();
   }
 
-  public List<ClassReference> getClassRefs() {
-    return ImmutableList.copyOf(map.keySet());
+  public Set<ClassReference> getClassRefs() {
+    return Collections.unmodifiableSet(map.keySet());
   }
 
   public void add(ClassReference classRef) {
@@ -54,9 +52,9 @@ class FilterMap {
   }
 
   public Set<ClassField<?>> getFields(ClassReference classRef) {
-    Set<ClassField<?>> ret = ImmutableSet.of();
+    Set<ClassField<?>> ret = Collections.emptySet();
     if (hasFields(classRef)) {
-      ret = ImmutableSet.copyOf(map.get(classRef).keySet());
+      ret = Collections.unmodifiableSet(map.get(classRef).keySet());
     }
     return ret;
   }
@@ -66,7 +64,7 @@ class FilterMap {
   }
 
   public <T> Set<T> getValues(ClassField<T> field) {
-    return ImmutableSet.copyOf(getFieldValues(field).values);
+    return Collections.unmodifiableSet(getFieldValues(field).values);
   }
 
   public boolean isAbsent(ClassField<?> field) {

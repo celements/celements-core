@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
 public class DefaultXObjectHandlerTest extends AbstractComponentTest {
@@ -431,10 +432,39 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_createIfNotExists_create_field() throws Exception {
+    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    String val = "val";
+    BaseObject obj = addObj(classRef, field.getName(), "otherval");
+    BaseClass bClass = expectNewBaseObject(classRef.getDocumentReference(wikiRef));
+    expect(bClass.get(field.getName())).andReturn(new StringClass()).once();
+    replayDefault();
+    List<BaseObject> ret = getXObjHandler().filter(field, val).createIfNotExists();
+    verifyDefault();
+    assertEquals(1, ret.size());
+    assertNotSame(obj, ret.get(0));
+    assertEquals(classRef.getDocumentReference(wikiRef), ret.get(0).getXClassReference());
+    assertEquals(val, ret.get(0).getStringValue(field.getName()));
+    assertObjs(getXObjHandler(), obj, ret.get(0));
+  }
+
+  @Test
   public void test_createIfNotExists_exists() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
     replayDefault();
     List<BaseObject> ret = getXObjHandler().filter(classRef).createIfNotExists();
+    verifyDefault();
+    assertEquals(0, ret.size());
+    assertObjs(getXObjHandler(), obj);
+  }
+
+  @Test
+  public void test_createIfNotExists_exists_field() throws Exception {
+    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    String val = "val";
+    BaseObject obj = addObj(classRef, field.getName(), val);
+    replayDefault();
+    List<BaseObject> ret = getXObjHandler().filter(field, val).createIfNotExists();
     verifyDefault();
     assertEquals(0, ret.size());
     assertObjs(getXObjHandler(), obj);
