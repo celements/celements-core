@@ -1,12 +1,13 @@
 package org.xwiki.model.reference;
 
+import static com.google.common.base.Preconditions.*;
+
 import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.EntityType;
 
 import com.celements.model.context.ModelContext;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
@@ -27,7 +28,7 @@ public class ClassReference extends EntityReference {
   }
 
   private void checkInit() {
-    Preconditions.checkState(!initialised, "unable to modify already initialised instance");
+    checkState(!initialised, "unable to modify already initialised instance");
   }
 
   @Override
@@ -39,11 +40,14 @@ public class ClassReference extends EntityReference {
   @Override
   public void setParent(EntityReference parent) {
     checkInit();
-    if ((parent == null) || (parent.getType() != EntityType.SPACE)) {
-      throw new IllegalArgumentException("Invalid parent reference [" + parent
-          + "] for a document reference");
-    }
+    checkArgument((parent != null) && (parent.getType() == EntityType.SPACE),
+        "Invalid parent reference [" + parent + "] for a class reference");
     super.setParent(new EntityReference(parent.getName(), EntityType.SPACE));
+  }
+
+  @Override
+  public EntityReference getParent() {
+    return super.getParent().clone();
   }
 
   @Override
@@ -55,10 +59,13 @@ public class ClassReference extends EntityReference {
   @Override
   public void setType(EntityType type) {
     checkInit();
-    if (type != EntityType.DOCUMENT) {
-      throw new IllegalArgumentException("Invalid type [" + type + "] for a document reference");
-    }
+    checkArgument(type == EntityType.DOCUMENT, "Invalid type [" + type + "] for a class reference");
     super.setType(EntityType.DOCUMENT);
+  }
+
+  @Override
+  public EntityReference clone() {
+    return new ClassReference(this);
   }
 
   public DocumentReference getDocumentReference() {
