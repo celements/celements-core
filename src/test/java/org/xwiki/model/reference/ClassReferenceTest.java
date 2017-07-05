@@ -127,10 +127,10 @@ public class ClassReferenceTest extends AbstractComponentTest {
   @Test
   public void test_getDocumentReference() {
     assertEquals(new DocumentReference(getContext().getDatabase(), classRef.getParent().getName(),
-        classRef.getName()), classRef.getDocumentReference());
+        classRef.getName()), classRef.getDocRef());
     WikiReference wikiRef = new WikiReference("wiki");
     assertEquals(new DocumentReference(wikiRef.getName(), classRef.getParent().getName(),
-        classRef.getName()), classRef.getDocumentReference(wikiRef));
+        classRef.getName()), classRef.getDocRef(wikiRef));
   }
 
 }

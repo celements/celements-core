@@ -46,13 +46,13 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
   @Deprecated
   @Override
   public DocumentReference getClassRef() {
-    return getClassReference().getDocumentReference();
+    return getClassReference().getDocRef();
   }
 
   @Deprecated
   @Override
   public DocumentReference getClassRef(WikiReference wikiRef) {
-    return getClassReference().getDocumentReference(wikiRef);
+    return getClassReference().getDocRef(wikiRef);
   }
 
   /**

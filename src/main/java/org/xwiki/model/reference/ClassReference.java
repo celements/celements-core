@@ -68,11 +68,11 @@ public class ClassReference extends EntityReference {
     return new ClassReference(this);
   }
 
-  public DocumentReference getDocumentReference() {
-    return getDocumentReference(getModelContext().getWikiRef());
+  public DocumentReference getDocRef() {
+    return getDocRef(getModelContext().getWikiRef());
   }
 
-  public DocumentReference getDocumentReference(WikiReference wikiRef) {
+  public DocumentReference getDocRef(WikiReference wikiRef) {
     return new DocumentReference(getName(), new SpaceReference(getParent().getName(), wikiRef));
   }
 

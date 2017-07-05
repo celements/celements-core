@@ -86,7 +86,7 @@ public class DefaultXClassCreator implements XClassCreator {
   public void createXClass(ClassDefinition classDef) throws XClassCreateException {
     LOGGER.debug("creating class '{}'", classDef.getName());
     XWikiDocument classDoc = modelAccess.getOrCreateDocument(
-        classDef.getClassReference().getDocumentReference());
+        classDef.getClassReference().getDocRef());
     BaseClass bClass = generateXClass(classDef);
     if (!classDoc.getXClass().equals(bClass)) {
       try {
@@ -101,7 +101,7 @@ public class DefaultXClassCreator implements XClassCreator {
   @Override
   public BaseClass generateXClass(ClassDefinition classDef) {
     BaseClass bClass = new BaseClass();
-    DocumentReference classDocRef = classDef.getClassReference().getDocumentReference();
+    DocumentReference classDocRef = classDef.getClassReference().getDocRef();
     bClass.setDocumentReference(classDocRef);
     bClass.setXClassReference(classDocRef);
     if (classDef.isInternalMapping() && !bClass.hasInternalCustomMapping()) {
