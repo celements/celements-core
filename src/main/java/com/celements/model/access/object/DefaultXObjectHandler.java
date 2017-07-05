@@ -260,7 +260,7 @@ public class DefaultXObjectHandler implements XObjectHandler {
   }
 
   private DocumentReference getClassDocRef(ClassReference classRef) {
-    return classRef.getDocumentReference(getDoc().getDocumentReference().getWikiReference());
+    return classRef.getDocRef(getDoc().getDocumentReference().getWikiReference());
   }
 
 }

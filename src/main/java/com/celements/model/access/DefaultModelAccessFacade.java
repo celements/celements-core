@@ -377,7 +377,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     WikiReference wikiRef = doc.getDocumentReference().getWikiReference();
     Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
     for (ClassReference classRef : map.keySet()) {
-      ret.put(classRef.getDocumentReference(wikiRef), map.get(classRef));
+      ret.put(classRef.getDocRef(wikiRef), map.get(classRef));
     }
     return ImmutableMap.copyOf(ret);
   }

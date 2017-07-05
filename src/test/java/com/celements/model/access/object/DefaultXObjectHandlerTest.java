@@ -356,34 +356,34 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_create() throws Exception {
-    expectNewBaseObject(classRef.getDocumentReference(wikiRef));
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
     List<BaseObject> ret = getXObjHandler().filter(classRef).create();
     verifyDefault();
     assertEquals(1, ret.size());
-    assertEquals(classRef.getDocumentReference(wikiRef), ret.get(0).getXClassReference());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertObjs(getXObjHandler(), ret.get(0));
   }
 
   @Test
   public void test_create_keyValue() throws Exception {
-    BaseClass bClassMock = expectNewBaseObject(classRef.getDocumentReference(wikiRef));
+    BaseClass bClassMock = expectNewBaseObject(classRef.getDocRef(wikiRef));
     ClassField<String> field1 = TestClassDefinition.FIELD_MY_STRING;
     expect(bClassMock.get(eq(field1.getName()))).andReturn(field1.getXField()).anyTimes();
     List<String> vals = Arrays.asList("val1", "val2");
     ClassField<Integer> field2 = TestClassDefinition.FIELD_MY_INT;
     expect(bClassMock.get(eq(field2.getName()))).andReturn(field2.getXField()).anyTimes();
     int val = 2;
-    expectNewBaseObject(classRef2.getDocumentReference(wikiRef));
+    expectNewBaseObject(classRef2.getDocRef(wikiRef));
     replayDefault();
     List<BaseObject> ret = getXObjHandler().filter(field1, vals).filter(field2, val).filter(
         classRef2).create();
     verifyDefault();
     assertEquals(2, ret.size());
-    assertEquals(classRef.getDocumentReference(wikiRef), ret.get(0).getXClassReference());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertTrue(vals.contains(ret.get(0).getStringValue(field1.getName())));
     assertEquals(val, ret.get(0).getIntValue(field2.getName()));
-    assertEquals(classRef2.getDocumentReference(wikiRef), ret.get(1).getXClassReference());
+    assertEquals(classRef2.getDocRef(wikiRef), ret.get(1).getXClassReference());
     assertObjs(getXObjHandler(), ret.get(0), ret.get(1));
   }
 
@@ -398,7 +398,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_create_ClassDocumentLoadException() throws Exception {
     Throwable cause = new XWikiException();
-    expect(createBaseClassMock(classRef.getDocumentReference(wikiRef)).newCustomClassInstance(same(
+    expect(createBaseClassMock(classRef.getDocRef(wikiRef)).newCustomClassInstance(same(
         getContext()))).andThrow(cause).once();
     replayDefault();
     try {
@@ -422,12 +422,12 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_createIfNotExists_create() throws Exception {
-    expectNewBaseObject(classRef.getDocumentReference(wikiRef));
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
     List<BaseObject> ret = getXObjHandler().filter(classRef).createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
-    assertEquals(classRef.getDocumentReference(wikiRef), ret.get(0).getXClassReference());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertObjs(getXObjHandler(), ret.get(0));
   }
 
@@ -436,14 +436,14 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), "otherval");
-    BaseClass bClass = expectNewBaseObject(classRef.getDocumentReference(wikiRef));
+    BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wikiRef));
     expect(bClass.get(field.getName())).andReturn(new StringClass()).once();
     replayDefault();
     List<BaseObject> ret = getXObjHandler().filter(field, val).createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertNotSame(obj, ret.get(0));
-    assertEquals(classRef.getDocumentReference(wikiRef), ret.get(0).getXClassReference());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertEquals(val, ret.get(0).getStringValue(field.getName()));
     assertObjs(getXObjHandler(), obj, ret.get(0));
   }
@@ -539,7 +539,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
   private BaseObject createObj(ClassReference classRef, String key, String value) {
     BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef.getDocumentReference(wikiRef));
+    obj.setXClassReference(classRef.getDocRef(wikiRef));
     if (key != null) {
       obj.setStringValue(key, value);
     }
