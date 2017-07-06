@@ -1,5 +1,8 @@
 package com.celements.common.observation.listener;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.observation.event.Event;
 
 public abstract class AbstractLocalEventListener<S, D> extends AbstractEventListener {
@@ -18,6 +21,7 @@ public abstract class AbstractLocalEventListener<S, D> extends AbstractEventList
     }
   }
 
-  protected abstract void onEventInternal(Event event, S source, D data);
+  protected abstract void onEventInternal(@NotNull Event event, @NotNull S source,
+      @Nullable D data);
 
 }

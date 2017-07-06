@@ -1,5 +1,6 @@
 package com.celements.common.observation.listener;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -15,22 +16,23 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.copydoc.ICopyDocumentRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponentTestCase {
+public class AbstractDocumentUpdateListenerTest extends AbstractComponentTest {
 
   private TestDocumentUpdateListener listener;
   private XWikiContext context;
@@ -63,8 +65,9 @@ public class AbstractDocumentUpdateListenerTest extends AbstractBridgedComponent
     expect(docMock.getOriginalDocument()).andReturn(origDocMock).anyTimes();
 
     listener = new TestDocumentUpdateListener();
+    listener.modelAccess = Utils.getComponent(IModelAccessFacade.class);
+    listener.context = Utils.getComponent(ModelContext.class);
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
-    listener.injecExecution(Utils.getComponent(Execution.class));
     listener.injectCopyDocService(Utils.getComponent(ICopyDocumentRole.class));
     listener.injectRemoteObservationManagerContext(
         remoteObsManContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class));

@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -24,6 +23,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.ModelMock;
+import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -61,8 +61,8 @@ public class AbstractDocumentDeleteListenerTest extends AbstractComponentTest {
 
     listener = new TestDocumentDeleteListener();
     listener.modelAccess = Utils.getComponent(IModelAccessFacade.class);
+    listener.context = Utils.getComponent(ModelContext.class);
     listener.injectWebUtilsService(Utils.getComponent(IWebUtilsService.class));
-    listener.injecExecution(Utils.getComponent(Execution.class));
     listener.injectRemoteObservationManagerContext(
         remoteObsManContextMock = createMockAndAddToDefault(RemoteObservationManagerContext.class));
     listener.injectObservationManager(obsManagerMock = createMockAndAddToDefault(
