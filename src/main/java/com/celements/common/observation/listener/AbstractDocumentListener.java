@@ -1,5 +1,7 @@
 package com.celements.common.observation.listener;
 
+import javax.validation.constraints.NotNull;
+
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -14,51 +16,30 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public abstract class AbstractDocumentListener extends AbstractEventListener {
+public abstract class AbstractDocumentListener extends
+    AbstractLocalEventListener<XWikiDocument, Object> {
 
   @Override
-  protected void onLocalEvent(Event event, Object source, Object data) {
-    XWikiDocument doc = (XWikiDocument) source;
-    if (doc != null) {
-      getLogger().debug("onLocalEvent: got event '{}' on doc '{}'", event.getClass(),
+  protected void onEventInternal(Event event, XWikiDocument doc, Object data) {
+    Event notifyEvent = getNotifyEvent(event, doc);
+    if (notifyEvent != null) {
+      getLogger().debug("onEvent: notifying event '{}' on doc '{}'", notifyEvent.getClass(),
           doc.getDocumentReference());
-      Event notifyEvent = getNotifyEvent(event, doc);
-      if (notifyEvent != null) {
-        getLogger().debug("onLocalEvent: notifying event '{}' on doc '{}'", notifyEvent.getClass(),
-            doc.getDocumentReference());
-        getObservationManager().notify(notifyEvent, source, getContext());
-      } else {
-        getLogger().trace("onLocalEvent: skipped notifying event for event '{}' " + "on doc '{}'",
-            event.getClass(), doc.getDocumentReference());
-      }
-    }
-  }
-
-  @Override
-  protected void onRemoteEvent(Event event, Object source, Object data) {
-    if (getLogger().isTraceEnabled()) {
-      getLogger().trace("onRemoteEvent: skipped event '{}' on source '{}', data '{}'",
-          event.getClass(), source, data);
+      getObservationManager().notify(notifyEvent, doc, getContext());
+    } else {
+      getLogger().trace("onEvent: skipped notifying event for event '{}' " + "on doc '{}'",
+          event.getClass(), doc.getDocumentReference());
     }
   }
 
   /**
-   * @param event
-   *          may not be null
-   * @param doc
-   *          may not be null
    * @return next event to notify on {@link ObservationManager}, null indicating nothing
    *         to notify
    */
-  protected abstract Event getNotifyEvent(Event event, XWikiDocument doc);
+  protected abstract Event getNotifyEvent(@NotNull Event event, @NotNull XWikiDocument doc);
 
   protected BaseObject getRequiredObj(XWikiDocument doc) {
-    BaseObject bObj = null;
-    if (doc != null) {
-      WikiReference wikiRef = webUtilsService.getWikiRef(doc);
-      bObj = doc.getXObject(getRequiredObjClassRef(wikiRef));
-    }
-    return bObj;
+    return doc.getXObject(getRequiredObjClassRef(context.getWikiRef()));
   }
 
   /**

@@ -1,19 +1,25 @@
 package com.celements.common.observation.listener;
 
+import static com.google.common.base.MoreObjects.*;
+
+import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -34,10 +40,10 @@ public abstract class AbstractEventListener implements EventListener {
   protected ConfigurationSource configSrc;
 
   @Requirement
-  private RemoteObservationManagerContext remoteObsManagerContext;
+  protected ModelContext context;
 
   @Requirement
-  protected Execution execution;
+  private RemoteObservationManagerContext remoteObsManagerContext;
 
   /**
    * The observation manager that will be use to fire user creation events. Note: We can't
@@ -59,12 +65,17 @@ public abstract class AbstractEventListener implements EventListener {
     return this.observationManager;
   }
 
+  /**
+   * @deprecated instead use {@link #context}
+   */
+  @Deprecated
   protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    return context.getXWikiContext();
   }
 
   public synchronized boolean isDisabled() {
-    return disabled || configSrc.getProperty(CFG_SRC_KEY, List.class).contains(getName());
+    return disabled || firstNonNull(configSrc.getProperty(CFG_SRC_KEY, List.class),
+        Collections.emptyList()).contains(getName());
   }
 
   public synchronized void enable() {
@@ -95,17 +106,16 @@ public abstract class AbstractEventListener implements EventListener {
     }
   }
 
-  protected abstract void onLocalEvent(Event event, Object source, Object data);
+  protected abstract void onLocalEvent(@NotNull Event event, @NotNull Object source,
+      @Nullable Object data);
 
-  protected abstract void onRemoteEvent(Event event, Object source, Object data);
+  protected abstract void onRemoteEvent(@NotNull Event event, @NotNull Object source,
+      @Nullable Object data);
 
   protected XWikiDocument getDocument(Object source, Event event) {
-    XWikiDocument doc = null;
-    if (source != null) {
-      doc = (XWikiDocument) source;
-      if (event instanceof DocumentDeletedEvent) {
-        doc = doc.getOriginalDocument();
-      }
+    XWikiDocument doc = (XWikiDocument) source;
+    if (event instanceof DocumentDeletedEvent) {
+      doc = doc.getOriginalDocument();
     }
     return doc;
   }
@@ -128,10 +138,6 @@ public abstract class AbstractEventListener implements EventListener {
 
   void injectRemoteObservationManagerContext(RemoteObservationManagerContext context) {
     this.remoteObsManagerContext = context;
-  }
-
-  void injecExecution(Execution execution) {
-    this.execution = execution;
   }
 
 }
