@@ -45,8 +45,8 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private XObjectHandler getXObjHandler() {
-    return Utils.getComponent(XObjectHandler.class).onDoc(doc);
+  private ObjectHandler getObjHandler() {
+    return ObjectHandler.onDoc(doc);
   }
 
   @Test
@@ -55,7 +55,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().onDoc(null);
+        ObjectHandler.onDoc(null);
       }
     }.evaluate();
   }
@@ -68,7 +68,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
       protected void execute() throws Exception {
         doc.setLanguage("en");
         doc.setTranslation(1);
-        getXObjHandler();
+        getObjHandler();
       }
     }.evaluate();
     assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
@@ -82,7 +82,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filter(null);
+        getObjHandler().filter(null);
       }
     }.evaluate();
   }
@@ -93,7 +93,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filter((ClassField<String>) null, null);
+        getObjHandler().filter((ClassField<String>) null, null);
       }
     }.evaluate();
   }
@@ -104,7 +104,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filter(TestClassDefinition.FIELD_MY_STRING, (List<String>) null);
+        getObjHandler().filter(TestClassDefinition.FIELD_MY_STRING, (List<String>) null);
       }
     }.evaluate();
   }
@@ -115,7 +115,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filter(TestClassDefinition.FIELD_MY_STRING,
+        getObjHandler().filter(TestClassDefinition.FIELD_MY_STRING,
             Collections.<String>emptyList());
 
       }
@@ -126,8 +126,8 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   public void test_filterAbsent() throws Exception {
     ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
     BaseObject obj = addObj(classRef, field.getName(), null);
-    assertObjs(getXObjHandler().filterAbsent(field), obj);
-    assertObjs(getXObjHandler().filter(classRef).filterAbsent(field), obj);
+    assertObjs(getObjHandler().filterAbsent(field), obj);
+    assertObjs(getObjHandler().filter(classRef).filterAbsent(field), obj);
   }
 
   @Test
@@ -136,7 +136,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filterAbsent(null);
+        getObjHandler().filterAbsent(null);
       }
     }.evaluate();
   }
@@ -148,10 +148,10 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filter(field, "val").filterAbsent(field);
+        getObjHandler().filter(field, "val").filterAbsent(field);
       }
     }.evaluate();
-    assertEquals("filter field already present", ise.getMessage());
+    assertEquals("filter entry already present", ise.getMessage());
   }
 
   @Test
@@ -161,15 +161,15 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().filterAbsent(field).filter(field, "val");
+        getObjHandler().filterAbsent(field).filter(field, "val");
       }
     }.evaluate();
-    assertEquals("filter field already absent", ise.getMessage());
+    assertEquals("filter entry already absent", ise.getMessage());
   }
 
   @Test
   public void test_fetch_emptyDoc() throws Exception {
-    List<BaseObject> ret = getXObjHandler().fetchList();
+    List<BaseObject> ret = getObjHandler().fetch().list();
     assertEquals(0, ret.size());
   }
 
@@ -178,11 +178,11 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), val);
-    assertObjs(getXObjHandler(), obj);
-    assertObjs(getXObjHandler().filter(classRef), obj);
-    assertObjs(getXObjHandler().filter(field, val), obj);
-    assertObjs(getXObjHandler().filter(field, Arrays.asList("", val)), obj);
-    assertObjs(getXObjHandler().filterAbsent(field));
+    assertObjs(getObjHandler(), obj);
+    assertObjs(getObjHandler().filter(classRef), obj);
+    assertObjs(getObjHandler().filter(field, val), obj);
+    assertObjs(getObjHandler().filter(field, Arrays.asList("", val)), obj);
+    assertObjs(getObjHandler().filterAbsent(field));
   }
 
   @Test
@@ -196,17 +196,17 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj4 = addObj(classRef, "other", null);
     BaseObject obj5 = addObj(classRef, field.getName(), null);
     BaseObject obj6 = addObj(classRef, field.getName(), val2);
-    assertObjs(getXObjHandler(), obj1, obj3, obj4, obj5, obj6, obj2);
-    assertObjs(getXObjHandler().filter(classRef), obj1, obj3, obj4, obj5, obj6);
-    assertObjs(getXObjHandler().filterAbsent(field), obj1, obj4, obj5);
-    assertObjs(getXObjHandler().filter(field, val1), obj3);
-    assertObjs(getXObjHandler().filter(field, val2), obj6);
-    assertObjs(getXObjHandler().filter(field, Arrays.asList(val1, val2)), obj3, obj6);
-    assertObjs(getXObjHandler().filter(field, val1).filter(field, val2), obj3, obj6);
-    assertObjs(getXObjHandler().filter(field, "other"));
-    assertObjs(getXObjHandler().filter(classRef2), obj2);
-    assertObjs(getXObjHandler().filter(field, val1).filter(classRef2), obj3, obj2);
-    assertObjs(getXObjHandler().filter(classRef).filter(classRef2), obj1, obj3, obj4, obj5, obj6,
+    assertObjs(getObjHandler(), obj1, obj3, obj4, obj5, obj6, obj2);
+    assertObjs(getObjHandler().filter(classRef), obj1, obj3, obj4, obj5, obj6);
+    assertObjs(getObjHandler().filterAbsent(field), obj1, obj4, obj5);
+    assertObjs(getObjHandler().filter(field, val1), obj3);
+    assertObjs(getObjHandler().filter(field, val2), obj6);
+    assertObjs(getObjHandler().filter(field, Arrays.asList(val1, val2)), obj3, obj6);
+    assertObjs(getObjHandler().filter(field, val1).filter(field, val2), obj3, obj6);
+    assertObjs(getObjHandler().filter(field, "other"));
+    assertObjs(getObjHandler().filter(classRef2), obj2);
+    assertObjs(getObjHandler().filter(field, val1).filter(classRef2), obj3, obj2);
+    assertObjs(getObjHandler().filter(classRef).filter(classRef2), obj1, obj3, obj4, obj5, obj6,
         obj2);
   }
 
@@ -223,13 +223,13 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj3 = addObj(classRef, field1.getName(), val1);
     obj3.setIntValue(field2.getName(), val2);
 
-    assertObjs(getXObjHandler().filter(field1, val1), obj1, obj3);
-    assertObjs(getXObjHandler().filter(field2, val2), obj2, obj3);
-    assertObjs(getXObjHandler().filter(field1, val1).filter(field2, val2), obj3);
-    assertObjs(getXObjHandler().filterAbsent(field1), obj2);
-    assertObjs(getXObjHandler().filterAbsent(field1).filter(field2, val2), obj2);
-    assertObjs(getXObjHandler().filterAbsent(field2), obj1);
-    assertObjs(getXObjHandler().filterAbsent(field2).filter(field1, val1), obj1);
+    assertObjs(getObjHandler().filter(field1, val1), obj1, obj3);
+    assertObjs(getObjHandler().filter(field2, val2), obj2, obj3);
+    assertObjs(getObjHandler().filter(field1, val1).filter(field2, val2), obj3);
+    assertObjs(getObjHandler().filterAbsent(field1), obj2);
+    assertObjs(getObjHandler().filterAbsent(field1).filter(field2, val2), obj2);
+    assertObjs(getObjHandler().filterAbsent(field2), obj1);
+    assertObjs(getObjHandler().filterAbsent(field2).filter(field1, val1), obj1);
   }
 
   @Test
@@ -237,14 +237,14 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     addObj(classRef2, null, null);
     addObj(classRef, null, null);
-    Optional<BaseObject> ret = getXObjHandler().fetchFirst();
+    Optional<BaseObject> ret = getObjHandler().fetch().first();
     assertTrue(ret.isPresent());
     assertSame(obj1, ret.get());
   }
 
   @Test
   public void test_fetchFirst_none() throws Exception {
-    Optional<BaseObject> ret = getXObjHandler().fetchFirst();
+    Optional<BaseObject> ret = getObjHandler().fetch().first();
     assertFalse(ret.isPresent());
   }
 
@@ -255,7 +255,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().fetchFirst();
+        getObjHandler().fetch().first();
       }
     }.evaluate();
   }
@@ -265,14 +265,14 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     addObj(classRef2, null, null);
     addObj(classRef, null, null);
-    Optional<BaseObject> ret = getXObjHandler().fetchNumber(obj1.getNumber());
+    Optional<BaseObject> ret = getObjHandler().fetch().number(obj1.getNumber());
     assertTrue(ret.isPresent());
     assertSame(obj1, ret.get());
   }
 
   @Test
   public void test_fetchNumber_none() throws Exception {
-    Optional<BaseObject> ret = getXObjHandler().fetchNumber(0);
+    Optional<BaseObject> ret = getObjHandler().fetch().number(0);
     assertFalse(ret.isPresent());
   }
 
@@ -283,7 +283,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().fetchNumber(0);
+        getObjHandler().fetch().number(0);
       }
     }.evaluate();
   }
@@ -293,7 +293,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    List<BaseObject> ret = getXObjHandler().fetchList();
+    List<BaseObject> ret = getObjHandler().fetch().list();
     assertEquals(3, ret.size());
     assertSame(obj1, ret.get(0));
     assertSame(obj3, ret.get(1));
@@ -307,7 +307,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().fetchList();
+        getObjHandler().fetch().list();
       }
     }.evaluate();
   }
@@ -315,8 +315,8 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_fetchList_unmodifiable() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    getXObjHandler().fetchList().remove(0); // may not remove obj from doc
-    assertObjs(getXObjHandler(), obj);
+    getObjHandler().fetch().list().remove(0); // may not remove obj from doc
+    assertObjs(getObjHandler(), obj);
   }
 
   @Test
@@ -324,7 +324,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    Map<ClassReference, List<BaseObject>> ret = getXObjHandler().fetchMap();
+    Map<ClassReference, List<BaseObject>> ret = getObjHandler().fetch().map();
     assertEquals(2, ret.size());
     assertSame(2, ret.get(classRef).size());
     assertSame(obj1, ret.get(classRef).get(0));
@@ -340,7 +340,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().fetchMap();
+        getObjHandler().fetch().map();
       }
     }.evaluate();
   }
@@ -348,21 +348,21 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_fetchMap_unmodifiable() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    getXObjHandler().fetchMap().remove(classRef); // may not remove obj from doc
-    assertObjs(getXObjHandler(), obj);
-    getXObjHandler().fetchMap().get(classRef).remove(0); // may not remove obj from doc
-    assertObjs(getXObjHandler(), obj);
+    getObjHandler().fetch().map().remove(classRef); // may not remove obj from doc
+    assertObjs(getObjHandler(), obj);
+    getObjHandler().fetch().map().get(classRef).remove(0); // may not remove obj from doc
+    assertObjs(getObjHandler(), obj);
   }
 
   @Test
   public void test_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().filter(classRef).create();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().create();
     verifyDefault();
     assertEquals(1, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertObjs(getXObjHandler(), ret.get(0));
+    assertObjs(getObjHandler(), ret.get(0));
   }
 
   @Test
@@ -376,21 +376,21 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     int val = 2;
     expectNewBaseObject(classRef2.getDocRef(wikiRef));
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().filter(field1, vals).filter(field2, val).filter(
-        classRef2).create();
+    List<BaseObject> ret = getObjHandler().filter(field1, vals).filter(field2, val).filter(
+        classRef2).edit().create();
     verifyDefault();
     assertEquals(2, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertTrue(vals.contains(ret.get(0).getStringValue(field1.getName())));
     assertEquals(val, ret.get(0).getIntValue(field2.getName()));
     assertEquals(classRef2.getDocRef(wikiRef), ret.get(1).getXClassReference());
-    assertObjs(getXObjHandler(), ret.get(0), ret.get(1));
+    assertObjs(getObjHandler(), ret.get(0), ret.get(1));
   }
 
   @Test
   public void test_create_none() throws Exception {
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().create();
+    List<BaseObject> ret = getObjHandler().edit().create();
     verifyDefault();
     assertEquals(0, ret.size());
   }
@@ -402,7 +402,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
         getContext()))).andThrow(cause).once();
     replayDefault();
     try {
-      getXObjHandler().filter(classRef).create();
+      getObjHandler().filter(classRef).edit().create();
     } catch (ClassDocumentLoadException exc) {
       assertSame(cause, exc.getCause());
     }
@@ -415,7 +415,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getXObjHandler().create();
+        getObjHandler().edit().create();
       }
     }.evaluate();
   }
@@ -424,11 +424,11 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   public void test_createIfNotExists_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().filter(classRef).createIfNotExists();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertObjs(getXObjHandler(), ret.get(0));
+    assertObjs(getObjHandler(), ret.get(0));
   }
 
   @Test
@@ -439,23 +439,23 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wikiRef));
     expect(bClass.get(field.getName())).andReturn(new StringClass()).once();
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().filter(field, val).createIfNotExists();
+    List<BaseObject> ret = getObjHandler().filter(field, val).edit().createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertNotSame(obj, ret.get(0));
     assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertEquals(val, ret.get(0).getStringValue(field.getName()));
-    assertObjs(getXObjHandler(), obj, ret.get(0));
+    assertObjs(getObjHandler(), obj, ret.get(0));
   }
 
   @Test
   public void test_createIfNotExists_exists() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().filter(classRef).createIfNotExists();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().createIfNotExists();
     verifyDefault();
     assertEquals(0, ret.size());
-    assertObjs(getXObjHandler(), obj);
+    assertObjs(getObjHandler(), obj);
   }
 
   @Test
@@ -464,16 +464,16 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), val);
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().filter(field, val).createIfNotExists();
+    List<BaseObject> ret = getObjHandler().filter(field, val).edit().createIfNotExists();
     verifyDefault();
     assertEquals(0, ret.size());
-    assertObjs(getXObjHandler(), obj);
+    assertObjs(getObjHandler(), obj);
   }
 
   @Test
   public void test_createIfNotExists_none() throws Exception {
     replayDefault();
-    List<BaseObject> ret = getXObjHandler().createIfNotExists();
+    List<BaseObject> ret = getObjHandler().edit().createIfNotExists();
     verifyDefault();
     assertEquals(0, ret.size());
   }
@@ -481,27 +481,27 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_remove() {
     BaseObject obj = addObj(classRef, null, null);
-    List<BaseObject> ret = getXObjHandler().remove();
+    List<BaseObject> ret = getObjHandler().edit().remove();
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(0));
-    assertObjs(getXObjHandler());
+    assertObjs(getObjHandler());
   }
 
   @Test
   public void test_remove_classRef() {
     BaseObject obj = addObj(classRef, null, null);
-    List<BaseObject> ret = getXObjHandler().filter(classRef).remove();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().remove();
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(0));
-    assertObjs(getXObjHandler());
+    assertObjs(getObjHandler());
   }
 
   @Test
   public void test_remove_none() {
     BaseObject obj = addObj(classRef2, null, null);
-    List<BaseObject> ret = getXObjHandler().filter(classRef).remove();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().remove();
     assertEquals(0, ret.size());
-    assertObjs(getXObjHandler(), obj);
+    assertObjs(getObjHandler(), obj);
   }
 
   @Test
@@ -509,11 +509,11 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    List<BaseObject> ret = getXObjHandler().filter(classRef).remove();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().remove();
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
     assertSame(obj3, ret.get(1));
-    assertObjs(getXObjHandler(), obj2);
+    assertObjs(getObjHandler(), obj2);
   }
 
   @Test
@@ -524,11 +524,11 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj2 = addObj(classRef, null, null);
     BaseObject obj3 = addObj(classRef, field.getName(), vals.get(1));
     BaseObject obj4 = addObj(classRef2, field.getName(), vals.get(0));
-    List<BaseObject> ret = getXObjHandler().filter(field, vals).remove();
+    List<BaseObject> ret = getObjHandler().filter(field, vals).edit().remove();
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
     assertSame(obj3, ret.get(1));
-    assertObjs(getXObjHandler(), obj2, obj4);
+    assertObjs(getObjHandler(), obj2, obj4);
   }
 
   private BaseObject addObj(ClassReference classRef, String key, String value) {
@@ -546,8 +546,8 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     return obj;
   }
 
-  private void assertObjs(XObjectHandler xObjHandler, BaseObject... expObjs) {
-    List<BaseObject> ret = xObjHandler.fetchList();
+  private void assertObjs(ObjectHandler objHandler, BaseObject... expObjs) {
+    List<BaseObject> ret = objHandler.fetch().list();
     assertEquals("not same size, objs: " + ret, expObjs.length, ret.size());
     for (int i = 0; i < ret.size(); i++) {
       assertSame("not same obj at " + i, expObjs[i], ret.get(i));
