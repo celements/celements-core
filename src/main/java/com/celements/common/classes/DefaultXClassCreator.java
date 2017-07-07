@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentSaveException;
@@ -84,7 +85,8 @@ public class DefaultXClassCreator implements XClassCreator {
   @Override
   public void createXClass(ClassDefinition classDef) throws XClassCreateException {
     LOGGER.debug("creating class '{}'", classDef.getName());
-    XWikiDocument classDoc = modelAccess.getOrCreateDocument(classDef.getClassRef());
+    XWikiDocument classDoc = modelAccess.getOrCreateDocument(
+        classDef.getClassReference().getDocRef());
     BaseClass bClass = generateXClass(classDef);
     if (!classDoc.getXClass().equals(bClass)) {
       try {
@@ -99,8 +101,9 @@ public class DefaultXClassCreator implements XClassCreator {
   @Override
   public BaseClass generateXClass(ClassDefinition classDef) {
     BaseClass bClass = new BaseClass();
-    bClass.setDocumentReference(classDef.getClassRef());
-    bClass.setXClassReference(classDef.getClassRef());
+    DocumentReference classDocRef = classDef.getClassReference().getDocRef();
+    bClass.setDocumentReference(classDocRef);
+    bClass.setXClassReference(classDocRef);
     if (classDef.isInternalMapping() && !bClass.hasInternalCustomMapping()) {
       bClass.setCustomMapping("internal");
     }

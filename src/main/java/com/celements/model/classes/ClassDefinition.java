@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -22,15 +23,25 @@ public interface ClassDefinition {
   public String getName();
 
   /**
+   * @return the class reference
+   */
+  @NotNull
+  public ClassReference getClassReference();
+
+  /**
+   * @deprecated instead use {{@link #getClassReference()}
    * @return the document reference on which the class is defined, using current wiki
    */
+  @Deprecated
   @NotNull
   public DocumentReference getClassRef();
 
   /**
+   * @deprecated instead use {{@link #getClassReference()}
    * @param wikiRef
    * @return the document reference on which the class is defined, using given wiki
    */
+  @Deprecated
   @NotNull
   public DocumentReference getClassRef(@NotNull WikiReference wikiRef);
 
