@@ -72,7 +72,7 @@ public class AttachmentURLCommand {
             + attName, exp);
         url = link;
       } catch (AttachmentNotExistsException anee) {
-        LOGGER.warn("Attachment not found for link [{}] and action [{}]", link, action, anee);
+        LOGGER.info("Attachment not found for link [{}] and action [{}]", link, action, anee);
         return null;
       }
     } else if (isOnDiskLink(link)) {
