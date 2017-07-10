@@ -27,7 +27,4 @@ public interface ObjectFetcher<D, O> {
   @NotNull
   Map<ClassReference, List<O>> map();
 
-  @NotNull
-  List<ClassReference> getClassRefs();
-
 }

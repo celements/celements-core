@@ -84,6 +84,7 @@ public class ObjectFilter {
   @ThreadSafe
   public class ObjectFilterView {
 
+    // TODO still mutable because map could change
     private ObjectFilterView() {
     }
 

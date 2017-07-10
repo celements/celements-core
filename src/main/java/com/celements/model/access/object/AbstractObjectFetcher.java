@@ -57,6 +57,7 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
   @Override
   public List<O> list() {
+    // TODO cache
     List<O> ret = new ArrayList<>();
     return FluentIterable.from(getClassRefs()).transformAndConcat(new ObjectFetchFunction()).filter(
         new ObjectFetchPredicate()).copyInto(ret);
@@ -64,14 +65,13 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
   @Override
   public Map<ClassReference, List<O>> map() {
+    // TODO cache
     Map<ClassReference, List<O>> ret = new LinkedHashMap<>();
     Predicate<O> predicate = new ObjectFetchPredicate();
     for (ClassReference classRef : getClassRefs()) {
       List<O> objs = new ArrayList<>();
       FluentIterable.from(getXObjects(classRef)).filter(predicate).copyInto(objs);
-      if (!objs.isEmpty()) {
-        ret.put(classRef, objs);
-      }
+      ret.put(classRef, objs);
     }
     return ret;
   }
@@ -120,8 +120,7 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
   protected abstract @NotNull <T> Optional<T> getObjectField(@NotNull O obj,
       @NotNull ClassField<T> field);
 
-  @Override
-  public List<ClassReference> getClassRefs() {
+  private List<ClassReference> getClassRefs() {
     List<ClassReference> ret = new ArrayList<>();
     if (!filter.isEmpty()) {
       ret.addAll(filter.getClassRefs());

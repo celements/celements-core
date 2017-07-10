@@ -17,6 +17,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 
 public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
 
@@ -36,19 +37,24 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
   }
 
   @Override
+  public ObjectFetcher<D, O> fetch() {
+    return fetcher;
+  }
+
+  @Override
   public List<O> create() {
-    return createInternal(false);
+    return createInternal(new ObjectCreateFunction(false));
   }
 
   @Override
   public List<O> createIfNotExists() {
-    return createInternal(true);
+    return createInternal(new ObjectCreateFunction(true));
   }
 
-  private List<O> createInternal(boolean ifNotExists) {
+  private List<O> createInternal(ObjectCreateFunction function) {
     List<O> ret = new ArrayList<>();
-    return FluentIterable.from(fetcher.getClassRefs()).transform(new ObjectCreateFunction(
-        ifNotExists)).filter(Predicates.notNull()).copyInto(ret);
+    return FluentIterable.from(filter.getClassRefs()).transform(function).filter(
+        Predicates.notNull()).copyInto(ret);
 
   }
 
@@ -73,11 +79,10 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
     }
 
     private boolean hasObj(ClassReference classRef) {
-      List<O> objs = fetcher.map().get(classRef);
+      List<O> objs = fetch().map().get(classRef);
       return (objs == null) || objs.isEmpty();
     }
 
-    // TODO why only first and not all?
     private <T> void setFirstValue(O obj, ClassField<T> field) {
       Optional<T> value = FluentIterable.from(filter.getValues(field)).first();
       if (value.isPresent()) {
@@ -93,9 +98,31 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
       @Nullable T value);
 
   @Override
+  public List<O> fetchOrCreate() {
+    List<O> ret = new ArrayList<>();
+    return FluentIterable.from(filter.getClassRefs()).transformAndConcat(
+        new ObjectFetchOrCreateFunction()).copyInto(ret);
+  }
+
+  private class ObjectFetchOrCreateFunction implements Function<ClassReference, List<O>> {
+
+    private ObjectCreateFunction createFunction = new ObjectCreateFunction(false);
+
+    @Override
+    public List<O> apply(ClassReference classRef) {
+      List<O> ret = fetch().map().get(classRef);
+      if (ret.isEmpty()) {
+        ret = ImmutableList.of(createFunction.apply(classRef));
+      }
+      return ret;
+    }
+
+  }
+
+  @Override
   public List<O> remove() {
     List<O> ret = new ArrayList<>();
-    return FluentIterable.from(fetcher.list()).filter(new ObjectRemovePredicate()).copyInto(ret);
+    return FluentIterable.from(fetch().list()).filter(new ObjectRemovePredicate()).copyInto(ret);
   }
 
   protected abstract boolean removeObject(@NotNull O obj);

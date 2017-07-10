@@ -9,10 +9,16 @@ import javax.validation.constraints.NotNull;
 public interface ObjectEditor<D, O> {
 
   @NotNull
+  ObjectFetcher<D, O> fetch();
+
+  @NotNull
   List<O> create();
 
   @NotNull
   List<O> createIfNotExists();
+
+  @NotNull
+  List<O> fetchOrCreate();
 
   @NotNull
   List<O> remove();

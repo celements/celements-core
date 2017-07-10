@@ -479,6 +479,28 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_fetchOrCreate_create() throws Exception {
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
+    replayDefault();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().fetchOrCreate();
+    verifyDefault();
+    assertEquals(1, ret.size());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
+    assertObjs(getObjHandler(), ret.get(0));
+  }
+
+  @Test
+  public void test_fetchOrCreate_fetch() throws Exception {
+    BaseObject obj = addObj(classRef, null, null);
+    replayDefault();
+    List<BaseObject> ret = getObjHandler().filter(classRef).edit().fetchOrCreate();
+    verifyDefault();
+    assertEquals(1, ret.size());
+    assertSame(obj, ret.get(0));
+    assertObjs(getObjHandler(), obj);
+  }
+
+  @Test
   public void test_remove() {
     BaseObject obj = addObj(classRef, null, null);
     List<BaseObject> ret = getObjHandler().edit().remove();
