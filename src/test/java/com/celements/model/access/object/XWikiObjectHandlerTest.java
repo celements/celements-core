@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
-public class DefaultXObjectHandlerTest extends AbstractComponentTest {
+public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   private WikiReference wikiRef;
   private XWikiDocument doc;
@@ -45,8 +45,8 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private ObjectHandler getObjHandler() {
-    return ObjectHandler.onDoc(doc);
+  private ObjectHandler<XWikiDocument, BaseObject> getObjHandler() {
+    return XWikiObjectHandler.onDoc(doc);
   }
 
   @Test
@@ -55,7 +55,7 @@ public class DefaultXObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        ObjectHandler.onDoc(null);
+        XWikiObjectHandler.onDoc(null);
       }
     }.evaluate();
   }

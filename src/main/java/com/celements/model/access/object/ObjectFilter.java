@@ -9,6 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
+
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.fields.ClassField;
@@ -16,6 +19,7 @@ import com.celements.model.classes.fields.ClassField;
 /**
  * Type Safe Heterogenous Container for object filtering
  */
+@NotThreadSafe
 public class ObjectFilter {
 
   ObjectFilter() {
@@ -77,6 +81,7 @@ public class ObjectFilter {
     return new ObjectFilterView();
   }
 
+  @ThreadSafe
   public class ObjectFilterView {
 
     private ObjectFilterView() {
