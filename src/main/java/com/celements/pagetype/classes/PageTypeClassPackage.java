@@ -8,6 +8,7 @@ import org.xwiki.component.annotation.Requirement;
 
 import com.celements.model.classes.AbstractClassPackage;
 import com.celements.model.classes.ClassDefinition;
+import com.google.common.base.Optional;
 
 @Component(PageTypeClassPackage.NAME)
 public class PageTypeClassPackage extends AbstractClassPackage {
@@ -25,6 +26,11 @@ public class PageTypeClassPackage extends AbstractClassPackage {
   @Override
   public List<? extends ClassDefinition> getClassDefinitions() {
     return new ArrayList<>(classDefs);
+  }
+
+  @Override
+  protected Optional<String> getLegacyName() {
+    return Optional.of("celPageTypeClasses");
   }
 
 }
