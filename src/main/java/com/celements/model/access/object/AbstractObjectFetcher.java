@@ -6,17 +6,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.ObjectFilter.ObjectFilterView;
+import com.celements.model.access.object.filter.ObjectFilterView;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 
 public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
@@ -55,25 +57,30 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
   protected abstract int getObjectNumber(@NotNull O obj);
 
+  private List<O> cacheList;
+
   @Override
   public List<O> list() {
-    // TODO cache
-    List<O> ret = new ArrayList<>();
-    return FluentIterable.from(getClassRefs()).transformAndConcat(new ObjectFetchFunction()).filter(
-        new ObjectFetchPredicate()).copyInto(ret);
+    if (cacheList == null) {
+      cacheList = FluentIterable.from(getClassRefs()).transformAndConcat(
+          new ObjectFetchFunction()).filter(new ObjectFetchPredicate()).toList();
+    }
+    return cacheList;
   }
+
+  private Map<ClassReference, List<O>> cacheMap;
 
   @Override
   public Map<ClassReference, List<O>> map() {
-    // TODO cache
-    Map<ClassReference, List<O>> ret = new LinkedHashMap<>();
-    Predicate<O> predicate = new ObjectFetchPredicate();
-    for (ClassReference classRef : getClassRefs()) {
-      List<O> objs = new ArrayList<>();
-      FluentIterable.from(getXObjects(classRef)).filter(predicate).copyInto(objs);
-      ret.put(classRef, objs);
+    if (cacheMap == null) {
+      Map<ClassReference, List<O>> map = new LinkedHashMap<>();
+      Predicate<O> predicate = new ObjectFetchPredicate();
+      for (ClassReference classRef : getClassRefs()) {
+        map.put(classRef, FluentIterable.from(getXObjects(classRef)).filter(predicate).toList());
+      }
+      cacheMap = ImmutableMap.copyOf(map);
     }
-    return ret;
+    return cacheMap;
   }
 
   private class ObjectFetchFunction implements Function<ClassReference, List<O>> {
@@ -91,8 +98,8 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
     @Override
     public boolean apply(O obj) {
-      return !filter.hasFields(getObjectClassRef(obj)) || FluentIterable.from(filter.getFields(
-          getObjectClassRef(obj))).allMatch(getClassFieldPrediate(obj));
+      Set<ClassField<?>> fields = filter.getFields(getObjectClassRef(obj));
+      return fields.isEmpty() || FluentIterable.from(fields).allMatch(getClassFieldPrediate(obj));
     }
 
     private Predicate<ClassField<?>> getClassFieldPrediate(final O obj) {
@@ -106,7 +113,7 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
         private <T> boolean applyFilter(ClassField<T> field) {
           Optional<T> value = getObjectField(obj, field);
           if (value.isPresent()) {
-            return filter.hasValue(field, value.get());
+            return filter.getValues(field).contains(value.get());
           } else {
             return filter.isAbsent(field);
           }

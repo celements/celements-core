@@ -11,8 +11,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class XWikiObjectHandler extends AbstractObjectHandler<XWikiDocument, BaseObject> {
 
-  public static @NotNull ObjectHandler<XWikiDocument, BaseObject> onDoc(
-      @NotNull XWikiDocument doc) {
+  public static @NotNull XWikiObjectHandler onDoc(@NotNull XWikiDocument doc) {
     return new XWikiObjectHandler(doc);
   }
 
@@ -23,12 +22,12 @@ public class XWikiObjectHandler extends AbstractObjectHandler<XWikiDocument, Bas
   }
 
   @Override
-  public ObjectFetcher<XWikiDocument, BaseObject> fetch() {
+  public XWikiObjectFetcher fetch() {
     return new XWikiObjectFetcher(getDoc(), getFilter());
   }
 
   @Override
-  public ObjectEditor<XWikiDocument, BaseObject> edit() {
+  public XWikiObjectEditor edit() {
     return new XWikiObjectEditor(getDoc(), getFilter());
   }
 

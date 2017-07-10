@@ -9,7 +9,7 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.IModelAccessFacade;
-import com.celements.model.access.object.ObjectFilter.ObjectFilterView;
+import com.celements.model.access.object.filter.ObjectFilterView;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;

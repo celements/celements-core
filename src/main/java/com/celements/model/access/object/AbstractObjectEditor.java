@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.ObjectFilter.ObjectFilterView;
+import com.celements.model.access.object.filter.ObjectFilterView;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;

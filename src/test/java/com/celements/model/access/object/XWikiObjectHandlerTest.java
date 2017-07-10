@@ -45,7 +45,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private ObjectHandler<XWikiDocument, BaseObject> getObjHandler() {
+  private XWikiObjectHandler getObjHandler() {
     return XWikiObjectHandler.onDoc(doc);
   }
 
@@ -313,9 +313,15 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_fetchList_unmodifiable() throws Exception {
+  public void test_fetchList_immutability() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    getObjHandler().fetch().list().remove(0); // may not remove obj from doc
+    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getObjHandler().fetch().list().remove(0);
+      }
+    }.evaluate();
     assertObjs(getObjHandler(), obj);
   }
 
@@ -346,12 +352,35 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_fetchMap_unmodifiable() throws Exception {
+  public void test_fetchMap_immutability() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    getObjHandler().fetch().map().remove(classRef); // may not remove obj from doc
+    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getObjHandler().fetch().map().remove(classRef);
+      }
+    }.evaluate();
     assertObjs(getObjHandler(), obj);
-    getObjHandler().fetch().map().get(classRef).remove(0); // may not remove obj from doc
+    new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        getObjHandler().fetch().map().get(classRef).remove(0);
+      }
+    }.evaluate();
     assertObjs(getObjHandler(), obj);
+  }
+
+  @Test
+  public void test_fetch_immutability() {
+    XWikiObjectHandler handler = getObjHandler();
+    handler.filter(classRef);
+    assertEquals(1, handler.fetch().map().size());
+    XWikiObjectFetcher fetcher = handler.fetch();
+    handler.filter(classRef2);
+    assertEquals(2, handler.fetch().map().size());
+    assertEquals("fetcher was also mutated by second handler mutation", 1, fetcher.map().size());
   }
 
   @Test
@@ -568,7 +597,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     return obj;
   }
 
-  private void assertObjs(ObjectHandler objHandler, BaseObject... expObjs) {
+  private void assertObjs(ObjectHandler<?, BaseObject> objHandler, BaseObject... expObjs) {
     List<BaseObject> ret = objHandler.fetch().list();
     assertEquals("not same size, objs: " + ret, expObjs.length, ret.size());
     for (int i = 0; i < ret.size(); i++) {
