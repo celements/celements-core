@@ -26,6 +26,7 @@ import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
@@ -240,7 +241,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     addObj(classRef, null, null);
     Optional<BaseObject> ret = getObjHandler().fetch().first();
     assertTrue(ret.isPresent());
-    assertSame(obj1, ret.get());
+    assertEqualObjs(obj1, ret.get());
   }
 
   @Test
@@ -268,7 +269,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     addObj(classRef, null, null);
     Optional<BaseObject> ret = getObjHandler().fetch().number(obj1.getNumber());
     assertTrue(ret.isPresent());
-    assertSame(obj1, ret.get());
+    assertEqualObjs(obj1, ret.get());
   }
 
   @Test
@@ -296,9 +297,9 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj3 = addObj(classRef, null, null);
     List<BaseObject> ret = getObjHandler().fetch().list();
     assertEquals(3, ret.size());
-    assertSame(obj1, ret.get(0));
-    assertSame(obj3, ret.get(1));
-    assertSame(obj2, ret.get(2));
+    assertEqualObjs(obj1, ret.get(0));
+    assertEqualObjs(obj3, ret.get(1));
+    assertEqualObjs(obj2, ret.get(2));
   }
 
   @Test
@@ -598,11 +599,29 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     return obj;
   }
 
-  private void assertObjs(ObjectHandler<?, BaseObject> objHandler, BaseObject... expObjs) {
+  private static void assertObjs(ObjectHandler<?, BaseObject> objHandler, BaseObject... expObjs) {
     List<BaseObject> ret = objHandler.fetch().list();
     assertEquals("not same size, objs: " + ret, expObjs.length, ret.size());
     for (int i = 0; i < ret.size(); i++) {
-      assertSame("not same obj at " + i, expObjs[i], ret.get(i));
+      assertNotSame("obj not cloned at " + i, expObjs[i], ret.get(i));
+      assertEqualObjs(expObjs[i], ret.get(i));
+    }
+  }
+
+  private static void assertEqualObjs(BaseObject exp, BaseObject act) {
+    assertEquals(exp.getDocumentReference(), act.getDocumentReference());
+    assertEquals(exp.getXClassReference(), act.getXClassReference());
+    assertEquals(exp.getNumber(), act.getNumber());
+    assertEquals(exp.getPropertyList().size(), act.getPropertyList().size());
+    for (String propName : exp.getPropertyList()) {
+      try {
+        BaseProperty expProp = (BaseProperty) exp.get(propName);
+        BaseProperty actProp = (BaseProperty) act.get(propName);
+        assertEquals(expProp.getName(), actProp.getName());
+        assertEquals(expProp.getValue(), actProp.getValue());
+      } catch (XWikiException xwe) {
+        throw new RuntimeException(xwe);
+      }
     }
   }
 

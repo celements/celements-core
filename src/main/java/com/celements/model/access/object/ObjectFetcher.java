@@ -87,6 +87,7 @@ public final class ObjectFetcher<D, O> {
       Map<ClassReference, List<O>> map = new LinkedHashMap<>();
       Predicate<O> predicate = new ObjectFetchPredicate();
       for (ClassReference classRef : getClassRefs()) {
+        // TODO clone
         map.put(classRef, FluentIterable.from(bridge.getObjects(classRef)).filter(
             predicate).toList());
       }
