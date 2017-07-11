@@ -28,7 +28,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.ModelAccessRuntimeException;
 import com.celements.model.access.object.ObjectFetcher;
-import com.celements.model.access.object.XWikiObjectHandler;
+import com.celements.model.access.object.xwiki.XWikiObjectHandler;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;

@@ -1,32 +1,57 @@
 package com.celements.model.access.object;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.Collection;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
+import com.celements.model.access.object.filter.ObjectFilter;
 import com.celements.model.classes.fields.ClassField;
 
-@NotThreadSafe
-public interface ObjectHandler<D, O> {
+public class ObjectHandler<D, O> {
 
-  @NotNull
-  ObjectHandler<D, O> filter(@NotNull ClassReference classRef);
+  private final D doc;
+  private final ObjectBridge<D, O> bridge;
+  private final ObjectFilter filter = new ObjectFilter();
 
-  @NotNull
-  <T> ObjectHandler<D, O> filter(@NotNull ClassField<T> field, @NotNull T value);
+  protected ObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge) {
+    this.doc = checkNotNull(doc);
+    this.bridge = checkNotNull(bridge);
+  }
 
-  @NotNull
-  <T> ObjectHandler<D, O> filter(@NotNull ClassField<T> field, @NotNull Collection<T> values);
+  public final ObjectHandler<D, O> filter(ClassReference classRef) {
+    filter.add(checkNotNull(classRef));
+    return this;
+  }
 
-  @NotNull
-  ObjectHandler<D, O> filterAbsent(@NotNull ClassField<?> field);
+  public final <T> ObjectHandler<D, O> filter(ClassField<T> field, T value) {
+    filter.add(checkNotNull(field), checkNotNull(value));
+    return this;
+  }
 
-  @NotNull
-  ObjectFetcher<D, O> fetch();
+  public final <T> ObjectHandler<D, O> filter(ClassField<T> field, Collection<T> values) {
+    checkNotNull(field);
+    checkArgument(!checkNotNull(values).isEmpty(), "cannot filter for empty value list");
+    for (T value : values) {
+      filter.add(field, value);
+    }
+    return this;
+  }
 
-  @NotNull
-  ObjectEditor<D, O> edit();
+  public final ObjectHandler<D, O> filterAbsent(ClassField<?> field) {
+    filter.addAbsent(checkNotNull(field));
+    return this;
+  }
+
+  public final ObjectFetcher<D, O> fetch() {
+    return new ObjectFetcher<>(doc, filter.createView(), bridge);
+  }
+
+  public final ObjectEditor<D, O> edit() {
+    return new ObjectEditor<>(doc, filter.createView(), bridge);
+  }
+
 }

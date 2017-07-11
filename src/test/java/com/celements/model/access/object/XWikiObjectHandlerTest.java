@@ -18,6 +18,7 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.access.object.xwiki.XWikiObjectHandler;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
@@ -377,7 +378,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     XWikiObjectHandler handler = getObjHandler();
     handler.filter(classRef);
     assertEquals(1, handler.fetch().map().size());
-    XWikiObjectFetcher fetcher = handler.fetch();
+    ObjectFetcher<XWikiDocument, BaseObject> fetcher = handler.fetch();
     handler.filter(classRef2);
     assertEquals(2, handler.fetch().map().size());
     assertEquals("fetcher was also mutated by second handler mutation", 1, fetcher.map().size());
