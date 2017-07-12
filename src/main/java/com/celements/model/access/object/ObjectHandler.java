@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.Collection;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -12,15 +13,26 @@ import com.celements.model.access.object.filter.ObjectFilter;
 import com.celements.model.access.object.filter.ObjectFilterView;
 import com.celements.model.classes.fields.ClassField;
 
+@NotThreadSafe
 public class ObjectHandler<D, O> {
 
   private final D doc;
   private final ObjectBridge<D, O> bridge;
-  private final ObjectFilter filter = new ObjectFilter();
+  private final ObjectFilter filter;
 
-  protected ObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge) {
+  private ObjectHandler(D doc, ObjectBridge<D, O> bridge, ObjectFilter filter) {
     this.doc = checkNotNull(doc);
     this.bridge = checkNotNull(bridge);
+    this.filter = checkNotNull(filter);
+  }
+
+  protected ObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge) {
+    this(doc, bridge, new ObjectFilter());
+  }
+
+  protected ObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge,
+      @NotNull ObjectFilterView filterView) {
+    this(doc, bridge, checkNotNull(filterView).getFilter());
   }
 
   public final ObjectFilterView getFilter() {

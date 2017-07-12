@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -20,6 +21,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 
+@Immutable
 public final class ObjectFetcher<D, O> {
 
   private final D doc;
@@ -143,6 +145,10 @@ public final class ObjectFetcher<D, O> {
       ret.addAll(bridge.getDocClassRefs());
     }
     return ret;
+  }
+
+  public ObjectHandler<D, O> handle() {
+    return new ObjectHandler<>(doc, bridge, filter);
   }
 
 }

@@ -10,6 +10,11 @@ import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.fields.ClassField;
 
+/**
+ * View for an {@link ObjectFilter}
+ *
+ * @author Marc Sladek
+ */
 @Immutable
 public class ObjectFilterView {
 
@@ -17,6 +22,10 @@ public class ObjectFilterView {
 
   ObjectFilterView(ObjectFilter filter) {
     this.filter = filter.clone();
+  }
+
+  public @NotNull ObjectFilter getFilter() {
+    return filter.clone();
   }
 
   public boolean isEmpty() {
