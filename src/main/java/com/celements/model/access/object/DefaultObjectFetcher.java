@@ -3,7 +3,6 @@ package com.celements.model.access.object;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +18,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.Iterables;
 
 @Immutable
 public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
@@ -67,42 +69,19 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
     });
   }
 
-  private List<O> cacheList;
-
   @Override
   public List<O> list() {
-    if (cacheList == null) {
-      cacheList = FluentIterable.from(getClassRefs()).transformAndConcat(
-          new ObjectFetchFunction()).filter(new ObjectFetchPredicate()).transform(
-              new ObjectCloner()).toList();
-    }
-    return cacheList;
+    return ImmutableList.copyOf(Iterables.concat(map().values()));
   }
-
-  private Map<ClassReference, List<O>> cacheMap;
 
   @Override
   public Map<ClassReference, List<O>> map() {
-    if (cacheMap == null) {
-      Map<ClassReference, List<O>> map = new LinkedHashMap<>();
-      for (ClassReference classRef : getClassRefs()) {
-        List<O> objs = new ObjectFetchFunction().apply(classRef);
-        objs = FluentIterable.from(objs).filter(new ObjectFetchPredicate()).transform(
-            new ObjectCloner()).toList();
-        map.put(classRef, objs);
-      }
-      cacheMap = ImmutableMap.copyOf(map);
+    Builder<ClassReference, List<O>> builder = ImmutableMap.builder();
+    for (ClassReference classRef : getClassRefs()) {
+      builder.put(classRef, FluentIterable.from(bridge.getObjects(classRef)).filter(
+          new ObjectFetchPredicate()).transform(new ObjectCloner()).toList());
     }
-    return cacheMap;
-  }
-
-  private class ObjectFetchFunction implements Function<ClassReference, List<O>> {
-
-    @Override
-    public List<O> apply(ClassReference classRef) {
-      return FluentIterable.from(bridge.getObjects(classRef)).toList();
-    }
-
+    return builder.build();
   }
 
   private class ObjectFetchPredicate implements Predicate<O> {
