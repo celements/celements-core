@@ -39,9 +39,10 @@ public abstract class AbstractClassPackage implements ClassPackage {
   private boolean checkLegacyFallback() {
     boolean ret = false;
     if (getLegacyName().isPresent()) {
-      String preferences = "," + context.getXWikiContext().getWiki().getXWikiPreference(
-          "activated_classcollections", context.getXWikiContext()) + ",";
-      ret = preferences.contains("," + getLegacyName().get() + ",");
+      String prefs = context.getXWikiContext().getWiki().getXWikiPreference(
+          "activated_classcollections", context.getXWikiContext());
+      prefs += "," + context.getXWikiContext().getWiki().Param("celements.classcollections", "");
+      ret = ("," + prefs + ",").contains("," + getLegacyName().get() + ",");
       LOGGER.debug("{}: checkLegacyFallback '{}' for legacy name '{}'", getName(), ret,
           getLegacyName().get());
     }

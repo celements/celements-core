@@ -6,6 +6,8 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
+import com.google.common.base.Optional;
+
 @Component(TestClassPackage.NAME)
 public class TestClassPackage extends AbstractClassPackage {
 
@@ -22,6 +24,17 @@ public class TestClassPackage extends AbstractClassPackage {
   @Override
   public List<? extends ClassDefinition> getClassDefinitions() {
     return new ArrayList<>(classDefs);
+  }
+
+  String legacyName;
+
+  @Override
+  protected Optional<String> getLegacyName() {
+    return Optional.fromNullable(legacyName);
+  }
+
+  public void setLegacyName(String legacyName) {
+    this.legacyName = legacyName;
   }
 
 }

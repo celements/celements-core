@@ -31,10 +31,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ClassReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.model.access.ModelMock;
+import com.celements.model.access.ModelMock.DocRecord;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
@@ -63,8 +64,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_notActive() throws Exception {
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        Collections.emptyList()).anyTimes();
+    expectActive(Collections.<String>emptyList(), "");
 
     replayDefault();
     creator.createXClasses();
@@ -73,10 +73,8 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_blacklisted() throws Exception {
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        Arrays.asList(classPackage.getName())).anyTimes();
-    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
-        Arrays.asList(classDef.getName())).anyTimes();
+    expectActive(Arrays.asList(classPackage.getName()), "");
+    expectBlacklist(Arrays.asList(classDef.getName()));
 
     replayDefault();
     creator.createXClasses();
@@ -85,20 +83,18 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses() throws Exception {
-    DocumentReference docRef = classDef.getClassRef();
-    XWikiDocument doc = modelMock.registerDoc(docRef).doc();
+    ClassReference classRef = classDef.getClassReference();
+    XWikiDocument doc = modelMock.registerDoc(classRef.getDocRef()).doc();
 
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        Arrays.asList(classPackage.getName())).anyTimes();
-    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
-        null).anyTimes();
+    expectActive(Arrays.asList(classPackage.getName()), "");
+    expectBlacklist(Collections.<String>emptyList());
 
     replayDefault();
     creator.createXClasses();
     creator.createXClasses(); // save is only called once
     verifyDefault();
 
-    assertEquals(1, modelMock.getDocRecord(docRef).getSavedCount());
+    assertEquals(1, modelMock.getDocRecord(classRef.getDocRef()).getSavedCount());
     assertEquals(classDef.isInternalMapping(), doc.getXClass().hasInternalCustomMapping());
     @SuppressWarnings("unchecked")
     List<BaseCollection> xFields = new ArrayList<>(doc.getXClass().getFieldList());
@@ -109,6 +105,35 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
       assertNotNull(xField);
       assertEquals(field.getName(), xField.getName());
     }
+  }
+
+  @Test
+  public void test_createXClasses_legacy() throws Exception {
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
+    String legacyName = "asdf";
+    ((TestClassPackage) classPackage).setLegacyName(legacyName);
+
+    expectActive(Collections.<String>emptyList(), legacyName);
+    expectBlacklist(Collections.<String>emptyList());
+
+    replayDefault();
+    creator.createXClasses();
+    verifyDefault();
+
+    assertEquals(1, record.getSavedCount());
+  }
+
+  private void expectActive(List<String> ret, String legacy) {
+    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
+        ret).anyTimes();
+    expect(getWikiMock().getXWikiPreference("activated_classcollections", getContext())).andReturn(
+        legacy).anyTimes();
+    expect(getWikiMock().Param("celements.classcollections", "")).andReturn("").anyTimes();
+  }
+
+  private void expectBlacklist(List<String> ret) {
+    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
+        ret).anyTimes();
   }
 
 }
