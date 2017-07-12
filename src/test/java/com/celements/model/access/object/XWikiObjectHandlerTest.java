@@ -48,7 +48,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   }
 
   private XWikiObjectHandler getObjHandler() {
-    return XWikiObjectHandler.onDoc(doc);
+    return XWikiObjectHandler.on(doc);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        XWikiObjectHandler.onDoc(null);
+        XWikiObjectHandler.on(null);
       }
     }.evaluate();
   }
@@ -389,18 +389,18 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   public void test_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(classRef).edit().create();
+    Map<ClassReference, BaseObject> ret = getObjHandler().filter(classRef).edit().create();
     verifyDefault();
     assertEquals(1, ret.size());
-    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertObjs(getObjHandler(), ret.get(0));
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
+    assertObjs(getObjHandler(), ret.get(classRef));
   }
 
   @Test
   public void test_create_notClone() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    BaseObject ret = getObjHandler().filter(classRef).edit().create().get(0);
+    BaseObject ret = getObjHandler().filter(classRef).edit().create().get(classRef);
     verifyDefault();
     // changing a property affects the doc
     ret.setStringValue(TestClassDefinition.FIELD_MY_STRING.getName(), "asdf");
@@ -418,21 +418,21 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     int val = 2;
     expectNewBaseObject(classRef2.getDocRef(wikiRef));
     replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(field1, vals).filter(field2, val).filter(
-        classRef2).edit().create();
+    Map<ClassReference, BaseObject> ret = getObjHandler().filter(field1, vals).filter(field2,
+        val).filter(classRef2).edit().create();
     verifyDefault();
     assertEquals(2, ret.size());
-    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertTrue(vals.contains(ret.get(0).getStringValue(field1.getName())));
-    assertEquals(val, ret.get(0).getIntValue(field2.getName()));
-    assertEquals(classRef2.getDocRef(wikiRef), ret.get(1).getXClassReference());
-    assertObjs(getObjHandler(), ret.get(0), ret.get(1));
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
+    assertTrue(vals.contains(ret.get(classRef).getStringValue(field1.getName())));
+    assertEquals(val, ret.get(classRef).getIntValue(field2.getName()));
+    assertEquals(classRef2.getDocRef(wikiRef), ret.get(classRef2).getXClassReference());
+    assertObjs(getObjHandler(), ret.get(classRef), ret.get(classRef2));
   }
 
   @Test
   public void test_create_none() throws Exception {
     replayDefault();
-    List<BaseObject> ret = getObjHandler().edit().create();
+    Map<ClassReference, BaseObject> ret = getObjHandler().edit().create();
     verifyDefault();
     assertEquals(0, ret.size());
   }
@@ -466,11 +466,12 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   public void test_createIfNotExists_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(classRef).edit().createIfNotExists();
+    Map<ClassReference, BaseObject> ret = getObjHandler().filter(
+        classRef).edit().createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
-    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertObjs(getObjHandler(), ret.get(0));
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
+    assertObjs(getObjHandler(), ret.get(classRef));
   }
 
   @Test
@@ -481,22 +482,25 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wikiRef));
     expect(bClass.get(field.getName())).andReturn(new StringClass()).once();
     replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(field, val).edit().createIfNotExists();
+    Map<ClassReference, BaseObject> ret = getObjHandler().filter(field,
+        val).edit().createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
-    assertNotSame(obj, ret.get(0));
-    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertEquals(val, ret.get(0).getStringValue(field.getName()));
-    assertObjs(getObjHandler(), obj, ret.get(0));
+    assertNotSame(obj, ret.get(classRef));
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
+    assertEquals(val, ret.get(classRef).getStringValue(field.getName()));
+    assertObjs(getObjHandler(), obj, ret.get(classRef));
   }
 
   @Test
   public void test_createIfNotExists_exists() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
     replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(classRef).edit().createIfNotExists();
+    Map<ClassReference, BaseObject> ret = getObjHandler().filter(
+        classRef).edit().createIfNotExists();
     verifyDefault();
-    assertEquals(0, ret.size());
+    assertEquals(1, ret.size());
+    assertSame(obj, ret.get(classRef));
     assertObjs(getObjHandler(), obj);
   }
 
@@ -506,40 +510,20 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), val);
     replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(field, val).edit().createIfNotExists();
+    Map<ClassReference, BaseObject> ret = getObjHandler().filter(field,
+        val).edit().createIfNotExists();
     verifyDefault();
-    assertEquals(0, ret.size());
+    assertEquals(1, ret.size());
+    assertSame(obj, ret.get(classRef));
     assertObjs(getObjHandler(), obj);
   }
 
   @Test
   public void test_createIfNotExists_none() throws Exception {
     replayDefault();
-    List<BaseObject> ret = getObjHandler().edit().createIfNotExists();
+    Map<ClassReference, BaseObject> ret = getObjHandler().edit().createIfNotExists();
     verifyDefault();
     assertEquals(0, ret.size());
-  }
-
-  @Test
-  public void test_fetchOrCreate_create() throws Exception {
-    expectNewBaseObject(classRef.getDocRef(wikiRef));
-    replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(classRef).edit().fetchOrCreate();
-    verifyDefault();
-    assertEquals(1, ret.size());
-    assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
-    assertObjs(getObjHandler(), ret.get(0));
-  }
-
-  @Test
-  public void test_fetchOrCreate_fetch() throws Exception {
-    BaseObject obj = addObj(classRef, null, null);
-    replayDefault();
-    List<BaseObject> ret = getObjHandler().filter(classRef).edit().fetchOrCreate();
-    verifyDefault();
-    assertEquals(1, ret.size());
-    assertSame(obj, ret.get(0));
-    assertObjs(getObjHandler(), obj);
   }
 
   @Test

@@ -2,9 +2,10 @@ package com.celements.model.access.object;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -14,40 +15,30 @@ import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 
+@Immutable
 public final class ObjectEditor<D, O> {
 
+  private final D doc;
   private final ObjectFilterView filter;
   private final ObjectBridge<D, O> bridge;
   private final ObjectFetcher<D, O> fetcher;
 
   ObjectEditor(@NotNull D doc, @NotNull ObjectFilterView filter,
       @NotNull ObjectBridge<D, O> bridge) {
+    this.doc = checkNotNull(doc);
     this.filter = checkNotNull(filter);
     this.bridge = checkNotNull(bridge);
     this.fetcher = new ObjectFetcher<>(doc, filter, bridge, false);
   }
 
-  public ObjectFetcher<D, O> fetch() {
-    return fetcher;
+  public Map<ClassReference, O> create() {
+    return FluentIterable.from(filter.getClassRefs()).toMap(new ObjectCreateFunction(false));
   }
 
-  public List<O> create() {
-    return createInternal(new ObjectCreateFunction(false));
-  }
-
-  public List<O> createIfNotExists() {
-    return createInternal(new ObjectCreateFunction(true));
-  }
-
-  private List<O> createInternal(ObjectCreateFunction function) {
-    List<O> ret = new ArrayList<>();
-    return FluentIterable.from(filter.getClassRefs()).transform(function).filter(
-        Predicates.notNull()).copyInto(ret);
-
+  public Map<ClassReference, O> createIfNotExists() {
+    return FluentIterable.from(filter.getClassRefs()).toMap(new ObjectCreateFunction(true));
   }
 
   private class ObjectCreateFunction implements Function<ClassReference, O> {
@@ -60,26 +51,24 @@ public final class ObjectEditor<D, O> {
 
     @Override
     public O apply(ClassReference classRef) {
-      O obj = null;
-      if (!ifNotExists || hasObj(classRef)) {
-        obj = bridge.createObject(classRef);
-        updateFields(obj);
+      Optional<O> obj = Optional.absent();
+      if (ifNotExists) {
+        obj = handle().filter(classRef).edit().fetch().first();
       }
-      return obj;
-    }
-
-    private boolean hasObj(ClassReference classRef) {
-      List<O> objs = fetch().map().get(classRef);
-      return (objs == null) || objs.isEmpty();
+      if (!obj.isPresent()) {
+        obj = Optional.of(updateFields(bridge.createObject(classRef)));
+      }
+      return obj.get();
     }
 
   }
 
-  private void updateFields(O obj) {
+  private O updateFields(O obj) {
     ClassReference classRef = bridge.getObjectClassRef(obj);
     for (ClassField<?> field : filter.getFields(classRef)) {
       setFirstValue(obj, field);
     }
+    return obj;
   }
 
   private <T> void setFirstValue(O obj, ClassField<T> field) {
@@ -89,30 +78,8 @@ public final class ObjectEditor<D, O> {
     }
   }
 
-  public List<O> fetchOrCreate() {
-    List<O> ret = new ArrayList<>();
-    return FluentIterable.from(filter.getClassRefs()).transformAndConcat(
-        new ObjectFetchOrCreateFunction()).copyInto(ret);
-  }
-
-  private class ObjectFetchOrCreateFunction implements Function<ClassReference, List<O>> {
-
-    private ObjectCreateFunction createFunction = new ObjectCreateFunction(false);
-
-    @Override
-    public List<O> apply(ClassReference classRef) {
-      List<O> ret = fetch().map().get(classRef);
-      if (ret.isEmpty()) {
-        ret = ImmutableList.of(createFunction.apply(classRef));
-      }
-      return ret;
-    }
-
-  }
-
   public List<O> remove() {
-    List<O> ret = new ArrayList<>();
-    return FluentIterable.from(fetch().list()).filter(new ObjectRemovePredicate()).copyInto(ret);
+    return FluentIterable.from(fetch().list()).filter(new ObjectRemovePredicate()).toList();
   }
 
   private class ObjectRemovePredicate implements Predicate<O> {
@@ -122,6 +89,14 @@ public final class ObjectEditor<D, O> {
       return bridge.removeObject(obj);
     }
 
+  }
+
+  public ObjectHandler<D, O> handle() {
+    return new ObjectHandler<>(doc, bridge, filter);
+  }
+
+  public ObjectFetcher<D, O> fetch() {
+    return fetcher;
   }
 
 }

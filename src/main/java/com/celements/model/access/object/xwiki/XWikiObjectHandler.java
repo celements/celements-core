@@ -8,12 +8,20 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class XWikiObjectHandler extends ObjectHandler<XWikiDocument, BaseObject> {
 
-  public static XWikiObjectHandler onDoc(@NotNull XWikiDocument doc) {
+  public static XWikiObjectHandler on(@NotNull XWikiDocument doc) {
     return new XWikiObjectHandler(doc);
   }
 
-  private XWikiObjectHandler(@NotNull XWikiDocument doc) {
+  public static XWikiObjectHandler from(@NotNull XWikiObjectHandler handler) {
+    return new XWikiObjectHandler(handler);
+  }
+
+  private XWikiObjectHandler(XWikiDocument doc) {
     super(doc, new XWikiObjectBridge(doc));
+  }
+
+  private XWikiObjectHandler(XWikiObjectHandler handler) {
+    super(handler.getDoc(), handler.getBridge(), handler.getFilter());
   }
 
 }

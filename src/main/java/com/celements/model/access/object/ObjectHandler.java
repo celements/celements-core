@@ -35,6 +35,14 @@ public class ObjectHandler<D, O> {
     this(doc, bridge, checkNotNull(filterView).getFilter());
   }
 
+  protected final D getDoc() {
+    return doc;
+  }
+
+  protected final ObjectBridge<D, O> getBridge() {
+    return bridge;
+  }
+
   public final ObjectFilterView getFilter() {
     return filter.createView();
   }
