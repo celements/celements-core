@@ -651,7 +651,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void test_newXObject() throws Exception {
     XWikiDocument docMock = createDocMock(doc.getDocumentReference());
     expectDefaultLang(docMock);
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
     replayDefault();
     BaseObject ret = modelAccess.newXObject(docMock, classRef);
@@ -679,7 +679,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   public void test_newXObject_otherWikiRef() throws Exception {
     XWikiDocument docMock = createDocMock(doc.getDocumentReference());
     expectDefaultLang(docMock);
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
     classRef = new DocumentReference("otherWiki", classRef.getLastSpaceReference().getName(),
         classRef.getName());
@@ -777,10 +777,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_String() throws Exception {
-    BaseObject obj = new BaseObject();
     String name = "name";
     String val = "val";
-    obj.setStringValue(name, val);
+    BaseObject obj = createObj(classRef, name, val);
 
     replayDefault();
     Object ret = modelAccess.getProperty(obj, name);
@@ -791,10 +790,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_String_emptyString() throws Exception {
-    BaseObject obj = new BaseObject();
     String name = "name";
     String val = "";
-    obj.setStringValue(name, val);
+    BaseObject obj = createObj(classRef, name, val);
 
     replayDefault();
     Object ret = modelAccess.getProperty(obj, name);
@@ -805,7 +803,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_Number() throws Exception {
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     String name = "name";
     int val = 5;
     obj.setIntValue(name, val);
@@ -819,7 +817,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_Date() throws Exception {
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     String name = "name";
     Date val = new Date();
     obj.setDateValue(name, val);
@@ -833,7 +831,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_Date_Timestamp() throws Exception {
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     String name = "name";
     Date date = new Date();
     Timestamp val = new Timestamp(date.getTime());
@@ -1029,8 +1027,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_String() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
     String val = "val";
 
@@ -1046,8 +1043,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_Number() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
     long val = 5;
 
@@ -1063,8 +1059,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_Date() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
     Date val = new Date();
 
@@ -1080,8 +1075,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_List() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
 
     expectPropertyClass(classRef, name, new StringClass());
@@ -1233,12 +1227,21 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   }
 
   private BaseObject addObj(DocumentReference classRef, String key, String value) {
+    BaseObject obj = createObj(classRef, key, value);
+    doc.addXObject(obj);
+    return obj;
+  }
+
+  private BaseObject createObj(DocumentReference classRef) {
+    return createObj(classRef, null, null);
+  }
+
+  private BaseObject createObj(DocumentReference classRef, String key, String value) {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     if (key != null) {
       obj.setStringValue(key, value);
     }
-    doc.addXObject(obj);
     return obj;
   }
 
