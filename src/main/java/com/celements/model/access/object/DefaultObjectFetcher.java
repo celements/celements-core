@@ -42,14 +42,13 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
     this.clone = clone;
   }
 
-  @NotNull
   D getDoc() {
     return this.doc;
   }
 
   @Override
-  public boolean hasValues() {
-    return !list().isEmpty();
+  public boolean isEmpty() {
+    return list().isEmpty();
   }
 
   @Override

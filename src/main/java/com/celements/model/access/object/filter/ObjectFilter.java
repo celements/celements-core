@@ -10,14 +10,12 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.DefaultObjectHandler;
+import com.celements.model.access.object.ObjectHandler;
 import com.celements.model.classes.fields.ClassField;
 
 /**
  * "Type Safe Heterogeneous Container" collecting information for object filtering used in
- * {@link DefaultObjectHandler}
- *
- * @author Marc Sladek
+ * {@link ObjectHandler}
  */
 @NotThreadSafe
 public class ObjectFilter {

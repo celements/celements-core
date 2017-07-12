@@ -11,6 +11,15 @@ import org.xwiki.model.reference.ClassReference;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 
+/**
+ * Bridge for actual access on document and objects, used by {@link ObjectHandler}s to allow
+ * generic implementation
+ *
+ * @param <D>
+ *          document type
+ * @param <O>
+ *          object type
+ */
 @Immutable
 public interface ObjectBridge<D, O> {
 

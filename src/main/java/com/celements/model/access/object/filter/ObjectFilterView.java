@@ -11,9 +11,7 @@ import org.xwiki.model.reference.ClassReference;
 import com.celements.model.classes.fields.ClassField;
 
 /**
- * View for an {@link ObjectFilter}
- *
- * @author Marc Sladek
+ * View/snapshot for an {@link ObjectFilter}
  */
 @Immutable
 public class ObjectFilterView {
