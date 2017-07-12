@@ -20,21 +20,15 @@ import com.google.common.collect.ImmutableList;
 
 public final class ObjectEditor<D, O> {
 
-  private final D doc;
   private final ObjectFilterView filter;
   private final ObjectBridge<D, O> bridge;
   private final ObjectFetcher<D, O> fetcher;
 
-  protected ObjectEditor(@NotNull D doc, @NotNull ObjectFilterView filter,
+  ObjectEditor(@NotNull D doc, @NotNull ObjectFilterView filter,
       @NotNull ObjectBridge<D, O> bridge) {
-    this.doc = checkNotNull(doc);
     this.filter = checkNotNull(filter);
     this.bridge = checkNotNull(bridge);
-    this.fetcher = new ObjectFetcher<>(doc, filter, bridge);
-  }
-
-  protected @NotNull D getDoc() {
-    return this.doc;
+    this.fetcher = new ObjectFetcher<>(doc, filter, bridge, false);
   }
 
   public ObjectFetcher<D, O> fetch() {

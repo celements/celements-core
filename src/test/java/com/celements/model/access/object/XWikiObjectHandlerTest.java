@@ -334,11 +334,11 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj3 = addObj(classRef, null, null);
     Map<ClassReference, List<BaseObject>> ret = getObjHandler().fetch().map();
     assertEquals(2, ret.size());
-    assertSame(2, ret.get(classRef).size());
-    assertSame(obj1, ret.get(classRef).get(0));
-    assertSame(obj3, ret.get(classRef).get(1));
-    assertSame(1, ret.get(classRef2).size());
-    assertSame(obj2, ret.get(classRef2).get(0));
+    assertEquals(2, ret.get(classRef).size());
+    assertEqualObjs(obj1, ret.get(classRef).get(0));
+    assertEqualObjs(obj3, ret.get(classRef).get(1));
+    assertEquals(1, ret.get(classRef2).size());
+    assertEqualObjs(obj2, ret.get(classRef2).get(0));
   }
 
   @Test
@@ -394,6 +394,17 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     assertEquals(1, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(0).getXClassReference());
     assertObjs(getObjHandler(), ret.get(0));
+  }
+
+  @Test
+  public void test_create_notClone() throws Exception {
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
+    replayDefault();
+    BaseObject ret = getObjHandler().filter(classRef).edit().create().get(0);
+    verifyDefault();
+    // changing a property affects the doc
+    ret.setStringValue(TestClassDefinition.FIELD_MY_STRING.getName(), "asdf");
+    assertObjs(getObjHandler(), ret);
   }
 
   @Test
@@ -608,15 +619,18 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     }
   }
 
-  private static void assertEqualObjs(BaseObject exp, BaseObject act) {
-    assertEquals(exp.getDocumentReference(), act.getDocumentReference());
-    assertEquals(exp.getXClassReference(), act.getXClassReference());
-    assertEquals(exp.getNumber(), act.getNumber());
-    assertEquals(exp.getPropertyList().size(), act.getPropertyList().size());
-    for (String propName : exp.getPropertyList()) {
+  private static void assertEqualObjs(BaseObject expObj, BaseObject actObj) {
+    assertNotSame("obj not cloned", expObj, actObj);
+    assertEquals(expObj.getDocumentReference(), actObj.getDocumentReference());
+    assertEquals(expObj.getXClassReference(), actObj.getXClassReference());
+    assertEquals(expObj.getNumber(), actObj.getNumber());
+    assertEquals(expObj.getId(), actObj.getId());
+    assertEquals("not same amount of fields set", expObj.getPropertyList().size(),
+        actObj.getPropertyList().size());
+    for (String propName : expObj.getPropertyList()) {
       try {
-        BaseProperty expProp = (BaseProperty) exp.get(propName);
-        BaseProperty actProp = (BaseProperty) act.get(propName);
+        BaseProperty expProp = (BaseProperty) expObj.get(propName);
+        BaseProperty actProp = (BaseProperty) actObj.get(propName);
         assertEquals(expProp.getName(), actProp.getName());
         assertEquals(expProp.getValue(), actProp.getValue());
       } catch (XWikiException xwe) {

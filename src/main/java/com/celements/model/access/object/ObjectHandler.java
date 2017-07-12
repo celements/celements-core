@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.access.object.filter.ObjectFilter;
+import com.celements.model.access.object.filter.ObjectFilterView;
 import com.celements.model.classes.fields.ClassField;
 
 public class ObjectHandler<D, O> {
@@ -20,6 +21,10 @@ public class ObjectHandler<D, O> {
   protected ObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge) {
     this.doc = checkNotNull(doc);
     this.bridge = checkNotNull(bridge);
+  }
+
+  public final ObjectFilterView getFilter() {
+    return filter.createView();
   }
 
   public final ObjectHandler<D, O> filter(ClassReference classRef) {
@@ -47,11 +52,11 @@ public class ObjectHandler<D, O> {
   }
 
   public final ObjectFetcher<D, O> fetch() {
-    return new ObjectFetcher<>(doc, filter.createView(), bridge);
+    return new ObjectFetcher<>(doc, getFilter(), bridge);
   }
 
   public final ObjectEditor<D, O> edit() {
-    return new ObjectEditor<>(doc, filter.createView(), bridge);
+    return new ObjectEditor<>(doc, getFilter(), bridge);
   }
 
 }

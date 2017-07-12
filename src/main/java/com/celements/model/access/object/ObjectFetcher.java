@@ -25,15 +25,23 @@ public final class ObjectFetcher<D, O> {
   private final D doc;
   private final ObjectFilterView filter;
   private final ObjectBridge<D, O> bridge;
+  private final boolean clone;
 
-  protected ObjectFetcher(@NotNull D doc, @NotNull ObjectFilterView filter,
+  ObjectFetcher(@NotNull D doc, @NotNull ObjectFilterView filter,
       @NotNull ObjectBridge<D, O> bridge) {
+    this(doc, filter, bridge, true);
+  }
+
+  ObjectFetcher(@NotNull D doc, @NotNull ObjectFilterView filter,
+      @NotNull ObjectBridge<D, O> bridge, boolean clone) {
     this.doc = checkNotNull(doc);
     this.filter = checkNotNull(filter);
     this.bridge = checkNotNull(bridge);
+    this.clone = clone;
   }
 
-  protected @NotNull D getDoc() {
+  @NotNull
+  D getDoc() {
     return this.doc;
   }
 
@@ -60,24 +68,10 @@ public final class ObjectFetcher<D, O> {
   public List<O> list() {
     if (cacheList == null) {
       cacheList = FluentIterable.from(getClassRefs()).transformAndConcat(
-          new ObjectFetchFunction()).filter(new ObjectFetchPredicate()).toList();
+          new ObjectFetchFunction()).filter(new ObjectFetchPredicate()).transform(
+              new ObjectCloner()).toList();
     }
     return cacheList;
-  }
-
-  private class ObjectFetchFunction implements Function<ClassReference, List<O>> {
-
-    @Override
-    public List<O> apply(ClassReference classRef) {
-      return FluentIterable.from(bridge.getObjects(classRef)).transform(new Function<O, O>() {
-
-        @Override
-        public O apply(O obj) {
-          return bridge.cloneObject(obj);
-        }
-      }).toList();
-    }
-
   }
 
   private Map<ClassReference, List<O>> cacheMap;
@@ -85,15 +79,24 @@ public final class ObjectFetcher<D, O> {
   public Map<ClassReference, List<O>> map() {
     if (cacheMap == null) {
       Map<ClassReference, List<O>> map = new LinkedHashMap<>();
-      Predicate<O> predicate = new ObjectFetchPredicate();
       for (ClassReference classRef : getClassRefs()) {
-        // TODO clone
-        map.put(classRef, FluentIterable.from(bridge.getObjects(classRef)).filter(
-            predicate).toList());
+        List<O> objs = new ObjectFetchFunction().apply(classRef);
+        objs = FluentIterable.from(objs).filter(new ObjectFetchPredicate()).transform(
+            new ObjectCloner()).toList();
+        map.put(classRef, objs);
       }
       cacheMap = ImmutableMap.copyOf(map);
     }
     return cacheMap;
+  }
+
+  private class ObjectFetchFunction implements Function<ClassReference, List<O>> {
+
+    @Override
+    public List<O> apply(ClassReference classRef) {
+      return FluentIterable.from(bridge.getObjects(classRef)).toList();
+    }
+
   }
 
   private class ObjectFetchPredicate implements Predicate<O> {
@@ -123,6 +126,14 @@ public final class ObjectFetcher<D, O> {
       };
     }
   }
+
+  private class ObjectCloner implements Function<O, O> {
+
+    @Override
+    public O apply(O obj) {
+      return clone ? bridge.cloneObject(obj) : obj;
+    }
+  };
 
   private List<ClassReference> getClassRefs() {
     List<ClassReference> ret = new ArrayList<>();
