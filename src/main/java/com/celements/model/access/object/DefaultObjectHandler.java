@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.access.object.filter.ObjectFilter;
-import com.celements.model.access.object.filter.ObjectFilterView;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
@@ -18,21 +17,21 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
 
   private final D doc;
   private final ObjectBridge<D, O> bridge;
-  private final ObjectFilter filter;
+  private final ObjectFilter.Builder filterBuilder;
 
-  private DefaultObjectHandler(D doc, ObjectBridge<D, O> bridge, ObjectFilter filter) {
+  private DefaultObjectHandler(D doc, ObjectBridge<D, O> bridge, ObjectFilter.Builder builder) {
     this.doc = checkNotNull(doc);
     this.bridge = checkNotNull(bridge);
-    this.filter = checkNotNull(filter);
+    this.filterBuilder = checkNotNull(builder);
   }
 
   protected DefaultObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge) {
-    this(doc, bridge, new ObjectFilter());
+    this(doc, bridge, new ObjectFilter.Builder());
   }
 
   protected DefaultObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge,
-      @NotNull ObjectFilterView filterView) {
-    this(doc, bridge, checkNotNull(filterView).getFilter());
+      @NotNull ObjectFilter filter) {
+    this(doc, bridge, checkNotNull(filter).newBuilder());
   }
 
   protected final D getDoc() {
@@ -44,19 +43,19 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
   }
 
   @Override
-  public final ObjectFilterView getFilter() {
-    return filter.createView();
+  public final ObjectFilter getFilter() {
+    return filterBuilder.build();
   }
 
   @Override
   public final ObjectHandler<D, O> filter(ClassReference classRef) {
-    filter.add(checkNotNull(classRef));
+    filterBuilder.add(checkNotNull(classRef));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, T value) {
-    filter.add(checkNotNull(field), checkNotNull(value));
+    filterBuilder.add(checkNotNull(field), checkNotNull(value));
     return this;
   }
 
@@ -65,14 +64,14 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
     checkNotNull(field);
     checkArgument(!checkNotNull(values).isEmpty(), "cannot filter for empty value list");
     for (T value : values) {
-      filter.add(field, value);
+      filterBuilder.add(field, value);
     }
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filterAbsent(ClassField<?> field) {
-    filter.addAbsent(checkNotNull(field));
+    filterBuilder.addAbsent(checkNotNull(field));
     return this;
   }
 

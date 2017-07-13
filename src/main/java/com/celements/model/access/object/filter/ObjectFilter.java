@@ -1,12 +1,10 @@
 package com.celements.model.access.object.filter;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.Immutable;
+import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
@@ -14,44 +12,48 @@ import com.celements.model.access.object.ObjectHandler;
 import com.celements.model.classes.fields.ClassField;
 
 /**
- * "Type Safe Heterogeneous Container" collecting information for object filtering used in
- * {@link ObjectHandler}
+ * "Type Safe Heterogeneous Container" for information on object filtering: {@link ClassReference}s
+ * and {@link ClassField}s with values. used in {@link ObjectHandler}
  */
-@NotThreadSafe
+@Immutable
 public class ObjectFilter {
 
-  public ObjectFilter() {
-  }
+  public static class Builder extends ObjectFilterMap {
 
-  // type safe inner map
-  private final Map<ClassReference, Map<ClassField<?>, Entry<?>>> map = new LinkedHashMap<>();
+    private static final long serialVersionUID = 1L;
 
-  public ObjectFilterView createView() {
-    return new ObjectFilterView(this);
-  }
-
-  public void add(ClassReference classRef) {
-    Map<ClassField<?>, Entry<?>> fieldMap = map.get(classRef);
-    if (fieldMap == null) {
-      map.put(classRef, fieldMap = new HashMap<>());
+    public Builder() {
     }
+
+    public Builder(ObjectFilterMap map) {
+      putAll(map.clone());
+    }
+
+    public ObjectFilter build() {
+      return new ObjectFilter(clone());
+    }
+
   }
 
-  public <T> void add(ClassField<T> field, T value) {
-    add(field.getClassDef().getClassReference());
-    getEntry(field).add(value);
+  private final ObjectFilterMap map;
+
+  private ObjectFilter(@NotNull ObjectFilterMap map) {
+    this.map = map;
   }
 
-  public void addAbsent(ClassField<?> field) {
-    add(field.getClassDef().getClassReference());
-    getEntry(field).setAbsent();
+  public @NotNull Builder newBuilder() {
+    return new Builder(map);
   }
 
-  Set<ClassReference> getClassRefs() {
+  public boolean isEmpty() {
+    return getClassRefs().isEmpty();
+  }
+
+  public @NotNull Set<ClassReference> getClassRefs() {
     return Collections.unmodifiableSet(map.keySet());
   }
 
-  Set<ClassField<?>> getFields(ClassReference classRef) {
+  public @NotNull Set<ClassField<?>> getFields(@NotNull ClassReference classRef) {
     Set<ClassField<?>> ret = Collections.emptySet();
     if (map.get(classRef) != null) {
       ret = Collections.unmodifiableSet(map.get(classRef).keySet());
@@ -59,32 +61,12 @@ public class ObjectFilter {
     return ret;
   }
 
-  @SuppressWarnings("unchecked")
-  <T> Entry<T> getEntry(ClassField<T> field) {
-    Entry<?> valueSet = new Entry<>();
-    Map<ClassField<?>, Entry<?>> fieldMap = map.get(field.getClassDef().getClassReference());
-    if (fieldMap != null) {
-      if (fieldMap.containsKey(field)) {
-        valueSet = fieldMap.get(field);
-      } else {
-        fieldMap.put(field, valueSet);
-      }
-    }
-    // cast is fine because of ensured type safety
-    return (Entry<T>) valueSet;
+  public @NotNull <T> Set<T> getValues(@NotNull ClassField<T> field) {
+    return Collections.unmodifiableSet(map.getEntry(field).getValues());
   }
 
-  @Override
-  public ObjectFilter clone() {
-    ObjectFilter clone = new ObjectFilter();
-    for (ClassReference classRef : map.keySet()) {
-      clone.add(classRef);
-      for (ClassField<?> field : map.get(classRef).keySet()) {
-        Entry<?> entryClone = map.get(classRef).get(field).clone();
-        clone.map.get(classRef).put(field, entryClone);
-      }
-    }
-    return clone;
+  public boolean isAbsent(@NotNull ClassField<?> field) {
+    return map.getEntry(field).isAbsent();
   }
 
 }

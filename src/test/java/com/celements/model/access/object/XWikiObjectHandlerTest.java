@@ -1,6 +1,7 @@
 package com.celements.model.access.object;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static com.celements.model.classes.TestClassDefinition.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -20,7 +21,6 @@ import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.object.xwiki.XWikiObjectHandler;
 import com.celements.model.classes.ClassDefinition;
-import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
@@ -42,8 +42,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     wikiRef = new WikiReference("db");
     doc = new XWikiDocument(new DocumentReference(wikiRef.getName(), "space", "doc"));
-    classRef = Utils.getComponent(ClassDefinition.class,
-        TestClassDefinition.NAME).getClassReference();
+    classRef = Utils.getComponent(ClassDefinition.class, NAME).getClassReference();
     classRef2 = new ClassReference("class", "other");
   }
 
@@ -106,7 +105,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getObjHandler().filter(TestClassDefinition.FIELD_MY_STRING, (List<String>) null);
+        getObjHandler().filter(FIELD_MY_STRING, (List<String>) null);
       }
     }.evaluate();
   }
@@ -117,8 +116,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getObjHandler().filter(TestClassDefinition.FIELD_MY_STRING,
-            Collections.<String>emptyList());
+        getObjHandler().filter(FIELD_MY_STRING, Collections.<String>emptyList());
 
       }
     }.evaluate();
@@ -126,7 +124,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_filterAbsent() throws Exception {
-    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field = FIELD_MY_STRING;
     BaseObject obj = addObj(classRef, field.getName(), null);
     assertObjs(getObjHandler().filterAbsent(field), obj);
     assertObjs(getObjHandler().filter(classRef).filterAbsent(field), obj);
@@ -145,7 +143,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_filterAbsent_afterFilter() throws Exception {
-    final ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    final ClassField<String> field = FIELD_MY_STRING;
     Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
 
       @Override
@@ -158,7 +156,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_filterAbsent_beforeFilter() throws Exception {
-    final ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    final ClassField<String> field = FIELD_MY_STRING;
     Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
 
       @Override
@@ -177,7 +175,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetch_oneObj() throws Exception {
-    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field = FIELD_MY_STRING;
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), val);
     assertObjs(getObjHandler(), obj);
@@ -189,7 +187,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetch_mutlipleObj() throws Exception {
-    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field = FIELD_MY_STRING;
     String val1 = "val1";
     String val2 = "val2";
     BaseObject obj1 = addObj(classRef, null, null);
@@ -214,9 +212,9 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetch_mutlipleFields() throws Exception {
-    ClassField<String> field1 = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field1 = FIELD_MY_STRING;
     String val1 = "val";
-    ClassField<Integer> field2 = TestClassDefinition.FIELD_MY_INT;
+    ClassField<Integer> field2 = FIELD_MY_INT;
     Integer val2 = 5;
 
     BaseObject obj1 = addObj(classRef, field1.getName(), val1);
@@ -232,6 +230,16 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     assertObjs(getObjHandler().filterAbsent(field1).filter(field2, val2), obj2);
     assertObjs(getObjHandler().filterAbsent(field2), obj1);
     assertObjs(getObjHandler().filterAbsent(field2).filter(field1, val1), obj1);
+  }
+
+  @Test
+  public void test_fetch_clone() throws Exception {
+    BaseObject obj = addObj(classRef, null, null);
+    BaseObject ret = getObjHandler().fetch().first().get();
+    ret.setStringValue(FIELD_MY_STRING.getName(), "val");
+    ((BaseProperty) ret.getField(FIELD_MY_STRING.getName())).setValue("val");
+    assertNull("manipulation on fetched object changed original", obj.get(
+        FIELD_MY_STRING.getName()));
   }
 
   @Test
@@ -402,18 +410,18 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     replayDefault();
     BaseObject ret = getObjHandler().filter(classRef).edit().create().get(classRef);
     verifyDefault();
-    // changing a property affects the doc
-    ret.setStringValue(TestClassDefinition.FIELD_MY_STRING.getName(), "asdf");
+    // manipulating created object also affects the doc
+    ret.setStringValue(FIELD_MY_STRING.getName(), "asdf");
     assertObjs(getObjHandler(), ret);
   }
 
   @Test
   public void test_create_keyValue() throws Exception {
     BaseClass bClassMock = expectNewBaseObject(classRef.getDocRef(wikiRef));
-    ClassField<String> field1 = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field1 = FIELD_MY_STRING;
     expect(bClassMock.get(eq(field1.getName()))).andReturn(field1.getXField()).anyTimes();
     List<String> vals = Arrays.asList("val1", "val2");
-    ClassField<Integer> field2 = TestClassDefinition.FIELD_MY_INT;
+    ClassField<Integer> field2 = FIELD_MY_INT;
     expect(bClassMock.get(eq(field2.getName()))).andReturn(field2.getXField()).anyTimes();
     int val = 2;
     expectNewBaseObject(classRef2.getDocRef(wikiRef));
@@ -476,7 +484,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_createIfNotExists_create_field() throws Exception {
-    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field = FIELD_MY_STRING;
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), "otherval");
     BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wikiRef));
@@ -506,7 +514,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_createIfNotExists_exists_field() throws Exception {
-    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field = FIELD_MY_STRING;
     String val = "val";
     BaseObject obj = addObj(classRef, field.getName(), val);
     replayDefault();
@@ -566,7 +574,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_remove_keyValue() {
-    ClassField<String> field = TestClassDefinition.FIELD_MY_STRING;
+    ClassField<String> field = FIELD_MY_STRING;
     List<String> vals = Arrays.asList("val1", "val2");
     BaseObject obj1 = addObj(classRef, field.getName(), vals.get(0));
     BaseObject obj2 = addObj(classRef, null, null);

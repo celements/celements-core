@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.filter.ObjectFilterView;
+import com.celements.model.access.object.filter.ObjectFilter;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -21,11 +21,11 @@ import com.google.common.collect.FluentIterable;
 public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
   private final D doc;
-  private final ObjectFilterView filter;
+  private final ObjectFilter filter;
   private final ObjectBridge<D, O> bridge;
   private final ObjectFetcher<D, O> fetcher;
 
-  DefaultObjectEditor(@NotNull D doc, @NotNull ObjectFilterView filter,
+  DefaultObjectEditor(@NotNull D doc, @NotNull ObjectFilter filter,
       @NotNull ObjectBridge<D, O> bridge) {
     this.doc = checkNotNull(doc);
     this.filter = checkNotNull(filter);
