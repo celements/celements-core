@@ -1,5 +1,8 @@
 package com.celements.model.access.object.filter;
 
+import static com.google.common.base.Preconditions.*;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -10,6 +13,7 @@ import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.access.object.ObjectHandler;
 import com.celements.model.classes.fields.ClassField;
+import com.google.common.base.Optional;
 
 /**
  * "Type Safe Heterogeneous Container" for information on object filtering: {@link ClassReference}s
@@ -18,31 +22,47 @@ import com.celements.model.classes.fields.ClassField;
 @Immutable
 public class ObjectFilter {
 
-  public static class Builder extends ObjectFilterMap {
+  public static class Builder {
 
-    private static final long serialVersionUID = 1L;
+    private final ObjectFilterMap filterMap = new ObjectFilterMap();
 
-    public Builder() {
+    public Builder add(@NotNull ObjectFilter filter) {
+      filterMap.add(filter.map);
+      return this;
     }
 
-    public Builder(ObjectFilterMap map) {
-      putAll(map.clone());
+    public Builder add(@NotNull ClassReference classRef) {
+      filterMap.add(checkNotNull(classRef));
+      return this;
     }
 
-    public ObjectFilter build() {
-      return new ObjectFilter(clone());
+    public <T> Builder add(@NotNull ClassField<T> field, @NotNull T value) {
+      filterMap.add(checkNotNull(field), checkNotNull(value));
+      return this;
+    }
+
+    public <T> Builder add(@NotNull ClassField<T> field, @NotNull Collection<T> values) {
+      for (T value : checkNotNull(values)) {
+        add(checkNotNull(field), value);
+      }
+      return this;
+    }
+
+    public <T> Builder addAbsent(@NotNull ClassField<T> field) {
+      filterMap.addAbsent(checkNotNull(field));
+      return this;
+    }
+
+    public @NotNull ObjectFilter build() {
+      return new ObjectFilter(new ObjectFilterMap(filterMap));
     }
 
   }
 
   private final ObjectFilterMap map;
 
-  private ObjectFilter(@NotNull ObjectFilterMap map) {
+  private ObjectFilter(ObjectFilterMap map) {
     this.map = map;
-  }
-
-  public @NotNull Builder newBuilder() {
-    return new Builder(map);
   }
 
   public boolean isEmpty() {
@@ -62,11 +82,18 @@ public class ObjectFilter {
   }
 
   public @NotNull <T> Set<T> getValues(@NotNull ClassField<T> field) {
-    return Collections.unmodifiableSet(map.getEntry(field).getValues());
+    Optional<ObjectFilterEntry<T>> entry = map.getEntry(field);
+    return entry.isPresent() ? Collections.unmodifiableSet(entry.get().getValues())
+        : Collections.<T>emptySet();
   }
 
-  public boolean isAbsent(@NotNull ClassField<?> field) {
-    return map.getEntry(field).isAbsent();
+  public <T> boolean isAbsent(@NotNull ClassField<T> field) {
+    Optional<ObjectFilterEntry<T>> entry = map.getEntry(field);
+    return entry.isPresent() && entry.get().isAbsent();
+  }
+
+  public @NotNull Builder newBuilder() {
+    return new Builder().add(this);
   }
 
 }

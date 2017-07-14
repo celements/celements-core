@@ -14,6 +14,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.classes.fields.ClassField;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 @NotThreadSafe
 class ObjectFilterMap extends
@@ -21,55 +23,63 @@ class ObjectFilterMap extends
 
   private static final long serialVersionUID = 1L;
 
-  @Override
-  public Map<ClassField<?>, ObjectFilterEntry<?>> put(ClassReference classRef,
-      Map<ClassField<?>, ObjectFilterEntry<?>> fieldMap) {
-    throw new UnsupportedOperationException();
+  ObjectFilterMap() {
   }
 
-  public void add(ClassReference classRef) {
+  ObjectFilterMap(ObjectFilterMap map) {
+    add(map);
+  }
+
+  void add(ClassReference classRef) {
     if (!containsKey(classRef)) {
-      super.put(classRef, new HashMap<ClassField<?>, ObjectFilterEntry<?>>());
+      put(classRef, new HashMap<ClassField<?>, ObjectFilterEntry<?>>());
     }
   }
 
-  public <T> void add(ClassField<T> field, T value) {
+  <T> void add(ClassField<T> field, T value) {
     add(field.getClassDef().getClassReference());
-    getEntry(field).add(value);
+    getOrCreateEntry(field).add(value);
   }
 
-  public void addAbsent(ClassField<?> field) {
+  <T> void addAbsent(ClassField<T> field) {
     add(field.getClassDef().getClassReference());
-    getEntry(field).setAbsent();
+    getOrCreateEntry(field).setAbsent();
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> ObjectFilterEntry<T> getEntry(ClassField<T> field) {
-    ObjectFilterEntry<?> entry = new ObjectFilterEntry<>();
+  <T> void add(ObjectFilterMap map) {
+    for (ClassReference classRef : map.keySet()) {
+      add(classRef);
+      for (ClassField<?> field : map.get(classRef).keySet()) {
+        get(classRef).put(field, map.get(classRef).get(field).clone());
+      }
+    }
+  }
+
+  <T> Optional<ObjectFilterEntry<T>> getEntry(ClassField<T> field) {
+    ObjectFilterEntry<T> entry = null;
+    if (getFieldMap(field) != null) {
+      entry = getFieldMap(field).get(field);
+    }
+    return Optional.fromNullable(entry);
+  }
+
+  private <T> ObjectFilterEntry<T> getOrCreateEntry(ClassField<T> field) {
+    ObjectFilterEntry<T> entry = getFieldMap(field).get(field);
+    if (entry == null) {
+      getFieldMap(field).put(field, entry = new ObjectFilterEntry<>());
+    }
+    return entry;
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private <T> Map<ClassField<T>, ObjectFilterEntry<T>> getFieldMap(ClassField<T> field) {
     ClassReference classRef = field.getClassDef().getClassReference();
-    if (containsKey(classRef)) {
-      Map<ClassField<?>, ObjectFilterEntry<?>> fieldMap = get(classRef);
-      if (fieldMap.containsKey(field)) {
-        entry = fieldMap.get(field);
-      } else {
-        fieldMap.put(field, entry);
-      }
+    // unchecked cast is fine because of ensured type safety by add methods
+    Map<ClassField<T>, ObjectFilterEntry<T>> map = (Map) get(classRef);
+    if (map == null) {
+      map = ImmutableMap.of();
     }
-    // cast is fine because of ensured type safety
-    return (ObjectFilterEntry<T>) entry;
-  }
-
-  @Override
-  public ObjectFilterMap clone() {
-    ObjectFilterMap clone = new ObjectFilterMap();
-    for (ClassReference classRef : keySet()) {
-      clone.add(classRef);
-      for (ClassField<?> field : get(classRef).keySet()) {
-        ObjectFilterEntry<?> entryClone = get(classRef).get(field).clone();
-        clone.get(classRef).put(field, entryClone);
-      }
-    }
-    return clone;
+    return map;
   }
 
 }

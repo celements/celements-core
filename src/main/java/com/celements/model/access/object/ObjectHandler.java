@@ -29,6 +29,9 @@ public interface ObjectHandler<D, O> {
   @NotNull
   ObjectFilter getFilter();
 
+  @NotNull
+  ObjectHandler<D, O> with(@NotNull ObjectFilter filter);
+
   /**
    * filters objects with the given {@link ClassField}
    *

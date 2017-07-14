@@ -111,15 +111,20 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_filter_values_empty() throws Exception {
-    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+  public void test_filter_values_nullElement() throws Exception {
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
 
       @Override
       protected void execute() throws Exception {
-        getObjHandler().filter(FIELD_MY_STRING, Collections.<String>emptyList());
-
+        getObjHandler().filter(FIELD_MY_STRING, Arrays.<String>asList("", null));
       }
     }.evaluate();
+  }
+
+  @Test
+  public void test_filter_values_empty() throws Exception {
+    assertTrue(getObjHandler().filter(FIELD_MY_STRING,
+        Collections.<String>emptyList()).getFilter().isEmpty());
   }
 
   @Test

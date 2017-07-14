@@ -48,30 +48,32 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
   }
 
   @Override
+  public final ObjectHandler<D, O> with(ObjectFilter filter) {
+    filterBuilder.add(filter);
+    return this;
+  }
+
+  @Override
   public final ObjectHandler<D, O> filter(ClassReference classRef) {
-    filterBuilder.add(checkNotNull(classRef));
+    filterBuilder.add(classRef);
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, T value) {
-    filterBuilder.add(checkNotNull(field), checkNotNull(value));
+    filterBuilder.add(field, value);
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, Collection<T> values) {
-    checkNotNull(field);
-    checkArgument(!checkNotNull(values).isEmpty(), "cannot filter for empty value list");
-    for (T value : values) {
-      filterBuilder.add(field, value);
-    }
+    filterBuilder.add(field, values);
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filterAbsent(ClassField<?> field) {
-    filterBuilder.addAbsent(checkNotNull(field));
+    filterBuilder.addAbsent(field);
     return this;
   }
 
