@@ -21,7 +21,7 @@ public class XWikiObjectHandler extends DefaultObjectHandler<XWikiDocument, Base
   }
 
   private XWikiObjectHandler(XWikiObjectHandler handler) {
-    super(handler.getDoc(), handler.getBridge(), handler.getFilter());
+    super(handler.getDoc(), handler.getBridge(), handler.getQuery());
   }
 
 }

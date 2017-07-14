@@ -124,7 +124,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_filter_values_empty() throws Exception {
     assertTrue(getObjHandler().filter(FIELD_MY_STRING,
-        Collections.<String>emptyList()).getFilter().isEmpty());
+        Collections.<String>emptyList()).getQuery().isEmpty());
   }
 
   @Test

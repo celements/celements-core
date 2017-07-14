@@ -10,6 +10,10 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.access.object.filter.ObjectFilter;
+import com.celements.model.access.object.restriction.ClassRestriction;
+import com.celements.model.access.object.restriction.FieldAbsentRestriction;
+import com.celements.model.access.object.restriction.FieldRestriction;
+import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
@@ -17,21 +21,16 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
 
   private final D doc;
   private final ObjectBridge<D, O> bridge;
-  private final ObjectFilter.Builder filterBuilder;
+  private final ObjectQuery<O> query;
 
-  private DefaultObjectHandler(D doc, ObjectBridge<D, O> bridge, ObjectFilter.Builder builder) {
+  protected DefaultObjectHandler(D doc, ObjectBridge<D, O> bridge, ObjectQuery<O> query) {
     this.doc = checkNotNull(doc);
     this.bridge = checkNotNull(bridge);
-    this.filterBuilder = checkNotNull(builder);
+    this.query = new ObjectQuery<>(query);
   }
 
   protected DefaultObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge) {
-    this(doc, bridge, new ObjectFilter.Builder());
-  }
-
-  protected DefaultObjectHandler(@NotNull D doc, @NotNull ObjectBridge<D, O> bridge,
-      @NotNull ObjectFilter filter) {
-    this(doc, bridge, checkNotNull(filter).newBuilder());
+    this(doc, bridge, new ObjectQuery<O>());
   }
 
   protected final D getDoc() {
@@ -43,48 +42,48 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
   }
 
   @Override
-  public final ObjectFilter getFilter() {
-    return filterBuilder.build();
+  public final ObjectQuery<O> getQuery() {
+    return new ObjectQuery<>(query);
   }
 
   @Override
   public final ObjectHandler<D, O> with(ObjectFilter filter) {
-    filterBuilder.add(filter);
+    // TODO
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filter(ClassReference classRef) {
-    filterBuilder.add(classRef);
+    query.add(new ClassRestriction<>(bridge, classRef));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, T value) {
-    filterBuilder.add(field, value);
+    query.add(new FieldRestriction<>(bridge, field, value));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, Collection<T> values) {
-    filterBuilder.add(field, values);
+    query.add(new FieldRestriction<>(bridge, field, values));
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filterAbsent(ClassField<?> field) {
-    filterBuilder.addAbsent(field);
+    query.add(new FieldAbsentRestriction<>(bridge, field));
     return this;
   }
 
   @Override
   public final ObjectFetcher<D, O> fetch() {
-    return new DefaultObjectFetcher<>(doc, getFilter(), bridge);
+    return new DefaultObjectFetcher<>(doc, query, bridge);
   }
 
   @Override
   public final ObjectEditor<D, O> edit() {
-    return new DefaultObjectEditor<>(doc, getFilter(), bridge);
+    return new DefaultObjectEditor<>(doc, query, bridge);
   }
 
 }

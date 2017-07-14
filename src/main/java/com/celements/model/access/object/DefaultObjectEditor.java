@@ -4,14 +4,15 @@ import static com.google.common.base.Preconditions.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.filter.ObjectFilter;
-import com.celements.model.classes.fields.ClassField;
+import com.celements.model.access.object.restriction.FieldRestriction;
+import com.celements.model.access.object.restriction.ObjectQuery;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -21,26 +22,26 @@ import com.google.common.collect.FluentIterable;
 public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
   private final D doc;
-  private final ObjectFilter filter;
+  private final ObjectQuery<O> query;
   private final ObjectBridge<D, O> bridge;
   private final ObjectFetcher<D, O> fetcher;
 
-  DefaultObjectEditor(@NotNull D doc, @NotNull ObjectFilter filter,
+  DefaultObjectEditor(@NotNull D doc, @NotNull ObjectQuery<O> query,
       @NotNull ObjectBridge<D, O> bridge) {
     this.doc = checkNotNull(doc);
-    this.filter = checkNotNull(filter);
+    this.query = new ObjectQuery<>(query);
     this.bridge = checkNotNull(bridge);
-    this.fetcher = new DefaultObjectFetcher<>(doc, filter, bridge, false);
+    this.fetcher = new DefaultObjectFetcher<>(doc, query, bridge, false);
   }
 
   @Override
   public Map<ClassReference, O> create() {
-    return FluentIterable.from(filter.getClassRefs()).toMap(new ObjectCreateFunction(false));
+    return FluentIterable.from(query.getClassRefs()).toMap(new ObjectCreateFunction(false));
   }
 
   @Override
   public Map<ClassReference, O> createIfNotExists() {
-    return FluentIterable.from(filter.getClassRefs()).toMap(new ObjectCreateFunction(true));
+    return FluentIterable.from(query.getClassRefs()).toMap(new ObjectCreateFunction(true));
   }
 
   private class ObjectCreateFunction implements Function<ClassReference, O> {
@@ -52,32 +53,47 @@ public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
     }
 
     @Override
-    public O apply(ClassReference classRef) {
-      Optional<O> obj = Optional.absent();
+    public O apply(final ClassReference classRef) {
+      Optional<O> ret = Optional.absent();
       if (ifNotExists) {
-        obj = handle().filter(classRef).edit().fetch().first();
+        ret = handle().filter(classRef).edit().fetch().first();
       }
-      if (!obj.isPresent()) {
-        obj = Optional.of(updateFields(bridge.createObject(classRef)));
+      if (!ret.isPresent()) {
+        O obj = bridge.createObject(classRef);
+        FieldUpdater<O> updater = new FieldUpdater<>(obj);
+        FluentIterable.from(query).filter(FieldRestriction.<O>getGenericClass()).filter(
+            updater).forEach(updater);
+        ret = Optional.of(obj);
       }
-      return obj.get();
+      return ret.get();
     }
 
   }
 
-  private O updateFields(O obj) {
-    ClassReference classRef = bridge.getObjectClassRef(obj);
-    for (ClassField<?> field : filter.getFields(classRef)) {
-      setFirstValue(obj, field);
-    }
-    return obj;
-  }
+  private static class FieldUpdater<O> implements Predicate<FieldRestriction<O, ?>>,
+      Consumer<FieldRestriction<O, ?>> {
 
-  private <T> void setFirstValue(O obj, ClassField<T> field) {
-    Optional<T> value = FluentIterable.from(filter.getValues(field)).first();
-    if (value.isPresent()) {
-      bridge.setObjectField(obj, field, value.get());
+    private final O obj;
+
+    private FieldUpdater(O obj) {
+      this.obj = obj;
     }
+
+    @Override
+    public boolean apply(FieldRestriction<O, ?> restr) {
+      return restr.getClassRef().equals(restr.getBridge().getObjectClassRef(obj));
+    }
+
+    @Override
+    public void accept(FieldRestriction<O, ?> restr) {
+      update(restr);
+    }
+
+    public <T> void update(FieldRestriction<O, T> restr) {
+      restr.getBridge().setObjectField(obj, restr.getField(), FluentIterable.from(
+          restr.getValues()).first().get());
+    }
+
   }
 
   @Override
@@ -96,7 +112,7 @@ public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
   @Override
   public ObjectHandler<D, O> handle() {
-    return new DefaultObjectHandler<>(doc, bridge, filter);
+    return new DefaultObjectHandler<>(doc, bridge, query);
   }
 
   @Override

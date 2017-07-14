@@ -2,7 +2,7 @@ package com.celements.model.access.object;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,11 +12,11 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.filter.ObjectFilter;
-import com.celements.model.classes.fields.ClassField;
+import com.celements.model.access.object.restriction.ObjectQuery;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -27,19 +27,19 @@ import com.google.common.collect.Iterables;
 public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
   private final D doc;
-  private final ObjectFilter filter;
+  private final ObjectQuery<O> query;
   private final ObjectBridge<D, O> bridge;
   private final boolean clone;
 
-  DefaultObjectFetcher(@NotNull D doc, @NotNull ObjectFilter filter,
+  DefaultObjectFetcher(@NotNull D doc, @NotNull ObjectQuery<O> query,
       @NotNull ObjectBridge<D, O> bridge) {
-    this(doc, filter, bridge, true);
+    this(doc, query, bridge, true);
   }
 
-  DefaultObjectFetcher(@NotNull D doc, @NotNull ObjectFilter filter,
+  DefaultObjectFetcher(@NotNull D doc, @NotNull ObjectQuery<O> query,
       @NotNull ObjectBridge<D, O> bridge, boolean clone) {
     this.doc = checkNotNull(doc);
-    this.filter = checkNotNull(filter);
+    this.query = new ObjectQuery<>(query);
     this.bridge = checkNotNull(bridge);
     this.clone = clone;
   }
@@ -78,38 +78,11 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
   public Map<ClassReference, List<O>> map() {
     Builder<ClassReference, List<O>> builder = ImmutableMap.builder();
     for (ClassReference classRef : getClassRefs()) {
-      builder.put(classRef, FluentIterable.from(bridge.getObjects(classRef)).filter(
-          new ObjectFetchPredicate()).transform(new ObjectCloner()).toList());
+      // TODO more tests fail with or?
+      builder.put(classRef, FluentIterable.from(bridge.getObjects(classRef)).filter(Predicates.and(
+          query)).transform(new ObjectCloner()).toList());
     }
     return builder.build();
-  }
-
-  private class ObjectFetchPredicate implements Predicate<O> {
-
-    @Override
-    public boolean apply(O obj) {
-      Set<ClassField<?>> fields = filter.getFields(bridge.getObjectClassRef(obj));
-      return fields.isEmpty() || FluentIterable.from(fields).allMatch(getClassFieldPrediate(obj));
-    }
-
-    private Predicate<ClassField<?>> getClassFieldPrediate(final O obj) {
-      return new Predicate<ClassField<?>>() {
-
-        @Override
-        public boolean apply(ClassField<?> field) {
-          return applyFilter(field);
-        }
-
-        private <T> boolean applyFilter(ClassField<T> field) {
-          Optional<T> value = bridge.getObjectField(obj, field);
-          if (value.isPresent()) {
-            return filter.getValues(field).contains(value.get());
-          } else {
-            return filter.isAbsent(field);
-          }
-        }
-      };
-    }
   }
 
   private class ObjectCloner implements Function<O, O> {
@@ -120,10 +93,10 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
     }
   };
 
-  private List<ClassReference> getClassRefs() {
-    List<ClassReference> ret = new ArrayList<>();
-    if (!filter.isEmpty()) {
-      ret.addAll(filter.getClassRefs());
+  private Set<ClassReference> getClassRefs() {
+    Set<ClassReference> ret = new LinkedHashSet<>();
+    if (!query.isEmpty()) {
+      ret.addAll(query.getClassRefs());
     } else {
       ret.addAll(bridge.getDocClassRefs());
     }
@@ -132,7 +105,7 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
   @Override
   public ObjectHandler<D, O> handle() {
-    return new DefaultObjectHandler<>(doc, bridge, filter);
+    return new DefaultObjectHandler<>(doc, bridge, query);
   }
 
 }
