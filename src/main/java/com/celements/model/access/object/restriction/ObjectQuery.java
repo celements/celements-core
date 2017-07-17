@@ -1,7 +1,7 @@
 package com.celements.model.access.object.restriction;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.xwiki.model.reference.ClassReference;
@@ -10,7 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
-public class ObjectQuery<O> extends ArrayList<ObjectRestriction<O>> {
+public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
 
   private static final long serialVersionUID = 1L;
 

@@ -24,6 +24,12 @@ import com.google.common.base.Optional;
 public interface ObjectBridge<D, O> {
 
   @NotNull
+  Class<D> getDocumentType();
+
+  @NotNull
+  Class<O> getObjectType();
+
+  @NotNull
   List<ClassReference> getDocClassRefs();
 
   @NotNull

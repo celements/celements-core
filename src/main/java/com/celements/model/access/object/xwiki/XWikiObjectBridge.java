@@ -37,6 +37,16 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   }
 
   @Override
+  public Class<XWikiDocument> getDocumentType() {
+    return XWikiDocument.class;
+  }
+
+  @Override
+  public Class<BaseObject> getObjectType() {
+    return BaseObject.class;
+  }
+
+  @Override
   public List<ClassReference> getDocClassRefs() {
     return FluentIterable.from(doc.getXObjects().keySet()).transform(
         ClassReference.FUNC_DOC_TO_CLASS_REF).toList();

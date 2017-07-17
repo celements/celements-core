@@ -2,6 +2,8 @@ package com.celements.model.access.object.restriction;
 
 import static com.google.common.base.Preconditions.*;
 
+import java.util.Objects;
+
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
@@ -19,6 +21,20 @@ public abstract class ObjectRestriction<O> implements Predicate<O> {
 
   public ObjectBridge<?, O> getBridge() {
     return bridge;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(bridge.getObjectType());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ObjectRestriction) {
+      ObjectRestriction<?> other = (ObjectRestriction<?>) obj;
+      return this.bridge.getObjectType() == other.bridge.getObjectType();
+    }
+    return false;
   }
 
 }

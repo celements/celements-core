@@ -3,6 +3,7 @@ package com.celements.model.access.object.restriction;
 import static com.google.common.base.Preconditions.*;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.concurrent.Immutable;
@@ -41,6 +42,21 @@ public class FieldRestriction<O, T> extends ClassRestriction<O> {
   @Override
   public boolean apply(@NotNull O obj) {
     return super.apply(obj) && values.contains(getBridge().getObjectField(obj, field).orNull());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), field, values);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof FieldRestriction) {
+      FieldRestriction<?, ?> other = (FieldRestriction<?, ?>) obj;
+      return super.equals(obj) && Objects.equals(this.field, other.field) && Objects.equals(
+          this.values, other.values);
+    }
+    return false;
   }
 
 }

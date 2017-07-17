@@ -131,6 +131,17 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_filter_unique() throws Exception {
+    XWikiObjectHandler handler = getObjHandler();
+    handler.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
+    assertEquals(3, handler.getQuery().size());
+    handler.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
+    assertEquals(3, handler.getQuery().size());
+    handler.with(handler.getQuery());
+    assertEquals(3, handler.getQuery().size());
+  }
+
+  @Test
   public void test_filterAbsent() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     BaseObject obj = addObj(classRef, field.getName(), null);
