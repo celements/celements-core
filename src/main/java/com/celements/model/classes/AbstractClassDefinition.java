@@ -36,11 +36,15 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
   @Requirement
   protected ConfigurationSource configSrc;
 
+  private ClassReference classRef;
   private volatile Map<String, ClassField<?>> fields;
 
   @Override
   public ClassReference getClassReference() {
-    return new ClassReference(getClassSpaceName(), getClassDocName());
+    if (classRef == null) {
+      classRef = new ClassReference(getClassSpaceName(), getClassDocName());
+    }
+    return classRef;
   }
 
   @Deprecated
