@@ -6,12 +6,11 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
-import com.celements.model.classes.AbstractClassPackage;
+import com.celements.model.classes.AbstractLegacyClassPackage;
 import com.celements.model.classes.ClassDefinition;
-import com.google.common.base.Optional;
 
 @Component(PageTypeClassPackage.NAME)
-public class PageTypeClassPackage extends AbstractClassPackage {
+public class PageTypeClassPackage extends AbstractLegacyClassPackage {
 
   public static final String NAME = "pagetype";
 
@@ -29,8 +28,8 @@ public class PageTypeClassPackage extends AbstractClassPackage {
   }
 
   @Override
-  protected Optional<String> getLegacyName() {
-    return Optional.of("celPageTypeClasses");
+  public String getLegacyName() {
+    return "celPageTypeClasses";
   }
 
 }

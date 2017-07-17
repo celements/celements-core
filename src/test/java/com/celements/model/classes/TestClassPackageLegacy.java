@@ -6,10 +6,10 @@ import java.util.List;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 
-@Component(TestClassPackage.NAME)
-public class TestClassPackage extends AbstractClassPackage {
+@Component(TestClassPackageLegacy.NAME)
+public class TestClassPackageLegacy extends AbstractLegacyClassPackage {
 
-  public static final String NAME = "Test";
+  public static final String NAME = "TestLegacy";
 
   @Requirement
   private List<TestClassDefinitionRole> classDefs;
@@ -22,6 +22,17 @@ public class TestClassPackage extends AbstractClassPackage {
   @Override
   public List<? extends ClassDefinition> getClassDefinitions() {
     return new ArrayList<>(classDefs);
+  }
+
+  String legacyName = "celPageTypeClasses";
+
+  @Override
+  public String getLegacyName() {
+    return legacyName;
+  }
+
+  public void setLegacyName(String legacyName) {
+    this.legacyName = legacyName;
   }
 
 }

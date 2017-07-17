@@ -34,6 +34,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.ModelMock;
 import com.celements.model.access.ModelMock.DocRecord;
 import com.celements.model.classes.ClassDefinition;
@@ -41,6 +42,7 @@ import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.TestClassDefinitionRole;
 import com.celements.model.classes.TestClassPackage;
+import com.celements.model.classes.TestClassPackageLegacy;
 import com.celements.model.classes.fields.ClassField;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -64,21 +66,27 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_notActive() throws Exception {
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
     expectActive(Collections.<String>emptyList(), "");
 
     replayDefault();
     creator.createXClasses();
     verifyDefault();
+
+    assertEquals(0, record.getSavedCount());
   }
 
   @Test
   public void test_createXClasses_blacklisted() throws Exception {
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
     expectActive(Arrays.asList(classPackage.getName()), "");
     expectBlacklist(Arrays.asList(classDef.getName()));
 
     replayDefault();
     creator.createXClasses();
     verifyDefault();
+
+    assertEquals(0, record.getSavedCount());
   }
 
   @Test
@@ -109,11 +117,11 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_legacy() throws Exception {
+    TestClassPackageLegacy classPackage = (TestClassPackageLegacy) Utils.getComponent(
+        ClassPackage.class, TestClassPackageLegacy.NAME);
     DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
-    String legacyName = "asdf";
-    ((TestClassPackage) classPackage).setLegacyName(legacyName);
 
-    expectActive(Collections.<String>emptyList(), legacyName);
+    expectActive(Collections.<String>emptyList(), classPackage.getLegacyName());
     expectBlacklist(Collections.<String>emptyList());
 
     replayDefault();
@@ -123,12 +131,35 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     assertEquals(1, record.getSavedCount());
   }
 
+  @Test
+  public void test_createXClasses_legacy_illegalName() throws Exception {
+    TestClassPackageLegacy classPackage = (TestClassPackageLegacy) Utils.getComponent(
+        ClassPackage.class, TestClassPackageLegacy.NAME);
+    classPackage.setLegacyName("asdf");
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
+
+    expectActive(Collections.<String>emptyList(), classPackage.getLegacyName());
+    expectBlacklist(Collections.<String>emptyList());
+
+    replayDefault();
+    new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
+
+      @Override
+      protected void execute() throws IllegalStateException {
+        creator.createXClasses();
+      }
+    }.evaluate();
+    verifyDefault();
+
+    assertEquals(0, record.getSavedCount());
+  }
+
   private void expectActive(List<String> ret, String legacy) {
     expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
         ret).anyTimes();
-    expect(getWikiMock().getXWikiPreference("activated_classcollections", getContext())).andReturn(
-        legacy).anyTimes();
-    expect(getWikiMock().Param("celements.classcollections", "")).andReturn("").anyTimes();
+    expect(getWikiMock().getXWikiPreference(IClassCollectionRole.ACTIVATED_XWIKIPREF,
+        getContext())).andReturn(legacy).anyTimes();
+    expect(getWikiMock().Param(IClassCollectionRole.ACTIVATED_PARAM)).andReturn("").anyTimes();
   }
 
   private void expectBlacklist(List<String> ret) {

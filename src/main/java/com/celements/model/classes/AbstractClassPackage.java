@@ -8,7 +8,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
 import com.celements.model.context.ModelContext;
-import com.google.common.base.Optional;
 
 public abstract class AbstractClassPackage implements ClassPackage {
 
@@ -30,27 +29,7 @@ public abstract class AbstractClassPackage implements ClassPackage {
       activated = prop.toString().trim().equals(getName());
     }
     LOGGER.debug("{}: isActivated '{}' for property value '{}'", getName(), activated, prop);
-    return activated || checkLegacyFallback();
-  }
-
-  /**
-   * fallback for legacy XWikiPreferences config (see CELDEV-516)
-   */
-  private boolean checkLegacyFallback() {
-    boolean ret = false;
-    if (getLegacyName().isPresent()) {
-      String prefs = context.getXWikiContext().getWiki().getXWikiPreference(
-          "activated_classcollections", context.getXWikiContext());
-      prefs += "," + context.getXWikiContext().getWiki().Param("celements.classcollections", "");
-      ret = ("," + prefs + ",").contains("," + getLegacyName().get() + ",");
-      LOGGER.debug("{}: checkLegacyFallback '{}' for legacy name '{}'", getName(), ret,
-          getLegacyName().get());
-    }
-    return ret;
-  }
-
-  protected Optional<String> getLegacyName() {
-    return Optional.absent();
+    return activated;
   }
 
 }
