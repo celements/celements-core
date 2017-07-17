@@ -26,6 +26,20 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     return FluentIterable.from(this);
   }
 
+  public FluentIterable<ObjectRestriction<O>> getRestrictions(ClassReference classRef) {
+    return getNonClassRestrictions().append(getClassRestrictions(classRef));
+  }
+
+  public FluentIterable<ObjectRestriction<O>> getNonClassRestrictions() {
+    return this.asIter().filter(new Predicate<ObjectRestriction<O>>() {
+
+      @Override
+      public boolean apply(ObjectRestriction<O> restr) {
+        return !(restr instanceof ClassRestriction);
+      }
+    });
+  }
+
   public FluentIterable<ClassRestriction<O>> getClassRestrictions() {
     return this.asIter().filter(getClassRestrictionClass());
   }

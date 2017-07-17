@@ -12,16 +12,8 @@ public class XWikiObjectHandler extends DefaultObjectHandler<XWikiDocument, Base
     return new XWikiObjectHandler(doc);
   }
 
-  public static XWikiObjectHandler from(@NotNull XWikiObjectHandler handler) {
-    return new XWikiObjectHandler(handler);
-  }
-
   private XWikiObjectHandler(XWikiDocument doc) {
     super(doc, new XWikiObjectBridge(doc));
-  }
-
-  private XWikiObjectHandler(XWikiObjectHandler handler) {
-    super(handler.getDoc(), handler.getBridge(), handler.getQuery());
   }
 
 }

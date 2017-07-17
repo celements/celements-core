@@ -95,7 +95,7 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
   private FluentIterable<O> getObjects(ClassReference classRef) {
     FluentIterable<O> iter = FluentIterable.from(bridge.getObjects(classRef));
-    iter = iter.filter(Predicates.and(query.getClassRestrictions(classRef)));
+    iter = iter.filter(Predicates.and(query.getRestrictions(classRef)));
     if (clone) {
       iter = iter.transform(new ObjectCloner());
     }
