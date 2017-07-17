@@ -78,20 +78,10 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
   public Map<ClassReference, List<O>> map() {
     Builder<ClassReference, List<O>> builder = ImmutableMap.builder();
     for (ClassReference classRef : getClassRefs()) {
-      // TODO more tests fail with or?
-      builder.put(classRef, FluentIterable.from(bridge.getObjects(classRef)).filter(Predicates.and(
-          query)).transform(new ObjectCloner()).toList());
+      builder.put(classRef, getObjects(classRef).toList());
     }
     return builder.build();
   }
-
-  private class ObjectCloner implements Function<O, O> {
-
-    @Override
-    public O apply(O obj) {
-      return clone ? bridge.cloneObject(obj) : obj;
-    }
-  };
 
   private Set<ClassReference> getClassRefs() {
     Set<ClassReference> ret = new LinkedHashSet<>();
@@ -102,6 +92,23 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
     }
     return ret;
   }
+
+  private FluentIterable<O> getObjects(ClassReference classRef) {
+    FluentIterable<O> iter = FluentIterable.from(bridge.getObjects(classRef));
+    iter = iter.filter(Predicates.and(query.getClassRestrictions(classRef)));
+    if (clone) {
+      iter = iter.transform(new ObjectCloner());
+    }
+    return iter;
+  }
+
+  private class ObjectCloner implements Function<O, O> {
+
+    @Override
+    public O apply(O obj) {
+      return bridge.cloneObject(obj);
+    }
+  };
 
   @Override
   public ObjectHandler<D, O> handle() {

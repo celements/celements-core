@@ -83,7 +83,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        getObjHandler().filter(null);
+        getObjHandler().filter((ClassReference) null);
       }
     }.evaluate();
   }
@@ -123,8 +123,11 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_filter_values_empty() throws Exception {
-    assertTrue(getObjHandler().filter(FIELD_MY_STRING,
-        Collections.<String>emptyList()).getQuery().isEmpty());
+    ClassField<String> field = FIELD_MY_STRING;
+    addObj(classRef, null, null);
+    addObj(classRef, field.getName(), null);
+    addObj(classRef, field.getName(), "val");
+    assertObjs(getObjHandler().filter(field, Collections.<String>emptyList()));
   }
 
   @Test
@@ -133,6 +136,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     BaseObject obj = addObj(classRef, field.getName(), null);
     assertObjs(getObjHandler().filterAbsent(field), obj);
     assertObjs(getObjHandler().filter(classRef).filterAbsent(field), obj);
+    assertObjs(getObjHandler().filter(field, "val").filterAbsent(field));
   }
 
   @Test
@@ -144,32 +148,6 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
         getObjHandler().filterAbsent(null);
       }
     }.evaluate();
-  }
-
-  @Test
-  public void test_filterAbsent_afterFilter() throws Exception {
-    final ClassField<String> field = FIELD_MY_STRING;
-    Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        getObjHandler().filter(field, "val").filterAbsent(field);
-      }
-    }.evaluate();
-    assertEquals("filter entry already present", ise.getMessage());
-  }
-
-  @Test
-  public void test_filterAbsent_beforeFilter() throws Exception {
-    final ClassField<String> field = FIELD_MY_STRING;
-    Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
-
-      @Override
-      protected void execute() throws Exception {
-        getObjHandler().filterAbsent(field).filter(field, "val");
-      }
-    }.evaluate();
-    assertEquals("filter entry already absent", ise.getMessage());
   }
 
   @Test
@@ -207,7 +185,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     assertObjs(getObjHandler().filter(field, val1), obj3);
     assertObjs(getObjHandler().filter(field, val2), obj6);
     assertObjs(getObjHandler().filter(field, Arrays.asList(val1, val2)), obj3, obj6);
-    assertObjs(getObjHandler().filter(field, val1).filter(field, val2), obj3, obj6);
+    assertObjs(getObjHandler().filter(field, val1).filter(field, val2));
     assertObjs(getObjHandler().filter(field, "other"));
     assertObjs(getObjHandler().filter(classRef2), obj2);
     assertObjs(getObjHandler().filter(field, val1).filter(classRef2), obj3, obj2);

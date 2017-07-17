@@ -27,9 +27,4 @@ public class FieldAbsentRestriction<O, T> extends ClassRestriction<O> {
     return super.apply(obj) && !getBridge().getObjectField(obj, field).isPresent();
   }
 
-  @SuppressWarnings("unchecked")
-  public static <O> Class<? extends FieldAbsentRestriction<O, ?>> getGenericClass() {
-    return (Class<? extends FieldAbsentRestriction<O, ?>>) (Class<?>) FieldAbsentRestriction.class;
-  }
-
 }

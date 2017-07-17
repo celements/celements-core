@@ -43,9 +43,4 @@ public class FieldRestriction<O, T> extends ClassRestriction<O> {
     return super.apply(obj) && values.contains(getBridge().getObjectField(obj, field).orNull());
   }
 
-  @SuppressWarnings("unchecked")
-  public static <O> Class<? extends FieldRestriction<O, ?>> getGenericClass() {
-    return (Class<? extends FieldRestriction<O, ?>>) (Class<?>) FieldRestriction.class;
-  }
-
 }

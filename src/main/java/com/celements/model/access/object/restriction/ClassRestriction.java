@@ -28,9 +28,4 @@ public class ClassRestriction<O> extends ObjectRestriction<O> {
     return ref;
   }
 
-  @SuppressWarnings("unchecked")
-  public static <O> Class<? extends ClassRestriction<O>> getGenericClass() {
-    return (Class<? extends ClassRestriction<O>>) (Class<?>) ClassRestriction.class;
-  }
-
 }

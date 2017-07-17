@@ -53,45 +53,32 @@ public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
     }
 
     @Override
-    public O apply(final ClassReference classRef) {
+    public O apply(ClassReference classRef) {
       Optional<O> ret = Optional.absent();
       if (ifNotExists) {
         ret = handle().filter(classRef).edit().fetch().first();
       }
       if (!ret.isPresent()) {
-        O obj = bridge.createObject(classRef);
-        FieldUpdater<O> updater = new FieldUpdater<>(obj);
-        FluentIterable.from(query).filter(FieldRestriction.<O>getGenericClass()).filter(
-            updater).forEach(updater);
-        ret = Optional.of(obj);
+        ret = Optional.of(createObject(classRef));
       }
       return ret.get();
     }
 
-  }
+    private O createObject(ClassReference classRef) {
+      final O obj = bridge.createObject(classRef);
+      query.getFieldRestrictions(classRef).forEach(new Consumer<FieldRestriction<O, ?>>() {
 
-  private static class FieldUpdater<O> implements Predicate<FieldRestriction<O, ?>>,
-      Consumer<FieldRestriction<O, ?>> {
+        @Override
+        public void accept(FieldRestriction<O, ?> restr) {
+          updateField(obj, restr);
+        }
 
-    private final O obj;
-
-    private FieldUpdater(O obj) {
-      this.obj = obj;
-    }
-
-    @Override
-    public boolean apply(FieldRestriction<O, ?> restr) {
-      return restr.getClassRef().equals(restr.getBridge().getObjectClassRef(obj));
-    }
-
-    @Override
-    public void accept(FieldRestriction<O, ?> restr) {
-      update(restr);
-    }
-
-    public <T> void update(FieldRestriction<O, T> restr) {
-      restr.getBridge().setObjectField(obj, restr.getField(), FluentIterable.from(
-          restr.getValues()).first().get());
+        private <T> void updateField(O obj, FieldRestriction<O, T> restr) {
+          bridge.setObjectField(obj, restr.getField(), FluentIterable.from(
+              restr.getValues()).first().get());
+        }
+      });
+      return obj;
     }
 
   }

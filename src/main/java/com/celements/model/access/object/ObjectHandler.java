@@ -7,8 +7,8 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.filter.ObjectFilter;
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.access.object.restriction.ObjectRestriction;
 import com.celements.model.classes.fields.ClassField;
 
 /**
@@ -31,7 +31,10 @@ public interface ObjectHandler<D, O> {
   ObjectQuery<O> getQuery();
 
   @NotNull
-  ObjectHandler<D, O> with(@NotNull ObjectFilter filter);
+  ObjectHandler<D, O> with(@NotNull ObjectQuery<O> query);
+
+  @NotNull
+  ObjectHandler<D, O> filter(@NotNull ObjectRestriction<O> restriction);
 
   /**
    * filters objects with the given {@link ClassField}

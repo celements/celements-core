@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
 
-import com.celements.model.access.object.filter.ObjectFilter;
 import com.celements.model.access.object.restriction.ClassRestriction;
 import com.celements.model.access.object.restriction.FieldAbsentRestriction;
 import com.celements.model.access.object.restriction.FieldRestriction;
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.access.object.restriction.ObjectRestriction;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
@@ -47,32 +47,38 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
   }
 
   @Override
-  public final ObjectHandler<D, O> with(ObjectFilter filter) {
-    // TODO
+  public final ObjectHandler<D, O> with(ObjectQuery<O> query) {
+    query.addAll(query);
+    return this;
+  }
+
+  @Override
+  public final ObjectHandler<D, O> filter(ObjectRestriction<O> restriction) {
+    query.add(checkNotNull(restriction));
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filter(ClassReference classRef) {
-    query.add(new ClassRestriction<>(bridge, classRef));
+    filter(new ClassRestriction<>(bridge, classRef));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, T value) {
-    query.add(new FieldRestriction<>(bridge, field, value));
+    filter(new FieldRestriction<>(bridge, field, value));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, Collection<T> values) {
-    query.add(new FieldRestriction<>(bridge, field, values));
+    filter(new FieldRestriction<>(bridge, field, values));
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filterAbsent(ClassField<?> field) {
-    query.add(new FieldAbsentRestriction<>(bridge, field));
+    filter(new FieldAbsentRestriction<>(bridge, field));
     return this;
   }
 
