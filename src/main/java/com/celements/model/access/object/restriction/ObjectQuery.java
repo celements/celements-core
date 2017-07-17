@@ -22,30 +22,19 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     super(coll);
   }
 
-  public FluentIterable<ObjectRestriction<O>> asIter() {
-    return FluentIterable.from(this);
-  }
-
   public FluentIterable<ObjectRestriction<O>> getRestrictions(ClassReference classRef) {
-    return getNonClassRestrictions().append(getClassRestrictions(classRef));
+    return FluentIterable.from(this).filter(new ClassPredicate(classRef));
   }
 
-  public FluentIterable<ObjectRestriction<O>> getNonClassRestrictions() {
-    return this.asIter().filter(new Predicate<ObjectRestriction<O>>() {
+  public Set<ClassReference> getClassRefs() {
+    return FluentIterable.from(this).filter(getClassRestrictionClass()).transform(
+        new Function<ClassRestriction<O>, ClassReference>() {
 
-      @Override
-      public boolean apply(ObjectRestriction<O> restr) {
-        return !(restr instanceof ClassRestriction);
-      }
-    });
-  }
-
-  public FluentIterable<ClassRestriction<O>> getClassRestrictions() {
-    return this.asIter().filter(getClassRestrictionClass());
-  }
-
-  public FluentIterable<ClassRestriction<O>> getClassRestrictions(ClassReference classRef) {
-    return getClassRestrictions().filter(new ClassPredicate(classRef));
+          @Override
+          public ClassReference apply(ClassRestriction<O> restr) {
+            return restr.getClassRef();
+          }
+        }).toSet();
   }
 
   @SuppressWarnings("unchecked")
@@ -53,22 +42,9 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     return (Class<ClassRestriction<O>>) (Class<?>) ClassRestriction.class;
   }
 
-  public Set<ClassReference> getClassRefs() {
-    return getClassRestrictions().transform(new Function<ClassRestriction<O>, ClassReference>() {
-
-      @Override
-      public ClassReference apply(ClassRestriction<O> restr) {
-        return restr.getClassRef();
-      }
-    }).toSet();
-  }
-
-  public FluentIterable<FieldRestriction<O, ?>> getFieldRestrictions() {
-    return this.asIter().filter(getFieldRestrictionClass());
-  }
-
   public FluentIterable<FieldRestriction<O, ?>> getFieldRestrictions(ClassReference classRef) {
-    return getFieldRestrictions().filter(new ClassPredicate(classRef));
+    return FluentIterable.from(this).filter(getFieldRestrictionClass()).filter(new ClassPredicate(
+        classRef));
   }
 
   @SuppressWarnings("unchecked")
@@ -76,7 +52,7 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     return (Class<FieldRestriction<O, ?>>) (Class<?>) FieldRestriction.class;
   }
 
-  private class ClassPredicate implements Predicate<ClassRestriction<O>> {
+  private class ClassPredicate implements Predicate<ObjectRestriction<?>> {
 
     private final ClassReference classRef;
 
@@ -85,8 +61,11 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     }
 
     @Override
-    public boolean apply(ClassRestriction<O> restr) {
-      return restr.getClassRef().equals(classRef);
+    public boolean apply(ObjectRestriction<?> restr) {
+      if (restr instanceof ClassRestriction) {
+        return ((ClassRestriction<?>) restr).getClassRef().equals(classRef);
+      }
+      return true;
     }
 
   }
