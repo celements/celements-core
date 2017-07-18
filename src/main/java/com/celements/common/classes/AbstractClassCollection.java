@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Extend CelementsClassCollection and make the implementor a named component. Celements
+ * Extend AbstractClassCollection and make the implementor a named component. Celements
  * then will call your initClasses method on system start once or if it is explicitly
  * asked for.
  *
