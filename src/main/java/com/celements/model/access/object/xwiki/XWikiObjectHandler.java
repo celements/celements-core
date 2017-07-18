@@ -13,7 +13,7 @@ public class XWikiObjectHandler extends DefaultObjectHandler<XWikiDocument, Base
   }
 
   private XWikiObjectHandler(XWikiDocument doc) {
-    super(doc, new XWikiObjectBridge(doc));
+    super(new XWikiObjectBridge(), doc);
   }
 
 }

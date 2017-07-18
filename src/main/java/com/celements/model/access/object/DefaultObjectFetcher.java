@@ -26,26 +26,22 @@ import com.google.common.collect.Iterables;
 @Immutable
 public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
+  private final ObjectBridge<D, O> bridge;
   private final D doc;
   private final ObjectQuery<O> query;
-  private final ObjectBridge<D, O> bridge;
   private final boolean clone;
 
-  DefaultObjectFetcher(@NotNull D doc, @NotNull ObjectQuery<O> query,
-      @NotNull ObjectBridge<D, O> bridge) {
-    this(doc, query, bridge, true);
+  DefaultObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+      @NotNull ObjectQuery<O> query) {
+    this(bridge, doc, query, true);
   }
 
-  DefaultObjectFetcher(@NotNull D doc, @NotNull ObjectQuery<O> query,
-      @NotNull ObjectBridge<D, O> bridge, boolean clone) {
+  DefaultObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+      @NotNull ObjectQuery<O> query, boolean clone) {
+    this.bridge = checkNotNull(bridge);
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
-    this.bridge = checkNotNull(bridge);
     this.clone = clone;
-  }
-
-  D getDoc() {
-    return this.doc;
   }
 
   @Override
@@ -88,13 +84,13 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
     if (!query.isEmpty()) {
       ret.addAll(query.getClassRefs());
     } else {
-      ret.addAll(bridge.getDocClassRefs());
+      ret.addAll(bridge.getDocClassRefs(doc));
     }
     return ret;
   }
 
   private FluentIterable<O> getObjects(ClassReference classRef) {
-    FluentIterable<O> iter = FluentIterable.from(bridge.getObjects(classRef));
+    FluentIterable<O> iter = FluentIterable.from(bridge.getObjects(doc, classRef));
     iter = iter.filter(Predicates.and(query.getRestrictions(classRef)));
     if (clone) {
       iter = iter.transform(new ObjectCloner());
@@ -112,7 +108,7 @@ public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
   @Override
   public ObjectHandler<D, O> handle() {
-    return new DefaultObjectHandler<>(doc, bridge, query);
+    return new DefaultObjectHandler<>(bridge, doc, query);
   }
 
 }

@@ -7,9 +7,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.IModelAccessFacade;
@@ -26,14 +27,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+@Immutable
 public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject> {
 
-  private final XWikiDocument doc;
-
-  XWikiObjectBridge(@NotNull XWikiDocument doc) {
-    this.doc = checkNotNull(doc);
-    checkState(doc.getTranslation() == 0, MessageFormat.format("XWikiObjectAdapter cannot be used"
-        + " on translation ''{0}'' of doc ''{1}''", doc.getLanguage(), doc.getDocumentReference()));
+  XWikiObjectBridge() {
   }
 
   @Override
@@ -47,13 +44,25 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   }
 
   @Override
-  public List<ClassReference> getDocClassRefs() {
+  public void checkDoc(XWikiDocument doc) throws IllegalArgumentException {
+    checkArgument(doc.getTranslation() == 0, MessageFormat.format("XWikiObjectBridge "
+        + "cannot be used  on translation ''{0}'' of doc ''{1}''", doc.getLanguage(),
+        doc.getDocumentReference()));
+  }
+
+  @Override
+  public DocumentReference getDocRef(XWikiDocument doc) {
+    return new DocumentReference(doc.getDocumentReference());
+  }
+
+  @Override
+  public List<ClassReference> getDocClassRefs(XWikiDocument doc) {
     return FluentIterable.from(doc.getXObjects().keySet()).transform(
         ClassReference.FUNC_DOC_TO_CLASS_REF).toList();
   }
 
   @Override
-  public List<BaseObject> getObjects(ClassReference classRef) {
+  public List<BaseObject> getObjects(XWikiDocument doc, ClassReference classRef) {
     List<BaseObject> ret = new ArrayList<>();
     WikiReference docWiki = doc.getDocumentReference().getWikiReference();
     List<BaseObject> objs = firstNonNull(doc.getXObjects(classRef.getDocRef(docWiki)),
@@ -77,7 +86,7 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   }
 
   @Override
-  public BaseObject createObject(ClassReference classRef) {
+  public BaseObject createObject(XWikiDocument doc, ClassReference classRef) {
     WikiReference docWiki = doc.getDocumentReference().getWikiReference();
     try {
       return doc.newXObject(classRef.getDocRef(docWiki), getContext().getXWikiContext());
@@ -87,7 +96,7 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   }
 
   @Override
-  public boolean removeObject(BaseObject obj) {
+  public boolean removeObject(XWikiDocument doc, BaseObject obj) {
     return doc.removeXObject(obj);
   }
 

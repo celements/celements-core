@@ -7,6 +7,7 @@ import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
@@ -29,11 +30,16 @@ public interface ObjectBridge<D, O> {
   @NotNull
   Class<O> getObjectType();
 
-  @NotNull
-  List<ClassReference> getDocClassRefs();
+  void checkDoc(@NotNull D doc) throws IllegalArgumentException;
 
   @NotNull
-  List<O> getObjects(@NotNull ClassReference classRef);
+  DocumentReference getDocRef(@NotNull D doc);
+
+  @NotNull
+  List<ClassReference> getDocClassRefs(@NotNull D doc);
+
+  @NotNull
+  List<O> getObjects(@NotNull D doc, @NotNull ClassReference classRef);
 
   int getObjectNumber(@NotNull O obj);
 
@@ -44,9 +50,9 @@ public interface ObjectBridge<D, O> {
   O cloneObject(@NotNull O obj);
 
   @NotNull
-  O createObject(@NotNull ClassReference classRef);
+  O createObject(@NotNull D doc, @NotNull ClassReference classRef);
 
-  boolean removeObject(@NotNull O obj);
+  boolean removeObject(@NotNull D doc, @NotNull O obj);
 
   @NotNull
   <T> Optional<T> getObjectField(@NotNull O obj, @NotNull ClassField<T> field);

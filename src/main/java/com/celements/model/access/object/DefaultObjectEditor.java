@@ -21,17 +21,17 @@ import com.google.common.collect.FluentIterable;
 @Immutable
 public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
+  private final ObjectBridge<D, O> bridge;
   private final D doc;
   private final ObjectQuery<O> query;
-  private final ObjectBridge<D, O> bridge;
   private final ObjectFetcher<D, O> fetcher;
 
-  DefaultObjectEditor(@NotNull D doc, @NotNull ObjectQuery<O> query,
-      @NotNull ObjectBridge<D, O> bridge) {
+  DefaultObjectEditor(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+      @NotNull ObjectQuery<O> query) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
     this.bridge = checkNotNull(bridge);
-    this.fetcher = new DefaultObjectFetcher<>(doc, query, bridge, false);
+    this.fetcher = new DefaultObjectFetcher<>(bridge, doc, query, false);
   }
 
   @Override
@@ -65,7 +65,7 @@ public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
     }
 
     private O createObject(ClassReference classRef) {
-      final O obj = bridge.createObject(classRef);
+      final O obj = bridge.createObject(doc, classRef);
       query.getFieldRestrictions(classRef).forEach(new Consumer<FieldRestriction<O, ?>>() {
 
         @Override
@@ -92,14 +92,14 @@ public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
     @Override
     public boolean apply(O obj) {
-      return bridge.removeObject(obj);
+      return bridge.removeObject(doc, obj);
     }
 
   }
 
   @Override
   public ObjectHandler<D, O> handle() {
-    return new DefaultObjectHandler<>(doc, bridge, query);
+    return new DefaultObjectHandler<>(bridge, doc, query);
   }
 
   @Override

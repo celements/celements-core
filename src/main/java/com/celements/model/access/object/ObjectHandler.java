@@ -6,6 +6,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.access.object.restriction.ObjectRestriction;
@@ -23,6 +24,12 @@ import com.celements.model.classes.fields.ClassField;
  */
 @NotThreadSafe
 public interface ObjectHandler<D, O> {
+
+  @NotNull
+  ObjectBridge<D, O> getBridge();
+
+  @NotNull
+  DocumentReference getDocRef();
 
   /**
    * @return a view/snapshot of the current underlying filter
