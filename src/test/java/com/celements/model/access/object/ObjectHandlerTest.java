@@ -19,6 +19,9 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.exception.ClassDocumentLoadException;
+import com.celements.model.access.object.restriction.ClassRestriction;
+import com.celements.model.access.object.restriction.FieldAbsentRestriction;
+import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.access.object.xwiki.XWikiObjectHandler;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
@@ -31,7 +34,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.web.Utils;
 
-public class XWikiObjectHandlerTest extends AbstractComponentTest {
+public class ObjectHandlerTest extends AbstractComponentTest {
 
   private WikiReference wikiRef;
   private XWikiDocument doc;
@@ -46,7 +49,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private XWikiObjectHandler getObjHandler() {
+  private ObjectHandler<XWikiDocument, BaseObject> getObjHandler() {
     return XWikiObjectHandler.on(doc);
   }
 
@@ -63,17 +66,18 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_onDoc_isTranslation() throws Exception {
-    Exception ise = new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
+    IllegalArgumentException iae = new ExceptionAsserter<IllegalArgumentException>(
+        IllegalArgumentException.class) {
 
       @Override
-      protected void execute() throws Exception {
+      protected void execute() throws IllegalArgumentException {
         doc.setLanguage("en");
         doc.setTranslation(1);
         getObjHandler();
       }
     }.evaluate();
-    assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
-    assertTrue("format not replacing placeholder 1", ise.getMessage().contains("'"
+    assertTrue("format not replacing placeholder 0", iae.getMessage().contains("'en'"));
+    assertTrue("format not replacing placeholder 1", iae.getMessage().contains("'"
         + doc.getDocumentReference() + "'"));
   }
 
@@ -132,7 +136,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_filter_unique() throws Exception {
-    XWikiObjectHandler handler = getObjHandler();
+    ObjectHandler<XWikiDocument, BaseObject> handler = getObjHandler();
     handler.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
     assertEquals(3, handler.getQuery().size());
     handler.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
@@ -157,6 +161,33 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
       @Override
       protected void execute() throws Exception {
         getObjHandler().filterAbsent(null);
+      }
+    }.evaluate();
+  }
+
+  @Test
+  public void test_with() throws Exception {
+    ObjectHandler<XWikiDocument, BaseObject> handler = getObjHandler();
+    ObjectQuery<BaseObject> queryInit = new ObjectQuery<>();
+    queryInit.add(new ClassRestriction<>(handler.getBridge(), classRef));
+    queryInit.add(new FieldAbsentRestriction<>(handler.getBridge(), FIELD_MY_STRING));
+    handler.with(queryInit);
+    ObjectQuery<BaseObject> query = handler.getQuery();
+    assertEquals(2, query.size());
+    assertEquals(queryInit, query);
+    queryInit.add(new ClassRestriction<>(handler.getBridge(), classRef2));
+    assertEquals("query should be cloned in with", 2, query.size());
+    handler.getQuery().add(new ClassRestriction<>(handler.getBridge(), classRef2));
+    assertEquals("getQuery should return a clone", 2, query.size());
+  }
+
+  @Test
+  public void test_with_null() throws Exception {
+    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+
+      @Override
+      protected void execute() throws NullPointerException {
+        getObjHandler().with(null);
       }
     }.evaluate();
   }
@@ -378,7 +409,7 @@ public class XWikiObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetch_immutability() {
-    XWikiObjectHandler handler = getObjHandler();
+    ObjectHandler<XWikiDocument, BaseObject> handler = getObjHandler();
     handler.filter(classRef);
     assertEquals(1, handler.fetch().map().size());
     ObjectFetcher<XWikiDocument, BaseObject> fetcher = handler.fetch();

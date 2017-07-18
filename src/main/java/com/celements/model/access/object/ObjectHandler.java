@@ -32,7 +32,7 @@ public interface ObjectHandler<D, O> {
   DocumentReference getDocRef();
 
   /**
-   * @return a view/snapshot of the current underlying filter
+   * @return clone of the current query
    */
   @NotNull
   ObjectQuery<O> getQuery();

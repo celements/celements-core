@@ -53,7 +53,7 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
 
   @Override
   public final ObjectHandler<D, O> with(ObjectQuery<O> query) {
-    query.addAll(query);
+    this.query.addAll(query);
     return this;
   }
 
