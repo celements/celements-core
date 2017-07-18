@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableBiMap;
 
 public class EntityTypeUtil {
 
+  private static final Map<Class<? extends EntityReference>, Class<? extends EntityReference>> OVERRIDE_MAP;
   private static final BiMap<Class<? extends EntityReference>, EntityType> ENTITY_TYPE_MAP;
   private static final Map<EntityType, String> REGEX_MAP;
 
@@ -38,29 +39,42 @@ public class EntityTypeUtil {
   public static final String REGEX_ATT = REGEX_DOC + "\\@" + ".+";
 
   static {
-    Map<Class<? extends EntityReference>, EntityType> map = new HashMap<>();
-    map.put(WikiReference.class, EntityType.WIKI);
-    map.put(SpaceReference.class, EntityType.SPACE);
-    map.put(ImmutableDocumentReference.class, EntityType.DOCUMENT);
-    map.put(AttachmentReference.class, EntityType.ATTACHMENT);
-    map.put(ObjectReference.class, EntityType.OBJECT);
-    map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
-    ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(map);
-    Map<EntityType, String> regexMap = new LinkedHashMap<>(); // keeps insertion order
-    regexMap.put(EntityType.WIKI, REGEX_WIKINAME);
-    regexMap.put(EntityType.SPACE, REGEX_SPACE);
-    regexMap.put(EntityType.DOCUMENT, REGEX_DOC);
-    regexMap.put(EntityType.ATTACHMENT, REGEX_ATT);
-    REGEX_MAP = Collections.unmodifiableMap(regexMap);
+    Map<Class<? extends EntityReference>, Class<? extends EntityReference>> overrides = new HashMap<>();
+    overrides.put(DocumentReference.class, ImmutableDocumentReference.class);
+    // XXX add new immutable sub classes here
+    OVERRIDE_MAP = Collections.unmodifiableMap(overrides);
+
+    Map<Class<? extends EntityReference>, EntityType> entityTypes = new HashMap<>();
+    entityTypes.put(WikiReference.class, EntityType.WIKI);
+    entityTypes.put(SpaceReference.class, EntityType.SPACE);
+    entityTypes.put(ImmutableDocumentReference.class, EntityType.DOCUMENT);
+    entityTypes.put(AttachmentReference.class, EntityType.ATTACHMENT);
+    entityTypes.put(ObjectReference.class, EntityType.OBJECT);
+    entityTypes.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
+    ENTITY_TYPE_MAP = ImmutableBiMap.copyOf(entityTypes);
+
+    Map<EntityType, String> regexs = new LinkedHashMap<>(); // keeps insertion order
+    regexs.put(EntityType.WIKI, REGEX_WIKINAME);
+    regexs.put(EntityType.SPACE, REGEX_SPACE);
+    regexs.put(EntityType.DOCUMENT, REGEX_DOC);
+    regexs.put(EntityType.ATTACHMENT, REGEX_ATT);
+    REGEX_MAP = Collections.unmodifiableMap(regexs);
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <T extends EntityReference> Class<T> checkSubClassOverride(Class<T> token) {
+    if (OVERRIDE_MAP.containsKey(token)) {
+      return (Class<T>) OVERRIDE_MAP.get(token);
+    }
+    return token;
   }
 
   @NotNull
   public static Optional<EntityType> getEntityTypeForClass(
       @NotNull Class<? extends EntityReference> token) {
-    if (token == DocumentReference.class) {
-      token = ImmutableDocumentReference.class;
-    }
-    return Optional.fromNullable(ENTITY_TYPE_MAP.get(checkNotNull(token)));
+    token = checkSubClassOverride(checkNotNull(token));
+    return Optional.fromNullable(ENTITY_TYPE_MAP.get(token));
   }
 
   @NotNull

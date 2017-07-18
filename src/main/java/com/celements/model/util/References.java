@@ -60,6 +60,8 @@ public class References {
       @NotNull Class<T> token) {
     checkNotNull(ref);
     checkNotNull(token);
+    // clone as immutable subclass is preferable
+    token = checkSubClassOverride(token);
     try {
       ref = ref.clone();
       T ret;

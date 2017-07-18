@@ -10,6 +10,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -92,6 +93,8 @@ public class ReferencesTest extends AbstractComponentTest {
     assertEquals(ref, newRef);
     ref.getParent().setName("asdf");
     assertFalse(ref.equals(newRef));
+    assertTrue(newRef instanceof DocumentReference);
+    assertTrue(newRef instanceof ImmutableDocumentReference);
   }
 
   @Test
@@ -242,7 +245,7 @@ public class ReferencesTest extends AbstractComponentTest {
     assertTrue(ret.isPresent());
     assertEquals(docRef, ret.get());
     assertNotSame(docRef, ret.get());
-    assertEquals(DocumentReference.class, ret.get().getClass());
+    assertTrue(ret.get() instanceof DocumentReference);
   }
 
   @Test
@@ -262,7 +265,7 @@ public class ReferencesTest extends AbstractComponentTest {
     assertTrue(ret.isPresent());
     assertEquals(docRef, ret.get());
     assertNotSame(docRef, ret.get());
-    assertEquals(DocumentReference.class, ret.get().getClass());
+    assertTrue(ret.get() instanceof DocumentReference);
   }
 
   @Test

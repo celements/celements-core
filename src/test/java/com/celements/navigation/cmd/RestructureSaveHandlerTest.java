@@ -172,7 +172,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   @Test
   public void testConvertToDocRef() {
     String parentFN = "MySpace.ParentDoc";
-    assertEquals(DocumentReference.class, restrSaveCmd.convertToDocRef(parentFN).getClass());
+    assertTrue(restrSaveCmd.convertToDocRef(parentFN) instanceof DocumentReference);
   }
 
   @Test

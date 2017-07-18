@@ -1,6 +1,7 @@
 package com.celements.model.util;
 
 import static com.celements.model.util.EntityTypeUtil.*;
+import static com.google.common.base.MoreObjects.*;
 import static com.google.common.base.Preconditions.*;
 
 import org.xwiki.component.annotation.Component;
@@ -12,7 +13,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.context.ModelContext;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 
 @Component
@@ -53,7 +53,7 @@ public class DefaultModelUtils implements ModelUtils {
 
   @Override
   public <T extends EntityReference> T adjustRef(T ref, Class<T> token, EntityReference toRef) {
-    return References.adjustRef(ref, token, MoreObjects.firstNonNull(toRef, context.getWikiRef()));
+    return References.adjustRef(ref, token, firstNonNull(toRef, context.getWikiRef()));
   }
 
   @Override
@@ -87,10 +87,9 @@ public class DefaultModelUtils implements ModelUtils {
       // resolver cannot handle root reference
       resolvedRef = new WikiReference(name);
     } else {
-      baseRef = MoreObjects.firstNonNull(baseRef, context.getWikiRef());
+      baseRef = firstNonNull(baseRef, context.getWikiRef());
       resolvedRef = resolver.resolve(name, type, baseRef);
     }
-    // TODO return ImmutableDocumentReference
     return cloneRef(resolvedRef, token); // effective immutability
   }
 
