@@ -15,6 +15,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -40,7 +41,7 @@ public class EntityTypeUtil {
     Map<Class<? extends EntityReference>, EntityType> map = new HashMap<>();
     map.put(WikiReference.class, EntityType.WIKI);
     map.put(SpaceReference.class, EntityType.SPACE);
-    map.put(DocumentReference.class, EntityType.DOCUMENT);
+    map.put(ImmutableDocumentReference.class, EntityType.DOCUMENT);
     map.put(AttachmentReference.class, EntityType.ATTACHMENT);
     map.put(ObjectReference.class, EntityType.OBJECT);
     map.put(ObjectPropertyReference.class, EntityType.OBJECT_PROPERTY);
@@ -56,6 +57,9 @@ public class EntityTypeUtil {
   @NotNull
   public static Optional<EntityType> getEntityTypeForClass(
       @NotNull Class<? extends EntityReference> token) {
+    if (token == DocumentReference.class) {
+      token = ImmutableDocumentReference.class;
+    }
     return Optional.fromNullable(ENTITY_TYPE_MAP.get(checkNotNull(token)));
   }
 

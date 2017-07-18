@@ -73,7 +73,8 @@ public class ClassReference extends EntityReference {
   }
 
   public DocumentReference getDocRef(WikiReference wikiRef) {
-    return new DocumentReference(getName(), new SpaceReference(getParent().getName(), wikiRef));
+    return new ImmutableDocumentReference(getName(), new SpaceReference(getParent().getName(),
+        wikiRef));
   }
 
   private static ModelContext getModelContext() {
