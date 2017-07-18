@@ -2,6 +2,7 @@ package com.celements.model.access.object;
 
 import static com.celements.common.test.CelementsTestUtils.*;
 import static com.celements.model.classes.TestClassDefinition.*;
+import static com.google.common.base.MoreObjects.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -129,8 +130,8 @@ public class ObjectHandlerTest extends AbstractComponentTest {
   public void test_filter_values_empty() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     addObj(classRef, null, null);
-    addObj(classRef, field.getName(), null);
-    addObj(classRef, field.getName(), "val");
+    addObj(classRef, field, null);
+    addObj(classRef, field, "val");
     assertObjs(getObjHandler().filter(field, Collections.<String>emptyList()));
   }
 
@@ -148,7 +149,7 @@ public class ObjectHandlerTest extends AbstractComponentTest {
   @Test
   public void test_filterAbsent() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
-    BaseObject obj = addObj(classRef, field.getName(), null);
+    BaseObject obj = addObj(classRef, field, null);
     assertObjs(getObjHandler().filterAbsent(field), obj);
     assertObjs(getObjHandler().filter(classRef).filterAbsent(field), obj);
     assertObjs(getObjHandler().filter(field, "val").filterAbsent(field));
@@ -194,33 +195,81 @@ public class ObjectHandlerTest extends AbstractComponentTest {
 
   @Test
   public void test_fetch_emptyDoc() throws Exception {
-    List<BaseObject> ret = getObjHandler().fetch().list();
-    assertEquals(0, ret.size());
+    assertObjs(getObjHandler());
   }
 
   @Test
   public void test_fetch_oneObj() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     String val = "val";
-    BaseObject obj = addObj(classRef, field.getName(), val);
+    BaseObject obj = addObj(classRef, field, val);
+
     assertObjs(getObjHandler(), obj);
     assertObjs(getObjHandler().filter(classRef), obj);
     assertObjs(getObjHandler().filter(field, val), obj);
-    assertObjs(getObjHandler().filter(field, Arrays.asList("", val)), obj);
+    assertObjs(getObjHandler().filter(field, Arrays.asList("asdf", val)), obj);
     assertObjs(getObjHandler().filterAbsent(field));
   }
 
   @Test
-  public void test_fetch_mutlipleObj() throws Exception {
+  public void test_fetch_class() throws Exception {
+    BaseObject obj1 = addObj(classRef, null, null);
+    BaseObject obj2 = addObj(classRef2, null, null);
+
+    assertObjs(getObjHandler().filter(classRef), obj1);
+    assertObjs(getObjHandler().filter(classRef2), obj2);
+    assertObjs(getObjHandler().filter(classRef).filter(classRef2), obj1, obj2);
+  }
+
+  @Test
+  public void test_fetch_field_and() throws Exception {
+    ClassField<String> field1 = FIELD_MY_STRING;
+    String val1 = "val";
+    ClassField<Integer> field2 = FIELD_MY_INT;
+    Integer val2 = 5;
+
+    BaseObject obj1 = addObj(classRef, field1, val1);
+    BaseObject obj2 = addObj(classRef, field2, val2);
+    BaseObject obj3 = addObj(classRef, field1, val1);
+    obj3.setIntValue(field2.getName(), val2);
+
+    assertObjs(getObjHandler(), obj1, obj2, obj3);
+    assertObjs(getObjHandler().filter(field1, val1), obj1, obj3);
+    assertObjs(getObjHandler().filter(field2, val2), obj2, obj3);
+    assertObjs(getObjHandler().filter(field1, val1).filter(field2, val2), obj3);
+    assertObjs(getObjHandler().filterAbsent(field1), obj2);
+    assertObjs(getObjHandler().filterAbsent(field1).filter(field2, val2), obj2);
+    assertObjs(getObjHandler().filterAbsent(field2), obj1);
+    assertObjs(getObjHandler().filterAbsent(field2).filter(field1, val1), obj1);
+  }
+
+  @Test
+  public void test_fetch_field_or() throws Exception {
+    ClassField<String> field = FIELD_MY_STRING;
+    String val1 = "val1";
+    String val2 = "val2";
+
+    addObj(classRef, null, null);
+    addObj(classRef, field, "asdf");
+    BaseObject obj1 = addObj(classRef, field, val1);
+    BaseObject obj2 = addObj(classRef, field, val2);
+
+    assertObjs(getObjHandler().filter(field, val1), obj1);
+    assertObjs(getObjHandler().filter(field, val2), obj2);
+    assertObjs(getObjHandler().filter(field, Arrays.asList(val1, val2)), obj1, obj2);
+  }
+
+  @Test
+  public void test_fetch_combined() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     String val1 = "val1";
     String val2 = "val2";
     BaseObject obj1 = addObj(classRef, null, null);
-    BaseObject obj2 = addObj(classRef2, field.getName(), val1);
-    BaseObject obj3 = addObj(classRef, field.getName(), val1);
-    BaseObject obj4 = addObj(classRef, "other", null);
-    BaseObject obj5 = addObj(classRef, field.getName(), null);
-    BaseObject obj6 = addObj(classRef, field.getName(), val2);
+    BaseObject obj2 = addObj(classRef2, field, val1);
+    BaseObject obj3 = addObj(classRef, field, val1);
+    BaseObject obj4 = addObj(classRef, FIELD_MY_INT, null);
+    BaseObject obj5 = addObj(classRef, field, null);
+    BaseObject obj6 = addObj(classRef, field, val2);
     assertObjs(getObjHandler(), obj1, obj3, obj4, obj5, obj6, obj2);
     assertObjs(getObjHandler().filter(classRef), obj1, obj3, obj4, obj5, obj6);
     assertObjs(getObjHandler().filterAbsent(field), obj1, obj4, obj5);
@@ -233,28 +282,6 @@ public class ObjectHandlerTest extends AbstractComponentTest {
     assertObjs(getObjHandler().filter(field, val1).filter(classRef2), obj3, obj2);
     assertObjs(getObjHandler().filter(classRef).filter(classRef2), obj1, obj3, obj4, obj5, obj6,
         obj2);
-  }
-
-  @Test
-  public void test_fetch_mutlipleFields() throws Exception {
-    ClassField<String> field1 = FIELD_MY_STRING;
-    String val1 = "val";
-    ClassField<Integer> field2 = FIELD_MY_INT;
-    Integer val2 = 5;
-
-    BaseObject obj1 = addObj(classRef, field1.getName(), val1);
-    BaseObject obj2 = addObj(classRef, null, null);
-    obj2.setIntValue(field2.getName(), val2);
-    BaseObject obj3 = addObj(classRef, field1.getName(), val1);
-    obj3.setIntValue(field2.getName(), val2);
-
-    assertObjs(getObjHandler().filter(field1, val1), obj1, obj3);
-    assertObjs(getObjHandler().filter(field2, val2), obj2, obj3);
-    assertObjs(getObjHandler().filter(field1, val1).filter(field2, val2), obj3);
-    assertObjs(getObjHandler().filterAbsent(field1), obj2);
-    assertObjs(getObjHandler().filterAbsent(field1).filter(field2, val2), obj2);
-    assertObjs(getObjHandler().filterAbsent(field2), obj1);
-    assertObjs(getObjHandler().filterAbsent(field2).filter(field1, val1), obj1);
   }
 
   @Test
@@ -511,7 +538,7 @@ public class ObjectHandlerTest extends AbstractComponentTest {
   public void test_createIfNotExists_create_field() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     String val = "val";
-    BaseObject obj = addObj(classRef, field.getName(), "otherval");
+    BaseObject obj = addObj(classRef, field, "otherval");
     BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wikiRef));
     expect(bClass.get(field.getName())).andReturn(new StringClass()).once();
     replayDefault();
@@ -541,7 +568,7 @@ public class ObjectHandlerTest extends AbstractComponentTest {
   public void test_createIfNotExists_exists_field() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     String val = "val";
-    BaseObject obj = addObj(classRef, field.getName(), val);
+    BaseObject obj = addObj(classRef, field, val);
     replayDefault();
     Map<ClassReference, BaseObject> ret = getObjHandler().filter(field,
         val).edit().createIfNotExists();
@@ -601,10 +628,10 @@ public class ObjectHandlerTest extends AbstractComponentTest {
   public void test_remove_keyValue() {
     ClassField<String> field = FIELD_MY_STRING;
     List<String> vals = Arrays.asList("val1", "val2");
-    BaseObject obj1 = addObj(classRef, field.getName(), vals.get(0));
+    BaseObject obj1 = addObj(classRef, field, vals.get(0));
     BaseObject obj2 = addObj(classRef, null, null);
-    BaseObject obj3 = addObj(classRef, field.getName(), vals.get(1));
-    BaseObject obj4 = addObj(classRef2, field.getName(), vals.get(0));
+    BaseObject obj3 = addObj(classRef, field, vals.get(1));
+    BaseObject obj4 = addObj(classRef2, field, vals.get(0));
     List<BaseObject> ret = getObjHandler().filter(field, vals).edit().remove();
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
@@ -612,17 +639,21 @@ public class ObjectHandlerTest extends AbstractComponentTest {
     assertObjs(getObjHandler(), obj2, obj4);
   }
 
-  private BaseObject addObj(ClassReference classRef, String key, String value) {
-    BaseObject obj = createObj(classRef, key, value);
+  private <T> BaseObject addObj(ClassReference classRef, ClassField<T> field, T value) {
+    BaseObject obj = createObj(classRef, field, value);
     doc.addXObject(obj);
     return obj;
   }
 
-  private BaseObject createObj(ClassReference classRef, String key, String value) {
+  private <T> BaseObject createObj(ClassReference classRef, ClassField<T> field, T value) {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef.getDocRef(wikiRef));
-    if (key != null) {
-      obj.setStringValue(key, value);
+    if (field != null) {
+      if (field.getType() == String.class) {
+        obj.setStringValue(field.getName(), (String) value);
+      } else if (field.getType() == Integer.class) {
+        obj.setIntValue(field.getName(), firstNonNull((Integer) value, 0));
+      }
     }
     return obj;
   }

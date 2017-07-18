@@ -63,7 +63,7 @@ public interface ObjectHandler<D, O> {
   <T> ObjectHandler<D, O> filter(@NotNull ClassField<T> field, @NotNull T value);
 
   /**
-   * filters objects for the given {@link ClassField} and possible values
+   * filters objects for the given {@link ClassField} and possible values (logical OR)
    *
    * @param field
    * @param values
