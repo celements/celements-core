@@ -35,7 +35,6 @@ import com.celements.model.classes.fields.CustomClassField;
 import com.celements.model.context.ModelContext;
 import com.celements.model.util.ClassFieldValue;
 import com.celements.model.util.ModelUtils;
-import com.celements.model.util.References;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.rights.access.exceptions.NoAccessRightsException;
@@ -253,13 +252,6 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   private XWikiDocument cloneDoc(XWikiDocument doc) {
     if (doc.isFromCache()) {
       doc = doc.clone();
-      // fix missing docRef clone in XWikiDocument.clone()
-      DocumentReference docRef = References.cloneRef(doc.getDocumentReference(),
-          DocumentReference.class);
-      // set invalid docRef first to circumvent equals check in setDocumentReference
-      doc.setDocumentReference(new DocumentReference("$", "$", "$"));
-      doc.setDocumentReference(docRef);
-      doc.setMetaDataDirty(false); // set true by setDocumentReference
       doc.setFromCache(false);
     }
     return doc;

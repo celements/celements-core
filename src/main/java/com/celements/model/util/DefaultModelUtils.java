@@ -90,6 +90,7 @@ public class DefaultModelUtils implements ModelUtils {
       baseRef = MoreObjects.firstNonNull(baseRef, context.getWikiRef());
       resolvedRef = resolver.resolve(name, type, baseRef);
     }
+    // TODO return ImmutableDocumentReference
     return cloneRef(resolvedRef, token); // effective immutability
   }
 

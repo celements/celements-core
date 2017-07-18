@@ -116,8 +116,8 @@ public class References {
    * @return a new instance of the adjusted reference
    */
   @NotNull
-  public static <T extends EntityReference> T adjustRef(@NotNull T ref, @NotNull Class<T> token,
-      @Nullable EntityReference toRef) {
+  public static <T extends EntityReference> T adjustRef(@NotNull T ref,
+      @NotNull Class<? extends T> token, @Nullable EntityReference toRef) {
     EntityType type = getEntityTypeForClass(token).orNull();
     // combinedRef cannot be absent since ref is not null
     EntityReference combinedRef = combineRef(token, type, toRef, checkNotNull(ref)).get();

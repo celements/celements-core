@@ -140,4 +140,15 @@ public class ImmutableDocumentReferenceTest extends AbstractComponentTest {
     assertEquals(docRef, clone);
   }
 
+  @Test
+  public void test_mutability_input() {
+    DocumentReference input = new DocumentReference(docRef);
+    DocumentReference immutableDocRef = new ImmutableDocumentReference(input);
+    input.setName("asdf");
+    input.getParent().setName("asdf");
+    input.getWikiReference().setName("asdf");
+    input.setWikiReference(new WikiReference("asdf"));
+    assertEquals(docRef, immutableDocRef);
+  }
+
 }
