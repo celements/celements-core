@@ -144,8 +144,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
     verifyDefault();
     assertNotSame(doc, theDoc);
-    assertEquals(doc.getDocumentReference(), theDoc.getDocumentReference());
-    assertNotSame(doc.getDocumentReference(), theDoc.getDocumentReference());
   }
 
   @Test
