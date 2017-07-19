@@ -12,7 +12,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -88,7 +87,7 @@ public class NextFreeDocService implements INextFreeDocRole {
   private DocumentReference createDocRef(DocumentReference baseDocRef, long num) {
     String name = new StringBuilder(baseDocRef.getName()).append(num).toString();
     SpaceReference parent = References.extractRef(baseDocRef, SpaceReference.class).get();
-    return References.create(ImmutableDocumentReference.class, name, parent);
+    return References.create(DocumentReference.class, name, parent);
   }
 
   /**

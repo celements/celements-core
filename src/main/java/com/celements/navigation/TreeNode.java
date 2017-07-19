@@ -29,7 +29,6 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.celements.model.util.ModelUtils;
 import com.google.common.base.MoreObjects;
@@ -78,7 +77,7 @@ public final class TreeNode {
   private TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @Nullable String partName, @Nullable PartNameGetter strategy) {
     checkNotNull(docRef, "Document reference for TreeNode may not be null.");
-    this.docRef = new ImmutableDocumentReference(docRef);
+    this.docRef = getModelUtils().cloneRef(docRef, DocumentReference.class);
     this.parentRef = (parentRef != null) ? getModelUtils().cloneRef(parentRef) : null;
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
     this.partName = (strategy == null) ? Strings.nullToEmpty(partName) : partName;
