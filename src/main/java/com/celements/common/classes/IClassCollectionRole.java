@@ -30,6 +30,9 @@ import com.xpn.xwiki.XWikiException;
 @ComponentRole
 public interface IClassCollectionRole {
 
+  public static final String ACTIVATED_PARAM = "celements.classcollections";
+  public static final String ACTIVATED_XWIKIPREF = "activated_classcollections";
+
   public void runUpdate() throws XWikiException;
 
   public String getConfigName();
