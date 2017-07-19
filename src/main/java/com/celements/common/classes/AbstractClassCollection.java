@@ -75,9 +75,9 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   @Override
   public boolean isActivated() {
-    return ("," + getContext().getWiki().getXWikiPreference("activated_classcollections",
-        getContext()) + "," + getContext().getWiki().Param("celements.classcollections", "")
-        + ",").contains("," + getConfigName() + ",");
+    return ("," + getContext().getWiki().getXWikiPreference(ACTIVATED_XWIKIPREF, getContext()) + ","
+        + getContext().getWiki().Param(ACTIVATED_PARAM, "") + ",").contains("," + getConfigName()
+            + ",");
   }
 
   protected XWikiDocument getClassDoc(DocumentReference classRef) {

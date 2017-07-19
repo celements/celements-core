@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 
+import com.celements.model.context.ModelContext;
+
 public abstract class AbstractClassPackage implements ClassPackage {
 
   protected Logger LOGGER = LoggerFactory.getLogger(ClassPackage.class);
@@ -14,17 +16,20 @@ public abstract class AbstractClassPackage implements ClassPackage {
   @Requirement
   protected ConfigurationSource configSrc;
 
+  @Requirement
+  protected ModelContext context;
+
   @Override
   public boolean isActivated() {
-    boolean ret = false;
+    boolean activated = false;
     Object prop = configSrc.getProperty(CFG_SRC_KEY);
     if (prop instanceof Collection) {
-      ret = ((Collection<?>) prop).contains(getName());
+      activated = ((Collection<?>) prop).contains(getName());
     } else if (prop instanceof String) {
-      ret = prop.toString().trim().equals(getName());
+      activated = prop.toString().trim().equals(getName());
     }
-    LOGGER.debug("{}: isActivated '{}' for property value '{}'", getName(), ret, prop);
-    return ret;
+    LOGGER.debug("{}: isActivated '{}' for property value '{}'", getName(), activated, prop);
+    return activated;
   }
 
 }
