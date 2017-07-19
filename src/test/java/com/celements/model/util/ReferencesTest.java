@@ -109,6 +109,24 @@ public class ReferencesTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_cloneRef_noChild() {
+    SpaceReference ref = docRef.getLastSpaceReference();
+    assertNotNull(ref.getChild());
+    assertNull("child not lost in clone", cloneRef(ref).getChild());
+    assertNull("child not lost in clone", cloneRef(ref, SpaceReference.class).getChild());
+    assertNull("child not lost in clone", cloneRef(ref, EntityReference.class).getChild());
+  }
+
+  @Test
+  public void test_cloneRef_wrongAbsoluteType() {
+    try {
+      cloneRef(spaceRef, DocumentReference.class);
+      fail("expecting failure, cannot clone space reference as document reference");
+    } catch (IllegalArgumentException iae) {
+    }
+  }
+
+  @Test
   public void test_cloneRef_relative() {
     EntityReference ref = getRelativeRefResolver().resolve(modelUtils.serializeRefLocal(docRef),
         EntityType.DOCUMENT);
