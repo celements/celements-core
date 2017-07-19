@@ -7,7 +7,6 @@ import javax.annotation.concurrent.Immutable;
 import org.xwiki.model.EntityType;
 
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.References;
 import com.google.common.base.Function;
 import com.xpn.xwiki.web.Utils;
 
@@ -48,7 +47,7 @@ public class ClassReference extends EntityReference {
 
   @Override
   public EntityReference getParent() {
-    return References.cloneRef(super.getParent());
+    return super.getParent().clone();
   }
 
   @Override
@@ -65,8 +64,8 @@ public class ClassReference extends EntityReference {
   }
 
   @Override
-  public EntityReference clone() {
-    return new ClassReference(this);
+  public ClassReference clone() {
+    return this;
   }
 
   public DocumentReference getDocRef() {

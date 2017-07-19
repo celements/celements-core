@@ -27,9 +27,7 @@ public class ClassReferenceTest extends AbstractComponentTest {
 
   @Test
   public void test_clone() {
-    assertNotSame(classRef, classRef.clone());
-    assertEquals(classRef, classRef.clone());
-    assertTrue(classRef.clone() instanceof ClassReference);
+    assertSame(classRef, classRef.clone());
   }
 
   @Test

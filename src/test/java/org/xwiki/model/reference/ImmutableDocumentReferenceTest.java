@@ -30,14 +30,7 @@ public class ImmutableDocumentReferenceTest extends AbstractComponentTest {
 
   @Test
   public void test_clone() {
-    assertNotSame(docRef, docRef.clone());
-    assertEquals(docRef, docRef.clone());
-    assertTrue(docRef.clone() instanceof ImmutableDocumentReference);
-  }
-
-  @Test
-  public void test_getName() {
-    assertEquals("doc", docRef.getName());
+    assertSame(docRef, docRef.clone());
   }
 
   @Test
@@ -58,8 +51,10 @@ public class ImmutableDocumentReferenceTest extends AbstractComponentTest {
     clone.getParent().setName("x");
     clone.getParent().setParent(new WikiReference("asdf"));
     clone.getParent().setChild(null);
+    clone.getParent().getParent().getChild().setName("x");
     assertEquals(docRef, clone);
     assertSame(docRef, docRef.getParent().getChild());
+    assertSame(docRef, docRef.getParent().getParent().getChild().getChild());
   }
 
   @Test

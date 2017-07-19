@@ -6,8 +6,6 @@ import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.EntityType;
 
-import com.celements.model.util.References;
-
 @Immutable
 public class ImmutableDocumentReference extends DocumentReference {
 
@@ -47,8 +45,8 @@ public class ImmutableDocumentReference extends DocumentReference {
   }
 
   @Override
-  public EntityReference getParent() {
-    return References.cloneRef(super.getParent());
+  public SpaceReference getParent() {
+    return (SpaceReference) super.getParent().clone();
   }
 
   @Override
@@ -70,8 +68,8 @@ public class ImmutableDocumentReference extends DocumentReference {
   }
 
   @Override
-  public EntityReference clone() {
-    return new ImmutableDocumentReference(this);
+  public ImmutableDocumentReference clone() {
+    return this;
   }
 
 }
