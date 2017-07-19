@@ -33,10 +33,15 @@ public class References {
 
   @NotNull
   public static Class<? extends EntityReference> determineClass(@NotNull EntityReference ref) {
-    return isAbsoluteRef(ref) ? getClassForEntityType(ref.getType()) : EntityReference.class;
+    if ((ref.getClass() == EntityReference.class) && isAbsoluteRef(ref)) {
+      return getClassForEntityType(ref.getType());
+    }
+    return ref.getClass();
   }
 
   /**
+   * NOTE: clone will have no child set
+   *
    * @param ref
    *          the reference to be cloned
    * @return a cloned instance of the reference
@@ -47,6 +52,8 @@ public class References {
   }
 
   /**
+   * NOTE: clone will have no child set
+   *
    * @param ref
    *          the reference to be cloned
    * @param token
@@ -60,21 +67,27 @@ public class References {
       @NotNull Class<T> token) {
     checkNotNull(ref);
     checkNotNull(token);
-    try {
-      ref = ref.clone();
-      T ret;
-      if (token == EntityReference.class) {
-        ret = token.cast(ref);
-      } else if (isAbsoluteRef(ref)) {
-        ret = token.getConstructor(EntityReference.class).newInstance(ref);
-      } else {
-        throw new IllegalArgumentException("Relative references can only be returned as "
-            + "EntityReference");
+    T ret;
+    if (token == EntityReference.class) {
+      ret = token.cast(ref.clone());
+      try {
+        // EntityReference.clone doesn't correctly clone the child, therefore set it to null
+        ret.setChild(null);
+      } catch (IllegalStateException ise) {
+        // expected for immutable reference types
       }
-      return ret;
-    } catch (ReflectiveOperationException | SecurityException exc) {
-      throw new IllegalArgumentException("Unsupported entity class: " + token, exc);
+    } else if (token == determineClass(ref)) {
+      try {
+        ret = token.getConstructor(EntityReference.class).newInstance(ref);
+      } catch (ReflectiveOperationException | SecurityException exc) {
+        throw new IllegalArgumentException("Unsupported entity class: " + token, exc);
+      }
+    } else {
+      String msg = isAbsoluteRef(ref) ? "Given reference is not a " + token.getSimpleName()
+          : "Given reference is relative and can only be returned as EntityReference";
+      throw new IllegalArgumentException(msg);
     }
+    return ret;
   }
 
   /**
