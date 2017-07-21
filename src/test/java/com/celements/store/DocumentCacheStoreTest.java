@@ -8,7 +8,6 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -219,7 +218,6 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     assertNotSame(inputParamDoc, querySaveDoc);
     assertEquals(inputParamDoc.getDocumentReference(), querySaveDoc.getDocumentReference());
     assertEquals(inputParamDoc.getLanguage(), querySaveDoc.getLanguage());
-    assertTrue(querySaveDoc.getDocumentReference() instanceof ImmutableDocumentReference);
     assertFalse(existingDocument.isNew());
     assertTrue(existingDocument.isFromCache());
     String key = docCacheStore.getKeyWithLang(existingDocument);

@@ -48,7 +48,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -850,9 +849,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
         LOGGER_DL.trace("DocumentLoader-{}: Trying to get doc '{}' for real",
             Thread.currentThread().getId(), key);
         // IMPORTANT: do not clone here. Creating new document is much faster.
-        // however use ImmutableDocumentReference to avoid cache poisoning via reference
-        XWikiDocument buildDoc = new XWikiDocument(new ImmutableDocumentReference(
-            doc.getDocumentReference()));
+        XWikiDocument buildDoc = new XWikiDocument(doc.getDocumentReference());
         buildDoc.setLanguage(doc.getLanguage());
         buildDoc = getBackingStore().loadXWikiDoc(buildDoc, context);
         buildDoc.setStore(getBackingStore());
