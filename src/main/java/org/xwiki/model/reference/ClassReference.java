@@ -1,5 +1,6 @@
 package org.xwiki.model.reference;
 
+import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -19,6 +20,7 @@ public class ClassReference extends EntityReference {
 
   public ClassReference(EntityReference reference) {
     super(reference.getName(), reference.getType(), reference.getParent());
+    setChild(reference.getChild());
     initialised = true;
   }
 
@@ -53,7 +55,9 @@ public class ClassReference extends EntityReference {
   @Override
   public void setChild(EntityReference child) {
     checkInit();
-    super.setChild(child);
+    if (child != null) {
+      super.setChild(cloneRef(child));
+    }
   }
 
   @Override

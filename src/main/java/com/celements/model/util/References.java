@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ImmutableReference;
 
 import com.google.common.base.Optional;
 
@@ -43,8 +44,6 @@ public class References {
   }
 
   /**
-   * NOTE: clone will have no child set
-   *
    * @param ref
    *          the reference to be cloned
    * @return a cloned instance of the reference
@@ -55,8 +54,6 @@ public class References {
   }
 
   /**
-   * NOTE: clone will have no child set
-   *
    * @param ref
    *          the reference to be cloned
    * @param token
@@ -69,29 +66,37 @@ public class References {
   public static <T extends EntityReference> T cloneRef(@NotNull EntityReference ref,
       @NotNull Class<T> token) {
     checkNotNull(ref);
+    checkNotNull(token);
     // clone as immutable is preferable
-    token = checkClassOverride(checkNotNull(token));
+    token = checkClassOverride(token);
+    assertAssignability(ref, token);
     T ret;
-    if (token == EntityReference.class) {
+    if (ref instanceof ImmutableReference) {
+      ret = token.cast(ref);
+    } else if (token == EntityReference.class) {
       ret = token.cast(ref.clone());
-      try {
-        // EntityReference.clone doesn't correctly clone the child, therefore set it to null
-        ret.setChild(null);
-      } catch (IllegalStateException ise) {
-        // expected for immutable reference types
-      }
-    } else if (token == determineClass(ref)) {
+    } else {
       try {
         ret = token.getConstructor(EntityReference.class).newInstance(ref);
       } catch (ReflectiveOperationException | SecurityException exc) {
         throw new IllegalArgumentException("Unsupported entity class: " + token, exc);
       }
-    } else {
-      String msg = isAbsoluteRef(ref) ? "Given reference is not a " + token.getSimpleName()
-          : "Given reference is relative and can only be returned as EntityReference";
-      throw new IllegalArgumentException(msg);
+    }
+    // EntityReference.clone doesn't correctly clone the child, therefore set for mutable references
+    if (!(ret instanceof ImmutableReference) && (ref.getChild() != null)) {
+      ret.setChild(cloneRef(ref.getChild()));
     }
     return ret;
+  }
+
+  private static void assertAssignability(EntityReference ref, Class<?> token)
+      throws IllegalArgumentException {
+    if ((token != EntityReference.class) && (determineClass(ref) != token)) {
+      String msg = "Given " + (isAbsoluteRef(ref) ? "absolute reference (" + determineClass(
+          ref).getSimpleName() + ")" : "relative reference") + " is not assignable to '"
+          + token.getSimpleName() + "' - " + ref;
+      throw new IllegalArgumentException(msg);
+    }
   }
 
   /**
