@@ -1,5 +1,6 @@
 package org.xwiki.model.reference;
 
+import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -7,7 +8,7 @@ import javax.annotation.concurrent.Immutable;
 import org.xwiki.model.EntityType;
 
 @Immutable
-public class ImmutableDocumentReference extends DocumentReference {
+public class ImmutableDocumentReference extends DocumentReference implements ImmutableReference {
 
   private static final long serialVersionUID = 4196990820112451663L;
 
@@ -15,6 +16,7 @@ public class ImmutableDocumentReference extends DocumentReference {
 
   public ImmutableDocumentReference(EntityReference reference) {
     super(reference);
+    setChild(reference.getChild());
     initialised = true;
   }
 
@@ -41,6 +43,7 @@ public class ImmutableDocumentReference extends DocumentReference {
   @Override
   public void setParent(EntityReference parent) {
     checkInit();
+    // super already clones parent before setting
     super.setParent(parent);
   }
 
@@ -52,7 +55,14 @@ public class ImmutableDocumentReference extends DocumentReference {
   @Override
   public void setChild(EntityReference child) {
     checkInit();
-    super.setChild(child);
+    if (child != null) {
+      super.setChild(cloneRef(child));
+    }
+  }
+
+  @Override
+  public EntityReference getChild() {
+    return super.getChild() != null ? super.getChild().clone() : null;
   }
 
   @Override
