@@ -33,10 +33,13 @@ public class References {
 
   @NotNull
   public static Class<? extends EntityReference> determineClass(@NotNull EntityReference ref) {
-    if ((ref.getClass() == EntityReference.class) && isAbsoluteRef(ref)) {
-      return getClassForEntityType(ref.getType());
+    Class<? extends EntityReference> type = ref.getClass();
+    if (type != EntityReference.class) {
+      type = checkSubClassOverride(type);
+    } else if (isAbsoluteRef(ref)) {
+      type = getClassForEntityType(ref.getType());
     }
-    return ref.getClass();
+    return type;
   }
 
   /**
