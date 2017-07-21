@@ -70,6 +70,16 @@ public class ImmutableDocumentReferenceTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_getChild() {
+    EntityReference child = new EntityReference("child", EntityType.ATTACHMENT);
+    docRef = new DocumentReference(docRef);
+    docRef.setChild(child);
+    docRef = new ImmutableDocumentReference(docRef);
+    assertNotSame(child, docRef.getChild());
+    assertEquals(child, docRef.getChild());
+  }
+
+  @Test
   public void test_setChild() {
     new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
 
