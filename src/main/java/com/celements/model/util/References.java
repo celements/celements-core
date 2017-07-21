@@ -33,13 +33,13 @@ public class References {
 
   @NotNull
   public static Class<? extends EntityReference> determineClass(@NotNull EntityReference ref) {
-    Class<? extends EntityReference> type = ref.getClass();
-    if (type != EntityReference.class) {
-      type = checkSubClassOverride(type);
+    Class<? extends EntityReference> token = ref.getClass();
+    if (token != EntityReference.class) {
+      token = checkClassOverride(token);
     } else if (isAbsoluteRef(ref)) {
-      type = getClassForEntityType(ref.getType());
+      token = getClassForEntityType(ref.getType());
     }
-    return type;
+    return token;
   }
 
   /**
@@ -69,8 +69,8 @@ public class References {
   public static <T extends EntityReference> T cloneRef(@NotNull EntityReference ref,
       @NotNull Class<T> token) {
     checkNotNull(ref);
-    // clone as immutable subclass is preferable
-    token = checkSubClassOverride(checkNotNull(token));
+    // clone as immutable is preferable
+    token = checkClassOverride(checkNotNull(token));
     T ret;
     if (token == EntityReference.class) {
       ret = token.cast(ref.clone());

@@ -19,8 +19,6 @@
  */
 package com.celements.navigation;
 
-import static com.google.common.base.Preconditions.*;
-
 import java.util.Objects;
 
 import javax.annotation.Nullable;
@@ -32,6 +30,7 @@ import org.xwiki.model.reference.EntityReference;
 
 import com.celements.model.util.ModelUtils;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.web.Utils;
 
@@ -76,7 +75,7 @@ public final class TreeNode {
 
   private TreeNode(@NotNull DocumentReference docRef, @Nullable EntityReference parentRef,
       @Nullable Integer position, @Nullable String partName, @Nullable PartNameGetter strategy) {
-    checkNotNull(docRef, "Document reference for TreeNode may not be null.");
+    Preconditions.checkNotNull(docRef, "Document reference for TreeNode may not be null.");
     this.docRef = getModelUtils().cloneRef(docRef, DocumentReference.class);
     this.parentRef = (parentRef != null) ? getModelUtils().cloneRef(parentRef) : null;
     this.position = MoreObjects.firstNonNull(position, new Integer(0));
