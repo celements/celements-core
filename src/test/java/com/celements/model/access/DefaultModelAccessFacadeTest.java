@@ -145,7 +145,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     verifyDefault();
     assertNotSame(doc, theDoc);
     assertEquals(doc.getDocumentReference(), theDoc.getDocumentReference());
-    assertNotSame(doc.getDocumentReference(), theDoc.getDocumentReference());
   }
 
   @Test
