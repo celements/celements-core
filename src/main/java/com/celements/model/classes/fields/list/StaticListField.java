@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 @Immutable
 public final class StaticListField extends StringListField {
 
-  public static class Builder extends StringListField.Builder {
+  public static class Builder extends StringListField.Builder<Builder> {
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
       super(classDefName, name);
