@@ -8,8 +8,10 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.util.References;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
@@ -36,6 +38,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
 
   @Test
   public void testSaveXWikiDoc() throws Exception {
+    getContext().setDatabase("wiki");
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
@@ -65,6 +68,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
 
   @Test
   public void testSaveXWikiDoc_noTransaction() throws Exception {
+    getContext().setDatabase("wiki");
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
@@ -203,6 +207,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
 
   @Test
   public void testLoadXWikiDoc() throws Exception {
+    getContext().setDatabase("wiki");
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
@@ -229,7 +234,38 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
   }
 
   @Test
+  public void testLoadXWikiDoc_different_contextDb_WikiRef() throws Exception {
+    getContext().setDatabase("xwikimyDB");
+    DocumentReference docRef = new DocumentReference("wiki", "space", "page");
+    DocumentReference expectedDocRef = References.adjustRef(docRef, DocumentReference.class,
+        new WikiReference(getContext().getDatabase()));
+    XWikiDocument savedDoc = new XWikiDocument(docRef);
+    savedDoc.setNew(false);
+    savedDoc.setOriginalDocument(savedDoc.clone());
+    Capture<XWikiDocument> querySaveDocCapture = new Capture<>();
+    expect(mockStore.loadXWikiDoc(capture(querySaveDocCapture), same(getContext()))).andReturn(
+        savedDoc).once();
+    replayDefault();
+    docCacheStore.initalize();
+    XWikiDocument inputParamDoc = new XWikiDocument(docRef);
+    XWikiDocument existingDocument = docCacheStore.loadXWikiDoc(inputParamDoc, getContext());
+    XWikiDocument querySaveDoc = querySaveDocCapture.getValue();
+    assertNotSame(inputParamDoc, querySaveDoc);
+    assertEquals(expectedDocRef, querySaveDoc.getDocumentReference());
+    assertEquals(inputParamDoc.getLanguage(), querySaveDoc.getLanguage());
+    assertFalse(existingDocument.isNew());
+    assertTrue(existingDocument.isFromCache());
+    String key = docCacheStore.getKeyWithLang(existingDocument);
+    assertNotNull("doc expected in cache", docCacheStore.getDocFromCache(key));
+    assertTrue(docCacheStore.exists(existingDocument, getContext()));
+
+    assertSame(existingDocument, docCacheStore.loadXWikiDoc(inputParamDoc, getContext()));
+    verifyDefault();
+  }
+
+  @Test
   public void testLoadXWikiDoc_noOverwriteExistsCache() throws Exception {
+    getContext().setDatabase("wiki");
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
@@ -280,6 +316,7 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
 
   @Test
   public void testDeleteXWikiDoc() throws Exception {
+    getContext().setDatabase("wiki");
     DocumentReference docRef = new DocumentReference("wiki", "space", "page");
     XWikiDocument savedDoc = new XWikiDocument(docRef);
     savedDoc.setNew(false);
