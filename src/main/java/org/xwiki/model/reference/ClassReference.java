@@ -12,7 +12,7 @@ import com.google.common.base.Function;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
-public class ClassReference extends EntityReference {
+public class ClassReference extends EntityReference implements ImmutableReference {
 
   private static final long serialVersionUID = -8664491352611685779L;
 
@@ -70,6 +70,11 @@ public class ClassReference extends EntityReference {
   @Override
   public ClassReference clone() {
     return this;
+  }
+
+  @Override
+  public EntityReference getMutable() {
+    return new EntityReference(getName(), getType(), getParent());
   }
 
   public DocumentReference getDocRef() {
