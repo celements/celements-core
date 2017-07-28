@@ -21,16 +21,15 @@ package com.celements.navigation.cmd;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.celements.sajson.Parser;
 import com.xpn.xwiki.XWikiContext;
 
 public class ReorderSaveCommand {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(ReorderSaveCommand.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ReorderSaveCommand.class);
   private ReorderSaveHandler injected_Handler;
 
   /**
@@ -42,23 +41,21 @@ public class ReorderSaveCommand {
     injected_Handler = injectedHandler;
   }
 
-  ReorderSaveHandler getHandler(XWikiContext context) {
+  ReorderSaveHandler getHandler() {
     if (injected_Handler != null) {
       return injected_Handler;
     }
-    return new ReorderSaveHandler(context);
+    return new ReorderSaveHandler();
   }
 
   public String reorderSave(String fullName, String structureJSON, XWikiContext context) {
-    ReorderSaveHandler handler = getHandler(context);
+    ReorderSaveHandler handler = getHandler();
     Parser jsonParser = Parser.createLexicalParser(EReorderLiteral.REQUEST_ARRAY, handler);
     try {
       jsonParser.parse(structureJSON);
       return "OK";
-    } catch (JsonParseException exp) {
-      mLogger.error("Failed to save restructre.", exp);
     } catch (IOException exp) {
-      mLogger.error("Failed to save restructre.", exp);
+      LOGGER.error("Failed to save restructre.", exp);
     }
     return "Failed";
   }
