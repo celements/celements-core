@@ -8,6 +8,7 @@ import org.xwiki.model.EntityType;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
+import com.xpn.xwiki.web.Utils;
 
 public class ImmutableDocumentReferenceTest extends AbstractComponentTest {
 
@@ -154,6 +155,12 @@ public class ImmutableDocumentReferenceTest extends AbstractComponentTest {
     input.getWikiReference().setName("asdf");
     input.setWikiReference(new WikiReference("asdf"));
     assertEquals(docRef, immutableDocRef);
+  }
+
+  @Test
+  public void serialize() {
+    assertEquals("wiki:space.doc", Utils.getComponent(EntityReferenceSerializer.class).serialize(
+        docRef));
   }
 
 }

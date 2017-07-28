@@ -265,6 +265,7 @@ public class ReferencesTest extends AbstractComponentTest {
     assertNotNull(spaceRef);
     assertEquals(name, spaceRef.getName());
     assertEquals(wikiRef, spaceRef.getParent());
+    assertSame(spaceRef, spaceRef.getParent().getChild());
   }
 
   @Test
@@ -272,8 +273,22 @@ public class ReferencesTest extends AbstractComponentTest {
     String name = "doc";
     DocumentReference docRef = create(DocumentReference.class, name, spaceRef);
     assertNotNull(docRef);
+    assertTrue(docRef instanceof ImmutableDocumentReference);
     assertEquals(name, docRef.getName());
     assertEquals(spaceRef, docRef.getParent());
+    assertSame(docRef, docRef.getParent().getChild());
+  }
+
+  @Test
+  public void test_create_parent_immutable() {
+    String name = "file";
+    AttachmentReference attRef = create(AttachmentReference.class, name,
+        new ImmutableDocumentReference(docRef));
+    assertNotNull(attRef);
+    assertEquals(name, attRef.getName());
+    assertEquals(docRef, attRef.getParent());
+    assertEquals(docRef, attRef.getDocumentReference());
+    assertSame(attRef, attRef.getParent().getChild());
   }
 
   @Test

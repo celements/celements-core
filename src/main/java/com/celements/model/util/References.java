@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ImmutableReference;
+import org.xwiki.model.reference.ReferenceParentSetter;
 
 import com.google.common.base.Optional;
 
@@ -245,10 +246,11 @@ public class References {
     checkNotNull(name);
     checkNotNull(type);
     checkNotNull(token);
+    EntityReference ref = new EntityReference(name, type);
     if (parent != null) {
-      parent = cloneRef(parent);
+      ReferenceParentSetter.set(ref, parent);
     }
-    return cloneRef(new EntityReference(name, type, parent), token);
+    return cloneRef(ref, token);
   }
 
   private static <T extends EntityReference> Optional<T> castOrAbsent(EntityReference ref,
