@@ -578,8 +578,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     try {
       modelAccess.getXObjects(doc, classRef);
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException ise) {
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
       // expected
     }
     verifyDefault();
@@ -640,8 +640,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     try {
       modelAccess.getXObjects(doc);
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException ise) {
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
       // expected
     }
     verifyDefault();

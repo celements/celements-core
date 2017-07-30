@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.annotation.concurrent.Immutable;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -25,13 +27,21 @@ import com.google.common.collect.ImmutableList;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 @Immutable
+@Component(XWikiObjectBridge.NAME)
 public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject> {
 
-  XWikiObjectBridge() {
-  }
+  public static final String NAME = "xwiki";
+
+  /**
+   * IMPORTANT: do not use for XObject operations, could lead to endless loops
+   */
+  @Requirement
+  private IModelAccessFacade modelAccess;
+
+  @Requirement
+  private ModelContext context;
 
   @Override
   public Class<XWikiDocument> getDocumentType() {
@@ -89,7 +99,7 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   public BaseObject createObject(XWikiDocument doc, ClassReference classRef) {
     WikiReference docWiki = doc.getDocumentReference().getWikiReference();
     try {
-      return doc.newXObject(classRef.getDocRef(docWiki), getContext().getXWikiContext());
+      return doc.newXObject(classRef.getDocRef(docWiki), context.getXWikiContext());
     } catch (XWikiException xwe) {
       throw new ClassDocumentLoadException(classRef.getDocRef(docWiki), xwe);
     }
@@ -102,23 +112,12 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
 
   @Override
   public <T> Optional<T> getObjectField(BaseObject obj, ClassField<T> field) {
-    return getModelAccess().getFieldValue(obj, field);
+    return modelAccess.getFieldValue(obj, field);
   }
 
   @Override
   public <T> boolean setObjectField(BaseObject obj, ClassField<T> field, T value) {
-    return getModelAccess().setProperty(obj, field, value);
-  }
-
-  private ModelContext getContext() {
-    return Utils.getComponent(ModelContext.class);
-  }
-
-  /**
-   * IMPORTANT: do not use for XObject operations, could lead to endless loops
-   */
-  private IModelAccessFacade getModelAccess() {
-    return Utils.getComponent(IModelAccessFacade.class);
+    return modelAccess.setProperty(obj, field, value);
   }
 
 }

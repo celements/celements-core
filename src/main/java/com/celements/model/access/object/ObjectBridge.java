@@ -4,8 +4,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -13,8 +15,8 @@ import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 
 /**
- * Bridge for actual access on document and objects, used by {@link ObjectHandler}s to allow
- * generic implementation
+ * Bridge for effective access on document and objects, primarily used by {@link ObjectHandler}s to
+ * allow generic implementations
  *
  * @param <D>
  *          document type
@@ -22,6 +24,8 @@ import com.google.common.base.Optional;
  *          object type
  */
 @Immutable
+@Singleton
+@ComponentRole
 public interface ObjectBridge<D, O> {
 
   @NotNull
