@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -18,8 +18,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
-@Immutable
-public final class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
+@NotThreadSafe
+public class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
   private final ObjectBridge<D, O> bridge;
   private final D doc;

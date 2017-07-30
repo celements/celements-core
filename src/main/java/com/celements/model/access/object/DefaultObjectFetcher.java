@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -23,8 +23,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 
-@Immutable
-public final class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
+@NotThreadSafe
+public class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
   private final ObjectBridge<D, O> bridge;
   private final D doc;

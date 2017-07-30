@@ -3,7 +3,6 @@ package com.celements.model.access.object;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -18,7 +17,6 @@ import com.google.common.base.Optional;
  * @param <O>
  *          object type
  */
-@Immutable
 public interface ObjectFetcher<D, O> {
 
   /**

@@ -4,15 +4,18 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import org.xwiki.model.reference.ClassReference;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
+@NotThreadSafe
 public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 7825122021132999318L;
 
   public ObjectQuery() {
     super();

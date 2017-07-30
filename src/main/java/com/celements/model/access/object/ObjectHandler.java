@@ -2,7 +2,6 @@ package com.celements.model.access.object;
 
 import java.util.Collection;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
@@ -22,7 +21,6 @@ import com.celements.model.classes.fields.ClassField;
  * @param <O>
  *          object type
  */
-@NotThreadSafe
 public interface ObjectHandler<D, O> {
 
   @NotNull
