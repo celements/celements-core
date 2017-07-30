@@ -20,6 +20,7 @@ import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.object.ObjectBridge;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
+import com.celements.model.util.References;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
@@ -62,7 +63,7 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
 
   @Override
   public DocumentReference getDocRef(XWikiDocument doc) {
-    return new DocumentReference(doc.getDocumentReference());
+    return References.cloneRef(doc.getDocumentReference(), DocumentReference.class);
   }
 
   @Override
