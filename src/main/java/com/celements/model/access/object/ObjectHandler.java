@@ -24,9 +24,6 @@ import com.celements.model.classes.fields.ClassField;
 public interface ObjectHandler<D, O> {
 
   @NotNull
-  ObjectBridge<D, O> getBridge();
-
-  @NotNull
   DocumentReference getDocRef();
 
   /**
@@ -35,45 +32,40 @@ public interface ObjectHandler<D, O> {
   @NotNull
   ObjectQuery<O> getQuery();
 
+  /**
+   * adds all restrictions from the the given {@link ObjectQuery}
+   */
   @NotNull
   ObjectHandler<D, O> with(@NotNull ObjectQuery<O> query);
 
+  /**
+   * restricts to objects for the given {@link ObjectRestriction}
+   */
   @NotNull
   ObjectHandler<D, O> filter(@NotNull ObjectRestriction<O> restriction);
 
   /**
-   * filters objects with the given {@link ClassField}
-   *
-   * @param classRef
+   * restricts to objects with the given {@link ClassField}
    */
   @NotNull
   ObjectHandler<D, O> filter(@NotNull ClassReference classRef);
 
   /**
-   * filters objects for the given {@link ClassField} and value<br>
+   * restricts to objects for the given {@link ClassField} and value<br>
    * <br>
    * NOTE: value may not be null, instead use {@link #filterAbsent(ClassField)}
-   *
-   * @param field
-   * @param value
    */
   @NotNull
   <T> ObjectHandler<D, O> filter(@NotNull ClassField<T> field, @NotNull T value);
 
   /**
-   * filters objects for the given {@link ClassField} and possible values (logical OR)
-   *
-   * @param field
-   * @param values
+   * restricts to objects for the given {@link ClassField} and possible values (logical OR)
    */
   @NotNull
   <T> ObjectHandler<D, O> filter(@NotNull ClassField<T> field, @NotNull Collection<T> values);
 
   /**
-   * filters objects with no value for the given {@link ClassField}
-   *
-   * @param field
-   * @return
+   * restricts to objects with no value for the given {@link ClassField}
    */
   @NotNull
   ObjectHandler<D, O> filterAbsent(@NotNull ClassField<?> field);

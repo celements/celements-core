@@ -10,7 +10,7 @@ import org.xwiki.model.reference.ClassReference;
 import com.google.common.base.Optional;
 
 /**
- * Fetches objects O on a document D for the defined filter.
+ * Fetches objects O on a document D for the defined query.
  *
  * @param <D>
  *          document type
@@ -31,7 +31,6 @@ public interface ObjectFetcher<D, O> {
   Optional<O> first();
 
   /**
-   * @param objNb
    * @return the fetched object with the specified object number
    */
   @NotNull
@@ -50,7 +49,7 @@ public interface ObjectFetcher<D, O> {
   Map<ClassReference, List<O>> map();
 
   /**
-   * @return a new {@link ObjectHandler} with an equal filter
+   * @return a new {@link ObjectHandler} with an equal query
    */
   @NotNull
   ObjectHandler<D, O> handle();

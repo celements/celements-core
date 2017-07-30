@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 /**
- * Manipulates objects O on a document D for the defined filter or fetches them for manipulation.
+ * Manipulates objects O on a document D for the defined query or fetches them for manipulation.
  *
  * @param <D>
  *          document type
@@ -18,7 +18,7 @@ import org.xwiki.model.reference.ClassReference;
 public interface ObjectEditor<D, O> {
 
   /**
-   * creates all objects defined by the filter and also sets fields if any
+   * creates all objects defined by the query and also sets fields if any
    *
    * @return a map of all created objects indexed by their {@link ClassReference}
    */
@@ -34,13 +34,13 @@ public interface ObjectEditor<D, O> {
   Map<ClassReference, O> createIfNotExists();
 
   /**
-   * @return a list of all removed objects defined in by filter
+   * @return a list of all removed objects defined by the query
    */
   @NotNull
   List<O> remove();
 
   /**
-   * @return a new {@link ObjectHandler} with an equal filter
+   * @return a new {@link ObjectHandler} with an equal query
    */
   @NotNull
   ObjectHandler<D, O> handle();
