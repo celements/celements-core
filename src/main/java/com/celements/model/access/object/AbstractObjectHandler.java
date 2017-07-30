@@ -18,13 +18,13 @@ import com.celements.model.access.object.restriction.ObjectRestriction;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
-public abstract class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
+public abstract class AbstractObjectHandler<D, O> implements ObjectHandler<D, O> {
 
   protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
 
-  protected DefaultObjectHandler(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc) {
+  protected AbstractObjectHandler(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc) {
     this.bridge = checkNotNull(bridge);
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>();

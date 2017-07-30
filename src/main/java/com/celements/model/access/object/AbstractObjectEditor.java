@@ -19,13 +19,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
 @NotThreadSafe
-public abstract class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
+public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
 
   protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
 
-  protected DefaultObjectEditor(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+  protected AbstractObjectEditor(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
       @NotNull ObjectQuery<O> query) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);

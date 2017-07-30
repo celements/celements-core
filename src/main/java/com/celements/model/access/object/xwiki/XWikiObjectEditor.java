@@ -2,7 +2,7 @@ package com.celements.model.access.object.xwiki;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-import com.celements.model.access.object.DefaultObjectEditor;
+import com.celements.model.access.object.AbstractObjectEditor;
 import com.celements.model.access.object.ObjectBridge;
 import com.celements.model.access.object.ObjectFetcher;
 import com.celements.model.access.object.ObjectHandler;
@@ -12,7 +12,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 @NotThreadSafe
-public class XWikiObjectEditor extends DefaultObjectEditor<XWikiDocument, BaseObject> {
+public class XWikiObjectEditor extends AbstractObjectEditor<XWikiDocument, BaseObject> {
 
   XWikiObjectEditor(XWikiDocument doc, ObjectQuery<BaseObject> query) {
     super(getXWikiObjectBridge(), doc, query);

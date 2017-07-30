@@ -24,14 +24,14 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 
 @NotThreadSafe
-public abstract class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
+public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
   protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
   protected final boolean clone;
 
-  protected DefaultObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+  protected AbstractObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
       @NotNull ObjectQuery<O> query, boolean clone) {
     this.bridge = checkNotNull(bridge);
     this.doc = checkNotNull(doc);
