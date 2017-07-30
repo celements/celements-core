@@ -44,4 +44,9 @@ public class ClassRestriction<O> extends ObjectRestriction<O> {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return "ClassRestriction [ref=" + ref + "]";
+  }
+
 }

@@ -43,4 +43,9 @@ public class FieldAbsentRestriction<O, T> extends ClassRestriction<O> {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return "FieldAbsentRestriction [field=" + field + "]";
+  }
+
 }

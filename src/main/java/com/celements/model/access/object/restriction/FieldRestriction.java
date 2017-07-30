@@ -59,4 +59,9 @@ public class FieldRestriction<O, T> extends ClassRestriction<O> {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return "FieldRestriction [field=" + field + ", values=" + values + "]";
+  }
+
 }
