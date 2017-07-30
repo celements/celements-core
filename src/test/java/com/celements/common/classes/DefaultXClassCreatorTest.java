@@ -31,15 +31,18 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ClassReference;
 
 import com.celements.common.test.AbstractComponentTest;
+import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.ModelMock;
+import com.celements.model.access.ModelMock.DocRecord;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassPackage;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.TestClassDefinitionRole;
 import com.celements.model.classes.TestClassPackage;
+import com.celements.model.classes.TestClassPackageLegacy;
 import com.celements.model.classes.fields.ClassField;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -63,42 +66,43 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_notActive() throws Exception {
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        Collections.emptyList()).anyTimes();
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
+    expectActive(Collections.<String>emptyList(), "");
 
     replayDefault();
     creator.createXClasses();
     verifyDefault();
+
+    assertEquals(0, record.getSavedCount());
   }
 
   @Test
   public void test_createXClasses_blacklisted() throws Exception {
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        Arrays.asList(classPackage.getName())).anyTimes();
-    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
-        Arrays.asList(classDef.getName())).anyTimes();
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
+    expectActive(Arrays.asList(classPackage.getName()), "");
+    expectBlacklist(Arrays.asList(classDef.getName()));
 
     replayDefault();
     creator.createXClasses();
     verifyDefault();
+
+    assertEquals(0, record.getSavedCount());
   }
 
   @Test
   public void test_createXClasses() throws Exception {
-    DocumentReference docRef = classDef.getClassRef();
-    XWikiDocument doc = modelMock.registerDoc(docRef).doc();
+    ClassReference classRef = classDef.getClassReference();
+    XWikiDocument doc = modelMock.registerDoc(classRef.getDocRef()).doc();
 
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        Arrays.asList(classPackage.getName())).anyTimes();
-    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
-        null).anyTimes();
+    expectActive(Arrays.asList(classPackage.getName()), "");
+    expectBlacklist(Collections.<String>emptyList());
 
     replayDefault();
     creator.createXClasses();
     creator.createXClasses(); // save is only called once
     verifyDefault();
 
-    assertEquals(1, modelMock.getDocRecord(docRef).getSavedCount());
+    assertEquals(1, modelMock.getDocRecord(classRef.getDocRef()).getSavedCount());
     assertEquals(classDef.isInternalMapping(), doc.getXClass().hasInternalCustomMapping());
     @SuppressWarnings("unchecked")
     List<BaseCollection> xFields = new ArrayList<>(doc.getXClass().getFieldList());
@@ -109,6 +113,58 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
       assertNotNull(xField);
       assertEquals(field.getName(), xField.getName());
     }
+  }
+
+  @Test
+  public void test_createXClasses_legacy() throws Exception {
+    TestClassPackageLegacy classPackage = (TestClassPackageLegacy) Utils.getComponent(
+        ClassPackage.class, TestClassPackageLegacy.NAME);
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
+
+    expectActive(Collections.<String>emptyList(), classPackage.getLegacyName());
+    expectBlacklist(Collections.<String>emptyList());
+
+    replayDefault();
+    creator.createXClasses();
+    verifyDefault();
+
+    assertEquals(1, record.getSavedCount());
+  }
+
+  @Test
+  public void test_createXClasses_legacy_illegalName() throws Exception {
+    TestClassPackageLegacy classPackage = (TestClassPackageLegacy) Utils.getComponent(
+        ClassPackage.class, TestClassPackageLegacy.NAME);
+    classPackage.setLegacyName("asdf");
+    DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
+
+    expectActive(Collections.<String>emptyList(), classPackage.getLegacyName());
+    expectBlacklist(Collections.<String>emptyList());
+
+    replayDefault();
+    new ExceptionAsserter<IllegalStateException>(IllegalStateException.class) {
+
+      @Override
+      protected void execute() throws IllegalStateException {
+        creator.createXClasses();
+      }
+    }.evaluate();
+    verifyDefault();
+
+    assertEquals(0, record.getSavedCount());
+  }
+
+  private void expectActive(List<String> ret, String legacy) {
+    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
+        ret).anyTimes();
+    expect(getWikiMock().getXWikiPreference(IClassCollectionRole.ACTIVATED_XWIKIPREF,
+        getContext())).andReturn(legacy).anyTimes();
+    expect(getWikiMock().Param(IClassCollectionRole.ACTIVATED_PARAM)).andReturn("").anyTimes();
+  }
+
+  private void expectBlacklist(List<String> ret) {
+    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
+        ret).anyTimes();
   }
 
 }

@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Extend CelementsClassCollection and make the implementor a named component. Celements
+ * Extend AbstractClassCollection and make the implementor a named component. Celements
  * then will call your initClasses method on system start once or if it is explicitly
  * asked for.
  *
@@ -75,9 +75,9 @@ public abstract class AbstractClassCollection implements IClassCollectionRole {
 
   @Override
   public boolean isActivated() {
-    return ("," + getContext().getWiki().getXWikiPreference("activated_classcollections",
-        getContext()) + "," + getContext().getWiki().Param("celements.classcollections", "")
-        + ",").contains("," + getConfigName() + ",");
+    return ("," + getContext().getWiki().getXWikiPreference(ACTIVATED_XWIKIPREF, getContext()) + ","
+        + getContext().getWiki().Param(ACTIVATED_PARAM, "") + ",").contains("," + getConfigName()
+            + ",");
   }
 
   protected XWikiDocument getClassDoc(DocumentReference classRef) {

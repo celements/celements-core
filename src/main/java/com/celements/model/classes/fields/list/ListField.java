@@ -99,7 +99,7 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
   public String serialize(List<T> values) {
     values = firstNonNull(values, ImmutableList.<T>of());
     return FluentIterable.from(values).transform(marshaller.getSerializer()).filter(
-        Predicates.notNull()).join(Joiner.on(getSeparator()));
+        Predicates.notNull()).join(Joiner.on(getSeparator().charAt(0)));
   }
 
   @Override
@@ -111,7 +111,7 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
   private List<String> asStringList(Object obj) {
     List<String> list = ImmutableList.of();
     if (obj instanceof String) {
-      list = Splitter.on(getSeparator()).splitToList((String) obj);
+      list = Splitter.onPattern("[" + getSeparator() + "]").splitToList((String) obj);
     } else if (obj instanceof List) {
       list = FluentIterable.from((List<?>) obj).filter(Predicates.notNull()).transform(
           Functions.toStringFunction()).toList();

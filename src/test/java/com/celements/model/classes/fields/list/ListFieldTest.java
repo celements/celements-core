@@ -29,21 +29,21 @@ import com.xpn.xwiki.web.Utils;
 public class ListFieldTest extends AbstractComponentTest {
 
   // test static definition
-  private static final ClassField<List<String>> STATIC_DEFINITION = new StringListField.Builder(
+  private static final ClassField<List<String>> STATIC_DEFINITION = new StaticListField.Builder(
       TestClassDefinition.NAME, "name").build();
 
-  private StringListField.Builder fieldBuilder;
+  private StaticListField.Builder fieldBuilder;
 
   private boolean multiSelect = true;
   private Integer size = 5;
   private String displayType = "displayType";
   private Boolean picker = true;
-  private String separator = ",";
+  private String separator = "|";
 
   @Before
   public void prepareTest() throws Exception {
     assertNotNull(STATIC_DEFINITION);
-    fieldBuilder = new StringListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
+    fieldBuilder = new StaticListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
         multiSelect).size(size).displayType(displayType).picker(picker).separator(separator);
   }
 
@@ -53,26 +53,26 @@ public class ListFieldTest extends AbstractComponentTest {
         AllowedReason.provided(Marshaller.class).isAlsoImmutable());
     assertInstancesOf(CustomListField.class, areImmutable(), allowingForSubclassing(),
         assumingFields("values").areSafelyCopiedUnmodifiableCollectionsWithImmutableElements());
-    assertInstancesOf(StringListField.class, areImmutable(), allowingForSubclassing());
+    assertInstancesOf(StaticListField.class, areImmutable(), allowingForSubclassing());
     assertImmutable(StaticListField.class);
     assertImmutable(DBListField.class);
   }
 
   @Test
   public void test_getters() throws Exception {
-    StringListField field = fieldBuilder.build();
+    StaticListField field = fieldBuilder.build();
     assertEquals(multiSelect, field.getMultiSelect());
     assertEquals(size, field.getSize());
     assertEquals(displayType, field.getDisplayType());
     assertEquals(picker, field.getPicker());
     assertEquals(separator, field.getSeparator());
-    assertEquals("|", new StringListField.Builder(TestClassDefinition.NAME,
+    assertEquals("|", new StaticListField.Builder(TestClassDefinition.NAME,
         field.getName()).build().getSeparator());
   }
 
   @Test
   public void test_getXField() throws Exception {
-    StringListField field = fieldBuilder.build();
+    StaticListField field = fieldBuilder.build();
     assertTrue(field.getXField() instanceof ListClass);
     ListClass xField = (ListClass) field.getXField();
     assertEquals(multiSelect, xField.isMultiSelect());
@@ -85,7 +85,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize() throws Exception {
-    StringListField field = fieldBuilder.values(Arrays.asList("A", "B", "C", "D")).build();
+    StaticListField field = fieldBuilder.values(Arrays.asList("A", "B", "C", "D")).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
     XWikiDocument doc = new XWikiDocument(classRef);
@@ -105,7 +105,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_multiselect() throws Exception {
-    StringListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
+    StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
         "D")).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -126,7 +126,7 @@ public class ListFieldTest extends AbstractComponentTest {
 
   @Test
   public void test_resolve_serialize_null() throws Exception {
-    StringListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
+    StaticListField field = fieldBuilder.multiSelect(true).values(Arrays.asList("A", "B", "C",
         "D")).build();
     DocumentReference classRef = field.getClassDef().getClassRef();
     IModelAccessFacade modelAccess = Utils.getComponent(IModelAccessFacade.class);
@@ -146,6 +146,15 @@ public class ListFieldTest extends AbstractComponentTest {
     assertNotNull(ret2);
     assertTrue(ret2.isEmpty());
     assertTrue(modelAccess.getXObject(doc, classRef).getListValue(field.getName()).isEmpty());
+  }
+
+  @Test
+  public void test_resolve_serialize_multiSeparator() throws Exception {
+    String separator = "-|,";
+    List<String> values = Arrays.asList("A", "B", "C", "D");
+    StaticListField field = fieldBuilder.separator(separator).build();
+    assertEquals("A-B-C-D", field.serialize(values));
+    assertEquals(values, field.resolve("A,B-C|D"));
   }
 
 }
