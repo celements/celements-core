@@ -23,6 +23,8 @@ import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.object.restriction.ClassRestriction;
 import com.celements.model.access.object.restriction.FieldAbsentRestriction;
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.access.object.xwiki.XWikiObjectEditor;
+import com.celements.model.access.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.access.object.xwiki.XWikiObjectHandler;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
@@ -50,7 +52,7 @@ public class ObjectHandlerTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private ObjectHandler<XWikiDocument, BaseObject> getObjHandler() {
+  private XWikiObjectHandler getObjHandler() {
     return XWikiObjectHandler.on(doc);
   }
 
@@ -637,6 +639,18 @@ public class ObjectHandlerTest extends AbstractComponentTest {
     assertSame(obj1, ret.get(0));
     assertSame(obj3, ret.get(1));
     assertObjs(getObjHandler(), obj2, obj4);
+  }
+
+  @Test
+  public void test_handler_immutability() throws Exception {
+    XWikiObjectHandler handler = getObjHandler();
+    handler.filter(classRef);
+    XWikiObjectFetcher fetcher = handler.fetch();
+    XWikiObjectEditor editor = handler.edit();
+    handler.filter(classRef2);
+    assertEquals(1, fetcher.handle().getQuery().size());
+    assertEquals(1, editor.handle().getQuery().size());
+    assertEquals(1, editor.fetch().handle().getQuery().size());
   }
 
   private <T> BaseObject addObj(ClassReference classRef, ClassField<T> field, T value) {

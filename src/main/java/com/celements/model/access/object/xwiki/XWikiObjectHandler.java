@@ -20,6 +20,16 @@ public class XWikiObjectHandler extends DefaultObjectHandler<XWikiDocument, Base
     super(getXWikiObjectBridge(), doc);
   }
 
+  @Override
+  public XWikiObjectFetcher fetch() {
+    return new XWikiObjectFetcher(doc, query, true);
+  }
+
+  @Override
+  public XWikiObjectEditor edit() {
+    return new XWikiObjectEditor(doc, query);
+  }
+
   private static XWikiObjectBridge getXWikiObjectBridge() {
     return (XWikiObjectBridge) Utils.getComponent(ObjectBridge.class, XWikiObjectBridge.NAME);
   }

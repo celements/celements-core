@@ -18,22 +18,17 @@ import com.celements.model.access.object.restriction.ObjectRestriction;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
-public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
+public abstract class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
 
   protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
 
-  protected DefaultObjectHandler(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
-      @NotNull ObjectQuery<O> query) {
+  protected DefaultObjectHandler(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc) {
     this.bridge = checkNotNull(bridge);
     this.doc = checkNotNull(doc);
-    this.query = new ObjectQuery<>(query);
+    this.query = new ObjectQuery<>();
     bridge.checkDoc(doc);
-  }
-
-  protected DefaultObjectHandler(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc) {
-    this(bridge, doc, new ObjectQuery<O>());
   }
 
   @Override
@@ -88,13 +83,9 @@ public class DefaultObjectHandler<D, O> implements ObjectHandler<D, O> {
   }
 
   @Override
-  public ObjectFetcher<D, O> fetch() {
-    return new DefaultObjectFetcher<>(bridge, doc, query);
-  }
-
-  @Override
-  public ObjectEditor<D, O> edit() {
-    return new DefaultObjectEditor<>(bridge, doc, query);
+  public String toString() {
+    return this.getClass().getSimpleName() + " [doc=" + bridge.getDocRef(doc) + ", query=" + query
+        + "]";
   }
 
 }

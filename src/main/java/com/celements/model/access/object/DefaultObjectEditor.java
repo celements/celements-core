@@ -19,19 +19,17 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
 @NotThreadSafe
-public class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
+public abstract class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
 
-  private final ObjectBridge<D, O> bridge;
-  private final D doc;
-  private final ObjectQuery<O> query;
-  private final ObjectFetcher<D, O> fetcher;
+  protected final ObjectBridge<D, O> bridge;
+  protected final D doc;
+  protected final ObjectQuery<O> query;
 
-  DefaultObjectEditor(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+  protected DefaultObjectEditor(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
       @NotNull ObjectQuery<O> query) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
     this.bridge = checkNotNull(bridge);
-    this.fetcher = new DefaultObjectFetcher<>(bridge, doc, query, false);
   }
 
   @Override
@@ -98,13 +96,9 @@ public class DefaultObjectEditor<D, O> implements ObjectEditor<D, O> {
   }
 
   @Override
-  public ObjectHandler<D, O> handle() {
-    return new DefaultObjectHandler<>(bridge, doc, query);
-  }
-
-  @Override
-  public ObjectFetcher<D, O> fetch() {
-    return fetcher;
+  public String toString() {
+    return this.getClass().getSimpleName() + " [doc=" + bridge.getDocRef(doc) + ", query=" + query
+        + "]";
   }
 
 }

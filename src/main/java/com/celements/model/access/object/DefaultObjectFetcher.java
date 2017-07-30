@@ -24,19 +24,14 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 
 @NotThreadSafe
-public class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
+public abstract class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
-  private final ObjectBridge<D, O> bridge;
-  private final D doc;
-  private final ObjectQuery<O> query;
-  private final boolean clone;
+  protected final ObjectBridge<D, O> bridge;
+  protected final D doc;
+  protected final ObjectQuery<O> query;
+  protected final boolean clone;
 
-  DefaultObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
-      @NotNull ObjectQuery<O> query) {
-    this(bridge, doc, query, true);
-  }
-
-  DefaultObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
+  protected DefaultObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
       @NotNull ObjectQuery<O> query, boolean clone) {
     this.bridge = checkNotNull(bridge);
     this.doc = checkNotNull(doc);
@@ -107,8 +102,9 @@ public class DefaultObjectFetcher<D, O> implements ObjectFetcher<D, O> {
   };
 
   @Override
-  public ObjectHandler<D, O> handle() {
-    return new DefaultObjectHandler<>(bridge, doc, query);
+  public String toString() {
+    return this.getClass().getSimpleName() + " [doc=" + bridge.getDocRef(doc) + ", query=" + query
+        + "]";
   }
 
 }
