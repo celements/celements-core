@@ -17,9 +17,9 @@ import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.object.restriction.ClassRestriction;
 import com.celements.model.access.object.restriction.FieldAbsentRestriction;
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.access.object.restriction.ObjectQueryBuilder;
+import com.celements.model.access.object.xwiki.XWikiObjectBridge;
 import com.celements.model.access.object.xwiki.XWikiObjectEditor;
-import com.celements.model.access.object.xwiki.XWikiObjectEditor.Builder;
-import com.celements.model.access.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -41,7 +41,7 @@ public class QueryBuilderTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private Builder newBuilder() {
+  private XWikiObjectEditor newBuilder() {
     return XWikiObjectEditor.on(doc);
   }
 
@@ -91,13 +91,13 @@ public class QueryBuilderTest extends AbstractComponentTest {
 
   @Test
   public void test_filter_unique() throws Exception {
-    Builder builder = newBuilder();
+    ObjectQueryBuilder<?, BaseObject> builder = newBuilder();
     builder.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
-    assertEquals(3, builder.buildQuery().size());
+    assertEquals(3, builder.getQuery().size());
     builder.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
-    assertEquals(3, builder.buildQuery().size());
-    builder.with(builder.buildQuery());
-    assertEquals(3, builder.buildQuery().size());
+    assertEquals(3, builder.getQuery().size());
+    builder.with(builder.getQuery());
+    assertEquals(3, builder.getQuery().size());
   }
 
   @Test
@@ -113,17 +113,17 @@ public class QueryBuilderTest extends AbstractComponentTest {
 
   @Test
   public void test_with() throws Exception {
-    Builder builder = newBuilder();
+    XWikiObjectEditor builder = newBuilder();
     ObjectQuery<BaseObject> queryInit = new ObjectQuery<>();
-    queryInit.add(new ClassRestriction<>(builder.getBridge(), classRef));
-    queryInit.add(new FieldAbsentRestriction<>(builder.getBridge(), FIELD_MY_STRING));
+    queryInit.add(new ClassRestriction<>(getBridge(), classRef));
+    queryInit.add(new FieldAbsentRestriction<>(getBridge(), FIELD_MY_STRING));
     builder.with(queryInit);
-    ObjectQuery<BaseObject> query = builder.buildQuery();
+    ObjectQuery<BaseObject> query = builder.getQuery();
     assertEquals(2, query.size());
     assertEquals(queryInit, query);
-    queryInit.add(new ClassRestriction<>(builder.getBridge(), classRef2));
+    queryInit.add(new ClassRestriction<>(getBridge(), classRef2));
     assertEquals("query should be cloned in with", 2, query.size());
-    builder.buildQuery().add(new ClassRestriction<>(builder.getBridge(), classRef2));
+    builder.getQuery().add(new ClassRestriction<>(getBridge(), classRef2));
     assertEquals("getQuery should return a clone", 2, query.size());
   }
 
@@ -138,16 +138,8 @@ public class QueryBuilderTest extends AbstractComponentTest {
     }.evaluate();
   }
 
-  @Test
-  public void test_builder_immutability() throws Exception {
-    Builder builder = newBuilder();
-    builder.filter(classRef);
-    XWikiObjectFetcher fetcher = builder.edit().fetch();
-    XWikiObjectEditor editor = builder.edit();
-    builder.filter(classRef2);
-    assertEquals(1, fetcher.getQuery().size());
-    assertEquals(1, editor.getQuery().size());
-    assertEquals(1, editor.fetch().getQuery().size());
+  private XWikiObjectBridge getBridge() {
+    return (XWikiObjectBridge) Utils.getComponent(ObjectBridge.class, XWikiObjectBridge.NAME);
   }
 
 }

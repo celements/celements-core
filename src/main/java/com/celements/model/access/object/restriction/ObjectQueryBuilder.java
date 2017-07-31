@@ -15,17 +15,13 @@ import com.celements.model.classes.fields.ClassField;
 @NotThreadSafe
 public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> {
 
-  protected final ObjectBridge<?, O> bridge;
   private final ObjectQuery<O> query;
 
-  public ObjectQueryBuilder(@NotNull ObjectBridge<?, O> bridge) {
+  public ObjectQueryBuilder() {
     this.query = new ObjectQuery<>();
-    this.bridge = checkNotNull(bridge);
   }
 
-  public final ObjectBridge<?, O> getBridge() {
-    return bridge;
-  }
+  protected abstract @NotNull ObjectBridge<?, O> getBridge();
 
   /**
    * adds all restrictions from the the given {@link ObjectQuery}
@@ -87,7 +83,7 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
     return filter(new IdentityRestriction<>(getBridge(), obj));
   }
 
-  public final ObjectQuery<O> buildQuery() {
+  public final ObjectQuery<O> getQuery() {
     return new ObjectQuery<>(query);
   }
 

@@ -293,8 +293,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef) {
-    return XWikiObjectEditor.on(doc).filter(new ClassReference(
-        classRef)).edit().fetch().first().orNull();
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().first().orNull();
   }
 
   @Override
@@ -316,7 +315,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
       int objectNumber) {
     return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).filter(
-        objectNumber).edit().fetch().first();
+        objectNumber).fetch().first();
   }
 
   @Override
@@ -343,7 +342,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).edit().fetch().list();
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().list();
   }
 
   @Override
@@ -358,7 +357,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values) {
     ObjectFetcher<XWikiDocument, BaseObject> objFetcher = XWikiObjectEditor.on(doc).filter(
-        new ClassReference(classRef)).edit().fetch();
+        new ClassReference(classRef)).fetch();
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : objFetcher.list()) {
       if (checkPropertyKeyValues(obj, key, values)) {
@@ -371,7 +370,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
-    Map<ClassReference, List<BaseObject>> map = XWikiObjectEditor.on(doc).edit().fetch().map();
+    Map<ClassReference, List<BaseObject>> map = XWikiObjectEditor.on(doc).fetch().map();
     WikiReference wikiRef = doc.getDocumentReference().getWikiReference();
     Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
     for (ClassReference classRef : map.keySet()) {
@@ -454,7 +453,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public BaseObject newXObject(XWikiDocument doc, DocumentReference docClassRef) {
     ClassReference classRef = new ClassReference(docClassRef);
-    return XWikiObjectEditor.on(doc).filter(classRef).edit().create().get(classRef);
+    return XWikiObjectEditor.on(doc).filter(classRef).create().get(classRef);
   }
 
   @Override
@@ -480,7 +479,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public boolean removeXObject(XWikiDocument doc, BaseObject objToRemove) {
-    return XWikiObjectEditor.on(doc).filter(objToRemove).edit().deleteFirst().isPresent();
+    return XWikiObjectEditor.on(doc).filter(objToRemove).deleteFirst().isPresent();
   }
 
   @Override
@@ -490,7 +489,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
     boolean changed = false;
     for (BaseObject obj : new ArrayList<>(objsToRemove)) {
       if (obj != null) {
-        changed |= XWikiObjectEditor.on(doc).filter(obj).edit().deleteFirst().isPresent();
+        changed |= XWikiObjectEditor.on(doc).filter(obj).deleteFirst().isPresent();
       }
     }
     return changed;
@@ -499,8 +498,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return !XWikiObjectEditor.on(doc).filter(new ClassReference(
-        classRef)).edit().delete().isEmpty();
+    return !XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).delete().isEmpty();
   }
 
   @Override

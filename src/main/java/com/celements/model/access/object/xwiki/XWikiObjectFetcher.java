@@ -1,54 +1,39 @@
 package com.celements.model.access.object.xwiki;
 
-import static com.google.common.base.Preconditions.*;
-
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import com.celements.model.access.object.AbstractObjectFetcher;
 import com.celements.model.access.object.ObjectBridge;
-import com.celements.model.access.object.restriction.ObjectQuery;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 @NotThreadSafe
-public class XWikiObjectFetcher extends AbstractObjectFetcher<XWikiDocument, BaseObject> {
+public class XWikiObjectFetcher extends
+    AbstractObjectFetcher<XWikiObjectFetcher, XWikiDocument, BaseObject> {
 
-  public static Builder on(@NotNull XWikiDocument doc) {
-    return new Builder(checkNotNull(doc));
+  public static XWikiObjectFetcher on(@NotNull XWikiDocument doc) {
+    return new XWikiObjectFetcher(doc);
   }
 
-  public static class Builder extends
-      AbstractObjectFetcher.Builder<Builder, XWikiDocument, BaseObject> {
-
-    public Builder(XWikiDocument doc) {
-      super(getXWikiObjectBridge(), doc);
-    }
-
-    @Override
-    public XWikiObjectFetcher fetch() {
-      return new XWikiObjectFetcher(doc, buildQuery(), clone);
-    }
-
-    @Override
-    protected Builder getThis() {
-      return this;
-    }
-
-  }
-
-  private XWikiObjectFetcher(XWikiDocument doc, ObjectQuery<BaseObject> query, boolean clone) {
-    super(doc, query, clone);
+  private XWikiObjectFetcher(XWikiDocument doc) {
+    super(doc);
   }
 
   @Override
-  public XWikiObjectBridge getBridge() {
-    return getXWikiObjectBridge();
+  protected XWikiObjectFetcher disableCloning() {
+    return super.disableCloning();
   }
 
-  private static XWikiObjectBridge getXWikiObjectBridge() {
+  @Override
+  protected XWikiObjectBridge getBridge() {
     return (XWikiObjectBridge) Utils.getComponent(ObjectBridge.class, XWikiObjectBridge.NAME);
+  }
+
+  @Override
+  protected XWikiObjectFetcher getThis() {
+    return this;
   }
 
 }

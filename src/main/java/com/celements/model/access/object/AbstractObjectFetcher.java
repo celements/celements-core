@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -24,62 +23,21 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 @NotThreadSafe
-public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O> {
-
-  /**
-   * Builder for {@link ObjectFetcher}s. Use {@link #filter()} methods to construct the desired
-   * query, then use {@link #fetch()} to retrieve (read-only) objects.
-   */
-  public static abstract class Builder<B extends Builder<B, D, O>, D, O> extends
-      ObjectQueryBuilder<B, O> {
-
-    protected final D doc;
-    protected boolean clone;
-
-    protected Builder(@NotNull ObjectBridge<D, O> bridge, D doc) {
-      super(bridge);
-      this.doc = doc;
-      clone = true;
-    }
-
-    /**
-     * disables cloning for the fetcher. use with caution!
-     */
-    public B disableCloning() {
-      clone = false;
-      return getThis();
-    }
-
-    /**
-     * @return a new {@link ObjectFetcher} for object retrieval. Objects returned by this
-     *         fetcher will by default only be useful for read-only operations.
-     */
-    public abstract @NotNull ObjectFetcher<D, O> fetch();
-
-    @Override
-    protected abstract B getThis();
-
-  }
+public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D, O>, D, O> extends
+    ObjectQueryBuilder<R, O> implements ObjectFetcher<D, O> {
 
   protected final D doc;
-  protected final ObjectQuery<O> query;
-  protected final boolean clone;
+  private boolean clone;
 
-  protected AbstractObjectFetcher(@NotNull D doc, @NotNull ObjectQuery<O> query, boolean clone) {
+  protected AbstractObjectFetcher(@NotNull D doc) {
     this.doc = checkNotNull(doc);
-    this.query = new ObjectQuery<>(query);
-    this.clone = clone;
     getBridge().checkDoc(doc);
+    this.clone = true;
   }
 
   @Override
   public DocumentReference getDocRef() {
     return getBridge().getDocRef(doc);
-  }
-
-  @Override
-  public ObjectQuery<O> getQuery() {
-    return new ObjectQuery<>(query);
   }
 
   @Override
@@ -107,7 +65,7 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
   }
 
   private Set<ClassReference> getClassRefs() {
-    Set<ClassReference> ret = query.getClassRefs();
+    Set<ClassReference> ret = getQuery().getClassRefs();
     if (ret.isEmpty()) {
       ret = ImmutableSet.copyOf(getBridge().getDocClassRefs(doc));
     }
@@ -116,11 +74,19 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
   private FluentIterable<O> getObjects(ClassReference classRef) {
     FluentIterable<O> iter = FluentIterable.from(getBridge().getObjects(doc, classRef));
-    iter = iter.filter(Predicates.and(query.getRestrictions(classRef)));
+    iter = iter.filter(Predicates.and(getQuery().getRestrictions(classRef)));
     if (clone) {
       iter = iter.transform(new ObjectCloner());
     }
     return iter;
+  }
+
+  /**
+   * disables cloning for the fetcher. use with caution!
+   */
+  protected R disableCloning() {
+    clone = false;
+    return getThis();
   }
 
   private class ObjectCloner implements Function<O, O> {
@@ -134,9 +100,10 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + " [doc=" + getBridge().getDocRef(doc) + ", query="
-        + query + "]";
+        + getQuery() + "]";
   }
 
+  @Override
   protected abstract @NotNull ObjectBridge<D, O> getBridge();
 
 }

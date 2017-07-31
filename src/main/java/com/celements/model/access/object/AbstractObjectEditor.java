@@ -14,57 +14,25 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.FieldRestriction;
-import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 @NotThreadSafe
-public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
-
-  /**
-   * Builder for {@link ObjectEditor}s. Use {@link #filter()} methods to construct the desired
-   * query, then use {@link #edit()} to manipulate objects.
-   */
-  public static abstract class Builder<B extends Builder<B, D, O>, D, O> extends
-      ObjectQueryBuilder<B, O> {
-
-    protected final D doc;
-
-    protected Builder(@NotNull ObjectBridge<D, O> bridge, D doc) {
-      super(bridge);
-      this.doc = doc;
-    }
-
-    /**
-     * @return a new {@link ObjectEditor} for object manipulation
-     */
-    @NotNull
-    public abstract ObjectEditor<D, O> edit();
-
-    @Override
-    protected abstract B getThis();
-
-  }
+public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, O>, D, O> extends
+    ObjectQueryBuilder<R, O> implements ObjectEditor<D, O> {
 
   protected final D doc;
-  protected final ObjectQuery<O> query;
 
-  protected AbstractObjectEditor(@NotNull D doc, @NotNull ObjectQuery<O> query) {
+  protected AbstractObjectEditor(@NotNull D doc) {
     this.doc = checkNotNull(doc);
-    this.query = new ObjectQuery<>(query);
     getBridge().checkDoc(doc);
   }
 
   @Override
   public DocumentReference getDocRef() {
     return getBridge().getDocRef(doc);
-  }
-
-  @Override
-  public ObjectQuery<O> getQuery() {
-    return new ObjectQuery<>(query);
   }
 
   @Override
@@ -78,7 +46,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
   }
 
   private Map<ClassReference, O> create(boolean ifNotExists) {
-    return from(query.getClassRefs()).toMap(new ObjectCreateFunction(ifNotExists));
+    return from(getQuery().getClassRefs()).toMap(new ObjectCreateFunction(ifNotExists));
   }
 
   @Override
@@ -92,7 +60,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
   }
 
   private Optional<O> createFirst(boolean ifNotExists) {
-    Optional<ClassReference> classRef = from(query.getClassRefs()).first();
+    Optional<ClassReference> classRef = from(getQuery().getClassRefs()).first();
     if (classRef.isPresent()) {
       return Optional.of(new ObjectCreateFunction(ifNotExists).apply(classRef.get()));
     }
@@ -121,7 +89,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
 
     private O createObject(ClassReference classRef) {
       final O obj = getBridge().createObject(doc, classRef);
-      query.getFieldRestrictions(classRef).forEach(new Consumer<FieldRestriction<O, ?>>() {
+      getQuery().getFieldRestrictions(classRef).forEach(new Consumer<FieldRestriction<O, ?>>() {
 
         @Override
         public void accept(FieldRestriction<O, ?> restr) {
@@ -163,9 +131,10 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + " [doc=" + getBridge().getDocRef(doc) + ", query="
-        + query + "]";
+        + getQuery() + "]";
   }
 
+  @Override
   protected abstract @NotNull ObjectBridge<D, O> getBridge();
 
 }

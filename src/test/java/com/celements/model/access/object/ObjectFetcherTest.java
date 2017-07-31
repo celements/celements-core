@@ -18,7 +18,6 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.object.xwiki.XWikiObjectFetcher;
-import com.celements.model.access.object.xwiki.XWikiObjectFetcher.Builder;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
@@ -43,7 +42,7 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     classRef2 = new ClassReference("class", "other");
   }
 
-  private Builder newBuilder() {
+  private XWikiObjectFetcher newFetcher() {
     return XWikiObjectFetcher.on(doc);
   }
 
@@ -67,7 +66,7 @@ public class ObjectFetcherTest extends AbstractComponentTest {
       protected void execute() throws IllegalArgumentException {
         doc.setLanguage("en");
         doc.setTranslation(1);
-        newBuilder().fetch();
+        newFetcher();
       }
     }.evaluate();
     assertTrue("format not replacing placeholder 0", iae.getMessage().contains("'en'"));
@@ -77,13 +76,13 @@ public class ObjectFetcherTest extends AbstractComponentTest {
 
   @Test
   public void test_fetch_emptyDoc() throws Exception {
-    assertObjs(newBuilder());
+    assertObjs(newFetcher());
   }
 
   @Test
   public void test_fetch_clone() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    BaseObject ret = newBuilder().fetch().first().get();
+    BaseObject ret = newFetcher().first().get();
     assertEqualObjs(obj, ret);
   }
 
@@ -93,11 +92,11 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     String val = "val";
     BaseObject obj = addObj(classRef, field, val);
 
-    assertObjs(newBuilder(), obj);
-    assertObjs(newBuilder().filter(classRef), obj);
-    assertObjs(newBuilder().filter(field, val), obj);
-    assertObjs(newBuilder().filter(field, Arrays.asList("asdf", val)), obj);
-    assertObjs(newBuilder().filterAbsent(field));
+    assertObjs(newFetcher(), obj);
+    assertObjs(newFetcher().filter(classRef), obj);
+    assertObjs(newFetcher().filter(field, val), obj);
+    assertObjs(newFetcher().filter(field, Arrays.asList("asdf", val)), obj);
+    assertObjs(newFetcher().filterAbsent(field));
   }
 
   @Test
@@ -105,9 +104,9 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
 
-    assertObjs(newBuilder().filter(classRef), obj1);
-    assertObjs(newBuilder().filter(classRef2), obj2);
-    assertObjs(newBuilder().filter(classRef).filter(classRef2), obj1, obj2);
+    assertObjs(newFetcher().filter(classRef), obj1);
+    assertObjs(newFetcher().filter(classRef2), obj2);
+    assertObjs(newFetcher().filter(classRef).filter(classRef2), obj1, obj2);
   }
 
   @Test
@@ -116,16 +115,16 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     addObj(classRef, null, null);
     addObj(classRef, field, null);
     addObj(classRef, field, "val");
-    assertObjs(newBuilder().filter(field, Collections.<String>emptyList()));
+    assertObjs(newFetcher().filter(field, Collections.<String>emptyList()));
   }
 
   @Test
   public void test_fetch_absent() throws Exception {
     ClassField<String> field = FIELD_MY_STRING;
     BaseObject obj = addObj(classRef, field, null);
-    assertObjs(newBuilder().filterAbsent(field), obj);
-    assertObjs(newBuilder().filter(classRef).filterAbsent(field), obj);
-    assertObjs(newBuilder().filter(field, "val").filterAbsent(field));
+    assertObjs(newFetcher().filterAbsent(field), obj);
+    assertObjs(newFetcher().filter(classRef).filterAbsent(field), obj);
+    assertObjs(newFetcher().filter(field, "val").filterAbsent(field));
   }
 
   @Test
@@ -140,14 +139,14 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj3 = addObj(classRef, field1, val1);
     obj3.setIntValue(field2.getName(), val2);
 
-    assertObjs(newBuilder(), obj1, obj2, obj3);
-    assertObjs(newBuilder().filter(field1, val1), obj1, obj3);
-    assertObjs(newBuilder().filter(field2, val2), obj2, obj3);
-    assertObjs(newBuilder().filter(field1, val1).filter(field2, val2), obj3);
-    assertObjs(newBuilder().filterAbsent(field1), obj2);
-    assertObjs(newBuilder().filterAbsent(field1).filter(field2, val2), obj2);
-    assertObjs(newBuilder().filterAbsent(field2), obj1);
-    assertObjs(newBuilder().filterAbsent(field2).filter(field1, val1), obj1);
+    assertObjs(newFetcher(), obj1, obj2, obj3);
+    assertObjs(newFetcher().filter(field1, val1), obj1, obj3);
+    assertObjs(newFetcher().filter(field2, val2), obj2, obj3);
+    assertObjs(newFetcher().filter(field1, val1).filter(field2, val2), obj3);
+    assertObjs(newFetcher().filterAbsent(field1), obj2);
+    assertObjs(newFetcher().filterAbsent(field1).filter(field2, val2), obj2);
+    assertObjs(newFetcher().filterAbsent(field2), obj1);
+    assertObjs(newFetcher().filterAbsent(field2).filter(field1, val1), obj1);
   }
 
   @Test
@@ -161,9 +160,9 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, field, val1);
     BaseObject obj2 = addObj(classRef, field, val2);
 
-    assertObjs(newBuilder().filter(field, val1), obj1);
-    assertObjs(newBuilder().filter(field, val2), obj2);
-    assertObjs(newBuilder().filter(field, Arrays.asList(val1, val2)), obj1, obj2);
+    assertObjs(newFetcher().filter(field, val1), obj1);
+    assertObjs(newFetcher().filter(field, val2), obj2);
+    assertObjs(newFetcher().filter(field, Arrays.asList(val1, val2)), obj1, obj2);
   }
 
   @Test
@@ -177,17 +176,17 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj4 = addObj(classRef, FIELD_MY_INT, null);
     BaseObject obj5 = addObj(classRef, field, null);
     BaseObject obj6 = addObj(classRef, field, val2);
-    assertObjs(newBuilder(), obj1, obj3, obj4, obj5, obj6, obj2);
-    assertObjs(newBuilder().filter(classRef), obj1, obj3, obj4, obj5, obj6);
-    assertObjs(newBuilder().filterAbsent(field), obj1, obj4, obj5);
-    assertObjs(newBuilder().filter(field, val1), obj3);
-    assertObjs(newBuilder().filter(field, val2), obj6);
-    assertObjs(newBuilder().filter(field, Arrays.asList(val1, val2)), obj3, obj6);
-    assertObjs(newBuilder().filter(field, val1).filter(field, val2));
-    assertObjs(newBuilder().filter(field, "other"));
-    assertObjs(newBuilder().filter(classRef2), obj2);
-    assertObjs(newBuilder().filter(field, val1).filter(classRef2), obj3, obj2);
-    assertObjs(newBuilder().filter(classRef).filter(classRef2), obj1, obj3, obj4, obj5, obj6, obj2);
+    assertObjs(newFetcher(), obj1, obj3, obj4, obj5, obj6, obj2);
+    assertObjs(newFetcher().filter(classRef), obj1, obj3, obj4, obj5, obj6);
+    assertObjs(newFetcher().filterAbsent(field), obj1, obj4, obj5);
+    assertObjs(newFetcher().filter(field, val1), obj3);
+    assertObjs(newFetcher().filter(field, val2), obj6);
+    assertObjs(newFetcher().filter(field, Arrays.asList(val1, val2)), obj3, obj6);
+    assertObjs(newFetcher().filter(field, val1).filter(field, val2));
+    assertObjs(newFetcher().filter(field, "other"));
+    assertObjs(newFetcher().filter(classRef2), obj2);
+    assertObjs(newFetcher().filter(field, val1).filter(classRef2), obj3, obj2);
+    assertObjs(newFetcher().filter(classRef).filter(classRef2), obj1, obj3, obj4, obj5, obj6, obj2);
   }
 
   @Test
@@ -195,26 +194,26 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     addObj(classRef2, null, null);
     addObj(classRef, null, null);
-    Optional<BaseObject> ret = newBuilder().fetch().first();
+    Optional<BaseObject> ret = newFetcher().first();
     assertTrue(ret.isPresent());
     assertEqualObjs(obj1, ret.get());
   }
 
   @Test
   public void test_fetchFirst_none() throws Exception {
-    Optional<BaseObject> ret = newBuilder().fetch().first();
+    Optional<BaseObject> ret = newFetcher().first();
     assertFalse(ret.isPresent());
   }
 
   @Test
   public void test_fetch_number() throws Exception {
-    assertObjs(newBuilder().filter(-1));
-    assertObjs(newBuilder().filter(0));
+    assertObjs(newFetcher().filter(-1));
+    assertObjs(newFetcher().filter(0));
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef, null, null);
-    assertObjs(newBuilder().filter(-1));
-    assertObjs(newBuilder().filter(0), obj1);
-    assertObjs(newBuilder().filter(1), obj2);
+    assertObjs(newFetcher().filter(-1));
+    assertObjs(newFetcher().filter(0), obj1);
+    assertObjs(newFetcher().filter(1), obj2);
   }
 
   @Test
@@ -223,9 +222,9 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj2 = addObj(classRef2, null, null);
     addObj(classRef, null, null);
     addObj(classRef2, null, null);
-    assertObjs(newBuilder().filter(obj1.getNumber()), obj1, obj2);
-    assertObjs(newBuilder().filter(obj1.getNumber()).filter(classRef), obj1);
-    assertObjs(newBuilder().filter(obj1.getNumber()).filter(classRef2), obj2);
+    assertObjs(newFetcher().filter(obj1.getNumber()), obj1, obj2);
+    assertObjs(newFetcher().filter(obj1.getNumber()).filter(classRef), obj1);
+    assertObjs(newFetcher().filter(obj1.getNumber()).filter(classRef2), obj2);
   }
 
   @Test
@@ -233,7 +232,7 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    List<BaseObject> ret = newBuilder().fetch().list();
+    List<BaseObject> ret = newFetcher().list();
     assertEquals(3, ret.size());
     assertEqualObjs(obj1, ret.get(0));
     assertEqualObjs(obj3, ret.get(1));
@@ -247,10 +246,10 @@ public class ObjectFetcherTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        newBuilder().fetch().list().remove(0);
+        newFetcher().list().remove(0);
       }
     }.evaluate();
-    assertObjs(newBuilder(), obj);
+    assertObjs(newFetcher(), obj);
   }
 
   @Test
@@ -258,7 +257,7 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    Map<ClassReference, List<BaseObject>> ret = newBuilder().fetch().map();
+    Map<ClassReference, List<BaseObject>> ret = newFetcher().map();
     assertEquals(2, ret.size());
     assertEquals(2, ret.get(classRef).size());
     assertEqualObjs(obj1, ret.get(classRef).get(0));
@@ -274,18 +273,18 @@ public class ObjectFetcherTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        newBuilder().fetch().map().remove(classRef);
+        newFetcher().map().remove(classRef);
       }
     }.evaluate();
-    assertObjs(newBuilder(), obj);
+    assertObjs(newFetcher(), obj);
     new ExceptionAsserter<UnsupportedOperationException>(UnsupportedOperationException.class) {
 
       @Override
       protected void execute() throws Exception {
-        newBuilder().fetch().map().get(classRef).remove(0);
+        newFetcher().map().get(classRef).remove(0);
       }
     }.evaluate();
-    assertObjs(newBuilder(), obj);
+    assertObjs(newFetcher(), obj);
   }
 
   private <T> BaseObject addObj(ClassReference classRef, ClassField<T> field, T value) {
@@ -307,8 +306,8 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     return obj;
   }
 
-  private static void assertObjs(Builder builder, BaseObject... expObjs) {
-    List<BaseObject> ret = builder.fetch().list();
+  private static void assertObjs(XWikiObjectFetcher fetcher, BaseObject... expObjs) {
+    List<BaseObject> ret = fetcher.list();
     assertEquals("not same size, objs: " + ret, expObjs.length, ret.size());
     for (int i = 0; i < ret.size(); i++) {
       assertEqualObjs(expObjs[i], ret.get(i));
