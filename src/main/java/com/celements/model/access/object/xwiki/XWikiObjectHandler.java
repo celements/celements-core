@@ -17,7 +17,7 @@ public class XWikiObjectHandler extends AbstractObjectHandler<XWikiDocument, Bas
   }
 
   private XWikiObjectHandler(XWikiDocument doc) {
-    super(getXWikiObjectBridge(), doc);
+    super(doc);
   }
 
   @Override
@@ -30,7 +30,8 @@ public class XWikiObjectHandler extends AbstractObjectHandler<XWikiDocument, Bas
     return new XWikiObjectEditor(doc, query);
   }
 
-  private static XWikiObjectBridge getXWikiObjectBridge() {
+  @Override
+  public XWikiObjectBridge getBridge() {
     return (XWikiObjectBridge) Utils.getComponent(ObjectBridge.class, XWikiObjectBridge.NAME);
   }
 

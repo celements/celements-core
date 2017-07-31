@@ -21,15 +21,12 @@ import com.google.common.collect.FluentIterable;
 @NotThreadSafe
 public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
 
-  protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
 
-  protected AbstractObjectEditor(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
-      @NotNull ObjectQuery<O> query) {
+  protected AbstractObjectEditor(@NotNull D doc, @NotNull ObjectQuery<O> query) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
-    this.bridge = checkNotNull(bridge);
   }
 
   @Override
@@ -63,7 +60,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
     }
 
     private O createObject(ClassReference classRef) {
-      final O obj = bridge.createObject(doc, classRef);
+      final O obj = getBridge().createObject(doc, classRef);
       query.getFieldRestrictions(classRef).forEach(new Consumer<FieldRestriction<O, ?>>() {
 
         @Override
@@ -72,7 +69,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
         }
 
         private <T> void updateField(O obj, FieldRestriction<O, T> restr) {
-          bridge.setObjectField(obj, restr.getField(), FluentIterable.from(
+          getBridge().setObjectField(obj, restr.getField(), FluentIterable.from(
               restr.getValues()).first().get());
         }
       });
@@ -90,15 +87,17 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
 
     @Override
     public boolean apply(O obj) {
-      return bridge.removeObject(doc, obj);
+      return getBridge().removeObject(doc, obj);
     }
 
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + " [doc=" + bridge.getDocRef(doc) + ", query=" + query
-        + "]";
+    return this.getClass().getSimpleName() + " [doc=" + getBridge().getDocRef(doc) + ", query="
+        + query + "]";
   }
+
+  protected abstract @NotNull ObjectBridge<D, O> getBridge();
 
 }

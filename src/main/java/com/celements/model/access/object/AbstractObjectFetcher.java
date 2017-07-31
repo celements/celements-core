@@ -26,14 +26,11 @@ import com.google.common.collect.Iterables;
 @NotThreadSafe
 public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O> {
 
-  protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
   protected final boolean clone;
 
-  protected AbstractObjectFetcher(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc,
-      @NotNull ObjectQuery<O> query, boolean clone) {
-    this.bridge = checkNotNull(bridge);
+  protected AbstractObjectFetcher(@NotNull D doc, @NotNull ObjectQuery<O> query, boolean clone) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
     this.clone = clone;
@@ -55,7 +52,7 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
       @Override
       public boolean apply(O obj) {
-        return bridge.getObjectNumber(obj) == objNb;
+        return getBridge().getObjectNumber(obj) == objNb;
       }
     });
   }
@@ -79,13 +76,13 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
     if (!query.isEmpty()) {
       ret.addAll(query.getClassRefs());
     } else {
-      ret.addAll(bridge.getDocClassRefs(doc));
+      ret.addAll(getBridge().getDocClassRefs(doc));
     }
     return ret;
   }
 
   private FluentIterable<O> getObjects(ClassReference classRef) {
-    FluentIterable<O> iter = FluentIterable.from(bridge.getObjects(doc, classRef));
+    FluentIterable<O> iter = FluentIterable.from(getBridge().getObjects(doc, classRef));
     iter = iter.filter(Predicates.and(query.getRestrictions(classRef)));
     if (clone) {
       iter = iter.transform(new ObjectCloner());
@@ -97,14 +94,16 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
     @Override
     public O apply(O obj) {
-      return bridge.cloneObject(obj);
+      return getBridge().cloneObject(obj);
     }
   };
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + " [doc=" + bridge.getDocRef(doc) + ", query=" + query
-        + "]";
+    return this.getClass().getSimpleName() + " [doc=" + getBridge().getDocRef(doc) + ", query="
+        + query + "]";
   }
+
+  protected abstract @NotNull ObjectBridge<D, O> getBridge();
 
 }

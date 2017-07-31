@@ -20,25 +20,18 @@ import com.celements.model.classes.fields.ClassField;
 @NotThreadSafe
 public abstract class AbstractObjectHandler<D, O> implements ObjectHandler<D, O> {
 
-  protected final ObjectBridge<D, O> bridge;
   protected final D doc;
   protected final ObjectQuery<O> query;
 
-  protected AbstractObjectHandler(@NotNull ObjectBridge<D, O> bridge, @NotNull D doc) {
-    this.bridge = checkNotNull(bridge);
+  protected AbstractObjectHandler(@NotNull D doc) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>();
-    bridge.checkDoc(doc);
+    getBridge().checkDoc(doc);
   }
 
   @Override
   public DocumentReference getDocRef() {
-    return bridge.getDocRef(doc);
-  }
-
-  @Override
-  public final ObjectBridge<D, O> getBridge() {
-    return bridge;
+    return getBridge().getDocRef(doc);
   }
 
   @Override
@@ -60,32 +53,34 @@ public abstract class AbstractObjectHandler<D, O> implements ObjectHandler<D, O>
 
   @Override
   public final ObjectHandler<D, O> filter(ClassReference classRef) {
-    filter(new ClassRestriction<>(bridge, classRef));
+    filter(new ClassRestriction<>(getBridge(), classRef));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, T value) {
-    filter(new FieldRestriction<>(bridge, field, value));
+    filter(new FieldRestriction<>(getBridge(), field, value));
     return this;
   }
 
   @Override
   public final <T> ObjectHandler<D, O> filter(ClassField<T> field, Collection<T> values) {
-    filter(new FieldRestriction<>(bridge, field, values));
+    filter(new FieldRestriction<>(getBridge(), field, values));
     return this;
   }
 
   @Override
   public final ObjectHandler<D, O> filterAbsent(ClassField<?> field) {
-    filter(new FieldAbsentRestriction<>(bridge, field));
+    filter(new FieldAbsentRestriction<>(getBridge(), field));
     return this;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + " [doc=" + bridge.getDocRef(doc) + ", query=" + query
-        + "]";
+    return this.getClass().getSimpleName() + " [doc=" + getBridge().getDocRef(doc) + ", query="
+        + query + "]";
   }
+
+  protected abstract @NotNull ObjectBridge<D, O> getBridge();
 
 }

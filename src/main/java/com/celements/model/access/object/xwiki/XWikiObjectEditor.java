@@ -15,7 +15,7 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiObjectEditor extends AbstractObjectEditor<XWikiDocument, BaseObject> {
 
   XWikiObjectEditor(XWikiDocument doc, ObjectQuery<BaseObject> query) {
-    super(getXWikiObjectBridge(), doc, query);
+    super(doc, query);
   }
 
   @Override
@@ -28,7 +28,8 @@ public class XWikiObjectEditor extends AbstractObjectEditor<XWikiDocument, BaseO
     return new XWikiObjectFetcher(doc, query, false);
   }
 
-  private static XWikiObjectBridge getXWikiObjectBridge() {
+  @Override
+  public XWikiObjectBridge getBridge() {
     return (XWikiObjectBridge) Utils.getComponent(ObjectBridge.class, XWikiObjectBridge.NAME);
   }
 

@@ -14,7 +14,7 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiObjectFetcher extends AbstractObjectFetcher<XWikiDocument, BaseObject> {
 
   XWikiObjectFetcher(XWikiDocument doc, ObjectQuery<BaseObject> query, boolean clone) {
-    super(getXWikiObjectBridge(), doc, query, clone);
+    super(doc, query, clone);
   }
 
   @Override
@@ -22,7 +22,8 @@ public class XWikiObjectFetcher extends AbstractObjectFetcher<XWikiDocument, Bas
     return XWikiObjectHandler.on(doc).with(query);
   }
 
-  private static XWikiObjectBridge getXWikiObjectBridge() {
+  @Override
+  public XWikiObjectBridge getBridge() {
     return (XWikiObjectBridge) Utils.getComponent(ObjectBridge.class, XWikiObjectBridge.NAME);
   }
 
