@@ -15,8 +15,8 @@ import com.celements.model.access.exception.DocumentAlreadyExistsException;
 import com.celements.model.access.exception.DocumentDeleteException;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
-import com.celements.model.access.object.ObjectEditor;
-import com.celements.model.access.object.ObjectFetcher;
+import com.celements.model.access.object.xwiki.XWikiObjectEditor;
+import com.celements.model.access.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
@@ -74,7 +74,7 @@ public interface IModelAccessFacade {
   public boolean isTranslation(@NotNull XWikiDocument doc);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param docRef
    *          to get xobject on (may not be null)
    * @param classRef
@@ -88,7 +88,7 @@ public interface IModelAccessFacade {
       throws DocumentNotExistsException;
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param docRef
    *          to get xobject on (may not be null)
    * @param classRef
@@ -106,7 +106,7 @@ public interface IModelAccessFacade {
       Object value) throws DocumentNotExistsException;
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobject on (may not be null)
    * @param classRef
@@ -117,7 +117,7 @@ public interface IModelAccessFacade {
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobject on (may not be null)
    * @param classRef
@@ -133,7 +133,7 @@ public interface IModelAccessFacade {
       Object value);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param docRef
    *          to get xobject on (may not be null)
    * @param classRef
@@ -147,7 +147,7 @@ public interface IModelAccessFacade {
       int objectNumber) throws DocumentNotExistsException;
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobject on (may not be null)
    * @param classRef
@@ -161,7 +161,7 @@ public interface IModelAccessFacade {
       int objectNumber);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -175,7 +175,7 @@ public interface IModelAccessFacade {
       throws DocumentNotExistsException;
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -193,7 +193,7 @@ public interface IModelAccessFacade {
       String key, Object value) throws DocumentNotExistsException;
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param docRef
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -211,7 +211,7 @@ public interface IModelAccessFacade {
       String key, Collection<?> values) throws DocumentNotExistsException;
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -222,7 +222,7 @@ public interface IModelAccessFacade {
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -238,7 +238,7 @@ public interface IModelAccessFacade {
       Object value);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobjects on (may not be null)
    * @param classRef
@@ -254,7 +254,7 @@ public interface IModelAccessFacade {
       Collection<?> values);
 
   /**
-   * @deprecated instead use {@link ObjectFetcher}
+   * @deprecated instead use {@link XWikiObjectFetcher}
    * @param doc
    *          to get xobjects on (may not be null)
    * @return
@@ -264,7 +264,7 @@ public interface IModelAccessFacade {
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to get new xobject on (may not be null)
    * @param classRef
@@ -279,7 +279,7 @@ public interface IModelAccessFacade {
   public BaseObject newXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to get or create new xobject on (may not be null)
    * @param classRef
@@ -290,7 +290,7 @@ public interface IModelAccessFacade {
   public BaseObject getOrCreateXObject(XWikiDocument doc, DocumentReference classRef);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to get or create new xobject on (may not be null)
    * @param classRef
@@ -302,7 +302,7 @@ public interface IModelAccessFacade {
       Object value);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to remove xobject on (may not be null)
    * @param objsToRemove
@@ -313,7 +313,7 @@ public interface IModelAccessFacade {
   public boolean removeXObject(XWikiDocument doc, BaseObject objToRemove);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param objsToRemove
@@ -324,7 +324,7 @@ public interface IModelAccessFacade {
   public boolean removeXObjects(XWikiDocument doc, List<BaseObject> objsToRemove);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param classRef
@@ -335,7 +335,7 @@ public interface IModelAccessFacade {
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param classRef
@@ -351,7 +351,7 @@ public interface IModelAccessFacade {
       Object value);
 
   /**
-   * @deprecated instead use {@link ObjectEditor}
+   * @deprecated instead use {@link XWikiObjectEditor}
    * @param doc
    *          to remove xobjects on (may not be null)
    * @param classRef
