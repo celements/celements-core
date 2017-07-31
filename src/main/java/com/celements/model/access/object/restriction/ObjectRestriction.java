@@ -25,14 +25,14 @@ public abstract class ObjectRestriction<O> implements Predicate<O> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(bridge.getObjectType());
+    return Objects.hash(getBridge().getObjectType());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ObjectRestriction) {
       ObjectRestriction<?> other = (ObjectRestriction<?>) obj;
-      return this.bridge.getObjectType() == other.bridge.getObjectType();
+      return this.getBridge().getObjectType() == other.getBridge().getObjectType();
     }
     return false;
   }

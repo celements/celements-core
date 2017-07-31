@@ -41,27 +41,28 @@ public class FieldRestriction<O, T> extends ClassRestriction<O> {
 
   @Override
   public boolean apply(@NotNull O obj) {
-    return super.apply(obj) && values.contains(getBridge().getObjectField(obj, field).orNull());
+    return super.apply(obj) && values.contains(getBridge().getObjectField(obj,
+        getField()).orNull());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), field, values);
+    return Objects.hash(super.hashCode(), getField(), getValues());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof FieldRestriction) {
       FieldRestriction<?, ?> other = (FieldRestriction<?, ?>) obj;
-      return super.equals(obj) && Objects.equals(this.field, other.field) && Objects.equals(
-          this.values, other.values);
+      return super.equals(obj) && Objects.equals(this.getField(), other.getField())
+          && Objects.equals(this.getValues(), other.getValues());
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return "FieldRestriction [field=" + field + ", values=" + values + "]";
+    return "FieldRestriction [field=" + getField() + ", values=" + getValues() + "]";
   }
 
 }

@@ -32,21 +32,21 @@ public class ClassRestriction<O> extends ObjectRestriction<O> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), ref);
+    return Objects.hash(super.hashCode(), getClassRef());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ClassRestriction) {
       ClassRestriction<?> other = (ClassRestriction<?>) obj;
-      return super.equals(obj) && Objects.equals(this.ref, other.ref);
+      return super.equals(obj) && Objects.equals(this.getClassRef(), other.getClassRef());
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return "ClassRestriction [ref=" + ref + "]";
+    return "ClassRestriction [ref=" + getClassRef() + "]";
   }
 
 }

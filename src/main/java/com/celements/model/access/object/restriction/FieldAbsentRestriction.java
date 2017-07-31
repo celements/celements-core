@@ -26,26 +26,26 @@ public class FieldAbsentRestriction<O, T> extends ClassRestriction<O> {
 
   @Override
   public boolean apply(@NotNull O obj) {
-    return super.apply(obj) && !getBridge().getObjectField(obj, field).isPresent();
+    return super.apply(obj) && !getBridge().getObjectField(obj, getField()).isPresent();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), field);
+    return Objects.hash(super.hashCode(), getField());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof FieldAbsentRestriction) {
       FieldAbsentRestriction<?, ?> other = (FieldAbsentRestriction<?, ?>) obj;
-      return super.equals(obj) && Objects.equals(this.field, other.field);
+      return super.equals(obj) && Objects.equals(this.getField(), other.getField());
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return "FieldAbsentRestriction [field=" + field + "]";
+    return "FieldAbsentRestriction [field=" + getField() + "]";
   }
 
 }

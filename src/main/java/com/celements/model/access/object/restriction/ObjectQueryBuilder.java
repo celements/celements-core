@@ -47,8 +47,7 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
    * restricts to objects with the given {@link ClassField}
    */
   public final @NotNull B filter(@NotNull ClassReference classRef) {
-    filter(new ClassRestriction<>(getBridge(), classRef));
-    return getThis();
+    return filter(new ClassRestriction<>(getBridge(), classRef));
   }
 
   /**
@@ -57,24 +56,35 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
    * NOTE: value may not be null, instead use {@link #filterAbsent(ClassField)}
    */
   public final @NotNull <T> B filter(@NotNull ClassField<T> field, @NotNull T value) {
-    filter(new FieldRestriction<>(getBridge(), field, value));
-    return getThis();
+    return filter(new FieldRestriction<>(getBridge(), field, value));
   }
 
   /**
    * restricts to objects for the given {@link ClassField} and possible values (logical OR)
    */
   public final @NotNull <T> B filter(@NotNull ClassField<T> field, @NotNull Collection<T> values) {
-    filter(new FieldRestriction<>(getBridge(), field, values));
-    return getThis();
+    return filter(new FieldRestriction<>(getBridge(), field, values));
   }
 
   /**
    * restricts to objects with no value for the given {@link ClassField}
    */
   public final @NotNull B filterAbsent(@NotNull ClassField<?> field) {
-    filter(new FieldAbsentRestriction<>(getBridge(), field));
-    return getThis();
+    return filter(new FieldAbsentRestriction<>(getBridge(), field));
+  }
+
+  /**
+   * restricts to objects with the given number
+   */
+  public final @NotNull B filter(int number) {
+    return filter(new NumberRestriction<>(getBridge(), number));
+  }
+
+  /**
+   * restricts to the given object
+   */
+  public final @NotNull B filter(O obj) {
+    return filter(new IdentityRestriction<>(getBridge(), obj));
   }
 
   public final ObjectQuery<O> buildQuery() {
