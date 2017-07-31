@@ -6,11 +6,14 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.object.restriction.ObjectQuery;
 import com.google.common.base.Optional;
 
 /**
- * Fetches objects O on a document D for the defined query.
+ * Fetches objects O on a document D for the defined query. Returned objects are intended for
+ * read-only operations. Use {@link ObjectEditor} instead for manipulations.
  *
  * @param <D>
  *          document type
@@ -18,6 +21,15 @@ import com.google.common.base.Optional;
  *          object type
  */
 public interface ObjectFetcher<D, O> {
+
+  @NotNull
+  DocumentReference getDocRef();
+
+  /**
+   * @return clone of the current query
+   */
+  @NotNull
+  ObjectQuery<O> getQuery();
 
   /**
    * @return true if no objects were fetched
@@ -47,11 +59,5 @@ public interface ObjectFetcher<D, O> {
    */
   @NotNull
   Map<ClassReference, List<O>> map();
-
-  /**
-   * @return a new {@link ObjectHandler} with an equal query
-   */
-  @NotNull
-  ObjectHandler<D, O> handle();
 
 }

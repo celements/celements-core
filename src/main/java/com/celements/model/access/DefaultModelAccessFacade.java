@@ -28,7 +28,7 @@ import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.model.access.exception.DocumentSaveException;
 import com.celements.model.access.exception.ModelAccessRuntimeException;
 import com.celements.model.access.object.ObjectFetcher;
-import com.celements.model.access.object.xwiki.XWikiObjectHandler;
+import com.celements.model.access.object.xwiki.XWikiObjectEditor;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
@@ -293,7 +293,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef) {
-    return XWikiObjectHandler.on(doc).filter(new ClassReference(classRef)).fetch().first().orNull();
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().first().orNull();
   }
 
   @Override
@@ -314,7 +314,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
       int objectNumber) {
-    return XWikiObjectHandler.on(doc).filter(new ClassReference(classRef)).fetch().number(
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().number(
         objectNumber);
   }
 
@@ -342,7 +342,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return XWikiObjectHandler.on(doc).filter(new ClassReference(classRef)).edit().fetch().list();
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).edit().fetch().list();
   }
 
   @Override
@@ -356,7 +356,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public List<BaseObject> getXObjects(XWikiDocument doc, DocumentReference classRef, String key,
       Collection<?> values) {
-    ObjectFetcher<XWikiDocument, BaseObject> objFetcher = XWikiObjectHandler.on(doc).filter(
+    ObjectFetcher<XWikiDocument, BaseObject> objFetcher = XWikiObjectEditor.on(doc).filter(
         new ClassReference(classRef)).edit().fetch();
     List<BaseObject> ret = new ArrayList<>();
     for (BaseObject obj : objFetcher.list()) {
@@ -370,7 +370,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
-    Map<ClassReference, List<BaseObject>> map = XWikiObjectHandler.on(doc).fetch().map();
+    Map<ClassReference, List<BaseObject>> map = XWikiObjectEditor.on(doc).fetch().map();
     WikiReference wikiRef = doc.getDocumentReference().getWikiReference();
     Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
     for (ClassReference classRef : map.keySet()) {
@@ -453,7 +453,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public BaseObject newXObject(XWikiDocument doc, DocumentReference docClassRef) {
     ClassReference classRef = new ClassReference(docClassRef);
-    return XWikiObjectHandler.on(doc).filter(classRef).edit().create().get(classRef);
+    return XWikiObjectEditor.on(doc).filter(classRef).edit().create().get(classRef);
   }
 
   @Override
@@ -496,7 +496,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
-    return !XWikiObjectHandler.on(doc).filter(new ClassReference(
+    return !XWikiObjectEditor.on(doc).filter(new ClassReference(
         classRef)).edit().remove().isEmpty();
   }
 

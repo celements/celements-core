@@ -11,6 +11,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQuery;
 import com.google.common.base.Function;
@@ -20,7 +21,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 
 @NotThreadSafe
@@ -34,6 +34,17 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
     this.clone = clone;
+    getBridge().checkDoc(doc);
+  }
+
+  @Override
+  public DocumentReference getDocRef() {
+    return getBridge().getDocRef(doc);
+  }
+
+  @Override
+  public ObjectQuery<O> getQuery() {
+    return new ObjectQuery<>(query);
   }
 
   @Override
@@ -64,7 +75,7 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
 
   @Override
   public Map<ClassReference, List<O>> map() {
-    Builder<ClassReference, List<O>> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<ClassReference, List<O>> builder = ImmutableMap.builder();
     for (ClassReference classRef : getClassRefs()) {
       builder.put(classRef, getObjects(classRef).toList());
     }

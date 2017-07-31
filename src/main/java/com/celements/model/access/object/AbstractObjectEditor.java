@@ -10,6 +10,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.FieldRestriction;
 import com.celements.model.access.object.restriction.ObjectQuery;
@@ -17,6 +18,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 
 @NotThreadSafe
 public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
@@ -27,6 +29,17 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
   protected AbstractObjectEditor(@NotNull D doc, @NotNull ObjectQuery<O> query) {
     this.doc = checkNotNull(doc);
     this.query = new ObjectQuery<>(query);
+    getBridge().checkDoc(doc);
+  }
+
+  @Override
+  public DocumentReference getDocRef() {
+    return getBridge().getDocRef(doc);
+  }
+
+  @Override
+  public ObjectQuery<O> getQuery() {
+    return new ObjectQuery<>(query);
   }
 
   @Override
@@ -51,7 +64,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
     public O apply(ClassReference classRef) {
       Optional<O> ret = Optional.absent();
       if (ifNotExists) {
-        ret = handle().filter(classRef).edit().fetch().first();
+        ret = Optional.fromNullable(Iterables.getFirst(fetch().map().get(classRef), null));
       }
       if (!ret.isPresent()) {
         ret = Optional.of(createObject(classRef));
