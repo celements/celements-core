@@ -1,6 +1,7 @@
 package com.celements.model.access.object;
 
 import static com.google.common.base.Preconditions.*;
+import static com.google.common.collect.FluentIterable.*;
 
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,6 @@ import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 
 @NotThreadSafe
 public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
@@ -70,12 +69,34 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
 
   @Override
   public Map<ClassReference, O> create() {
-    return FluentIterable.from(query.getClassRefs()).toMap(new ObjectCreateFunction(false));
+    return create(false);
   }
 
   @Override
   public Map<ClassReference, O> createIfNotExists() {
-    return FluentIterable.from(query.getClassRefs()).toMap(new ObjectCreateFunction(true));
+    return create(true);
+  }
+
+  private Map<ClassReference, O> create(boolean ifNotExists) {
+    return from(query.getClassRefs()).toMap(new ObjectCreateFunction(ifNotExists));
+  }
+
+  @Override
+  public Optional<O> createFirst() {
+    return createFirst(false);
+  }
+
+  @Override
+  public Optional<O> createFirstIfNotExists() {
+    return createFirst(true);
+  }
+
+  private Optional<O> createFirst(boolean ifNotExists) {
+    Optional<ClassReference> classRef = from(query.getClassRefs()).first();
+    if (classRef.isPresent()) {
+      return Optional.of(new ObjectCreateFunction(ifNotExists).apply(classRef.get()));
+    }
+    return Optional.absent();
   }
 
   private class ObjectCreateFunction implements Function<ClassReference, O> {
@@ -90,7 +111,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
     public O apply(ClassReference classRef) {
       Optional<O> ret = Optional.absent();
       if (ifNotExists) {
-        ret = Optional.fromNullable(Iterables.getFirst(fetch().map().get(classRef), null));
+        ret = from(fetch().map().get(classRef)).first();
       }
       if (!ret.isPresent()) {
         ret = Optional.of(createObject(classRef));
@@ -108,8 +129,7 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
         }
 
         private <T> void updateField(O obj, FieldRestriction<O, T> restr) {
-          getBridge().setObjectField(obj, restr.getField(), FluentIterable.from(
-              restr.getValues()).first().get());
+          getBridge().setObjectField(obj, restr.getField(), from(restr.getValues()).first().get());
         }
       });
       return obj;
@@ -118,8 +138,17 @@ public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
   }
 
   @Override
-  public List<O> remove() {
-    return FluentIterable.from(fetch().list()).filter(new ObjectRemovePredicate()).toList();
+  public List<O> delete() {
+    return from(fetch().list()).filter(new ObjectRemovePredicate()).toList();
+  }
+
+  @Override
+  public Optional<O> deleteFirst() {
+    Optional<O> obj = fetch().first();
+    if (obj.isPresent() && new ObjectRemovePredicate().apply(obj.get())) {
+      return obj;
+    }
+    return Optional.absent();
   }
 
   private class ObjectRemovePredicate implements Predicate<O> {

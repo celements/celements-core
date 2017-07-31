@@ -32,21 +32,15 @@ public interface ObjectFetcher<D, O> {
   ObjectQuery<O> getQuery();
 
   /**
-   * @return true if no objects were fetched
+   * @return amount of fetched objects
    */
-  boolean isEmpty();
+  int count();
 
   /**
    * @return the first fetched object
    */
   @NotNull
   Optional<O> first();
-
-  /**
-   * @return the fetched object with the specified object number
-   */
-  @NotNull
-  Optional<O> number(int objNb);
 
   /**
    * @return a list of all fetched objects

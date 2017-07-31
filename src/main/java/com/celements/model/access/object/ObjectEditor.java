@@ -9,6 +9,7 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.google.common.base.Optional;
 
 /**
  * Manipulates objects O on a document D for the defined query or fetches them for manipulation. Use
@@ -47,10 +48,30 @@ public interface ObjectEditor<D, O> {
   Map<ClassReference, O> createIfNotExists();
 
   /**
-   * @return a list of all removed objects defined by the query
+   * creates the first object defined by the query and also sets fields if any
    */
   @NotNull
-  List<O> remove();
+  Optional<O> createFirst();
+
+  /**
+   * like {@link #createFirst()} but fetches an object if it exists already
+   */
+  @NotNull
+  Optional<O> createFirstIfNotExists();
+
+  /**
+   * deletes all objects defined by the query
+   *
+   * @return a map of all deleted objects indexed by their {@link ClassReference}
+   */
+  @NotNull
+  List<O> delete();
+
+  /**
+   * deletes the first object defined by the query
+   */
+  @NotNull
+  Optional<O> deleteFirst();
 
   /**
    * @return a fetcher which returns objects for manipulation

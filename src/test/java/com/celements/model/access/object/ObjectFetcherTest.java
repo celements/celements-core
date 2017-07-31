@@ -207,19 +207,25 @@ public class ObjectFetcherTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_fetchNumber() throws Exception {
+  public void test_fetch_number() throws Exception {
+    assertObjs(newBuilder().filter(-1));
+    assertObjs(newBuilder().filter(0));
     BaseObject obj1 = addObj(classRef, null, null);
-    addObj(classRef2, null, null);
-    addObj(classRef, null, null);
-    Optional<BaseObject> ret = newBuilder().fetch().number(obj1.getNumber());
-    assertTrue(ret.isPresent());
-    assertEqualObjs(obj1, ret.get());
+    BaseObject obj2 = addObj(classRef, null, null);
+    assertObjs(newBuilder().filter(-1));
+    assertObjs(newBuilder().filter(0), obj1);
+    assertObjs(newBuilder().filter(1), obj2);
   }
 
   @Test
-  public void test_fetchNumber_none() throws Exception {
-    Optional<BaseObject> ret = newBuilder().fetch().number(0);
-    assertFalse(ret.isPresent());
+  public void test_fetch_number_multiple() throws Exception {
+    BaseObject obj1 = addObj(classRef, null, null);
+    BaseObject obj2 = addObj(classRef2, null, null);
+    addObj(classRef, null, null);
+    addObj(classRef2, null, null);
+    assertObjs(newBuilder().filter(obj1.getNumber()), obj1, obj2);
+    assertObjs(newBuilder().filter(obj1.getNumber()).filter(classRef), obj1);
+    assertObjs(newBuilder().filter(obj1.getNumber()).filter(classRef2), obj2);
   }
 
   @Test

@@ -2,7 +2,6 @@ package com.celements.model.access.object;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,11 +16,11 @@ import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 @NotThreadSafe
@@ -84,24 +83,13 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
   }
 
   @Override
-  public boolean isEmpty() {
-    return list().isEmpty();
+  public int count() {
+    return list().size();
   }
 
   @Override
   public Optional<O> first() {
     return FluentIterable.from(list()).first();
-  }
-
-  @Override
-  public Optional<O> number(final int objNb) {
-    return FluentIterable.from(list()).firstMatch(new Predicate<O>() {
-
-      @Override
-      public boolean apply(O obj) {
-        return getBridge().getObjectNumber(obj) == objNb;
-      }
-    });
   }
 
   @Override
@@ -119,11 +107,9 @@ public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O>
   }
 
   private Set<ClassReference> getClassRefs() {
-    Set<ClassReference> ret = new LinkedHashSet<>();
-    if (!query.isEmpty()) {
-      ret.addAll(query.getClassRefs());
-    } else {
-      ret.addAll(getBridge().getDocClassRefs(doc));
+    Set<ClassReference> ret = query.getClassRefs();
+    if (ret.isEmpty()) {
+      ret = ImmutableSet.copyOf(getBridge().getDocClassRefs(doc));
     }
     return ret;
   }

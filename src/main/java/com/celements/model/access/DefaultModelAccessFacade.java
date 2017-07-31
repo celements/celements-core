@@ -315,8 +315,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
       int objectNumber) {
-    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).edit().fetch().number(
-        objectNumber);
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).filter(
+        objectNumber).edit().fetch().first();
   }
 
   @Override
@@ -478,17 +478,19 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   }
 
   @Override
+  @Deprecated
   public boolean removeXObject(XWikiDocument doc, BaseObject objToRemove) {
-    return removeXObjects(doc, Arrays.asList(objToRemove));
+    return XWikiObjectEditor.on(doc).filter(objToRemove).edit().deleteFirst().isPresent();
   }
 
   @Override
+  @Deprecated
   public boolean removeXObjects(XWikiDocument doc, List<BaseObject> objsToRemove) {
     checkNotNull(doc);
     boolean changed = false;
     for (BaseObject obj : new ArrayList<>(objsToRemove)) {
       if (obj != null) {
-        changed |= doc.removeXObject(obj);
+        changed |= XWikiObjectEditor.on(doc).filter(obj).edit().deleteFirst().isPresent();
       }
     }
     return changed;
@@ -498,7 +500,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public boolean removeXObjects(XWikiDocument doc, DocumentReference classRef) {
     return !XWikiObjectEditor.on(doc).filter(new ClassReference(
-        classRef)).edit().remove().isEmpty();
+        classRef)).edit().delete().isEmpty();
   }
 
   @Override

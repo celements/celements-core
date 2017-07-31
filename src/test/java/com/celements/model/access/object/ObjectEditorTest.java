@@ -23,6 +23,7 @@ import com.celements.model.access.object.xwiki.XWikiObjectEditor;
 import com.celements.model.access.object.xwiki.XWikiObjectEditor.Builder;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
+import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -96,6 +97,20 @@ public class ObjectEditorTest extends AbstractComponentTest {
   }
 
   @Test
+  public void test_create_multiple() throws Exception {
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
+    expectNewBaseObject(classRef2.getDocRef(wikiRef));
+    replayDefault();
+    Map<ClassReference, BaseObject> ret = newBuilder().filter(classRef).filter(
+        classRef2).edit().create();
+    verifyDefault();
+    assertEquals(2, ret.size());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
+    assertEquals(classRef2.getDocRef(wikiRef), ret.get(classRef2).getXClassReference());
+    assertObjs(newBuilder(), ret.get(classRef), ret.get(classRef2));
+  }
+
+  @Test
   public void test_create_notClone() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
@@ -142,23 +157,15 @@ public class ObjectEditorTest extends AbstractComponentTest {
     expect(createBaseClassMock(classRef.getDocRef(wikiRef)).newCustomClassInstance(same(
         getContext()))).andThrow(cause).once();
     replayDefault();
-    try {
-      newBuilder().filter(classRef).edit().create();
-    } catch (ClassDocumentLoadException exc) {
-      assertSame(cause, exc.getCause());
-    }
-  }
-
-  @Test
-  public void test_create_noDoc() throws Exception {
-    doc = null;
-    new ExceptionAsserter<NullPointerException>(NullPointerException.class) {
+    ClassDocumentLoadException exc = new ExceptionAsserter<ClassDocumentLoadException>(
+        ClassDocumentLoadException.class) {
 
       @Override
-      protected void execute() throws Exception {
-        newBuilder().edit().create();
+      protected void execute() throws ClassDocumentLoadException {
+        newBuilder().filter(classRef).edit().create();
       }
     }.evaluate();
+    assertSame(cause, exc.getCause());
   }
 
   @Test
@@ -224,37 +231,86 @@ public class ObjectEditorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_remove() {
+  public void test_createFirst() throws Exception {
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
+    replayDefault();
+    Optional<BaseObject> ret = newBuilder().filter(classRef).edit().createFirst();
+    verifyDefault();
+    assertTrue(ret.isPresent());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get().getXClassReference());
+    assertObjs(newBuilder(), ret.get());
+  }
+
+  @Test
+  public void test_createFirst_none() throws Exception {
+    replayDefault();
+    Optional<BaseObject> ret = newBuilder().edit().createFirst();
+    verifyDefault();
+    assertFalse(ret.isPresent());
+  }
+
+  @Test
+  public void test_createFirstIfNotExists_create() throws Exception {
+    expectNewBaseObject(classRef.getDocRef(wikiRef));
+    replayDefault();
+    Optional<BaseObject> ret = newBuilder().filter(classRef).edit().createFirstIfNotExists();
+    verifyDefault();
+    assertTrue(ret.isPresent());
+    assertEquals(classRef.getDocRef(wikiRef), ret.get().getXClassReference());
+    assertObjs(newBuilder(), ret.get());
+  }
+
+  @Test
+  public void test_createFirstIfNotExists_exists() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    List<BaseObject> ret = newBuilder().edit().remove();
+    replayDefault();
+    Optional<BaseObject> ret = newBuilder().filter(classRef).edit().createFirstIfNotExists();
+    verifyDefault();
+    assertTrue(ret.isPresent());
+    assertSame(obj, ret.get());
+    assertObjs(newBuilder(), ret.get());
+  }
+
+  @Test
+  public void test_createFirstIfNotExists_none() throws Exception {
+    replayDefault();
+    Optional<BaseObject> ret = newBuilder().edit().createFirstIfNotExists();
+    verifyDefault();
+    assertFalse(ret.isPresent());
+  }
+
+  @Test
+  public void test_delete() {
+    BaseObject obj = addObj(classRef, null, null);
+    List<BaseObject> ret = newBuilder().edit().delete();
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(0));
     assertObjs(newBuilder());
   }
 
   @Test
-  public void test_remove_classRef() {
+  public void test_delete_classRef() {
     BaseObject obj = addObj(classRef, null, null);
-    List<BaseObject> ret = newBuilder().filter(classRef).edit().remove();
+    List<BaseObject> ret = newBuilder().filter(classRef).edit().delete();
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(0));
     assertObjs(newBuilder());
   }
 
   @Test
-  public void test_remove_none() {
+  public void test_delete_none() {
     BaseObject obj = addObj(classRef2, null, null);
-    List<BaseObject> ret = newBuilder().filter(classRef).edit().remove();
+    List<BaseObject> ret = newBuilder().filter(classRef).edit().delete();
     assertEquals(0, ret.size());
     assertObjs(newBuilder(), obj);
   }
 
   @Test
-  public void test_remove_multiple() {
+  public void test_delete_multiple() {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    List<BaseObject> ret = newBuilder().filter(classRef).edit().remove();
+    List<BaseObject> ret = newBuilder().filter(classRef).edit().delete();
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
     assertSame(obj3, ret.get(1));
@@ -262,18 +318,34 @@ public class ObjectEditorTest extends AbstractComponentTest {
   }
 
   @Test
-  public void test_remove_keyValue() {
+  public void test_delete_keyValue() {
     ClassField<String> field = FIELD_MY_STRING;
     List<String> vals = Arrays.asList("val1", "val2");
     BaseObject obj1 = addObj(classRef, field, vals.get(0));
     BaseObject obj2 = addObj(classRef, null, null);
     BaseObject obj3 = addObj(classRef, field, vals.get(1));
     BaseObject obj4 = addObj(classRef2, field, vals.get(0));
-    List<BaseObject> ret = newBuilder().filter(field, vals).edit().remove();
+    List<BaseObject> ret = newBuilder().filter(field, vals).edit().delete();
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
     assertSame(obj3, ret.get(1));
     assertObjs(newBuilder(), obj2, obj4);
+  }
+
+  @Test
+  public void test_deleteFirst() {
+    BaseObject obj = addObj(classRef, null, null);
+    BaseObject objNotDelted = addObj(classRef, null, null);
+    Optional<BaseObject> ret = newBuilder().edit().deleteFirst();
+    assertTrue(ret.isPresent());
+    assertSame(obj, ret.get());
+    assertObjs(newBuilder(), objNotDelted);
+  }
+
+  @Test
+  public void test_deleteFirst_none() {
+    Optional<BaseObject> ret = newBuilder().edit().deleteFirst();
+    assertFalse(ret.isPresent());
   }
 
   private <T> BaseObject addObj(ClassReference classRef, ClassField<T> field, T value) {
