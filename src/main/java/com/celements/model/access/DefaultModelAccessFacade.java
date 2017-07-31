@@ -293,7 +293,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public BaseObject getXObject(XWikiDocument doc, DocumentReference classRef) {
-    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().first().orNull();
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(
+        classRef)).edit().fetch().first().orNull();
   }
 
   @Override
@@ -314,7 +315,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Deprecated
   public Optional<BaseObject> getXObject(XWikiDocument doc, DocumentReference classRef,
       int objectNumber) {
-    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).fetch().number(
+    return XWikiObjectEditor.on(doc).filter(new ClassReference(classRef)).edit().fetch().number(
         objectNumber);
   }
 
@@ -370,7 +371,7 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
-    Map<ClassReference, List<BaseObject>> map = XWikiObjectEditor.on(doc).fetch().map();
+    Map<ClassReference, List<BaseObject>> map = XWikiObjectEditor.on(doc).edit().fetch().map();
     WikiReference wikiRef = doc.getDocumentReference().getWikiReference();
     Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
     for (ClassReference classRef : map.keySet()) {

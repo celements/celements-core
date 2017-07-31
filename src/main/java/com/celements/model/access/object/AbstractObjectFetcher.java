@@ -14,6 +14,7 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -25,6 +26,41 @@ import com.google.common.collect.Iterables;
 
 @NotThreadSafe
 public abstract class AbstractObjectFetcher<D, O> implements ObjectFetcher<D, O> {
+
+  /**
+   * Builder for {@link ObjectFetcher}s. Use {@link #filter()} methods to construct the desired
+   * query, then use {@link #fetch()} to retrieve (read-only) objects.
+   */
+  public static abstract class Builder<B extends Builder<B, D, O>, D, O> extends
+      ObjectQueryBuilder<B, O> {
+
+    protected final D doc;
+    protected boolean clone;
+
+    protected Builder(@NotNull ObjectBridge<D, O> bridge, D doc) {
+      super(bridge);
+      this.doc = doc;
+      clone = true;
+    }
+
+    /**
+     * disables cloning for the fetcher. use with caution!
+     */
+    public B disableCloning() {
+      clone = false;
+      return getThis();
+    }
+
+    /**
+     * @return a new {@link ObjectFetcher} for object retrieval. Objects returned by this
+     *         fetcher will by default only be useful for read-only operations.
+     */
+    public abstract @NotNull ObjectFetcher<D, O> fetch();
+
+    @Override
+    protected abstract B getThis();
+
+  }
 
   protected final D doc;
   protected final ObjectQuery<O> query;

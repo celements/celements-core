@@ -14,6 +14,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.FieldRestriction;
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -22,6 +23,31 @@ import com.google.common.collect.Iterables;
 
 @NotThreadSafe
 public abstract class AbstractObjectEditor<D, O> implements ObjectEditor<D, O> {
+
+  /**
+   * Builder for {@link ObjectEditor}s. Use {@link #filter()} methods to construct the desired
+   * query, then use {@link #edit()} to manipulate objects.
+   */
+  public static abstract class Builder<B extends Builder<B, D, O>, D, O> extends
+      ObjectQueryBuilder<B, O> {
+
+    protected final D doc;
+
+    protected Builder(@NotNull ObjectBridge<D, O> bridge, D doc) {
+      super(bridge);
+      this.doc = doc;
+    }
+
+    /**
+     * @return a new {@link ObjectEditor} for object manipulation
+     */
+    @NotNull
+    public abstract ObjectEditor<D, O> edit();
+
+    @Override
+    protected abstract B getThis();
+
+  }
 
   protected final D doc;
   protected final ObjectQuery<O> query;

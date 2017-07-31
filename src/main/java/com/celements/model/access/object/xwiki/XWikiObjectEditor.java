@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import com.celements.model.access.object.AbstractObjectEditor;
 import com.celements.model.access.object.ObjectBridge;
 import com.celements.model.access.object.restriction.ObjectQuery;
-import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -20,13 +19,16 @@ public class XWikiObjectEditor extends AbstractObjectEditor<XWikiDocument, BaseO
     return new Builder(checkNotNull(doc));
   }
 
-  public static class Builder extends ObjectQueryBuilder<Builder, BaseObject> {
-
-    private final XWikiDocument doc;
+  public static class Builder extends
+      AbstractObjectEditor.Builder<Builder, XWikiDocument, BaseObject> {
 
     public Builder(XWikiDocument doc) {
-      super(getXWikiObjectBridge());
-      this.doc = doc;
+      super(getXWikiObjectBridge(), doc);
+    }
+
+    @Override
+    public XWikiObjectEditor edit() {
+      return new XWikiObjectEditor(doc, buildQuery());
     }
 
     @Override
@@ -34,17 +36,9 @@ public class XWikiObjectEditor extends AbstractObjectEditor<XWikiDocument, BaseO
       return this;
     }
 
-    public XWikiObjectEditor edit() {
-      return new XWikiObjectEditor(doc, buildQuery());
-    }
-
-    public XWikiObjectFetcher fetch() {
-      return edit().fetch();
-    }
-
   }
 
-  XWikiObjectEditor(XWikiDocument doc, ObjectQuery<BaseObject> query) {
+  private XWikiObjectEditor(XWikiDocument doc, ObjectQuery<BaseObject> query) {
     super(doc, query);
   }
 

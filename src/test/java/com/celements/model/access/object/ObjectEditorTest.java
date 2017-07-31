@@ -63,7 +63,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   @Test
   public void test_fetch_noClone() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
-    BaseObject ret = newBuilder().fetch().first().get();
+    BaseObject ret = newBuilder().edit().fetch().first().get();
     assertSame(obj, ret);
   }
 
@@ -296,7 +296,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   }
 
   private static void assertObjs(Builder builder, BaseObject... expObjs) {
-    List<BaseObject> ret = builder.fetch().list();
+    List<BaseObject> ret = builder.edit().fetch().list();
     assertEquals("not same size, objs: " + ret, expObjs.length, ret.size());
     for (int i = 0; i < ret.size(); i++) {
       assertSame(expObjs[i], ret.get(i));

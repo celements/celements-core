@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import com.celements.model.access.object.AbstractObjectFetcher;
 import com.celements.model.access.object.ObjectBridge;
 import com.celements.model.access.object.restriction.ObjectQuery;
-import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
@@ -20,19 +19,16 @@ public class XWikiObjectFetcher extends AbstractObjectFetcher<XWikiDocument, Bas
     return new Builder(checkNotNull(doc));
   }
 
-  public static class Builder extends ObjectQueryBuilder<Builder, BaseObject> {
-
-    private final XWikiDocument doc;
-    private boolean clone = true;
+  public static class Builder extends
+      AbstractObjectFetcher.Builder<Builder, XWikiDocument, BaseObject> {
 
     public Builder(XWikiDocument doc) {
-      super(getXWikiObjectBridge());
-      this.doc = doc;
+      super(getXWikiObjectBridge(), doc);
     }
 
-    Builder disableCloning() {
-      clone = false;
-      return getThis();
+    @Override
+    public XWikiObjectFetcher fetch() {
+      return new XWikiObjectFetcher(doc, buildQuery(), clone);
     }
 
     @Override
@@ -40,13 +36,9 @@ public class XWikiObjectFetcher extends AbstractObjectFetcher<XWikiDocument, Bas
       return this;
     }
 
-    public XWikiObjectFetcher fetch() {
-      return new XWikiObjectFetcher(doc, buildQuery(), clone);
-    }
-
   }
 
-  XWikiObjectFetcher(XWikiDocument doc, ObjectQuery<BaseObject> query, boolean clone) {
+  private XWikiObjectFetcher(XWikiDocument doc, ObjectQuery<BaseObject> query, boolean clone) {
     super(doc, query, clone);
   }
 

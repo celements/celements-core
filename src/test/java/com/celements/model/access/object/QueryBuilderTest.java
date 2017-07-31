@@ -142,7 +142,7 @@ public class QueryBuilderTest extends AbstractComponentTest {
   public void test_builder_immutability() throws Exception {
     Builder builder = newBuilder();
     builder.filter(classRef);
-    XWikiObjectFetcher fetcher = builder.fetch();
+    XWikiObjectFetcher fetcher = builder.edit().fetch();
     XWikiObjectEditor editor = builder.edit();
     builder.filter(classRef2);
     assertEquals(1, fetcher.getQuery().size());
