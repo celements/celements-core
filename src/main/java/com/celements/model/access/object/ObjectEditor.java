@@ -51,13 +51,13 @@ public interface ObjectEditor<D, O> {
    * creates the first object defined by the query and also sets fields if any
    */
   @NotNull
-  Optional<O> createFirst();
+  O createFirst();
 
   /**
    * like {@link #createFirst()} but fetches an object if it exists already
    */
   @NotNull
-  Optional<O> createFirstIfNotExists();
+  O createFirstIfNotExists();
 
   /**
    * deletes all objects defined by the query

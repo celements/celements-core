@@ -16,12 +16,12 @@ public class IdentityRestriction<O> extends ObjectRestriction<O> {
 
   private final Set<Integer> hashCodes;
 
-  public IdentityRestriction(@NotNull ObjectBridge<?, O> bridge, O obj) {
+  public IdentityRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull O obj) {
     super(bridge);
     this.hashCodes = ImmutableSet.of(obj.hashCode());
   }
 
-  public IdentityRestriction(@NotNull ObjectBridge<?, O> bridge, Iterable<O> obj) {
+  public IdentityRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull Iterable<O> obj) {
     super(bridge);
     this.hashCodes = FluentIterable.from(obj).transform(MoreFunctions.hashCodeFunction()).toSet();
   }

@@ -50,21 +50,22 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
   }
 
   @Override
-  public Optional<O> createFirst() {
+  public O createFirst() {
     return createFirst(false);
   }
 
   @Override
-  public Optional<O> createFirstIfNotExists() {
+  public O createFirstIfNotExists() {
     return createFirst(true);
   }
 
-  private Optional<O> createFirst(boolean ifNotExists) {
+  private O createFirst(boolean ifNotExists) {
     Optional<ClassReference> classRef = from(getQuery().getClassRefs()).first();
     if (classRef.isPresent()) {
-      return Optional.of(new ObjectCreateFunction(ifNotExists).apply(classRef.get()));
+      return new ObjectCreateFunction(ifNotExists).apply(classRef.get());
+    } else {
+      throw new IllegalArgumentException("no class defined");
     }
-    return Optional.absent();
   }
 
   private class ObjectCreateFunction implements Function<ClassReference, O> {

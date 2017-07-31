@@ -79,8 +79,12 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
   /**
    * restricts to the given object
    */
-  public final @NotNull B filter(O obj) {
+  public final @NotNull B filter(@NotNull O obj) {
     return filter(new IdentityRestriction<>(getBridge(), obj));
+  }
+
+  public final @NotNull B filter(@NotNull Iterable<O> objs) {
+    return filter(new IdentityRestriction<>(getBridge(), objs));
   }
 
   public final ObjectQuery<O> getQuery() {
