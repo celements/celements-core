@@ -9,6 +9,8 @@ import java.util.Set;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -25,6 +27,8 @@ import com.google.common.collect.Iterables;
 @NotThreadSafe
 public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D, O>, D, O> extends
     ObjectQueryBuilder<R, O> implements ObjectFetcher<D, O> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ObjectFetcher.class);
 
   protected final D doc;
   private boolean clone;
@@ -76,7 +80,13 @@ public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D
     FluentIterable<O> objIter = FluentIterable.from(getBridge().getObjects(doc, classRef));
     objIter = objIter.filter(Predicates.and(getQuery().getRestrictions(classRef)));
     if (clone) {
+      LOGGER.debug("{} clone objects", this);
       objIter = objIter.transform(new ObjectCloner());
+    }
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("{} fetched for {}: {}", this, classRef, objIter);
+    } else {
+      LOGGER.info("{} fetched for {} {} objects", this, classRef, objIter.size());
     }
     return objIter;
   }

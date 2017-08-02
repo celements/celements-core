@@ -107,7 +107,7 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   }
 
   @Override
-  public boolean removeObject(XWikiDocument doc, BaseObject obj) {
+  public boolean deleteObject(XWikiDocument doc, BaseObject obj) {
     return doc.removeXObject(obj);
   }
 

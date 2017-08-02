@@ -56,7 +56,7 @@ public interface ObjectBridge<D, O> {
   @NotNull
   O createObject(@NotNull D doc, @NotNull ClassReference classRef);
 
-  boolean removeObject(@NotNull D doc, @NotNull O obj);
+  boolean deleteObject(@NotNull D doc, @NotNull O obj);
 
   @NotNull
   <T> Optional<T> getObjectField(@NotNull O obj, @NotNull ClassField<T> field);

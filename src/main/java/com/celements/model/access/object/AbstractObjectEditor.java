@@ -10,6 +10,8 @@ import java.util.function.Consumer;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -22,6 +24,8 @@ import com.google.common.base.Predicate;
 @NotThreadSafe
 public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, O>, D, O> extends
     ObjectQueryBuilder<R, O> implements ObjectEditor<D, O> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ObjectEditor.class);
 
   protected final D doc;
 
@@ -85,6 +89,8 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
       if (obj == null) {
         obj = getBridge().createObject(doc, classRef);
         getQuery().getFieldRestrictions(classRef).forEach(new FieldSetter(obj));
+        LOGGER.info("{} created object {} for {}", AbstractObjectEditor.this,
+            getBridge().getObjectNumber(obj), classRef);
       }
       return obj;
     }
@@ -105,6 +111,8 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
       <T> void setField(O obj, FieldRestriction<O, T> restriction) {
         T value = from(restriction.getValues()).first().get();
         getBridge().setObjectField(obj, restriction.getField(), value);
+        LOGGER.debug("{} set field {} on created object to value", AbstractObjectEditor.this,
+            restriction.getField(), value);
       }
 
     }
@@ -113,23 +121,26 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
 
   @Override
   public List<O> delete() {
-    return from(fetch().list()).filter(new ObjectRemovePredicate()).toList();
+    return from(fetch().list()).filter(new ObjectDeletePredicate()).toList();
   }
 
   @Override
   public Optional<O> deleteFirst() {
     Optional<O> obj = fetch().first();
-    if (obj.isPresent() && new ObjectRemovePredicate().apply(obj.get())) {
+    if (obj.isPresent() && new ObjectDeletePredicate().apply(obj.get())) {
       return obj;
     }
     return Optional.absent();
   }
 
-  private class ObjectRemovePredicate implements Predicate<O> {
+  private class ObjectDeletePredicate implements Predicate<O> {
 
     @Override
     public boolean apply(O obj) {
-      return getBridge().removeObject(doc, obj);
+      boolean success = getBridge().deleteObject(doc, obj);
+      LOGGER.info("{} deleted object {} for {}: {}", AbstractObjectEditor.this,
+          getBridge().getObjectNumber(obj), getBridge().getObjectClassRef(obj), success);
+      return success;
     }
   }
 
