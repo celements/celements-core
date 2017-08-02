@@ -40,7 +40,7 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
   }
 
   /**
-   * restricts to objects with the given {@link ClassField}
+   * restricts to objects with the given {@link ClassReference}
    */
   public final @NotNull B filter(@NotNull ClassReference classRef) {
     return filter(new ClassRestriction<>(getBridge(), classRef));
@@ -83,10 +83,16 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
     return filter(new IdentityRestriction<>(getBridge(), obj));
   }
 
+  /**
+   * restricts to the given objects
+   */
   public final @NotNull B filter(@NotNull Iterable<O> objs) {
     return filter(new IdentityRestriction<>(getBridge(), objs));
   }
 
+  /**
+   * @return a new {@link ObjectQuery} for the current builder state
+   */
   public final ObjectQuery<O> getQuery() {
     return new ObjectQuery<>(query);
   }

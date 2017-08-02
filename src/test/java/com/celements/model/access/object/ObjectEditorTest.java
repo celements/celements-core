@@ -240,49 +240,56 @@ public class ObjectEditorTest extends AbstractComponentTest {
   public void test_createFirst() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    Optional<BaseObject> ret = newEditor().filter(classRef).createFirst();
+    BaseObject ret = newEditor().filter(classRef).createFirst();
     verifyDefault();
-    assertTrue(ret.isPresent());
-    assertEquals(classRef.getDocRef(wikiRef), ret.get().getXClassReference());
-    assertObjs(newEditor(), ret.get());
+    assertEquals(classRef.getDocRef(wikiRef), ret.getXClassReference());
+    assertObjs(newEditor(), ret);
   }
 
   @Test
   public void test_createFirst_none() throws Exception {
     replayDefault();
-    Optional<BaseObject> ret = newEditor().createFirst();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        newEditor().createFirst();
+      }
+    }.evaluate();
     verifyDefault();
-    assertFalse(ret.isPresent());
   }
 
   @Test
   public void test_createFirstIfNotExists_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    Optional<BaseObject> ret = newEditor().filter(classRef).createFirstIfNotExists();
+    BaseObject ret = newEditor().filter(classRef).createFirstIfNotExists();
     verifyDefault();
-    assertTrue(ret.isPresent());
-    assertEquals(classRef.getDocRef(wikiRef), ret.get().getXClassReference());
-    assertObjs(newEditor(), ret.get());
+    assertEquals(classRef.getDocRef(wikiRef), ret.getXClassReference());
+    assertObjs(newEditor(), ret);
   }
 
   @Test
   public void test_createFirstIfNotExists_exists() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
     replayDefault();
-    Optional<BaseObject> ret = newEditor().filter(classRef).createFirstIfNotExists();
+    BaseObject ret = newEditor().filter(classRef).createFirstIfNotExists();
     verifyDefault();
-    assertTrue(ret.isPresent());
-    assertSame(obj, ret.get());
-    assertObjs(newEditor(), ret.get());
+    assertSame(obj, ret);
+    assertObjs(newEditor(), ret);
   }
 
   @Test
   public void test_createFirstIfNotExists_none() throws Exception {
     replayDefault();
-    Optional<BaseObject> ret = newEditor().createFirstIfNotExists();
+    new ExceptionAsserter<IllegalArgumentException>(IllegalArgumentException.class) {
+
+      @Override
+      protected void execute() throws Exception {
+        newEditor().createFirstIfNotExists();
+      }
+    }.evaluate();
     verifyDefault();
-    assertFalse(ret.isPresent());
   }
 
   @Test

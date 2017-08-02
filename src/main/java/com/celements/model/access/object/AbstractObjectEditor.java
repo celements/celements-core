@@ -78,30 +78,35 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
 
     @Override
     public O apply(ClassReference classRef) {
-      Optional<O> ret = Optional.absent();
+      O obj = null;
       if (ifNotExists) {
-        ret = from(fetch().map().get(classRef)).first();
+        obj = fetch().filter(classRef).first().orNull();
       }
-      if (!ret.isPresent()) {
-        ret = Optional.of(createObject(classRef));
+      if (obj == null) {
+        obj = getBridge().createObject(doc, classRef);
+        getQuery().getFieldRestrictions(classRef).forEach(new FieldSetter(obj));
       }
-      return ret.get();
+      return obj;
     }
 
-    private O createObject(ClassReference classRef) {
-      final O obj = getBridge().createObject(doc, classRef);
-      getQuery().getFieldRestrictions(classRef).forEach(new Consumer<FieldRestriction<O, ?>>() {
+    private class FieldSetter implements Consumer<FieldRestriction<O, ?>> {
 
-        @Override
-        public void accept(FieldRestriction<O, ?> restr) {
-          updateField(obj, restr);
-        }
+      private final O obj;
 
-        private <T> void updateField(O obj, FieldRestriction<O, T> restr) {
-          getBridge().setObjectField(obj, restr.getField(), from(restr.getValues()).first().get());
-        }
-      });
-      return obj;
+      FieldSetter(O obj) {
+        this.obj = obj;
+      }
+
+      @Override
+      public void accept(FieldRestriction<O, ?> restriction) {
+        setField(obj, restriction);
+      }
+
+      <T> void setField(O obj, FieldRestriction<O, T> restriction) {
+        T value = from(restriction.getValues()).first().get();
+        getBridge().setObjectField(obj, restriction.getField(), value);
+      }
+
     }
 
   }
@@ -126,7 +131,6 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
     public boolean apply(O obj) {
       return getBridge().removeObject(doc, obj);
     }
-
   }
 
   @Override
@@ -134,6 +138,9 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
     return this.getClass().getSimpleName() + " [doc=" + getBridge().getDocRef(doc) + ", query="
         + getQuery() + "]";
   }
+
+  @Override
+  public abstract AbstractObjectFetcher<?, D, O> fetch();
 
   @Override
   protected abstract @NotNull ObjectBridge<D, O> getBridge();

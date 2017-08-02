@@ -65,20 +65,20 @@ public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D
   }
 
   private Set<ClassReference> getClassRefs() {
-    Set<ClassReference> ret = getQuery().getClassRefs();
-    if (ret.isEmpty()) {
-      ret = ImmutableSet.copyOf(getBridge().getDocClassRefs(doc));
+    Set<ClassReference> classRefs = getQuery().getClassRefs();
+    if (classRefs.isEmpty()) {
+      classRefs = ImmutableSet.copyOf(getBridge().getDocClassRefs(doc));
     }
-    return ret;
+    return classRefs;
   }
 
   private FluentIterable<O> getObjects(ClassReference classRef) {
-    FluentIterable<O> iter = FluentIterable.from(getBridge().getObjects(doc, classRef));
-    iter = iter.filter(Predicates.and(getQuery().getRestrictions(classRef)));
+    FluentIterable<O> objIter = FluentIterable.from(getBridge().getObjects(doc, classRef));
+    objIter = objIter.filter(Predicates.and(getQuery().getRestrictions(classRef)));
     if (clone) {
-      iter = iter.transform(new ObjectCloner());
+      objIter = objIter.transform(new ObjectCloner());
     }
-    return iter;
+    return objIter;
   }
 
   /**
@@ -95,7 +95,7 @@ public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D
     public O apply(O obj) {
       return getBridge().cloneObject(obj);
     }
-  };
+  }
 
   @Override
   public String toString() {
