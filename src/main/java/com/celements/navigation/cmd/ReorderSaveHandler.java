@@ -23,32 +23,40 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.util.ModelUtils;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.sajson.AbstractEventHandler;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
 public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(ReorderSaveHandler.class);
-  private XWikiContext context;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReorderSaveHandler.class);
   private DocumentReference parentRef;
   private EReorderLiteral currentCommand;
   private Integer currentPos;
   private Set<EntityReference> dirtyParents;
 
-  public ReorderSaveHandler(XWikiContext context) {
-    this.context = context;
+  public ReorderSaveHandler() {
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
   @Override
@@ -68,7 +76,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
     if (currentCommand == EReorderLiteral.PARENT_CHILDREN_PROPERTY) {
       String newParentFN = extractDocFN(key);
       DocumentReference newParentRef = convertToDocRef(newParentFN);
-      if ((newParentRef != null) && context.getWiki().exists(newParentRef, context)) {
+      if ((newParentRef != null) && getModelAccess().exists(newParentRef)) {
         parentRef = newParentRef;
       } else {
         parentRef = null;
@@ -83,7 +91,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
   DocumentReference convertToDocRef(String docFN) {
     if (!StringUtils.isEmpty(docFN)) {
-      return getWebUtils().resolveDocumentReference(docFN);
+      return getModelUtils().resolveRef(docFN, DocumentReference.class);
     }
     return null;
   }
@@ -102,7 +110,7 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
 
   String getParentFN() {
     if (parentRef != null) {
-      return getWebUtils().getRefLocalSerializer().serialize(parentRef);
+      return getModelUtils().serializeRefLocal(parentRef);
     }
     return "";
   }
@@ -138,18 +146,18 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
     if (currentCommand == EReorderLiteral.ELEMENT_ID) {
       String docFN = extractDocFN(value);
       DocumentReference docRef = convertToDocRef(docFN);
-      if ((docRef != null) && context.getWiki().exists(docRef, context)) {
+      if ((docRef != null) && getModelAccess().exists(docRef)) {
         try {
           boolean updateNeeded = false;
-          XWikiDocument xdoc = context.getWiki().getDocument(docRef, context);
+          XWikiDocument xdoc = getModelAccess().getDocument(docRef);
           if (hasDiffParentReferences(xdoc.getParentReference())) {
             markParentDirty(xdoc.getParentReference());
             xdoc.setParentReference(getRelativeParentReference());
             markParentDirty(getParentReference());
             updateNeeded = true;
           }
-          BaseObject menuItemObj = xdoc.getXObject(getNavClassConfig().getMenuItemClassRef(
-              context.getDatabase()));
+          BaseObject menuItemObj = getModelAccess().getXObject(xdoc,
+              getNavClassConfig().getMenuItemClassRef(docRef.getWikiReference()));
           if ((menuItemObj != null) && (menuItemObj.getIntValue(
               "menu_position") != getCurrentPos())) {
             menuItemObj.setIntValue("menu_position", getCurrentPos());
@@ -157,10 +165,13 @@ public class ReorderSaveHandler extends AbstractEventHandler<EReorderLiteral> {
             updateNeeded = true;
           }
           if (updateNeeded) {
-            context.getWiki().saveDocument(xdoc, "Restructuring", context);
+            getModelAccess().saveDocument(xdoc, "Restructuring");
           }
-        } catch (XWikiException e) {
-          LOGGER.error("readPropertyKey: cannot load document [" + docFN + "].");
+        } catch (DocumentNotExistsException dneExp) {
+          // This should never happen because we check for document exist before
+          LOGGER.error("stringEvent: cannot load document [{}].", docFN, dneExp);
+        } catch (DocumentSaveException dsExp) {
+          LOGGER.error("stringEvent: cannot save document [{}].", docFN, dsExp);
         }
         currentPos = getCurrentPos() + 1;
       } else {
