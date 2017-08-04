@@ -393,8 +393,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   }
 
   private DocumentReference getDocRefContextDb(XWikiDocument doc) {
-    return References.adjustRef(doc.getDocumentReference(), DocumentReference.class,
-        modelContext.getWikiRef());
+    return new DocumentReference(References.adjustRef(doc.getDocumentReference(),
+        DocumentReference.class, modelContext.getWikiRef()));
   }
 
   private boolean doesNotExistsForKey(String key) {
