@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -48,7 +47,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -62,6 +60,7 @@ import com.celements.model.metadata.ImmutableDocumentMetaData;
 import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -99,7 +98,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   private CacheManager cacheManager;
 
   @Requirement
-  private ModelContext context;
+  private ModelContext modelContext;
 
   @Requirement
   private ModelUtils modelUtils;
@@ -162,7 +161,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
 
   private int getExistCacheCapacity() {
     int existCacheCapacity = 10000;
-    String existsCapacity = context.getXWikiContext().getWiki().Param(PARAM_EXIST_CACHE_CAPACITY);
+    String existsCapacity = modelContext.getXWikiContext().getWiki().Param(
+        PARAM_EXIST_CACHE_CAPACITY);
     if (existsCapacity != null) {
       try {
         existCacheCapacity = Integer.parseInt(existsCapacity);
@@ -192,7 +192,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
 
   private int getDocCacheCapacity() {
     int docCacheCapacity = 100;
-    String capacity = context.getXWikiContext().getWiki().Param(PARAM_DOC_CACHE_CAPACITY);
+    String capacity = modelContext.getXWikiContext().getWiki().Param(PARAM_DOC_CACHE_CAPACITY);
     if (capacity != null) {
       try {
         docCacheCapacity = Integer.parseInt(capacity);
@@ -268,7 +268,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
 
   String getKey(DocumentReference docRef) {
     DocumentReference cacheDocRef = References.adjustRef(docRef, DocumentReference.class,
-        context.getWikiRef());
+        modelContext.getWikiRef());
     return modelUtils.serializeRef(cacheDocRef);
   }
 
@@ -368,7 +368,8 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   @Override
   public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
     LOGGER.trace("Cache: begin for docRef '{}' in cache", doc.getDocumentReference());
-    String key = getKey(doc.getDocumentReference());
+    DocumentReference contextDocRef = getDocRefContextDb(doc);
+    String key = getKey(contextDocRef);
     String keyWithLang = getKeyWithLang(doc);
     if (doesNotExistsForKey(key) || doesNotExistsForKey(keyWithLang)) {
       LOGGER.debug("Cache: The document {} does not exist, return an empty one", keyWithLang);
@@ -376,7 +377,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
       doc.setNew(true);
       // Make sure to always return a document with an original version, even for one that does
       // not exist. This allows to write more generic code.
-      doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference()));
+      doc.setOriginalDocument(new XWikiDocument(contextDocRef));
       return doc;
     } else {
       LOGGER.debug("Cache: Trying to get doc '{}' from cache", keyWithLang);
@@ -389,6 +390,11 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
       LOGGER.trace("Cache: end for doc '{}' in cache", keyWithLang);
       return cachedoc;
     }
+  }
+
+  private DocumentReference getDocRefContextDb(XWikiDocument doc) {
+    return References.adjustRef(doc.getDocumentReference(), DocumentReference.class,
+        modelContext.getWikiRef());
   }
 
   private boolean doesNotExistsForKey(String key) {
@@ -737,11 +743,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
 
   static enum InvalidateState {
 
-    CACHE_MISS,
-    REMOVED,
-    LOADING_CANCELED,
-    LOADING_MULTI_CANCELED,
-    LOADING_CANCEL_FAILED
+    CACHE_MISS, REMOVED, LOADING_CANCELED, LOADING_MULTI_CANCELED, LOADING_CANCEL_FAILED
 
   }
 
@@ -850,9 +852,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
         LOGGER_DL.trace("DocumentLoader-{}: Trying to get doc '{}' for real",
             Thread.currentThread().getId(), key);
         // IMPORTANT: do not clone here. Creating new document is much faster.
-        // however use ImmutableDocumentReference to avoid cache poisoning via reference
-        XWikiDocument buildDoc = new XWikiDocument(new ImmutableDocumentReference(
-            doc.getDocumentReference()));
+        XWikiDocument buildDoc = new XWikiDocument(getDocRefContextDb(doc));
         buildDoc.setLanguage(doc.getLanguage());
         buildDoc = getBackingStore().loadXWikiDoc(buildDoc, context);
         buildDoc.setStore(getBackingStore());
@@ -905,7 +905,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
     String hql = sb.toString();
     Query query = getQueryManager().createQuery(hql, Query.HQL);
     query.setWiki(References.extractRef(filterRef, WikiReference.class).or(
-        context.getWikiRef()).getName());
+        modelContext.getWikiRef()).getName());
     for (Entry<String, String> bind : bindValues.entrySet()) {
       query.bindValue(bind.getKey(), bind.getValue());
     }

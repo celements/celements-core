@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -17,6 +16,7 @@ import com.celements.navigation.presentation.IPresentationTypeRole;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable

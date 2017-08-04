@@ -1,5 +1,6 @@
 package org.xwiki.model.reference;
 
+import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -7,7 +8,7 @@ import javax.annotation.concurrent.Immutable;
 import org.xwiki.model.EntityType;
 
 @Immutable
-public class ImmutableDocumentReference extends DocumentReference {
+public class ImmutableDocumentReference extends DocumentReference implements ImmutableReference {
 
   private static final long serialVersionUID = 4196990820112451663L;
 
@@ -15,6 +16,7 @@ public class ImmutableDocumentReference extends DocumentReference {
 
   public ImmutableDocumentReference(EntityReference reference) {
     super(reference);
+    setChild(reference.getChild());
     initialised = true;
   }
 
@@ -41,7 +43,9 @@ public class ImmutableDocumentReference extends DocumentReference {
   @Override
   public void setParent(EntityReference parent) {
     checkInit();
-    super.setParent(parent);
+    checkArgument(((parent != null) && (parent.getType() == EntityType.SPACE) && isAbsoluteRef(
+        parent)), "Invalid parent reference [" + parent + "] for a document reference");
+    ReferenceParentSetter.setWithoutMutabilityCheck(this, parent);
   }
 
   @Override
@@ -52,7 +56,14 @@ public class ImmutableDocumentReference extends DocumentReference {
   @Override
   public void setChild(EntityReference child) {
     checkInit();
-    super.setChild(child);
+    if (child != null) {
+      super.setChild(cloneRef(child));
+    }
+  }
+
+  @Override
+  public EntityReference getChild() {
+    return super.getChild() != null ? super.getChild().clone() : null;
   }
 
   @Override
@@ -64,12 +75,19 @@ public class ImmutableDocumentReference extends DocumentReference {
   @Override
   public void setWikiReference(WikiReference newWikiReference) {
     checkInit();
-    super.setWikiReference(newWikiReference);
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public ImmutableDocumentReference clone() {
     return this;
+  }
+
+  @Override
+  public DocumentReference getMutable() {
+    DocumentReference ret = new DocumentReference(this);
+    ret.setChild(getChild());
+    return ret;
   }
 
 }

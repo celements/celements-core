@@ -19,7 +19,6 @@
  */
 package com.celements.cells;
 
-import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,6 +38,7 @@ import com.celements.pagetype.service.IPageTypeRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.PageLayoutCommand;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
