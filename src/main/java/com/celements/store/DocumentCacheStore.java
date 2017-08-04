@@ -47,6 +47,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -66,6 +67,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -852,14 +854,41 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
         LOGGER_DL.trace("DocumentLoader-{}: Trying to get doc '{}' for real",
             Thread.currentThread().getId(), key);
         // IMPORTANT: do not clone here. Creating new document is much faster.
-        XWikiDocument buildDoc = new XWikiDocument(getDocRefContextDb(doc));
+        DocumentReference docRef = getDocRefContextDb(doc);
+        // XWikiHibernateStore.loadXWikiDoc requires a mutable docRef
+        DocumentReference mutableDocRef = new DocumentReference(docRef);
+        XWikiDocument buildDoc = new XWikiDocument(mutableDocRef);
         buildDoc.setLanguage(doc.getLanguage());
         buildDoc = getBackingStore().loadXWikiDoc(buildDoc, context);
         buildDoc.setStore(getBackingStore());
         buildDoc.setFromCache(!buildDoc.isNew());
+        // set back immutable docRef
+        injectImmutableDocRef(buildDoc);
+        if (buildDoc.getOriginalDocument() != null) {
+          injectImmutableDocRef(buildDoc.getOriginalDocument());
+        }
         return buildDoc;
       }
 
+    }
+  }
+
+  private void injectImmutableDocRef(XWikiDocument doc) {
+    DocumentReference docRef = new ImmutableDocumentReference(doc.getDocumentReference());
+    boolean metaDataDirty = doc.isMetaDataDirty();
+    // set invalid docRef first to circumvent equals check in setDocumentReference
+    doc.setDocumentReference(new DocumentReference("$", "$", "$"));
+    doc.setDocumentReference(docRef);
+    doc.setMetaDataDirty(metaDataDirty); // is set true by setDocumentReference
+    doc.getXClass().setDocumentReference(docRef);
+    for (DocumentReference classRef : doc.getXObjects().keySet()) {
+      classRef = new ImmutableDocumentReference(classRef);
+      for (BaseObject obj : doc.getXObjects(classRef)) {
+        if (obj != null) {
+          obj.setDocumentReference(docRef);
+          obj.setXClassReference(classRef);
+        }
+      }
     }
   }
 

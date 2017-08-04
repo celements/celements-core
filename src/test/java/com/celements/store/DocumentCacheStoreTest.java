@@ -8,7 +8,7 @@ import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
+import org.xwiki.model.reference.ImmutableReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractComponentTest;
@@ -224,7 +224,10 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     assertNotSame(inputParamDoc, querySaveDoc);
     assertEquals(inputParamDoc.getDocumentReference(), querySaveDoc.getDocumentReference());
     assertEquals(inputParamDoc.getLanguage(), querySaveDoc.getLanguage());
-    assertTrue(querySaveDoc.getDocumentReference() instanceof ImmutableDocumentReference);
+    assertFalse("XWikiHibernateStore expects mutable docRef",
+        querySaveDoc.getDocumentReference() instanceof ImmutableReference);
+    assertTrue("DocumentBuilder should return immutable docRef",
+        existingDocument.getDocumentReference() instanceof ImmutableReference);
     assertFalse(existingDocument.isNew());
     assertTrue(existingDocument.isFromCache());
     String key = docCacheStore.getKeyWithLang(existingDocument);
@@ -296,7 +299,10 @@ public class DocumentCacheStoreTest extends AbstractComponentTest {
     assertNotSame(inputParamDoc, querySaveDoc);
     assertEquals(inputParamDoc.getDocumentReference(), querySaveDoc.getDocumentReference());
     assertEquals(inputParamDoc.getLanguage(), querySaveDoc.getLanguage());
-    assertTrue(querySaveDoc.getDocumentReference() instanceof ImmutableDocumentReference);
+    assertFalse("XWikiHibernateStore expects mutable docRef",
+        querySaveDoc.getDocumentReference() instanceof ImmutableReference);
+    assertTrue("DocumentBuilder should return immutable docRef",
+        existingDocument.getDocumentReference() instanceof ImmutableReference);
     assertFalse(existingDocument.isNew());
     assertTrue(existingDocument.isFromCache());
     String key = docCacheStore.getKeyWithLang(existingDocument);
