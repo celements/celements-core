@@ -67,7 +67,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -878,20 +877,21 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   private void injectImmutableDocRef(XWikiDocument doc) {
     DocumentReference docRef = new ImmutableDocumentReference(doc.getDocumentReference());
     injectDocRef(doc, docRef);
-    for (DocumentReference classRef : doc.getXObjects().keySet()) {
-      classRef = new ImmutableDocumentReference(classRef);
-      for (BaseObject obj : doc.getXObjects(classRef)) {
-        if (obj != null) {
-          obj.setDocumentReference(docRef);
-          obj.setXClassReference(classRef);
-        }
-      }
-    }
-    // skip BaseClass reference injection for 'XWiki' space since some XWikiPlugins modify it
-    // see e.g. MailSenderPlugin
-    if (!docRef.getLastSpaceReference().getName().equals("XWiki")) {
-      doc.getXClass().setDocumentReference(docRef);
-    }
+    // // skip reference injection in BaseClass for 'XWiki' space since some XWikiPlugins modify it
+    // // see e.g. MailSenderPlugin.init
+    // if (!docRef.getLastSpaceReference().getName().equals("XWiki")) {
+    // doc.getXClass().setDocumentReference(docRef);
+    // }
+    // // inject reference
+    // for (DocumentReference classRef : doc.getXObjects().keySet()) {
+    // classRef = new ImmutableDocumentReference(classRef);
+    // for (BaseObject obj : doc.getXObjects(classRef)) {
+    // if (obj != null) {
+    // obj.setDocumentReference(docRef);
+    // obj.setXClassReference(classRef);
+    // }
+    // }
+    // }
     if (doc.getOriginalDocument() != null) {
       injectImmutableDocRef(doc.getOriginalDocument());
     }
