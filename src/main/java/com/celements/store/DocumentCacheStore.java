@@ -878,13 +878,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   private void injectImmutableDocRef(XWikiDocument doc) {
     DocumentReference docRef = new ImmutableDocumentReference(doc.getDocumentReference());
     injectDocRef(doc, docRef);
-    // inject reference
+    // inject reference in objects
     for (DocumentReference classRef : doc.getXObjects().keySet()) {
       classRef = new ImmutableDocumentReference(classRef);
       for (BaseObject obj : doc.getXObjects(classRef)) {
         if (obj != null) {
           obj.setDocumentReference(docRef);
-          obj.setXClassReference(classRef);
+          // obj.setXClassReference(classRef);
         }
       }
     }
