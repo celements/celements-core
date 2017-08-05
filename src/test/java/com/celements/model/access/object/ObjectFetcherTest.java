@@ -315,9 +315,9 @@ public class ObjectFetcherTest extends AbstractComponentTest {
   }
 
   private static void assertEqualObjs(BaseObject expObj, BaseObject actObj) {
-    assertNotSame("obj not cloned", expObj, actObj);
-    assertEquals(expObj.getDocumentReference(), actObj.getDocumentReference());
-    assertEquals(expObj.getXClassReference(), actObj.getXClassReference());
+    assertNotSame("object not cloned", expObj, actObj);
+    assertClone(expObj.getDocumentReference(), actObj.getDocumentReference());
+    assertClone(expObj.getXClassReference(), actObj.getXClassReference());
     assertEquals(expObj.getNumber(), actObj.getNumber());
     assertEquals(expObj.getId(), actObj.getId());
     assertEquals("not same amount of fields set", expObj.getPropertyList().size(),
@@ -326,12 +326,18 @@ public class ObjectFetcherTest extends AbstractComponentTest {
       try {
         BaseProperty expProp = (BaseProperty) expObj.get(propName);
         BaseProperty actProp = (BaseProperty) actObj.get(propName);
+        assertNotSame("object property not cloned", expProp, actProp);
         assertEquals(expProp.getName(), actProp.getName());
         assertEquals(expProp.getValue(), actProp.getValue());
       } catch (XWikiException xwe) {
         throw new RuntimeException(xwe);
       }
     }
+  }
+
+  private static void assertClone(Object expected, Object actual) {
+    assertNotSame(expected, actual);
+    assertEquals(expected, actual);
   }
 
 }
