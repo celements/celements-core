@@ -94,7 +94,7 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   @Override
   public BaseObject cloneObject(BaseObject obj) {
     BaseObject clone = (BaseObject) obj.clone();
-    // BaseObject.clone does not property clone document reference
+    // BaseObject.clone does not properly clone document reference
     clone.setDocumentReference(cloneRef(obj.getDocumentReference(), DocumentReference.class));
     return clone;
   }
