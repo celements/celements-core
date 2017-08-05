@@ -878,7 +878,6 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   private void injectImmutableDocRef(XWikiDocument doc) {
     DocumentReference docRef = new ImmutableDocumentReference(doc.getDocumentReference());
     injectDocRef(doc, docRef);
-    doc.getXClass().setDocumentReference(docRef);
     for (DocumentReference classRef : doc.getXObjects().keySet()) {
       classRef = new ImmutableDocumentReference(classRef);
       for (BaseObject obj : doc.getXObjects(classRef)) {
@@ -887,6 +886,11 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
           obj.setXClassReference(classRef);
         }
       }
+    }
+    // skip BaseClass reference injection for 'XWiki' space since some XWikiPlugins modify it
+    // see e.g. MailSenderPlugin
+    if (!docRef.getLastSpaceReference().getName().equals("XWiki")) {
+      doc.getXClass().setDocumentReference(docRef);
     }
     if (doc.getOriginalDocument() != null) {
       injectImmutableDocRef(doc.getOriginalDocument());
