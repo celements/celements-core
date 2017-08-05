@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.access.object.ObjectBridge;
+import com.celements.model.classes.ClassDefinition;
 
 @Immutable
 public class ClassRestriction<O> extends ObjectRestriction<O> {
@@ -19,6 +20,10 @@ public class ClassRestriction<O> extends ObjectRestriction<O> {
   public ClassRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull ClassReference ref) {
     super(bridge);
     this.ref = checkNotNull(ref);
+  }
+
+  public ClassRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull ClassDefinition classDef) {
+    this(bridge, checkNotNull(classDef).getClassReference());
   }
 
   @Override

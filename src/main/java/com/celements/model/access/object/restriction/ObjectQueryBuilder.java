@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import org.xwiki.model.reference.ClassReference;
 
 import com.celements.model.access.object.ObjectBridge;
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
@@ -44,6 +45,13 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
    */
   public final @NotNull B filter(@NotNull ClassReference classRef) {
     return filter(new ClassRestriction<>(getBridge(), classRef));
+  }
+
+  /**
+   * restricts to objects with the given {@link ClassReference}
+   */
+  public final @NotNull B filter(@NotNull ClassDefinition classDef) {
+    return filter(new ClassRestriction<>(getBridge(), classDef));
   }
 
   /**
