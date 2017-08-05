@@ -62,6 +62,7 @@ import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -878,21 +879,12 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   private void injectImmutableDocRef(XWikiDocument doc) {
     DocumentReference docRef = new ImmutableDocumentReference(doc.getDocumentReference());
     injectDocRef(doc, docRef);
-    // inject reference in objects
-    for (DocumentReference classRef : doc.getXObjects().keySet()) {
-      classRef = new ImmutableDocumentReference(classRef);
-      for (BaseObject obj : doc.getXObjects(classRef)) {
-        if (obj != null) {
-          obj.setDocumentReference(docRef);
-          // obj.setXClassReference(classRef);
-        }
+    // inject immutable reference in objects
+    for (BaseObject obj : Iterables.concat(doc.getXObjects().values())) {
+      if (obj != null) {
+        obj.setDocumentReference(docRef);
       }
     }
-    // // skip reference injection in BaseClass for 'XWiki' space since some XWikiPlugins modify it
-    // // see e.g. MailSenderPlugin.init
-    // if (!docRef.getLastSpaceReference().getName().equals("XWiki")) {
-    // doc.getXClass().setDocumentReference(docRef);
-    // }
     if (doc.getOriginalDocument() != null) {
       injectImmutableDocRef(doc.getOriginalDocument());
     }
