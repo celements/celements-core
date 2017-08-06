@@ -12,11 +12,11 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.FieldRestriction;
 import com.celements.model.access.object.restriction.ObjectQueryBuilder;
+import com.celements.model.classes.ClassIdentity;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -40,17 +40,17 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
   }
 
   @Override
-  public Map<ClassReference, O> create() {
+  public Map<ClassIdentity, O> create() {
     return create(false);
   }
 
   @Override
-  public Map<ClassReference, O> createIfNotExists() {
+  public Map<ClassIdentity, O> createIfNotExists() {
     return create(true);
   }
 
-  private Map<ClassReference, O> create(boolean ifNotExists) {
-    return from(getQuery().getClassRefs()).toMap(new ObjectCreateFunction(ifNotExists));
+  private Map<ClassIdentity, O> create(boolean ifNotExists) {
+    return from(getQuery().getObjectClasses()).toMap(new ObjectCreateFunction(ifNotExists));
   }
 
   @Override
@@ -64,15 +64,15 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
   }
 
   private O createFirst(boolean ifNotExists) {
-    Optional<ClassReference> classRef = from(getQuery().getClassRefs()).first();
-    if (classRef.isPresent()) {
-      return new ObjectCreateFunction(ifNotExists).apply(classRef.get());
+    Optional<ClassIdentity> classId = from(getQuery().getObjectClasses()).first();
+    if (classId.isPresent()) {
+      return new ObjectCreateFunction(ifNotExists).apply(classId.get());
     } else {
       throw new IllegalArgumentException("no class defined");
     }
   }
 
-  private class ObjectCreateFunction implements Function<ClassReference, O> {
+  private class ObjectCreateFunction implements Function<ClassIdentity, O> {
 
     private final boolean ifNotExists;
 
@@ -81,16 +81,16 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
     }
 
     @Override
-    public O apply(ClassReference classRef) {
+    public O apply(ClassIdentity classId) {
       O obj = null;
       if (ifNotExists) {
-        obj = fetch().filter(classRef).first().orNull();
+        obj = fetch().filter(classId).first().orNull();
       }
       if (obj == null) {
-        obj = getBridge().createObject(doc, classRef);
-        getQuery().getFieldRestrictions(classRef).forEach(new FieldSetter(obj));
+        obj = getBridge().createObject(doc, classId);
+        getQuery().getFieldRestrictions(classId).forEach(new FieldSetter(obj));
         LOGGER.info("{} created object {} for {}", AbstractObjectEditor.this,
-            getBridge().getObjectNumber(obj), classRef);
+            getBridge().getObjectNumber(obj), classId);
       }
       return obj;
     }
@@ -139,7 +139,7 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
     public boolean apply(O obj) {
       boolean success = getBridge().deleteObject(doc, obj);
       LOGGER.info("{} deleted object {} for {}: {}", AbstractObjectEditor.this,
-          getBridge().getObjectNumber(obj), getBridge().getObjectClassRef(obj), success);
+          getBridge().getObjectNumber(obj), getBridge().getObjectClass(obj), success);
       return success;
     }
   }

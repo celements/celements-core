@@ -13,7 +13,7 @@ import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 
 @ComponentRole
-public interface ClassDefinition {
+public interface ClassDefinition extends ClassIdentity {
 
   public static final String CFG_SRC_KEY = "celements.classdefinition.blacklist";
 

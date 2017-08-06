@@ -7,51 +7,45 @@ import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.ClassReference;
-
 import com.celements.model.access.object.ObjectBridge;
-import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassIdentity;
 
 @Immutable
 public class ClassRestriction<O> extends ObjectRestriction<O> {
 
-  private final ClassReference ref;
+  private final ClassIdentity classId;
 
-  public ClassRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull ClassReference ref) {
+  public ClassRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull ClassIdentity classId) {
     super(bridge);
-    this.ref = checkNotNull(ref);
-  }
-
-  public ClassRestriction(@NotNull ObjectBridge<?, O> bridge, @NotNull ClassDefinition classDef) {
-    this(bridge, checkNotNull(classDef).getClassReference());
+    this.classId = checkNotNull(classId);
   }
 
   @Override
   public boolean apply(@NotNull O obj) {
-    return ref.equals(getBridge().getObjectClassRef(obj));
+    return classId.equals(getBridge().getObjectClass(obj));
   }
 
-  public ClassReference getClassRef() {
-    return ref;
+  public ClassIdentity getClassIdentity() {
+    return classId;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), getClassRef());
+    return Objects.hash(super.hashCode(), getClassIdentity());
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ClassRestriction) {
       ClassRestriction<?> other = (ClassRestriction<?>) obj;
-      return super.equals(obj) && Objects.equals(this.getClassRef(), other.getClassRef());
+      return super.equals(obj) && Objects.equals(this.getClassIdentity(), other.getClassIdentity());
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return "ClassRestriction [ref=" + getClassRef() + "]";
+    return "ClassRestriction [classId=" + getClassIdentity() + "]";
   }
 
 }

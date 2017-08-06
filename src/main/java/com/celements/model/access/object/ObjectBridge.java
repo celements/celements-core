@@ -8,9 +8,9 @@ import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.classes.ClassIdentity;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 
@@ -40,21 +40,21 @@ public interface ObjectBridge<D, O> {
   DocumentReference getDocRef(@NotNull D doc);
 
   @NotNull
-  List<ClassReference> getDocClassRefs(@NotNull D doc);
+  List<? extends ClassIdentity> getDocClasses(@NotNull D doc);
 
   @NotNull
-  List<O> getObjects(@NotNull D doc, @NotNull ClassReference classRef);
+  List<O> getObjects(@NotNull D doc, @NotNull ClassIdentity classId);
 
   int getObjectNumber(@NotNull O obj);
 
   @NotNull
-  ClassReference getObjectClassRef(@NotNull O obj);
+  ClassIdentity getObjectClass(@NotNull O obj);
 
   @NotNull
   O cloneObject(@NotNull O obj);
 
   @NotNull
-  O createObject(@NotNull D doc, @NotNull ClassReference classRef);
+  O createObject(@NotNull D doc, @NotNull ClassIdentity classId);
 
   boolean deleteObject(@NotNull D doc, @NotNull O obj);
 

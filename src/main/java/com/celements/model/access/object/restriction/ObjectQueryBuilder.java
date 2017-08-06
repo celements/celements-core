@@ -7,10 +7,8 @@ import java.util.Collection;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.ClassReference;
-
 import com.celements.model.access.object.ObjectBridge;
-import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassIdentity;
 import com.celements.model.classes.fields.ClassField;
 
 @NotThreadSafe
@@ -41,17 +39,10 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
   }
 
   /**
-   * restricts to objects with the given {@link ClassReference}
+   * restricts to objects with the given {@link ClassIdentity}
    */
-  public final @NotNull B filter(@NotNull ClassReference classRef) {
-    return filter(new ClassRestriction<>(getBridge(), classRef));
-  }
-
-  /**
-   * restricts to objects with the given {@link ClassReference}
-   */
-  public final @NotNull B filter(@NotNull ClassDefinition classDef) {
-    return filter(new ClassRestriction<>(getBridge(), classDef));
+  public final @NotNull B filter(@NotNull ClassIdentity classId) {
+    return filter(new ClassRestriction<>(getBridge(), classId));
   }
 
   /**

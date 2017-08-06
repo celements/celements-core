@@ -30,6 +30,7 @@ import com.celements.model.access.exception.ModelAccessRuntimeException;
 import com.celements.model.access.object.ObjectFetcher;
 import com.celements.model.access.object.xwiki.XWikiObjectEditor;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassIdentity;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.CustomClassField;
 import com.celements.model.context.ModelContext;
@@ -370,11 +371,11 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   @Override
   @Deprecated
   public Map<DocumentReference, List<BaseObject>> getXObjects(XWikiDocument doc) {
-    Map<ClassReference, List<BaseObject>> map = XWikiObjectEditor.on(doc).fetch().map();
+    Map<ClassIdentity, List<BaseObject>> map = XWikiObjectEditor.on(doc).fetch().map();
     WikiReference wikiRef = doc.getDocumentReference().getWikiReference();
     Map<DocumentReference, List<BaseObject>> ret = new HashMap<>();
-    for (ClassReference classRef : map.keySet()) {
-      ret.put(classRef.getDocRef(wikiRef), map.get(classRef));
+    for (ClassIdentity classId : map.keySet()) {
+      ret.put(classId.getDocRef(wikiRef), map.get(classId));
     }
     return ImmutableMap.copyOf(ret);
   }

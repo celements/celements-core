@@ -19,6 +19,7 @@ import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
 import com.celements.model.access.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassIdentity;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
@@ -257,7 +258,7 @@ public class ObjectFetcherTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, null, null);
     BaseObject obj2 = addObj(classRef2, null, null);
     BaseObject obj3 = addObj(classRef, null, null);
-    Map<ClassReference, List<BaseObject>> ret = newFetcher().map();
+    Map<ClassIdentity, List<BaseObject>> ret = newFetcher().map();
     assertEquals(2, ret.size());
     assertEquals(2, ret.get(classRef).size());
     assertEqualObjs(obj1, ret.get(classRef).get(0));

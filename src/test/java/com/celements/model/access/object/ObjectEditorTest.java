@@ -22,6 +22,7 @@ import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.access.object.xwiki.XWikiObjectEditor;
 import com.celements.model.access.object.xwiki.XWikiObjectFetcher;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.classes.ClassIdentity;
 import com.celements.model.classes.fields.ClassField;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiException;
@@ -98,7 +99,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   public void test_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(classRef).create();
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(classRef).create();
     verifyDefault();
     assertEquals(1, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
@@ -110,7 +111,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     expectNewBaseObject(classRef2.getDocRef(wikiRef));
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(classRef).filter(classRef2).create();
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(classRef).filter(classRef2).create();
     verifyDefault();
     assertEquals(2, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
@@ -140,7 +141,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
     int val = 2;
     expectNewBaseObject(classRef2.getDocRef(wikiRef));
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(field1, vals).filter(field2,
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(field1, vals).filter(field2,
         val).filter(classRef2).create();
     verifyDefault();
     assertEquals(2, ret.size());
@@ -154,7 +155,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   @Test
   public void test_create_none() throws Exception {
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().create();
+    Map<ClassIdentity, BaseObject> ret = newEditor().create();
     verifyDefault();
     assertEquals(0, ret.size());
   }
@@ -180,7 +181,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   public void test_createIfNotExists_create() throws Exception {
     expectNewBaseObject(classRef.getDocRef(wikiRef));
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(classRef).createIfNotExists();
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(classRef).createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertEquals(classRef.getDocRef(wikiRef), ret.get(classRef).getXClassReference());
@@ -195,7 +196,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
     BaseClass bClass = expectNewBaseObject(classRef.getDocRef(wikiRef));
     expect(bClass.get(field.getName())).andReturn(new StringClass()).once();
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(field, val).createIfNotExists();
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(field, val).createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertNotSame(obj, ret.get(classRef));
@@ -208,7 +209,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   public void test_createIfNotExists_exists() throws Exception {
     BaseObject obj = addObj(classRef, null, null);
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(classRef).createIfNotExists();
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(classRef).createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(classRef));
@@ -221,7 +222,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
     String val = "val";
     BaseObject obj = addObj(classRef, field, val);
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().filter(field, val).createIfNotExists();
+    Map<ClassIdentity, BaseObject> ret = newEditor().filter(field, val).createIfNotExists();
     verifyDefault();
     assertEquals(1, ret.size());
     assertSame(obj, ret.get(classRef));
@@ -231,7 +232,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
   @Test
   public void test_createIfNotExists_none() throws Exception {
     replayDefault();
-    Map<ClassReference, BaseObject> ret = newEditor().createIfNotExists();
+    Map<ClassIdentity, BaseObject> ret = newEditor().createIfNotExists();
     verifyDefault();
     assertEquals(0, ret.size());
   }

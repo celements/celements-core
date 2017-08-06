@@ -5,10 +5,10 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.classes.ClassIdentity;
 import com.google.common.base.Optional;
 
 /**
@@ -49,9 +49,9 @@ public interface ObjectFetcher<D, O> {
   List<O> list();
 
   /**
-   * @return a map of all fetched objects indexed by their {@link ClassReference}
+   * @return a map of all fetched objects indexed by their {@link ClassIdentity}
    */
   @NotNull
-  Map<ClassReference, List<O>> map();
+  Map<ClassIdentity, List<O>> map();
 
 }

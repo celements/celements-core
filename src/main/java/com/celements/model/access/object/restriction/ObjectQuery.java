@@ -6,8 +6,7 @@ import java.util.Set;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
-import org.xwiki.model.reference.ClassReference;
-
+import com.celements.model.classes.ClassIdentity;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
@@ -25,17 +24,17 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     super(coll);
   }
 
-  public FluentIterable<ObjectRestriction<O>> getRestrictions(ClassReference classRef) {
-    return FluentIterable.from(this).filter(new ClassPredicate(classRef));
+  public FluentIterable<ObjectRestriction<O>> getRestrictions(ClassIdentity classId) {
+    return FluentIterable.from(this).filter(new ClassPredicate(classId));
   }
 
-  public Set<ClassReference> getClassRefs() {
+  public Set<ClassIdentity> getObjectClasses() {
     return FluentIterable.from(this).filter(getClassRestrictionClass()).transform(
-        new Function<ClassRestriction<O>, ClassReference>() {
+        new Function<ClassRestriction<O>, ClassIdentity>() {
 
           @Override
-          public ClassReference apply(ClassRestriction<O> restr) {
-            return restr.getClassRef();
+          public ClassIdentity apply(ClassRestriction<O> restr) {
+            return restr.getClassIdentity();
           }
         }).toSet();
   }
@@ -45,9 +44,9 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
     return (Class<ClassRestriction<O>>) (Class<?>) ClassRestriction.class;
   }
 
-  public FluentIterable<FieldRestriction<O, ?>> getFieldRestrictions(ClassReference classRef) {
+  public FluentIterable<FieldRestriction<O, ?>> getFieldRestrictions(ClassIdentity classId) {
     return FluentIterable.from(this).filter(getFieldRestrictionClass()).filter(new ClassPredicate(
-        classRef));
+        classId));
   }
 
   @SuppressWarnings("unchecked")
@@ -57,16 +56,16 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
 
   private class ClassPredicate implements Predicate<ObjectRestriction<?>> {
 
-    private final ClassReference classRef;
+    private final ClassIdentity classId;
 
-    ClassPredicate(ClassReference classRef) {
-      this.classRef = classRef;
+    ClassPredicate(ClassIdentity classId) {
+      this.classId = classId;
     }
 
     @Override
     public boolean apply(ObjectRestriction<?> restr) {
       if (restr instanceof ClassRestriction) {
-        return ((ClassRestriction<?>) restr).getClassRef().equals(classRef);
+        return ((ClassRestriction<?>) restr).getClassIdentity().equals(classId);
       }
       return true;
     }

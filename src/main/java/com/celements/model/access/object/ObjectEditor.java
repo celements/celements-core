@@ -5,10 +5,10 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQuery;
+import com.celements.model.classes.ClassIdentity;
 import com.google.common.base.Optional;
 
 /**
@@ -34,18 +34,18 @@ public interface ObjectEditor<D, O> {
   /**
    * creates all objects defined by the query and also sets fields if any
    *
-   * @return a map of all created objects indexed by their {@link ClassReference}
+   * @return a map of all created objects indexed by their {@link ClassIdentity}
    */
   @NotNull
-  Map<ClassReference, O> create();
+  Map<ClassIdentity, O> create();
 
   /**
    * like {@link #create()} but fetches an object if it exists already
    *
-   * @return a map of all created or fetched objects indexed by their {@link ClassReference}
+   * @return a map of all created or fetched objects indexed by their {@link ClassIdentity}
    */
   @NotNull
-  Map<ClassReference, O> createIfNotExists();
+  Map<ClassIdentity, O> createIfNotExists();
 
   /**
    * creates the first object defined by the query and also sets fields if any
@@ -62,7 +62,7 @@ public interface ObjectEditor<D, O> {
   /**
    * deletes all objects defined by the query
    *
-   * @return a map of all deleted objects indexed by their {@link ClassReference}
+   * @return a list of all deleted objects
    */
   @NotNull
   List<O> delete();

@@ -11,10 +11,10 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.access.object.restriction.ObjectQueryBuilder;
+import com.celements.model.classes.ClassIdentity;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
@@ -60,33 +60,33 @@ public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D
   }
 
   @Override
-  public Map<ClassReference, List<O>> map() {
-    ImmutableMap.Builder<ClassReference, List<O>> builder = ImmutableMap.builder();
-    for (ClassReference classRef : getClassRefs()) {
-      builder.put(classRef, getObjects(classRef).toList());
+  public Map<ClassIdentity, List<O>> map() {
+    ImmutableMap.Builder<ClassIdentity, List<O>> builder = ImmutableMap.builder();
+    for (ClassIdentity classId : getObjectClasses()) {
+      builder.put(classId, getObjects(classId).toList());
     }
     return builder.build();
   }
 
-  private Set<ClassReference> getClassRefs() {
-    Set<ClassReference> classRefs = getQuery().getClassRefs();
-    if (classRefs.isEmpty()) {
-      classRefs = ImmutableSet.copyOf(getBridge().getDocClassRefs(doc));
+  private Set<ClassIdentity> getObjectClasses() {
+    Set<ClassIdentity> classes = getQuery().getObjectClasses();
+    if (classes.isEmpty()) {
+      classes = ImmutableSet.copyOf(getBridge().getDocClasses(doc));
     }
-    return classRefs;
+    return classes;
   }
 
-  private FluentIterable<O> getObjects(ClassReference classRef) {
-    FluentIterable<O> objIter = FluentIterable.from(getBridge().getObjects(doc, classRef));
-    objIter = objIter.filter(Predicates.and(getQuery().getRestrictions(classRef)));
+  private FluentIterable<O> getObjects(ClassIdentity classId) {
+    FluentIterable<O> objIter = FluentIterable.from(getBridge().getObjects(doc, classId));
+    objIter = objIter.filter(Predicates.and(getQuery().getRestrictions(classId)));
     if (clone) {
       LOGGER.debug("{} clone objects", this);
       objIter = objIter.transform(new ObjectCloner());
     }
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("{} fetched for {}: {}", this, classRef, objIter);
+      LOGGER.trace("{} fetched for {}: {}", this, classId, objIter);
     } else {
-      LOGGER.info("{} fetched for {} {} objects", this, classRef, objIter.size());
+      LOGGER.info("{} fetched for {} {} objects", this, classId, objIter.size());
     }
     return objIter;
   }
