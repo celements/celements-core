@@ -29,6 +29,8 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ListField.class);
 
+  protected static final String DEFAULT_SEPARATOR = "|";
+
   protected final Marshaller<T> marshaller;
   private final Boolean multiSelect;
   private final Integer size;
@@ -86,7 +88,7 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
     this.size = firstNonNull(builder.size, 2);
     this.displayType = builder.displayType;
     this.picker = builder.picker;
-    this.separator = firstNonNull(Strings.emptyToNull(builder.separator), "|");
+    this.separator = firstNonNull(Strings.emptyToNull(builder.separator), DEFAULT_SEPARATOR);
   }
 
   @Override
@@ -97,9 +99,13 @@ public abstract class ListField<T> extends AbstractClassField<List<T>> implement
 
   @Override
   public String serialize(List<T> values) {
+    return serialize(values, getSeparator().substring(0, 1));
+  }
+
+  public String serialize(@NotNull List<T> values, @Nullable String separator) {
     values = firstNonNull(values, ImmutableList.<T>of());
     return FluentIterable.from(values).transform(marshaller.getSerializer()).filter(
-        Predicates.notNull()).join(Joiner.on(getSeparator().charAt(0)));
+        Predicates.notNull()).join(Joiner.on(firstNonNull(separator, DEFAULT_SEPARATOR)));
   }
 
   @Override
