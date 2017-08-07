@@ -47,7 +47,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ImmutableDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
@@ -62,13 +61,11 @@ import com.celements.model.util.ModelUtils;
 import com.celements.model.util.References;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -251,10 +248,7 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
   @Override
   public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction)
       throws XWikiException {
-    // XWikiHibernateStore.saveXWikiDoc requires a mutable docRef
-    injectMutableDocRef(doc);
     getBackingStore().saveXWikiDoc(doc, context, bTransaction);
-    injectImmutableDocRef(doc);
     doc.setStore(this.store);
     removeDocFromCache(doc, true);
   }
@@ -860,43 +854,13 @@ public class DocumentCacheStore implements XWikiCacheStoreInterface, MetaDataSto
         // IMPORTANT: do not clone here. Creating new document is much faster.
         XWikiDocument buildDoc = new XWikiDocument(getDocRefContextDb(doc));
         buildDoc.setLanguage(doc.getLanguage());
-        // XWikiHibernateStore.loadXWikiDoc requires a mutable docRef
-        injectMutableDocRef(buildDoc);
         buildDoc = getBackingStore().loadXWikiDoc(buildDoc, context);
-        injectImmutableDocRef(buildDoc);
         buildDoc.setStore(getBackingStore());
         buildDoc.setFromCache(!buildDoc.isNew());
         return buildDoc;
       }
 
     }
-  }
-
-  private void injectMutableDocRef(XWikiDocument doc) {
-    injectDocRef(doc, new DocumentReference(doc.getDocumentReference()));
-  }
-
-  private void injectImmutableDocRef(XWikiDocument doc) {
-    DocumentReference docRef = new ImmutableDocumentReference(doc.getDocumentReference());
-    injectDocRef(doc, docRef);
-    // inject immutable reference in objects
-    for (BaseObject obj : Iterables.concat(doc.getXObjects().values())) {
-      if (obj != null) {
-        obj.setDocumentReference(docRef);
-      }
-    }
-    if (doc.getOriginalDocument() != null) {
-      injectImmutableDocRef(doc.getOriginalDocument());
-    }
-  }
-
-  @SuppressWarnings("deprecation")
-  private void injectDocRef(XWikiDocument doc, DocumentReference docRef) {
-    boolean metaDataDirty = doc.isMetaDataDirty();
-    // set invalid docRef first to circumvent equals check in setDocumentReference
-    doc.setDocumentReference(new DocumentReference("$", "$", "$"));
-    doc.setDocumentReference(docRef);
-    doc.setMetaDataDirty(metaDataDirty); // is set true by setDocumentReference
   }
 
   @Override
