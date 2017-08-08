@@ -26,7 +26,7 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
    * adds all restrictions from the the given {@link ObjectQuery}
    */
   public final @NotNull B with(@NotNull ObjectQuery<O> query) {
-    this.query.addAll(query);
+    this.query.addAll(query.getRestrictions());
     return getThis();
   }
 
@@ -93,7 +93,7 @@ public abstract class ObjectQueryBuilder<B extends ObjectQueryBuilder<B, O>, O> 
    * @return a new {@link ObjectQuery} for the current builder state
    */
   public final ObjectQuery<O> getQuery() {
-    return new ObjectQuery<>(query);
+    return new ObjectQuery<>(query.getRestrictions());
   }
 
   protected abstract B getThis();

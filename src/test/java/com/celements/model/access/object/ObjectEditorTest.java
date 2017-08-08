@@ -75,7 +75,7 @@ public class ObjectEditorTest extends AbstractComponentTest {
     builder.filter(classRef);
     XWikiObjectFetcher fetcher = builder.fetch();
     builder.filter(classRef2);
-    assertEquals(1, fetcher.getQuery().size());
+    assertEquals(1, fetcher.getQuery().getRestrictions().size());
   }
 
   @Test

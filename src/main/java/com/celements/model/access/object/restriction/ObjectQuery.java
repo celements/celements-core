@@ -1,7 +1,7 @@
 package com.celements.model.access.object.restriction;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -12,24 +12,37 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
 @NotThreadSafe
-public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
+public class ObjectQuery<O> {
 
-  private static final long serialVersionUID = 7825122021132999318L;
+  private Set<ObjectRestriction<O>> restrictions = new LinkedHashSet<>();
 
   public ObjectQuery() {
-    super();
   }
 
-  public ObjectQuery(Collection<? extends ObjectRestriction<O>> coll) {
-    super(coll);
+  public ObjectQuery(Iterable<? extends ObjectRestriction<O>> iter) {
+    this.addAll(iter);
+  }
+
+  public void add(ObjectRestriction<O> restr) {
+    restrictions.add(restr);
+  }
+
+  public void addAll(Iterable<? extends ObjectRestriction<O>> iter) {
+    for (ObjectRestriction<O> restr : iter) {
+      this.add(restr);
+    }
+  }
+
+  public FluentIterable<ObjectRestriction<O>> getRestrictions() {
+    return FluentIterable.from(restrictions);
   }
 
   public FluentIterable<ObjectRestriction<O>> getRestrictions(ClassIdentity classId) {
-    return FluentIterable.from(this).filter(new ClassPredicate(classId));
+    return getRestrictions().filter(new ClassPredicate(classId));
   }
 
   public Set<ClassIdentity> getObjectClasses() {
-    return FluentIterable.from(this).filter(getClassRestrictionClass()).transform(
+    return getRestrictions().filter(getClassRestrictionClass()).transform(
         new Function<ClassRestriction<O>, ClassIdentity>() {
 
           @Override
@@ -45,13 +58,26 @@ public class ObjectQuery<O> extends LinkedHashSet<ObjectRestriction<O>> {
   }
 
   public FluentIterable<FieldRestriction<O, ?>> getFieldRestrictions(ClassIdentity classId) {
-    return FluentIterable.from(this).filter(getFieldRestrictionClass()).filter(new ClassPredicate(
-        classId));
+    return getRestrictions().filter(getFieldRestrictionClass()).filter(new ClassPredicate(classId));
   }
 
   @SuppressWarnings("unchecked")
   private Class<FieldRestriction<O, ?>> getFieldRestrictionClass() {
     return (Class<FieldRestriction<O, ?>>) (Class<?>) FieldRestriction.class;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(restrictions);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ObjectQuery) {
+      ObjectQuery<?> other = (ObjectQuery<?>) obj;
+      return Objects.equals(this.restrictions, other.restrictions);
+    }
+    return false;
   }
 
   private class ClassPredicate implements Predicate<ObjectRestriction<?>> {

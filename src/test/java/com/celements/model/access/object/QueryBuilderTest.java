@@ -93,11 +93,11 @@ public class QueryBuilderTest extends AbstractComponentTest {
   public void test_filter_unique() throws Exception {
     ObjectQueryBuilder<?, BaseObject> builder = newBuilder();
     builder.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
-    assertEquals(3, builder.getQuery().size());
+    assertEquals(3, builder.getQuery().getRestrictions().size());
     builder.filter(classRef).filter(FIELD_MY_STRING, "val").filterAbsent(FIELD_MY_INT);
-    assertEquals(3, builder.getQuery().size());
+    assertEquals(3, builder.getQuery().getRestrictions().size());
     builder.with(builder.getQuery());
-    assertEquals(3, builder.getQuery().size());
+    assertEquals(3, builder.getQuery().getRestrictions().size());
   }
 
   @Test
@@ -119,12 +119,12 @@ public class QueryBuilderTest extends AbstractComponentTest {
     queryInit.add(new FieldAbsentRestriction<>(getBridge(), FIELD_MY_STRING));
     builder.with(queryInit);
     ObjectQuery<BaseObject> query = builder.getQuery();
-    assertEquals(2, query.size());
+    assertEquals(2, query.getRestrictions().size());
     assertEquals(queryInit, query);
     queryInit.add(new ClassRestriction<>(getBridge(), classRef2));
-    assertEquals("query should be cloned in with", 2, query.size());
+    assertEquals("query should be cloned in with", 2, query.getRestrictions().size());
     builder.getQuery().add(new ClassRestriction<>(getBridge(), classRef2));
-    assertEquals("getQuery should return a clone", 2, query.size());
+    assertEquals("getQuery should return a clone", 2, query.getRestrictions().size());
   }
 
   @Test
