@@ -19,6 +19,7 @@
  */
 package com.celements.job;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.quartz.Job;
@@ -26,6 +27,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -33,6 +35,7 @@ import org.xwiki.context.ExecutionContextManager;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.scheduler.XWikiServletRequestStub;
 import com.xpn.xwiki.plugin.scheduler.XWikiServletResponseStub;
@@ -67,8 +70,8 @@ public abstract class AbstractJob implements Job {
     Execution execution;
     try {
       execution = initExecutionContext(xwikiContext);
-    } catch (ExecutionContextException | DocumentNotExistsException e) {
-      throw new JobExecutionException("Fail to initialize execution context", e);
+    } catch (ExecutionContextException | DocumentNotExistsException | MalformedURLException exp) {
+      throw new JobExecutionException("Fail to initialize execution context", exp);
     }
 
     try {
@@ -84,7 +87,7 @@ public abstract class AbstractJob implements Job {
   }
 
   private Execution initExecutionContext(XWikiContext xwikiContext)
-      throws DocumentNotExistsException, ExecutionContextException {
+      throws ExecutionContextException, DocumentNotExistsException, MalformedURLException {
     // Init execution context
     ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
     Execution execution = Utils.getComponent(Execution.class);
@@ -103,13 +106,12 @@ public abstract class AbstractJob implements Job {
    * The xwiki context is NOT thread safe and may not be shared.
    *
    * @throws DocumentNotExistsException
+   * @throws MalformedURLException
    */
-  private XWikiContext createJobContext(XWikiContext xwikiContext)
-      throws DocumentNotExistsException {
-    // lets now build the stub context
-    XWikiContext scontext = (XWikiContext) xwikiContext.clone();
-    scontext.setWiki(xwikiContext.getWiki());
-    scontext.getWiki().getStore().cleanUp(scontext);
+  XWikiContext createJobContext(XWikiContext xwikiContext) throws DocumentNotExistsException,
+      MalformedURLException {
+    final XWiki xwiki = xwikiContext.getWiki();
+    final String database = xwikiContext.getDatabase();
 
     // We are sure the context request is a real servlet request
     // So we force the dummy request with the current host
@@ -117,27 +119,35 @@ public abstract class AbstractJob implements Job {
     dummy.setHost(xwikiContext.getRequest().getHeader("x-forwarded-host"));
     dummy.setScheme(xwikiContext.getRequest().getScheme());
     XWikiServletRequest request = new XWikiServletRequest(dummy);
-    scontext.setRequest(request);
 
     // Force forged context response to a stub response, since the current context response
     // will not mean anything anymore when running in the scheduler's thread, and can cause
     // errors.
-    XWikiResponse stub = new XWikiServletResponseStub();
-    scontext.setResponse(stub);
+    XWikiResponse response = new XWikiServletResponseStub();
 
-    // feed the dummy context
+    // IMPORTANT: do NOT clone xwikiContext. You would need to ensure that no reference or
+    // unwanted value leaks in the new context.
+    // IMPORTANT: following lines base on Utils.prepareContext
+    XWikiContext scontext = new XWikiContext();
+    scontext.setEngineContext(xwikiContext.getEngineContext());
+    scontext.setRequest(request);
+    scontext.setResponse(response);
+    scontext.setAction("view");
+    scontext.setDatabase(database);
+
+    // feed the job context
     scontext.setUser(xwikiContext.getUser());
     scontext.setLanguage(xwikiContext.getLanguage());
-    scontext.setDatabase(xwikiContext.getDatabase());
     scontext.setMainXWiki(xwikiContext.getMainXWiki());
     scontext.setMode(XWikiContext.MODE_SERVLET);
-    if (scontext.getURL() == null) {
-      try {
-        scontext.setURL(new URL("http://www.mystuburl.com/"));
-      } catch (Exception e) {
-        // the URL is well formed, I promise
-      }
-    }
+
+    scontext.setWiki(xwiki);
+    scontext.getWiki().getStore().cleanUp(scontext);
+    final URL url = xwiki.getServerURL(database, scontext);
+    // Push the URL into the slf4j MDC context so that we can display it in the generated logs
+    // using the %X{url} syntax.
+    MDC.put("url", url.toString());
+    scontext.setURL(url);
 
     com.xpn.xwiki.web.XWikiURLFactory xurf = xwikiContext.getURLFactory();
     if (xurf == null) {
