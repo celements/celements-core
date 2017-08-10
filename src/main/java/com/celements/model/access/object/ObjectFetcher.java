@@ -10,6 +10,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.classes.ClassIdentity;
 import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 
 /**
  * Fetches objects O on a document D for the defined query. Returned objects are intended for
@@ -43,13 +44,19 @@ public interface ObjectFetcher<D, O> {
   Optional<O> first();
 
   /**
-   * @return a list of all fetched objects
+   * @return a {@link List} of all fetched objects
    */
   @NotNull
   List<O> list();
 
   /**
-   * @return a map of all fetched objects indexed by their {@link ClassIdentity}
+   * @return an {@link Iterable} for all fetched objects
+   */
+  @NotNull
+  FluentIterable<O> iter();
+
+  /**
+   * @return a {@link Map} of all fetched objects indexed by their {@link ClassIdentity}
    */
   @NotNull
   Map<ClassIdentity, List<O>> map();

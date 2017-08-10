@@ -19,7 +19,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -51,12 +50,17 @@ public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D
 
   @Override
   public Optional<O> first() {
-    return FluentIterable.from(list()).first();
+    return iter().first();
   }
 
   @Override
   public List<O> list() {
-    return ImmutableList.copyOf(Iterables.concat(map().values()));
+    return iter().toList();
+  }
+
+  @Override
+  public FluentIterable<O> iter() {
+    return FluentIterable.from(Iterables.concat(map().values()));
   }
 
   @Override
