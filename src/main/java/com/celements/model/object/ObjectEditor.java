@@ -1,4 +1,4 @@
-package com.celements.model.access.object;
+package com.celements.model.object;
 
 import java.util.List;
 import java.util.Map;
@@ -7,8 +7,8 @@ import javax.validation.constraints.NotNull;
 
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.access.object.restriction.ObjectQuery;
 import com.celements.model.classes.ClassIdentity;
+import com.celements.model.object.restriction.ObjectQuery;
 import com.google.common.base.Optional;
 
 /**

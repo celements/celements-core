@@ -1,4 +1,4 @@
-package com.celements.model.access.object.restriction;
+package com.celements.model.object.restriction;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -7,7 +7,7 @@ import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
-import com.celements.model.access.object.ObjectBridge;
+import com.celements.model.object.ObjectBridge;
 import com.google.common.base.Predicate;
 
 @Immutable

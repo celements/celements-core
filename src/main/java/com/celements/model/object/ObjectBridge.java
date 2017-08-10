@@ -1,4 +1,4 @@
-package com.celements.model.access.object;
+package com.celements.model.object;
 
 import java.util.List;
 

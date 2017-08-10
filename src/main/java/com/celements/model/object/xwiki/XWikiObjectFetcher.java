@@ -1,10 +1,10 @@
-package com.celements.model.access.object.xwiki;
+package com.celements.model.object.xwiki;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
-import com.celements.model.access.object.AbstractObjectFetcher;
-import com.celements.model.access.object.ObjectBridge;
+import com.celements.model.object.AbstractObjectFetcher;
+import com.celements.model.object.ObjectBridge;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;

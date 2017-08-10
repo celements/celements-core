@@ -1,4 +1,4 @@
-package com.celements.model.access.object.restriction;
+package com.celements.model.object.restriction;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package com.celements.model.access.object.xwiki;
+package com.celements.model.object.xwiki;
 
 import static com.celements.model.util.References.*;
 import static com.google.common.base.MoreObjects.*;
@@ -18,10 +18,10 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
-import com.celements.model.access.object.ObjectBridge;
 import com.celements.model.classes.ClassIdentity;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
+import com.celements.model.object.ObjectBridge;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;

@@ -1,4 +1,4 @@
-package com.celements.model.access.object;
+package com.celements.model.object;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.model.access.object.restriction.ObjectQueryBuilder;
 import com.celements.model.classes.ClassIdentity;
+import com.celements.model.object.restriction.ObjectQueryBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;

@@ -1,12 +1,12 @@
-package com.celements.model.access.object.xwiki;
+package com.celements.model.object.xwiki;
 
 import static com.google.common.base.Preconditions.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
 
-import com.celements.model.access.object.AbstractObjectEditor;
-import com.celements.model.access.object.ObjectBridge;
+import com.celements.model.object.AbstractObjectEditor;
+import com.celements.model.object.ObjectBridge;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
