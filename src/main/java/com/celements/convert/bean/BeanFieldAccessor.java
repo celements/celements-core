@@ -13,6 +13,8 @@ import com.celements.model.access.field.FieldAccessor;
 import com.celements.model.access.field.FieldMissingException;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.list.ListField;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -33,29 +35,32 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
   }
 
   @Override
-  public <V> V getValue(T obj, ClassField<V> field) throws FieldAccessException {
-    V ret;
+  public <V> Optional<V> getValue(T obj, ClassField<V> field) throws FieldAccessException {
     try {
-      ret = field.getType().cast(PropertyUtils.getProperty(obj, getBeanMethodName(field)));
+      V ret = field.getType().cast(PropertyUtils.getProperty(obj, getBeanMethodName(field)));
+      LOGGER.info("getValue: '{}' for '{}' from '{}'", ret, field, obj);
+      return Optional.fromNullable(ret);
     } catch (NoSuchMethodException exc) {
       throw new FieldMissingException(exc);
     } catch (ReflectiveOperationException | ClassCastException exc) {
       throw new FieldAccessException(exc);
     }
-    LOGGER.info("getValue: '{}' for '{}' from '{}'", ret, field, obj);
-    return ret;
   }
 
   @Override
-  public <V> void setValue(T obj, ClassField<V> field, V value) throws FieldAccessException {
+  public <V> boolean setValue(T obj, ClassField<V> field, V value) throws FieldAccessException {
     try {
-      PropertyUtils.setProperty(obj, getBeanMethodName(field), resolveSetValue(field, value));
+      boolean dirty = !Objects.equal(value, getValue(obj, field).orNull());
+      if (dirty) {
+        PropertyUtils.setProperty(obj, getBeanMethodName(field), resolveSetValue(field, value));
+        LOGGER.info("setValue: '{}' for '{}' from '{}'", value, field, obj);
+      }
+      return dirty;
     } catch (NoSuchMethodException exc) {
       throw new FieldMissingException(exc);
     } catch (ReflectiveOperationException exc) {
       throw new FieldAccessException(exc);
     }
-    LOGGER.info("setValue: '{}' for '{}' from '{}'", value, field, obj);
   }
 
   /**

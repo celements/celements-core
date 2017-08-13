@@ -46,7 +46,7 @@ public abstract class ClassDefConverter<A, B> implements Converter<A, B> {
 
   private static <V, A, B> void convertField(ClassField<V> field, FieldAccessor<A> toAccessor, A to,
       FieldAccessor<B> fromAccessor, B from) throws FieldAccessException {
-    toAccessor.setValue(to, field, fromAccessor.getValue(from, field));
+    toAccessor.setValue(to, field, fromAccessor.getValue(from, field).orNull());
   }
 
   private void handle(FieldAccessException exc) throws ConversionException {
