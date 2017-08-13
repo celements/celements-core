@@ -17,6 +17,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Component
 public class CelHibernateStore extends XWikiHibernateStore {
 
+  // TODO CELDEV-530 - inline&refactor XWikiHibernateStore.saveXWikiDoc
   @Override
   public void saveXWikiDoc(XWikiDocument doc, final XWikiContext context,
       final boolean bTransaction) throws XWikiException {
@@ -32,6 +33,8 @@ public class CelHibernateStore extends XWikiHibernateStore {
     exec.execute(doc);
   }
 
+  // TODO CELDEV-530 - inline&refactor XWikiHibernateStore.loadXWikiDoc
+  // TODO CELDEV-531 - improve load performance
   @Override
   public XWikiDocument loadXWikiDoc(XWikiDocument doc, final XWikiContext context)
       throws XWikiException {
