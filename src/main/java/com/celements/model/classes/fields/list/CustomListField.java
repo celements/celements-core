@@ -51,7 +51,7 @@ public class CustomListField<T> extends ListField<T> {
   @Override
   protected ListClass getListClass() {
     StaticListClass element = new StaticListClass();
-    element.setValues(serialize(getValues()));
+    element.setValues(serialize(getValues(), DEFAULT_SEPARATOR));
     return element;
   }
 
