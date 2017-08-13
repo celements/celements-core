@@ -16,7 +16,7 @@ public interface FieldAccessor<T> {
 
   public @NotNull String getName();
 
-  public @Nullable <V> Optional<V> getValue(@NotNull T instance, @NotNull ClassField<V> field)
+  public @NotNull <V> Optional<V> getValue(@NotNull T instance, @NotNull ClassField<V> field)
       throws FieldAccessException;
 
   public <V> boolean setValue(@NotNull T instance, @NotNull ClassField<V> field, @Nullable V value)

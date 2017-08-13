@@ -16,13 +16,12 @@ import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.ClassDocumentLoadException;
 import com.celements.model.classes.ClassIdentity;
-import com.celements.model.classes.fields.ClassField;
 import com.celements.model.context.ModelContext;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.XObjectFieldAccessor;
 import com.celements.model.object.ObjectBridge;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -36,11 +35,8 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
 
   public static final String NAME = "xwiki";
 
-  /**
-   * IMPORTANT: do not use for XObject operations, could lead to endless loops
-   */
-  @Requirement
-  private IModelAccessFacade modelAccess;
+  @Requirement(XObjectFieldAccessor.NAME)
+  private FieldAccessor<BaseObject> xObjAccessor;
 
   @Requirement
   private ModelContext context;
@@ -116,13 +112,8 @@ public class XWikiObjectBridge implements ObjectBridge<XWikiDocument, BaseObject
   }
 
   @Override
-  public <T> Optional<T> getObjectField(BaseObject obj, ClassField<T> field) {
-    return modelAccess.getFieldValue(obj, field);
-  }
-
-  @Override
-  public <T> boolean setObjectField(BaseObject obj, ClassField<T> field, T value) {
-    return modelAccess.setProperty(obj, field, value);
+  public FieldAccessor<BaseObject> getFieldAccessor() {
+    return xObjAccessor;
   }
 
 }

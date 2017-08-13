@@ -2,7 +2,6 @@ package com.celements.model.object;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
@@ -11,8 +10,7 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.model.classes.ClassIdentity;
-import com.celements.model.classes.fields.ClassField;
-import com.google.common.base.Optional;
+import com.celements.model.field.FieldAccessor;
 
 /**
  * Bridge for effective access on document and objects, primarily used by {@link ObjectHandler}s to
@@ -59,8 +57,6 @@ public interface ObjectBridge<D, O> {
   boolean deleteObject(@NotNull D doc, @NotNull O obj);
 
   @NotNull
-  <T> Optional<T> getObjectField(@NotNull O obj, @NotNull ClassField<T> field);
-
-  <T> boolean setObjectField(@NotNull O obj, @NotNull ClassField<T> field, @Nullable T value);
+  FieldAccessor<O> getFieldAccessor();
 
 }

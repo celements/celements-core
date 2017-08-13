@@ -110,7 +110,7 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
 
       <T> void setField(O obj, FieldRestriction<O, T> restriction) {
         T value = from(restriction.getValues()).first().get();
-        getBridge().setObjectField(obj, restriction.getField(), value);
+        getBridge().getFieldAccessor().setValue(obj, restriction.getField(), value);
         LOGGER.debug("{} set field {} on created object to value", AbstractObjectEditor.this,
             restriction.getField(), value);
       }
