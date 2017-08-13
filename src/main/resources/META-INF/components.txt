@@ -155,3 +155,4 @@ com.celements.model.field.XObjectFieldAccessor
 com.celements.convert.bean.BeanFieldAccessor
 com.celements.convert.bean.XObjectBeanConverter
 com.celements.convert.bean.BeanXObjectConverter
+com.celements.model.object.xwiki.XWikiObjectBridge
