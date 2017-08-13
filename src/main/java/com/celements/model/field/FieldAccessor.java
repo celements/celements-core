@@ -1,4 +1,4 @@
-package com.celements.model.access.field;
+package com.celements.model.field;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;

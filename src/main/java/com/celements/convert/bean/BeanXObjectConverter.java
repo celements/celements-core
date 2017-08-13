@@ -9,8 +9,8 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 
 import com.celements.convert.classes.XObjectDeconverter;
-import com.celements.model.access.field.FieldAccessor;
 import com.celements.model.classes.ClassDefinition;
+import com.celements.model.field.FieldAccessor;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**

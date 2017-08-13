@@ -8,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
-import com.celements.model.access.field.FieldAccessException;
-import com.celements.model.access.field.FieldAccessor;
-import com.celements.model.access.field.FieldMissingException;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.classes.fields.list.ListField;
+import com.celements.model.field.FieldAccessException;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.FieldMissingException;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;

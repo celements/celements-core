@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import com.celements.convert.ConversionException;
 import com.celements.convert.Converter;
-import com.celements.model.access.field.FieldAccessException;
-import com.celements.model.access.field.FieldAccessor;
-import com.celements.model.access.field.FieldMissingException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.field.FieldAccessException;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.FieldMissingException;
 
 /**
  * abstract {@link Converter} simplifying conversions based on a specific {@link ClassDefinition} by
