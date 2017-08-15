@@ -5,7 +5,6 @@ import static com.google.common.collect.FluentIterable.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.validation.constraints.NotNull;
@@ -88,33 +87,20 @@ public abstract class AbstractObjectEditor<R extends AbstractObjectEditor<R, D, 
       }
       if (obj == null) {
         obj = getBridge().createObject(doc, classId);
-        getQuery().getFieldRestrictions(classId).forEach(new FieldSetter(obj));
+        for (FieldRestriction<O, ?> restriction : getQuery().getFieldRestrictions(classId)) {
+          setField(obj, restriction);
+        }
         LOGGER.info("{} created object {} for {}", AbstractObjectEditor.this,
             getBridge().getObjectNumber(obj), classId);
       }
       return obj;
     }
 
-    private class FieldSetter implements Consumer<FieldRestriction<O, ?>> {
-
-      private final O obj;
-
-      FieldSetter(O obj) {
-        this.obj = obj;
-      }
-
-      @Override
-      public void accept(FieldRestriction<O, ?> restriction) {
-        setField(obj, restriction);
-      }
-
-      <T> void setField(O obj, FieldRestriction<O, T> restriction) {
-        T value = from(restriction.getValues()).first().get();
-        getBridge().getFieldAccessor().setValue(obj, restriction.getField(), value);
-        LOGGER.debug("{} set field {} on created object to value", AbstractObjectEditor.this,
-            restriction.getField(), value);
-      }
-
+    <T> void setField(O obj, FieldRestriction<O, T> restriction) {
+      T value = from(restriction.getValues()).first().get();
+      getBridge().getFieldAccessor().setValue(obj, restriction.getField(), value);
+      LOGGER.debug("{} set field {} on created object to value", AbstractObjectEditor.this,
+          restriction.getField(), value);
     }
 
   }
