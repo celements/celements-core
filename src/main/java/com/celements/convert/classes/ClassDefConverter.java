@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import com.celements.convert.ConversionException;
 import com.celements.convert.Converter;
-import com.celements.model.access.field.FieldAccessException;
-import com.celements.model.access.field.FieldAccessor;
-import com.celements.model.access.field.FieldMissingException;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.fields.ClassField;
+import com.celements.model.field.FieldAccessException;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.FieldMissingException;
 
 /**
  * abstract {@link Converter} simplifying conversions based on a specific {@link ClassDefinition} by
@@ -46,7 +46,7 @@ public abstract class ClassDefConverter<A, B> implements Converter<A, B> {
 
   private static <V, A, B> void convertField(ClassField<V> field, FieldAccessor<A> toAccessor, A to,
       FieldAccessor<B> fromAccessor, B from) throws FieldAccessException {
-    toAccessor.setValue(to, field, fromAccessor.getValue(from, field));
+    toAccessor.setValue(to, field, fromAccessor.getValue(from, field).orNull());
   }
 
   private void handle(FieldAccessException exc) throws ConversionException {
