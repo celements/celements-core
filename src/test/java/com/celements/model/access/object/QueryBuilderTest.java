@@ -63,7 +63,7 @@ public class QueryBuilderTest extends AbstractComponentTest {
 
       @Override
       protected void execute() throws Exception {
-        newBuilder().filter((ClassField<String>) null, null);
+        newBuilder().filter((ClassField<String>) null, (String) null);
       }
     }.evaluate();
   }
