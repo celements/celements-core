@@ -19,6 +19,7 @@
  */
 package com.celements.navigation.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -32,7 +33,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.navigation.INavigationClassConfig;
 import com.celements.navigation.Navigation;
 import com.xpn.xwiki.XWiki;
@@ -41,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase {
+public class RestructureSaveHandlerTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private ReorderSaveHandler restrSaveCmd;
@@ -51,7 +52,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
   public void setUp_RestructureSaveCommandTest() throws Exception {
     context = getContext();
     wiki = getWikiMock();
-    restrSaveCmd = new ReorderSaveHandler(context);
+    restrSaveCmd = new ReorderSaveHandler();
   }
 
   @Test
@@ -203,7 +204,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setParentReference(parentRef);
     BaseObject menuItemObj = new BaseObject();
@@ -211,7 +212,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     menuItemObj.setIntValue("menu_position", 12);
     xdoc.setXObject(0, menuItemObj);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
+    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
@@ -230,7 +231,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "OldParentDoc");
@@ -240,7 +241,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     menuItemObj.setIntValue("menu_position", 0);
     xdoc.setXObject(0, menuItemObj);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
+    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
@@ -261,7 +262,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "OldParentDoc");
@@ -271,7 +272,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     menuItemObj.setIntValue("menu_position", 12);
     xdoc.setXObject(0, menuItemObj);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
+    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
@@ -291,7 +292,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     restrSaveCmd.inject_current(EReorderLiteral.ELEMENT_ID);
     restrSaveCmd.inject_ParentRef(null);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     EntityReference oldParentRef = new DocumentReference(context.getDatabase(), "MySpace",
         "OldParentDoc");
@@ -301,7 +302,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
     menuItemObj.setIntValue("menu_position", 12);
     xdoc.setXObject(0, menuItemObj);
     expect(wiki.getDocument(eq(docRef), same(context))).andReturn(xdoc);
-    wiki.saveDocument(same(xdoc), eq("Restructuring"), same(context));
+    wiki.saveDocument(same(xdoc), eq("Restructuring"), eq(false), same(context));
     expectLastCall();
     replayDefault();
     restrSaveCmd.stringEvent("LIN1:MySpace:MySpace.MyDoc1");
@@ -319,7 +320,7 @@ public class RestructureSaveHandlerTest extends AbstractBridgedComponentTestCase
         "MyParentDoc");
     restrSaveCmd.inject_ParentRef(parentRef);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "MySpace", "MyDoc1");
-    expect(wiki.exists(eq(docRef), same(context))).andReturn(true);
+    expect(wiki.exists(eq(docRef), same(context))).andReturn(true).atLeastOnce();
     XWikiDocument xdoc = new XWikiDocument(docRef);
     xdoc.setParentReference(parentRef);
     BaseObject menuItemObj = new BaseObject();

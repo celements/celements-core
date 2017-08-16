@@ -551,8 +551,6 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     BaseObject obj1 = addObj(classRef, key, val);
     addObj(classRef, key, null);
     BaseObject obj2 = addObj(classRef, key, val);
-    assertEquals(0, modelAccess.getXObjects(doc, classRef, key, null).size());
-    assertEquals(0, modelAccess.getXObjects(doc, classRef, key, "").size());
     List<BaseObject> ret = modelAccess.getXObjects(doc, classRef, key, val);
     assertEquals(2, ret.size());
     assertSame(obj1, ret.get(0));
@@ -580,8 +578,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     try {
       modelAccess.getXObjects(doc, classRef);
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException ise) {
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
       // expected
     }
     verifyDefault();
@@ -642,8 +640,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     replayDefault();
     try {
       modelAccess.getXObjects(doc);
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException ise) {
+      fail("expecting IllegalArgumentException");
+    } catch (IllegalArgumentException iae) {
       // expected
     }
     verifyDefault();
@@ -651,9 +649,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_newXObject() throws Exception {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
-    BaseObject obj = new BaseObject();
+    XWikiDocument docMock = createDocMock(doc.getDocumentReference());
+    expectDefaultLang(docMock);
+    BaseObject obj = createObj(classRef);
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
     replayDefault();
     BaseObject ret = modelAccess.newXObject(docMock, classRef);
@@ -664,8 +662,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
   @Test
   public void test_newXObject_loadException() throws Exception {
     Throwable cause = new XWikiException();
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
+    XWikiDocument docMock = createDocMock(doc.getDocumentReference());
+    expectDefaultLang(docMock);
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andThrow(cause).once();
     replayDefault();
     try {
@@ -679,9 +677,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_newXObject_otherWikiRef() throws Exception {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
-    expect(docMock.getDocumentReference()).andReturn(doc.getDocumentReference());
-    BaseObject obj = new BaseObject();
+    XWikiDocument docMock = createDocMock(doc.getDocumentReference());
+    expectDefaultLang(docMock);
+    BaseObject obj = createObj(classRef);
     expect(docMock.newXObject(eq(classRef), same(getContext()))).andReturn(obj).once();
     classRef = new DocumentReference("otherWiki", classRef.getLastSpaceReference().getName(),
         classRef.getName());
@@ -779,10 +777,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_String() throws Exception {
-    BaseObject obj = new BaseObject();
     String name = "name";
     String val = "val";
-    obj.setStringValue(name, val);
+    BaseObject obj = createObj(classRef, name, val);
 
     replayDefault();
     Object ret = modelAccess.getProperty(obj, name);
@@ -793,10 +790,9 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_String_emptyString() throws Exception {
-    BaseObject obj = new BaseObject();
     String name = "name";
     String val = "";
-    obj.setStringValue(name, val);
+    BaseObject obj = createObj(classRef, name, val);
 
     replayDefault();
     Object ret = modelAccess.getProperty(obj, name);
@@ -807,7 +803,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_Number() throws Exception {
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     String name = "name";
     int val = 5;
     obj.setIntValue(name, val);
@@ -821,7 +817,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_Date() throws Exception {
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     String name = "name";
     Date val = new Date();
     obj.setDateValue(name, val);
@@ -835,7 +831,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_getProperty_Date_Timestamp() throws Exception {
-    BaseObject obj = new BaseObject();
+    BaseObject obj = createObj(classRef);
     String name = "name";
     Date date = new Date();
     Timestamp val = new Timestamp(date.getTime());
@@ -1031,8 +1027,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_String() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
     String val = "val";
 
@@ -1048,8 +1043,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_Number() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
     long val = 5;
 
@@ -1065,8 +1059,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_Date() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
     Date val = new Date();
 
@@ -1082,8 +1075,7 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
 
   @Test
   public void test_setProperty_List() throws Exception {
-    BaseObject obj = new BaseObject();
-    obj.setXClassReference(classRef);
+    BaseObject obj = createObj(classRef);
     String name = "name";
 
     expectPropertyClass(classRef, name, new StringClass());
@@ -1229,35 +1221,28 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     verifyDefault();
   }
 
-  @Test
-  public void test_checkNotTranslation() throws Exception {
-    modelAccess.checkNotTranslation(doc);
-    doc.setLanguage("en");
-    doc.setTranslation(1);
-    try {
-      modelAccess.checkNotTranslation(doc);
-      fail("expecting IllegalStateException");
-    } catch (IllegalStateException ise) {
-      assertTrue("format not replacing placeholder 0", ise.getMessage().contains("'en'"));
-      assertTrue("format not replacing placeholder 1", ise.getMessage().contains("'"
-          + doc.getDocumentReference() + "'"));
-    }
+  private void expectDefaultLang(XWikiDocument docMock) {
+    expect(docMock.getTranslation()).andReturn(0).once();
+    expect(docMock.getLanguage()).andReturn("").once();
   }
 
   private BaseObject addObj(DocumentReference classRef, String key, String value) {
+    BaseObject obj = createObj(classRef, key, value);
+    doc.addXObject(obj);
+    return obj;
+  }
+
+  private BaseObject createObj(DocumentReference classRef) {
+    return createObj(classRef, null, null);
+  }
+
+  private BaseObject createObj(DocumentReference classRef, String key, String value) {
     BaseObject obj = new BaseObject();
     obj.setXClassReference(classRef);
     if (key != null) {
       obj.setStringValue(key, value);
     }
-    doc.addXObject(obj);
     return obj;
-  }
-
-  private void assertCapture(Capture<XWikiDocument> capt, DocumentReference docRef, String lang) {
-    assertNotNull(capt.getValue());
-    assertEquals(docRef, capt.getValue().getDocumentReference());
-    assertEquals(lang, capt.getValue().getLanguage());
   }
 
   private class TestXWikiDocumentCreator implements XWikiDocumentCreator {

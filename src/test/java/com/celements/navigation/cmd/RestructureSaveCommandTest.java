@@ -19,16 +19,17 @@
  */
 package com.celements.navigation.cmd;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWikiContext;
 
-public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase {
+public class RestructureSaveCommandTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private ReorderSaveCommand restrSaveCmd;
@@ -45,16 +46,16 @@ public class RestructureSaveCommandTest extends AbstractBridgedComponentTestCase
   @Test
   public void testGetHandler() {
     restrSaveCmd.injected_Handler(null);
-    assertNotNull(restrSaveCmd.getHandler(context));
+    assertNotNull(restrSaveCmd.getHandler());
     assertEquals("Expecting RestructureSaveHandler handler.", ReorderSaveHandler.class,
-        restrSaveCmd.getHandler(context).getClass());
+        restrSaveCmd.getHandler().getClass());
   }
 
   @Test
   public void testInjected_Handler() {
     restrSaveCmd.injected_Handler(mockHandler);
-    assertNotNull(restrSaveCmd.getHandler(context));
-    assertSame("Expecting injected handler object.", mockHandler, restrSaveCmd.getHandler(context));
+    assertNotNull(restrSaveCmd.getHandler());
+    assertSame("Expecting injected handler object.", mockHandler, restrSaveCmd.getHandler());
   }
 
   @Test
