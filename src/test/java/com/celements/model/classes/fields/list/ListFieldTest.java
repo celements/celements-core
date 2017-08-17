@@ -20,10 +20,12 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.classes.TestClassDefinition;
 import com.celements.model.classes.fields.ClassField;
 import com.celements.model.util.ClassFieldValue;
+import com.google.common.base.Joiner;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.web.Utils;
 
 public class ListFieldTest extends AbstractComponentTest {
@@ -38,13 +40,15 @@ public class ListFieldTest extends AbstractComponentTest {
   private Integer size = 5;
   private String displayType = "displayType";
   private Boolean picker = true;
-  private String separator = "|";
+  private String separator = ",";
+  private List<String> values = Arrays.asList("A", "B", "C");
 
   @Before
   public void prepareTest() throws Exception {
     assertNotNull(STATIC_DEFINITION);
-    fieldBuilder = new StaticListField.Builder(TestClassDefinition.NAME, "name").multiSelect(
-        multiSelect).size(size).displayType(displayType).picker(picker).separator(separator);
+    fieldBuilder = new StaticListField.Builder(TestClassDefinition.NAME, "name");
+    fieldBuilder.multiSelect(multiSelect).size(size).displayType(displayType).picker(
+        picker).separator(separator).values(values);
   }
 
   @Test
@@ -66,7 +70,8 @@ public class ListFieldTest extends AbstractComponentTest {
     assertEquals(displayType, field.getDisplayType());
     assertEquals(picker, field.getPicker());
     assertEquals(separator, field.getSeparator());
-    assertEquals("|", new StaticListField.Builder(TestClassDefinition.NAME,
+    assertEquals(values, field.getValues());
+    assertEquals(ListField.DEFAULT_SEPARATOR, new StaticListField.Builder(TestClassDefinition.NAME,
         field.getName()).build().getSeparator());
   }
 
@@ -74,13 +79,16 @@ public class ListFieldTest extends AbstractComponentTest {
   public void test_getXField() throws Exception {
     StaticListField field = fieldBuilder.build();
     assertTrue(field.getXField() instanceof ListClass);
-    ListClass xField = (ListClass) field.getXField();
+    StaticListClass xField = (StaticListClass) field.getXField();
     assertEquals(multiSelect, xField.isMultiSelect());
     assertEquals(size, (Integer) xField.getSize());
     assertEquals(displayType, xField.getDisplayType());
     assertEquals(picker, xField.isPicker());
     assertEquals(separator, xField.getSeparators());
     assertEquals(" ", xField.getSeparator()); // this is the view separator
+    assertEquals(values, xField.getList(getContext()));
+    assertEquals("separator has to be | for XField values", Joiner.on(
+        ListField.DEFAULT_SEPARATOR).join(values), xField.getValues());
   }
 
   @Test

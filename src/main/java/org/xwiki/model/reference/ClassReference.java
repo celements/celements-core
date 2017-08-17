@@ -7,12 +7,13 @@ import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.EntityType;
 
+import com.celements.model.classes.ClassIdentity;
 import com.celements.model.context.ModelContext;
 import com.google.common.base.Function;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
-public class ClassReference extends EntityReference implements ImmutableReference {
+public class ClassReference extends EntityReference implements ImmutableReference, ClassIdentity {
 
   private static final long serialVersionUID = -8664491352611685779L;
 
@@ -77,10 +78,12 @@ public class ClassReference extends EntityReference implements ImmutableReferenc
     return new EntityReference(getName(), getType(), getParent());
   }
 
+  @Override
   public DocumentReference getDocRef() {
     return getDocRef(getModelContext().getWikiRef());
   }
 
+  @Override
   public DocumentReference getDocRef(WikiReference wikiRef) {
     return new ImmutableDocumentReference(getName(), new SpaceReference(getParent().getName(),
         wikiRef));

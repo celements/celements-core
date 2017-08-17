@@ -1,4 +1,4 @@
-package com.celements.model.access.field;
+package com.celements.model.field;
 
 public class FieldAccessException extends RuntimeException {
 
