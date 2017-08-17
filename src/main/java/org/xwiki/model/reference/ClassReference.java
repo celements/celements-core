@@ -1,5 +1,6 @@
 package org.xwiki.model.reference;
 
+import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
 
 import javax.annotation.concurrent.Immutable;
@@ -12,7 +13,7 @@ import com.google.common.base.Function;
 import com.xpn.xwiki.web.Utils;
 
 @Immutable
-public class ClassReference extends EntityReference implements ClassIdentity {
+public class ClassReference extends EntityReference implements ImmutableReference, ClassIdentity {
 
   private static final long serialVersionUID = -8664491352611685779L;
 
@@ -20,6 +21,7 @@ public class ClassReference extends EntityReference implements ClassIdentity {
 
   public ClassReference(EntityReference reference) {
     super(reference.getName(), reference.getType(), reference.getParent());
+    setChild(reference.getChild());
     initialised = true;
   }
 
@@ -54,7 +56,9 @@ public class ClassReference extends EntityReference implements ClassIdentity {
   @Override
   public void setChild(EntityReference child) {
     checkInit();
-    super.setChild(child);
+    if (child != null) {
+      super.setChild(cloneRef(child));
+    }
   }
 
   @Override
@@ -65,8 +69,13 @@ public class ClassReference extends EntityReference implements ClassIdentity {
   }
 
   @Override
-  public EntityReference clone() {
-    return new ClassReference(this);
+  public ClassReference clone() {
+    return this;
+  }
+
+  @Override
+  public EntityReference getMutable() {
+    return new EntityReference(getName(), getType(), getParent());
   }
 
   @Override
@@ -76,7 +85,8 @@ public class ClassReference extends EntityReference implements ClassIdentity {
 
   @Override
   public DocumentReference getDocRef(WikiReference wikiRef) {
-    return new DocumentReference(getName(), new SpaceReference(getParent().getName(), wikiRef));
+    return new ImmutableDocumentReference(getName(), new SpaceReference(getParent().getName(),
+        wikiRef));
   }
 
   private static ModelContext getModelContext() {
