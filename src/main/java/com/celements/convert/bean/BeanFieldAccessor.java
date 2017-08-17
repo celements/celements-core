@@ -13,7 +13,6 @@ import com.celements.model.classes.fields.list.ListField;
 import com.celements.model.field.FieldAccessException;
 import com.celements.model.field.FieldAccessor;
 import com.celements.model.field.FieldMissingException;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -50,12 +49,9 @@ public class BeanFieldAccessor<T> implements FieldAccessor<T> {
   @Override
   public <V> boolean setValue(T obj, ClassField<V> field, V value) throws FieldAccessException {
     try {
-      boolean dirty = !Objects.equal(value, getValue(obj, field).orNull());
-      if (dirty) {
-        PropertyUtils.setProperty(obj, getBeanMethodName(field), resolveSetValue(field, value));
-        LOGGER.info("setValue: '{}' for '{}' from '{}'", value, field, obj);
-      }
-      return dirty;
+      PropertyUtils.setProperty(obj, getBeanMethodName(field), resolveSetValue(field, value));
+      LOGGER.info("setValue: '{}' for '{}' from '{}'", value, field, obj);
+      return true;
     } catch (NoSuchMethodException exc) {
       throw new FieldMissingException(exc);
     } catch (ReflectiveOperationException exc) {
