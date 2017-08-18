@@ -107,6 +107,7 @@ public abstract class AbstractJob implements Job {
   /**
    * create a new copy of the xwiki context. Job Executions always use a different thread.
    * The xwiki context is NOT thread safe and may not be shared.
+   * TODO CELDEV-534
    *
    * @throws DocumentNotExistsException
    * @throws MalformedURLException
