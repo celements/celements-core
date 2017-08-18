@@ -71,14 +71,17 @@ public abstract class AbstractJob implements Job {
     try {
       execution = initExecutionContext(xwikiContext);
     } catch (ExecutionContextException | DocumentNotExistsException | MalformedURLException exp) {
-      throw new JobExecutionException("Fail to initialize execution context", exp);
+      throw new JobExecutionException("Failed to initialize execution context", exp);
     }
 
     try {
       // Execute the job
       executeJob(jobContext);
-    } catch (Throwable t) {
-      getLogger().error("Exception thrown during job execution", t);
+    } catch (Throwable exp) {
+      getLogger().error("Exception thrown during job '{}' execution",
+          jobContext.getJobDetail().getFullName(), exp);
+      throw new JobExecutionException("Failed to execute job '"
+          + jobContext.getJobDetail().getFullName() + "'", exp);
     } finally {
       // We must ensure we clean the ThreadLocal variables located in the Execution
       // component as otherwise we will have a potential memory leak.
