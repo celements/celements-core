@@ -34,7 +34,9 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.sajson.Builder;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -188,6 +190,20 @@ public class ExternalJavaScriptFilesCommand {
           context.getDatabase(),
           context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
           "WebPreferences"), context));
+
+      DocumentReference currDocRef = context.getDoc().getDocumentReference();
+      PageTypeReference pageTypeDocRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
+          currDocRef);
+      pageTypeDocRef.getConfigName();
+      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
+          context.getDatabase(), "PageTypes", currDocRef.getName()), context));
+
+      XWikiDocument pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
+      DocumentReference pageLayoutDocRef = pageLayoutDoc.getDocumentReference();
+      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
+          context.getDatabase(), pageLayoutDocRef.getLastSpaceReference().getName(),
+          pageLayoutDocRef.getName()), context));
+
       addAllExtJSfilesFromDoc(context.getDoc());
       XWikiDocument pagetype = getPageTypeDoc(context.getDoc());
       if (pagetype != null) {
@@ -273,6 +289,10 @@ public class ExternalJavaScriptFilesCommand {
 
   private IWebUtilsService getWebUtils() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+
+  private IPageTypeResolverRole getPageTypeResolver() {
+    return Utils.getComponent(IPageTypeResolverRole.class);
   }
 
 }
