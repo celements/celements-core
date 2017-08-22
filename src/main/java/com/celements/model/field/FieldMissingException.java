@@ -1,4 +1,4 @@
-package com.celements.model.access.field;
+package com.celements.model.field;
 
 /**
  * is thrown if a {@link FieldAccessor} detects a field that is missing or unhandled by the

@@ -1,5 +1,8 @@
 package com.celements.model.classes.fields;
 
+import static com.google.common.base.MoreObjects.*;
+import static com.google.common.base.Preconditions.*;
+
 import java.util.Objects;
 
 import javax.annotation.Nullable;
@@ -7,7 +10,6 @@ import javax.validation.constraints.NotNull;
 
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.util.ModelUtils;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -33,8 +35,8 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
     private String validationMessage;
 
     public Builder(@NotNull String classDefName, @NotNull String name) {
-      this.classDefName = Objects.requireNonNull(classDefName);
-      this.name = Objects.requireNonNull(Strings.emptyToNull(name));
+      this.classDefName = checkNotNull(classDefName);
+      this.name = checkNotNull(Strings.emptyToNull(name));
     }
 
     public abstract B getThis();
@@ -61,7 +63,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
   protected AbstractClassField(@NotNull Builder<?, T> builder) {
     this.classDefName = builder.classDefName;
     this.name = builder.name;
-    this.prettyName = MoreObjects.firstNonNull(builder.prettyName, builder.name);
+    this.prettyName = firstNonNull(builder.prettyName, builder.name);
     this.validationRegExp = builder.validationRegExp;
     this.validationMessage = builder.validationMessage;
   }
@@ -123,7 +125,7 @@ public abstract class AbstractClassField<T> implements ClassField<T> {
 
   @Override
   public String toString() {
-    return new StringBuilder().append(getClassDef()).append(".").append(name).toString();
+    return getClassDef() + "." + name;
   }
 
   protected static ModelUtils getModelUtils() {

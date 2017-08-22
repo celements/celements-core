@@ -2,8 +2,8 @@ package com.celements.convert.classes;
 
 import org.xwiki.component.annotation.Requirement;
 
-import com.celements.model.access.field.FieldAccessor;
-import com.celements.model.access.field.XObjectFieldAccessor;
+import com.celements.model.field.FieldAccessor;
+import com.celements.model.field.XObjectFieldAccessor;
 import com.xpn.xwiki.objects.BaseObject;
 
 public abstract class XObjectDeconverter<T> extends ClassDefConverter<T, BaseObject> {
