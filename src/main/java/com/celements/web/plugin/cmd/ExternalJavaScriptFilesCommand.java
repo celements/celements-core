@@ -28,12 +28,14 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.sajson.Builder;
@@ -52,7 +54,7 @@ public class ExternalJavaScriptFilesCommand {
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS = JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       ExternalJavaScriptFilesCommand.class);
 
   private XWikiContext context;
@@ -189,10 +191,15 @@ public class ExternalJavaScriptFilesCommand {
           context.getDatabase(),
           context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
           "WebPreferences"), context));
-      PageTypeReference pageTypeDocRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
+      PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
           context.getDoc().getDocumentReference());
-      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-          context.getDatabase(), "PageTypes", pageTypeDocRef.getConfigName()), context));
+      DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+          pageTypeRef.getConfigName());
+      try {
+        addAllExtJSfilesFromDoc(getModelAccess().getDocument(pageTypeDocRef));
+      } catch (DocumentNotExistsException exp) {
+        LOGGER.error("Could not get Document with docRef {} ", pageTypeDocRef, exp);
+      }
       XWikiDocument pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
       DocumentReference pageLayoutDocRef = pageLayoutDoc.getDocumentReference();
       addAllExtJSfilesFromDoc(context.getWiki().getDocument(pageLayoutDocRef, context));
@@ -262,4 +269,7 @@ public class ExternalJavaScriptFilesCommand {
     return Utils.getComponent(IPageTypeResolverRole.class);
   }
 
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
 }
