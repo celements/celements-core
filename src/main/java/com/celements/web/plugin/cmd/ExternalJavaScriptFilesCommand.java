@@ -38,6 +38,7 @@ import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.Builder;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -193,12 +194,12 @@ public class ExternalJavaScriptFilesCommand {
           "WebPreferences"), context));
       PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
           context.getDoc().getDocumentReference());
-      DocumentReference pageTypeDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
-          pageTypeRef.getConfigName());
       try {
-        addAllExtJSfilesFromDoc(getModelAccess().getDocument(pageTypeDocRef));
+        addAllExtJSfilesFromDoc(getModelAccess().getDocument(
+            getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
       } catch (DocumentNotExistsException exp) {
-        LOGGER.error("Could not get Document with docRef {} ", pageTypeDocRef, exp);
+        LOGGER.error("Could not get Document with docRef {} ",
+            getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
       }
       XWikiDocument pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
       DocumentReference pageLayoutDocRef = pageLayoutDoc.getDocumentReference();
@@ -271,5 +272,9 @@ public class ExternalJavaScriptFilesCommand {
 
   private IModelAccessFacade getModelAccess() {
     return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private XObjectPageTypeUtilsRole getObjectPageTypeUtils() {
+    return Utils.getComponent(XObjectPageTypeUtilsRole.class);
   }
 }
