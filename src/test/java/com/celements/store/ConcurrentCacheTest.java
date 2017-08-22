@@ -1,17 +1,16 @@
 package com.celements.store;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static com.celements.store.TestHibernateQuery.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -27,15 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.easymock.IAnswer;
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.LockMode;
-import org.hibernate.Query;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.classic.Session;
-import org.hibernate.impl.AbstractQueryImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -319,8 +312,9 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     expect(sessionMock.close()).andReturn(null).anyTimes();
     XWikiDocument myDoc = new XWikiDocument(testDocRef);
     expectXWikiDocLoad(sessionMock, myDoc);
-    expectLoadEmptyAttachmentList(sessionMock);
-    expectBaseObjectLoad(sessionMock);
+    expectLoadAttachments(sessionMock, Collections.<XWikiAttachment>emptyList());
+    expectLoadObjects(sessionMock, getNewObjList(testDocRef));
+    expectLoadProperties(sessionMock, baseObjMap.get(testDocRef), propertiesMap);
   }
 
   /**
@@ -399,80 +393,15 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
         failMessgs.toArray()), futureList.size(), successfulRuns);
   }
 
-  private void expectBaseObjectLoad(Session sessionMock) {
-    String loadBaseObjectHql = "from BaseObject as bobject where bobject.name = :name order by "
-        + "bobject.number";
-    Query queryObj = new TestQuery<>(loadBaseObjectHql, new QueryList<BaseObject>() {
-
-      @Override
-      public List<BaseObject> list(String string, Map<String, Object> params)
-          throws HibernateException {
-        DocumentReference theDocRef = webUtilsService.resolveDocumentReference((String) params.get(
-            "name"));
-        List<BaseObject> attList = new ArrayList<>();
-        for (BaseObject templBaseObject : baseObjMap.get(theDocRef)) {
-          BaseObject bObj = createBaseObject(templBaseObject.getNumber(),
-              templBaseObject.getXClassReference());
-          bObj.setDocumentReference(theDocRef);
-          attList.add(bObj);
-        }
-        return attList;
-      }
-
-    });
-    expect(sessionMock.createQuery(eq(loadBaseObjectHql))).andReturn(queryObj).anyTimes();
-    expectPropertiesLoad(sessionMock);
-  }
-
-  private void expectPropertiesLoad(Session sessionMock) {
-    String loadPropHql = "select prop.name, prop.classType from BaseProperty as prop where "
-        + "prop.id.id = :id";
-    Query queryProp = new TestQuery<>(loadPropHql, new QueryList<String[]>() {
-
-      @Override
-      public List<String[]> list(String string, Map<String, Object> params)
-          throws HibernateException {
-        return propertiesMap.get(params.get("id"));
-      }
-
-    });
-    expect(sessionMock.createQuery(eq(loadPropHql))).andReturn(queryProp).atLeastOnce();
-    sessionMock.load(isA(PropertyInterface.class), isA(Serializable.class));
-    expectLastCall().andAnswer(new IAnswer<Object>() {
-
-      @Override
-      public Object answer() throws Throwable {
-        BaseProperty property = (BaseProperty) getCurrentArguments()[0];
-        Integer objId = property.getObject().getId();
-        for (BaseObject templBaseObject : baseObjMap.get(testDocRef)) {
-          if (objId.equals(templBaseObject.getId())) {
-            for (Object theObj : templBaseObject.getFieldList()) {
-              BaseProperty theField = (BaseProperty) theObj;
-              if (theField.getName().equals(property.getName()) && theField.getClass().equals(
-                  property.getClass())) {
-                property.setValue(theField.getValue());
-              }
-            }
-          }
-        }
-        return this;
-      }
-    }).atLeastOnce();
-  }
-
-  private void expectLoadEmptyAttachmentList(Session sessionMock) {
-    String loadAttachmentHql = "from XWikiAttachment as attach where attach.docId=:docid";
-    Query query = new TestQuery<>(loadAttachmentHql, new QueryList<XWikiAttachment>() {
-
-      @Override
-      public List<XWikiAttachment> list(String string, Map<String, Object> params)
-          throws HibernateException {
-        List<XWikiAttachment> attList = new ArrayList<>();
-        return attList;
-      }
-
-    });
-    expect(sessionMock.createQuery(eq(loadAttachmentHql))).andReturn(query).anyTimes();
+  private List<BaseObject> getNewObjList(DocumentReference fromDocRef) {
+    List<BaseObject> objList = new ArrayList<>();
+    for (BaseObject templBaseObject : baseObjMap.get(fromDocRef)) {
+      BaseObject bObj = createBaseObject(templBaseObject.getNumber(),
+          templBaseObject.getXClassReference());
+      bObj.setDocumentReference(fromDocRef);
+      objList.add(bObj);
+    }
+    return objList;
   }
 
   private void expectXWikiDocLoad(Session sessionMock, XWikiDocument myDoc) {
@@ -765,86 +694,6 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
     bObj.setXClassReference(new DocumentReference(classRef.clone()));
     bObj.setNumber(num);
     return bObj;
-  }
-
-  private interface QueryList<T> {
-
-    public List<T> list(String string, Map<String, Object> params) throws HibernateException;
-
-  }
-
-  private class TestQuery<T> extends AbstractQueryImpl {
-
-    private Query theQueryMock;
-    private QueryList<T> listStub;
-    private Map<String, Object> params;
-
-    public TestQuery(String queryStr, QueryList<T> listStub) {
-      super(queryStr, FlushMode.AUTO, null, null);
-      this.listStub = listStub;
-      this.params = new HashMap<>();
-      theQueryMock = createMock(Query.class);
-      replay(theQueryMock);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public Iterator iterate() throws HibernateException {
-      return theQueryMock.iterate();
-    }
-
-    @Override
-    public ScrollableResults scroll() throws HibernateException {
-      return theQueryMock.scroll();
-    }
-
-    @Override
-    public ScrollableResults scroll(ScrollMode scrollMode) throws HibernateException {
-      return theQueryMock.scroll(scrollMode);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<T> list() throws HibernateException {
-      if (listStub != null) {
-        return listStub.list(getQueryString(), params);
-      }
-      return theQueryMock.list();
-    }
-
-    @Override
-    public Query setText(String named, String val) {
-      this.params.put(named, val);
-      return this;
-    }
-
-    @Override
-    public Query setInteger(String named, int val) {
-      this.params.put(named, new Integer(val));
-      return this;
-    }
-
-    @Override
-    public Query setLong(String named, long val) {
-      this.params.put(named, new Long(val));
-      return this;
-    }
-
-    @Override
-    public int executeUpdate() throws HibernateException {
-      return theQueryMock.executeUpdate();
-    }
-
-    @Override
-    public Query setLockMode(String alias, LockMode lockMode) {
-      return theQueryMock.setLockMode(alias, lockMode);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    protected Map getLockModes() {
-      throw new UnsupportedOperationException("getLockModes not supported");
-    }
   }
 
   private class TestXWiki extends XWiki {
