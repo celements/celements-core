@@ -144,7 +144,8 @@ public class DefaultModelAccessFacadeTest extends AbstractComponentTest {
     XWikiDocument theDoc = modelAccess.getDocument(doc.getDocumentReference(), lang);
     verifyDefault();
     assertNotSame(doc, theDoc);
-    assertEquals(doc.getDocumentReference(), theDoc.getDocumentReference());
+    assertSame("docRef clone is not required anymore due to ImmutableDocumentReference",
+        doc.getDocumentReference(), theDoc.getDocumentReference());
   }
 
   @Test
