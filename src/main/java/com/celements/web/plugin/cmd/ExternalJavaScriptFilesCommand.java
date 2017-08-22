@@ -35,7 +35,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.cmd.PageTypeCommand;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.sajson.Builder;
 import com.celements.web.service.IWebUtilsService;
@@ -190,25 +189,14 @@ public class ExternalJavaScriptFilesCommand {
           context.getDatabase(),
           context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
           "WebPreferences"), context));
-
-      DocumentReference currDocRef = context.getDoc().getDocumentReference();
       PageTypeReference pageTypeDocRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
-          currDocRef);
-      pageTypeDocRef.getConfigName();
+          context.getDoc().getDocumentReference());
       addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-          context.getDatabase(), "PageTypes", currDocRef.getName()), context));
-
+          context.getDatabase(), "PageTypes", pageTypeDocRef.getConfigName()), context));
       XWikiDocument pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
       DocumentReference pageLayoutDocRef = pageLayoutDoc.getDocumentReference();
-      addAllExtJSfilesFromDoc(context.getWiki().getDocument(new DocumentReference(
-          context.getDatabase(), pageLayoutDocRef.getLastSpaceReference().getName(),
-          pageLayoutDocRef.getName()), context));
-
+      addAllExtJSfilesFromDoc(context.getWiki().getDocument(pageLayoutDocRef, context));
       addAllExtJSfilesFromDoc(context.getDoc());
-      XWikiDocument pagetype = getPageTypeDoc(context.getDoc());
-      if (pagetype != null) {
-        addAllExtJSfilesFromDoc(pagetype);
-      }
     }
     notifyExtJavaScriptFileListener();
     String jsIncludes = "";
@@ -247,27 +235,6 @@ public class ExternalJavaScriptFilesCommand {
       }
     }
     return jsIncludes2;
-  }
-
-  private XWikiDocument getPageTypeDoc(XWikiDocument doc) throws XWikiException {
-    LOGGER.trace("entering with doc: '" + ((doc != null) ? doc.getDocumentReference() : "null")
-        + "'");
-    XWikiDocument pagetypeDoc = null;
-    BaseObject obj = doc.getXObject(new DocumentReference(context.getDatabase(),
-        PageTypeCommand.PAGE_TYPE_CLASS_SPACE, PageTypeCommand.PAGE_TYPE_CLASS_DOC));
-    LOGGER.debug("Celements2.PageType object: '" + obj + "'");
-    if ((obj != null) && (obj instanceof BaseObject)) {
-      String pagetypeName = obj.getStringValue("page_type");
-      LOGGER.debug("PageType name is: '" + pagetypeName + "'");
-      if ((pagetypeName != null) && (!pagetypeName.equals(""))) {
-        pagetypeDoc = context.getWiki().getDocument(getWebUtils().resolveDocumentReference(
-            new PageTypeCommand().completePageTypeDocName(pagetypeName)), context);
-      }
-    }
-
-    LOGGER.trace("ending. PageType is: '" + ((pagetypeDoc != null)
-        ? pagetypeDoc.getDocumentReference() : "null") + "'");
-    return pagetypeDoc;
   }
 
   private List<String> getJavaScriptExternalFilePaths(XWikiDocument doc) {
