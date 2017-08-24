@@ -33,6 +33,11 @@ public interface ObjectFetcher<D, O> {
   ObjectQuery<O> getQuery();
 
   /**
+   * @return true if an object to fetch exists
+   */
+  boolean exists();
+
+  /**
    * @return amount of fetched objects
    */
   int count();

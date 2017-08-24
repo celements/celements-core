@@ -44,8 +44,13 @@ public abstract class AbstractObjectFetcher<R extends AbstractObjectFetcher<R, D
   }
 
   @Override
+  public boolean exists() {
+    return count() > 0;
+  }
+
+  @Override
   public int count() {
-    return list().size();
+    return iter().size();
   }
 
   @Override
