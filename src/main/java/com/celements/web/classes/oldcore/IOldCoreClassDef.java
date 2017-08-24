@@ -15,4 +15,15 @@ import com.celements.model.classes.ClassDefinition;
 @ComponentRole
 public interface IOldCoreClassDef extends ClassDefinition {
 
+  static final String CLASS_SPACE = "XWiki";
+
+  static final String FIELD_GROUPS_NAME = "groups";
+  static final String FIELD_GROUPS_PRETTY_NAME = "Groups";
+  static final String FIELD_ACCESSLVL_NAME = "levels";
+  static final String FIELD_ACCESSLVL_PRETTY_NAME = "Levels";
+  static final String FIELD_USERS_NAME = "users";
+  static final String FIELD_USERS_PRETTY_NAME = "Users";
+  static final String FIELD_ALLOW_NAME = "allow";
+  static final String FIELD_ALLOW_PRETTY_NAME = "Allow/Deny";
+
 }
