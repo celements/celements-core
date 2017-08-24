@@ -142,10 +142,9 @@ public abstract class AbstractClassDefinition implements ClassDefinition {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ClassDefinition) {
-      ClassDefinition other = (ClassDefinition) obj;
-      return Objects.equals(this.getClassReference(), other.getClassReference());
+      obj = ((ClassDefinition) obj).getClassReference();
     }
-    return false;
+    return Objects.equals(this.getClassReference(), obj);
   }
 
   @Override
