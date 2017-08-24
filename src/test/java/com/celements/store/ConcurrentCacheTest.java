@@ -257,9 +257,10 @@ public class ConcurrentCacheTest extends AbstractComponentTest {
   }
 
   /**
-   * IMPORTANT: This test shows, that XWikiCacheStore is broken!!!
+   * IMPORTANT: This test shows, that XWikiCacheStore is broken. Increase executeRuns if the test
+   * fails. Commented out from test executions since it doesn't pass reliably, see CELDEV-532
    */
-  @Test
+  // @Test
   public void test_failing_multiThreaded_scenario1_XWikiCacheStore() throws Exception {
     int cores = Runtime.getRuntime().availableProcessors();
     assertTrue("This tests needs real multi core processors, but found " + cores, cores > 1);
