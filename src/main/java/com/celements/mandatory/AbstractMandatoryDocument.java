@@ -23,12 +23,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentLoadException;
+import com.celements.model.access.exception.DocumentSaveException;
+import com.celements.model.context.ModelContext;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,14 +46,15 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
   @Requirement
   protected IModelAccessFacade modelAccess;
 
+  @Requirement
+  protected ModelContext modelContext;
+
   @Requirement("xwikiproperties")
   protected ConfigurationSource xwikiPropConfigSource;
 
-  @Requirement
-  private Execution execution;
-
+  @Deprecated
   protected XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+    return modelContext.getXWikiContext();
   }
 
   public abstract String getName();
@@ -106,8 +108,12 @@ public abstract class AbstractMandatoryDocument implements IMandatoryDocumentRol
 
   protected void saveDoc(XWikiDocument doc, boolean dirty) throws XWikiException {
     if (dirty) {
-      getLogger().info("updated doc '{}' for '{}'", doc, getName());
-      getContext().getWiki().saveDocument(doc, "autocreate mandatory " + getName(), getContext());
+      try {
+        modelAccess.saveDocument(doc, "autocreate mandatory " + getName());
+        getLogger().info("updated doc '{}' for '{}'", doc, getName());
+      } catch (DocumentSaveException exc) {
+        throw new XWikiException(0, 0, "failed to save doc", exc);
+      }
     } else {
       getLogger().debug("is uptodate '{}' for '{}'", doc, getName());
     }
