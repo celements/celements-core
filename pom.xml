@@ -54,6 +54,11 @@
       <version>2.5</version>
       <scope>test</scope>
     </dependency>
+     <dependency>
+       <groupId>com.xpn.xwiki.platform.plugins</groupId>
+       <artifactId>xwiki-plugin-scheduler</artifactId>
+       <scope>provided</scope>
+     </dependency>
   </dependencies>
   <scm>
     <connection>scm:git:git@github.com:celements/celements-core.git</connection>

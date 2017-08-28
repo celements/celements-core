@@ -253,12 +253,8 @@ public class DefaultModelAccessFacade implements IModelAccessFacade {
   private XWikiDocument cloneDoc(XWikiDocument doc) {
     if (doc.isFromCache()) {
       doc = doc.clone();
-      // fix missing docRef clone in XWikiDocument.clone()
-      DocumentReference docRef = new DocumentReference(doc.getDocumentReference());
-      // set invalid docRef first to circumvent equals check in setDocumentReference
-      doc.setDocumentReference(new DocumentReference("$", "$", "$"));
-      doc.setDocumentReference(docRef);
-      doc.setMetaDataDirty(false); // set true by setDocumentReference
+      // missing docRef clone in XWikiDocument.clone() doesn't matter since:
+      // [CELDEV-522] Use ImmutableDocumentReference in DocumentBuilder
       doc.setFromCache(false);
     }
     return doc;

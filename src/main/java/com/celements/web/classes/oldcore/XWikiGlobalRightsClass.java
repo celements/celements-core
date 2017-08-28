@@ -16,10 +16,10 @@ import com.celements.rights.access.EAccessLevel;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 @Singleton
-@Component(XWikiRightsClass.CLASS_DEF_HINT)
-public class XWikiRightsClass extends AbstractClassDefinition implements IOldCoreClassDef {
+@Component(XWikiGlobalRightsClass.CLASS_DEF_HINT)
+public class XWikiGlobalRightsClass extends AbstractClassDefinition implements IOldCoreClassDef {
 
-  public static final String CLASS_NAME = "XWikiRights";
+  public static final String CLASS_NAME = "XWikiGlobalRights";
   public static final String CLASS_FN = CLASS_SPACE + "." + CLASS_NAME;
   public static final String CLASS_DEF_HINT = CLASS_FN;
 

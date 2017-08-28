@@ -2,11 +2,13 @@ package org.xwiki.model.reference;
 
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
+import static java.text.MessageFormat.format;
 
 import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.EntityType;
 
+import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassIdentity;
 import com.celements.model.context.ModelContext;
 import com.google.common.base.Function;
@@ -31,7 +33,10 @@ public class ClassReference extends EntityReference implements ImmutableReferenc
   }
 
   private void checkInit() {
-    checkState(!initialised, "unable to modify already initialised instance");
+    if (initialised) {
+      throw new IllegalStateException(format("unable to modify already initialised {0}: {1}",
+          this.getClass().getSimpleName(), this));
+    }
   }
 
   @Override
@@ -87,6 +92,14 @@ public class ClassReference extends EntityReference implements ImmutableReferenc
   public DocumentReference getDocRef(WikiReference wikiRef) {
     return new ImmutableDocumentReference(getName(), new SpaceReference(getParent().getName(),
         wikiRef));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ClassDefinition) {
+      obj = ((ClassDefinition) obj).getClassReference();
+    }
+    return super.equals(obj);
   }
 
   private static ModelContext getModelContext() {

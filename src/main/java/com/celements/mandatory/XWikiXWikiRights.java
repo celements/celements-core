@@ -25,8 +25,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.model.classes.ClassDefinition;
+import com.celements.web.classes.oldcore.XWikiGlobalRightsClass;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -35,6 +38,9 @@ import com.xpn.xwiki.objects.BaseObject;
 public class XWikiXWikiRights extends AbstractMandatoryDocument {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(XWikiXWikiRights.class);
+
+  @Requirement(XWikiGlobalRightsClass.CLASS_DEF_HINT)
+  private ClassDefinition globalRightsClass;
 
   @Override
   public List<String> dependsOnMandatoryDocuments() {
@@ -95,7 +101,7 @@ public class XWikiXWikiRights extends AbstractMandatoryDocument {
   }
 
   private DocumentReference getGlobalRightsRef() {
-    return new DocumentReference(getWiki(), "XWiki", "XWikiGlobalRights");
+    return globalRightsClass.getClassReference().getDocRef();
   }
 
   @Override
