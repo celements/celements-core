@@ -2,6 +2,7 @@ package org.xwiki.model.reference;
 
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
+import static java.text.MessageFormat.format;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -31,7 +32,10 @@ public class ImmutableDocumentReference extends DocumentReference implements Imm
   }
 
   private void checkInit() {
-    checkState(!initialised, "unable to modify already initialised instance");
+    if (initialised) {
+      throw new IllegalStateException(format("unable to modify already initialised {0}: {1}",
+          this.getClass().getSimpleName(), this));
+    }
   }
 
   @Override
