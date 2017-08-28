@@ -11,7 +11,6 @@ import org.xwiki.model.EntityType;
 import com.celements.model.classes.ClassDefinition;
 import com.celements.model.classes.ClassIdentity;
 import com.celements.model.context.ModelContext;
-import com.celements.model.util.ModelUtils;
 import com.google.common.base.Function;
 import com.xpn.xwiki.web.Utils;
 
@@ -35,7 +34,8 @@ public class ClassReference extends EntityReference implements ImmutableReferenc
 
   private void checkInit() {
     if (initialised) {
-      throw new IllegalStateException(format("unable to modify already initialised {0}", this));
+      throw new IllegalStateException(format("unable to modify already initialised {0}: {1}",
+          this.getClass().getSimpleName(), this));
     }
   }
 
@@ -100,15 +100,6 @@ public class ClassReference extends EntityReference implements ImmutableReferenc
       obj = ((ClassDefinition) obj).getClassReference();
     }
     return super.equals(obj);
-  }
-
-  @Override
-  public String toString() {
-    return "ClassReference [" + getModelUtils().serializeRef(this) + "]";
-  }
-
-  private ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
   }
 
   private static ModelContext getModelContext() {
