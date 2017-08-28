@@ -9,6 +9,7 @@ import org.xwiki.model.EntityType;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
+import com.xpn.xwiki.web.Utils;
 
 public class ClassReferenceTest extends AbstractComponentTest {
 
@@ -129,6 +130,12 @@ public class ClassReferenceTest extends AbstractComponentTest {
     WikiReference wikiRef = new WikiReference("wiki");
     assertEquals(new DocumentReference(wikiRef.getName(), classRef.getParent().getName(),
         classRef.getName()), classRef.getDocRef(wikiRef));
+  }
+
+  @Test
+  public void serialize() {
+    assertEquals("space.class", Utils.getComponent(EntityReferenceSerializer.class).serialize(
+        classRef));
   }
 
 }

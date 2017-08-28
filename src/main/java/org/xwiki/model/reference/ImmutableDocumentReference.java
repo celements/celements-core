@@ -2,10 +2,14 @@ package org.xwiki.model.reference;
 
 import static com.celements.model.util.References.*;
 import static com.google.common.base.Preconditions.*;
+import static java.text.MessageFormat.format;
 
 import javax.annotation.concurrent.Immutable;
 
 import org.xwiki.model.EntityType;
+
+import com.celements.model.util.ModelUtils;
+import com.xpn.xwiki.web.Utils;
 
 @Immutable
 public class ImmutableDocumentReference extends DocumentReference implements ImmutableReference {
@@ -31,7 +35,9 @@ public class ImmutableDocumentReference extends DocumentReference implements Imm
   }
 
   private void checkInit() {
-    checkState(!initialised, "unable to modify already initialised instance");
+    if (initialised) {
+      throw new IllegalStateException(format("unable to modify already initialised {0}", this));
+    }
   }
 
   @Override
@@ -88,6 +94,15 @@ public class ImmutableDocumentReference extends DocumentReference implements Imm
     DocumentReference ret = new DocumentReference(this);
     ret.setChild(getChild());
     return ret;
+  }
+
+  @Override
+  public String toString() {
+    return "ImmutableDocumentReference [" + getModelUtils().serializeRef(this) + "]";
+  }
+
+  private ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }
