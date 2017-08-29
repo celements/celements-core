@@ -22,6 +22,9 @@ package com.celements.web.plugin.cmd;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -202,6 +205,17 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         "WebPreferences");
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
     expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(mainPrefDoc).anyTimes();
+    DocumentReference webHomeDocRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
+    XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).anyTimes();
+    List<String> resultList = Arrays.asList("pageTypes.name1", "pageTypes.name2");
+    expect(xwiki.<String>search(eq(
+        "select doc.fullName from XWikiDocument as doc, BaseObject as obj where "
+            + "doc.space='PageTypes' and doc.translation=0 and obj.name=doc.fullName  and "
+            + "obj.className='Celements2.PageTypeProperties'"), same(context))).andReturn(
+                resultList).atLeastOnce();
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));

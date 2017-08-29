@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -34,12 +37,14 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
 import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.pagetype.PageTypeReference;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.Builder;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -243,9 +248,14 @@ public class ExternalJavaScriptFilesCommand {
     return jsIncludes2;
   }
 
-  private List<String> getJavaScriptExternalFilePaths(XWikiDocument doc) {
-    List<BaseObject> javaScriptFiles = doc.getXObjects(new DocumentReference(context.getDatabase(),
-        JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE, JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC));
+  @NotNull
+  private List<String> getJavaScriptExternalFilePaths(@Nullable XWikiDocument doc) {
+    if (doc == null) {
+      return Collections.emptyList();
+    }
+    List<BaseObject> javaScriptFiles = doc.getXObjects(
+        getOldCoreClasses().getJavaScriptExternalFilesClassRef(
+            doc.getDocumentReference().getWikiReference().getName()));
     Vector<String> jsFiles = new Vector<>();
     if (javaScriptFiles != null) {
       for (Object filepath : javaScriptFiles) {
@@ -274,5 +284,10 @@ public class ExternalJavaScriptFilesCommand {
 
   private XObjectPageTypeUtilsRole getObjectPageTypeUtils() {
     return Utils.getComponent(XObjectPageTypeUtilsRole.class);
+  }
+
+  private OldCoreClasses getOldCoreClasses() {
+    return (OldCoreClasses) Utils.getComponent(IClassCollectionRole.class,
+        "celements.oldCoreClasses");
   }
 }
