@@ -201,13 +201,7 @@ public class ExternalJavaScriptFilesCommand {
         LOGGER.info("Could not get Document with docRef {} ",
             getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
       }
-      XWikiDocument pageLayoutDoc = new PageLayoutCommand().getLayoutPropDoc();
-      DocumentReference pageLayoutDocRef = pageLayoutDoc.getDocumentReference();
-      try {
-        addAllExtJSfilesFromDoc(getModelAccess().getDocument(pageLayoutDocRef));
-      } catch (DocumentNotExistsException exp) {
-        LOGGER.info("Could not get Document with docRef {} ", pageLayoutDocRef, exp);
-      }
+      addAllExtJSfilesFromDoc(new PageLayoutCommand().getLayoutPropDoc());
       addAllExtJSfilesFromDoc(context.getDoc());
     }
     notifyExtJavaScriptFileListener();
