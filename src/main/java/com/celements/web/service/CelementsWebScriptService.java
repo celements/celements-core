@@ -108,6 +108,9 @@ public class CelementsWebScriptService implements ScriptService {
   @Requirement
   IWebUtilsService webUtilsService;
 
+  @Requirement
+  ConfigurationSource configSource;
+
   @Requirement("legacyskin")
   ScriptService legacySkinScriptService;
 
@@ -1078,6 +1081,15 @@ public class CelementsWebScriptService implements ScriptService {
 
   public Splitter getSplitter(String separator) {
     return Splitter.on(Strings.nullToEmpty(separator));
+  }
+
+  public String getSupportLinkURL(String key) {
+    String url = "";
+    url = webUtilsService.getAdminMessageTool().get(key);
+    if (key.equals(url)) {
+      url = configSource.getProperty(key, "");
+    }
+    return url;
   }
 
 }
