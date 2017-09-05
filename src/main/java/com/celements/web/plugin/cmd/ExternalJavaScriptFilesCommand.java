@@ -19,12 +19,12 @@
  */
 package com.celements.web.plugin.cmd;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -76,8 +76,8 @@ public class ExternalJavaScriptFilesCommand {
     this.context = context;
     extJSfileSet = new HashSet<>();
     extJSAttUrlSet = new HashSet<>();
-    extJSfileList = new Vector<>();
-    extJSnotFoundList = new Vector<>();
+    extJSfileList = new ArrayList<>();
+    extJSnotFoundList = new ArrayList<>();
   }
 
   public String addLazyExtJSfile(String jsFile) {
@@ -261,7 +261,7 @@ public class ExternalJavaScriptFilesCommand {
     List<BaseObject> javaScriptFiles = doc.getXObjects(
         getOldCoreClasses().getJavaScriptExternalFilesClassRef(
             doc.getDocumentReference().getWikiReference().getName()));
-    Vector<String> jsFiles = new Vector<>();
+    List<String> jsFiles = new ArrayList<>();
     if (javaScriptFiles != null) {
       for (Object filepath : javaScriptFiles) {
         if ((filepath != null) && (filepath instanceof BaseObject)) {
