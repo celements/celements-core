@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +98,8 @@ public class CelementsWebScriptService implements ScriptService {
   private static final String CEL_GLOBALVAL_PREFIX = "celements.globalvalues.";
 
   private static final String IMAGE_MAP_COMMAND = "com.celements.web.ImageMapCommand";
+
+  private static final String CEL_SUPPORTLINK_URL = "cel_supportLink_url";
 
   private static Logger LOGGER = LoggerFactory.getLogger(CelementsWebScriptService.class);
 
@@ -1083,11 +1087,16 @@ public class CelementsWebScriptService implements ScriptService {
     return Splitter.on(Strings.nullToEmpty(separator));
   }
 
-  public String getSupportLinkURL(String key) {
+  @NotNull
+  public String getSupportLinkURL() {
     String url = "";
-    url = webUtilsService.getAdminMessageTool().get(key);
-    if (key.equals(url)) {
-      url = configSource.getProperty(key, "");
+    url = webUtilsService.getAdminMessageTool().get(CEL_SUPPORTLINK_URL);
+    if (CEL_SUPPORTLINK_URL.equals(url)) {
+      url = configSource.getProperty(CEL_SUPPORTLINK_URL + "_" + webUtilsService.getAdminLanguage(),
+          "");
+      if (url.isEmpty()) {
+        url = configSource.getProperty(CEL_SUPPORTLINK_URL);
+      }
     }
     return url;
   }
