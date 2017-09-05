@@ -1089,13 +1089,12 @@ public class CelementsWebScriptService implements ScriptService {
 
   @NotNull
   public String getSupportLinkURL() {
-    String url = "";
-    url = webUtilsService.getAdminMessageTool().get(CEL_SUPPORTLINK_URL);
-    if (CEL_SUPPORTLINK_URL.equals(url)) {
+    String url = webUtilsService.getAdminMessageTool().get(CEL_SUPPORTLINK_URL);
+    if (url.equals(CEL_SUPPORTLINK_URL)) {
       url = configSource.getProperty(CEL_SUPPORTLINK_URL + "_" + webUtilsService.getAdminLanguage(),
           "");
       if (url.isEmpty()) {
-        url = configSource.getProperty(CEL_SUPPORTLINK_URL);
+        url = configSource.getProperty(CEL_SUPPORTLINK_URL, "");
       }
     }
     return url;
