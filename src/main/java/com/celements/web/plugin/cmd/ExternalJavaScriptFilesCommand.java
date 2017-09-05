@@ -19,23 +19,32 @@
  */
 package com.celements.web.plugin.cmd;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.pagetype.cmd.PageTypeCommand;
+import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.celements.pagetype.xobject.XObjectPageTypeUtilsRole;
 import com.celements.sajson.Builder;
+import com.celements.web.classcollections.OldCoreClasses;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -51,7 +60,7 @@ public class ExternalJavaScriptFilesCommand {
   public static final String JAVA_SCRIPT_EXTERNAL_FILES_CLASS = JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE
       + "." + JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       ExternalJavaScriptFilesCommand.class);
 
   private XWikiContext context;
@@ -61,13 +70,14 @@ public class ExternalJavaScriptFilesCommand {
   private List<String> extJSnotFoundList;
   private boolean displayedAll = false;
   private AttachmentURLCommand attUrlCmd_injected = null;
+  private IPageTypeResolverRole ptResolver_injected = null;
 
   public ExternalJavaScriptFilesCommand(XWikiContext context) {
     this.context = context;
     extJSfileSet = new HashSet<>();
     extJSAttUrlSet = new HashSet<>();
-    extJSfileList = new Vector<>();
-    extJSnotFoundList = new Vector<>();
+    extJSfileList = new ArrayList<>();
+    extJSnotFoundList = new ArrayList<>();
   }
 
   public String addLazyExtJSfile(String jsFile) {
@@ -165,6 +175,10 @@ public class ExternalJavaScriptFilesCommand {
     attUrlCmd_injected = attUrlCmd;
   }
 
+  void injectPageTypeResolver(IPageTypeResolverRole ptResolver) {
+    ptResolver_injected = ptResolver;
+  }
+
   void injectDisplayAll(boolean displayedAll) {
     this.displayedAll = displayedAll;
   }
@@ -188,11 +202,17 @@ public class ExternalJavaScriptFilesCommand {
           context.getDatabase(),
           context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
           "WebPreferences"), context));
-      addAllExtJSfilesFromDoc(context.getDoc());
-      XWikiDocument pagetype = getPageTypeDoc(context.getDoc());
-      if (pagetype != null) {
-        addAllExtJSfilesFromDoc(pagetype);
+      PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
+          context.getDoc().getDocumentReference());
+      try {
+        addAllExtJSfilesFromDoc(getModelAccess().getDocument(
+            getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
+      } catch (DocumentNotExistsException exp) {
+        LOGGER.info("Could not get Document with docRef {} ",
+            getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef), exp);
       }
+      addAllExtJSfilesFromDoc(new PageLayoutCommand().getLayoutPropDoc());
+      addAllExtJSfilesFromDoc(context.getDoc());
     }
     notifyExtJavaScriptFileListener();
     String jsIncludes = "";
@@ -233,31 +253,15 @@ public class ExternalJavaScriptFilesCommand {
     return jsIncludes2;
   }
 
-  private XWikiDocument getPageTypeDoc(XWikiDocument doc) throws XWikiException {
-    LOGGER.trace("entering with doc: '" + ((doc != null) ? doc.getDocumentReference() : "null")
-        + "'");
-    XWikiDocument pagetypeDoc = null;
-    BaseObject obj = doc.getXObject(new DocumentReference(context.getDatabase(),
-        PageTypeCommand.PAGE_TYPE_CLASS_SPACE, PageTypeCommand.PAGE_TYPE_CLASS_DOC));
-    LOGGER.debug("Celements2.PageType object: '" + obj + "'");
-    if ((obj != null) && (obj instanceof BaseObject)) {
-      String pagetypeName = obj.getStringValue("page_type");
-      LOGGER.debug("PageType name is: '" + pagetypeName + "'");
-      if ((pagetypeName != null) && (!pagetypeName.equals(""))) {
-        pagetypeDoc = context.getWiki().getDocument(getWebUtils().resolveDocumentReference(
-            new PageTypeCommand().completePageTypeDocName(pagetypeName)), context);
-      }
+  @NotNull
+  private List<String> getJavaScriptExternalFilePaths(@Nullable XWikiDocument doc) {
+    if (doc == null) {
+      return Collections.emptyList();
     }
-
-    LOGGER.trace("ending. PageType is: '" + ((pagetypeDoc != null)
-        ? pagetypeDoc.getDocumentReference() : "null") + "'");
-    return pagetypeDoc;
-  }
-
-  private List<String> getJavaScriptExternalFilePaths(XWikiDocument doc) {
-    List<BaseObject> javaScriptFiles = doc.getXObjects(new DocumentReference(context.getDatabase(),
-        JAVA_SCRIPT_EXTERNAL_FILES_CLASS_SPACE, JAVA_SCRIPT_EXTERNAL_FILES_CLASS_DOC));
-    Vector<String> jsFiles = new Vector<>();
+    List<BaseObject> javaScriptFiles = doc.getXObjects(
+        getOldCoreClasses().getJavaScriptExternalFilesClassRef(
+            doc.getDocumentReference().getWikiReference().getName()));
+    List<String> jsFiles = new ArrayList<>();
     if (javaScriptFiles != null) {
       for (Object filepath : javaScriptFiles) {
         if ((filepath != null) && (filepath instanceof BaseObject)) {
@@ -275,4 +279,23 @@ public class ExternalJavaScriptFilesCommand {
     return Utils.getComponent(IWebUtilsService.class);
   }
 
+  private IPageTypeResolverRole getPageTypeResolver() {
+    if (ptResolver_injected != null) {
+      return ptResolver_injected;
+    }
+    return Utils.getComponent(IPageTypeResolverRole.class);
+  }
+
+  private IModelAccessFacade getModelAccess() {
+    return Utils.getComponent(IModelAccessFacade.class);
+  }
+
+  private XObjectPageTypeUtilsRole getObjectPageTypeUtils() {
+    return Utils.getComponent(XObjectPageTypeUtilsRole.class);
+  }
+
+  private OldCoreClasses getOldCoreClasses() {
+    return (OldCoreClasses) Utils.getComponent(IClassCollectionRole.class,
+        "celements.oldCoreClasses");
+  }
 }

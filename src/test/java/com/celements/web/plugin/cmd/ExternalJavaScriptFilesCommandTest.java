@@ -22,11 +22,16 @@ package com.celements.web.plugin.cmd;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.pagetype.PageTypeReference;
+import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,6 +43,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
   private XWikiContext context = null;
   private AttachmentURLCommand attUrlCmd = null;
   private XWiki xwiki;
+  IPageTypeResolverRole pageTypeResolverMock;
 
   @Before
   public void setUp_ExternalJavaScriptFilesCommandTest() throws Exception {
@@ -45,6 +51,8 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
     command = new ExternalJavaScriptFilesCommand(context);
     attUrlCmd = createMockAndAddToDefault(AttachmentURLCommand.class);
     command.injectAttUrlCmd(attUrlCmd);
+    pageTypeResolverMock = createMockAndAddToDefault(IPageTypeResolverRole.class);
+    command.injectPageTypeResolver(pageTypeResolverMock);
     xwiki = getWikiMock();
   }
 
@@ -183,8 +191,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_double() throws Exception {
-    context.setDoc(new XWikiDocument(new DocumentReference(context.getDatabase(), "Main",
-        "WebHome")));
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
     String fileNotFound = "celJS/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).anyTimes();
@@ -202,6 +212,55 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         "WebPreferences");
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
     expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(mainPrefDoc).anyTimes();
+    DocumentReference webHomeDocRef = contextDocRef;
+    XWikiDocument webHomeDoc = new XWikiDocument(webHomeDocRef);
+    expect(xwiki.exists(eq(webHomeDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(webHomeDocRef), same(context))).andReturn(webHomeDoc).anyTimes();
+    String pageTypeDocName1 = "PageTypes.Name1";
+    String pageTypeDocName2 = "PageTypes.Name2";
+    List<String> resultList = Arrays.asList(pageTypeDocName1, pageTypeDocName2);
+    expect(xwiki.<String>search(eq(
+        "select doc.fullName from XWikiDocument as doc, BaseObject as obj where "
+            + "doc.space='PageTypes' and doc.translation=0 and obj.name=doc.fullName  and "
+            + "obj.className='Celements2.PageTypeProperties'"), same(context))).andReturn(
+                resultList).anyTimes();
+    DocumentReference pageTypesName2DocRef = new DocumentReference(context.getDatabase(),
+        "PageTypes", "Name2");
+    XWikiDocument pageTypesName2Doc = new XWikiDocument(pageTypesName2DocRef);
+    expect(xwiki.exists(eq(pageTypeDocName2), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(pageTypeDocName2), same(context))).andReturn(
+        pageTypesName2Doc).anyTimes();
+    DocumentReference pageTypesName1DocRef = new DocumentReference(context.getDatabase(),
+        "PageTypes", "Name1");
+    XWikiDocument pageTypesName1Doc = new XWikiDocument(pageTypesName1DocRef);
+    expect(xwiki.exists(eq(pageTypeDocName1), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(pageTypeDocName1), same(context))).andReturn(
+        pageTypesName1Doc).anyTimes();
+    PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
+        Arrays.asList(""));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(contextDocRef)).andReturn(
+        pageTypeRef);
+    DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "TestPageType");
+    XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
+    expect(xwiki.exists(eq(pageTypesDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(pageTypesDocRef), same(context))).andReturn(
+        pageTypesDoc).anyTimes();
+    expect(xwiki.Param("celements.layout.default", "SimpleLayout")).andReturn(
+        "SimpleLayout").once();
+    DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
+    expect(xwiki.exists(eq(simpleLayoutDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(simpleLayoutDocRef), same(context))).andReturn(
+        simpleLayoutDoc).anyTimes();
+    DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutCentralDoc = new XWikiDocument(simpleLayoutDocRef);
+    expect(xwiki.exists(eq(simpleLayoutCentralDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(simpleLayoutCentralDocRef), same(context))).andReturn(
+        simpleLayoutCentralDoc).anyTimes();
+
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(file));
     assertEquals("", command.addExtJSfileOnce(file));
@@ -214,8 +273,10 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
 
   @Test
   public void testAddExtJSfileOnce_beforeGetAll_explicitAndImplicit_double() throws Exception {
-    context.setDoc(new XWikiDocument(new DocumentReference(context.getDatabase(), "Main",
-        "WebHome")));
+    DocumentReference contextDocRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
+    XWikiDocument contextDoc = new XWikiDocument(contextDocRef);
+    context.setDoc(contextDoc);
     String fileNotFound = ":celJS/blabla.js";
     expect(attUrlCmd.getAttachmentURL(eq(fileNotFound), same(context))).andReturn(null).once();
     expect(attUrlCmd.isAttachmentLink(eq(fileNotFound))).andReturn(false).anyTimes();
@@ -237,6 +298,38 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         "WebPreferences");
     XWikiDocument mainPrefDoc = new XWikiDocument(mainPrefDocRef);
     expect(xwiki.getDocument(eq(mainPrefDocRef), same(context))).andReturn(mainPrefDoc).anyTimes();
+
+    PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
+        Arrays.asList(""));
+    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(contextDocRef)).andReturn(
+        pageTypeRef);
+    DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
+        "TestPageType");
+    XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
+    expect(xwiki.exists(eq(pageTypesDocRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(pageTypesDocRef), same(context))).andReturn(
+        pageTypesDoc).atLeastOnce();
+    DocumentReference mainWebHomeDocRef = new DocumentReference(context.getDatabase(), "Main",
+        "WebHome");
+    XWikiDocument mainWebHomeDoc = new XWikiDocument(pageTypesDocRef);
+    expect(xwiki.exists(eq(mainWebHomeDocRef), same(context))).andReturn(true).atLeastOnce();
+    expect(xwiki.getDocument(eq(mainWebHomeDocRef), same(context))).andReturn(
+        mainWebHomeDoc).atLeastOnce();
+    expect(xwiki.Param("celements.layout.default", "SimpleLayout")).andReturn(
+        "SimpleLayout").once();
+    DocumentReference simpleLayoutDocRef = new DocumentReference(context.getDatabase(),
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutDoc = new XWikiDocument(simpleLayoutDocRef);
+    expect(xwiki.exists(eq(simpleLayoutDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(simpleLayoutDocRef), same(context))).andReturn(
+        simpleLayoutDoc).anyTimes();
+    DocumentReference simpleLayoutCentralDocRef = new DocumentReference("celements2web",
+        "SimpleLayout", "WebHome");
+    XWikiDocument simpleLayoutCentralDoc = new XWikiDocument(simpleLayoutDocRef);
+    expect(xwiki.exists(eq(simpleLayoutCentralDocRef), same(context))).andReturn(true).anyTimes();
+    expect(xwiki.getDocument(eq(simpleLayoutCentralDocRef), same(context))).andReturn(
+        simpleLayoutCentralDoc).anyTimes();
+
     replayDefault();
     assertEquals("", command.addExtJSfileOnce(attFileURL, "file"));
     assertEquals("", command.addExtJSfileOnce(attFileURL));
