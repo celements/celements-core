@@ -54,12 +54,14 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   private ClassPackage classPackage;
   private ClassDefinition classDef;
   private ModelMock modelMock;
+  private ConfigurationSource configSrcMock;
 
   @Before
   public void prepareTest() throws Exception {
     modelMock = ModelMock.init();
-    registerComponentMock(ConfigurationSource.class);
+    configSrcMock = registerComponentMock(ConfigurationSource.class);
     creator = Utils.getComponent(XClassCreator.class);
+    assertEquals(DefaultXClassCreator.class, creator.getClass());
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
     classDef = Utils.getComponent(TestClassDefinitionRole.class, TestClassDefinition.NAME);
   }
@@ -155,16 +157,14 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   }
 
   private void expectActive(List<String> ret, String legacy) {
-    expect(getMock(ConfigurationSource.class).getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(
-        ret).anyTimes();
+    expect(configSrcMock.getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(ret).anyTimes();
     expect(getWikiMock().getXWikiPreference(IClassCollectionRole.ACTIVATED_XWIKIPREF,
         getContext())).andReturn(legacy).anyTimes();
     expect(getWikiMock().Param(IClassCollectionRole.ACTIVATED_PARAM)).andReturn("").anyTimes();
   }
 
   private void expectBlacklist(List<String> ret) {
-    expect(getMock(ConfigurationSource.class).getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(
-        ret).anyTimes();
+    expect(configSrcMock.getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(ret).anyTimes();
   }
 
 }
