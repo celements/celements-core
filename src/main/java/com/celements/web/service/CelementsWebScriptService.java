@@ -20,6 +20,7 @@
 package com.celements.web.service;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -1098,6 +1099,17 @@ public class CelementsWebScriptService implements ScriptService {
       }
     }
     return url;
+  }
+
+  public String encodeUrlToUtf8(String url) {
+    String retUrl = "";
+    try {
+      retUrl = new String(url.getBytes("ISO-8859-1"), "UTF-8");
+      // retUrl = URLEncoder.encode(url, "UTF-8");
+    } catch (UnsupportedEncodingException exp) {
+      LOGGER.error("Failed to encode url [" + url + "] to utf-8", exp);
+    }
+    return retUrl;
   }
 
 }
