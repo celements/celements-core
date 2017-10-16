@@ -30,11 +30,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.ClassReference;
+import org.xwiki.test.MockConfigurationSource;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.common.test.ExceptionAsserter;
+import com.celements.configuration.CelementsPropertiesConfigurationSource;
 import com.celements.model.access.ModelMock;
 import com.celements.model.access.ModelMock.DocRecord;
 import com.celements.model.classes.ClassDefinition;
@@ -54,12 +57,12 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   private ClassPackage classPackage;
   private ClassDefinition classDef;
   private ModelMock modelMock;
-  private ConfigurationSource configSrcMock;
+  private MockConfigurationSource configSrcMock;
 
   @Before
   public void prepareTest() throws Exception {
     modelMock = ModelMock.init();
-    configSrcMock = registerComponentMock(ConfigurationSource.class);
+    configSrcMock = getConfigurationSource();
     creator = Utils.getComponent(XClassCreator.class);
     assertEquals(DefaultXClassCreator.class, creator.getClass());
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
@@ -156,15 +159,18 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
     assertEquals(0, record.getSavedCount());
   }
 
-  private void expectActive(List<String> ret, String legacy) {
-    expect(configSrcMock.getProperty(ClassPackage.CFG_SRC_KEY)).andReturn(ret).anyTimes();
+  private void expectActive(List<String> ret, String legacy) throws ComponentRepositoryException {
+    registerComponentMock(ConfigurationSource.class, "wiki", configSrcMock);
+    registerComponentMock(ConfigurationSource.class, CelementsPropertiesConfigurationSource.NAME,
+        configSrcMock);
+    configSrcMock.setProperty(ClassPackage.CFG_SRC_KEY, ret);
     expect(getWikiMock().getXWikiPreference(IClassCollectionRole.ACTIVATED_XWIKIPREF,
         getContext())).andReturn(legacy).anyTimes();
     expect(getWikiMock().Param(IClassCollectionRole.ACTIVATED_PARAM)).andReturn("").anyTimes();
   }
 
   private void expectBlacklist(List<String> ret) {
-    expect(configSrcMock.getProperty(ClassDefinition.CFG_SRC_KEY)).andReturn(ret).anyTimes();
+    configSrcMock.setProperty(ClassDefinition.CFG_SRC_KEY, ret);
   }
 
 }
