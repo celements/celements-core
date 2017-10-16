@@ -22,6 +22,7 @@ package com.celements.web.service;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1101,15 +1102,15 @@ public class CelementsWebScriptService implements ScriptService {
     return url;
   }
 
-  public String encodeUrlToUtf8(String url) {
-    String retUrl = "";
+  public String encodeUrlToUtf8(String urlStr) {
+    urlStr = urlStr.replaceAll("http://", "");
     try {
-      retUrl = new String(url.getBytes("ISO-8859-1"), "UTF-8");
-      // retUrl = URLEncoder.encode(url, "UTF-8");
+      urlStr = URLEncoder.encode(urlStr, "UTF-8");
     } catch (UnsupportedEncodingException exp) {
-      LOGGER.error("Failed to encode url [" + url + "] to utf-8", exp);
+      LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
     }
-    return retUrl;
+    urlStr = "http://" + urlStr;
+    return urlStr;
   }
 
 }
