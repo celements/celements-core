@@ -1117,14 +1117,10 @@ public class CelementsWebScriptService implements ScriptService {
 
   public void sendRedirect(String urlStr) {
     try {
-      System.out.println(
-          "<<<<<<<<<<<<<<<<<<<<<<<<<< CelementsWebScriptService sendRedirect urlStr: "
-              + encodeUrlToUtf8(urlStr));
       getContext().getResponse().sendRedirect(encodeUrlToUtf8(urlStr));
     } catch (IOException exp) {
       LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
     }
-    ;
   }
 
 }
