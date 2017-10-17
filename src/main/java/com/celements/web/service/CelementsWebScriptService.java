@@ -19,6 +19,7 @@
  */
 package com.celements.web.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -1103,8 +1104,6 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String encodeUrlToUtf8(String urlStr) {
-    System.out.println(
-        "<<<<<<<<<<<<<<<<<<<<<<<<<< 1 CelementsWebScriptService encodeUrlToUtf8 urlStr: " + urlStr);
     urlStr = urlStr.replaceAll("http://", "");
     try {
       urlStr = URLEncoder.encode(urlStr, "UTF-8");
@@ -1112,9 +1111,20 @@ public class CelementsWebScriptService implements ScriptService {
       LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
     }
     urlStr = "http://" + urlStr;
-    System.out.println(
-        "<<<<<<<<<<<<<<<<<<<<<<<<<< 2 CelementsWebScriptService encodeUrlToUtf8 urlStr: " + urlStr);
+    getContext().getResponse();
     return urlStr;
+  }
+
+  public void sendRedirect(String urlStr) {
+    try {
+      System.out.println(
+          "<<<<<<<<<<<<<<<<<<<<<<<<<< CelementsWebScriptService sendRedirect urlStr: "
+              + encodeUrlToUtf8(urlStr));
+      getContext().getResponse().sendRedirect(encodeUrlToUtf8(urlStr));
+    } catch (IOException exp) {
+      LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
+    }
+    ;
   }
 
 }
