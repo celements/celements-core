@@ -1111,7 +1111,6 @@ public class CelementsWebScriptService implements ScriptService {
       LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
     }
     urlStr = "http://" + urlStr;
-    getContext().getResponse();
     return urlStr;
   }
 
