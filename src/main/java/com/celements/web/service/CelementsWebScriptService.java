@@ -1103,6 +1103,8 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String encodeUrlToUtf8(String urlStr) {
+    System.out.println(
+        "<<<<<<<<<<<<<<<<<<<<<<<<<< 1 CelementsWebScriptService encodeUrlToUtf8 urlStr: " + urlStr);
     urlStr = urlStr.replaceAll("http://", "");
     try {
       urlStr = URLEncoder.encode(urlStr, "UTF-8");
@@ -1110,6 +1112,8 @@ public class CelementsWebScriptService implements ScriptService {
       LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
     }
     urlStr = "http://" + urlStr;
+    System.out.println(
+        "<<<<<<<<<<<<<<<<<<<<<<<<<< 2 CelementsWebScriptService encodeUrlToUtf8 urlStr: " + urlStr);
     return urlStr;
   }
 
