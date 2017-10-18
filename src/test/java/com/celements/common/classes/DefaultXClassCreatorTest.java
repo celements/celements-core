@@ -63,6 +63,9 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   public void prepareTest() throws Exception {
     modelMock = ModelMock.init();
     configSrcMock = getConfigurationSource();
+    registerComponentMock(ConfigurationSource.class, "wiki", configSrcMock);
+    registerComponentMock(ConfigurationSource.class, CelementsPropertiesConfigurationSource.NAME,
+        configSrcMock);
     creator = Utils.getComponent(XClassCreator.class);
     assertEquals(DefaultXClassCreator.class, creator.getClass());
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
@@ -160,9 +163,6 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   }
 
   private void expectActive(List<String> ret, String legacy) throws ComponentRepositoryException {
-    registerComponentMock(ConfigurationSource.class, "wiki", configSrcMock);
-    registerComponentMock(ConfigurationSource.class, CelementsPropertiesConfigurationSource.NAME,
-        configSrcMock);
     configSrcMock.setProperty(ClassPackage.CFG_SRC_KEY, ret);
     expect(getWikiMock().getXWikiPreference(IClassCollectionRole.ACTIVATED_XWIKIPREF,
         getContext())).andReturn(legacy).anyTimes();
