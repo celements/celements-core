@@ -1115,18 +1115,15 @@ public class CelementsWebScriptService implements ScriptService {
         LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
       }
       urlStr = protocol + urlStr;
-    } else {
-      try {
-        urlStr = URLEncoder.encode(urlStr, "UTF-8");
-      } catch (UnsupportedEncodingException exp) {
-        LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
-      }
     }
     return urlStr;
   }
 
   public void sendRedirect(String urlStr) {
     try {
+      System.out.println(
+          "<<<<<<<<<<<<<<<<<<<< CelementsWebScriptService sendRedirect encodeUrlToUtf8(urlStr): "
+              + encodeUrlToUtf8(urlStr));
       getContext().getResponse().sendRedirect(encodeUrlToUtf8(urlStr));
     } catch (IOException exp) {
       LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
