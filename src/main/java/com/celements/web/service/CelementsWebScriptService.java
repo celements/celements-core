@@ -1104,13 +1104,18 @@ public class CelementsWebScriptService implements ScriptService {
   }
 
   public String encodeUrlToUtf8(String urlStr) {
-    urlStr = urlStr.replaceAll("http://", "");
-    try {
-      urlStr = URLEncoder.encode(urlStr, "UTF-8");
-    } catch (UnsupportedEncodingException exp) {
-      LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
+    String pattern = "://";
+    int findIndex = urlStr.indexOf(pattern);
+    if (findIndex > 0) {
+      String protocol = urlStr.substring(0, findIndex + pattern.length());
+      String mainUrl = urlStr.substring(findIndex + pattern.length(), urlStr.length());
+      try {
+        urlStr = URLEncoder.encode(mainUrl, "UTF-8");
+      } catch (UnsupportedEncodingException exp) {
+        LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
+      }
+      urlStr = protocol + urlStr;
     }
-    urlStr = "http://" + urlStr;
     return urlStr;
   }
 
