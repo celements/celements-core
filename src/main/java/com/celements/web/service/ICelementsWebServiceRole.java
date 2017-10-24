@@ -36,7 +36,7 @@ public interface ICelementsWebServiceRole {
 
   public boolean writeUTF8Response(String filename, String renderDocFullName);
 
-  void sendRedirect(String urlStr);
+  public void sendRedirect(String urlStr);
 
-  String encodeUrlToUtf8(String urlStr);
+  public String encodeUrlToUtf8(String urlStr);
 }
