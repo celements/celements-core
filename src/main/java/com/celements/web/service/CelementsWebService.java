@@ -2,6 +2,7 @@ package com.celements.web.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -287,4 +288,31 @@ public class CelementsWebService implements ICelementsWebServiceRole {
   public void setSupportedAdminLanguages(List<String> supportedAdminLangList) {
     this.supportedAdminLangList = supportedAdminLangList;
   }
+
+  @Override
+  public String encodeUrlToUtf8(String urlStr) {
+    String pattern = "://";
+    int findIndex = urlStr.indexOf(pattern);
+    if (findIndex > 0) {
+      String urlPrefix = urlStr.substring(0, findIndex + pattern.length());
+      String mainUrl = urlStr.substring(findIndex + pattern.length());
+      try {
+        urlStr = URLEncoder.encode(mainUrl, "UTF-8");
+      } catch (UnsupportedEncodingException exp) {
+        _LOGGER.error("Failed to encode url [" + urlStr + "] to utf-8", exp);
+      }
+      urlStr = urlPrefix + urlStr;
+    }
+    return urlStr;
+  }
+
+  @Override
+  public void sendRedirect(String urlStr) {
+    try {
+      getContext().getResponse().sendRedirect(encodeUrlToUtf8(urlStr));
+    } catch (IOException exp) {
+      _LOGGER.error("Failed to redirect to url [" + urlStr + "]", exp);
+    }
+  }
+
 }

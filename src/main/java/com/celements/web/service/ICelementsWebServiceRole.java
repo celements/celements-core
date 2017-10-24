@@ -35,4 +35,8 @@ public interface ICelementsWebServiceRole {
   public void setSupportedAdminLanguages(List<String> supportedAdminLangList);
 
   public boolean writeUTF8Response(String filename, String renderDocFullName);
+
+  void sendRedirect(String urlStr);
+
+  String encodeUrlToUtf8(String urlStr);
 }
