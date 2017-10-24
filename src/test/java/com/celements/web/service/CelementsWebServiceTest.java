@@ -146,4 +146,13 @@ public class CelementsWebServiceTest extends AbstractComponentTest {
     assertEquals(otherGroups, obj4.getStringValue(XWikiRightsClass.FIELD_GROUPS.getName()));
   }
 
+  @Test
+  public void testEncodeUrlToUtf8() throws Exception {
+    String url = "http://www.üparties.ch";
+    replayDefault();
+    String ret = service.encodeUrlToUtf8(url);
+    verifyDefault();
+    assertEquals("http://www.%C3%BCparties.ch", ret);
+  }
+
 }
