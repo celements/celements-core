@@ -202,8 +202,7 @@ public class ExternalJavaScriptFilesCommand {
           context.getDatabase(),
           context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
           "WebPreferences"), context));
-      PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForDocWithDefault(
-          context.getDoc().getDocumentReference());
+      PageTypeReference pageTypeRef = getPageTypeResolver().getPageTypeRefForCurrentDoc();
       try {
         addAllExtJSfilesFromDoc(getModelAccess().getDocument(
             getObjectPageTypeUtils().getDocRefForPageType(pageTypeRef)));
