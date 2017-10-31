@@ -238,8 +238,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
         pageTypesName1Doc).anyTimes();
     PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
         Arrays.asList(""));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(contextDocRef)).andReturn(
-        pageTypeRef);
+    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(pageTypeRef);
     DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
         "TestPageType");
     XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
@@ -301,8 +300,7 @@ public class ExternalJavaScriptFilesCommandTest extends AbstractBridgedComponent
 
     PageTypeReference pageTypeRef = new PageTypeReference("TestPageType", "providerHint",
         Arrays.asList(""));
-    expect(pageTypeResolverMock.getPageTypeRefForDocWithDefault(contextDocRef)).andReturn(
-        pageTypeRef);
+    expect(pageTypeResolverMock.getPageTypeRefForCurrentDoc()).andReturn(pageTypeRef);
     DocumentReference pageTypesDocRef = new DocumentReference(context.getDatabase(), "PageTypes",
         "TestPageType");
     XWikiDocument pageTypesDoc = new XWikiDocument(pageTypesDocRef);
