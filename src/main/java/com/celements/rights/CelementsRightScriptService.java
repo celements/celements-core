@@ -1,20 +1,19 @@
 package com.celements.rights;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.RightsAccessScriptService;
 import com.celements.rights.publication.EPubUnpub;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * @deprecated use RightsAccessScriptService instead
@@ -23,17 +22,23 @@ import com.xpn.xwiki.web.Utils;
 @Deprecated
 public class CelementsRightScriptService implements ScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      CelementsRightScriptService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(CelementsRightScriptService.class);
 
   @Requirement(RightsAccessScriptService.NAME)
-  ScriptService rightsAccess;
+  private ScriptService rightsAccess;
 
   @Requirement
-  Execution execution;
+  private ModelUtils modelUtils;
 
-  private RightsAccessScriptService getRightsAccess() {
-    return (RightsAccessScriptService) rightsAccess;
+  @Requirement
+  private ModelContext modelContext;
+
+  /**
+   * @deprecated instead use {@link #modelContext}
+   */
+  @Deprecated
+  private XWikiContext getContext() {
+    return modelContext.getXWikiContext();
   }
 
   /**
@@ -49,7 +54,7 @@ public class CelementsRightScriptService implements ScriptService {
    */
   @Deprecated
   public boolean hasAccessLevelPublished(String right, String username, DocumentReference docname) {
-    return hasAccessLevel(right, username, getWebUtils().getRefLocalSerializer().serialize(docname),
+    return hasAccessLevel(right, username, modelUtils.serializeRefLocal(docname),
         EPubUnpub.PUBLISHED);
   }
 
@@ -59,7 +64,7 @@ public class CelementsRightScriptService implements ScriptService {
   @Deprecated
   public boolean hasAccessLevelUnpublished(String right, String username,
       DocumentReference docname) {
-    return hasAccessLevel(right, username, getWebUtils().getRefLocalSerializer().serialize(docname),
+    return hasAccessLevel(right, username, modelUtils.serializeRefLocal(docname),
         EPubUnpub.UNPUBLISHED);
   }
 
@@ -84,11 +89,8 @@ public class CelementsRightScriptService implements ScriptService {
     }
   }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  private RightsAccessScriptService getRightsAccess() {
+    return (RightsAccessScriptService) rightsAccess;
   }
 
-  private IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
-  }
 }

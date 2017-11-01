@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
-import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Optional;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -26,13 +26,17 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
   IEntityReferenceRandomCompleterRole randomCompleter;
 
   @Requirement
-  private IWebUtilsService webUtilsService;
+  private ModelUtils modelUtils;
 
   @Requirement
-  private Execution execution;
+  private ModelContext modelContext;
 
+  /**
+   * @deprecated instead use {@link #modelContext}
+   */
+  @Deprecated
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    return modelContext.getXWikiContext();
   }
 
   @Override
@@ -67,9 +71,9 @@ public class DefaultRightsAccessFacade implements IRightsAccessFacadeRole {
     }
     if ((docRef != null) && (level != null)) {
       try {
-        ret = getRightsService().hasAccessLevel(level.getIdentifier(), (user != null
-            ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME), webUtilsService.serializeRef(
-                docRef), getContext());
+        String userName = (user != null ? user.getUser() : XWikiRightService.GUEST_USER_FULLNAME);
+        ret = getRightsService().hasAccessLevel(level.getIdentifier(), userName,
+            modelUtils.serializeRef(docRef), getContext());
       } catch (XWikiException xwe) {
         // already being catched in XWikiRightServiceImpl.hasAccessLevel()
         LOGGER.error("should not happen", xwe);

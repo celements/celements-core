@@ -13,11 +13,13 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.context.ModelContext;
+import com.celements.model.util.References;
 import com.celements.web.classcollections.DocumentDetailsClasses;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -31,9 +33,6 @@ public class PublicationService implements IPublicationServiceRole {
   IClassCollectionRole documentDetailsClasses;
 
   @Requirement
-  IWebUtilsService webUtilsService;
-
-  @Requirement
   private DocumentAccessBridge documentAccessBridge;
 
   @Requirement
@@ -42,8 +41,15 @@ public class PublicationService implements IPublicationServiceRole {
   @Requirement
   private Execution execution;
 
+  @Requirement
+  private ModelContext modelContext;
+
+  /**
+   * @deprecated instead use {@link #modelContext}
+   */
+  @Deprecated
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    return modelContext.getXWikiContext();
   }
 
   @Override
@@ -89,7 +95,8 @@ public class PublicationService implements IPublicationServiceRole {
 
   DocumentReference getPublicationClassReference(EntityReference entityRef) {
     return ((DocumentDetailsClasses) documentDetailsClasses).getDocumentPublicationClassRef(
-        webUtilsService.getWikiRef(entityRef).getName());
+        References.extractRef(entityRef, WikiReference.class).or(
+            modelContext.getWikiRef()).getName());
   }
 
   @Override
