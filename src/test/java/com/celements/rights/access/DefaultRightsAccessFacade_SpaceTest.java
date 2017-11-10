@@ -15,8 +15,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.model.util.ModelUtils;
 import com.celements.rights.access.internal.IEntityReferenceRandomCompleterRole;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -34,7 +34,7 @@ public class DefaultRightsAccessFacade_SpaceTest extends AbstractBridgedComponen
   private XWikiContext context;
   private DefaultRightsAccessFacade rightsAccess;
   private XWikiGroupService groupSrvMock;
-  private IWebUtilsService webUtilsService;
+  private ModelUtils modelUtils;
   private IEntityReferenceRandomCompleterRole randomCompleterMock;
 
   @Before
@@ -43,7 +43,7 @@ public class DefaultRightsAccessFacade_SpaceTest extends AbstractBridgedComponen
     context = getContext();
     xwiki = getWikiMock();
     rightsAccess = (DefaultRightsAccessFacade) Utils.getComponent(IRightsAccessFacadeRole.class);
-    webUtilsService = Utils.getComponent(IWebUtilsService.class);
+    modelUtils = Utils.getComponent(ModelUtils.class);
     XWikiRightService xwikiRightsService = new XWikiRightServiceImpl();
     expect(xwiki.getRightService()).andReturn(xwikiRightsService).anyTimes();
     groupSrvMock = createMockAndAddToDefault(XWikiGroupService.class);
@@ -132,7 +132,7 @@ public class DefaultRightsAccessFacade_SpaceTest extends AbstractBridgedComponen
 
   private void prepareEmptyGroupMembers(XWikiUser user, List<DocumentReference> additionalGroups)
       throws XWikiException {
-    DocumentReference userRef = webUtilsService.resolveDocumentReference(user.getUser());
+    DocumentReference userRef = modelUtils.resolveRef(user.getUser(), DocumentReference.class);
     if (XWikiRightService.GUEST_USER.equals(userRef.getName())) {
       expect(groupSrvMock.getAllGroupsReferencesForMember(eq(userRef), eq(0), eq(0), same(
           context))).andReturn(Collections.<DocumentReference>emptyList()).anyTimes();
