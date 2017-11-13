@@ -55,6 +55,7 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   private XClassCreator creator;
   private ClassPackage classPackage;
+  private TestClassPackageLegacy legacyClassPackage;
   private ClassDefinition classDef;
   private ModelMock modelMock;
   private MockConfigurationSource configSrcMock;
@@ -62,14 +63,30 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     modelMock = ModelMock.init();
-    configSrcMock = getConfigurationSource();
-    registerComponentMock(ConfigurationSource.class, "wiki", configSrcMock);
-    registerComponentMock(ConfigurationSource.class, CelementsPropertiesConfigurationSource.NAME,
-        configSrcMock);
+    configSrcMock = registerCfgSrc();
+    legacyClassPackage = registerLegacyClassPackage();
     creator = Utils.getComponent(XClassCreator.class);
     assertEquals(DefaultXClassCreator.class, creator.getClass());
     classPackage = Utils.getComponent(ClassPackage.class, TestClassPackage.NAME);
     classDef = Utils.getComponent(TestClassDefinitionRole.class, TestClassDefinition.NAME);
+  }
+
+  private MockConfigurationSource registerCfgSrc() throws ComponentRepositoryException {
+    MockConfigurationSource configSrcMock = getConfigurationSource();
+    registerComponentMock(ConfigurationSource.class, "wiki", configSrcMock);
+    registerComponentMock(ConfigurationSource.class, CelementsPropertiesConfigurationSource.NAME,
+        configSrcMock);
+    return configSrcMock;
+  }
+
+  private TestClassPackageLegacy registerLegacyClassPackage() throws ComponentRepositoryException {
+    String legacyName = "legacyClassColl";
+    expect(registerComponentMock(IClassCollectionRole.class, legacyName).getConfigName()).andReturn(
+        legacyName).anyTimes();
+    TestClassPackageLegacy legacyClassPackage = (TestClassPackageLegacy) Utils.getComponent(
+        ClassPackage.class, TestClassPackageLegacy.NAME);
+    legacyClassPackage.setLegacyName(legacyName);
+    return legacyClassPackage;
   }
 
   @Test
@@ -125,11 +142,9 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_legacy() throws Exception {
-    TestClassPackageLegacy classPackage = (TestClassPackageLegacy) Utils.getComponent(
-        ClassPackage.class, TestClassPackageLegacy.NAME);
     DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
 
-    expectActive(Collections.<String>emptyList(), classPackage.getLegacyName());
+    expectActive(Collections.<String>emptyList(), legacyClassPackage.getLegacyName());
     expectBlacklist(Collections.<String>emptyList());
 
     replayDefault();
@@ -141,12 +156,10 @@ public class DefaultXClassCreatorTest extends AbstractComponentTest {
 
   @Test
   public void test_createXClasses_legacy_illegalName() throws Exception {
-    TestClassPackageLegacy classPackage = (TestClassPackageLegacy) Utils.getComponent(
-        ClassPackage.class, TestClassPackageLegacy.NAME);
-    classPackage.setLegacyName("asdf");
+    legacyClassPackage.setLegacyName("asdf");
     DocRecord record = modelMock.registerDoc(classDef.getClassReference().getDocRef());
 
-    expectActive(Collections.<String>emptyList(), classPackage.getLegacyName());
+    expectActive(Collections.<String>emptyList(), legacyClassPackage.getLegacyName());
     expectBlacklist(Collections.<String>emptyList());
 
     replayDefault();
