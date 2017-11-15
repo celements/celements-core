@@ -29,6 +29,7 @@ public interface ModelContext {
    *
    * @return the old, discouraged {@link XWikiContext}
    */
+  @NotNull
   public XWikiContext getXWikiContext();
 
   /**

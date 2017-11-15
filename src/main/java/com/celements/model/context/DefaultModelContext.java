@@ -1,5 +1,7 @@
 package com.celements.model.context;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.net.URL;
 
 import javax.annotation.Nullable;
@@ -11,6 +13,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -33,6 +37,9 @@ public class DefaultModelContext implements ModelContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelContext.class);
 
+  @Requirement("XWikiStubContextInitializer")
+  private ExecutionContextInitializer stubXWikiContextInitializer;
+
   @Requirement(CelementsFromWikiConfigurationSource.NAME)
   ConfigurationSource wikiConfigSrc;
 
@@ -44,6 +51,22 @@ public class DefaultModelContext implements ModelContext {
 
   @Override
   public XWikiContext getXWikiContext() {
+    XWikiContext context = getXWikiContextFromExecution();
+    if (context == null) {
+      try {
+        stubXWikiContextInitializer.initialize(execution.getContext());
+        context = getXWikiContextFromExecution();
+        // TODO [CELDEV-347] context may still be null at this point, e.g. in first request
+        // see DefaultXWikiStubContextProvider for explanation
+        // see AbstractJob#createJobContext to create context from scratch
+      } catch (ExecutionContextException exc) {
+        new RuntimeException("failed to initialise stub context", exc);
+      }
+    }
+    return checkNotNull(context);
+  }
+
+  private XWikiContext getXWikiContextFromExecution() {
     return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
