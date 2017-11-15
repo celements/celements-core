@@ -44,7 +44,8 @@ public class NoStackTracePatternLayout extends PatternLayout {
 
   private Level getNoStackTraceLevel() {
     String levelName = null;
-    if (Utils.getComponentManager().hasComponent(ConfigurationSource.class)) {
+    if ((Utils.getComponentManager() != null) && Utils.getComponentManager().hasComponent(
+        ConfigurationSource.class)) {
       levelName = Utils.getComponent(ConfigurationSource.class).getProperty(CFG_SRC_KEY_LEVEL);
     }
     return Level.toLevel(levelName, DEFAULT_LEVEL);
