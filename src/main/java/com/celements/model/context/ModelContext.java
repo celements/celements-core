@@ -1,5 +1,7 @@
 package com.celements.model.context;
 
+import java.net.URL;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -73,6 +75,9 @@ public interface ModelContext {
   public Optional<XWikiRequest> getRequest();
 
   @NotNull
+  public Optional<String> getRequestParameter(String key);
+
+  @NotNull
   public Optional<XWikiResponse> getResponse();
 
   /**
@@ -88,5 +93,19 @@ public interface ModelContext {
    */
   @NotNull
   public String getDefaultLanguage(@NotNull EntityReference ref);
+
+  /**
+   * @return the current url set in context
+   */
+  @NotNull
+  public Optional<URL> getUrl();
+
+  /**
+   * @param url
+   *          to be set in context
+   * @return the url which was set before
+   */
+  @NotNull
+  public Optional<URL> setUrl(@Nullable URL url);
 
 }

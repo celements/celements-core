@@ -1,7 +1,10 @@
 package com.celements.model.context;
 
+import java.net.URL;
+
 import javax.annotation.Nullable;
 
+import org.python.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -100,6 +103,15 @@ public class DefaultModelContext implements ModelContext {
   }
 
   @Override
+  public Optional<String> getRequestParameter(String name) {
+    Optional<String> ret = Optional.absent();
+    if (getRequest().isPresent()) {
+      ret = Optional.fromNullable(Strings.emptyToNull(getRequest().get().get(name)));
+    }
+    return ret;
+  }
+
+  @Override
   public Optional<XWikiResponse> getResponse() {
     return Optional.fromNullable(getXWikiContext().getResponse());
   }
@@ -164,6 +176,18 @@ public class DefaultModelContext implements ModelContext {
       }
     }
     return ret;
+  }
+
+  @Override
+  public Optional<URL> getUrl() {
+    return Optional.fromNullable(getXWikiContext().getURL());
+  }
+
+  @Override
+  public Optional<URL> setUrl(URL url) {
+    URL oldUrl = getXWikiContext().getURL();
+    getXWikiContext().setURL(url);
+    return Optional.fromNullable(oldUrl);
   }
 
   private ModelUtils getModelUtils() {
